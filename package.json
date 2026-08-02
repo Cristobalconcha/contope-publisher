@@ -1,0 +1,13 @@
+{
+  "name": "open-codesign-wordpress",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Development checks for Open CoDesign Publisher",
+  "scripts": {
+    "check": "node scripts/check.mjs"
+  },
+  "devDependencies": {
+    "php-parser": "3.7.0"
+  }
+}
+

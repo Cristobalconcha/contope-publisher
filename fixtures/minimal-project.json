@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 0,
+  "project": {
+    "id": "santa-luisa-de-palpi",
+    "name": "Santa Luisa de Palpi"
+  },
+  "pages": [
+    {
+      "id": "home",
+      "title": "Inicio",
+      "slug": "inicio",
+      "nodes": [
+        {
+          "id": "home.hero",
+          "type": "section",
+          "children": [
+            {
+              "id": "home.hero.title",
+              "type": "heading",
+              "level": 1,
+              "content": "Santa Luisa de Palpi"
+            },
+            {
+              "id": "home.hero.intro",
+              "type": "paragraph",
+              "content": "Página de prueba importada desde una descripción estructurada."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "faq",
+      "title": "Preguntas frecuentes",
+      "slug": "preguntas-frecuentes",
+      "nodes": [
+        {
+          "id": "faq.title",
+          "type": "heading",
+          "level": 1,
+          "content": "Preguntas frecuentes"
+        }
+      ]
+    },
+    {
+      "id": "contact",
+      "title": "Contacto",
+      "slug": "contacto",
+      "nodes": [
+        {
+          "id": "contact.title",
+          "type": "heading",
+          "level": 1,
+          "content": "Contacto"
+        }
+      ]
+    }
+  ]
+}
+

@@ -1,0 +1,47 @@
+import { readFile, readdir } from 'node:fs/promises';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import parser from 'php-parser';
+
+const pluginRoot = fileURLToPath(new URL('../open-codesign-publisher/', import.meta.url));
+const engine = new parser.Engine({
+  parser: { extractDoc: true, php7: true },
+  ast: { withPositions: true },
+});
+
+async function filesUnder(directory, extension) {
+  const entries = await readdir(directory, { withFileTypes: true });
+  const files = [];
+  for (const entry of entries) {
+    const path = join(directory, entry.name);
+    if (entry.isDirectory()) files.push(...(await filesUnder(path, extension)));
+    else if (entry.name.endsWith(extension)) files.push(path);
+  }
+  return files;
+}
+
+const phpFiles = await filesUnder(pluginRoot, '.php');
+for (const file of phpFiles) {
+  const source = await readFile(file, 'utf8');
+  engine.parseCode(source, file);
+}
+
+const fixturePath = new URL('../fixtures/minimal-project.json', import.meta.url);
+const fixture = JSON.parse(await readFile(fixturePath, 'utf8'));
+if (fixture.schemaVersion !== 0) throw new Error('Unexpected fixture schema version.');
+if (fixture.project?.id !== 'santa-luisa-de-palpi') throw new Error('Unexpected project ID.');
+if (!Array.isArray(fixture.pages) || fixture.pages.length !== 3) {
+  throw new Error('The vertical fixture must contain exactly three pages.');
+}
+const ids = new Set();
+for (const page of fixture.pages) {
+  if (ids.has(page.id)) throw new Error(`Duplicate page ID: ${page.id}`);
+  ids.add(page.id);
+}
+
+const main = await readFile(new URL('../open-codesign-publisher/open-codesign-publisher.php', import.meta.url), 'utf8');
+if (!main.includes('Plugin Name: Open CoDesign Publisher')) {
+  throw new Error('WordPress plugin header is missing.');
+}
+
+console.log(`OK: parsed ${phpFiles.length} PHP files and validated ${fixture.pages.length} fixture pages.`);

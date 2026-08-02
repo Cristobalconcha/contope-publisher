@@ -1,0 +1,10 @@
+/dist/
+/vendor/
+/node_modules/
+/.phpunit.cache/
+/.wordpress-org/
+*.zip
+.env
+.env.*
+!.env.example
+
