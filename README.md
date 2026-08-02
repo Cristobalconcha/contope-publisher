@@ -45,3 +45,14 @@ fixtures/
 3. Abrir **Herramientas → Open CoDesign**.
 4. Importar un documento compatible en modo borrador.
 
+## Despliegue FTPS de desarrollo
+
+El script se limita de forma rígida a `/wp-content/plugins/open-codesign-publisher/` y utiliza `.env.local`.
+
+```powershell
+# Solo muestra el plan
+.\scripts\deploy-ftps.ps1
+
+# Sube y verifica tamaños, sin activar el plugin
+.\scripts\deploy-ftps.ps1 -Apply
+```
