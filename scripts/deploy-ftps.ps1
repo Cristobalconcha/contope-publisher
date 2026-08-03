@@ -91,9 +91,13 @@ if (-not (Test-Path -LiteralPath $pluginRoot -PathType Container)) {
 
 $files = @(Get-ChildItem -LiteralPath $pluginRoot -Recurse -File | Sort-Object FullName)
 if ($files.Count -eq 0) { throw 'El plugin local no contiene archivos.' }
-$unexpected = @($files | Where-Object { $_.Extension -ne '.php' })
+$allowedRuntimePath = '^(open-codesign-publisher\.php|includes/[^/]+\.php|assets/(css|js)/[^/]+\.(css|js)|assets/vendor/grapesjs/(grapes\.min\.(css|js)|LICENSE|README\.md))$'
+$unexpected = @($files | Where-Object {
+    $relative = $_.FullName.Substring($pluginRootPrefix.Length).Replace('\', '/')
+    $relative -notmatch $allowedRuntimePath
+})
 if ($unexpected.Count -gt 0) {
-    throw "El primer despliegue solo admite PHP; archivo inesperado: $($unexpected[0].FullName)"
+    throw "Archivo fuera de la lista segura de despliegue: $($unexpected[0].FullName)"
 }
 
 Write-Output "Modo: $(if ($Apply) { 'APLICAR' } else { 'SIMULACIÓN' })"
