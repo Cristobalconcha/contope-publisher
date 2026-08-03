@@ -1,0 +1,1 @@
+{ "expect": "invalid", "expectedErrors": ["INVALID_REVISION"], "description": "package.revision is an empty string, violating minLength." }

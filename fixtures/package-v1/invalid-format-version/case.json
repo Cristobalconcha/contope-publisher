@@ -1,0 +1,1 @@
+{ "expect": "invalid", "expectedErrors": ["FORMAT_VERSION"], "description": "formatVersion is not the integer const 1." }

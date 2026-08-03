@@ -1,0 +1,1 @@
+{ "expect": "invalid", "expectedErrors": ["INVALID_SIZE"], "description": "A file declares a negative uncompressed size." }

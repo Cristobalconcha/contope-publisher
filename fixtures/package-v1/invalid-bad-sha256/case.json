@@ -1,0 +1,1 @@
+{ "expect": "invalid", "expectedErrors": ["INVALID_SHA256"], "description": "A file sha256 is not 64 lowercase hex characters." }

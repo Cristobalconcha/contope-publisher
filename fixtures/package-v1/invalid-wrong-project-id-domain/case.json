@@ -1,0 +1,1 @@
+{ "expect": "invalid", "expectedErrors": ["PROJECT_ID_FORMAT"], "description": "project.id uses the wrong OCD domain (urn:ocd:package instead of urn:ocd:project)." }

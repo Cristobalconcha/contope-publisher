@@ -1,0 +1,1 @@
+{ "expect": "invalid", "expectedErrors": ["NOT_BOOLEAN"], "description": "capabilities.fullSiteEditing is a string instead of a boolean." }

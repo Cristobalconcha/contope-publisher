@@ -1,0 +1,1 @@
+{ "expect": "invalid", "expectedErrors": ["INVALID_ROLE"], "description": "A file inventory entry declares a role that is not in the fileRole enum (banana). The bad role is on a non-entrypoint file so it does not collide with the entrypoint->role check." }

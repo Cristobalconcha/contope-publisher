@@ -1,0 +1,1 @@
+{ "expect": "invalid", "expectedErrors": ["VERSION_FORMAT"], "description": "requirements.canvas does not match the semver-like version pattern." }

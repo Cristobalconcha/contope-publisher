@@ -1,0 +1,1 @@
+{ "expect": "invalid", "expectedErrors": ["UNKNOWN_FIELD"], "description": "An asset declares a symlink field; v1 rejects unknown fields via additionalProperties:false. (This does NOT imply secrets are detected inside allowed fields.)" }

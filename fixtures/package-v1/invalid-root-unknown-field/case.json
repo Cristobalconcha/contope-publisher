@@ -1,0 +1,1 @@
+{ "expect": "invalid", "expectedErrors": ["UNKNOWN_FIELD"], "description": "An unknown top-level field (unexpected) is rejected by additionalProperties:false at the manifest root." }

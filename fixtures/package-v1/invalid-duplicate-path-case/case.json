@@ -1,0 +1,1 @@
+{ "expect": "invalid", "expectedErrors": ["DUPLICATE_PATH_CASE"], "description": "Two inventory paths differ only by letter case (content/pages.json and content/Pages.json). They are case-unique but collide on case-insensitive filesystems (Windows, macOS default), so the declared inventory is ambiguous." }

@@ -1,0 +1,1 @@
+{ "expect": "invalid", "expectedErrors": ["INVALID_DATE_TIME"], "description": "package.createdAt is not a valid RFC 3339 date-time (space instead of 'T' and no timezone). Enforced by ajv-formats, not approximated." }

@@ -1,0 +1,1 @@
+{ "expect": "invalid", "expectedErrors": ["PATH_NOT_NORMALIZED"], "description": "An absolute path (leading slash) is not portable. The entrypoint value and the inventory entry both violate the rule." }

@@ -1,0 +1,4 @@
+{
+  "expect": "valid",
+  "description": "Complete Santa Luisa de Palpi package: content graph, child theme, WordPress database-state document, fonts and media assets. The sha256 values are format-valid placeholders derived from the declared path, not real byte digests; the packager must recompute them from actual ZIP entries."
+}

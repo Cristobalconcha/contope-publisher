@@ -1,0 +1,1 @@
+{ "expect": "invalid", "expectedErrors": ["ENTRYPOINT_ROLE_MISMATCH"], "description": "The content entrypoint resolves to a file whose role is idml instead of content. Each entrypoint must point at the role that matches its name; content -> idml is rejected." }

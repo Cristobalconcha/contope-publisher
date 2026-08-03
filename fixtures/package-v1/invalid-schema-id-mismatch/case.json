@@ -1,0 +1,1 @@
+{ "expect": "invalid", "expectedErrors": ["SCHEMA_ID_MISMATCH"], "description": "$schema is a foreign URI instead of the exact canonical $id. The $schema property is a const so a manifest cannot silently claim conformance to another contract." }

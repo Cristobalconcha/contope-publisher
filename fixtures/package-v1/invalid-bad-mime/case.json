@@ -1,0 +1,1 @@
+{ "expect": "invalid", "expectedErrors": ["INVALID_MIME"], "description": "An asset declares a MIME type without the type/subtype form." }

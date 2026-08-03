@@ -1,0 +1,1 @@
+{ "expect": "invalid", "expectedErrors": ["INVALID_JSON"], "description": "manifest.json is not valid JSON." }

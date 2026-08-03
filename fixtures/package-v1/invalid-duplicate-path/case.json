@@ -1,0 +1,1 @@
+{ "expect": "invalid", "expectedErrors": ["DUPLICATE_PATH"], "description": "Two file inventory entries share the exact same path." }

@@ -1,0 +1,163 @@
+{
+  "$schema": "https://open-codesign.org/schemas/package/manifest-v1.schema.json",
+  "formatVersion": 1,
+  "package": {
+    "id": "urn:ocd:package:4b3f9c2e-8a7d-4f1e-9b6c-1d2e3f4a5b6c",
+    "revision": "2026-08-02T03:00:00Z",
+    "createdAt": "2026-08-02T03:00:00Z"
+  },
+  "project": {
+    "id": "urn:ocd:project:a1b2c3d4-e5f6-4789-9abc-def012345678",
+    "name": "Santa Luisa de Palpi"
+  },
+  "origin": {
+    "producer": "open-codesign-publisher",
+    "producerVersion": "0.1.0",
+    "siteId": "urn:ocd:site:9c8d7e6f-5a4b-3c2d-1e0f-1234567890ab",
+    "siteUrl": "https://santaluisadepalpi.kpispublicitarios.com",
+    "exportedAt": "2026-08-02T03:00:00Z"
+  },
+  "requirements": {
+    "canvas": "0.1.0",
+    "publisher": "0.1.0",
+    "wordpress": "6.5"
+  },
+  "entrypoints": {
+    "content": "content/pages.json",
+    "theme": "themes/santa-luisa/theme.json",
+    "wordpressState": "wordpress/state.json"
+  },
+  "files": [
+    {
+      "path": "content/pages.json",
+      "role": "content",
+      "size": 18450,
+      "sha256": "706abdea01cb07cfd275d221acac79e3c382df76a549573a319aa4a257f3408f"
+    },
+    {
+      "path": "themes/santa-luisa/theme.json",
+      "role": "theme-config",
+      "size": 1820,
+      "sha256": "613f6ac8ff87c872dcff3e1d9f7bf5b34f49966af2221b75ae7dbff1d6cda9e7"
+    },
+    {
+      "path": "themes/santa-luisa/style.css",
+      "role": "theme-stylesheet",
+      "size": 980,
+      "sha256": "cb86ec8eccd678f173f2c301543a71e0f382d511fc12776f10fb99d6b7a0ebee"
+    },
+    {
+      "path": "themes/santa-luisa/functions.php",
+      "role": "other",
+      "size": 220,
+      "sha256": "fc36b0a4c123be187c4aaa90f5e931d3bd787344f15192a8c8c972f42666a22b"
+    },
+    {
+      "path": "themes/santa-luisa/templates/index.html",
+      "role": "template",
+      "size": 494,
+      "sha256": "0886ee7bc1aa3a49f8a5f9ffb82615338358445416e0262c9b3274a194493e4d"
+    },
+    {
+      "path": "themes/santa-luisa/parts/header.html",
+      "role": "part",
+      "size": 360,
+      "sha256": "f39d4e6469942e731bd8f40964d656cd158da673c13531f17cf8d23b9af0dc49"
+    },
+    {
+      "path": "themes/santa-luisa/parts/footer.html",
+      "role": "part",
+      "size": 280,
+      "sha256": "f9eedd7368b99a924edddb7837f8b23e94878f9c129e5ea6b870b4e1d4a54d32"
+    },
+    {
+      "path": "wordpress/state.json",
+      "role": "wordpress-state",
+      "size": 980,
+      "sha256": "624ed3c3c1ecb26e568825fd42ab1356cc6e3a8d55508f11eeedb6fe5d2cac79"
+    },
+    {
+      "path": "readme.txt",
+      "role": "readme",
+      "size": 210,
+      "sha256": "0b6c9de5868e1d0ee16a64769c6c49f3f8cfa4bf89968e9ecfe8fc3c6bd2ff87"
+    }
+  ],
+  "assets": [
+    {
+      "id": "urn:ocd:asset:0a1b2c3d4e5f60718293a4b5",
+      "path": "assets/banner-familia.jpg",
+      "mime": "image/jpeg",
+      "size": 246318,
+      "sha256": "562189193ea3db4ec7dcae6eee90668f13e75a68d63d6ee7c649edf1f2c04e9a"
+    },
+    {
+      "id": "urn:ocd:asset:1b2c3d4e5f6071829300a4b5",
+      "path": "assets/aerial-0174.jpg",
+      "mime": "image/jpeg",
+      "size": 312400,
+      "sha256": "1a14b6623c339ddb5551f7a03bbd0ae2b4020273555674b250a5b9cde2856aab"
+    },
+    {
+      "id": "urn:ocd:asset:2c3d4e5f6071829300a4b5c6",
+      "path": "assets/aerial-0256.jpg",
+      "mime": "image/jpeg",
+      "size": 298770,
+      "sha256": "53b099694614c66f29d6d47d5b1244a062083a601fc8317b8b122f1246dc6bb4"
+    },
+    {
+      "id": "urn:ocd:asset:3d4e5f6071829300a4b5c6d7",
+      "path": "assets/landscape-9680.jpg",
+      "mime": "image/jpeg",
+      "size": 187622,
+      "sha256": "586452972ca5ade6a99fde1bd6d452a928b7428c053a2c622c04a77ac8580fc8"
+    },
+    {
+      "id": "urn:ocd:asset:4e5f6071829300a4b5c6d7e8",
+      "path": "assets/landscape-9630.jpg",
+      "mime": "image/jpeg",
+      "size": 175300,
+      "sha256": "cc24130472a20c723f9f8f4f529a4abab4b2acd1720fff68d438b1166f9708a9"
+    },
+    {
+      "id": "urn:ocd:asset:5f6071829300a4b5c6d7e8f9",
+      "path": "assets/drone-simulation.mp4",
+      "mime": "video/mp4",
+      "size": 1842390,
+      "sha256": "a583b675d02a88e1391643c9d425d5f643add622e18f59e6d98a8595e5412db1"
+    },
+    {
+      "id": "urn:ocd:asset:6071829300a4b5c6d7e8f9a0",
+      "path": "assets/drone-poster.png",
+      "mime": "image/png",
+      "size": 84210,
+      "sha256": "fd7b3d5d635e80f2b971baac29c3956ae81eaca694e7e634b2d1aec54526e1a1"
+    },
+    {
+      "id": "urn:ocd:asset:71829300a4b5c6d7e8f9a0b1",
+      "path": "assets/fonts/Inter.woff2",
+      "mime": "font/woff2",
+      "size": 96400,
+      "sha256": "0de3c9fdde10378472d248c6dafef53dea82a19791ac097cbbacf2fa18354d52"
+    }
+  ],
+  "capabilities": {
+    "blockEditor": true,
+    "fullSiteEditing": true,
+    "localFonts": true,
+    "networkAccess": false,
+    "requiredBlocks": [
+      "core/columns",
+      "core/column",
+      "core/group",
+      "core/image",
+      "core/video",
+      "core/buttons",
+      "core/button",
+      "core/details",
+      "core/list",
+      "core/separator",
+      "core/spacer"
+    ]
+  }
+}

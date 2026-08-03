@@ -1,0 +1,1 @@
+{ "expect": "invalid", "expectedErrors": ["UNRESOLVED_REFERENCE"], "description": "entrypoints.content points to a path that does not exist in the file inventory." }

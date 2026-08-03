@@ -1,0 +1,1 @@
+{ "expect": "invalid", "expectedErrors": ["PATH_NOT_NORMALIZED"], "description": "A path contains a parent-directory (..) traversal segment." }

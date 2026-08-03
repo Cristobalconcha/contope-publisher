@@ -1,0 +1,1 @@
+{ "expect": "invalid", "expectedErrors": ["INVALID_NAME"], "description": "project.name is an empty string, violating minLength." }

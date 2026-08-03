@@ -1,0 +1,301 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-codesign.org/schemas/package/manifest-v1.schema.json",
+  "title": "Open CoDesign portable site package manifest (format v1)",
+  "description": "Strict contract for the manifest.json file inside a .ocdsite container. The schema validates the declared manifest document only; it cannot inspect ZIP bytes and therefore does not promise protection against ZIP traversal, ZIP bombs, deceptive MIME truth or excessive file counts at extraction time. Those runtime limits are documented in docs/package-format-v1.md and must be enforced by the packager/extractor. Note: additionalProperties:false only rejects UNKNOWN fields; it does NOT detect secrets hidden inside allowed fields, nor executable code (e.g. PHP) declared with a valid role/path. Secret scanning and the executable-code policy are the packager/importer's responsibility (see docs §7).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "formatVersion",
+    "package",
+    "project",
+    "origin",
+    "requirements",
+    "entrypoints",
+    "files",
+    "assets",
+    "capabilities"
+  ],
+  "properties": {
+    "$schema": {
+      "const": "https://open-codesign.org/schemas/package/manifest-v1.schema.json",
+      "description": "Canonical URI of this manifest schema. Optional but, when present, must equal the $id EXACTLY; a foreign $schema is rejected with SCHEMA_ID_MISMATCH so a manifest cannot silently claim conformance to another contract."
+    },
+    "formatVersion": {
+      "type": "integer",
+      "const": 1,
+      "description": "Portable package format version. v1 is the first cross-tool contract and is intentionally independent from the v0 node-graph schemaVersion."
+    },
+    "package": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "revision"],
+      "description": "Identity of THIS package revision. Distinct from the project identity (a project has many package revisions) and from the site identity.",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/ocdPackageId",
+          "description": "Stable, opaque identifier of this package revision. Domain urn:ocd:package. Never a WordPress slug."
+        },
+        "revision": {
+          "$ref": "#/$defs/revision",
+          "description": "Immutable revision of this package contents (timestamp, semver or opaque token)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Optional creation timestamp of this package revision."
+        }
+      }
+    },
+    "project": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name"],
+      "description": "Identity of the Open CoDesign PROJECT this package belongs to. A project can have many package revisions; this is the stable cross-revision identity. Domain urn:ocd:project.",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/ocdProjectId",
+          "description": "Stable, opaque Open CoDesign project identifier. Domain urn:ocd:project. Never a WordPress slug."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "description": "Human-readable project name."
+        }
+      }
+    },
+    "origin": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["producer", "producerVersion"],
+      "properties": {
+        "producer": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80,
+          "description": "Tool that produced the package, e.g. open-codesign-publisher or open-codesign-desktop."
+        },
+        "producerVersion": {
+          "$ref": "#/$defs/version"
+        },
+        "siteId": {
+          "$ref": "#/$defs/ocdSiteId",
+          "description": "Optional stable identifier of the source WordPress site. Domain urn:ocd:site. Distinct from the project identity."
+        },
+        "siteUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "Source site URL when the package was exported from WordPress. Optional."
+        },
+        "exportedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "requirements": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["canvas", "publisher", "wordpress"],
+      "description": "Minimum versions required to reconstruct the site faithfully.",
+      "properties": {
+        "canvas": {
+          "$ref": "#/$defs/version",
+          "description": "Required Open CoDesign Canvas (parent theme engine) version."
+        },
+        "publisher": {
+          "$ref": "#/$defs/version",
+          "description": "Required Open CoDesign Publisher plugin version."
+        },
+        "wordpress": {
+          "$ref": "#/$defs/version",
+          "description": "Minimum WordPress version."
+        }
+      }
+    },
+    "entrypoints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["content", "theme"],
+      "description": "Named references into the file inventory. Every value must resolve to a files[].path and values must be unique. content and theme are required; wordpressState and the Open CoDesign Desktop interchange entrypoints (designModel, desktopSource, idml) are optional.",
+      "properties": {
+        "content": {
+          "$ref": "#/$defs/portablePath",
+          "description": "Pages and blocks document (the editable content graph)."
+        },
+        "theme": {
+          "$ref": "#/$defs/portablePath",
+          "description": "Child theme configuration entry (typically theme.json)."
+        },
+        "wordpressState": {
+          "$ref": "#/$defs/portablePath",
+          "description": "Optional WordPress database-state document (global styles, navigation, page-on-front, saved patterns)."
+        },
+        "designModel": {
+          "$ref": "#/$defs/portablePath",
+          "description": "Optional Open CoDesign design model interchange file (role design-model)."
+        },
+        "desktopSource": {
+          "$ref": "#/$defs/portablePath",
+          "description": "Optional Open CoDesign Desktop source project file (role desktop-source)."
+        },
+        "idml": {
+          "$ref": "#/$defs/portablePath",
+          "description": "Optional IDML (Adobe InDesign Markup) interchange file (role idml), for design-round-trip scenarios."
+        }
+      }
+    },
+    "files": {
+      "type": "array",
+      "description": "Inventory of every non-asset payload file. Paths must be unique within files and across assets.",
+      "items": {
+        "$ref": "#/$defs/fileEntry"
+      }
+    },
+    "assets": {
+      "type": "array",
+      "description": "Media and binary assets. Each asset has a stable OCD identifier, MIME, size and SHA-256. Asset paths must be unique within assets and across files.",
+      "items": {
+        "$ref": "#/$defs/assetEntry"
+      }
+    },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["blockEditor", "fullSiteEditing", "localFonts", "networkAccess", "requiredBlocks"],
+      "description": "Declared runtime needs so an importer can refuse gracefully instead of dropping data silently.",
+      "properties": {
+        "blockEditor": {
+          "type": "boolean",
+          "description": "Requires the WordPress block editor."
+        },
+        "fullSiteEditing": {
+          "type": "boolean",
+          "description": "Requires full-site editing (block themes)."
+        },
+        "localFonts": {
+          "type": "boolean",
+          "description": "Whether fonts are bundled locally. v1 packages should set true so the site works without network fonts."
+        },
+        "networkAccess": {
+          "type": "boolean",
+          "description": "Whether the rendered site needs outbound network access at runtime. v1 packages should set false."
+        },
+        "requiredBlocks": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "description": "Block types the content depends on, so an importer can preflight missing blocks."
+        }
+      }
+    }
+  },
+  "$defs": {
+    "portablePath": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512,
+      "pattern": "^(?:[A-Za-z0-9][A-Za-z0-9._-]*)(?:/[A-Za-z0-9][A-Za-z0-9._-]*)*$",
+      "description": "Relative, POSIX-style, normalized path. Each segment must start with an alphanumeric character (no leading slash, no backslash, no absolute/drive paths, no '.' or '..' segments, no empty segments, no dotfiles, no spaces)."
+    },
+    "ocdPackageId": {
+      "type": "string",
+      "pattern": "^urn:ocd:package:[A-Za-z0-9._-]+$",
+      "description": "Opaque URN identifier of a package revision. Domain urn:ocd:package, deliberately distinct from project and site."
+    },
+    "ocdProjectId": {
+      "type": "string",
+      "pattern": "^urn:ocd:project:[A-Za-z0-9._-]+$",
+      "description": "Opaque URN-form Open CoDesign project identifier. Domain urn:ocd:project. Deliberately not a slug."
+    },
+    "ocdSiteId": {
+      "type": "string",
+      "pattern": "^urn:ocd:site:[A-Za-z0-9._-]+$",
+      "description": "Opaque URN identifier of a WordPress site. Domain urn:ocd:site."
+    },
+    "ocdAssetId": {
+      "type": "string",
+      "pattern": "^urn:ocd:asset:[A-Za-z0-9._-]+$",
+      "description": "Opaque URN-form Open CoDesign asset identifier. Domain urn:ocd:asset."
+    },
+    "revision": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "version": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 40,
+      "pattern": "^[0-9]+(?:\\.[0-9]+){0,3}(?:[-+][A-Za-z0-9._-]+)?$",
+      "description": "Loose semver-like version (1 to 4 numeric groups plus optional pre-release/build tag)."
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "Lowercase SHA-256 hex digest of the file bytes. Format-only: the schema cannot prove the digest matches real bytes inside the ZIP."
+    },
+    "mimeType": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 100,
+      "pattern": "^[a-z0-9!#$&^_.+-]+/[a-z0-9!#$&^_.+-]+$",
+      "description": "Declared MIME type (lowercase). Declared, not verified, against actual bytes."
+    },
+    "fileRole": {
+      "enum": [
+        "manifest",
+        "content",
+        "wordpress-state",
+        "theme-config",
+        "theme-stylesheet",
+        "template",
+        "part",
+        "pattern",
+        "navigation",
+        "fonts",
+        "design-model",
+        "desktop-source",
+        "idml",
+        "readme",
+        "other"
+      ]
+    },
+    "fileEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "role", "size", "sha256"],
+      "properties": {
+        "path": { "$ref": "#/$defs/portablePath" },
+        "role": { "$ref": "#/$defs/fileRole" },
+        "size": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Uncompressed size in bytes."
+        },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "assetEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "path", "mime", "size", "sha256"],
+      "description": "additionalProperties:false rejects declared symlinks (symlink/target fields) and any other UNKNOWN field. It does NOT detect secrets encoded inside ALLOWED fields (path, sha256, id, mime, ...); secret scanning is the packager/importer's responsibility (see docs §7).",
+      "properties": {
+        "id": { "$ref": "#/$defs/ocdAssetId" },
+        "path": { "$ref": "#/$defs/portablePath" },
+        "mime": { "$ref": "#/$defs/mimeType" },
+        "size": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    }
+  }
+}

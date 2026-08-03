@@ -1,0 +1,17 @@
+{
+  "$schema": "https://example.com/different.schema.json",
+  "formatVersion": 1,
+  "package": { "id": "urn:ocd:package:00000000-0000-0000-0000-000000000001", "revision": "r1" },
+  "project": { "id": "urn:ocd:project:00000000-0000-0000-0000-000000000002", "name": "Negative case base" },
+  "origin": { "producer": "open-codesign-publisher", "producerVersion": "0.1.0" },
+  "requirements": { "canvas": "0.1.0", "publisher": "0.1.0", "wordpress": "6.5" },
+  "entrypoints": { "content": "content/pages.json", "theme": "themes/t/theme.json" },
+  "files": [
+    { "path": "content/pages.json", "role": "content", "size": 10, "sha256": "706abdea01cb07cfd275d221acac79e3c382df76a549573a319aa4a257f3408f" },
+    { "path": "themes/t/theme.json", "role": "theme-config", "size": 10, "sha256": "613f6ac8ff87c872dcff3e1d9f7bf5b34f49966af2221b75ae7dbff1d6cda9e7" }
+  ],
+  "assets": [
+    { "id": "urn:ocd:asset:aaaaaaaa", "path": "assets/a.jpg", "mime": "image/jpeg", "size": 10, "sha256": "562189193ea3db4ec7dcae6eee90668f13e75a68d63d6ee7c649edf1f2c04e9a" }
+  ],
+  "capabilities": { "blockEditor": true, "fullSiteEditing": true, "localFonts": true, "networkAccess": false, "requiredBlocks": ["core/image"] }
+}

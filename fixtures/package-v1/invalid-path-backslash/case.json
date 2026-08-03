@@ -1,0 +1,1 @@
+{ "expect": "invalid", "expectedErrors": ["PATH_NOT_NORMALIZED"], "description": "Backslashes are used instead of the POSIX separator. The entrypoint value and the inventory entry both violate the rule." }

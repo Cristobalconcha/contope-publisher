@@ -1,0 +1,1 @@
+{ "expect": "invalid", "expectedErrors": ["DUPLICATE_ID"], "description": "Two assets share the same stable OCD identifier." }

@@ -4,9 +4,13 @@
   "private": true,
   "description": "Development checks for Open CoDesign Publisher",
   "scripts": {
-    "check": "node scripts/check.mjs"
+    "check": "node scripts/check.mjs",
+    "check:package": "node scripts/check-package-v1.mjs"
   },
+  "//devDependencies": "ajv and ajv-formats are development-only MIT-licensed libraries used by scripts/check-package-v1.mjs to validate the .ocdsite v1 manifest against the standards-compliant JSON Schema draft 2020-12 contract in schemas/manifest-v1.schema.json (including date-time and uri formats that a hand-rolled validator would only approximate). They are NOT runtime dependencies: the WordPress plugin/theme never loads them, and they only execute in this local check toolchain. License: ajv MIT, ajv-formats MIT.",
   "devDependencies": {
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
     "php-parser": "3.7.0"
   }
 }

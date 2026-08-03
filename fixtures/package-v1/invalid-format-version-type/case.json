@@ -1,0 +1,1 @@
+{ "expect": "invalid", "expectedErrors": ["FORMAT_VERSION"], "description": "formatVersion has the wrong JSON type (string '1' instead of integer 1). Both the type and const violations collapse to FORMAT_VERSION, not INVALID_SIZE." }

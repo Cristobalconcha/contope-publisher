@@ -1,0 +1,1 @@
+{ "expect": "invalid", "expectedErrors": ["INVALID_URI"], "description": "origin.siteUrl is a bare host without scheme, so it is not a valid absolute URI. Enforced by ajv-formats." }

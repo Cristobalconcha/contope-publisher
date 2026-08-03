@@ -1,0 +1,1 @@
+{ "expect": "invalid", "expectedErrors": ["INVALID_PRODUCER"], "description": "origin.producer is an empty string, violating minLength." }

@@ -1,0 +1,1 @@
+{ "expect": "invalid", "expectedErrors": ["DUPLICATE_BLOCK"], "description": "capabilities.requiredBlocks contains the same block name twice; block names must be unique." }

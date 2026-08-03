@@ -1,0 +1,48 @@
+{
+  "$schema": "https://open-codesign.org/schemas/package/manifest-v1.schema.json",
+  "formatVersion": 1,
+  "package": {
+    "id": "urn:ocd:package:11111111-0000-0000-0000-000000000001",
+    "revision": "2026-08-03T03:00:00Z",
+    "createdAt": "2026-08-03T03:00:00Z"
+  },
+  "project": {
+    "id": "urn:ocd:project:22222222-0000-0000-0000-000000000002",
+    "name": "Open CoDesign desktop interchange sample"
+  },
+  "origin": {
+    "producer": "open-codesign-desktop",
+    "producerVersion": "0.1.0",
+    "siteId": "urn:ocd:site:33333333-0000-0000-0000-000000000003",
+    "siteUrl": "https://desktop.open-codesign.org",
+    "exportedAt": "2026-08-03T03:00:00Z"
+  },
+  "requirements": { "canvas": "0.1.0", "publisher": "0.1.0", "wordpress": "6.5" },
+  "entrypoints": {
+    "content": "content/pages.json",
+    "theme": "themes/proj/theme.json",
+    "wordpressState": "wordpress/state.json",
+    "designModel": "design/model.json",
+    "desktopSource": "source/project.ocd",
+    "idml": "source/book.idml"
+  },
+  "files": [
+    { "path": "content/pages.json", "role": "content", "size": 1024, "sha256": "f9a54a79a4697d08d2ae3081a5170bb89375c473fc1e6c17e1e69caab3832b15" },
+    { "path": "themes/proj/theme.json", "role": "theme-config", "size": 800, "sha256": "f4539a8dd78a594a70385742d25aaea3e267d93891bdb394415ea6ac949bf14f" },
+    { "path": "themes/proj/style.css", "role": "theme-stylesheet", "size": 640, "sha256": "faaf5c07ff441bf73ff87b52cae5c9730184637d7584874b605114ecb9a93137" },
+    { "path": "themes/proj/templates/index.html", "role": "template", "size": 512, "sha256": "f745b8a5f200ef88b8efe01844d1561c2817a98523a0584abff3affa8301591a" },
+    { "path": "themes/proj/parts/header.html", "role": "part", "size": 384, "sha256": "49cd70d333b1ce594a6ca547d03c02dcb99c995150e604b7d5d8c8ce5fdac7c7" },
+    { "path": "themes/proj/patterns/hero.html", "role": "pattern", "size": 460, "sha256": "940da0975e56b0e590035fbe15bbc88c7174c28683bf5a02bcc2eeceafcb98e2" },
+    { "path": "wordpress/state.json", "role": "wordpress-state", "size": 720, "sha256": "435891d82e7016f78d35608142cafbac319d298fee5eabdc9c0180daddd8871e" },
+    { "path": "wordpress/navigation.html", "role": "navigation", "size": 300, "sha256": "e81159da55ad6d3bd3778bb2d9d4b66558e045774b8769deb2bdc7739cdd3907" },
+    { "path": "themes/proj/fonts/Inter.woff2", "role": "fonts", "size": 96400, "sha256": "03684caa52e83356ecffa2f8570f5eb2e8dade5cfadb85933a799bb7d545f73a" },
+    { "path": "design/model.json", "role": "design-model", "size": 2048, "sha256": "7b5ef3dbd7d087b6f32f0c1e2638c9fbb61fe314607ae89f3ac5d6c60e630bb1" },
+    { "path": "source/project.ocd", "role": "desktop-source", "size": 8192, "sha256": "928a144aad623fe8043b356cb0de5efed597448276acbcd4b6c0d23d5dc0db7a" },
+    { "path": "source/book.idml", "role": "idml", "size": 4096, "sha256": "e2eb28668486d573c8dc02cb873b492342e1c35329f7517e121273afc22b3fc2" },
+    { "path": "readme.txt", "role": "readme", "size": 210, "sha256": "9e6e4772050998a5c0dc3c61acf3dab0a7e594566171fa5746d6b62f9598efb6" }
+  ],
+  "assets": [
+    { "id": "urn:ocd:asset:d1f2e3a4b5c60718293a4b5c", "path": "assets/preview.png", "mime": "image/png", "size": 51200, "sha256": "3b3d17d6f24058a70cc60ad2f41e6db640b20510a1fbf88120a50c830e572923" }
+  ],
+  "capabilities": { "blockEditor": true, "fullSiteEditing": true, "localFonts": true, "networkAccess": false, "requiredBlocks": ["core/group", "core/image"] }
+}
