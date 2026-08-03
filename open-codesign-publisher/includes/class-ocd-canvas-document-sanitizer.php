@@ -159,7 +159,6 @@ final class OCD_Canvas_Document_Sanitizer
             'vbscript:' => 'esquemas vbscript:',
             'expression(' => 'expression()',
             '@import' => '@import',
-            'behavior:' => 'behavior:',
             '-moz-binding' => '-moz-binding',
             'data:text/html' => 'data:text/html',
         ];
@@ -167,6 +166,9 @@ final class OCD_Canvas_Document_Sanitizer
             if (strpos($lower, $needle) !== false) {
                 return new WP_Error('ocd_canvas_css_forbidden', sprintf('El CSS no admite %s.', $label));
             }
+        }
+        if (preg_match('/(?:^|[;{])\s*behavior\s*:/i', $css) === 1) {
+            return new WP_Error('ocd_canvas_css_forbidden', 'El CSS no admite la propiedad behavior:.');
         }
 
         $invalid_url = $this->first_invalid_css_url($css);

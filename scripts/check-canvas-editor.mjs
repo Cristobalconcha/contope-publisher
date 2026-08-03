@@ -350,7 +350,7 @@ async function checkAdminSurface() {
 // ---------------------------------------------------------------------------
 
 async function checkSanitizer() {
-  const { ast } = await parsePhp('open-codesign-publisher/includes/class-ocd-canvas-document-sanitizer.php');
+  const { ast, source } = await parsePhp('open-codesign-publisher/includes/class-ocd-canvas-document-sanitizer.php');
   const sanitizer = classOf(ast, 'OCD_Canvas_Document_Sanitizer');
   check(sanitizer !== null, 'Falta la clase OCD_Canvas_Document_Sanitizer.');
   if (!sanitizer) return;
@@ -421,9 +421,13 @@ async function checkSanitizer() {
   check(css !== null, 'Falta sanitize_css().');
   if (css) {
     const values = stringLiterals(css).map((value) => value.toLowerCase());
-    for (const needle of ['javascript:', 'vbscript:', 'expression(', '@import', 'behavior:', 'data:text/html']) {
+    for (const needle of ['javascript:', 'vbscript:', 'expression(', '@import', 'data:text/html']) {
       check(values.includes(needle), `sanitize_css() debe rechazar ${needle}.`);
     }
+    check(
+      source.includes("\\s*behavior\\s*:") && source.includes('preg_match'),
+      'sanitize_css() debe rechazar la propiedad behavior completa sin bloquear scroll-behavior.',
+    );
     check(values.includes('<'), 'sanitize_css() debe rechazar el carácter "<" para no romper contextos HTML.');
     check(
       callNames(css).includes('first_invalid_css_url'),
