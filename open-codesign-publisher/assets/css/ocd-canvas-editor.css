@@ -13,18 +13,27 @@
 }
 
 .ocd-canvas-status {
-    margin-left: 8px;
-    font-style: italic;
+    flex: 1 0 100%;
+    box-sizing: border-box;
+    min-height: 32px;
+    margin: 4px 0 0;
+    padding: 7px 10px;
+    border-left: 4px solid #72aee6;
+    background: #f0f6fc;
+    font-style: normal;
 }
 
 .ocd-canvas-status.is-ok {
     color: #14622c;
-    font-style: normal;
+    border-left-color: #00a32a;
+    background: #edfaef;
 }
 
 .ocd-canvas-status.is-error {
     color: #8a1f11;
-    font-style: normal;
+    border-left-color: #d63638;
+    background: #fcf0f1;
+    font-weight: 600;
 }
 
 .ocd-canvas-meta {

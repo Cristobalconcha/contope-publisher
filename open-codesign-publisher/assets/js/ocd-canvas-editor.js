@@ -231,12 +231,7 @@
 
     function save() {
         setStatus('Guardando…');
-        behaviorApi.refresh();
-        var payload = {
-            project_data: JSON.stringify(editor.getProjectData()),
-            html: serializedHtml(),
-            css: serializedCss()
-        };
+        var payload = snapshot();
         return request(config.saveAction, payload)
             .then(function (doc) {
                 current = doc;
@@ -247,6 +242,15 @@
                 setStatus('No se guardó: ' + error.message, 'error');
                 throw error;
             });
+    }
+
+    function snapshot() {
+        behaviorApi.refresh();
+        return {
+            project_data: JSON.stringify(editor.getProjectData()),
+            html: serializedHtml(),
+            css: serializedCss()
+        };
     }
 
     function reload() {
@@ -458,19 +462,44 @@
 
     function publishPage() {
         var title = document.getElementById('ocd-canvas-page-title');
-        setStatus('Guardando el Canvas antes de publicar…');
-        return save()
-            .then(function () {
-                setStatus('Publicando página…');
-                return request(config.publishAction, { title: title ? title.value : '' });
-            })
+        var button = document.getElementById('ocd-canvas-publish');
+        var previewWindow = null;
+        try {
+            previewWindow = window.open('', 'ocd-canvas-published-page');
+            if (previewWindow) {
+                previewWindow.document.title = 'Publicando Open CoDesign Canvas…';
+                previewWindow.document.body.textContent = 'Guardando y publicando la página…';
+            }
+        } catch (_error) {
+            previewWindow = null;
+        }
+
+        if (button) button.disabled = true;
+        setStatus('Guardando y publicando la página…');
+        var payload = snapshot();
+        payload.title = title ? title.value : '';
+
+        return request(config.publishAction, payload)
             .then(function (page) {
+                current = Object.assign({}, current || {}, {
+                    revision: page.revision,
+                    updatedAt: page.updatedAt
+                });
+                updateMeta(current);
                 updatePublishedPage(page);
-                setStatus('Página publicada y vinculada al Canvas.', 'ok');
+                setStatus('Página publicada correctamente. Abriendo la vista pública…', 'ok');
+                if (previewWindow && page.url) {
+                    previewWindow.location.replace(page.url);
+                }
                 return page;
             })
             .catch(function (error) {
-                setStatus('No se publicó: ' + error.message, 'error');
+                if (previewWindow && !previewWindow.closed) previewWindow.close();
+                setStatus('PUBLICACIÓN FALLIDA: ' + error.message, 'error');
+                window.alert('No se pudo publicar la página:\n\n' + error.message);
+            })
+            .finally(function () {
+                if (button) button.disabled = false;
             });
     }
 

@@ -7,8 +7,8 @@ if (!defined('ABSPATH')) {
 /**
  * Pantalla experimental y aislada del editor Open CoDesign Canvas.
  *
- * No interviene en el importador de paquetes ni en la publicación de páginas:
- * sólo edita y persiste un documento experimental con ID estable.
+ * No interviene en el importador de paquetes. Edita y persiste un documento
+ * experimental con ID estable, que puede publicarse como una página Canvas.
  */
 final class OCD_Canvas_Editor_Admin
 {
@@ -155,7 +155,8 @@ final class OCD_Canvas_Editor_Admin
             <p class="ocd-canvas-intro">
                 Slice vertical aislado. Edita un único documento experimental con ID estable
                 <code><?php echo esc_html(OCD_Canvas_Document_Repository::DOCUMENT_ID); ?></code>
-                y guarda datos estructurados, HTML y CSS por separado. No publica páginas ni toca el importador.
+                y guarda datos estructurados, HTML y CSS por separado. La publicación crea o actualiza
+                una página WordPress vinculada, sin tocar el importador anterior.
             </p>
 
             <div class="ocd-canvas-toolbar">
@@ -284,11 +285,40 @@ final class OCD_Canvas_Editor_Admin
         }
         check_ajax_referer(self::NONCE_ACTION, 'nonce');
 
+        $raw_project = isset($_POST['project_data']) ? (string) wp_unslash($_POST['project_data']) : '';
+        $raw_html = isset($_POST['html']) ? (string) wp_unslash($_POST['html']) : '';
+        $raw_css = isset($_POST['css']) ? (string) wp_unslash($_POST['css']) : '';
+
+        $project_data = $this->sanitizer->sanitize_project_data($raw_project);
+        if (is_wp_error($project_data)) {
+            wp_send_json_error(['message' => $project_data->get_error_message(), 'stage' => 'project_data'], 400);
+        }
+        $html = $this->sanitizer->sanitize_html($raw_html);
+        if (is_wp_error($html)) {
+            wp_send_json_error(['message' => $html->get_error_message(), 'stage' => 'html'], 400);
+        }
+        $css = $this->sanitizer->sanitize_css($raw_css);
+        if (is_wp_error($css)) {
+            wp_send_json_error(['message' => $css->get_error_message(), 'stage' => 'css'], 400);
+        }
+
+        $saved = $this->repository->save(
+            OCD_Canvas_Document_Repository::DOCUMENT_ID,
+            $project_data,
+            $html,
+            $css
+        );
+        if (is_wp_error($saved)) {
+            wp_send_json_error(['message' => $saved->get_error_message(), 'stage' => 'save'], 500);
+        }
+
         $title = isset($_POST['title']) ? sanitize_text_field((string) wp_unslash($_POST['title'])) : '';
         $published = $this->publisher->publish(OCD_Canvas_Document_Repository::DOCUMENT_ID, $title);
         if (is_wp_error($published)) {
-            wp_send_json_error(['message' => $published->get_error_message()], 400);
+            wp_send_json_error(['message' => $published->get_error_message(), 'stage' => 'publish'], 400);
         }
+        $published['revision'] = (int) $saved['revision'];
+        $published['updatedAt'] = (string) $saved['updatedAt'];
         wp_send_json_success($published);
     }
 }
