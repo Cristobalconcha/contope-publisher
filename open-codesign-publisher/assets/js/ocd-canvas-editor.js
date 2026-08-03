@@ -234,7 +234,11 @@
     }
 
     function persist(kind) {
-        if (saveInFlight) return saveInFlight;
+        if (saveInFlight) {
+            return saveInFlight.then(function () {
+                return persist(kind);
+            });
+        }
         window.clearTimeout(autosaveTimer);
         isSaving = true;
         setStatus(kind === 'auto' ? 'Autoguardando cambios…' : 'Guardando…');

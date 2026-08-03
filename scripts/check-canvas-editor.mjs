@@ -654,6 +654,10 @@ async function checkIsolationAndAssets() {
     fileURLToPath(new URL('open-codesign-publisher/assets/js/ocd-canvas-editor.js', repoRoot)),
     'utf8',
   );
+  const inspectorSource = await readFile(
+    fileURLToPath(new URL('open-codesign-publisher/assets/js/ocd-computed-inspector.js', repoRoot)),
+    'utf8',
+  );
   for (const controlId of [
     'ocd-canvas-save',
     'ocd-canvas-reload',
@@ -700,6 +704,17 @@ async function checkIsolationAndAssets() {
   check(
     script.includes('resolveAssetsAction') && script.includes('publishAction'),
     'El cliente debe resolver activos y publicar mediante endpoints protegidos.',
+  );
+  check(
+    inspectorSource.includes("['fill', 'Relleno SVG']") &&
+      inspectorSource.includes("['stroke', 'Trazo SVG']") &&
+      inspectorSource.includes('applySvgMask') &&
+      inspectorSource.includes('prefers-color-scheme: dark'),
+    'El inspector debe editar SVG inline y colorear SVG externos en modos claro/oscuro.',
+  );
+  check(
+    /saveInFlight\.then\([\s\S]*return persist\(kind\)/.test(script),
+    'El autoguardado debe encolar un estado nuevo si ya existe una escritura en curso.',
   );
 }
 

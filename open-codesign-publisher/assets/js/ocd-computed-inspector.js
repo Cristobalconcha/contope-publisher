@@ -17,6 +17,8 @@
     ['margin', 'Margen'],
     ['background-color', 'Fondo'],
     ['color', 'Color'],
+    ['fill', 'Relleno SVG'],
+    ['stroke', 'Trazo SVG'],
     ['font-family', 'Tipografía'],
     ['font-size', 'Tamaño tipográfico'],
   ];
@@ -318,6 +320,14 @@
       .ocd-ci__value { color:#a9d9bd; font-variant-numeric:tabular-nums; }
       .ocd-ci__origin { margin-top:4px; color:#918b82; font-size:10px; overflow-wrap:anywhere; }
       .ocd-ci__empty { padding:28px 10px; text-align:center; color:#a9a39a; }
+      .ocd-ci__svg { margin:8px 0; padding:10px; border:1px solid #a7641a66; border-radius:6px; background:#a7641a14; }
+      .ocd-ci__svg-title { margin-bottom:8px; color:#f0c28e; font-weight:650; }
+      .ocd-ci__svg-colors { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+      .ocd-ci__svg-colors label { display:grid; gap:4px; color:#c7bda9; font-size:10px; }
+      .ocd-ci__svg input[type="color"] { min-height:34px; padding:3px; cursor:pointer; }
+      .ocd-ci__svg button { width:100%; margin-top:8px; border:1px solid #b8752a; border-radius:5px;
+        padding:7px; background:#a7641a; color:#fff; cursor:pointer; font:inherit; font-weight:650; }
+      .ocd-ci__svg-hint { margin-top:7px; color:#a9a39a; font-size:10px; }
     `;
     document.head.appendChild(style);
   }
@@ -397,6 +407,65 @@
       return refreshAfterRender();
     }
 
+    function isExternalSvgImage(component) {
+      if (!component || String(component.get('tagName') || '').toLowerCase() !== 'img') return false;
+      const source = String(component.getAttributes?.().src || '');
+      return /\.svg(?:[?#].*)?$/i.test(source) || /^data:image\/svg\+xml[;,]/i.test(source);
+    }
+
+    function safeCssUrl(value) {
+      return String(value || '').replace(/["\\\n\r]/g, (character) => `\\${character}`);
+    }
+
+    function applySvgMask(lightColor, darkColor, requestedClass) {
+      const component = editor.getSelected() || selected;
+      if (!isExternalSvgImage(component)) {
+        throw new Error('Selecciona una imagen SVG externa antes de aplicar color adaptable.');
+      }
+      const parent = typeof component.parent === 'function' ? component.parent() : null;
+      if (!parent) throw new Error('El SVG necesita un contenedor para aplicar color adaptable.');
+
+      const source = String(component.getAttributes().src || '');
+      const parentClasses = componentClasses(parent);
+      const className = normalizeClassName(
+        requestedClass || parentClasses[0] || `ocd-svg-color-${component.cid || 'asset'}`,
+      );
+      if (!parentClasses.includes(className)) parent.addClass(className);
+
+      const maskUrl = `url("${safeCssUrl(source)}")`;
+      editor.Css.setRule(
+        `.${className}`,
+        {
+          '--ocd-svg-color': lightColor,
+          '--ocd-svg-color-dark': darkColor,
+          'background-color': 'var(--ocd-svg-color)',
+          '-webkit-mask-image': maskUrl,
+          'mask-image': maskUrl,
+          '-webkit-mask-repeat': 'no-repeat',
+          'mask-repeat': 'no-repeat',
+          '-webkit-mask-position': 'center',
+          'mask-position': 'center',
+          '-webkit-mask-size': 'contain',
+          'mask-size': 'contain',
+        },
+        { addStyles: true },
+      );
+      component.addStyle({ visibility: 'hidden' });
+      editor.Css.setRule(
+        `.dark .${className}, [data-theme="dark"] .${className}`,
+        { 'background-color': 'var(--ocd-svg-color-dark)' },
+        { addStyles: true },
+      );
+      editor.Css.setRule(
+        `.${className}`,
+        { 'background-color': 'var(--ocd-svg-color-dark)' },
+        { addStyles: true, atRuleType: 'media', atRuleParams: '(prefers-color-scheme: dark)' },
+      );
+      selected = parent;
+      editor.select(parent);
+      return refreshAfterRender();
+    }
+
     function refreshAfterRender() {
       const view = getElement(selected);
       const window = view?.ownerDocument?.defaultView || global;
@@ -436,6 +505,40 @@
       if (!snapshot) {
         body.appendChild(createElement(hostDocument, 'div', 'ocd-ci__empty', 'Selecciona un elemento del lienzo.'));
         return;
+      }
+
+      if (isExternalSvgImage(snapshot.component)) {
+        const panel = createElement(hostDocument, 'div', 'ocd-ci__svg');
+        panel.appendChild(createElement(hostDocument, 'div', 'ocd-ci__svg-title', 'Color adaptable del SVG'));
+        const colors = createElement(hostDocument, 'div', 'ocd-ci__svg-colors');
+        const lightLabel = createElement(hostDocument, 'label', '', 'Color claro');
+        const lightInput = createElement(hostDocument, 'input');
+        lightInput.type = 'color';
+        lightInput.value = '#111111';
+        lightLabel.appendChild(lightInput);
+        const darkLabel = createElement(hostDocument, 'label', '', 'Color oscuro');
+        const darkInput = createElement(hostDocument, 'input');
+        darkInput.type = 'color';
+        darkInput.value = '#ffffff';
+        darkLabel.appendChild(darkInput);
+        colors.append(lightLabel, darkLabel);
+        const apply = createElement(hostDocument, 'button', '', 'Aplicar color SVG');
+        apply.type = 'button';
+        apply.addEventListener('click', async () => {
+          const requestedClass = scopeSelect?.value === 'class' ? classSelect?.value : '';
+          await applySvgMask(lightInput.value, darkInput.value, requestedClass);
+        });
+        panel.append(
+          colors,
+          apply,
+          createElement(
+            hostDocument,
+            'div',
+            'ocd-ci__svg-hint',
+            'Convierte el SVG monocromático en color adaptable. El modo oscuro responde al sistema, .dark o data-theme="dark".',
+          ),
+        );
+        body.appendChild(panel);
       }
 
       for (const value of Object.values(snapshot.values)) {
@@ -513,6 +616,7 @@
       getSnapshot: () => snapshot,
       applyLocalStyle,
       applyClassStyle,
+      applySvgMask,
       mount,
       destroy() {
         editor.off('component:selected', onSelected);
