@@ -694,6 +694,10 @@ async function checkIsolationAndAssets() {
     'El editor debe preservar video como componente OCD sin controles añadidos.',
   );
   check(
+    script.includes("querySelectorAll('video[autoplay]')") && script.includes("setAttribute('muted', '')"),
+    'La serialización debe conservar autoplay como video silencioso reproducible.',
+  );
+  check(
     script.includes('resolveAssetsAction') && script.includes('publishAction'),
     'El cliente debe resolver activos y publicar mediante endpoints protegidos.',
   );

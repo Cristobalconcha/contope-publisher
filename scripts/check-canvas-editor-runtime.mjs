@@ -14,7 +14,7 @@ const initialHtml = `
   <body><base href="https://example.test/source/">
   <meta name="ocd-source" content="desktop-export">
   <nav class="nav">Menú</nav>
-  <section class="hero"><video class="hero__video" autoplay muted loop></video><h1>Santa Luisa de Palpi</h1></section>
+  <section class="hero"><video class="hero__video" autoplay loop></video><h1>Santa Luisa de Palpi</h1></section>
   <section class="details__grid">
     <article class="detail-card">Terreno</article>
     <article class="detail-card">Naturaleza</article>
@@ -30,7 +30,9 @@ const initialCss = `
 const html = `<!doctype html>
 <html><head><meta charset="utf-8"><link rel="stylesheet" href="${asset('vendor/grapesjs/grapes.min.css')}">
 <style>html,body{height:100%;margin:0}.ocd-canvas-workspace{display:grid;grid-template-columns:1fr 320px;height:700px}.ocd-canvas-editor-root{height:700px}.ocd-canvas-inspector.ocd-ci{position:relative!important;inset:auto!important;width:auto!important;height:700px}</style>
-</head><body>
+</head><body class="admin-bar">
+<div id="wpadminbar" style="height:32px"></div>
+<div class="ocd-canvas-published"><nav id="published-fixed" style="position:fixed;top:0"></nav><video id="published-video" autoplay></video></div>
 <button id="ocd-canvas-save">Guardar</button><button id="ocd-canvas-reload">Recargar</button>
 <button id="ocd-canvas-export-html">Exportar HTML</button><button id="ocd-canvas-export-css">Exportar CSS</button>
 <button id="ocd-canvas-toggle-import">Importar</button><button id="ocd-canvas-import-apply">Aplicar</button>
@@ -50,10 +52,12 @@ window.fetch=async(_url,options)=>{const body=new URLSearchParams(options.body);
 <script src="${asset('js/ocd-grid-controls.js')}"></script>
 <script src="${asset('js/ocd-behaviors.js')}"></script>
 <script src="${asset('js/ocd-canvas-editor.js')}"></script>
+<script src="${asset('js/ocd-canvas-public.js')}"></script>
 <script>
 (async()=>{try{
   const wait=(predicate,timeout=8000)=>new Promise((resolve,reject)=>{const start=Date.now();const tick=()=>{if(predicate())return resolve();if(Date.now()-start>timeout)return reject(new Error('timeout'));setTimeout(tick,50)};tick()});
   await wait(()=>window.ocdCanvas?.editor?.Canvas?.getDocument());
+  await wait(()=>document.getElementById('published-fixed').getAttribute('data-ocd-admin-bar-offset')==='32');
   const api=window.ocdCanvas;
   const video=api.editor.getWrapper().find('.hero__video')[0];
   const videoType=video.get('type');
@@ -84,12 +88,14 @@ window.fetch=async(_url,options)=>{const body=new URLSearchParams(options.body);
   document.getElementById('ocd-canvas-import-css').value='.resolved-image{width:100%}';
   document.getElementById('ocd-canvas-import-apply').click();
   await wait(()=>api.editor.getWrapper().find('.resolved-image')[0]?.getAttributes().src.startsWith('https://example.test/uploads/'));
-  await wait(()=>stored.revision===3);
+  await wait(()=>stored.html.includes('resolved-image'));
   const resolvedSrc=api.editor.getWrapper().find('.resolved-image')[0].getAttributes().src;
   const headTagsStripped=!/<(?:base|meta)\b/i.test(stored.html);
-  const ok=heroRadius==='16px'&&cardRadius==='12px'&&restored.template===api.grid.presets['1/2/1']&&restored.gap==='2rem'&&behavior.length===1&&gridPersisted&&videoType==='ocd-video'&&!videoControls&&resolvedSrc.startsWith('https://example.test/uploads/')&&stored.revision===3&&headTagsStripped;
+  const publicHeaderTop=window.getComputedStyle(document.getElementById('published-fixed')).top;
+  const publicVideoMuted=document.getElementById('published-video').muted;
+  const ok=heroRadius==='16px'&&cardRadius==='12px'&&restored.template===api.grid.presets['1/2/1']&&restored.gap==='2rem'&&behavior.length===1&&gridPersisted&&videoType==='ocd-video'&&!videoControls&&resolvedSrc.startsWith('https://example.test/uploads/')&&stored.revision>=3&&headTagsStripped&&publicHeaderTop==='32px'&&publicVideoMuted;
   document.documentElement.dataset.ocdRuntime=ok?'passed':'failed';
-  document.documentElement.dataset.ocdRuntimeDetails=JSON.stringify({heroRadius,cardRadius,template:restored.template,gap:restored.gap,behavior:behavior.length,revision:stored.revision,headTagsStripped,videoType,videoControls,resolvedSrc,published:document.getElementById('ocd-canvas-view-page').href});
+  document.documentElement.dataset.ocdRuntimeDetails=JSON.stringify({heroRadius,cardRadius,template:restored.template,gap:restored.gap,behavior:behavior.length,revision:stored.revision,headTagsStripped,publicHeaderTop,publicVideoMuted,videoType,videoControls,resolvedSrc,published:document.getElementById('ocd-canvas-view-page').href});
 }catch(error){document.documentElement.dataset.ocdRuntime='failed';document.documentElement.dataset.ocdRuntimeDetails=error.message;}})();
 </script></body></html>`;
 

@@ -345,6 +345,10 @@
         parsed.body.querySelectorAll('base, meta, link, title').forEach(function (node) {
             node.remove();
         });
+        parsed.body.querySelectorAll('video[autoplay]').forEach(function (video) {
+            video.setAttribute('muted', '');
+            video.setAttribute('playsinline', '');
+        });
         return parsed.body ? parsed.body.innerHTML : html;
     }
 
