@@ -218,11 +218,12 @@ if ($null -ne (Remote-FileSizeOrNull $config $remoteHelperPath)) {
     throw 'El helper temporal sigue presente despues de la eliminacion.'
 }
 
-$home = Invoke-WebRequest -UseBasicParsing -Uri ($siteUrl + '/') -Method Get -TimeoutSec 30
-if ([int]$home.StatusCode -ne 200) {
-    throw "La portada respondio HTTP $([int]$home.StatusCode) despues del cambio de tema."
+$verificationUri = $siteUrl + '/?ocd_verify_theme=' + [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
+$homeResponse = Invoke-WebRequest -UseBasicParsing -Uri $verificationUri -Method Get -TimeoutSec 30
+if ([int]$homeResponse.StatusCode -ne 200) {
+    throw "La portada respondio HTTP $([int]$homeResponse.StatusCode) despues del cambio de tema."
 }
-if ($home.Content -notmatch 'open-codesign-santa-luisa') {
+if ($homeResponse.Content -notmatch 'open-codesign-santa-luisa') {
     throw 'La portada no contiene una referencia al tema hijo activo.'
 }
 
