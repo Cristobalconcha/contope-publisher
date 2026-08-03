@@ -11,6 +11,8 @@ const temp = mkdtempSync(path.join(tmpdir(), 'ocd-canvas-runtime-'));
 const fixture = path.join(temp, 'index.html');
 
 const initialHtml = `
+  <base href="https://example.test/source/">
+  <meta name="ocd-source" content="desktop-export">
   <nav class="nav">Menú</nav>
   <section class="hero"><video class="hero__video" autoplay muted loop></video><h1>Santa Luisa de Palpi</h1></section>
   <section class="details__grid">
@@ -82,9 +84,10 @@ window.fetch=async(_url,options)=>{const body=new URLSearchParams(options.body);
   document.getElementById('ocd-canvas-import-apply').click();
   await wait(()=>api.editor.getWrapper().find('.resolved-image')[0]?.getAttributes().src.startsWith('https://example.test/uploads/'));
   const resolvedSrc=api.editor.getWrapper().find('.resolved-image')[0].getAttributes().src;
-  const ok=heroRadius==='16px'&&cardRadius==='12px'&&restored.template===api.grid.presets['1/2/1']&&restored.gap==='2rem'&&behavior.length===1&&stored.projectData.includes('ocdGridConfig')&&videoType==='ocd-video'&&!videoControls&&resolvedSrc.startsWith('https://example.test/uploads/')&&stored.revision===2;
+  const headTagsStripped=!/<(?:base|meta)\b/i.test(stored.html);
+  const ok=heroRadius==='16px'&&cardRadius==='12px'&&restored.template===api.grid.presets['1/2/1']&&restored.gap==='2rem'&&behavior.length===1&&stored.projectData.includes('ocdGridConfig')&&videoType==='ocd-video'&&!videoControls&&resolvedSrc.startsWith('https://example.test/uploads/')&&stored.revision===2&&headTagsStripped;
   document.documentElement.dataset.ocdRuntime=ok?'passed':'failed';
-  document.documentElement.dataset.ocdRuntimeDetails=JSON.stringify({heroRadius,cardRadius,template:restored.template,gap:restored.gap,behavior:behavior.length,revision:stored.revision,videoType,videoControls,resolvedSrc,published:document.getElementById('ocd-canvas-view-page').href});
+  document.documentElement.dataset.ocdRuntimeDetails=JSON.stringify({heroRadius,cardRadius,template:restored.template,gap:restored.gap,behavior:behavior.length,revision:stored.revision,headTagsStripped,videoType,videoControls,resolvedSrc,published:document.getElementById('ocd-canvas-view-page').href});
 }catch(error){document.documentElement.dataset.ocdRuntime='failed';document.documentElement.dataset.ocdRuntimeDetails=error.message;}})();
 </script></body></html>`;
 

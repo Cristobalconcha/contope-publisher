@@ -310,8 +310,8 @@
 
     function serializedHtml() {
         var html = editor.getHtml() || '';
-        var body = html.match(/^\s*<body(?:\s[^>]*)?>([\s\S]*)<\/body>\s*$/i);
-        return body ? body[1] : html;
+        var parsed = new window.DOMParser().parseFromString(html, 'text/html');
+        return parsed.body ? parsed.body.innerHTML : html;
     }
 
     function ensureSourceCss() {
