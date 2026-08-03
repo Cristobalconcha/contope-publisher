@@ -111,10 +111,14 @@ window.fetch=async(_url,options)=>{const body=new URLSearchParams(options.body);
   const resolvedSrc=api.editor.getWrapper().find('.resolved-image')[0].getAttributes().src;
   const headTagsStripped=!/<(?:base|meta)\b/i.test(stored.html);
   const publicHeaderTop=window.getComputedStyle(document.getElementById('published-fixed')).top;
-  const publicVideoMuted=document.getElementById('published-video').muted;
-  const ok=heroRadius==='16px'&&cardRadius==='12px'&&restored.template===api.grid.presets['1/2/1']&&restored.gap==='2rem'&&behavior.length===1&&gridPersisted&&svgMaskApplied&&sidePanelTabs&&videoType==='ocd-video'&&!videoControls&&resolvedSrc.startsWith('https://example.test/uploads/')&&stored.revision>=3&&headTagsStripped&&publicHeaderTop==='32px'&&publicVideoMuted;
+  const publicVideo=document.getElementById('published-video');
+  const publicVideoMuted=publicVideo.muted;
+  const soundToggle=publicVideo.parentElement.querySelector('.ocd-video-sound-toggle');
+  soundToggle.click();
+  const publicVideoSoundEnabled=!publicVideo.muted&&soundToggle.getAttribute('aria-pressed')==='true';
+  const ok=heroRadius==='16px'&&cardRadius==='12px'&&restored.template===api.grid.presets['1/2/1']&&restored.gap==='2rem'&&behavior.length===1&&gridPersisted&&svgMaskApplied&&sidePanelTabs&&videoType==='ocd-video'&&!videoControls&&resolvedSrc.startsWith('https://example.test/uploads/')&&stored.revision>=3&&headTagsStripped&&publicHeaderTop==='32px'&&publicVideoMuted&&publicVideoSoundEnabled;
   document.documentElement.dataset.ocdRuntime=ok?'passed':'failed';
-  document.documentElement.dataset.ocdRuntimeDetails=JSON.stringify({heroRadius,cardRadius,template:restored.template,gap:restored.gap,behavior:behavior.length,revision:stored.revision,headTagsStripped,svgMaskApplied,sidePanelTabs,publicHeaderTop,publicVideoMuted,videoType,videoControls,resolvedSrc,published:document.getElementById('ocd-canvas-view-page').href});
+  document.documentElement.dataset.ocdRuntimeDetails=JSON.stringify({heroRadius,cardRadius,template:restored.template,gap:restored.gap,behavior:behavior.length,revision:stored.revision,headTagsStripped,svgMaskApplied,sidePanelTabs,publicHeaderTop,publicVideoMuted,publicVideoSoundEnabled,videoType,videoControls,resolvedSrc,published:document.getElementById('ocd-canvas-view-page').href});
 }catch(error){document.documentElement.dataset.ocdRuntime='failed';document.documentElement.dataset.ocdRuntimeDetails=phase+': '+error.message;}})();
 </script></body></html>`;
 
