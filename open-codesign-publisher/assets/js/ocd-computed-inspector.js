@@ -413,14 +413,21 @@
       return /\.svg(?:[?#].*)?$/i.test(source) || /^data:image\/svg\+xml[;,]/i.test(source);
     }
 
+    function externalSvgImageFor(component) {
+      if (isExternalSvgImage(component)) return component;
+      if (!component || typeof component.find !== 'function') return null;
+      return component.find('img').find(isExternalSvgImage) || null;
+    }
+
     function safeCssUrl(value) {
       return String(value || '').replace(/["\\\n\r]/g, (character) => `\\${character}`);
     }
 
     function applySvgMask(lightColor, darkColor, requestedClass) {
-      const component = editor.getSelected() || selected;
-      if (!isExternalSvgImage(component)) {
-        throw new Error('Selecciona una imagen SVG externa antes de aplicar color adaptable.');
+      const selection = editor.getSelected() || selected;
+      const component = externalSvgImageFor(selection);
+      if (!component) {
+        throw new Error('Selecciona el logotipo SVG o uno de sus contenedores antes de aplicar color adaptable.');
       }
       const parent = typeof component.parent === 'function' ? component.parent() : null;
       if (!parent) throw new Error('El SVG necesita un contenedor para aplicar color adaptable.');
@@ -507,9 +514,10 @@
         return;
       }
 
-      if (isExternalSvgImage(snapshot.component)) {
+      const svgImage = externalSvgImageFor(snapshot.component);
+      if (svgImage) {
         const panel = createElement(hostDocument, 'div', 'ocd-ci__svg');
-        panel.appendChild(createElement(hostDocument, 'div', 'ocd-ci__svg-title', 'Color adaptable del SVG'));
+        panel.appendChild(createElement(hostDocument, 'div', 'ocd-ci__svg-title', 'Logotipo SVG detectado'));
         const colors = createElement(hostDocument, 'div', 'ocd-ci__svg-colors');
         const lightLabel = createElement(hostDocument, 'label', '', 'Color claro');
         const lightInput = createElement(hostDocument, 'input');
@@ -535,7 +543,7 @@
             hostDocument,
             'div',
             'ocd-ci__svg-hint',
-            'Convierte el SVG monocromático en color adaptable. El modo oscuro responde al sistema, .dark o data-theme="dark".',
+            'Puedes seleccionar directamente el logo o su contenedor. El color oscuro responde al sistema, .dark o data-theme="dark".',
           ),
         );
         body.appendChild(panel);

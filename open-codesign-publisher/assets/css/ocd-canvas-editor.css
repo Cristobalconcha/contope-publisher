@@ -94,11 +94,18 @@
 
 .ocd-canvas-workspace[data-ocd-active-panel="inspector"] .ocd-canvas-editor-root {
     --gjs-left-width: 0px;
+    --gjs-canvas-top: 0px;
 }
 
+.ocd-canvas-workspace[data-ocd-active-panel="inspector"] .gjs-pn-panels,
 .ocd-canvas-workspace[data-ocd-active-panel="inspector"] .gjs-pn-views,
 .ocd-canvas-workspace[data-ocd-active-panel="inspector"] .gjs-pn-views-container {
     display: none;
+}
+
+.ocd-canvas-workspace[data-ocd-active-panel="inspector"] .gjs-cv-canvas {
+    top: 0;
+    height: 100%;
 }
 
 .ocd-canvas-workspace[data-ocd-active-panel="components"] {
