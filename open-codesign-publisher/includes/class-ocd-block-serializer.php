@@ -32,10 +32,12 @@ final class OCD_Block_Serializer
             case 'column':
                 $width = isset($node['width']) && is_string($node['width']) ? $node['width'] : null;
                 $attrs = $metadata;
+                $style = '';
                 if ($width !== null && preg_match('/^(100|[1-9]?[0-9](?:\.\d+)?)%$/', $width) === 1) {
                     $attrs['width'] = $width;
+                    $style = ' style="flex-basis:' . esc_attr($width) . '"';
                 }
-                return $this->container_block('core/column', $attrs, $children, 'div', 'wp-block-column');
+                return $this->container_block('core/column', $attrs, $children, 'div', 'wp-block-column', $style);
 
             case 'heading':
                 $level = max(1, min(6, (int) ($node['level'] ?? 2)));
@@ -77,9 +79,17 @@ final class OCD_Block_Serializer
         throw new LogicException('Tipo de nodo no serializable.');
     }
 
-    private function container_block(string $name, array $attrs, array $children, string $tag, string $class): array
+    private function container_block(
+        string $name,
+        array $attrs,
+        array $children,
+        string $tag,
+        string $class,
+        string $extra_attributes = ''
+    ): array
     {
-        $inner_content = ['<' . $tag . ' class="' . $class . '">'];
+        $opening = '<' . $tag . ' class="' . $class . '"' . $extra_attributes . '>';
+        $inner_content = [$opening];
         foreach ($children as $_child) {
             $inner_content[] = null;
         }
@@ -89,7 +99,7 @@ final class OCD_Block_Serializer
             'blockName' => $name,
             'attrs' => $attrs,
             'innerBlocks' => $children,
-            'innerHTML' => '<' . $tag . ' class="' . $class . '"></' . $tag . '>',
+            'innerHTML' => $opening . '</' . $tag . '>',
             'innerContent' => $inner_content,
         ];
     }

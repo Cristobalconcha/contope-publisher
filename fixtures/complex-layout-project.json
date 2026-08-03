@@ -1,0 +1,219 @@
+{
+  "schemaVersion": 0,
+  "project": {
+    "id": "santa-luisa-layout-test",
+    "name": "Santa Luisa de Palpi — prueba de layout"
+  },
+  "pages": [
+    {
+      "id": "layout-test",
+      "title": "Prueba de estructura compleja",
+      "slug": "prueba-estructura-compleja",
+      "nodes": [
+        {
+          "id": "test.intro",
+          "type": "section",
+          "children": [
+            {
+              "id": "test.intro.eyebrow",
+              "type": "paragraph",
+              "content": "<strong>PRUEBA DE IMPORTACIÓN</strong> · Estructura Gutenberg nativa"
+            },
+            {
+              "id": "test.intro.title",
+              "type": "heading",
+              "level": 1,
+              "content": "Una página con composición real"
+            },
+            {
+              "id": "test.intro.copy",
+              "type": "paragraph",
+              "content": "Esta prueba combina <strong>bloques anidados</strong>, texto con <em>énfasis</em>, enlaces y proporciones de columnas que deberían permanecer editables."
+            }
+          ]
+        },
+        {
+          "id": "test.feature",
+          "type": "section",
+          "children": [
+            {
+              "id": "test.feature.columns",
+              "type": "columns",
+              "children": [
+                {
+                  "id": "test.feature.visual",
+                  "type": "column",
+                  "width": "40%",
+                  "children": [
+                    {
+                      "id": "test.feature.visual.group",
+                      "type": "group",
+                      "children": [
+                        {
+                          "id": "test.feature.visual.heading",
+                          "type": "heading",
+                          "level": 2,
+                          "content": "Columna visual"
+                        },
+                        {
+                          "id": "test.feature.visual.copy",
+                          "type": "paragraph",
+                          "content": "Esta columna ocupa inicialmente un 40 %. Más adelante contendrá una fotografía importada a la biblioteca multimedia."
+                        },
+                        {
+                          "id": "test.feature.visual.spacer",
+                          "type": "spacer",
+                          "height": 48
+                        },
+                        {
+                          "id": "test.feature.visual.note",
+                          "type": "paragraph",
+                          "content": "El espaciador anterior también debe ser seleccionable."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "test.feature.content",
+                  "type": "column",
+                  "width": "60%",
+                  "children": [
+                    {
+                      "id": "test.feature.content.heading",
+                      "type": "heading",
+                      "level": 2,
+                      "content": "Contenido principal"
+                    },
+                    {
+                      "id": "test.feature.content.copy1",
+                      "type": "paragraph",
+                      "content": "El contenido de esta columna puede modificarse sin reconstruir la sección ni regresar a Open CoDesign."
+                    },
+                    {
+                      "id": "test.feature.content.copy2",
+                      "type": "paragraph",
+                      "content": "También podemos incluir un <a href=\"https://santaluisadepalpi.kpispublicitarios.com\">enlace interno de prueba</a> y conservar su marcado."
+                    },
+                    {
+                      "id": "test.feature.actions",
+                      "type": "buttons",
+                      "children": [
+                        {
+                          "id": "test.feature.primary",
+                          "type": "button",
+                          "label": "Acción principal",
+                          "url": "#tarjetas"
+                        },
+                        {
+                          "id": "test.feature.secondary",
+                          "type": "button",
+                          "label": "Contacto",
+                          "url": "/contacto/"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "test.divider",
+          "type": "separator"
+        },
+        {
+          "id": "test.cards",
+          "type": "section",
+          "children": [
+            {
+              "id": "test.cards.title",
+              "type": "heading",
+              "level": 2,
+              "content": "Tres tarjetas editables"
+            },
+            {
+              "id": "test.cards.columns",
+              "type": "columns",
+              "children": [
+                {
+                  "id": "test.card.nature",
+                  "type": "column",
+                  "width": "33.3%",
+                  "children": [
+                    {
+                      "id": "test.card.nature.group",
+                      "type": "group",
+                      "children": [
+                        {
+                          "id": "test.card.nature.title",
+                          "type": "heading",
+                          "level": 3,
+                          "content": "Naturaleza"
+                        },
+                        {
+                          "id": "test.card.nature.copy",
+                          "type": "paragraph",
+                          "content": "Un módulo sencillo compuesto por título y contenido editorial."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "test.card.location",
+                  "type": "column",
+                  "width": "33.3%",
+                  "children": [
+                    {
+                      "id": "test.card.location.group",
+                      "type": "group",
+                      "children": [
+                        {
+                          "id": "test.card.location.title",
+                          "type": "heading",
+                          "level": 3,
+                          "content": "Ubicación"
+                        },
+                        {
+                          "id": "test.card.location.copy",
+                          "type": "paragraph",
+                          "content": "La tarjeta puede moverse, duplicarse o editarse desde WordPress."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "id": "test.card.project",
+                  "type": "column",
+                  "width": "33.4%",
+                  "children": [
+                    {
+                      "id": "test.card.project.group",
+                      "type": "group",
+                      "children": [
+                        {
+                          "id": "test.card.project.title",
+                          "type": "heading",
+                          "level": 3,
+                          "content": "Proyecto"
+                        },
+                        {
+                          "id": "test.card.project.copy",
+                          "type": "paragraph",
+                          "content": "La suma de las tres proporciones conserva exactamente el ancho disponible."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

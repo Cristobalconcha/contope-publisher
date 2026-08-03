@@ -44,4 +44,13 @@ if (!main.includes('Plugin Name: Open CoDesign Publisher')) {
   throw new Error('WordPress plugin header is missing.');
 }
 
-console.log(`OK: parsed ${phpFiles.length} PHP files and validated ${fixture.pages.length} fixture pages.`);
+const complexFixture = JSON.parse(
+  await readFile(new URL('../fixtures/complex-layout-project.json', import.meta.url), 'utf8'),
+);
+if (complexFixture.pages?.[0]?.nodes?.length < 4) {
+  throw new Error('Complex fixture does not contain the expected top-level structure.');
+}
+
+console.log(
+  `OK: parsed ${phpFiles.length} PHP files and validated minimal + complex fixtures (${fixture.pages.length + complexFixture.pages.length} pages).`,
+);
