@@ -69,12 +69,48 @@
 }
 
 .ocd-canvas-workspace {
+    --ocd-side-panel-width: 320px;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 320px;
+    grid-template-columns: minmax(0, 1fr) var(--ocd-side-panel-width);
     height: 70vh;
     min-height: 520px;
     border: 1px solid #c3c4c7;
     background: #fff;
+}
+
+.ocd-canvas-side-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 320px;
+    margin: 0 0 0 auto;
+}
+
+.ocd-canvas-side-tabs .button {
+    height: 36px;
+    margin: 0;
+    border-radius: 4px 4px 0 0;
+    text-align: center;
+}
+
+.ocd-canvas-workspace[data-ocd-active-panel="inspector"] .ocd-canvas-editor-root {
+    --gjs-left-width: 0px;
+}
+
+.ocd-canvas-workspace[data-ocd-active-panel="inspector"] .gjs-pn-views,
+.ocd-canvas-workspace[data-ocd-active-panel="inspector"] .gjs-pn-views-container {
+    display: none;
+}
+
+.ocd-canvas-workspace[data-ocd-active-panel="components"] {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.ocd-canvas-workspace[data-ocd-active-panel="components"] .ocd-canvas-editor-root {
+    --gjs-left-width: var(--ocd-side-panel-width);
+}
+
+.ocd-canvas-workspace[data-ocd-active-panel="components"] .ocd-canvas-inspector {
+    display: none;
 }
 
 .ocd-canvas-title-label {
@@ -113,6 +149,10 @@
 
 @media (max-width: 1100px) {
     .ocd-canvas-workspace {
-        grid-template-columns: minmax(0, 1fr) 280px;
+        --ocd-side-panel-width: 280px;
+    }
+
+    .ocd-canvas-side-tabs {
+        width: 280px;
     }
 }

@@ -203,7 +203,16 @@ final class OCD_Canvas_Editor_Admin
                 <span>GrapesJS <?php echo esc_html(self::GRAPESJS_VERSION); ?> (BSD-3-Clause, local)</span>
             </div>
 
-            <div class="ocd-canvas-workspace">
+            <div class="ocd-canvas-side-tabs" role="tablist" aria-label="Panel lateral del editor">
+                <button type="button" class="button" role="tab" data-ocd-side-panel="components" aria-selected="false">
+                    Estructura y componentes
+                </button>
+                <button type="button" class="button button-primary" role="tab" data-ocd-side-panel="inspector" aria-selected="true">
+                    Inspector Open CoDesign
+                </button>
+            </div>
+
+            <div class="ocd-canvas-workspace" data-ocd-active-panel="inspector">
                 <div id="ocd-canvas-editor-root" class="ocd-canvas-editor-root"></div>
                 <aside id="ocd-canvas-inspector" class="ocd-canvas-inspector" aria-label="Inspector de diseño efectivo"></aside>
             </div>

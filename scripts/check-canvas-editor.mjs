@@ -716,6 +716,12 @@ async function checkIsolationAndAssets() {
     /saveInFlight\.then\([\s\S]*return persist\(kind\)/.test(script),
     'El autoguardado debe encolar un estado nuevo si ya existe una escritura en curso.',
   );
+  check(
+    adminSource.includes('data-ocd-side-panel="components"') &&
+      adminSource.includes('data-ocd-side-panel="inspector"') &&
+      script.includes('activateSidePanel'),
+    'Los paneles nativo y Open CoDesign deben alternarse mediante pestañas.',
+  );
 }
 
 async function checkPublishingAndAssets() {

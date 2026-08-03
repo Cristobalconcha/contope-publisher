@@ -28,7 +28,7 @@ const initialCss = `
   .nav--scrolled { background:#f5f0eb; }`;
 
 const html = `<!doctype html>
-<html><head><meta charset="utf-8"><link rel="stylesheet" href="${asset('vendor/grapesjs/grapes.min.css')}">
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="${asset('vendor/grapesjs/grapes.min.css')}"><link rel="stylesheet" href="${asset('css/ocd-canvas-editor.css')}">
 <style>html,body{height:100%;margin:0}.ocd-canvas-workspace{display:grid;grid-template-columns:1fr 320px;height:700px}.ocd-canvas-editor-root{height:700px}.ocd-canvas-inspector.ocd-ci{position:relative!important;inset:auto!important;width:auto!important;height:700px}</style>
 </head><body class="admin-bar">
 <div id="wpadminbar" style="height:32px"></div>
@@ -39,7 +39,8 @@ const html = `<!doctype html>
 <input id="ocd-canvas-page-title" value="Santa Luisa Canvas"><button id="ocd-canvas-publish">Publicar</button><a id="ocd-canvas-view-page" hidden></a>
 <span id="ocd-canvas-status"></span><span id="ocd-canvas-revision"></span><span id="ocd-canvas-updated"></span>
 <div id="ocd-canvas-import" hidden><textarea id="ocd-canvas-import-html"></textarea><textarea id="ocd-canvas-import-css"></textarea></div>
-<div class="ocd-canvas-workspace"><div id="ocd-canvas-editor-root" class="ocd-canvas-editor-root"></div><aside id="ocd-canvas-inspector" class="ocd-canvas-inspector"></aside></div>
+<div class="ocd-canvas-side-tabs"><button data-ocd-side-panel="components">Componentes</button><button data-ocd-side-panel="inspector">Inspector</button></div>
+<div class="ocd-canvas-workspace" data-ocd-active-panel="inspector"><div id="ocd-canvas-editor-root" class="ocd-canvas-editor-root"></div><aside id="ocd-canvas-inspector" class="ocd-canvas-inspector"></aside></div>
 <script>
 window.confirm=()=>true;
 window.ocdCanvasEditor={ajaxUrl:'mock',nonce:'nonce',loadAction:'load',saveAction:'save',resolveAssetsAction:'resolve',publishAction:'publish',publishedPage:null,documentId:'runtime-test',document:{documentId:'runtime-test',projectData:'{}',html:${JSON.stringify(initialHtml)},css:${JSON.stringify(initialCss)},revision:0,updatedAt:''},loadError:''};
@@ -58,6 +59,11 @@ window.fetch=async(_url,options)=>{const body=new URLSearchParams(options.body);
   const wait=(predicate,timeout=8000)=>new Promise((resolve,reject)=>{const start=Date.now();const tick=()=>{if(predicate())return resolve();if(Date.now()-start>timeout)return reject(new Error('timeout'));setTimeout(tick,50)};tick()});
   phase='montaje del editor';
   await wait(()=>window.ocdCanvas?.editor?.Canvas?.getDocument());
+  document.querySelector('[data-ocd-side-panel="components"]').click();
+  await wait(()=>document.querySelector('.ocd-canvas-workspace').getAttribute('data-ocd-active-panel')==='components'&&window.getComputedStyle(document.getElementById('ocd-canvas-inspector')).display==='none');
+  document.querySelector('[data-ocd-side-panel="inspector"]').click();
+  await wait(()=>document.querySelector('.ocd-canvas-workspace').getAttribute('data-ocd-active-panel')==='inspector'&&window.getComputedStyle(document.getElementById('ocd-canvas-inspector')).display!=='none');
+  const sidePanelTabs=true;
   phase='compensación de barra WordPress';
   await wait(()=>document.getElementById('published-fixed').getAttribute('data-ocd-admin-bar-offset')==='32');
   const api=window.ocdCanvas;
@@ -106,9 +112,9 @@ window.fetch=async(_url,options)=>{const body=new URLSearchParams(options.body);
   const headTagsStripped=!/<(?:base|meta)\b/i.test(stored.html);
   const publicHeaderTop=window.getComputedStyle(document.getElementById('published-fixed')).top;
   const publicVideoMuted=document.getElementById('published-video').muted;
-  const ok=heroRadius==='16px'&&cardRadius==='12px'&&restored.template===api.grid.presets['1/2/1']&&restored.gap==='2rem'&&behavior.length===1&&gridPersisted&&svgMaskApplied&&videoType==='ocd-video'&&!videoControls&&resolvedSrc.startsWith('https://example.test/uploads/')&&stored.revision>=3&&headTagsStripped&&publicHeaderTop==='32px'&&publicVideoMuted;
+  const ok=heroRadius==='16px'&&cardRadius==='12px'&&restored.template===api.grid.presets['1/2/1']&&restored.gap==='2rem'&&behavior.length===1&&gridPersisted&&svgMaskApplied&&sidePanelTabs&&videoType==='ocd-video'&&!videoControls&&resolvedSrc.startsWith('https://example.test/uploads/')&&stored.revision>=3&&headTagsStripped&&publicHeaderTop==='32px'&&publicVideoMuted;
   document.documentElement.dataset.ocdRuntime=ok?'passed':'failed';
-  document.documentElement.dataset.ocdRuntimeDetails=JSON.stringify({heroRadius,cardRadius,template:restored.template,gap:restored.gap,behavior:behavior.length,revision:stored.revision,headTagsStripped,svgMaskApplied,publicHeaderTop,publicVideoMuted,videoType,videoControls,resolvedSrc,published:document.getElementById('ocd-canvas-view-page').href});
+  document.documentElement.dataset.ocdRuntimeDetails=JSON.stringify({heroRadius,cardRadius,template:restored.template,gap:restored.gap,behavior:behavior.length,revision:stored.revision,headTagsStripped,svgMaskApplied,sidePanelTabs,publicHeaderTop,publicVideoMuted,videoType,videoControls,resolvedSrc,published:document.getElementById('ocd-canvas-view-page').href});
 }catch(error){document.documentElement.dataset.ocdRuntime='failed';document.documentElement.dataset.ocdRuntimeDetails=phase+': '+error.message;}})();
 </script></body></html>`;
 

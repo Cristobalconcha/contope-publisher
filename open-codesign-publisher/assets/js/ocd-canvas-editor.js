@@ -578,6 +578,26 @@
         }
     }
 
+    function activateSidePanel(name) {
+        var workspace = document.querySelector('.ocd-canvas-workspace');
+        var tabs = document.querySelectorAll('[data-ocd-side-panel]');
+        if (!workspace || (name !== 'components' && name !== 'inspector')) return;
+        workspace.setAttribute('data-ocd-active-panel', name);
+        Array.prototype.forEach.call(tabs, function (tab) {
+            var active = tab.getAttribute('data-ocd-side-panel') === name;
+            tab.setAttribute('aria-selected', active ? 'true' : 'false');
+            tab.classList.toggle('button-primary', active);
+        });
+        try {
+            window.localStorage.setItem('ocdCanvasSidePanel', name);
+        } catch (_error) {
+            // El editor sigue funcionando cuando el almacenamiento local está bloqueado.
+        }
+        window.setTimeout(function () {
+            if (typeof editor.refresh === 'function') editor.refresh({ tools: true });
+        }, 0);
+    }
+
     on('ocd-canvas-save', save);
     on('ocd-canvas-reload', function () {
         if (window.confirm('Recargar descarta los cambios no guardados del lienzo. ¿Continuar?')) {
@@ -589,6 +609,11 @@
     on('ocd-canvas-import-apply', applyImport);
     on('ocd-canvas-publish', publishPage);
     editor.on('update', scheduleAutosave);
+    document.querySelectorAll('[data-ocd-side-panel]').forEach(function (tab) {
+        tab.addEventListener('click', function () {
+            activateSidePanel(tab.getAttribute('data-ocd-side-panel'));
+        });
+    });
     on('ocd-canvas-toggle-import', function (event) {
         var panel = document.getElementById('ocd-canvas-import');
         if (!panel) {
@@ -621,6 +646,13 @@
         setStatus('Sin documento inicial; usa Recargar.', 'error');
     }
     updatePublishedPage(config.publishedPage || null);
+    var initialSidePanel = 'inspector';
+    try {
+        initialSidePanel = window.localStorage.getItem('ocdCanvasSidePanel') || initialSidePanel;
+    } catch (_error) {
+        // Mantiene el inspector como pestaña inicial.
+    }
+    activateSidePanel(initialSidePanel);
     window.setTimeout(function () {
         autosaveEnabled = true;
     }, 0);
