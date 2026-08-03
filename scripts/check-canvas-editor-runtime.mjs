@@ -11,7 +11,7 @@ const temp = mkdtempSync(path.join(tmpdir(), 'ocd-canvas-runtime-'));
 const fixture = path.join(temp, 'index.html');
 
 const initialHtml = `
-  <base href="https://example.test/source/">
+  <body><base href="https://example.test/source/">
   <meta name="ocd-source" content="desktop-export">
   <nav class="nav">Menú</nav>
   <section class="hero"><video class="hero__video" autoplay muted loop></video><h1>Santa Luisa de Palpi</h1></section>
@@ -19,7 +19,7 @@ const initialHtml = `
     <article class="detail-card">Terreno</article>
     <article class="detail-card">Naturaleza</article>
     <article class="detail-card">Agua</article>
-  </section>`;
+  </section></body>`;
 const initialCss = `
   :root { --radius-container: 16px; --radius-card: 12px; }
   .hero { border-radius: 0 0 var(--radius-container) var(--radius-container); }

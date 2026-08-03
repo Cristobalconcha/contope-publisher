@@ -311,6 +311,9 @@
     function serializedHtml() {
         var html = editor.getHtml() || '';
         var parsed = new window.DOMParser().parseFromString(html, 'text/html');
+        parsed.body.querySelectorAll('base, meta, link, title').forEach(function (node) {
+            node.remove();
+        });
         return parsed.body ? parsed.body.innerHTML : html;
     }
 

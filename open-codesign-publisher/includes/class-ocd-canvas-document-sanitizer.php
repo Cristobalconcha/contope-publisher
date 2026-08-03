@@ -96,6 +96,7 @@ final class OCD_Canvas_Document_Sanitizer
     public function sanitize_html(string $html)
     {
         $html = $this->normalize($html);
+        $html = $this->strip_document_metadata($html);
         if (strlen($html) > self::MAX_HTML_BYTES) {
             return new WP_Error('ocd_canvas_html_size', 'El HTML supera el límite de 2 MB.');
         }
@@ -125,6 +126,17 @@ final class OCD_Canvas_Document_Sanitizer
         remove_filter('safe_style_css', $filter);
 
         return $clean;
+    }
+
+    /**
+     * El importador puede recibir un documento completo y GrapesJS conserva a
+     * veces metadatos de `<head>` dentro de su wrapper `<body>`. Son conocidos,
+     * no visuales y no deben transformarse en contenido de una página.
+     */
+    private function strip_document_metadata(string $html): string
+    {
+        $html = (string) preg_replace('/<\s*(?:base|meta|link)\b[^>]*\/?\s*>/i', '', $html);
+        return (string) preg_replace('/<\s*title\b[^>]*>[\s\S]*?<\s*\/\s*title\s*>/i', '', $html);
     }
 
     /**
