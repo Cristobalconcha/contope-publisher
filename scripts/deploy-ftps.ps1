@@ -114,11 +114,17 @@ if (-not $Apply) {
 
 $remotePluginRoot = "$expectedRemoteRoot$pluginSlug"
 Ensure-RemoteDirectory $config $remotePluginRoot
-$directories = @($files | ForEach-Object {
-    if ($_.DirectoryName -ne $pluginRoot) {
-        $_.DirectoryName.Substring($pluginRootPrefix.Length).Replace('\', '/')
+$directorySet = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
+foreach ($file in $files) {
+    if ($file.DirectoryName -eq $pluginRoot) { continue }
+    $relativeDirectory = $file.DirectoryName.Substring($pluginRootPrefix.Length).Replace('\', '/')
+    $current = ''
+    foreach ($segment in $relativeDirectory.Split('/')) {
+        $current = if ($current.Length -eq 0) { $segment } else { "$current/$segment" }
+        [void]$directorySet.Add($current)
     }
-} | Sort-Object -Unique)
+}
+$directories = @($directorySet | Sort-Object { ($_ -split '/').Count }, { $_ })
 foreach ($directory in $directories) {
     Ensure-RemoteDirectory $config "$remotePluginRoot/$directory"
 }
