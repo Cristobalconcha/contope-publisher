@@ -127,6 +127,10 @@
 
     /** Estado del documento tal como lo devolvió el servidor por última vez. */
     var current = config.document || null;
+    var autosaveEnabled = false;
+    var autosaveTimer = null;
+    var saveInFlight = null;
+    var isSaving = false;
 
     function parseJson(value) {
         if (typeof value !== 'string' || value === '') {
@@ -229,19 +233,46 @@
             });
     }
 
-    function save() {
-        setStatus('Guardando…');
+    function persist(kind) {
+        if (saveInFlight) return saveInFlight;
+        window.clearTimeout(autosaveTimer);
+        isSaving = true;
+        setStatus(kind === 'auto' ? 'Autoguardando cambios…' : 'Guardando…');
         var payload = snapshot();
-        return request(config.saveAction, payload)
+        saveInFlight = request(config.saveAction, payload)
             .then(function (doc) {
                 current = doc;
                 updateMeta(doc);
-                setStatus('Guardado (revisión ' + doc.revision + ').', 'ok');
+                setStatus(
+                    (kind === 'auto' ? 'Autoguardado' : 'Guardado') + ' (revisión ' + doc.revision + ').',
+                    'ok'
+                );
+                return doc;
             })
             .catch(function (error) {
-                setStatus('No se guardó: ' + error.message, 'error');
+                setStatus('No se pudo guardar el borrador: ' + error.message, 'error');
                 throw error;
+            })
+            .finally(function () {
+                saveInFlight = null;
+                isSaving = false;
             });
+        return saveInFlight;
+    }
+
+    function save() {
+        return persist('manual');
+    }
+
+    function scheduleAutosave() {
+        if (!autosaveEnabled || isSaving) return;
+        window.clearTimeout(autosaveTimer);
+        setStatus('Cambios pendientes de autoguardado…');
+        autosaveTimer = window.setTimeout(function () {
+            persist('auto').catch(function () {
+                // `persist` ya deja el error visible en la franja de estado.
+            });
+        }, 1200);
     }
 
     function snapshot() {
@@ -443,7 +474,12 @@
                 if (split.hadScript) {
                     note += ' Se descartaron scripts no declarativos.';
                 }
-                setStatus(note + ' Pulsa Guardar o Publicar.', resolved.missing.length ? 'error' : 'ok');
+                return persist('auto').then(function (doc) {
+                    setStatus(
+                        note + ' Borrador autoguardado en la revisión ' + doc.revision + '.',
+                        resolved.missing.length ? 'error' : 'ok'
+                    );
+                });
             })
             .catch(function (error) {
                 setStatus('No se pudo completar la importación: ' + error.message, 'error');
@@ -544,6 +580,7 @@
     on('ocd-canvas-export-css', exportCss);
     on('ocd-canvas-import-apply', applyImport);
     on('ocd-canvas-publish', publishPage);
+    editor.on('update', scheduleAutosave);
     on('ocd-canvas-toggle-import', function (event) {
         var panel = document.getElementById('ocd-canvas-import');
         if (!panel) {
@@ -576,4 +613,7 @@
         setStatus('Sin documento inicial; usa Recargar.', 'error');
     }
     updatePublishedPage(config.publishedPage || null);
+    window.setTimeout(function () {
+        autosaveEnabled = true;
+    }, 0);
 })(window, document);
