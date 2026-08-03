@@ -21,11 +21,19 @@ require_once OCD_PUBLISHER_DIR . 'includes/class-ocd-package-validator.php';
 require_once OCD_PUBLISHER_DIR . 'includes/class-ocd-block-serializer.php';
 require_once OCD_PUBLISHER_DIR . 'includes/class-ocd-importer.php';
 require_once OCD_PUBLISHER_DIR . 'includes/class-ocd-admin.php';
+require_once OCD_PUBLISHER_DIR . 'includes/class-ocd-canvas-document-sanitizer.php';
+require_once OCD_PUBLISHER_DIR . 'includes/class-ocd-canvas-document-repository.php';
+require_once OCD_PUBLISHER_DIR . 'includes/class-ocd-canvas-editor-admin.php';
 
 add_action('plugins_loaded', static function (): void {
     $validator = new OCD_Package_Validator();
     $serializer = new OCD_Block_Serializer();
     $importer = new OCD_Importer($validator, $serializer);
     (new OCD_Admin($importer))->register();
+
+    // Módulo experimental y aislado: no interviene en el importador anterior.
+    $canvas_repository = new OCD_Canvas_Document_Repository();
+    $canvas_repository->register();
+    (new OCD_Canvas_Editor_Admin($canvas_repository, new OCD_Canvas_Document_Sanitizer()))->register();
 });
 

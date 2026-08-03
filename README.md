@@ -22,6 +22,14 @@ El primer caso conductor es **Santa Luisa de Palpi**. El objetivo del MVP es rec
 - constructor visual completo;
 - modificaciones remotas del hosting.
 
+## Editor Canvas (experimental)
+
+`Herramientas → Open CoDesign Canvas (Experimental)` es un slice vertical aislado:
+edita un único documento con GrapesJS 0.23.4 local (BSD-3-Clause, sin CDN) y guarda
+datos estructurados, HTML y CSS por separado en la entidad `ocd_canvas_doc`, con
+`manage_options` y nonce. No publica páginas ni sustituye al importador.
+Detalle en [`docs/canvas-editor-experimental.md`](docs/canvas-editor-experimental.md).
+
 ## Estructura
 
 ```text

@@ -2,6 +2,7 @@ import { readFile, readdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import parser from 'php-parser';
+import { runCanvasEditorChecks } from './check-canvas-editor.mjs';
 
 const pluginRoot = fileURLToPath(new URL('../open-codesign-publisher/', import.meta.url));
 const themeRoots = [
@@ -87,6 +88,9 @@ if (!childStylesheet.includes('Template: open-codesign-canvas')) {
   throw new Error('Santa Luisa must declare Open CoDesign Canvas as its parent theme.');
 }
 
+const canvasEditorSummary = await runCanvasEditorChecks();
+
 console.log(
   `OK: parsed ${phpFiles.length} PHP files and validated three fixtures (${fixture.pages.length + complexFixture.pages.length + realFixture.pages.length} pages).`,
 );
+console.log(`OK: ${canvasEditorSummary}`);
