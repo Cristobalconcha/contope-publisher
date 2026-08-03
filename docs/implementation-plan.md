@@ -11,6 +11,14 @@ Construir un sistema abierto capaz de:
 5. incorporar posteriormente sitios creados con Gutenberg, HTML/CSS y otros page builders mediante adaptadores;
 6. permitir intervención remota controlada mediante MCP, sin hacer que el funcionamiento normal dependa de IA.
 
+El sistema forma parte de una plataforma mayor con salida hacia tres dominios:
+
+- aplicaciones e interfaces;
+- web y CMS;
+- diseño editorial, impreso y de escritorio mediante IDML/InDesign.
+
+Los tres dominios comparten sistema visual, contenidos, activos, estructura, procedencia y autoridad. Cada adaptador conserva además las capacidades propias de su medio.
+
 ## Arquitectura objetivo
 
 ### Tema padre: Open CoDesign Canvas
@@ -28,6 +36,14 @@ Servicios compartidos de paquete, identidad, activos, importación, exportación
 ### Paquete `.ocdsite`
 
 Contenedor ZIP versionado con manifiesto, configuración visual, contenido, navegación, templates/parts, tema hijo, activos e integridad. No incluye secretos. Conserva IDs estables y declara versiones requeridas de Canvas, Publisher y WordPress.
+
+El manifiesto no determina por sí solo la representación canónica del diseño. Debe admitir entrypoints opcionales para un modelo neutral, una fuente Desktop y una representación IDML sin obligar a incluirlos en el primer paquete WordPress.
+
+### LayoutScene e IDML
+
+Open CoDesign Desktop incorporará un `LayoutScene` neutral inspirado en conceptos maduros de IDML: páginas, spreads, masters, stories, frames, estilos, colores y vínculos. IDML será un adaptador editorial de primera clase y podrá ser la representación maestra de una publicación fija, pero no sustituirá por sí solo responsive, componentes, interacción, datos o accesibilidad web.
+
+Canvas interpretará la intención estructural de una composición desktop y aplicará reglas responsive explícitas. El motor recomendado usa CSS Grid propio con presets familiares de doce columnas y breakpoints, proporciones exactas como 45/55, anidación, orden, gaps y stack por breakpoint. Gutenberg aporta bloques y responsive básico; Canvas completa los controles avanzados.
 
 ## Principios no negociables
 
@@ -99,6 +115,14 @@ Contenedor ZIP versionado con manifiesto, configuración visual, contenido, nave
 
 Orden inicial: Gutenberg/Open CoDesign, HTML/CSS, Divi y luego otros builders. Cada adaptador ejecuta detección, preflight, extracción, normalización e informe de fidelidad.
 
+### Frente paralelo — IDML
+
+- spike `LayoutScene` → IDML con título, párrafo, forma e imagen editables;
+- ZIP IDML válido con `mimetype` primero y sin compresión;
+- apertura real en InDesign 2026 sin reparación;
+- reexportación y comprobación de editabilidad;
+- después, varias páginas, masters, texto enlazado, estilos, assets y roundtrip IDML → Open CoDesign.
+
 ## Sprint demostrable de una semana
 
 El objetivo es probar Santa Luisa de extremo a extremo, no terminar todavía un page builder universal.
@@ -119,4 +143,3 @@ El objetivo es probar Santa Luisa de extremo a extremo, no terminar todavía un 
 - exportación e importación repetible;
 - paquete reconocido como proyecto de Edición;
 - checks automatizados, revisión manual y checkpoint Git.
-

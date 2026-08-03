@@ -43,3 +43,14 @@ WordPress must remain fully usable without AI or Open CoDesign Desktop. Imports 
 - Codex owns architecture, shared contracts, integration, final verification, commits, deployment, and the Obsidian bitácora.
 - Handoffs must include base commit, files changed, tests with exit status, risks, and a concise diff summary.
 
+### Review loop
+
+Non-trivial tasks use a bounded implementation loop instead of accepting a one-shot report:
+
+1. one agent implements in its allowlisted worktree;
+2. Codex runs independent checks and records concrete findings;
+3. a second agent reviews the diff without editing it;
+4. validated findings return to the same implementer session;
+5. Codex integrates only after the final gates pass.
+
+Use at most three correction iterations per task. Stop earlier when the diff satisfies acceptance. Stop and escalate if the same failure repeats, the error count does not decrease, scope must expand, or checks expose an architectural conflict. Agent prose never overrides a failing command or an unverified runtime result.
