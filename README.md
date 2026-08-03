@@ -28,6 +28,10 @@ El primer caso conductor es **Santa Luisa de Palpi**. El objetivo del MVP es rec
 edita un único documento con GrapesJS 0.23.4 local (BSD-3-Clause, sin CDN) y guarda
 datos estructurados, HTML y CSS por separado en la entidad `ocd_canvas_doc`, con
 `manage_options` y nonce. No publica páginas ni sustituye al importador.
+Incluye inspector de estilos realmente renderizados, edición local o por clase,
+presets y manejadores de columnas, comportamiento declarativo de navegación y
+reapertura verificada. El CSS fuente se conserva literalmente y los cambios se
+guardan como una capa de overrides para evitar pérdidas por interpretación.
 Detalle en [`docs/canvas-editor-experimental.md`](docs/canvas-editor-experimental.md).
 
 ## Estructura

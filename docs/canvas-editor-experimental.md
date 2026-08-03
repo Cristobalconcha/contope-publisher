@@ -14,9 +14,31 @@ no genera bloques Gutenberg y no interviene en el importador de paquetes.
    nunca subida) y los vuelca en el lienzo.
 4. Permite editar el lienzo con el conjunto mínimo de bloques `Open CoDesign`
    (sección, dos columnas, título, párrafo, imagen, botón).
-5. Guarda y reabre el documento contra WordPress mediante `admin-ajax.php` con
+5. Lee estilos efectivos desde el iframe del lienzo y muestra su procedencia
+   (selector y variables CSS). Los cambios pueden aplicarse sólo al elemento o
+   a una clase reutilizable.
+6. Reconoce contenedores CSS Grid y ofrece presets como `1/2/1`, proporciones
+   libres, gap, reglas responsive y manejadores arrastrables.
+7. Modela el cambio de navegación al hacer scroll como comportamiento
+   declarativo `scroll-threshold`, sin aceptar JavaScript arbitrario.
+8. Guarda y reabre el documento contra WordPress mediante `admin-ajax.php` con
    nonce y comprobación de capacidad en cada petición.
-6. Exporta HTML y CSS como descargas separadas desde el navegador.
+9. Exporta HTML autosuficiente —CSS y runtime declarativo incluidos— o CSS por
+   separado desde el navegador.
+
+## Fidelidad del CSS
+
+GrapesJS no conserva necesariamente toda declaración que todavía no comprende;
+por ejemplo, puede normalizar o descartar un `border-radius` expresado mediante
+`var()`. Por eso `_ocd_canvas_css` contiene dos capas delimitadas por
+`OCD-CANVAS-EDITABLE-OVERRIDES`:
+
+1. CSS fuente preservado literalmente, que sigue siendo la autoridad visual.
+2. CSS editable producido por GrapesJS, que contiene las modificaciones del
+   usuario y puede sobrescribir la primera capa.
+
+El lienzo vuelve a inyectar la primera capa tras cada carga de frame o proyecto.
+Así el inspector ve los valores reales y una reapertura no degrada el diseño.
 
 ## Entidad y ID estable
 
@@ -52,7 +74,7 @@ CSS no se mezcla con el HTML.
 
 | Representación | Regla | Límite |
 | --- | --- | ---: |
-| HTML | `wp_kses` sobre el conjunto `post` de WordPress más etiquetas estructurales; `iframe`, `script`, `style`, `object`, `embed`, `form`, `input`, `select` y `textarea` se retiran del conjunto permitido. Las etiquetas fuera de la lista **se rechazan con `WP_Error`** en vez de descartarse en silencio. | 2 MB |
+| HTML | `wp_kses` sobre el conjunto `post` de WordPress más etiquetas estructurales. Los iframe sólo admiten embeds HTTPS de Google Maps, YouTube/YouTube No-Cookie y Vimeo. `script`, `style`, `object`, `embed`, `form`, `input`, `select` y `textarea` se retiran. Las etiquetas fuera de la lista **se rechazan con `WP_Error`** en vez de descartarse en silencio. | 2 MB |
 | CSS | Rechaza `<`, `javascript:`, `vbscript:`, `expression(`, `@import`, `behavior:`, `-moz-binding` y `data:text/html`; valida el esquema de cada `url()` (relativo, `http(s)` o `data:image/*`). | 512 kB |
 | `projectData` | Debe ser un objeto JSON válido con profundidad acotada; si trae `pages`, debe ser una lista. Se reencodifica de forma canónica. | 4 MB |
 
@@ -67,10 +89,10 @@ puede cerrar el `<script>` de la página.
 
 ## Sobre el iframe
 
-El formato guardado y el exportado son HTML y CSS; no se publica ni se almacena
-ningún `iframe`, y `iframe` está explícitamente fuera del conjunto permitido por
-`wp_kses`. El lienzo interno de GrapesJS sí usa un `iframe` en el navegador: es un
-detalle de la herramienta de edición, no del formato.
+El formato guardado y el exportado son HTML y CSS. Puede conservar iframes de
+servicios explícitamente permitidos —por ejemplo el mapa de Santa Luisa—, pero
+rechaza otros orígenes. El lienzo interno de GrapesJS también usa un `iframe` en
+el navegador: es un detalle de la herramienta de edición, no del formato.
 
 ## Vendor
 
@@ -86,6 +108,10 @@ capacidad, nonce, saneamiento y validación de las tres representaciones,
 persistencia por ID estable, aislamiento respecto al importador, ausencia de CDN e
 iframe, y la integridad byte a byte del vendor.
 
+`npm run check:canvas-runtime` abre un navegador real, verifica radios de 16 px y
+12 px derivados de variables, aplica una cuadrícula `1/2/1`, guarda, la altera,
+recarga y comprueba que columnas, CSS y comportamiento sobrevivieron.
+
 ## Límites conocidos
 
 - Es un **slice vertical**, no un page builder: un único documento, sin lista de
@@ -100,5 +126,6 @@ iframe, y la integridad byte a byte del vendor.
   cliente.
 - Si `loadProjectData()` falla, el lienzo se reconstruye desde el HTML y el CSS
   guardados: se conserva el resultado visual, pero se pierden capas y símbolos.
-- No se ha ejecutado en un WordPress real desde este worktree; las comprobaciones
-  son estáticas. Falta verificación en ejecución del guardado y la reapertura.
+- La prueba de navegador cubre el runtime del editor y simula la misma petición
+  AJAX; falta todavía la validación manual del ciclo contra la instalación remota
+  de WordPress después del despliegue.

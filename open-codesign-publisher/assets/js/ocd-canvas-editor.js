@@ -23,8 +23,15 @@
         statusNode.className = 'ocd-canvas-status' + (kind ? ' is-' + kind : '');
     }
 
-    if (!window.grapesjs || typeof window.grapesjs.init !== 'function') {
-        setStatus('No se pudo cargar GrapesJS desde los archivos locales del plugin.', 'error');
+    if (
+        !window.grapesjs ||
+        typeof window.grapesjs.init !== 'function' ||
+        !window.OCDComputedInspector ||
+        !window.OCDCanvasGrid ||
+        !window.OCDGridControls ||
+        !window.OcdBehaviors
+    ) {
+        setStatus('No se pudo cargar el editor Canvas completo desde los archivos locales del plugin.', 'error');
         return;
     }
 
@@ -88,6 +95,24 @@
         assetManager: { upload: false, custom: false },
         blockManager: { blocks: BLOCKS }
     });
+    var CSS_OVERRIDES_MARKER = '/* OCD-CANVAS-EDITABLE-OVERRIDES */';
+    var sourceCss = '';
+    var gridApi = window.OCDCanvasGrid.plugin(editor);
+    var behaviorApi = window.OcdBehaviors.grapesjsPlugin(editor, { threshold: 40 });
+    var inspector = window.OCDComputedInspector.create(editor, {
+        mount: document.getElementById('ocd-canvas-inspector')
+    });
+    var gridControls = window.OCDGridControls.create(editor, gridApi, {
+        mount: document.querySelector('#ocd-canvas-inspector .ocd-ci__head')
+    });
+
+    window.ocdCanvas = {
+        editor: editor,
+        inspector: inspector,
+        grid: gridApi,
+        gridControls: gridControls,
+        behaviors: behaviorApi
+    };
 
     /** Estado del documento tal como lo devolvió el servidor por última vez. */
     var current = config.document || null;
@@ -115,11 +140,16 @@
     }
 
     function applyFlatDocument(doc) {
+        var css = splitStoredCss(doc && doc.css);
+        sourceCss = css.source;
         editor.setComponents((doc && doc.html) || '');
-        editor.setStyle((doc && doc.css) || '');
+        editor.setStyle([sourceCss, css.overrides].filter(Boolean).join('\n'));
+        window.requestAnimationFrame(ensureSourceCss);
     }
 
     function applyDocument(doc) {
+        var css = splitStoredCss(doc && doc.css);
+        sourceCss = css.source;
         var project = parseJson(doc && doc.projectData);
         var hasPages = project && Array.isArray(project.pages) && project.pages.length > 0;
         if (hasPages) {
@@ -139,6 +169,22 @@
         } else {
             applyFlatDocument(doc);
         }
+        behaviorApi.refresh();
+        gridApi.scan();
+        window.requestAnimationFrame(function () {
+            ensureSourceCss();
+            var selected = editor.getSelected();
+            if (!selected) {
+                var children = editor.getWrapper().components();
+                selected = children && children.length ? children.at(0) : null;
+                if (selected) {
+                    editor.select(selected);
+                }
+            }
+            inspector.refresh(selected);
+            gridControls.refresh(selected);
+            behaviorApi.installCanvasRuntime();
+        });
         current = doc;
         updateMeta(doc);
     }
@@ -174,10 +220,11 @@
 
     function save() {
         setStatus('Guardando…');
+        behaviorApi.refresh();
         var payload = {
             project_data: JSON.stringify(editor.getProjectData()),
             html: editor.getHtml(),
-            css: editor.getCss()
+            css: serializedCss()
         };
         return request(config.saveAction, payload)
             .then(function (doc) {
@@ -217,21 +264,72 @@
     }
 
     function exportHtml() {
-        var markup = editor.getHtml() || '';
+        behaviorApi.refresh();
+        var exported = behaviorApi.buildExport();
+        var markup = exported.html || '';
         var bodyMarkup = /^\s*<body[\s>]/i.test(markup) ? markup : '<body>\n' + markup + '\n</body>';
         var page =
             '<!doctype html>\n<html lang="es">\n<head>\n<meta charset="utf-8">\n' +
             '<meta name="viewport" content="width=device-width, initial-scale=1">\n' +
             '<title>Open CoDesign Canvas</title>\n' +
-            '<link rel="stylesheet" href="open-codesign-canvas.css">\n</head>\n' +
+            '<style>\n' + sourceCss + '\n' + exported.css + '\n</style>\n</head>\n' +
             bodyMarkup +
-            '\n</html>\n';
+            '\n<script>\n' + exported.js + '\n<\/script>\n</html>\n';
         download('open-codesign-canvas.html', 'text/html;charset=utf-8', page);
-        setStatus('HTML exportado.', 'ok');
+        setStatus('HTML/CSS y comportamientos declarativos exportados.', 'ok');
     }
 
+    function splitStoredCss(value) {
+        var css = String(value || '');
+        var marker = css.indexOf(CSS_OVERRIDES_MARKER);
+        return {
+            source: marker === -1 ? css : css.slice(0, marker).trimEnd(),
+            overrides: marker === -1 ? '' : css.slice(marker + CSS_OVERRIDES_MARKER.length).trim()
+        };
+    }
+
+    function serializedCss() {
+        return sourceCss.trimEnd() + '\n\n' + CSS_OVERRIDES_MARKER + '\n' + (editor.getCss() || '');
+    }
+
+    function ensureSourceCss() {
+        var canvasDocument = editor.Canvas.getDocument();
+        if (!canvasDocument || !canvasDocument.head) {
+            return;
+        }
+        var style = canvasDocument.head.querySelector('style[data-ocd-source-css]');
+        if (!style) {
+            style = canvasDocument.createElement('style');
+            style.setAttribute('data-ocd-source-css', 'preserved');
+            canvasDocument.head.prepend(style);
+        }
+        style.textContent = sourceCss;
+    }
+
+    function refreshPresentation() {
+        ensureSourceCss();
+        var selected = editor.getSelected();
+        inspector.refresh(selected);
+        gridControls.refresh(selected);
+        behaviorApi.installCanvasRuntime();
+    }
+
+    editor.on('canvas:frame:load', function () {
+        window.requestAnimationFrame(refreshPresentation);
+    });
+    editor.on('project:load', function () {
+        window.requestAnimationFrame(refreshPresentation);
+    });
+    editor.on('load', function () {
+        window.requestAnimationFrame(refreshPresentation);
+    });
+
     function exportCss() {
-        download('open-codesign-canvas.css', 'text/css;charset=utf-8', editor.getCss() || '');
+        download(
+            'open-codesign-canvas.css',
+            'text/css;charset=utf-8',
+            sourceCss + '\n' + (behaviorApi.buildExport().css || '')
+        );
         setStatus('CSS exportado.', 'ok');
     }
 
@@ -262,6 +360,8 @@
 
         editor.setComponents(split.html);
         editor.setStyle(css);
+        sourceCss = css;
+        window.requestAnimationFrame(ensureSourceCss);
 
         var note = 'HTML y CSS cargados en el lienzo. Pulsa Guardar para persistirlos.';
         if (split.hadScript) {

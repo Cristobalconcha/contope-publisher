@@ -268,7 +268,7 @@ async function checkAdminSurface() {
     const enqueued = callsOf(enqueue).filter(
       (entry) => entry.name === 'wp_enqueue_script' || entry.name === 'wp_enqueue_style',
     );
-    check(enqueued.length === 4, 'enqueue_assets() debe encolar los dos assets vendor y los dos propios.');
+    check(enqueued.length === 8, 'enqueue_assets() debe encolar GrapesJS, los cuatro módulos Canvas y los assets propios.');
     for (const entry of enqueued) {
       check(
         firstCall(entry.node.arguments[1], 'plugins_url') !== null,
@@ -394,7 +394,7 @@ async function checkSanitizer() {
   check(allowed !== null, 'Falta allowed_html().');
   if (allowed) {
     const blocked = stringLiterals(allowed);
-    for (const tag of ['iframe', 'script', 'style', 'object', 'embed', 'form']) {
+    for (const tag of ['script', 'style', 'object', 'embed', 'form']) {
       check(blocked.includes(tag), `allowed_html() debe retirar explícitamente <${tag}>.`);
     }
     let unsets = 0;
@@ -406,7 +406,16 @@ async function checkSanitizer() {
       callNames(allowed).includes('wp_kses_allowed_html'),
       'allowed_html() debe partir del conjunto permitido de WordPress.',
     );
+    check(
+      stringLiterals(allowed).includes('iframe'),
+      'allowed_html() debe admitir iframe con atributos acotados para mapas y video.',
+    );
   }
+
+  check(
+    methodOf(sanitizer, 'first_invalid_iframe') !== null,
+    'El saneador debe validar el origen de cada iframe admitido.',
+  );
 
   const css = methodOf(sanitizer, 'sanitize_css');
   check(css !== null, 'Falta sanitize_css().');
@@ -609,16 +618,22 @@ async function checkIsolationAndAssets() {
     'open-codesign-publisher/includes/class-ocd-canvas-document-repository.php',
     'open-codesign-publisher/includes/class-ocd-canvas-document-sanitizer.php',
     'open-codesign-publisher/assets/js/ocd-canvas-editor.js',
+    'open-codesign-publisher/assets/js/ocd-computed-inspector.js',
+    'open-codesign-publisher/assets/js/ocd-canvas-grid.global.js',
+    'open-codesign-publisher/assets/js/ocd-grid-controls.js',
+    'open-codesign-publisher/assets/js/ocd-behaviors.js',
     'open-codesign-publisher/assets/css/ocd-canvas-editor.css',
   ];
   const cdnPattern = /(unpkg\.com|jsdelivr\.net|cdnjs\.|cdn\.|fonts\.googleapis\.com|grapesjs\.com\/)/i;
   for (const relativePath of authored) {
     const source = await readFile(fileURLToPath(new URL(relativePath, repoRoot)), 'utf8');
     check(!cdnPattern.test(source), `${relativePath} no debe referenciar un CDN.`);
-    check(
-      !/<iframe/i.test(source),
-      `${relativePath} no debe emitir un iframe como formato publicado.`,
-    );
+    if (!relativePath.endsWith('class-ocd-canvas-document-sanitizer.php')) {
+      check(
+        !/<iframe/i.test(source),
+        `${relativePath} no debe emitir un iframe como formato publicado.`,
+      );
+    }
   }
 
   // La pantalla y el script comparten exactamente los mismos controles.
@@ -655,6 +670,14 @@ async function checkIsolationAndAssets() {
   check(
     /storageManager: false/.test(script),
     'GrapesJS no debe usar su almacenamiento propio: la persistencia es de WordPress.',
+  );
+  check(
+    script.includes('OCD-CANVAS-EDITABLE-OVERRIDES') && script.includes('data-ocd-source-css'),
+    'El editor debe preservar el CSS fuente literalmente y separar sus overrides editables.',
+  );
+  check(
+    /css: serializedCss\(\)/.test(script),
+    'El guardado debe enviar el CSS fuente junto con la capa de overrides.',
   );
 }
 

@@ -78,9 +78,37 @@ final class OCD_Canvas_Editor_Admin
             true
         );
         wp_enqueue_script(
+            'ocd-computed-inspector',
+            plugins_url('assets/js/ocd-computed-inspector.js', OCD_PUBLISHER_FILE),
+            ['ocd-grapesjs'],
+            OCD_PUBLISHER_VERSION,
+            true
+        );
+        wp_enqueue_script(
+            'ocd-canvas-grid',
+            plugins_url('assets/js/ocd-canvas-grid.global.js', OCD_PUBLISHER_FILE),
+            ['ocd-grapesjs'],
+            OCD_PUBLISHER_VERSION,
+            true
+        );
+        wp_enqueue_script(
+            'ocd-grid-controls',
+            plugins_url('assets/js/ocd-grid-controls.js', OCD_PUBLISHER_FILE),
+            ['ocd-grapesjs', 'ocd-computed-inspector', 'ocd-canvas-grid'],
+            OCD_PUBLISHER_VERSION,
+            true
+        );
+        wp_enqueue_script(
+            'ocd-behaviors',
+            plugins_url('assets/js/ocd-behaviors.js', OCD_PUBLISHER_FILE),
+            ['ocd-grapesjs'],
+            OCD_PUBLISHER_VERSION,
+            true
+        );
+        wp_enqueue_script(
             'ocd-canvas-editor',
             plugins_url('assets/js/ocd-canvas-editor.js', OCD_PUBLISHER_FILE),
-            ['ocd-grapesjs'],
+            ['ocd-grapesjs', 'ocd-computed-inspector', 'ocd-canvas-grid', 'ocd-grid-controls', 'ocd-behaviors'],
             OCD_PUBLISHER_VERSION,
             true
         );
@@ -161,7 +189,10 @@ final class OCD_Canvas_Editor_Admin
                 <span>GrapesJS <?php echo esc_html(self::GRAPESJS_VERSION); ?> (BSD-3-Clause, local)</span>
             </div>
 
-            <div id="ocd-canvas-editor-root" class="ocd-canvas-editor-root"></div>
+            <div class="ocd-canvas-workspace">
+                <div id="ocd-canvas-editor-root" class="ocd-canvas-editor-root"></div>
+                <aside id="ocd-canvas-inspector" class="ocd-canvas-inspector" aria-label="Inspector de diseño efectivo"></aside>
+            </div>
         </div>
         <?php
     }

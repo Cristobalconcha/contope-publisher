@@ -50,6 +50,7 @@ final class OCD_Canvas_Document_Sanitizer
         'polyline',
         'polygon',
         'hgroup',
+        'iframe',
     ];
 
     /**
@@ -105,6 +106,14 @@ final class OCD_Canvas_Document_Sanitizer
             return new WP_Error(
                 'ocd_canvas_html_tag',
                 sprintf('El HTML contiene etiquetas no admitidas: %s.', implode(', ', $unsupported))
+            );
+        }
+
+        $invalid_iframe = $this->first_invalid_iframe($html);
+        if ($invalid_iframe !== null) {
+            return new WP_Error(
+                'ocd_canvas_iframe_source',
+                sprintf('El iframe referencia un origen no admitido: %s.', $invalid_iframe)
             );
         }
 
@@ -237,13 +246,41 @@ final class OCD_Canvas_Document_Sanitizer
         return null;
     }
 
+    private function first_invalid_iframe(string $html): ?string
+    {
+        if (preg_match_all('/<iframe\b([^>]*)>/i', $html, $matches) === false) {
+            return 'iframe mal formado';
+        }
+        foreach ($matches[1] as $attributes) {
+            if (preg_match('/\bsrc\s*=\s*([\'\"])(.*?)\1/i', $attributes, $source) !== 1) {
+                return 'iframe sin src';
+            }
+            $url = html_entity_decode(trim($source[2]), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            $parts = wp_parse_url($url);
+            if (!is_array($parts) || strtolower((string) ($parts['scheme'] ?? '')) !== 'https') {
+                return substr($url, 0, 100);
+            }
+            $host = strtolower((string) ($parts['host'] ?? ''));
+            $path = (string) ($parts['path'] ?? '');
+            $allowed =
+                ($host === 'www.google.com' && str_starts_with($path, '/maps/embed')) ||
+                (($host === 'www.youtube.com' || $host === 'youtube.com' || $host === 'www.youtube-nocookie.com') && str_starts_with($path, '/embed/')) ||
+                ($host === 'player.vimeo.com' && str_starts_with($path, '/video/'));
+            if (!$allowed) {
+                return substr($url, 0, 100);
+            }
+        }
+
+        return null;
+    }
+
     /**
      * @return array<string, array<string, bool>>
      */
     private function allowed_html(): array
     {
         $allowed = wp_kses_allowed_html('post');
-        foreach (['iframe', 'script', 'style', 'object', 'embed', 'form', 'input', 'select', 'textarea'] as $blocked) {
+        foreach (['script', 'style', 'object', 'embed', 'form', 'input', 'select', 'textarea'] as $blocked) {
             unset($allowed[$blocked]);
         }
         foreach (self::STRUCTURAL_TAGS as $tag) {
@@ -274,6 +311,7 @@ final class OCD_Canvas_Document_Sanitizer
             'source' => ['src' => true, 'srcset' => true, 'sizes' => true, 'type' => true, 'media' => true],
             'video' => ['src' => true, 'poster' => true, 'controls' => true, 'loop' => true, 'muted' => true, 'autoplay' => true, 'playsinline' => true, 'preload' => true, 'width' => true, 'height' => true],
             'audio' => ['src' => true, 'controls' => true, 'loop' => true, 'muted' => true, 'preload' => true],
+            'iframe' => ['src' => true, 'width' => true, 'height' => true, 'title' => true, 'loading' => true, 'allowfullscreen' => true, 'referrerpolicy' => true, 'sandbox' => true],
             'button' => ['type' => true, 'disabled' => true],
             'label' => ['for' => true],
             'svg' => ['viewbox' => true, 'xmlns' => true, 'fill' => true, 'stroke' => true, 'width' => true, 'height' => true, 'preserveaspectratio' => true],
