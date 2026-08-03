@@ -1,0 +1,51 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/theme.json",
+  "version": 3,
+  "settings": {
+    "appearanceTools": true,
+    "layout": { "contentSize": "1120px", "wideSize": "1360px" },
+    "color": {
+      "palette": [
+        { "slug": "background", "name": "Fondo", "color": "#F5F0EB" },
+        { "slug": "surface", "name": "Superficie", "color": "#FAF6F2" },
+        { "slug": "text", "name": "Texto", "color": "#1A1A1A" },
+        { "slug": "muted", "name": "Texto secundario", "color": "#5C4F42" },
+        { "slug": "accent", "name": "Acento", "color": "#A7641A" },
+        { "slug": "green", "name": "Verde", "color": "#2D4A22" }
+      ]
+    },
+    "spacing": { "units": ["px", "rem", "vw", "%"], "blockGap": true },
+    "typography": {
+      "fluid": true,
+      "fontFamilies": [
+        { "slug": "display", "name": "Display", "fontFamily": "'Cormorant Garamond', Georgia, serif" },
+        { "slug": "body", "name": "Cuerpo", "fontFamily": "Inter, system-ui, sans-serif" }
+      ],
+      "fontSizes": [
+        { "slug": "small", "name": "Pequeño", "size": "0.8rem" },
+        { "slug": "medium", "name": "Medio", "size": "1rem" },
+        { "slug": "large", "name": "Grande", "size": "clamp(1.35rem, 2vw, 1.8rem)" },
+        { "slug": "x-large", "name": "Muy grande", "size": "clamp(2.4rem, 6vw, 5rem)" }
+      ]
+    }
+  },
+  "styles": {
+    "color": { "background": "#F5F0EB", "text": "#1A1A1A" },
+    "spacing": { "blockGap": "1.25rem" },
+    "typography": { "fontFamily": "var(--wp--preset--font-family--body)", "lineHeight": "1.6" },
+    "elements": {
+      "heading": { "typography": { "fontFamily": "var(--wp--preset--font-family--display)", "fontWeight": "600", "lineHeight": "1.08" } },
+      "button": { "color": { "background": "#A7641A", "text": "#FFFFFF" }, "border": { "radius": "8px" }, "typography": { "fontSize": "0.8rem", "fontWeight": "600" } },
+      "link": { "color": { "text": "#7B4A13" } }
+    },
+    "blocks": {
+      "core/image": { "border": { "radius": "16px" } },
+      "core/group": { "spacing": { "padding": { "left": "clamp(1.25rem, 4vw, 3rem)", "right": "clamp(1.25rem, 4vw, 3rem)" } } }
+    }
+  },
+  "templateParts": [
+    { "name": "header", "title": "Cabecera", "area": "header" },
+    { "name": "footer", "title": "Pie", "area": "footer" }
+  ]
+}
+

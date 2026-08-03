@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import parser from 'php-parser';
 
 const pluginRoot = fileURLToPath(new URL('../open-codesign-publisher/', import.meta.url));
+const themeRoot = fileURLToPath(new URL('../open-codesign-santa-luisa/', import.meta.url));
 const engine = new parser.Engine({
   parser: { extractDoc: true, php7: true },
   ast: { withPositions: true },
@@ -21,6 +22,7 @@ async function filesUnder(directory, extension) {
 }
 
 const phpFiles = await filesUnder(pluginRoot, '.php');
+phpFiles.push(...(await filesUnder(themeRoot, '.php')));
 for (const file of phpFiles) {
   const source = await readFile(file, 'utf8');
   engine.parseCode(source, file);
@@ -56,6 +58,13 @@ const realFixture = JSON.parse(
 );
 if (realFixture.pages?.length !== 3 || realFixture.project?.id !== 'santa-luisa-de-palpi-real') {
   throw new Error('Santa Luisa fixture must contain the three real project pages.');
+}
+
+const themeJson = JSON.parse(
+  await readFile(new URL('../open-codesign-santa-luisa/theme.json', import.meta.url), 'utf8'),
+);
+if (themeJson.version !== 3 || themeJson.settings?.layout?.wideSize !== '1360px') {
+  throw new Error('Santa Luisa block theme configuration is incomplete.');
 }
 
 console.log(
