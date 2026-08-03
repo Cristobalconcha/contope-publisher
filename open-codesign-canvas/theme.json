@@ -1,0 +1,37 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/theme.json",
+  "version": 3,
+  "settings": {
+    "appearanceTools": true,
+    "layout": { "contentSize": "1120px", "wideSize": "1360px" },
+    "spacing": { "units": ["px", "rem", "em", "vw", "vh", "%"], "blockGap": true },
+    "typography": {
+      "fluid": true,
+      "fontFamilies": [
+        { "slug": "system", "name": "Sistema", "fontFamily": "system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" },
+        { "slug": "serif", "name": "Serif", "fontFamily": "Georgia, 'Times New Roman', 'Cambria', serif" }
+      ],
+      "fontSizes": [
+        { "slug": "small", "name": "Pequeño", "size": "0.8rem" },
+        { "slug": "medium", "name": "Medio", "size": "1rem" },
+        { "slug": "large", "name": "Grande", "size": "clamp(1.35rem, 2vw, 1.8rem)" },
+        { "slug": "x-large", "name": "Muy grande", "size": "clamp(2.4rem, 6vw, 5rem)" }
+      ]
+    }
+  },
+  "styles": {
+    "spacing": { "blockGap": "1.25rem" },
+    "typography": { "fontFamily": "var(--wp--preset--font-family--system)", "lineHeight": "1.6" },
+    "elements": {
+      "heading": { "typography": { "fontWeight": "600", "lineHeight": "1.1" } },
+      "button": { "border": { "radius": "8px" }, "typography": { "fontSize": "0.8rem", "fontWeight": "600" } }
+    },
+    "blocks": {
+      "core/group": { "spacing": { "padding": { "left": "clamp(1.25rem, 4vw, 3rem)", "right": "clamp(1.25rem, 4vw, 3rem)" } } }
+    }
+  },
+  "templateParts": [
+    { "name": "header", "title": "Cabecera", "area": "header" },
+    { "name": "footer", "title": "Pie", "area": "footer" }
+  ]
+}
