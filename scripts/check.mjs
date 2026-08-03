@@ -51,6 +51,13 @@ if (complexFixture.pages?.[0]?.nodes?.length < 4) {
   throw new Error('Complex fixture does not contain the expected top-level structure.');
 }
 
+const realFixture = JSON.parse(
+  await readFile(new URL('../fixtures/santa-luisa-project.json', import.meta.url), 'utf8'),
+);
+if (realFixture.pages?.length !== 3 || realFixture.project?.id !== 'santa-luisa-de-palpi-real') {
+  throw new Error('Santa Luisa fixture must contain the three real project pages.');
+}
+
 console.log(
-  `OK: parsed ${phpFiles.length} PHP files and validated minimal + complex fixtures (${fixture.pages.length + complexFixture.pages.length} pages).`,
+  `OK: parsed ${phpFiles.length} PHP files and validated three fixtures (${fixture.pages.length + complexFixture.pages.length + realFixture.pages.length} pages).`,
 );

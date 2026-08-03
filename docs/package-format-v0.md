@@ -28,6 +28,9 @@ Cada página requiere `id`, `title`, `slug` y `nodes`. Los identificadores deben
 - `image`: referencia de activo o URL;
 - `buttons`: agrupador de botones;
 - `button`: etiqueta y enlace;
+- `details`: resumen desplegable con bloques hijos;
+- `list`: lista ordenada o no ordenada;
+- `video`: video HTML5 con poster opcional;
 - `separator`;
 - `spacer`.
 
@@ -36,4 +39,3 @@ Los nodos desconocidos invalidan la importación. Esta decisión evita pérdidas
 ## Autoridad
 
 La importación inicial crea borradores. Una reimportación futura deberá diferenciar estructura controlada por Open CoDesign y contenido editorial controlado por WordPress; esa política todavía no forma parte de v0.
-

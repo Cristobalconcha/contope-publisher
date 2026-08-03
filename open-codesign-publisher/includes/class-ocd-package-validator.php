@@ -18,6 +18,9 @@ final class OCD_Package_Validator
         'image',
         'buttons',
         'button',
+        'details',
+        'list',
+        'video',
         'separator',
         'spacer',
     ];
@@ -101,6 +104,20 @@ final class OCD_Package_Validator
             if ($parent_type === 'columns' && $type !== 'column') {
                 return new WP_Error('ocd_columns_child', 'Un nodo columns solo puede contener columnas.');
             }
+            if ($type === 'list') {
+                $items = $node['items'] ?? null;
+                if (!is_array($items) || count($items) < 1 || count($items) > 100) {
+                    return new WP_Error('ocd_list_items', 'Un nodo list necesita entre 1 y 100 elementos.');
+                }
+                foreach ($items as $item) {
+                    if (!is_string($item) || trim($item) === '') {
+                        return new WP_Error('ocd_list_item', 'Cada elemento de lista debe contener texto.');
+                    }
+                }
+            }
+            if ($type === 'details' && !$this->text($node['summary'] ?? null)) {
+                return new WP_Error('ocd_details_summary', 'Un nodo details necesita un resumen.');
+            }
 
             $children = $node['children'] ?? [];
             if (!is_array($children)) {
@@ -124,4 +141,3 @@ final class OCD_Package_Validator
         return is_string($value) && trim($value) !== '' && strlen($value) <= 500;
     }
 }
-

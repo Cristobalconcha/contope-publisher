@@ -1,0 +1,131 @@
+{
+  "schemaVersion": 0,
+  "project": { "id": "santa-luisa-de-palpi-real", "name": "Santa Luisa de Palpi" },
+  "pages": [
+    {
+      "id": "home-real",
+      "title": "Inicio — Santa Luisa de Palpi",
+      "slug": "santa-luisa-inicio",
+      "nodes": [
+        {
+          "id": "home.hero", "type": "section", "children": [
+            { "id": "home.hero.image", "type": "image", "url": "https://santaluisadepalpi.kpispublicitarios.com/wp-content/uploads/open-codesign/santa-luisa/BannerFamilia.jpg", "alt": "Vista panorámica de Santa Luisa de Palpi" },
+            { "id": "home.hero.label", "type": "paragraph", "content": "<strong>Paine · Región Metropolitana</strong>" },
+            { "id": "home.hero.title", "type": "heading", "level": 1, "content": "Santa Luisa de Palpi" },
+            { "id": "home.hero.copy", "type": "paragraph", "content": "Parcelas rurales en un entorno privilegiado. Un proyecto pensado para quienes valoran el paisaje, la amplitud y la vida al aire libre." },
+            { "id": "home.hero.actions", "type": "buttons", "children": [
+              { "id": "home.hero.cta", "type": "button", "label": "Conocer más", "url": "/contacto/" }
+            ] }
+          ]
+        },
+        {
+          "id": "home.details", "type": "section", "children": [
+            { "id": "home.details.columns", "type": "columns", "children": [
+              { "id": "home.detail.terrain", "type": "column", "width": "33.3%", "children": [
+                { "id": "home.detail.terrain.title", "type": "heading", "level": 3, "content": "Terreno" },
+                { "id": "home.detail.terrain.copy", "type": "paragraph", "content": "Parcelas desde 5.000 m² con topografía suave, vistas abiertas a la cordillera y suelo apto para cultivo y edificación." }
+              ] },
+              { "id": "home.detail.nature", "type": "column", "width": "33.3%", "children": [
+                { "id": "home.detail.nature.title", "type": "heading", "level": 3, "content": "Naturaleza" },
+                { "id": "home.detail.nature.copy", "type": "paragraph", "content": "Algarrobos centenarios, espinos nativos y fauna local conviven con una parcelación que respeta el ecosistema." }
+              ] },
+              { "id": "home.detail.water", "type": "column", "width": "33.4%", "children": [
+                { "id": "home.detail.water.title", "type": "heading", "level": 3, "content": "Agua" },
+                { "id": "home.detail.water.copy", "type": "paragraph", "content": "Factibilidad de agua potable mediante pozos autorizados en cada parcela y riego por goteo en áreas comunes." }
+              ] }
+            ] }
+          ]
+        },
+        {
+          "id": "home.parcels", "type": "section", "children": [
+            { "id": "home.parcels.label", "type": "paragraph", "content": "<strong>EL TERRENO</strong>" },
+            { "id": "home.parcels.title", "type": "heading", "level": 2, "content": "Plano de parcelas" },
+            { "id": "home.parcels.copy", "type": "paragraph", "content": "Seis lotes disponibles desde 5.000 m²." },
+            { "id": "home.parcels.image", "type": "image", "url": "https://santaluisadepalpi.kpispublicitarios.com/wp-content/uploads/open-codesign/santa-luisa/DJI_0174-scaled.jpg", "alt": "Vista aérea del terreno" }
+          ]
+        },
+        {
+          "id": "home.location", "type": "section", "children": [
+            { "id": "home.location.columns", "type": "columns", "children": [
+              { "id": "home.location.copy-column", "type": "column", "width": "45%", "children": [
+                { "id": "home.location.label", "type": "paragraph", "content": "<strong>CÓMO LLEGAR</strong>" },
+                { "id": "home.location.title", "type": "heading", "level": 2, "content": "Ubicación privilegiada" },
+                { "id": "home.location.copy", "type": "paragraph", "content": "Santa Luisa de Palpi se encuentra en la comuna de Paine, a 45 minutos de Santiago por la Ruta 5 Sur." },
+                { "id": "home.location.list", "type": "list", "items": ["Ruta 5 Sur · Salida Paine", "45 minutos de Santiago", "15 minutos de servicios y colegios", "Acceso pavimentado durante todo el año"] }
+              ] },
+              { "id": "home.location.visual", "type": "column", "width": "55%", "children": [
+                { "id": "home.location.image", "type": "image", "url": "https://santaluisadepalpi.kpispublicitarios.com/wp-content/uploads/open-codesign/santa-luisa/DJI_0256-scaled.jpg", "alt": "Entorno de Santa Luisa de Palpi" }
+              ] }
+            ] }
+          ]
+        },
+        {
+          "id": "home.video", "type": "section", "children": [
+            { "id": "home.video.title", "type": "heading", "level": 2, "content": "Conoce el entorno" },
+            { "id": "home.video.media", "type": "video", "url": "https://santaluisadepalpi.kpispublicitarios.com/wp-content/uploads/open-codesign/santa-luisa/Simular-drone.mp4", "poster": "https://santaluisadepalpi.kpispublicitarios.com/wp-content/uploads/open-codesign/santa-luisa/drone-aerial-placeholder.png" }
+          ]
+        },
+        {
+          "id": "home.gallery", "type": "section", "children": [
+            { "id": "home.gallery.title", "type": "heading", "level": 2, "content": "Santa Luisa de Palpi en imágenes" },
+            { "id": "home.gallery.columns", "type": "columns", "children": [
+              { "id": "home.gallery.one", "type": "column", "width": "33.3%", "children": [{ "id": "home.gallery.one.image", "type": "image", "url": "https://santaluisadepalpi.kpispublicitarios.com/wp-content/uploads/open-codesign/santa-luisa/DSCF9680.jpg", "alt": "Paisaje de Santa Luisa de Palpi" }] },
+              { "id": "home.gallery.two", "type": "column", "width": "33.3%", "children": [{ "id": "home.gallery.two.image", "type": "image", "url": "https://santaluisadepalpi.kpispublicitarios.com/wp-content/uploads/open-codesign/santa-luisa/DJI_0256-scaled.jpg", "alt": "Vista aérea del terreno" }] },
+              { "id": "home.gallery.three", "type": "column", "width": "33.4%", "children": [{ "id": "home.gallery.three.image", "type": "image", "url": "https://santaluisadepalpi.kpispublicitarios.com/wp-content/uploads/open-codesign/santa-luisa/DSCF9630.jpg", "alt": "Entorno natural" }] }
+            ] }
+          ]
+        },
+        {
+          "id": "home.exit", "type": "section", "children": [
+            { "id": "home.exit.columns", "type": "columns", "children": [
+              { "id": "home.exit.faq", "type": "column", "width": "50%", "children": [
+                { "id": "home.exit.faq.title", "type": "heading", "level": 3, "content": "Preguntas frecuentes" },
+                { "id": "home.exit.faq.copy", "type": "paragraph", "content": "Resuelve tus dudas sobre parcelas, factibilidad y proceso de compra." },
+                { "id": "home.exit.faq.button", "type": "buttons", "children": [{ "id": "home.exit.faq.link", "type": "button", "label": "Ver preguntas", "url": "/preguntas-frecuentes/" }] }
+              ] },
+              { "id": "home.exit.contact", "type": "column", "width": "50%", "children": [
+                { "id": "home.exit.contact.title", "type": "heading", "level": 3, "content": "Contacto" },
+                { "id": "home.exit.contact.copy", "type": "paragraph", "content": "Escríbenos o agenda una visita guiada al terreno." },
+                { "id": "home.exit.contact.button", "type": "buttons", "children": [{ "id": "home.exit.contact.link", "type": "button", "label": "Contactar", "url": "/contacto/" }] }
+              ] }
+            ] }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "faq-real", "title": "Preguntas frecuentes", "slug": "preguntas-frecuentes", "nodes": [
+        { "id": "faq.header", "type": "section", "children": [
+          { "id": "faq.label", "type": "paragraph", "content": "<strong>INFORMACIÓN</strong>" },
+          { "id": "faq.title", "type": "heading", "level": 1, "content": "Preguntas frecuentes" }
+        ] },
+        { "id": "faq.one", "type": "details", "summary": "¿Qué tipo de parcelas están disponibles?", "children": [{ "id": "faq.one.answer", "type": "paragraph", "content": "Ofrecemos parcelas rurales de 5.000 m² en adelante, ubicadas en el sector de Paine, Región Metropolitana." }] },
+        { "id": "faq.two", "type": "details", "summary": "¿Cuentan con factibilidad de agua?", "children": [{ "id": "faq.two.answer", "type": "paragraph", "content": "Sí, las parcelas cuentan con factibilidad de agua potable mediante pozos autorizados." }] },
+        { "id": "faq.three", "type": "details", "summary": "¿Hay restricciones de construcción?", "children": [{ "id": "faq.three.answer", "type": "paragraph", "content": "Se permite una vivienda principal por parcela más construcciones complementarias, respetando la normativa rural vigente." }] },
+        { "id": "faq.four", "type": "details", "summary": "¿Es posible visitar el terreno?", "children": [{ "id": "faq.four.answer", "type": "paragraph", "content": "Por supuesto. Coordinamos visitas guiadas para conocer el paisaje, los deslindes y la conectividad." }] },
+        { "id": "faq.five", "type": "details", "summary": "¿Aceptan crédito hipotecario?", "children": [{ "id": "faq.five.answer", "type": "paragraph", "content": "El proyecto evaluará con cada interesado las alternativas de financiamiento disponibles." }] }
+      ]
+    },
+    {
+      "id": "contact-real", "title": "Contacto", "slug": "contacto", "nodes": [
+        { "id": "contact.header", "type": "section", "children": [
+          { "id": "contact.label", "type": "paragraph", "content": "<strong>HABLEMOS</strong>" },
+          { "id": "contact.title", "type": "heading", "level": 1, "content": "Contacto" },
+          { "id": "contact.intro", "type": "paragraph", "content": "Estamos disponibles para conversar y coordinar tu visita al terreno." }
+        ] },
+        { "id": "contact.cards", "type": "columns", "children": [
+          { "id": "contact.email", "type": "column", "width": "50%", "children": [
+            { "id": "contact.email.title", "type": "heading", "level": 3, "content": "Escríbenos" },
+            { "id": "contact.email.copy", "type": "paragraph", "content": "Respondemos consultas por correo electrónico." },
+            { "id": "contact.email.action", "type": "buttons", "children": [{ "id": "contact.email.button", "type": "button", "label": "Enviar correo", "url": "mailto:contacto@santaluisadepalpi.cl" }] }
+          ] },
+          { "id": "contact.visit", "type": "column", "width": "50%", "children": [
+            { "id": "contact.visit.title", "type": "heading", "level": 3, "content": "Visita el terreno" },
+            { "id": "contact.visit.copy", "type": "paragraph", "content": "Coordinamos una visita guiada para que conozcas el lugar en persona." },
+            { "id": "contact.visit.action", "type": "buttons", "children": [{ "id": "contact.visit.button", "type": "button", "label": "Agendar visita", "url": "#" }] }
+          ] }
+        ] }
+      ]
+    }
+  ]
+}

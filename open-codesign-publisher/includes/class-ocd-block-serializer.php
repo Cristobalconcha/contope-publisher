@@ -52,6 +52,31 @@ final class OCD_Block_Serializer
                 $content = wp_kses_post((string) ($node['content'] ?? ''));
                 return $this->leaf_block('core/paragraph', $metadata, '<p>' . $content . '</p>');
 
+            case 'list':
+                $ordered = !empty($node['ordered']);
+                $tag = $ordered ? 'ol' : 'ul';
+                $items = array_map(
+                    static fn($item): string => '<li>' . wp_kses_post((string) $item) . '</li>',
+                    $node['items'] ?? []
+                );
+                $attrs = $ordered ? array_merge($metadata, ['ordered' => true]) : $metadata;
+                return $this->leaf_block(
+                    'core/list',
+                    $attrs,
+                    '<' . $tag . ' class="wp-block-list">' . implode('', $items) . '</' . $tag . '>'
+                );
+
+            case 'details':
+                $summary = esc_html((string) ($node['summary'] ?? ''));
+                return $this->details_block($metadata, $summary, $children);
+
+            case 'video':
+                $url = esc_url((string) ($node['url'] ?? ''));
+                $poster = esc_url((string) ($node['poster'] ?? ''));
+                $poster_attr = $poster !== '' ? ' poster="' . $poster . '"' : '';
+                $html = '<figure class="wp-block-video"><video controls src="' . $url . '"' . $poster_attr . '></video></figure>';
+                return $this->leaf_block('core/video', $metadata, $html);
+
             case 'separator':
                 return $this->leaf_block('core/separator', $metadata, '<hr class="wp-block-separator has-alpha-channel-opacity"/>');
 
@@ -112,6 +137,23 @@ final class OCD_Block_Serializer
             'innerBlocks' => [],
             'innerHTML' => $html,
             'innerContent' => [$html],
+        ];
+    }
+
+    private function details_block(array $attrs, string $summary, array $children): array
+    {
+        $opening = '<details class="wp-block-details"><summary>' . $summary . '</summary>';
+        $inner_content = [$opening];
+        foreach ($children as $_child) {
+            $inner_content[] = null;
+        }
+        $inner_content[] = '</details>';
+        return [
+            'blockName' => 'core/details',
+            'attrs' => $attrs,
+            'innerBlocks' => $children,
+            'innerHTML' => $opening . '</details>',
+            'innerContent' => $inner_content,
         ];
     }
 }
