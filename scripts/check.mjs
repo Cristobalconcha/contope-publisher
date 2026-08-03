@@ -4,7 +4,10 @@ import { fileURLToPath } from 'node:url';
 import parser from 'php-parser';
 
 const pluginRoot = fileURLToPath(new URL('../open-codesign-publisher/', import.meta.url));
-const themeRoot = fileURLToPath(new URL('../open-codesign-santa-luisa/', import.meta.url));
+const themeRoots = [
+  fileURLToPath(new URL('../open-codesign-canvas/', import.meta.url)),
+  fileURLToPath(new URL('../open-codesign-santa-luisa/', import.meta.url)),
+];
 const engine = new parser.Engine({
   parser: { extractDoc: true, php7: true },
   ast: { withPositions: true },
@@ -22,7 +25,9 @@ async function filesUnder(directory, extension) {
 }
 
 const phpFiles = await filesUnder(pluginRoot, '.php');
-phpFiles.push(...(await filesUnder(themeRoot, '.php')));
+for (const themeRoot of themeRoots) {
+  phpFiles.push(...(await filesUnder(themeRoot, '.php')));
+}
 for (const file of phpFiles) {
   const source = await readFile(file, 'utf8');
   engine.parseCode(source, file);
@@ -60,11 +65,26 @@ if (realFixture.pages?.length !== 3 || realFixture.project?.id !== 'santa-luisa-
   throw new Error('Santa Luisa fixture must contain the three real project pages.');
 }
 
-const themeJson = JSON.parse(
+const childThemeJson = JSON.parse(
   await readFile(new URL('../open-codesign-santa-luisa/theme.json', import.meta.url), 'utf8'),
 );
-if (themeJson.version !== 3 || themeJson.settings?.layout?.wideSize !== '1360px') {
+if (childThemeJson.version !== 3 || childThemeJson.settings?.layout?.wideSize !== '1360px') {
   throw new Error('Santa Luisa block theme configuration is incomplete.');
+}
+
+const parentThemeJson = JSON.parse(
+  await readFile(new URL('../open-codesign-canvas/theme.json', import.meta.url), 'utf8'),
+);
+if (parentThemeJson.version !== 3 || parentThemeJson.settings?.layout?.wideSize !== '1360px') {
+  throw new Error('Open CoDesign Canvas block theme configuration is incomplete.');
+}
+
+const childStylesheet = await readFile(
+  new URL('../open-codesign-santa-luisa/style.css', import.meta.url),
+  'utf8',
+);
+if (!childStylesheet.includes('Template: open-codesign-canvas')) {
+  throw new Error('Santa Luisa must declare Open CoDesign Canvas as its parent theme.');
 }
 
 console.log(
