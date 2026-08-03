@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Open CoDesign Publisher
  * Description: Importa proyectos Open CoDesign como páginas Gutenberg nativas y editables.
- * Version: 0.1.12-dev
+ * Version: 0.1.13-dev
  * Requires at least: 6.5
  * Requires PHP: 8.0
  * Author: Open CoDesign Publisher contributors
@@ -13,7 +13,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('OCD_PUBLISHER_VERSION', '0.1.12-dev');
+define('OCD_PUBLISHER_VERSION', '0.1.13-dev');
 define('OCD_PUBLISHER_FILE', __FILE__);
 define('OCD_PUBLISHER_DIR', plugin_dir_path(__FILE__));
 

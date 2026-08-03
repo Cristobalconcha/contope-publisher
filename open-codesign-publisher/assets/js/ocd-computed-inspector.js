@@ -442,6 +442,12 @@
     }
 
     function cleanBrandSvg(svgText, imageComponent) {
+      const imageElement = getElement(imageComponent);
+      const imageWindow = imageElement?.ownerDocument?.defaultView;
+      const imageBounds = imageElement?.getBoundingClientRect();
+      const imageStyle = imageElement && imageWindow ? imageWindow.getComputedStyle(imageElement) : null;
+      const measuredWidth = imageBounds?.width || Number.parseFloat(imageStyle?.width || '0');
+      const measuredHeight = imageBounds?.height || Number.parseFloat(imageStyle?.height || '0');
       const parser = new global.DOMParser();
       const parsed = parser.parseFromString(svgText, 'image/svg+xml');
       const sourceSvg = parsed.documentElement;
@@ -478,6 +484,17 @@
       renderedSvg.setAttribute('role', 'img');
       renderedSvg.setAttribute('aria-label', imageAttributes.alt || 'Logotipo de marca');
       if (imageAttributes.id) renderedSvg.setAttribute('id', imageAttributes.id);
+      if (Number.isFinite(measuredWidth) && measuredWidth > 0) {
+        renderedSvg.setAttribute('width', String(Math.round(measuredWidth * 100) / 100));
+        renderedSvg.style.width = `${measuredWidth}px`;
+      }
+      if (Number.isFinite(measuredHeight) && measuredHeight > 0) {
+        renderedSvg.setAttribute('height', String(Math.round(measuredHeight * 100) / 100));
+        renderedSvg.style.height = `${measuredHeight}px`;
+      }
+      if (imageStyle?.display && imageStyle.display !== 'inline') {
+        renderedSvg.style.display = imageStyle.display;
+      }
       const classes = componentClasses(imageComponent).filter((name) => name !== 'ocd-brand-logo');
       renderedSvg.setAttribute('class', [...classes, 'ocd-brand-logo'].join(' '));
       scratch.remove();

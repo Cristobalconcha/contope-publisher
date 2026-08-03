@@ -23,6 +23,7 @@ const initialHtml = `
 const initialCss = `
   :root { --radius-container: 16px; --radius-card: 12px; }
   .hero { border-radius: 0 0 var(--radius-container) var(--radius-container); }
+  .svg-logo { width:100px; height:40px; }
   .details__grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem; }
   .detail-card { border-radius:var(--radius-card); padding:1rem; }
   .nav--scrolled { background:#f5f0eb; }`;
@@ -74,6 +75,9 @@ window.fetch=async(_url,options)=>{if(String(_url).endsWith('/Logo.svg'))return 
   await api.inspector.applySvgMask('#123456','#fefefe','brand-mark');
   const brandVectorCss=api.editor.getCss();
   const brandVectorApplied=api.editor.getHtml().includes('data-ocd-brand-logo="primary"')&&brandVectorCss.includes('--ocd-brand-color-dark')&&brandVectorCss.includes('prefers-color-scheme')&&!brandVectorCss.includes('mask-image');
+  const brandVector=api.editor.getWrapper().find('[data-ocd-brand-logo]')[0];
+  const brandVectorBounds=brandVector.getEl().getBoundingClientRect();
+  const brandVectorSizePreserved=brandVectorBounds.width===100&&brandVectorBounds.height===40;
   const video=api.editor.getWrapper().find('.hero__video')[0];
   const videoType=video.get('type');
   const videoControls=video.getEl().hasAttribute('controls');
@@ -118,9 +122,9 @@ window.fetch=async(_url,options)=>{if(String(_url).endsWith('/Logo.svg'))return 
   const soundToggle=publicVideo.parentElement.querySelector('.ocd-video-sound-toggle');
   soundToggle.click();
   const publicVideoSoundEnabled=!publicVideo.muted&&soundToggle.getAttribute('aria-pressed')==='true';
-  const ok=heroRadius==='16px'&&cardRadius==='12px'&&restored.template===api.grid.presets['1/2/1']&&restored.gap==='2rem'&&behavior.length===1&&gridPersisted&&brandVectorApplied&&sidePanelTabs&&inspectorCanvasTop==='0px'&&videoType==='ocd-video'&&!videoControls&&resolvedSrc.startsWith('https://example.test/uploads/')&&stored.revision>=3&&headTagsStripped&&publicHeaderTop==='32px'&&publicVideoMuted&&publicVideoSoundEnabled;
+  const ok=heroRadius==='16px'&&cardRadius==='12px'&&restored.template===api.grid.presets['1/2/1']&&restored.gap==='2rem'&&behavior.length===1&&gridPersisted&&brandVectorApplied&&brandVectorSizePreserved&&sidePanelTabs&&inspectorCanvasTop==='0px'&&videoType==='ocd-video'&&!videoControls&&resolvedSrc.startsWith('https://example.test/uploads/')&&stored.revision>=3&&headTagsStripped&&publicHeaderTop==='32px'&&publicVideoMuted&&publicVideoSoundEnabled;
   document.documentElement.dataset.ocdRuntime=ok?'passed':'failed';
-  document.documentElement.dataset.ocdRuntimeDetails=JSON.stringify({heroRadius,cardRadius,template:restored.template,gap:restored.gap,behavior:behavior.length,revision:stored.revision,headTagsStripped,brandVectorApplied,sidePanelTabs,inspectorCanvasTop,publicHeaderTop,publicVideoMuted,publicVideoSoundEnabled,videoType,videoControls,resolvedSrc,published:document.getElementById('ocd-canvas-view-page').href});
+  document.documentElement.dataset.ocdRuntimeDetails=JSON.stringify({heroRadius,cardRadius,template:restored.template,gap:restored.gap,behavior:behavior.length,revision:stored.revision,headTagsStripped,brandVectorApplied,brandVectorSizePreserved,sidePanelTabs,inspectorCanvasTop,publicHeaderTop,publicVideoMuted,publicVideoSoundEnabled,videoType,videoControls,resolvedSrc,published:document.getElementById('ocd-canvas-view-page').href});
 }catch(error){document.documentElement.dataset.ocdRuntime='failed';document.documentElement.dataset.ocdRuntimeDetails=phase+': '+error.message;}})();
 </script></body></html>`;
 
