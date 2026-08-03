@@ -45,6 +45,7 @@ Text Domain: ocd-canvas
 .ocd-site-footer { border-top: 1px solid var(--ocd-border-color, rgba(0, 0, 0, 0.12)); }
 
 @media (max-width: 781px) {
+  .ocd-main .wp-block-columns { flex-wrap: wrap !important; }
   .ocd-main .wp-block-column[style] { flex-basis: 100% !important; }
   .ocd-site-header { position: relative; }
 }
