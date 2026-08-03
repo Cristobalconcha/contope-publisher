@@ -25,6 +25,12 @@ no genera bloques Gutenberg y no interviene en el importador de paquetes.
    nonce y comprobación de capacidad en cada petición.
 9. Exporta HTML autosuficiente —CSS y runtime declarativo incluidos— o CSS por
    separado desde el navegador.
+10. Resuelve referencias locales `file://` y `assets/` contra el árbol administrado
+    `wp-content/uploads/open-codesign`, usando nombre normalizado y sin exponer
+    rutas arbitrarias del servidor.
+11. `Publicar/actualizar página` guarda primero el Canvas y crea o actualiza una
+    página WordPress identificada por el ID estable del documento. La página usa
+    una plantilla standalone y ofrece un enlace directo de visualización.
 
 ## Fidelidad del CSS
 
@@ -110,14 +116,17 @@ iframe, y la integridad byte a byte del vendor.
 
 `npm run check:canvas-runtime` abre un navegador real, verifica radios de 16 px y
 12 px derivados de variables, aplica una cuadrícula `1/2/1`, guarda, la altera,
-recarga y comprueba que columnas, CSS y comportamiento sobrevivieron.
+recarga y comprueba que columnas, CSS y comportamiento sobrevivieron. También
+verifica video sin controles añadidos, resolución de una ruta `file://` y la
+acción de publicación con enlace resultante.
 
 ## Límites conocidos
 
 - Es un **slice vertical**, no un page builder: un único documento, sin lista de
   documentos, sin publicación a páginas y sin bloques Gutenberg.
 - No hay subida de imágenes: el gestor de activos de GrapesJS está sin `upload`.
-  Las imágenes deben referenciarse por URL o `data:`.
+  El resolver reutiliza activos ya existentes bajo `uploads/open-codesign`; un
+  activo nuevo todavía debe subirse previamente a ese árbol administrado.
 - Los límites de saneamiento (2 MB + 512 kB + 4 MB) son mayores que el
   `post_max_size` habitual de PHP (8 MB) una vez aplicada la codificación
   `application/x-www-form-urlencoded`. Un documento muy grande puede llegar con

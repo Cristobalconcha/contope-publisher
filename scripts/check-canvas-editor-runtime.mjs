@@ -12,7 +12,7 @@ const fixture = path.join(temp, 'index.html');
 
 const initialHtml = `
   <nav class="nav">Menú</nav>
-  <section class="hero"><h1>Santa Luisa de Palpi</h1></section>
+  <section class="hero"><video class="hero__video" autoplay muted loop></video><h1>Santa Luisa de Palpi</h1></section>
   <section class="details__grid">
     <article class="detail-card">Terreno</article>
     <article class="detail-card">Naturaleza</article>
@@ -32,14 +32,15 @@ const html = `<!doctype html>
 <button id="ocd-canvas-save">Guardar</button><button id="ocd-canvas-reload">Recargar</button>
 <button id="ocd-canvas-export-html">Exportar HTML</button><button id="ocd-canvas-export-css">Exportar CSS</button>
 <button id="ocd-canvas-toggle-import">Importar</button><button id="ocd-canvas-import-apply">Aplicar</button>
+<input id="ocd-canvas-page-title" value="Santa Luisa Canvas"><button id="ocd-canvas-publish">Publicar</button><a id="ocd-canvas-view-page" hidden></a>
 <span id="ocd-canvas-status"></span><span id="ocd-canvas-revision"></span><span id="ocd-canvas-updated"></span>
 <div id="ocd-canvas-import" hidden><textarea id="ocd-canvas-import-html"></textarea><textarea id="ocd-canvas-import-css"></textarea></div>
 <div class="ocd-canvas-workspace"><div id="ocd-canvas-editor-root" class="ocd-canvas-editor-root"></div><aside id="ocd-canvas-inspector" class="ocd-canvas-inspector"></aside></div>
 <script>
 window.confirm=()=>true;
-window.ocdCanvasEditor={ajaxUrl:'mock',nonce:'nonce',loadAction:'load',saveAction:'save',documentId:'runtime-test',document:{documentId:'runtime-test',projectData:'{}',html:${JSON.stringify(initialHtml)},css:${JSON.stringify(initialCss)},revision:0,updatedAt:''},loadError:''};
+window.ocdCanvasEditor={ajaxUrl:'mock',nonce:'nonce',loadAction:'load',saveAction:'save',resolveAssetsAction:'resolve',publishAction:'publish',publishedPage:null,documentId:'runtime-test',document:{documentId:'runtime-test',projectData:'{}',html:${JSON.stringify(initialHtml)},css:${JSON.stringify(initialCss)},revision:0,updatedAt:''},loadError:''};
 let stored=structuredClone(window.ocdCanvasEditor.document);
-window.fetch=async(_url,options)=>{const body=new URLSearchParams(options.body);if(body.get('action')==='save'){stored={...stored,projectData:body.get('project_data'),html:body.get('html'),css:body.get('css'),revision:stored.revision+1,updatedAt:new Date().toISOString()};}return {text:async()=>JSON.stringify({success:true,data:structuredClone(stored)})};};
+window.fetch=async(_url,options)=>{const body=new URLSearchParams(options.body);const action=body.get('action');let data=structuredClone(stored);if(action==='save'){stored={...stored,projectData:body.get('project_data'),html:body.get('html'),css:body.get('css'),revision:stored.revision+1,updatedAt:new Date().toISOString()};data=structuredClone(stored);}else if(action==='resolve'){const refs=JSON.parse(body.get('asset_refs'));data={mapping:Object.fromEntries(refs.map(ref=>[ref,'https://example.test/uploads/'+ref.split('/').pop()])),missing:[]};}else if(action==='publish'){data={pageId:42,title:body.get('title'),status:'publish',url:'https://example.test/santa-luisa-canvas/',editUrl:'https://example.test/wp-admin/post.php?post=42'};}return {text:async()=>JSON.stringify({success:true,data})};};
 </script>
 <script src="${asset('vendor/grapesjs/grapes.min.js')}"></script>
 <script src="${asset('js/ocd-computed-inspector.js')}"></script>
@@ -52,6 +53,9 @@ window.fetch=async(_url,options)=>{const body=new URLSearchParams(options.body);
   const wait=(predicate,timeout=8000)=>new Promise((resolve,reject)=>{const start=Date.now();const tick=()=>{if(predicate())return resolve();if(Date.now()-start>timeout)return reject(new Error('timeout'));setTimeout(tick,50)};tick()});
   await wait(()=>window.ocdCanvas?.editor?.Canvas?.getDocument());
   const api=window.ocdCanvas;
+  const video=api.editor.getWrapper().find('.hero__video')[0];
+  const videoType=video.get('type');
+  const videoControls=video.getEl().hasAttribute('controls');
   const hero=api.editor.getWrapper().find('.hero')[0];
   api.editor.select(hero);
   await wait(()=>api.inspector.refresh(hero)?.values?.['border-bottom-left-radius']?.computedValue==='16px');
@@ -71,9 +75,16 @@ window.fetch=async(_url,options)=>{const body=new URLSearchParams(options.body);
   await new Promise(r=>setTimeout(r,100));
   const cardRadius=api.inspector.refresh(restoredCard).values['border-bottom-left-radius'].computedValue;
   const behavior=api.behaviors.attached();
-  const ok=heroRadius==='16px'&&cardRadius==='12px'&&restored.template===api.grid.presets['1/2/1']&&restored.gap==='2rem'&&behavior.length===1&&stored.projectData.includes('ocdGridConfig');
+  document.getElementById('ocd-canvas-publish').click();
+  await wait(()=>document.getElementById('ocd-canvas-view-page').href.includes('/santa-luisa-canvas/'));
+  document.getElementById('ocd-canvas-import-html').value='<img class="resolved-image" src="file:///G:/assets/BannerFamilia.jpg">';
+  document.getElementById('ocd-canvas-import-css').value='.resolved-image{width:100%}';
+  document.getElementById('ocd-canvas-import-apply').click();
+  await wait(()=>api.editor.getWrapper().find('.resolved-image')[0]?.getAttributes().src.startsWith('https://example.test/uploads/'));
+  const resolvedSrc=api.editor.getWrapper().find('.resolved-image')[0].getAttributes().src;
+  const ok=heroRadius==='16px'&&cardRadius==='12px'&&restored.template===api.grid.presets['1/2/1']&&restored.gap==='2rem'&&behavior.length===1&&stored.projectData.includes('ocdGridConfig')&&videoType==='ocd-video'&&!videoControls&&resolvedSrc.startsWith('https://example.test/uploads/')&&stored.revision===2;
   document.documentElement.dataset.ocdRuntime=ok?'passed':'failed';
-  document.documentElement.dataset.ocdRuntimeDetails=JSON.stringify({heroRadius,cardRadius,template:restored.template,gap:restored.gap,behavior:behavior.length,revision:stored.revision});
+  document.documentElement.dataset.ocdRuntimeDetails=JSON.stringify({heroRadius,cardRadius,template:restored.template,gap:restored.gap,behavior:behavior.length,revision:stored.revision,videoType,videoControls,resolvedSrc,published:document.getElementById('ocd-canvas-view-page').href});
 }catch(error){document.documentElement.dataset.ocdRuntime='failed';document.documentElement.dataset.ocdRuntimeDetails=error.message;}})();
 </script></body></html>`;
 

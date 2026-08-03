@@ -16,6 +16,8 @@ final class OCD_Canvas_Editor_Admin
     public const NONCE_ACTION = 'ocd_canvas_editor';
     public const AJAX_LOAD = 'ocd_canvas_editor_load';
     public const AJAX_SAVE = 'ocd_canvas_editor_save';
+    public const AJAX_RESOLVE_ASSETS = 'ocd_canvas_editor_resolve_assets';
+    public const AJAX_PUBLISH = 'ocd_canvas_editor_publish';
     public const CAPABILITY = 'manage_options';
 
     /** Versión exacta del vendor incluido en `assets/vendor/grapesjs`. */
@@ -25,7 +27,9 @@ final class OCD_Canvas_Editor_Admin
 
     public function __construct(
         private OCD_Canvas_Document_Repository $repository,
-        private OCD_Canvas_Document_Sanitizer $sanitizer
+        private OCD_Canvas_Document_Sanitizer $sanitizer,
+        private OCD_Canvas_Asset_Resolver $asset_resolver,
+        private OCD_Canvas_Page_Publisher $publisher
     ) {
     }
 
@@ -35,6 +39,8 @@ final class OCD_Canvas_Editor_Admin
         add_action('admin_enqueue_scripts', [$this, 'enqueue_assets']);
         add_action('wp_ajax_' . self::AJAX_LOAD, [$this, 'handle_load']);
         add_action('wp_ajax_' . self::AJAX_SAVE, [$this, 'handle_save']);
+        add_action('wp_ajax_' . self::AJAX_RESOLVE_ASSETS, [$this, 'handle_resolve_assets']);
+        add_action('wp_ajax_' . self::AJAX_PUBLISH, [$this, 'handle_publish']);
     }
 
     public function add_menu(): void
@@ -119,9 +125,12 @@ final class OCD_Canvas_Editor_Admin
             'nonce' => wp_create_nonce(self::NONCE_ACTION),
             'loadAction' => self::AJAX_LOAD,
             'saveAction' => self::AJAX_SAVE,
+            'resolveAssetsAction' => self::AJAX_RESOLVE_ASSETS,
+            'publishAction' => self::AJAX_PUBLISH,
             'documentId' => OCD_Canvas_Document_Repository::DOCUMENT_ID,
             'document' => is_wp_error($document) ? null : $document,
             'loadError' => is_wp_error($document) ? $document->get_error_message() : '',
+            'publishedPage' => $this->publisher->current(OCD_Canvas_Document_Repository::DOCUMENT_ID),
         ];
 
         // JSON_HEX_TAG evita cualquier salida de `<` dentro del script en línea.
@@ -157,6 +166,10 @@ final class OCD_Canvas_Editor_Admin
                 <button type="button" class="button" id="ocd-canvas-toggle-import" aria-expanded="false" aria-controls="ocd-canvas-import">
                     Importar HTML/CSS
                 </button>
+                <label class="ocd-canvas-title-label" for="ocd-canvas-page-title">Título público</label>
+                <input type="text" id="ocd-canvas-page-title" value="Página Open CoDesign Canvas" maxlength="160">
+                <button type="button" class="button button-primary" id="ocd-canvas-publish">Publicar/actualizar página</button>
+                <a id="ocd-canvas-view-page" class="button" href="#" target="_blank" rel="noopener" hidden>Ver página</a>
                 <span class="ocd-canvas-status" id="ocd-canvas-status" role="status" aria-live="polite"></span>
             </div>
 
@@ -247,5 +260,35 @@ final class OCD_Canvas_Editor_Admin
         }
 
         wp_send_json_success($saved);
+    }
+
+    public function handle_resolve_assets(): void
+    {
+        if (!current_user_can(self::CAPABILITY)) {
+            wp_send_json_error(['message' => 'Permisos insuficientes.'], 403);
+        }
+        check_ajax_referer(self::NONCE_ACTION, 'nonce');
+
+        $raw = isset($_POST['asset_refs']) ? (string) wp_unslash($_POST['asset_refs']) : '[]';
+        $references = json_decode($raw, true, 8);
+        if (!is_array($references)) {
+            wp_send_json_error(['message' => 'La lista de activos no es JSON válido.'], 400);
+        }
+        wp_send_json_success($this->asset_resolver->resolve($references));
+    }
+
+    public function handle_publish(): void
+    {
+        if (!current_user_can(self::CAPABILITY)) {
+            wp_send_json_error(['message' => 'Permisos insuficientes.'], 403);
+        }
+        check_ajax_referer(self::NONCE_ACTION, 'nonce');
+
+        $title = isset($_POST['title']) ? sanitize_text_field((string) wp_unslash($_POST['title'])) : '';
+        $published = $this->publisher->publish(OCD_Canvas_Document_Repository::DOCUMENT_ID, $title);
+        if (is_wp_error($published)) {
+            wp_send_json_error(['message' => $published->get_error_message()], 400);
+        }
+        wp_send_json_success($published);
     }
 }

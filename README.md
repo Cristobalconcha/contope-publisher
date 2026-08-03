@@ -32,6 +32,8 @@ Incluye inspector de estilos realmente renderizados, edición local o por clase,
 presets y manejadores de columnas, comportamiento declarativo de navegación y
 reapertura verificada. El CSS fuente se conserva literalmente y los cambios se
 guardan como una capa de overrides para evitar pérdidas por interpretación.
+Las rutas locales se resuelven contra los activos administrados del sitio y el
+documento puede publicarse o actualizarse como una página WordPress standalone.
 Detalle en [`docs/canvas-editor-experimental.md`](docs/canvas-editor-experimental.md).
 
 ## Estructura

@@ -197,7 +197,7 @@ async function checkAdminSurface() {
   }
 
   // Los dos endpoints AJAX y el render exigen capacidad antes que nada.
-  for (const name of ['handle_load', 'handle_save', 'render_page']) {
+  for (const name of ['handle_load', 'handle_save', 'handle_resolve_assets', 'handle_publish', 'render_page']) {
     const method = methodOf(admin, name);
     check(method !== null, `Falta OCD_Canvas_Editor_Admin::${name}().`);
     if (!method) continue;
@@ -219,7 +219,7 @@ async function checkAdminSurface() {
     'render_page() debe cortar con wp_die() cuando falta la capacidad.',
   );
 
-  for (const name of ['handle_load', 'handle_save']) {
+  for (const name of ['handle_load', 'handle_save', 'handle_resolve_assets', 'handle_publish']) {
     const method = methodOf(admin, name);
     if (!method) continue;
 
@@ -600,6 +600,8 @@ async function checkIsolationAndAssets() {
   for (const file of [
     'class-ocd-canvas-document-sanitizer.php',
     'class-ocd-canvas-document-repository.php',
+    'class-ocd-canvas-asset-resolver.php',
+    'class-ocd-canvas-page-publisher.php',
     'class-ocd-canvas-editor-admin.php',
   ]) {
     check(bootstrap.includes(file), `El bootstrap debe requerir ${file}.`);
@@ -617,7 +619,10 @@ async function checkIsolationAndAssets() {
     'open-codesign-publisher/includes/class-ocd-canvas-editor-admin.php',
     'open-codesign-publisher/includes/class-ocd-canvas-document-repository.php',
     'open-codesign-publisher/includes/class-ocd-canvas-document-sanitizer.php',
+    'open-codesign-publisher/includes/class-ocd-canvas-asset-resolver.php',
+    'open-codesign-publisher/includes/class-ocd-canvas-page-publisher.php',
     'open-codesign-publisher/assets/js/ocd-canvas-editor.js',
+    'open-codesign-publisher/assets/js/ocd-canvas-public.js',
     'open-codesign-publisher/assets/js/ocd-computed-inspector.js',
     'open-codesign-publisher/assets/js/ocd-canvas-grid.global.js',
     'open-codesign-publisher/assets/js/ocd-grid-controls.js',
@@ -651,6 +656,7 @@ async function checkIsolationAndAssets() {
     'ocd-canvas-export-html',
     'ocd-canvas-export-css',
     'ocd-canvas-import-apply',
+    'ocd-canvas-publish',
   ]) {
     check(adminSource.includes(`"${controlId}"`), `La pantalla debe exponer el control ${controlId}.`);
     check(script.includes(`'${controlId}'`), `El editor debe enlazar el control ${controlId}.`);
@@ -679,6 +685,54 @@ async function checkIsolationAndAssets() {
     /css: serializedCss\(\)/.test(script),
     'El guardado debe enviar el CSS fuente junto con la capa de overrides.',
   );
+  check(
+    /Components\.addType\('ocd-video'/.test(script) && /tagName === 'VIDEO'/.test(script),
+    'El editor debe preservar video como componente OCD sin controles añadidos.',
+  );
+  check(
+    script.includes('resolveAssetsAction') && script.includes('publishAction'),
+    'El cliente debe resolver activos y publicar mediante endpoints protegidos.',
+  );
+}
+
+async function checkPublishingAndAssets() {
+  const resolver = await parsePhp('open-codesign-publisher/includes/class-ocd-canvas-asset-resolver.php');
+  const resolverClass = classOf(resolver.ast, 'OCD_Canvas_Asset_Resolver');
+  check(resolverClass !== null, 'Falta OCD_Canvas_Asset_Resolver.');
+  if (resolverClass) {
+    const resolve = methodOf(resolverClass, 'resolve');
+    check(resolve !== null, 'El resolver debe exponer resolve().');
+    check(
+      resolver.source.includes("'open-codesign'") && resolver.source.includes('RecursiveDirectoryIterator'),
+      'El resolver debe limitar su búsqueda al árbol administrado open-codesign.',
+    );
+    check(
+      typeof constantOf(resolverClass, 'MAX_REFERENCES') === 'number' &&
+        typeof constantOf(resolverClass, 'MAX_FILES_SCANNED') === 'number',
+      'El resolver debe acotar referencias y archivos inspeccionados.',
+    );
+  }
+
+  const publisher = await parsePhp('open-codesign-publisher/includes/class-ocd-canvas-page-publisher.php');
+  const publisherClass = classOf(publisher.ast, 'OCD_Canvas_Page_Publisher');
+  check(publisherClass !== null, 'Falta OCD_Canvas_Page_Publisher.');
+  if (publisherClass) {
+    for (const method of ['publish', 'render_shortcode', 'standalone_template']) {
+      check(methodOf(publisherClass, method) !== null, `El publicador debe implementar ${method}().`);
+    }
+    check(
+      callNames(methodOf(publisherClass, 'publish')).includes('wp_insert_post'),
+      'La publicación debe crear o actualizar una página WordPress.',
+    );
+    check(
+      callNames(methodOf(publisherClass, 'render_shortcode')).includes('wp_add_inline_style'),
+      'El render publicado debe aplicar el CSS guardado del documento.',
+    );
+    check(
+      publisher.source.includes('META_DOCUMENT_ID') && publisher.source.includes('post_status'),
+      'La página publicada debe conservar identidad estable y estado editorial.',
+    );
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -743,6 +797,7 @@ export async function runCanvasEditorChecks() {
   await checkSanitizer();
   await checkRepository();
   await checkIsolationAndAssets();
+  await checkPublishingAndAssets();
   await checkVendor();
 
   if (failures.length > 0) {

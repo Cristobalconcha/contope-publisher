@@ -68,6 +68,16 @@
     background: #fff;
 }
 
+.ocd-canvas-title-label {
+    margin-left: 8px;
+    font-size: 12px;
+    color: #50575e;
+}
+
+#ocd-canvas-page-title {
+    width: min(260px, 100%);
+}
+
 .ocd-canvas-editor-root {
     min-width: 0;
     height: 70vh;

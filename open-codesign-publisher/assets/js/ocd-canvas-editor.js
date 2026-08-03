@@ -95,6 +95,17 @@
         assetManager: { upload: false, custom: false },
         blockManager: { blocks: BLOCKS }
     });
+    editor.Components.addType('ocd-video', {
+        isComponent: function (element) {
+            return element && element.tagName === 'VIDEO';
+        },
+        model: {
+            defaults: {
+                tagName: 'video',
+                droppable: false
+            }
+        }
+    });
     var CSS_OVERRIDES_MARKER = '/* OCD-CANVAS-EDITABLE-OVERRIDES */';
     var sourceCss = '';
     var gridApi = window.OCDCanvasGrid.plugin(editor);
@@ -223,7 +234,7 @@
         behaviorApi.refresh();
         var payload = {
             project_data: JSON.stringify(editor.getProjectData()),
-            html: editor.getHtml(),
+            html: serializedHtml(),
             css: serializedCss()
         };
         return request(config.saveAction, payload)
@@ -234,6 +245,7 @@
             })
             .catch(function (error) {
                 setStatus('No se guardó: ' + error.message, 'error');
+                throw error;
             });
     }
 
@@ -292,6 +304,12 @@
         return sourceCss.trimEnd() + '\n\n' + CSS_OVERRIDES_MARKER + '\n' + (editor.getCss() || '');
     }
 
+    function serializedHtml() {
+        var html = editor.getHtml() || '';
+        var body = html.match(/^\s*<body(?:\s[^>]*)?>([\s\S]*)<\/body>\s*$/i);
+        return body ? body[1] : html;
+    }
+
     function ensureSourceCss() {
         var canvasDocument = editor.Canvas.getDocument();
         if (!canvasDocument || !canvasDocument.head) {
@@ -348,6 +366,51 @@
         return { html: clean, css: extracted.join('\n'), hadScript: hadScript };
     }
 
+    function collectLocalAssetReferences(html, css) {
+        var references = [];
+        var source = String(html || '') + '\n' + String(css || '');
+        var patterns = [
+            /(?:src|poster)\s*=\s*(["'])(.*?)\1/gi,
+            /url\(\s*(["']?)(.*?)\1\s*\)/gi
+        ];
+        patterns.forEach(function (pattern) {
+            var match;
+            while ((match = pattern.exec(source)) !== null) {
+                var reference = match[2].trim();
+                if (/^file:/i.test(reference) || /^(?:\.\/)?assets\//i.test(reference)) {
+                    references.push(reference);
+                }
+            }
+        });
+        return Array.from(new Set(references));
+    }
+
+    function replaceAssetReferences(value, mapping) {
+        var result = String(value || '');
+        Object.keys(mapping || {})
+            .sort(function (left, right) { return right.length - left.length; })
+            .forEach(function (reference) {
+                result = result.split(reference).join(mapping[reference]);
+            });
+        return result;
+    }
+
+    function resolveAssets(html, css) {
+        var references = collectLocalAssetReferences(html, css);
+        if (!references.length) {
+            return Promise.resolve({ html: html, css: css, resolved: 0, missing: [] });
+        }
+        setStatus('Resolviendo ' + references.length + ' activos locales…');
+        return request(config.resolveAssetsAction, { asset_refs: JSON.stringify(references) }).then(function (result) {
+            return {
+                html: replaceAssetReferences(html, result.mapping),
+                css: replaceAssetReferences(css, result.mapping),
+                resolved: Object.keys(result.mapping || {}).length,
+                missing: result.missing || []
+            };
+        });
+    }
+
     function applyImport() {
         var htmlInput = document.getElementById('ocd-canvas-import-html');
         var cssInput = document.getElementById('ocd-canvas-import-css');
@@ -358,19 +421,57 @@
             })
             .join('\n');
 
-        editor.setComponents(split.html);
-        editor.setStyle(css);
-        sourceCss = css;
-        window.requestAnimationFrame(ensureSourceCss);
+        return resolveAssets(split.html, css)
+            .then(function (resolved) {
+                editor.setComponents(resolved.html);
+                editor.setStyle(resolved.css);
+                sourceCss = resolved.css;
+                behaviorApi.refresh();
+                window.requestAnimationFrame(refreshPresentation);
 
-        var note = 'HTML y CSS cargados en el lienzo. Pulsa Guardar para persistirlos.';
-        if (split.hadScript) {
-            note += ' Se descartaron etiquetas <script>: el documento no admite JavaScript.';
+                var note = 'HTML y CSS cargados. ' + resolved.resolved + ' activos remotos resueltos.';
+                if (resolved.missing.length) {
+                    note += ' Faltan ' + resolved.missing.length + ' activos locales.';
+                }
+                if (split.hadScript) {
+                    note += ' Se descartaron scripts no declarativos.';
+                }
+                setStatus(note + ' Pulsa Guardar o Publicar.', resolved.missing.length ? 'error' : 'ok');
+            })
+            .catch(function (error) {
+                setStatus('No se pudo completar la importación: ' + error.message, 'error');
+            });
+    }
+
+    function updatePublishedPage(page) {
+        var link = document.getElementById('ocd-canvas-view-page');
+        var title = document.getElementById('ocd-canvas-page-title');
+        if (title && page && page.title) title.value = page.title;
+        if (!link) return;
+        if (page && page.url) {
+            link.href = page.url;
+            link.removeAttribute('hidden');
+        } else {
+            link.setAttribute('hidden', 'hidden');
         }
-        if (split.css !== '') {
-            note += ' Los bloques <style> se movieron al CSS.';
-        }
-        setStatus(note, 'ok');
+    }
+
+    function publishPage() {
+        var title = document.getElementById('ocd-canvas-page-title');
+        setStatus('Guardando el Canvas antes de publicar…');
+        return save()
+            .then(function () {
+                setStatus('Publicando página…');
+                return request(config.publishAction, { title: title ? title.value : '' });
+            })
+            .then(function (page) {
+                updatePublishedPage(page);
+                setStatus('Página publicada y vinculada al Canvas.', 'ok');
+                return page;
+            })
+            .catch(function (error) {
+                setStatus('No se publicó: ' + error.message, 'error');
+            });
     }
 
     function readFileInto(fileInput, textarea) {
@@ -410,6 +511,7 @@
     on('ocd-canvas-export-html', exportHtml);
     on('ocd-canvas-export-css', exportCss);
     on('ocd-canvas-import-apply', applyImport);
+    on('ocd-canvas-publish', publishPage);
     on('ocd-canvas-toggle-import', function (event) {
         var panel = document.getElementById('ocd-canvas-import');
         if (!panel) {
@@ -441,4 +543,5 @@
     } else {
         setStatus('Sin documento inicial; usa Recargar.', 'error');
     }
+    updatePublishedPage(config.publishedPage || null);
 })(window, document);

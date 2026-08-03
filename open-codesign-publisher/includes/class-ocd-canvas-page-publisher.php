@@ -1,0 +1,125 @@
+<?php
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+/** Publishes a saved Canvas document as a stable WordPress page. */
+final class OCD_Canvas_Page_Publisher
+{
+    public const META_DOCUMENT_ID = '_ocd_canvas_document_id';
+
+    public function __construct(private OCD_Canvas_Document_Repository $repository)
+    {
+    }
+
+    public function register(): void
+    {
+        add_shortcode('open_codesign_canvas', [$this, 'render_shortcode']);
+        add_filter('template_include', [$this, 'standalone_template']);
+    }
+
+    /** @return array<string, mixed>|WP_Error */
+    public function publish(string $document_id, string $title)
+    {
+        $document = $this->repository->load($document_id);
+        if (is_wp_error($document)) {
+            return $document;
+        }
+        if (trim((string) $document['html']) === '') {
+            return new WP_Error('ocd_canvas_empty', 'Guarda contenido en el Canvas antes de publicarlo.');
+        }
+
+        $page_id = $this->find_page_id($document_id);
+        $post = [
+            'post_type' => 'page',
+            'post_status' => 'publish',
+            'post_title' => $title !== '' ? $title : 'Página Open CoDesign Canvas',
+            'post_content' => sprintf('[open_codesign_canvas document_id="%s"]', esc_attr($document_id)),
+            'meta_input' => [self::META_DOCUMENT_ID => $document_id],
+        ];
+        if ($page_id !== null) {
+            $post['ID'] = $page_id;
+        }
+        $saved_id = wp_insert_post($post, true);
+        if (is_wp_error($saved_id)) {
+            return $saved_id;
+        }
+
+        return $this->describe_page((int) $saved_id);
+    }
+
+    /** @return array<string, mixed>|null */
+    public function current(string $document_id): ?array
+    {
+        $page_id = $this->find_page_id($document_id);
+        return $page_id === null ? null : $this->describe_page($page_id);
+    }
+
+    /** @param array<string, mixed> $attributes */
+    public function render_shortcode(array $attributes): string
+    {
+        $document_id = sanitize_key((string) ($attributes['document_id'] ?? ''));
+        if ($document_id !== OCD_Canvas_Document_Repository::DOCUMENT_ID) {
+            return '';
+        }
+        $document = $this->repository->load($document_id);
+        if (is_wp_error($document)) {
+            return '';
+        }
+
+        wp_register_style('ocd-canvas-public', false, [], OCD_PUBLISHER_VERSION);
+        wp_enqueue_style('ocd-canvas-public');
+        wp_add_inline_style('ocd-canvas-public', (string) $document['css']);
+        wp_enqueue_script(
+            'ocd-canvas-public',
+            plugins_url('assets/js/ocd-canvas-public.js', OCD_PUBLISHER_FILE),
+            [],
+            OCD_PUBLISHER_VERSION,
+            true
+        );
+
+        return '<div class="ocd-canvas-published" data-ocd-document-id="' . esc_attr($document_id) . '">' .
+            (string) $document['html'] . '</div>';
+    }
+
+    public function standalone_template(string $template): string
+    {
+        if (!is_singular('page')) {
+            return $template;
+        }
+        $page_id = (int) get_queried_object_id();
+        if ((string) get_post_meta($page_id, self::META_DOCUMENT_ID, true) === '') {
+            return $template;
+        }
+
+        return OCD_PUBLISHER_DIR . 'templates/canvas-document.php';
+    }
+
+    private function find_page_id(string $document_id): ?int
+    {
+        $ids = get_posts([
+            'post_type' => 'page',
+            'post_status' => 'any',
+            'numberposts' => 1,
+            'fields' => 'ids',
+            'no_found_rows' => true,
+            'meta_key' => self::META_DOCUMENT_ID,
+            'meta_value' => $document_id,
+        ]);
+        return $ids === [] ? null : (int) $ids[0];
+    }
+
+    /** @return array<string, mixed> */
+    private function describe_page(int $page_id): array
+    {
+        $post = get_post($page_id);
+        return [
+            'pageId' => $page_id,
+            'title' => $post instanceof WP_Post ? $post->post_title : '',
+            'status' => $post instanceof WP_Post ? $post->post_status : '',
+            'url' => get_permalink($page_id),
+            'editUrl' => get_edit_post_link($page_id, 'raw'),
+        ];
+    }
+}
