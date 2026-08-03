@@ -646,13 +646,9 @@
         setStatus('Sin documento inicial; usa Recargar.', 'error');
     }
     updatePublishedPage(config.publishedPage || null);
-    var initialSidePanel = 'inspector';
-    try {
-        initialSidePanel = window.localStorage.getItem('ocdCanvasSidePanel') || initialSidePanel;
-    } catch (_error) {
-        // Mantiene el inspector como pestaña inicial.
-    }
-    activateSidePanel(initialSidePanel);
+    // Abrir siempre con los controles Open CoDesign visibles. La pestaña de
+    // componentes conserva GrapesJS, pero no debe ocultar Brand por un estado antiguo.
+    activateSidePanel('inspector');
     window.setTimeout(function () {
         autosaveEnabled = true;
     }, 0);

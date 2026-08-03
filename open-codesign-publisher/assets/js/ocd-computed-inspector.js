@@ -419,57 +419,111 @@
       return component.find('img').find(isExternalSvgImage) || null;
     }
 
-    function safeCssUrl(value) {
-      return String(value || '').replace(/["\\\n\r]/g, (character) => `\\${character}`);
+    function firstExternalSvgImage() {
+      const wrapper = typeof editor.getWrapper === 'function' ? editor.getWrapper() : null;
+      if (!wrapper || typeof wrapper.find !== 'function') return null;
+      return wrapper.find('img').find(isExternalSvgImage) || null;
     }
 
-    function applySvgMask(lightColor, darkColor, requestedClass) {
-      const selection = editor.getSelected() || selected;
-      const component = externalSvgImageFor(selection);
-      if (!component) {
-        throw new Error('Selecciona el logotipo SVG o uno de sus contenedores antes de aplicar color adaptable.');
+    function firstBrandVector() {
+      const wrapper = typeof editor.getWrapper === 'function' ? editor.getWrapper() : null;
+      if (!wrapper || typeof wrapper.find !== 'function') return null;
+      return wrapper.find('[data-ocd-brand-logo]')[0] || null;
+    }
+
+    async function svgSourceText(source) {
+      if (/^data:image\/svg\+xml[,;]/i.test(source)) {
+        const payload = source.slice(source.indexOf(',') + 1);
+        return source.includes(';base64,') ? global.atob(payload) : decodeURIComponent(payload);
       }
-      const parent = typeof component.parent === 'function' ? component.parent() : null;
-      if (!parent) throw new Error('El SVG necesita un contenedor para aplicar color adaptable.');
+      const response = await global.fetch(source, { credentials: 'same-origin' });
+      if (!response.ok) throw new Error('No fue posible leer el SVG de marca.');
+      return response.text();
+    }
 
-      const source = String(component.getAttributes().src || '');
-      const parentClasses = componentClasses(parent);
-      const className = normalizeClassName(
-        requestedClass || parentClasses[0] || `ocd-svg-color-${component.cid || 'asset'}`,
-      );
-      if (!parentClasses.includes(className)) parent.addClass(className);
+    function cleanBrandSvg(svgText, imageComponent) {
+      const parser = new global.DOMParser();
+      const parsed = parser.parseFromString(svgText, 'image/svg+xml');
+      const sourceSvg = parsed.documentElement;
+      if (!sourceSvg || sourceSvg.localName !== 'svg' || parsed.querySelector('parsererror')) {
+        throw new Error('El archivo seleccionado no contiene un SVG válido.');
+      }
 
-      const maskUrl = `url("${safeCssUrl(source)}")`;
+      sourceSvg.querySelectorAll('script, foreignObject, iframe, object, embed, image, use').forEach((node) => node.remove());
+      sourceSvg.querySelectorAll('*').forEach((node) => {
+        Array.from(node.attributes).forEach((attribute) => {
+          if (/^on/i.test(attribute.name) || /^(?:href|xlink:href)$/i.test(attribute.name)) {
+            node.removeAttribute(attribute.name);
+          }
+        });
+      });
+
+      const frameDocument = editor.Canvas?.getDocument?.() || hostDocument;
+      const scratch = frameDocument.createElement('div');
+      scratch.style.cssText = 'position:fixed;left:-10000px;top:-10000px;visibility:hidden';
+      scratch.innerHTML = sourceSvg.outerHTML;
+      frameDocument.body.appendChild(scratch);
+      const renderedSvg = scratch.querySelector('svg');
+      renderedSvg.querySelectorAll('path,g,circle,rect,line,polyline,polygon').forEach((node) => {
+        const style = frameDocument.defaultView.getComputedStyle(node);
+        if (style.fillRule) node.setAttribute('fill-rule', style.fillRule);
+        if (style.strokeLinecap) node.setAttribute('stroke-linecap', style.strokeLinecap);
+        if (style.strokeLinejoin) node.setAttribute('stroke-linejoin', style.strokeLinejoin);
+        if (style.strokeWidth && style.strokeWidth !== '0px') node.setAttribute('stroke-width', style.strokeWidth);
+      });
+      renderedSvg.querySelectorAll('defs,style').forEach((node) => node.remove());
+
+      const imageAttributes = imageComponent.getAttributes?.() || {};
+      renderedSvg.setAttribute('data-ocd-brand-logo', 'primary');
+      renderedSvg.setAttribute('role', 'img');
+      renderedSvg.setAttribute('aria-label', imageAttributes.alt || 'Logotipo de marca');
+      if (imageAttributes.id) renderedSvg.setAttribute('id', imageAttributes.id);
+      const classes = componentClasses(imageComponent).filter((name) => name !== 'ocd-brand-logo');
+      renderedSvg.setAttribute('class', [...classes, 'ocd-brand-logo'].join(' '));
+      scratch.remove();
+      return renderedSvg.outerHTML;
+    }
+
+    function setBrandColorRules(lightColor, darkColor) {
       editor.Css.setRule(
-        `.${className}`,
-        {
-          '--ocd-svg-color': lightColor,
-          '--ocd-svg-color-dark': darkColor,
-          'background-color': 'var(--ocd-svg-color)',
-          '-webkit-mask-image': maskUrl,
-          'mask-image': maskUrl,
-          '-webkit-mask-repeat': 'no-repeat',
-          'mask-repeat': 'no-repeat',
-          '-webkit-mask-position': 'center',
-          'mask-position': 'center',
-          '-webkit-mask-size': 'contain',
-          'mask-size': 'contain',
-        },
+        '.ocd-brand-logo',
+        { '--ocd-brand-color': lightColor, '--ocd-brand-color-dark': darkColor },
         { addStyles: true },
       );
-      component.addStyle({ visibility: 'hidden' });
       editor.Css.setRule(
-        `.dark .${className}, [data-theme="dark"] .${className}`,
-        { 'background-color': 'var(--ocd-svg-color-dark)' },
+        '.ocd-brand-logo path, .ocd-brand-logo g, .ocd-brand-logo circle, .ocd-brand-logo rect, .ocd-brand-logo line, .ocd-brand-logo polyline, .ocd-brand-logo polygon',
+        { fill: 'var(--ocd-brand-color)' },
         { addStyles: true },
       );
       editor.Css.setRule(
-        `.${className}`,
-        { 'background-color': 'var(--ocd-svg-color-dark)' },
+        '.dark .ocd-brand-logo, [data-theme="dark"] .ocd-brand-logo',
+        { '--ocd-brand-color': 'var(--ocd-brand-color-dark)' },
+        { addStyles: true },
+      );
+      editor.Css.setRule(
+        '.ocd-brand-logo',
+        { '--ocd-brand-color': 'var(--ocd-brand-color-dark)' },
         { addStyles: true, atRuleType: 'media', atRuleParams: '(prefers-color-scheme: dark)' },
       );
-      selected = parent;
-      editor.select(parent);
+    }
+
+    async function applySvgMask(lightColor, darkColor) {
+      let brand = firstBrandVector();
+      if (!brand) {
+        const selection = editor.getSelected() || selected;
+        const image = externalSvgImageFor(selection) || firstExternalSvgImage();
+        if (!image) throw new Error('El documento no contiene un logotipo SVG para configurar como Brand.');
+        const source = String(image.getAttributes().src || '');
+        const svgText = await svgSourceText(source);
+        const markup = cleanBrandSvg(svgText, image);
+        const replacement = image.replaceWith(markup);
+        brand = Array.isArray(replacement) ? replacement[0] : replacement;
+        if (!brand) brand = firstBrandVector();
+      }
+
+      setBrandColorRules(lightColor, darkColor);
+      selected = brand;
+      if (brand) editor.select(brand);
       return refreshAfterRender();
     }
 
@@ -509,15 +563,11 @@
           }
         }
       }
-      if (!snapshot) {
-        body.appendChild(createElement(hostDocument, 'div', 'ocd-ci__empty', 'Selecciona un elemento del lienzo.'));
-        return;
-      }
-
-      const svgImage = externalSvgImageFor(snapshot.component);
-      if (svgImage) {
+      const svgImage = externalSvgImageFor(snapshot?.component) || firstExternalSvgImage();
+      const brandVector = firstBrandVector();
+      if (svgImage || brandVector) {
         const panel = createElement(hostDocument, 'div', 'ocd-ci__svg');
-        panel.appendChild(createElement(hostDocument, 'div', 'ocd-ci__svg-title', 'Logotipo SVG detectado'));
+        panel.appendChild(createElement(hostDocument, 'div', 'ocd-ci__svg-title', 'Brand · logotipo vectorial'));
         const colors = createElement(hostDocument, 'div', 'ocd-ci__svg-colors');
         const lightLabel = createElement(hostDocument, 'label', '', 'Color claro');
         const lightInput = createElement(hostDocument, 'input');
@@ -530,11 +580,20 @@
         darkInput.value = '#ffffff';
         darkLabel.appendChild(darkInput);
         colors.append(lightLabel, darkLabel);
-        const apply = createElement(hostDocument, 'button', '', 'Aplicar color SVG');
+        const apply = createElement(
+          hostDocument,
+          'button',
+          '',
+          brandVector ? 'Aplicar colores de marca' : 'Convertir SVG en Brand y aplicar',
+        );
         apply.type = 'button';
         apply.addEventListener('click', async () => {
-          const requestedClass = scopeSelect?.value === 'class' ? classSelect?.value : '';
-          await applySvgMask(lightInput.value, darkInput.value, requestedClass);
+          apply.disabled = true;
+          try {
+            await applySvgMask(lightInput.value, darkInput.value);
+          } finally {
+            apply.disabled = false;
+          }
         });
         panel.append(
           colors,
@@ -543,10 +602,17 @@
             hostDocument,
             'div',
             'ocd-ci__svg-hint',
-            'Puedes seleccionar directamente el logo o su contenedor. El color oscuro responde al sistema, .dark o data-theme="dark".',
+            brandVector
+              ? 'SVG nativo editable. Los colores son propiedades de Brand y responden al modo claro u oscuro.'
+              : 'El SVG externo se convertirá en geometría vectorial nativa; no se tratará como una imagen.',
           ),
         );
         body.appendChild(panel);
+      }
+
+      if (!snapshot) {
+        body.appendChild(createElement(hostDocument, 'div', 'ocd-ci__empty', 'Selecciona un elemento del lienzo.'));
+        return;
       }
 
       for (const value of Object.values(snapshot.values)) {

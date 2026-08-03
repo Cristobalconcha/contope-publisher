@@ -329,13 +329,13 @@ final class OCD_Canvas_Document_Sanitizer
             'button' => ['type' => true, 'disabled' => true],
             'label' => ['for' => true],
             'svg' => ['viewbox' => true, 'xmlns' => true, 'fill' => true, 'stroke' => true, 'width' => true, 'height' => true, 'preserveaspectratio' => true],
-            'path' => ['d' => true, 'fill' => true, 'stroke' => true, 'stroke-width' => true, 'stroke-linecap' => true, 'stroke-linejoin' => true],
+            'path' => ['d' => true, 'fill' => true, 'fill-rule' => true, 'clip-rule' => true, 'stroke' => true, 'stroke-width' => true, 'stroke-linecap' => true, 'stroke-linejoin' => true],
             'circle' => ['cx' => true, 'cy' => true, 'r' => true, 'fill' => true, 'stroke' => true],
             'rect' => ['x' => true, 'y' => true, 'width' => true, 'height' => true, 'rx' => true, 'ry' => true, 'fill' => true, 'stroke' => true],
             'line' => ['x1' => true, 'y1' => true, 'x2' => true, 'y2' => true, 'stroke' => true],
             'polyline' => ['points' => true, 'fill' => true, 'stroke' => true],
             'polygon' => ['points' => true, 'fill' => true, 'stroke' => true],
-            'g' => ['fill' => true, 'stroke' => true, 'transform' => true],
+            'g' => ['fill' => true, 'fill-rule' => true, 'clip-rule' => true, 'stroke' => true, 'transform' => true],
         ];
         foreach ($specific as $tag => $attributes) {
             $allowed[$tag] = array_merge($allowed[$tag] ?? [], $attributes);

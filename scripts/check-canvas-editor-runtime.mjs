@@ -45,7 +45,7 @@ const html = `<!doctype html>
 window.confirm=()=>true;
 window.ocdCanvasEditor={ajaxUrl:'mock',nonce:'nonce',loadAction:'load',saveAction:'save',resolveAssetsAction:'resolve',publishAction:'publish',publishedPage:null,documentId:'runtime-test',document:{documentId:'runtime-test',projectData:'{}',html:${JSON.stringify(initialHtml)},css:${JSON.stringify(initialCss)},revision:0,updatedAt:''},loadError:''};
 let stored=structuredClone(window.ocdCanvasEditor.document);
-window.fetch=async(_url,options)=>{const body=new URLSearchParams(options.body);const action=body.get('action');let data=structuredClone(stored);if(action==='save'){stored={...stored,projectData:body.get('project_data'),html:body.get('html'),css:body.get('css'),revision:stored.revision+1,updatedAt:new Date().toISOString()};data=structuredClone(stored);}else if(action==='resolve'){const refs=JSON.parse(body.get('asset_refs'));data={mapping:Object.fromEntries(refs.map(ref=>[ref,'https://example.test/uploads/'+ref.split('/').pop()])),missing:[]};}else if(action==='publish'){stored={...stored,projectData:body.get('project_data'),html:body.get('html'),css:body.get('css'),revision:stored.revision+1,updatedAt:new Date().toISOString()};data={pageId:42,title:body.get('title'),status:'publish',url:'https://example.test/santa-luisa-canvas/',editUrl:'https://example.test/wp-admin/post.php?post=42',revision:stored.revision,updatedAt:stored.updatedAt};}return {text:async()=>JSON.stringify({success:true,data})};};
+window.fetch=async(_url,options)=>{if(String(_url).endsWith('/Logo.svg'))return {ok:true,text:async()=>'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 40"><style>.mark{fill:#a7641a;fill-rule:evenodd}</style><path class="mark" d="M0 0h100v40H0z"/></svg>'};const body=new URLSearchParams(options.body);const action=body.get('action');let data=structuredClone(stored);if(action==='save'){stored={...stored,projectData:body.get('project_data'),html:body.get('html'),css:body.get('css'),revision:stored.revision+1,updatedAt:new Date().toISOString()};data=structuredClone(stored);}else if(action==='resolve'){const refs=JSON.parse(body.get('asset_refs'));data={mapping:Object.fromEntries(refs.map(ref=>[ref,'https://example.test/uploads/'+ref.split('/').pop()])),missing:[]};}else if(action==='publish'){stored={...stored,projectData:body.get('project_data'),html:body.get('html'),css:body.get('css'),revision:stored.revision+1,updatedAt:new Date().toISOString()};data={pageId:42,title:body.get('title'),status:'publish',url:'https://example.test/santa-luisa-canvas/',editUrl:'https://example.test/wp-admin/post.php?post=42',revision:stored.revision,updatedAt:stored.updatedAt};}return {text:async()=>JSON.stringify({success:true,data})};};
 </script>
 <script src="${asset('vendor/grapesjs/grapes.min.js')}"></script>
 <script src="${asset('js/ocd-computed-inspector.js')}"></script>
@@ -70,10 +70,10 @@ window.fetch=async(_url,options)=>{const body=new URLSearchParams(options.body);
   const api=window.ocdCanvas;
   const svgImage=api.editor.getWrapper().find('.svg-logo')[0];
   api.editor.select(svgImage.parent());
-  await wait(()=>document.querySelector('.ocd-ci__svg-title')?.textContent==='Logotipo SVG detectado');
+  await wait(()=>document.querySelector('.ocd-ci__svg-title')?.textContent==='Brand · logotipo vectorial');
   await api.inspector.applySvgMask('#123456','#fefefe','brand-mark');
-  const svgMaskCss=api.editor.getCss();
-  const svgMaskApplied=svgMaskCss.includes('mask-image')&&svgMaskCss.includes('--ocd-svg-color-dark')&&svgMaskCss.includes('prefers-color-scheme');
+  const brandVectorCss=api.editor.getCss();
+  const brandVectorApplied=api.editor.getHtml().includes('data-ocd-brand-logo="primary"')&&brandVectorCss.includes('--ocd-brand-color-dark')&&brandVectorCss.includes('prefers-color-scheme')&&!brandVectorCss.includes('mask-image');
   const video=api.editor.getWrapper().find('.hero__video')[0];
   const videoType=video.get('type');
   const videoControls=video.getEl().hasAttribute('controls');
@@ -118,9 +118,9 @@ window.fetch=async(_url,options)=>{const body=new URLSearchParams(options.body);
   const soundToggle=publicVideo.parentElement.querySelector('.ocd-video-sound-toggle');
   soundToggle.click();
   const publicVideoSoundEnabled=!publicVideo.muted&&soundToggle.getAttribute('aria-pressed')==='true';
-  const ok=heroRadius==='16px'&&cardRadius==='12px'&&restored.template===api.grid.presets['1/2/1']&&restored.gap==='2rem'&&behavior.length===1&&gridPersisted&&svgMaskApplied&&sidePanelTabs&&inspectorCanvasTop==='0px'&&videoType==='ocd-video'&&!videoControls&&resolvedSrc.startsWith('https://example.test/uploads/')&&stored.revision>=3&&headTagsStripped&&publicHeaderTop==='32px'&&publicVideoMuted&&publicVideoSoundEnabled;
+  const ok=heroRadius==='16px'&&cardRadius==='12px'&&restored.template===api.grid.presets['1/2/1']&&restored.gap==='2rem'&&behavior.length===1&&gridPersisted&&brandVectorApplied&&sidePanelTabs&&inspectorCanvasTop==='0px'&&videoType==='ocd-video'&&!videoControls&&resolvedSrc.startsWith('https://example.test/uploads/')&&stored.revision>=3&&headTagsStripped&&publicHeaderTop==='32px'&&publicVideoMuted&&publicVideoSoundEnabled;
   document.documentElement.dataset.ocdRuntime=ok?'passed':'failed';
-  document.documentElement.dataset.ocdRuntimeDetails=JSON.stringify({heroRadius,cardRadius,template:restored.template,gap:restored.gap,behavior:behavior.length,revision:stored.revision,headTagsStripped,svgMaskApplied,sidePanelTabs,inspectorCanvasTop,publicHeaderTop,publicVideoMuted,publicVideoSoundEnabled,videoType,videoControls,resolvedSrc,published:document.getElementById('ocd-canvas-view-page').href});
+  document.documentElement.dataset.ocdRuntimeDetails=JSON.stringify({heroRadius,cardRadius,template:restored.template,gap:restored.gap,behavior:behavior.length,revision:stored.revision,headTagsStripped,brandVectorApplied,sidePanelTabs,inspectorCanvasTop,publicHeaderTop,publicVideoMuted,publicVideoSoundEnabled,videoType,videoControls,resolvedSrc,published:document.getElementById('ocd-canvas-view-page').href});
 }catch(error){document.documentElement.dataset.ocdRuntime='failed';document.documentElement.dataset.ocdRuntimeDetails=phase+': '+error.message;}})();
 </script></body></html>`;
 
