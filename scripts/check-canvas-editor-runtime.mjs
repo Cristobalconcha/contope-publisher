@@ -14,6 +14,8 @@ const initialHtml = `
   <body><base href="https://example.test/source/">
   <meta name="ocd-source" content="desktop-export">
   <nav class="nav"><span class="logo-wrap"><img class="svg-logo" src="https://example.test/Logo.svg"></span>Menú</nav>
+  <nav class="nav secondary-nav">Menú secundario</nav>
+  <header class="site-header">Encabezado alternativo</header>
   <section class="hero"><video class="hero__video" autoplay loop></video><h1>Santa Luisa de Palpi</h1></section>
   <section class="details__grid">
     <article class="detail-card">Terreno</article>
@@ -78,6 +80,35 @@ window.fetch=async(_url,options)=>{if(String(_url).endsWith('/Logo.svg'))return 
   const brandVector=api.editor.getWrapper().find('[data-ocd-brand-logo]')[0];
   const brandVectorBounds=brandVector.getEl().getBoundingClientRect();
   const brandVectorSizePreserved=brandVectorBounds.width===100&&brandVectorBounds.height===40;
+  const nav=api.editor.getWrapper().find('.nav')[0];
+  api.editor.select(nav);
+  phase='estados del encabezado';
+  await wait(()=>document.querySelector('.ocd-ci__header-state'));
+  const scrolledTab=Array.from(document.querySelectorAll('.ocd-ci__header-tabs button')).find(button=>button.textContent==='Con scroll');
+  scrolledTab.click();
+  await wait(()=>scrolledTab.classList.contains('is-active')||Array.from(document.querySelectorAll('.ocd-ci__header-tabs button')).some(button=>button.textContent==='Con scroll'&&button.classList.contains('is-active')));
+  const headerInput=(label)=>{const node=Array.from(document.querySelectorAll('.ocd-ci__header-grid label')).find(item=>item.textContent.startsWith(label));return node&&node.querySelector('input')};
+  const scrolledBackground=headerInput('Fondo');
+  scrolledBackground.value='#123456';
+  scrolledBackground.dispatchEvent(new Event('change',{bubbles:true}));
+  await wait(()=>api.editor.getCss().includes('data-ocd-header-id')&&api.editor.getCss().includes('nav--scrolled')&&api.editor.getCss().includes('#123456'));
+  const threshold=headerInput('Cambio desde');
+  threshold.value='72';
+  threshold.dispatchEvent(new Event('change',{bubbles:true}));
+  nav.getEl().ownerDocument.defaultView.dispatchEvent(new Event('resize'));
+  await wait(()=>nav.getEl().classList.contains('nav--scrolled'));
+  const headerStatePreviewed=nav.getEl().classList.contains('nav--scrolled');
+  const headerThreshold=nav.getAttributes()['data-ocd-scroll-threshold'];
+  const secondaryNav=api.editor.getWrapper().find('.secondary-nav')[0];
+  const secondaryStyle=secondaryNav.getEl().ownerDocument.defaultView.getComputedStyle(secondaryNav.getEl());
+  const headerStateIsLocal=!secondaryNav.getEl().classList.contains('nav--scrolled')&&secondaryStyle.backgroundColor!=='rgb(18, 52, 86)';
+  const plainHeader=api.editor.getWrapper().find('.site-header')[0];
+  api.editor.select(plainHeader);
+  await wait(()=>document.querySelector('.ocd-ci__header-activate'));
+  document.querySelector('.ocd-ci__header-activate').click();
+  await wait(()=>plainHeader.getAttributes()['data-ocd-behavior']==='scroll-threshold');
+  const headerWithoutNavClass=plainHeader.getAttributes()['data-ocd-behavior']==='scroll-threshold'&&!plainHeader.getClasses().includes('nav');
+  let headerStatesPersisted=false;
   const video=api.editor.getWrapper().find('.hero__video')[0];
   const videoType=video.get('type');
   const videoControls=video.getEl().hasAttribute('controls');
@@ -96,6 +127,7 @@ window.fetch=async(_url,options)=>{if(String(_url).endsWith('/Logo.svg'))return 
   document.getElementById('ocd-canvas-reload').click();
   phase='recarga';
   await wait(()=>{const currentCard=api.editor.getWrapper().find('.detail-card')[0];return currentCard&&api.grid.getConfig(currentCard.parent()).desktop.template===api.grid.presets['1/2/1'];});
+  headerStatesPersisted=stored.css.includes('data-ocd-header-id')&&stored.css.includes('nav--scrolled')&&stored.css.includes('#123456')&&stored.html.includes('data-ocd-scroll-threshold="72"');
   const restoredCard=api.editor.getWrapper().find('.detail-card')[0];
   const restoredGrid=restoredCard.parent();
   const restored=api.grid.getConfig(restoredGrid).desktop;
@@ -122,9 +154,9 @@ window.fetch=async(_url,options)=>{if(String(_url).endsWith('/Logo.svg'))return 
   const soundToggle=publicVideo.parentElement.querySelector('.ocd-video-sound-toggle');
   soundToggle.click();
   const publicVideoSoundEnabled=!publicVideo.muted&&soundToggle.getAttribute('aria-pressed')==='true';
-  const ok=heroRadius==='16px'&&cardRadius==='12px'&&restored.template===api.grid.presets['1/2/1']&&restored.gap==='2rem'&&behavior.length===1&&gridPersisted&&brandVectorApplied&&brandVectorSizePreserved&&sidePanelTabs&&inspectorCanvasTop==='0px'&&videoType==='ocd-video'&&!videoControls&&resolvedSrc.startsWith('https://example.test/uploads/')&&stored.revision>=3&&headTagsStripped&&publicHeaderTop==='32px'&&publicVideoMuted&&publicVideoSoundEnabled;
+  const ok=heroRadius==='16px'&&cardRadius==='12px'&&restored.template===api.grid.presets['1/2/1']&&restored.gap==='2rem'&&behavior.length===3&&gridPersisted&&brandVectorApplied&&brandVectorSizePreserved&&headerStatePreviewed&&headerThreshold==='72'&&headerStateIsLocal&&headerWithoutNavClass&&headerStatesPersisted&&sidePanelTabs&&inspectorCanvasTop==='0px'&&videoType==='ocd-video'&&!videoControls&&resolvedSrc.startsWith('https://example.test/uploads/')&&stored.revision>=3&&headTagsStripped&&publicHeaderTop==='32px'&&publicVideoMuted&&publicVideoSoundEnabled;
   document.documentElement.dataset.ocdRuntime=ok?'passed':'failed';
-  document.documentElement.dataset.ocdRuntimeDetails=JSON.stringify({heroRadius,cardRadius,template:restored.template,gap:restored.gap,behavior:behavior.length,revision:stored.revision,headTagsStripped,brandVectorApplied,brandVectorSizePreserved,sidePanelTabs,inspectorCanvasTop,publicHeaderTop,publicVideoMuted,publicVideoSoundEnabled,videoType,videoControls,resolvedSrc,published:document.getElementById('ocd-canvas-view-page').href});
+  document.documentElement.dataset.ocdRuntimeDetails=JSON.stringify({heroRadius,cardRadius,template:restored.template,gap:restored.gap,behavior:behavior.length,revision:stored.revision,headTagsStripped,brandVectorApplied,brandVectorSizePreserved,headerStatePreviewed,headerThreshold,headerStateIsLocal,headerWithoutNavClass,headerStatesPersisted,sidePanelTabs,inspectorCanvasTop,publicHeaderTop,publicVideoMuted,publicVideoSoundEnabled,videoType,videoControls,resolvedSrc,published:document.getElementById('ocd-canvas-view-page').href});
 }catch(error){document.documentElement.dataset.ocdRuntime='failed';document.documentElement.dataset.ocdRuntimeDetails=phase+': '+error.message;}})();
 </script></body></html>`;
 

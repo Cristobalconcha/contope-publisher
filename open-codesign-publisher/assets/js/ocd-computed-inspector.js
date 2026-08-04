@@ -328,6 +328,18 @@
       .ocd-ci__svg button { width:100%; margin-top:8px; border:1px solid #b8752a; border-radius:5px;
         padding:7px; background:#a7641a; color:#fff; cursor:pointer; font:inherit; font-weight:650; }
       .ocd-ci__svg-hint { margin-top:7px; color:#a9a39a; font-size:10px; }
+      .ocd-ci__header-state { margin:8px 0; padding:10px; border:1px solid #67a4ce66; border-radius:6px; background:#397ba118; }
+      .ocd-ci__header-title { display:flex; align-items:center; justify-content:space-between; gap:8px;
+        margin-bottom:8px; color:#b9ddf5; font-weight:650; }
+      .ocd-ci__header-tabs { display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-bottom:9px; }
+      .ocd-ci__header-tabs button,.ocd-ci__header-activate { border:1px solid #ffffff26; border-radius:5px;
+        padding:7px; background:#292e36; color:#ded8cc; cursor:pointer; font:inherit; }
+      .ocd-ci__header-tabs button.is-active { border-color:#70b9e9; background:#397ba1; color:#fff; }
+      .ocd-ci__header-activate { width:100%; border-color:#70b9e9; background:#397ba1; color:#fff; font-weight:650; }
+      .ocd-ci__header-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+      .ocd-ci__header-grid label { display:grid; gap:4px; color:#c7d7e1; font-size:10px; }
+      .ocd-ci__header-grid .is-wide { grid-column:1 / -1; }
+      .ocd-ci__header-hint { margin-top:8px; color:#9eabb4; font-size:10px; }
     `;
     document.head.appendChild(style);
   }
@@ -344,9 +356,81 @@
     let targetLabel = null;
     let scopeSelect = null;
     let classSelect = null;
+    let headerState = 'entry';
+    let previewHeaderElement = null;
+    let headerIdentityCounter = 0;
 
     function getElement(component) {
       return component && typeof component.getEl === 'function' ? component.getEl() : null;
+    }
+
+    function componentAttributes(component) {
+      return component && typeof component.getAttributes === 'function'
+        ? component.getAttributes()
+        : component?.get?.('attributes') || {};
+    }
+
+    function isHeaderComponent(component) {
+      if (!component) return false;
+      const tag = String(component.get?.('tagName') || '').toLowerCase();
+      const attributes = componentAttributes(component);
+      return tag === 'header' || tag === 'nav' || attributes['data-ocd-behavior'] === 'scroll-threshold';
+    }
+
+    function headerIsActive(component) {
+      return componentAttributes(component)['data-ocd-behavior'] === 'scroll-threshold';
+    }
+
+    function prepareHeader(component) {
+      if (!component || !isHeaderComponent(component)) return null;
+      ensureHeaderIdentity(component);
+      global.OcdBehaviors?.attachToComponent?.(component, { threshold: 40 });
+      return component;
+    }
+
+    function ensureHeaderIdentity(component) {
+      const attributes = componentAttributes(component);
+      if (attributes['data-ocd-header-id']) return attributes['data-ocd-header-id'];
+      headerIdentityCounter += 1;
+      const source = component.getId?.() || component.cid || `header-${headerIdentityCounter}`;
+      const identity = `ocd-${normalizeClassName(source)}`;
+      component.addAttributes({ 'data-ocd-header-id': identity });
+      return identity;
+    }
+
+    function headerSelector(component, state) {
+      const identity = ensureHeaderIdentity(component);
+      const base = `[data-ocd-header-id="${identity}"]`;
+      return state === 'scrolled' ? `${base}.nav--scrolled` : base;
+    }
+
+    function previewHeaderState(component, state) {
+      if (previewHeaderElement && previewHeaderElement !== getElement(component)) {
+        previewHeaderElement.removeAttribute('data-ocd-preview-scroll-state');
+        previewHeaderElement.classList.remove('nav--scrolled');
+      }
+      const element = getElement(component);
+      previewHeaderElement = element || null;
+      if (element) {
+        element.setAttribute('data-ocd-preview-scroll-state', state);
+        element.classList.toggle('nav--scrolled', state === 'scrolled');
+      }
+    }
+
+    function applyHeaderStateStyle(component, property, value, descendants) {
+      const header = prepareHeader(component);
+      const selector = headerSelector(header, headerState);
+      if (!selector) throw new Error('El encabezado necesita una clase CSS para guardar sus estados.');
+      const scopedSelector = descendants
+        ? descendants
+            .split(',')
+            .map((part) => `${selector} ${part.trim()}`)
+            .join(', ')
+        : selector;
+      editor.Css.setRule(scopedSelector, { [property]: value }, { addStyles: true });
+      previewHeaderState(header, headerState);
+      selected = header;
+      return refreshAfterRender();
     }
 
     function inspect(component) {
@@ -376,6 +460,13 @@
 
     function refresh(component) {
       selected = component || editor.getSelected() || selected;
+      if (isHeaderComponent(selected) && headerIsActive(selected)) {
+        previewHeaderState(selected, headerState);
+      } else if (previewHeaderElement) {
+        previewHeaderElement.removeAttribute('data-ocd-preview-scroll-state');
+        previewHeaderElement.classList.remove('nav--scrolled');
+        previewHeaderElement = null;
+      }
       snapshot = inspect(selected);
       render();
       if (typeof opts.onChange === 'function') opts.onChange(snapshot);
@@ -387,6 +478,13 @@
       if (!component) throw new Error('Selecciona un elemento antes de aplicar un estilo local.');
       const styles =
         typeof propertyOrStyles === 'string' ? { [propertyOrStyles]: value } : propertyOrStyles;
+      if (isHeaderComponent(component) && headerIsActive(component)) {
+        const selector = headerSelector(component, headerState);
+        editor.Css.setRule(selector, styles, { addStyles: true });
+        previewHeaderState(component, headerState);
+        selected = component;
+        return refreshAfterRender();
+      }
       component.addStyle(styles);
       selected = component;
       return refreshAfterRender();
@@ -402,7 +500,11 @@
       const className = normalizeClassName(requestedClass || existingClasses[0]);
       if (!className) throw new Error('Indica una clase para crear un estilo reutilizable.');
       if (!existingClasses.includes(className)) component.addClass(className);
-      editor.Css.setRule(`.${className}`, styles, { addStyles: true });
+      const selector =
+        isHeaderComponent(component) && headerIsActive(component) && headerState === 'scrolled'
+          ? `.${className}.nav--scrolled`
+          : `.${className}`;
+      editor.Css.setRule(selector, styles, { addStyles: true });
       selected = component;
       return refreshAfterRender();
     }
@@ -561,6 +663,118 @@
       return `Procedencia: ${declaration.selector} → ${declaration.value}${variables ? ` · ${variables}` : ''}`;
     }
 
+    function headerValue(component, property, descendants) {
+      previewHeaderState(component, headerState);
+      const header = getElement(component);
+      const target = descendants ? header?.querySelector(descendants) : header;
+      const view = target?.ownerDocument?.defaultView;
+      return target && view ? view.getComputedStyle(target).getPropertyValue(property).trim() : '';
+    }
+
+    function renderHeaderStatePanel(component) {
+      if (!isHeaderComponent(component)) return null;
+      const panel = createElement(hostDocument, 'section', 'ocd-ci__header-state');
+      const title = createElement(hostDocument, 'div', 'ocd-ci__header-title');
+      title.append(
+        createElement(hostDocument, 'span', '', 'Encabezado · estados'),
+        createElement(hostDocument, 'span', '', headerIsActive(component) ? 'Activo' : 'Sin activar'),
+      );
+      panel.appendChild(title);
+
+      if (!headerIsActive(component)) {
+        const activate = createElement(hostDocument, 'button', 'ocd-ci__header-activate', 'Activar estado con scroll');
+        activate.type = 'button';
+        activate.addEventListener('click', async () => {
+          prepareHeader(component);
+          headerState = 'entry';
+          global.ocdCanvas?.behaviors?.refresh?.();
+          global.ocdCanvas?.behaviors?.installCanvasRuntime?.();
+          await refreshAfterRender();
+        });
+        panel.append(
+          activate,
+          createElement(
+            hostDocument,
+            'div',
+            'ocd-ci__header-hint',
+            'Crea dos estados CSS del mismo encabezado y activa el cambio declarativo al desplazarse.',
+          ),
+        );
+        return panel;
+      }
+
+      const tabs = createElement(hostDocument, 'div', 'ocd-ci__header-tabs');
+      for (const [state, label] of [['entry', 'Entrada'], ['scrolled', 'Con scroll']]) {
+        const button = createElement(
+          hostDocument,
+          'button',
+          headerState === state ? 'is-active' : '',
+          label,
+        );
+        button.type = 'button';
+        button.addEventListener('click', () => {
+          headerState = state;
+          previewHeaderState(component, state);
+          refresh(component);
+        });
+        tabs.appendChild(button);
+      }
+      panel.appendChild(tabs);
+
+      const grid = createElement(hostDocument, 'div', 'ocd-ci__header-grid');
+      const attributes = componentAttributes(component);
+      const fields = [
+        ['background-color', 'Fondo', '', ''],
+        ['color', 'Texto y enlaces', 'a', ''],
+        ['fill', 'Logo SVG', '.ocd-brand-logo path, .ocd-brand-logo g, .ocd-brand-logo circle, .ocd-brand-logo rect, .ocd-brand-logo polygon', ''],
+        ['min-height', 'Alto mínimo', '', ''],
+        ['padding', 'Padding', '', 'is-wide'],
+        ['box-shadow', 'Sombra', '', 'is-wide'],
+        ['backdrop-filter', 'Desenfoque', '', ''],
+        ['transition-duration', 'Transición', '', ''],
+      ];
+      for (const [property, labelText, descendants, className] of fields) {
+        const label = createElement(hostDocument, 'label', className, labelText);
+        const input = createElement(hostDocument, 'input');
+        input.value = headerValue(component, property, descendants);
+        input.placeholder = property === 'backdrop-filter' ? 'blur(12px)' : '';
+        input.addEventListener('change', async () => {
+          if (property === 'color' && descendants === 'a') {
+            await applyHeaderStateStyle(component, property, input.value);
+            await applyHeaderStateStyle(component, property, input.value, ' a');
+            return;
+          }
+          await applyHeaderStateStyle(component, property, input.value, descendants ? ` ${descendants}` : '');
+        });
+        label.appendChild(input);
+        grid.appendChild(label);
+      }
+
+      const thresholdLabel = createElement(hostDocument, 'label', '', 'Cambio desde (px)');
+      const thresholdInput = createElement(hostDocument, 'input');
+      thresholdInput.type = 'number';
+      thresholdInput.min = '0';
+      thresholdInput.value = String(attributes['data-ocd-scroll-threshold'] || '40');
+      thresholdInput.addEventListener('change', () => {
+        const value = Math.max(0, Number.parseFloat(thresholdInput.value) || 0);
+        component.addAttributes({ 'data-ocd-scroll-threshold': String(value) });
+        global.ocdCanvas?.behaviors?.installCanvasRuntime?.();
+        thresholdInput.value = String(value);
+      });
+      thresholdLabel.appendChild(thresholdInput);
+      grid.prepend(thresholdLabel);
+      panel.append(
+        grid,
+        createElement(
+          hostDocument,
+          'div',
+          'ocd-ci__header-hint',
+          'La pestaña fuerza sólo la previsualización del Canvas. Al publicar, el estado cambia automáticamente al superar el umbral.',
+        ),
+      );
+      return panel;
+    }
+
     function render() {
       if (!root || !body || !targetLabel) return;
       targetLabel.textContent = snapshot?.description || 'Ningún elemento seleccionado';
@@ -580,6 +794,8 @@
           }
         }
       }
+      const headerPanel = renderHeaderStatePanel(snapshot?.component);
+      if (headerPanel) body.appendChild(headerPanel);
       const svgImage = externalSvgImageFor(snapshot?.component) || firstExternalSvgImage();
       const brandVector = firstBrandVector();
       if (svgImage || brandVector) {
@@ -713,6 +929,9 @@
         editor.off('component:selected', onSelected);
         editor.off('component:deselected', onDeselected);
         editor.off('component:styleUpdate', refreshAfterRender);
+        previewHeaderElement?.removeAttribute('data-ocd-preview-scroll-state');
+        previewHeaderElement?.classList.remove('nav--scrolled');
+        previewHeaderElement = null;
         root?.remove();
         root = null;
       },

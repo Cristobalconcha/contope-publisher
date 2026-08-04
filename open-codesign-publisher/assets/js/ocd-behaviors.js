@@ -58,7 +58,7 @@
   var BEHAVIOR_SCROLL_THRESHOLD = 'scroll-threshold';
   var ATTR_BEHAVIOR = 'data-ocd-behavior';
   var ATTR_THRESHOLD = 'data-ocd-scroll-threshold';
-  var DEFAULT_NAV_SELECTOR = '.nav';
+  var DEFAULT_NAV_SELECTOR = '[data-ocd-behavior="scroll-threshold"]';
   var DEFAULT_SCROLLED_CLASS = 'nav--scrolled';
   var DEFAULT_THRESHOLD = 40;
 
@@ -109,7 +109,8 @@
   }
 
   function isNavComponent(component) {
-    return getTagName(component) === 'nav' && hasNavClass(component);
+    var tag = getTagName(component);
+    return (tag === 'nav' || tag === 'header') && hasNavClass(component);
   }
 
   function walkComponents(component, cb) {
@@ -125,9 +126,14 @@
     var found = [];
     if (!wrapper) return found;
     walkComponents(wrapper, function (comp) {
-      if (getTagName(comp) === 'nav') {
+      var tag = getTagName(comp);
+      if (tag === 'nav' || tag === 'header') {
+        var attributes = getAttrObject(comp);
         var cls = getAttrObject(comp).class || '';
-        if (String(cls).split(/\s+/).indexOf(opts.navClass) !== -1) found.push(comp);
+        if (
+          String(cls).split(/\s+/).indexOf(opts.navClass) !== -1 ||
+          attributes[ATTR_BEHAVIOR] === BEHAVIOR_SCROLL_THRESHOLD
+        ) found.push(comp);
       }
     });
     return found;
@@ -210,7 +216,9 @@
           return 0;
         }
         function update() {
-          nav.classList.toggle(opts.scrolledClass, readScrollY() > threshold);
+          var previewState = nav.getAttribute('data-ocd-preview-scroll-state');
+          var scrolled = previewState === 'scrolled' || (previewState !== 'entry' && readScrollY() > threshold);
+          nav.classList.toggle(opts.scrolledClass, scrolled);
         }
         update();
         if (typeof win.addEventListener === 'function') {
@@ -280,8 +288,8 @@
     return [
       '/* ocd-behaviors: hook scroll-threshold. La animación real la define el',
       '   autor del sitio; estas reglas son conservadoras y sobreescribibles. */',
-      '.nav { transition: background-color .2s ease, box-shadow .2s ease; }',
-      '.nav.nav--scrolled { box-shadow: 0 2px 10px rgba(0,0,0,.08); }',
+      '[data-ocd-behavior="scroll-threshold"] { transition: background-color .2s ease, box-shadow .2s ease; }',
+      '[data-ocd-behavior="scroll-threshold"].nav--scrolled { box-shadow: 0 2px 10px rgba(0,0,0,.08); }',
     ].join('\n');
   }
 

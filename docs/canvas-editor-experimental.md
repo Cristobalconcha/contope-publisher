@@ -20,7 +20,10 @@ no genera bloques Gutenberg y no interviene en el importador de paquetes.
 6. Reconoce contenedores CSS Grid y ofrece presets como `1/2/1`, proporciones
    libres, gap, reglas responsive y manejadores arrastrables.
 7. Modela el cambio de navegación al hacer scroll como comportamiento
-   declarativo `scroll-threshold`, sin aceptar JavaScript arbitrario.
+   declarativo `scroll-threshold`, sin aceptar JavaScript arbitrario. El
+   inspector permite activar el comportamiento, previsualizar por separado
+   `Entrada` y `Con scroll`, editar ambos conjuntos de reglas CSS y definir el
+   umbral en píxeles.
 8. Guarda y reabre el documento contra WordPress mediante `admin-ajax.php` con
    nonce y comprobación de capacidad en cada petición.
 9. Exporta HTML autosuficiente —CSS y runtime declarativo incluidos— o CSS por
@@ -117,8 +120,9 @@ iframe, y la integridad byte a byte del vendor.
 `npm run check:canvas-runtime` abre un navegador real, verifica radios de 16 px y
 12 px derivados de variables, aplica una cuadrícula `1/2/1`, guarda, la altera,
 recarga y comprueba que columnas, CSS y comportamiento sobrevivieron. También
-verifica video sin controles añadidos, resolución de una ruta `file://` y la
-acción de publicación con enlace resultante.
+verifica los dos estados visuales del encabezado y su umbral, video sin controles
+añadidos, resolución de una ruta `file://` y la acción de publicación con enlace
+resultante.
 
 ## Límites conocidos
 
