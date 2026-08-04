@@ -340,6 +340,13 @@
       .ocd-ci__header-grid label { display:grid; gap:4px; color:#c7d7e1; font-size:10px; }
       .ocd-ci__header-grid .is-wide { grid-column:1 / -1; }
       .ocd-ci__header-hint { margin-top:8px; color:#9eabb4; font-size:10px; }
+      .gjs-toolbar-item.ocd-header-state-tool { position:relative; width:auto; min-width:28px; padding:5px 7px;
+        border-left:1px solid #ffffff38; font-weight:750; text-align:center; }
+      .gjs-toolbar-item.ocd-header-state-tool::before { display:block; min-width:14px; line-height:16px; }
+      .gjs-toolbar-item.ocd-header-state-pin::before { content:'⚑'; font-size:15px; }
+      .gjs-toolbar-item.ocd-header-state-entry::before { content:'E'; }
+      .gjs-toolbar-item.ocd-header-state-scroll::before { content:'S'; }
+      .gjs-toolbar-item.ocd-header-state-tool.is-active { background:#a7641a; box-shadow:inset 0 -2px #fff; }
     `;
     document.head.appendChild(style);
   }
@@ -359,6 +366,8 @@
     let headerState = 'entry';
     let previewHeaderElement = null;
     let headerIdentityCounter = 0;
+    let toolbarComponent = null;
+    let toolbarOriginal = null;
 
     function getElement(component) {
       return component && typeof component.getEl === 'function' ? component.getEl() : null;
@@ -375,6 +384,15 @@
       const tag = String(component.get?.('tagName') || '').toLowerCase();
       const attributes = componentAttributes(component);
       return tag === 'header' || tag === 'nav' || attributes['data-ocd-behavior'] === 'scroll-threshold';
+    }
+
+    function headerForComponent(component) {
+      let current = component || null;
+      while (current) {
+        if (isHeaderComponent(current)) return current;
+        current = typeof current.parent === 'function' ? current.parent() : null;
+      }
+      return null;
     }
 
     function headerIsActive(component) {
@@ -433,6 +451,103 @@
       return refreshAfterRender();
     }
 
+    function openInspectorPanel() {
+      const tab = hostDocument.querySelector('[data-ocd-side-panel="inspector"]');
+      if (tab && tab.getAttribute('aria-selected') !== 'true') tab.click();
+    }
+
+    function setHeaderPreviewState(state, component) {
+      const target = component || editor.getSelected() || selected;
+      const header = headerForComponent(target);
+      if (!header) return null;
+      prepareHeader(header);
+      headerState = state === 'scrolled' ? 'scrolled' : 'entry';
+      previewHeaderState(header, headerState);
+      global.ocdCanvas?.behaviors?.refresh?.();
+      global.ocdCanvas?.behaviors?.installCanvasRuntime?.();
+      previewHeaderState(header, headerState);
+      updateHeaderToolbar(target);
+      refresh(target);
+      return header;
+    }
+
+    function fallbackToolbar(component) {
+      const tools = [];
+      if (component?.get?.('draggable')) {
+        tools.push({ attributes: { class: 'fa fa-arrows', title: 'Mover' }, command: 'tlb-move' });
+      }
+      if (component?.parent?.()) {
+        tools.push({ attributes: { class: 'fa fa-arrow-up', title: 'Seleccionar contenedor' }, command: 'select-parent' });
+      }
+      if (component?.get?.('copyable') !== false) {
+        tools.push({ attributes: { class: 'fa fa-clone', title: 'Duplicar' }, command: 'tlb-clone' });
+      }
+      if (component?.get?.('removable') !== false) {
+        tools.push({ attributes: { class: 'fa fa-trash-o', title: 'Eliminar' }, command: 'tlb-delete' });
+      }
+      return tools;
+    }
+
+    function restoreHeaderToolbar() {
+      if (!toolbarComponent) return;
+      if (toolbarOriginal == null) toolbarComponent.unset?.('toolbar', { silent: true });
+      else toolbarComponent.set?.('toolbar', toolbarOriginal, { silent: true });
+      toolbarComponent = null;
+      toolbarOriginal = null;
+    }
+
+    function updateHeaderToolbar(component) {
+      const header = headerForComponent(component);
+      if (!header) {
+        restoreHeaderToolbar();
+        editor.refresh?.({ tools: true });
+        return;
+      }
+
+      if (toolbarComponent !== component) {
+        restoreHeaderToolbar();
+        toolbarComponent = component;
+        const current = component?.get?.('toolbar');
+        toolbarOriginal = Array.isArray(current) ? current.slice() : current ?? null;
+      }
+
+      const standard = Array.isArray(toolbarOriginal) && toolbarOriginal.length
+        ? toolbarOriginal
+        : fallbackToolbar(component);
+      const tools = [
+        {
+          attributes: {
+            class: 'ocd-header-state-tool ocd-header-state-pin',
+            title: headerIsActive(header) ? 'Abrir estados del encabezado' : 'Guardar estado y agregar estado Scroll',
+            'data-ocd-header-tool': 'pin',
+          },
+          command: 'ocd-header-states-open',
+        },
+      ];
+      if (headerIsActive(header)) {
+        tools.push(
+          {
+            attributes: {
+              class: `ocd-header-state-tool ocd-header-state-entry${headerState === 'entry' ? ' is-active' : ''}`,
+              title: 'Previsualizar y editar Entrada',
+              'data-ocd-header-tool': 'entry',
+            },
+            command: 'ocd-header-state-entry',
+          },
+          {
+            attributes: {
+              class: `ocd-header-state-tool ocd-header-state-scroll${headerState === 'scrolled' ? ' is-active' : ''}`,
+              title: 'Previsualizar y editar Scroll',
+              'data-ocd-header-tool': 'scroll',
+            },
+            command: 'ocd-header-state-scroll',
+          },
+        );
+      }
+      component.set?.('toolbar', [...tools, ...standard], { silent: true });
+      editor.refresh?.({ tools: true });
+    }
+
     function inspect(component) {
       const target = component || editor.getSelected();
       const element = getElement(target);
@@ -460,12 +575,15 @@
 
     function refresh(component) {
       selected = component || editor.getSelected() || selected;
-      if (isHeaderComponent(selected) && headerIsActive(selected)) {
-        previewHeaderState(selected, headerState);
+      const selectedHeader = headerForComponent(selected);
+      if (selectedHeader && headerIsActive(selectedHeader)) {
+        previewHeaderState(selectedHeader, headerState);
       } else if (previewHeaderElement) {
+        const previewWindow = previewHeaderElement.ownerDocument?.defaultView;
         previewHeaderElement.removeAttribute('data-ocd-preview-scroll-state');
         previewHeaderElement.classList.remove('nav--scrolled');
         previewHeaderElement = null;
+        previewWindow?.dispatchEvent?.(new previewWindow.Event('resize'));
       }
       snapshot = inspect(selected);
       render();
@@ -684,12 +802,8 @@
       if (!headerIsActive(component)) {
         const activate = createElement(hostDocument, 'button', 'ocd-ci__header-activate', 'Activar estado con scroll');
         activate.type = 'button';
-        activate.addEventListener('click', async () => {
-          prepareHeader(component);
-          headerState = 'entry';
-          global.ocdCanvas?.behaviors?.refresh?.();
-          global.ocdCanvas?.behaviors?.installCanvasRuntime?.();
-          await refreshAfterRender();
+        activate.addEventListener('click', () => {
+          setHeaderPreviewState('entry', editor.getSelected() || component);
         });
         panel.append(
           activate,
@@ -713,9 +827,7 @@
         );
         button.type = 'button';
         button.addEventListener('click', () => {
-          headerState = state;
-          previewHeaderState(component, state);
-          refresh(component);
+          setHeaderPreviewState(state, editor.getSelected() || component);
         });
         tabs.appendChild(button);
       }
@@ -794,7 +906,7 @@
           }
         }
       }
-      const headerPanel = renderHeaderStatePanel(snapshot?.component);
+      const headerPanel = renderHeaderStatePanel(headerForComponent(snapshot?.component));
       if (headerPanel) body.appendChild(headerPanel);
       const svgImage = externalSvgImageFor(snapshot?.component) || firstExternalSvgImage();
       const brandVector = firstBrandVector();
@@ -906,12 +1018,33 @@
     function onSelected(component) {
       selected = component;
       refresh(component);
+      updateHeaderToolbar(component);
     }
 
     function onDeselected() {
       selected = editor.getSelected() || null;
       refresh(selected);
+      if (selected) updateHeaderToolbar(selected);
+      else restoreHeaderToolbar();
     }
+
+    editor.Commands.add('ocd-header-states-open', () => {
+      const target = editor.getSelected() || selected;
+      const header = headerForComponent(target);
+      if (!header) return;
+      if (!headerIsActive(header)) setHeaderPreviewState('entry', target);
+      else {
+        updateHeaderToolbar(target);
+        refresh(target);
+      }
+      openInspectorPanel();
+    });
+    editor.Commands.add('ocd-header-state-entry', () => {
+      setHeaderPreviewState('entry', editor.getSelected() || selected);
+    });
+    editor.Commands.add('ocd-header-state-scroll', () => {
+      setHeaderPreviewState('scrolled', editor.getSelected() || selected);
+    });
 
     editor.on('component:selected', onSelected);
     editor.on('component:deselected', onDeselected);
@@ -924,6 +1057,8 @@
       applyLocalStyle,
       applyClassStyle,
       applySvgMask,
+      headerForComponent,
+      setHeaderPreviewState,
       mount,
       destroy() {
         editor.off('component:selected', onSelected);
@@ -932,13 +1067,20 @@
         previewHeaderElement?.removeAttribute('data-ocd-preview-scroll-state');
         previewHeaderElement?.classList.remove('nav--scrolled');
         previewHeaderElement = null;
+        restoreHeaderToolbar();
+        editor.Commands.remove?.('ocd-header-states-open');
+        editor.Commands.remove?.('ocd-header-state-entry');
+        editor.Commands.remove?.('ocd-header-state-scroll');
         root?.remove();
         root = null;
       },
     };
 
     if (opts.mount !== false) mount(opts.mount instanceof global.Element ? opts.mount : null);
-    if (editor.getSelected()) refresh(editor.getSelected());
+    if (editor.getSelected()) {
+      refresh(editor.getSelected());
+      updateHeaderToolbar(editor.getSelected());
+    }
     editor.OCDComputedInspector = api;
     return api;
   }

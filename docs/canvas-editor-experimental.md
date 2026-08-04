@@ -23,7 +23,9 @@ no genera bloques Gutenberg y no interviene en el importador de paquetes.
    declarativo `scroll-threshold`, sin aceptar JavaScript arbitrario. El
    inspector permite activar el comportamiento, previsualizar por separado
    `Entrada` y `Con scroll`, editar ambos conjuntos de reglas CSS y definir el
-   umbral en píxeles.
+   umbral en píxeles. Al seleccionar el encabezado o cualquiera de sus hijos,
+   el lienzo muestra además `⚑`, `E` y `S` sobre el propio objeto: el pin abre o
+   activa los estados, y `E`/`S` alternan la previsualización de Entrada y Scroll.
 8. Guarda y reabre el documento contra WordPress mediante `admin-ajax.php` con
    nonce y comprobación de capacidad en cada petición.
 9. Exporta HTML autosuficiente —CSS y runtime declarativo incluidos— o CSS por
@@ -120,9 +122,10 @@ iframe, y la integridad byte a byte del vendor.
 `npm run check:canvas-runtime` abre un navegador real, verifica radios de 16 px y
 12 px derivados de variables, aplica una cuadrícula `1/2/1`, guarda, la altera,
 recarga y comprueba que columnas, CSS y comportamiento sobrevivieron. También
-verifica los dos estados visuales del encabezado y su umbral, video sin controles
-añadidos, resolución de una ruta `file://` y la acción de publicación con enlace
-resultante.
+verifica los dos estados visuales del encabezado, su umbral y los controles
+sobre el objeto incluso al seleccionar un hijo; también verifica video sin
+controles añadidos, resolución de una ruta `file://` y la acción de publicación
+con enlace resultante.
 
 ## Límites conocidos
 
