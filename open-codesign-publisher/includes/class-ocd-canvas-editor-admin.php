@@ -165,8 +165,8 @@ final class OCD_Canvas_Editor_Admin
                 Slice vertical aislado. Edita documentos experimentales con ID estable
                 <code><?php echo esc_html(OCD_Canvas_Document_Repository::DOCUMENT_ID); ?></code>
                 y guarda datos estructurados, HTML y CSS por separado. Podés editar el documento
-                individual o cargar una página WordPress para ver y editar sus regiones Encabezado,
-                Cuerpo y Pie de página juntas.
+                individual o cargar una página WordPress para ver y editar sus regiones de
+                Encabezado y Pie de página juntas.
             </p>
 
             <div class="ocd-canvas-toolbar">
@@ -227,9 +227,6 @@ final class OCD_Canvas_Editor_Admin
                         <button type="button" class="button" role="tab" data-ocd-region-segment="header" aria-selected="false" disabled>
                             Encabezado
                         </button>
-                        <button type="button" class="button" role="tab" data-ocd-region-segment="body" aria-selected="false" disabled>
-                            Cuerpo
-                        </button>
                         <button type="button" class="button" role="tab" data-ocd-region-segment="footer" aria-selected="false" disabled>
                             Pie de página
                         </button>
@@ -242,12 +239,6 @@ final class OCD_Canvas_Editor_Admin
                             </div>
                             <div class="ocd-region-canvas-slot" data-ocd-region-canvas-slot="header"></div>
                         </section>
-                        <section class="ocd-region-segment-panel" data-ocd-region-segment-panel="body">
-                            <div class="ocd-region-preview" data-ocd-region-preview="body">
-                                <p class="ocd-region-empty">Cargá una página para resolver el Cuerpo.</p>
-                            </div>
-                            <div class="ocd-region-canvas-slot" data-ocd-region-canvas-slot="body"></div>
-                        </section>
                         <section class="ocd-region-segment-panel" data-ocd-region-segment-panel="footer">
                             <div class="ocd-region-preview" data-ocd-region-preview="footer">
                                 <p class="ocd-region-empty">Cargá una página para resolver el Pie de página.</p>
@@ -259,7 +250,7 @@ final class OCD_Canvas_Editor_Admin
             </div>
 
             <div class="ocd-canvas-region-panel">
-                <h2>Región de plantilla (Encabezado / Cuerpo / Pie de página)</h2>
+                <h2>Región de plantilla (Encabezado / Pie de página)</h2>
                 <p class="description">
                     Marca qué rol cumple este documento al armar una página. Global se usa en
                     todo el sitio salvo que exista una región local más específica. Local aplica
@@ -272,7 +263,6 @@ final class OCD_Canvas_Editor_Admin
                             <select id="ocd-region-kind">
                                 <option value="">(ninguno — documento normal)</option>
                                 <option value="header">Encabezado</option>
-                                <option value="body">Cuerpo</option>
                                 <option value="footer">Pie de página</option>
                             </select>
                         </td>

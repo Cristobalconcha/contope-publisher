@@ -133,7 +133,7 @@
     var saveInFlight = null;
     var isSaving = false;
     var dirty = false;
-    var pageRegionDocs = { header: null, body: null, footer: null };
+    var pageRegionDocs = { header: null, footer: null };
     var pageContext = null;
     var activeSegment = null;
     var originalEditorShellParent = null;
@@ -306,7 +306,6 @@
 
     function regionLabel(kind) {
         if (kind === 'header') return 'Encabezado';
-        if (kind === 'body') return 'Cuerpo';
         if (kind === 'footer') return 'Pie de página';
         return kind;
     }
@@ -930,45 +929,50 @@
                 pageContext = data;
                 pageRegionDocs = {
                     header: data.regions && data.regions.header ? data.regions.header : null,
-                    body: data.regions && data.regions.body ? data.regions.body : null,
                     footer: data.regions && data.regions.footer ? data.regions.footer : null
                 };
 
                 setRegionPreview('header', pageRegionDocs.header);
-                setRegionPreview('body', pageRegionDocs.body);
                 setRegionPreview('footer', pageRegionDocs.footer);
                 updateRegionSegmentTabs();
 
-                if (!pageRegionDocs.body) {
-                    function clearWithoutBody() {
-                        clearActiveSegment();
-                        pageStatus(
-                            'Esta página no tiene Cuerpo asignado. Elegí Encabezado o Pie si están disponibles.',
-                            'error'
-                        );
-                    }
+                var preferredKind = null;
+                if (pageRegionDocs.header) {
+                    preferredKind = 'header';
+                } else if (pageRegionDocs.footer) {
+                    preferredKind = 'footer';
+                }
 
+                function clearWithoutRegion() {
+                    clearActiveSegment();
+                    pageStatus(
+                        'Esta página no tiene regiones de Encabezado ni Pie de página asignadas.',
+                        'error'
+                    );
+                }
+
+                if (!preferredKind) {
                     if (activeDocumentId && hasUnsavedChanges()) {
                         pageStatus('Guardando el documento actual antes de descartar el segmento activo…');
-                        return persist('manual').then(clearWithoutBody).catch(function (error) {
+                        return persist('manual').then(clearWithoutRegion).catch(function (error) {
                             pageStatus('No se cargó la página: ' + error.message, 'error');
                         });
                     }
-                    clearWithoutBody();
+                    clearWithoutRegion();
                     return;
                 }
 
-                function proceedToBody() {
-                    setActiveRegionSegment('body', pageRegionDocs.body);
+                function proceedToRegion() {
+                    setActiveRegionSegment(preferredKind, pageRegionDocs[preferredKind]);
                 }
 
                 if (activeDocumentId && hasUnsavedChanges()) {
                     pageStatus('Guardando el documento actual antes de cargar la página…');
-                    return persist('manual').then(proceedToBody).catch(function (error) {
+                    return persist('manual').then(proceedToRegion).catch(function (error) {
                         pageStatus('No se cargó la página: ' + error.message, 'error');
                     });
                 }
-                proceedToBody();
+                proceedToRegion();
             })
             .catch(function (error) {
                 pageStatus('No se pudo cargar la página: ' + error.message, 'error');
