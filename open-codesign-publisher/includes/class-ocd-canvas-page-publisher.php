@@ -9,8 +9,10 @@ final class OCD_Canvas_Page_Publisher
 {
     public const META_DOCUMENT_ID = '_ocd_canvas_document_id';
 
-    public function __construct(private OCD_Canvas_Document_Repository $repository)
-    {
+    public function __construct(
+        private OCD_Canvas_Document_Repository $repository,
+        private ?OCD_Template_Region_Resolver $region_resolver = null
+    ) {
     }
 
     public function register(): void
@@ -60,7 +62,7 @@ final class OCD_Canvas_Page_Publisher
     public function render_shortcode(array $attributes): string
     {
         $document_id = sanitize_key((string) ($attributes['document_id'] ?? ''));
-        if ($document_id !== OCD_Canvas_Document_Repository::DOCUMENT_ID) {
+        if ($document_id === '') {
             return '';
         }
         $document = $this->repository->load($document_id);
@@ -68,9 +70,39 @@ final class OCD_Canvas_Page_Publisher
             return '';
         }
 
+        // Header/footer are resolved live, at render time, against the real
+        // page being viewed — not baked in at publish time. This is what
+        // makes a global (or category-local) region propagate automatically
+        // to every page that uses it without republishing each one.
+        $header_html = '';
+        $footer_html = '';
+        $header_css = '';
+        $footer_css = '';
+        if ($this->region_resolver !== null) {
+            $current_page_id = (int) get_the_ID();
+            if ($current_page_id > 0) {
+                $header = $this->region_resolver->resolve(
+                    OCD_Canvas_Document_Repository::REGION_KIND_HEADER,
+                    $current_page_id
+                );
+                if ($header !== null) {
+                    $header_html = (string) $header['html'];
+                    $header_css = (string) $header['css'];
+                }
+                $footer = $this->region_resolver->resolve(
+                    OCD_Canvas_Document_Repository::REGION_KIND_FOOTER,
+                    $current_page_id
+                );
+                if ($footer !== null) {
+                    $footer_html = (string) $footer['html'];
+                    $footer_css = (string) $footer['css'];
+                }
+            }
+        }
+
         wp_register_style('ocd-canvas-public', false, [], OCD_PUBLISHER_VERSION);
         wp_enqueue_style('ocd-canvas-public');
-        wp_add_inline_style('ocd-canvas-public', (string) $document['css']);
+        wp_add_inline_style('ocd-canvas-public', $header_css . (string) $document['css'] . $footer_css);
         wp_enqueue_script(
             'ocd-canvas-public',
             plugins_url('assets/js/ocd-canvas-public.js', OCD_PUBLISHER_FILE),
@@ -79,8 +111,17 @@ final class OCD_Canvas_Page_Publisher
             true
         );
 
-        return '<div class="ocd-canvas-published" data-ocd-document-id="' . esc_attr($document_id) . '">' .
+        $markup = '';
+        if ($header_html !== '') {
+            $markup .= '<header class="ocd-canvas-region ocd-canvas-region-header">' . $header_html . '</header>';
+        }
+        $markup .= '<div class="ocd-canvas-published" data-ocd-document-id="' . esc_attr($document_id) . '">' .
             (string) $document['html'] . '</div>';
+        if ($footer_html !== '') {
+            $markup .= '<footer class="ocd-canvas-region ocd-canvas-region-footer">' . $footer_html . '</footer>';
+        }
+
+        return $markup;
     }
 
     public function standalone_template(string $template): string

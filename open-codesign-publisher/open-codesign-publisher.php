@@ -24,6 +24,7 @@ require_once OCD_PUBLISHER_DIR . 'includes/class-ocd-admin.php';
 require_once OCD_PUBLISHER_DIR . 'includes/class-ocd-canvas-document-sanitizer.php';
 require_once OCD_PUBLISHER_DIR . 'includes/class-ocd-canvas-document-repository.php';
 require_once OCD_PUBLISHER_DIR . 'includes/class-ocd-canvas-asset-resolver.php';
+require_once OCD_PUBLISHER_DIR . 'includes/class-ocd-template-region-resolver.php';
 require_once OCD_PUBLISHER_DIR . 'includes/class-ocd-canvas-page-publisher.php';
 require_once OCD_PUBLISHER_DIR . 'includes/class-ocd-canvas-editor-admin.php';
 
@@ -36,13 +37,15 @@ add_action('plugins_loaded', static function (): void {
     // Módulo experimental y aislado: no interviene en el importador anterior.
     $canvas_repository = new OCD_Canvas_Document_Repository();
     $canvas_repository->register();
-    $canvas_publisher = new OCD_Canvas_Page_Publisher($canvas_repository);
+    $region_resolver = new OCD_Template_Region_Resolver($canvas_repository);
+    $canvas_publisher = new OCD_Canvas_Page_Publisher($canvas_repository, $region_resolver);
     $canvas_publisher->register();
     (new OCD_Canvas_Editor_Admin(
         $canvas_repository,
         new OCD_Canvas_Document_Sanitizer(),
         new OCD_Canvas_Asset_Resolver(),
-        $canvas_publisher
+        $canvas_publisher,
+        $region_resolver
     ))->register();
 });
 

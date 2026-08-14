@@ -45,6 +45,87 @@
     font-size: 12px;
 }
 
+.ocd-canvas-page-editor {
+    margin: 16px 0;
+}
+
+.ocd-canvas-page-picker {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.ocd-canvas-page-picker .ocd-canvas-status {
+    flex-basis: 100%;
+}
+
+#ocd-page-target {
+    width: 140px;
+}
+
+.ocd-region-tabs {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4px;
+    margin: 8px 0 0;
+}
+
+.ocd-region-tabs .button {
+    margin: 0;
+    text-align: center;
+}
+
+.ocd-region-panels {
+    display: grid;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.ocd-region-segment-panel {
+    border: 1px solid #c3c4c7;
+    background: #fff;
+    padding: 8px;
+}
+
+.ocd-region-segment-panel.is-active {
+    border-color: #2271b1;
+    box-shadow: 0 0 0 1px #2271b1;
+}
+
+.ocd-region-canvas-slot {
+    display: none;
+}
+
+.ocd-region-segment-panel.is-active .ocd-region-canvas-slot {
+    display: block;
+}
+
+.ocd-region-segment-panel.is-active .ocd-region-preview {
+    display: none;
+}
+
+.ocd-region-preview {
+    min-height: 96px;
+    max-height: 280px;
+    overflow: auto;
+    padding: 8px;
+    background: #f6f7f7;
+    border: 1px dashed #c3c4c7;
+}
+
+.ocd-region-preview-content,
+.ocd-region-preview-content * {
+    pointer-events: none;
+}
+
+.ocd-region-empty {
+    margin: 0;
+    color: #50575e;
+    font-style: italic;
+}
+
 .ocd-canvas-import {
     margin: 8px 0 16px;
     padding: 12px 16px;

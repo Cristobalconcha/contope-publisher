@@ -127,10 +127,17 @@
 
     /** Estado del documento tal como lo devolvió el servidor por última vez. */
     var current = config.document || null;
+    var activeDocumentId = config.documentId || null;
     var autosaveEnabled = false;
     var autosaveTimer = null;
     var saveInFlight = null;
     var isSaving = false;
+    var dirty = false;
+    var pageRegionDocs = { header: null, body: null, footer: null };
+    var pageContext = null;
+    var activeSegment = null;
+    var originalEditorShellParent = null;
+    var pageLoadInFlight = false;
 
     function parseJson(value) {
         if (typeof value !== 'string' || value === '') {
@@ -201,7 +208,14 @@
             behaviorApi.installCanvasRuntime();
         });
         current = doc;
+        if (doc && doc.documentId) {
+            activeDocumentId = doc.documentId;
+            config.documentId = doc.documentId;
+        }
         updateMeta(doc);
+        window.requestAnimationFrame(function () {
+            dirty = false;
+        });
     }
 
     function request(action, params) {
@@ -234,18 +248,29 @@
     }
 
     function persist(kind) {
+        if (!activeDocumentId) {
+            setStatus('No hay un documento activo para guardar.', 'error');
+            return Promise.reject(new Error('No hay un documento activo para guardar.'));
+        }
         if (saveInFlight) {
             return saveInFlight.then(function () {
                 return persist(kind);
             });
         }
         window.clearTimeout(autosaveTimer);
+        autosaveTimer = null;
         isSaving = true;
         setStatus(kind === 'auto' ? 'Autoguardando cambios…' : 'Guardando…');
         var payload = snapshot();
+        payload.document_id = activeDocumentId;
         saveInFlight = request(config.saveAction, payload)
             .then(function (doc) {
                 current = doc;
+                if (doc && doc.documentId) {
+                    activeDocumentId = doc.documentId;
+                    config.documentId = doc.documentId;
+                }
+                dirty = false;
                 updateMeta(doc);
                 setStatus(
                     (kind === 'auto' ? 'Autoguardado' : 'Guardado') + ' (revisión ' + doc.revision + ').',
@@ -265,7 +290,113 @@
     }
 
     function save() {
-        return persist('manual');
+        return persist('manual').catch(function (_error) {
+            // `persist` ya deja el error visible en la franja de estado.
+        });
+    }
+
+    function regionStatus(message, kind) {
+        var node = document.getElementById('ocd-canvas-region-status');
+        if (!node) {
+            return;
+        }
+        node.textContent = message;
+        node.className = 'ocd-canvas-status' + (kind ? ' is-' + kind : '');
+    }
+
+    function regionLabel(kind) {
+        if (kind === 'header') return 'Encabezado';
+        if (kind === 'body') return 'Cuerpo';
+        if (kind === 'footer') return 'Pie de página';
+        return kind;
+    }
+
+    function parseRegionRuleList(value, label) {
+        var raw = String(value || '').trim() === '' ? '[]' : String(value).trim();
+        var parsed;
+        try {
+            parsed = JSON.parse(raw);
+        } catch (_error) {
+            regionStatus('Las ' + label + ' deben ser JSON válido, p. ej. [{"type":"post","id":12}].', 'error');
+            return null;
+        }
+        if (!Array.isArray(parsed)) {
+            regionStatus('Las ' + label + ' deben ser un arreglo JSON.', 'error');
+            return null;
+        }
+        return parsed;
+    }
+
+    function populateRegionFields(doc) {
+        var kindField = document.getElementById('ocd-region-kind');
+        var scopeField = document.getElementById('ocd-region-scope');
+        var targetsField = document.getElementById('ocd-region-targets');
+        var excludesField = document.getElementById('ocd-region-excludes');
+        if (!doc || !kindField || !scopeField || !targetsField || !excludesField) {
+            return;
+        }
+        kindField.value = doc.regionKind || '';
+        scopeField.value = doc.regionScope || '';
+        targetsField.value =
+            doc.regionTargets && doc.regionTargets.length
+                ? JSON.stringify(doc.regionTargets)
+                : '';
+        excludesField.value =
+            doc.regionExcludes && doc.regionExcludes.length
+                ? JSON.stringify(doc.regionExcludes)
+                : '';
+    }
+
+    function saveRegion() {
+        var kindField = document.getElementById('ocd-region-kind');
+        var scopeField = document.getElementById('ocd-region-scope');
+        var targetsField = document.getElementById('ocd-region-targets');
+        var excludesField = document.getElementById('ocd-region-excludes');
+        if (!kindField || !scopeField || !targetsField || !excludesField) {
+            return;
+        }
+        if (!activeDocumentId) {
+            regionStatus('No hay un documento activo para guardar la región.', 'error');
+            return;
+        }
+        var parsedTargets = parseRegionRuleList(targetsField.value, 'destinos');
+        if (parsedTargets === null) {
+            return;
+        }
+        var parsedExcludes = parseRegionRuleList(excludesField.value, 'exclusiones');
+        if (parsedExcludes === null) {
+            return;
+        }
+
+        regionStatus('Guardando región…');
+        request(config.saveRegionAction, {
+            document_id: activeDocumentId,
+            region_kind: kindField.value,
+            region_scope: scopeField.value,
+            region_targets: JSON.stringify(parsedTargets),
+            region_excludes: JSON.stringify(parsedExcludes)
+        })
+            .then(function (doc) {
+                var regionPatch = {
+                    regionKind: doc.regionKind || '',
+                    regionScope: doc.regionScope || '',
+                    regionTargets: doc.regionTargets || [],
+                    regionExcludes: doc.regionExcludes || []
+                };
+                current = Object.assign({}, current || {}, regionPatch);
+                if (doc && doc.documentId) {
+                    activeDocumentId = doc.documentId;
+                    config.documentId = doc.documentId;
+                }
+                if (activeSegment && pageRegionDocs[activeSegment]) {
+                    pageRegionDocs[activeSegment] = Object.assign({}, pageRegionDocs[activeSegment], regionPatch);
+                }
+                populateRegionFields(doc);
+                regionStatus('Región guardada.', 'ok');
+            })
+            .catch(function (error) {
+                regionStatus('No se pudo guardar la región: ' + error.message, 'error');
+            });
     }
 
     function scheduleAutosave() {
@@ -273,6 +404,7 @@
         window.clearTimeout(autosaveTimer);
         setStatus('Cambios pendientes de autoguardado…');
         autosaveTimer = window.setTimeout(function () {
+            autosaveTimer = null;
             persist('auto').catch(function () {
                 // `persist` ya deja el error visible en la franja de estado.
             });
@@ -289,10 +421,22 @@
     }
 
     function reload() {
+        if (!activeDocumentId) {
+            setStatus('No hay un documento activo para recargar.', 'error');
+            return Promise.resolve();
+        }
+        window.clearTimeout(autosaveTimer);
+        autosaveTimer = null;
+        dirty = false;
         setStatus('Recargando…');
-        return request(config.loadAction, {})
+        return request(config.loadAction, { document_id: activeDocumentId })
             .then(function (doc) {
+                if (activeSegment && pageRegionDocs[activeSegment]) {
+                    pageRegionDocs[activeSegment] = doc;
+                    setRegionPreview(activeSegment, doc);
+                }
                 applyDocument(doc);
+                populateRegionFields(doc);
                 setStatus('Documento recargado desde WordPress.', 'ok');
             })
             .catch(function (error) {
@@ -508,6 +652,10 @@
     }
 
     function publishPage() {
+        if (!activeDocumentId) {
+            setStatus('No hay un documento activo para publicar.', 'error');
+            return Promise.resolve();
+        }
         var title = document.getElementById('ocd-canvas-page-title');
         var button = document.getElementById('ocd-canvas-publish');
         var previewWindow = null;
@@ -524,6 +672,7 @@
         if (button) button.disabled = true;
         setStatus('Guardando y publicando la página…');
         var payload = snapshot();
+        payload.document_id = activeDocumentId;
         payload.title = title ? title.value : '';
 
         return request(config.publishAction, payload)
@@ -598,6 +747,237 @@
         }, 0);
     }
 
+    function pageStatus(message, kind) {
+        var node = document.getElementById('ocd-canvas-page-status');
+        if (!node) {
+            return;
+        }
+        node.textContent = message;
+        node.className = 'ocd-canvas-status' + (kind ? ' is-' + kind : '');
+    }
+
+    function getRegionPanel(kind) {
+        return document.querySelector('[data-ocd-region-segment-panel="' + kind + '"]');
+    }
+
+    function setRegionPreview(kind, doc) {
+        var panel = getRegionPanel(kind);
+        var preview = panel ? panel.querySelector('[data-ocd-region-preview]') : null;
+        if (!preview) {
+            return;
+        }
+        preview.innerHTML = '';
+        if (!doc) {
+            var empty = document.createElement('p');
+            empty.className = 'ocd-region-empty';
+            empty.textContent = 'Sin ' + regionLabel(kind) + ' asignado.';
+            preview.appendChild(empty);
+            panel.classList.add('is-empty');
+            return;
+        }
+        panel.classList.remove('is-empty');
+        if (doc.css) {
+            var style = document.createElement('style');
+            style.textContent = doc.css;
+            preview.appendChild(style);
+        }
+        var content = document.createElement('div');
+        content.className = 'ocd-region-preview-content';
+        content.innerHTML = doc.html || '';
+        preview.appendChild(content);
+    }
+
+    function updateRegionSegmentTabs() {
+        var tabs = document.querySelectorAll('[data-ocd-region-segment]');
+        Array.prototype.forEach.call(tabs, function (tab) {
+            var kind = tab.getAttribute('data-ocd-region-segment');
+            var doc = pageRegionDocs && pageRegionDocs[kind] ? pageRegionDocs[kind] : null;
+            var active = kind === activeSegment && !!doc;
+            tab.disabled = !doc;
+            tab.setAttribute('aria-selected', active ? 'true' : 'false');
+            tab.classList.toggle('button-primary', active);
+            tab.classList.toggle('is-disabled', !doc);
+        });
+
+        var panels = document.querySelectorAll('[data-ocd-region-segment-panel]');
+        Array.prototype.forEach.call(panels, function (panel) {
+            var kind = panel.getAttribute('data-ocd-region-segment-panel');
+            var doc = pageRegionDocs && pageRegionDocs[kind] ? pageRegionDocs[kind] : null;
+            panel.classList.toggle('is-active', kind === activeSegment && !!doc);
+            panel.classList.toggle('is-empty', !doc);
+        });
+
+        var segmentRoot = document.querySelector('.ocd-region-segments');
+        if (segmentRoot) {
+            segmentRoot.setAttribute('data-ocd-active-segment', activeSegment || '');
+        }
+    }
+
+    function moveEditorShellInto(kind) {
+        var shell = document.querySelector('.ocd-canvas-editor-shell');
+        var slot = document.querySelector('[data-ocd-region-canvas-slot="' + kind + '"]');
+        if (!shell || !slot) {
+            return;
+        }
+        if (!originalEditorShellParent) {
+            originalEditorShellParent = shell.parentNode;
+        }
+        if (shell.parentNode !== slot) {
+            slot.appendChild(shell);
+        }
+        window.setTimeout(function () {
+            if (typeof editor.refresh === 'function') editor.refresh();
+        }, 0);
+    }
+
+    function clearActiveSegment() {
+        activeSegment = null;
+        activeDocumentId = null;
+        config.documentId = null;
+        current = null;
+        dirty = false;
+        window.clearTimeout(autosaveTimer);
+        autosaveTimer = null;
+        updateMeta(null);
+        populateRegionFields({
+            regionKind: '',
+            regionScope: '',
+            regionTargets: [],
+            regionExcludes: []
+        });
+        var shell = document.querySelector('.ocd-canvas-editor-shell');
+        if (shell && originalEditorShellParent && shell.parentNode !== originalEditorShellParent) {
+            originalEditorShellParent.appendChild(shell);
+        }
+        updateRegionSegmentTabs();
+    }
+
+    function setActiveRegionSegment(kind, doc) {
+        if (!doc || !doc.documentId) {
+            pageStatus('La región ' + regionLabel(kind) + ' no tiene un documento editable.', 'error');
+            return;
+        }
+        activeSegment = kind;
+        pageRegionDocs[kind] = doc;
+        setRegionPreview(kind, doc);
+        window.clearTimeout(autosaveTimer);
+        autosaveTimer = null;
+        moveEditorShellInto(kind);
+        updateRegionSegmentTabs();
+        applyDocument(doc);
+        populateRegionFields(doc);
+        dirty = false;
+        pageStatus(
+            'Editando ' + regionLabel(kind) + ' de la página «' + (pageContext ? pageContext.pageTitle : '') + '».',
+            'ok'
+        );
+    }
+
+    function hasUnsavedChanges() {
+        return dirty || autosaveTimer !== null;
+    }
+
+    function activateRegionSegment(kind) {
+        var doc = pageRegionDocs && pageRegionDocs[kind] ? pageRegionDocs[kind] : null;
+        if (!doc) {
+            pageStatus('La región ' + regionLabel(kind) + ' no está asignada a esta página.', 'error');
+            return;
+        }
+        if (kind === activeSegment) {
+            return;
+        }
+
+        var previousKind = activeSegment;
+        if (previousKind && current) {
+            pageRegionDocs[previousKind] = current;
+            setRegionPreview(previousKind, current);
+        }
+
+        function proceed() {
+            setActiveRegionSegment(kind, doc);
+        }
+
+        if (previousKind && hasUnsavedChanges()) {
+            pageStatus('Guardando ' + regionLabel(previousKind) + ' antes de cambiar…');
+            return persist('manual').then(function (savedDoc) {
+                if (savedDoc && savedDoc.documentId) {
+                    pageRegionDocs[previousKind] = savedDoc;
+                    setRegionPreview(previousKind, savedDoc);
+                }
+                proceed();
+            }).catch(function (error) {
+                pageStatus('No se cambió de segmento: ' + error.message, 'error');
+            });
+        }
+        proceed();
+    }
+
+    function loadTargetPage() {
+        if (pageLoadInFlight) {
+            return;
+        }
+        var input = document.getElementById('ocd-page-target');
+        var pageId = input ? parseInt(input.value, 10) : 0;
+        if (!pageId || pageId <= 0) {
+            pageStatus('Ingresá un ID de página válido.', 'error');
+            return;
+        }
+
+        pageLoadInFlight = true;
+        pageStatus('Resolviendo página ' + pageId + '…');
+        return request(config.resolvePageAction, { page_id: String(pageId) })
+            .then(function (data) {
+                pageContext = data;
+                pageRegionDocs = {
+                    header: data.regions && data.regions.header ? data.regions.header : null,
+                    body: data.regions && data.regions.body ? data.regions.body : null,
+                    footer: data.regions && data.regions.footer ? data.regions.footer : null
+                };
+
+                setRegionPreview('header', pageRegionDocs.header);
+                setRegionPreview('body', pageRegionDocs.body);
+                setRegionPreview('footer', pageRegionDocs.footer);
+                updateRegionSegmentTabs();
+
+                if (!pageRegionDocs.body) {
+                    function clearWithoutBody() {
+                        clearActiveSegment();
+                        pageStatus(
+                            'Esta página no tiene Cuerpo asignado. Elegí Encabezado o Pie si están disponibles.',
+                            'error'
+                        );
+                    }
+
+                    if (activeDocumentId && hasUnsavedChanges()) {
+                        pageStatus('Guardando el documento actual antes de descartar el segmento activo…');
+                        return persist('manual').then(clearWithoutBody).catch(function (error) {
+                            pageStatus('No se cargó la página: ' + error.message, 'error');
+                        });
+                    }
+                    clearWithoutBody();
+                    return;
+                }
+
+                function proceedToBody() {
+                    setActiveRegionSegment('body', pageRegionDocs.body);
+                }
+
+                if (activeDocumentId && hasUnsavedChanges()) {
+                    pageStatus('Guardando el documento actual antes de cargar la página…');
+                    return persist('manual').then(proceedToBody).catch(function (error) {
+                        pageStatus('No se cargó la página: ' + error.message, 'error');
+                    });
+                }
+                proceedToBody();
+            })
+            .catch(function (error) {
+                pageStatus('No se pudo cargar la página: ' + error.message, 'error');
+            })
+            .finally(function () {
+                pageLoadInFlight = false;
+            });
+    }
+
     on('ocd-canvas-save', save);
     on('ocd-canvas-reload', function () {
         if (window.confirm('Recargar descarta los cambios no guardados del lienzo. ¿Continuar?')) {
@@ -608,12 +988,32 @@
     on('ocd-canvas-export-css', exportCss);
     on('ocd-canvas-import-apply', applyImport);
     on('ocd-canvas-publish', publishPage);
-    editor.on('update', scheduleAutosave);
+    on('ocd-canvas-save-region', saveRegion);
+    editor.on('update', function () {
+        dirty = true;
+        scheduleAutosave();
+    });
     document.querySelectorAll('[data-ocd-side-panel]').forEach(function (tab) {
         tab.addEventListener('click', function () {
             activateSidePanel(tab.getAttribute('data-ocd-side-panel'));
         });
     });
+    on('ocd-page-load', loadTargetPage);
+    document.querySelectorAll('[data-ocd-region-segment]').forEach(function (tab) {
+        tab.addEventListener('click', function () {
+            activateRegionSegment(tab.getAttribute('data-ocd-region-segment'));
+        });
+    });
+    var pageTarget = document.getElementById('ocd-page-target');
+    if (pageTarget) {
+        pageTarget.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                loadTargetPage();
+            }
+        });
+    }
+
     on('ocd-canvas-toggle-import', function (event) {
         var panel = document.getElementById('ocd-canvas-import');
         if (!panel) {
@@ -641,7 +1041,8 @@
         setStatus('No fue posible abrir el documento: ' + config.loadError, 'error');
     } else if (current) {
         applyDocument(current);
-        setStatus('Documento ' + config.documentId + ' listo (revisión ' + current.revision + ').');
+        populateRegionFields(current);
+        setStatus('Documento ' + activeDocumentId + ' listo (revisión ' + current.revision + ').');
     } else {
         setStatus('Sin documento inicial; usa Recargar.', 'error');
     }
