@@ -11,7 +11,8 @@ final class OCD_Canvas_Page_Publisher
 
     public function __construct(
         private OCD_Canvas_Document_Repository $repository,
-        private ?OCD_Template_Region_Resolver $region_resolver = null
+        private ?OCD_Template_Region_Resolver $region_resolver = null,
+        private ?OCD_Dynamic_Token_Resolver $token_resolver = null
     ) {
     }
 
@@ -74,16 +75,16 @@ final class OCD_Canvas_Page_Publisher
         // page being viewed — not baked in at publish time. This is what
         // makes a global (or category-local) region propagate automatically
         // to every page that uses it without republishing each one.
+        $post_id = (int) get_the_ID();
         $header_html = '';
         $footer_html = '';
         $header_css = '';
         $footer_css = '';
         if ($this->region_resolver !== null) {
-            $current_page_id = (int) get_the_ID();
-            if ($current_page_id > 0) {
+            if ($post_id > 0) {
                 $header = $this->region_resolver->resolve(
                     OCD_Canvas_Document_Repository::REGION_KIND_HEADER,
-                    $current_page_id
+                    $post_id
                 );
                 if ($header !== null) {
                     $header_html = (string) $header['html'];
@@ -91,7 +92,7 @@ final class OCD_Canvas_Page_Publisher
                 }
                 $footer = $this->region_resolver->resolve(
                     OCD_Canvas_Document_Repository::REGION_KIND_FOOTER,
-                    $current_page_id
+                    $post_id
                 );
                 if ($footer !== null) {
                     $footer_html = (string) $footer['html'];
@@ -119,6 +120,10 @@ final class OCD_Canvas_Page_Publisher
             (string) $document['html'] . '</div>';
         if ($footer_html !== '') {
             $markup .= '<footer class="ocd-canvas-region ocd-canvas-region-footer">' . $footer_html . '</footer>';
+        }
+
+        if ($this->token_resolver !== null) {
+            $markup = $this->token_resolver->resolve($markup, $post_id);
         }
 
         return $markup;

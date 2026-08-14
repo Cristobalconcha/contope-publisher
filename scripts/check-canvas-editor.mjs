@@ -606,6 +606,7 @@ async function checkIsolationAndAssets() {
     'class-ocd-canvas-document-repository.php',
     'class-ocd-canvas-asset-resolver.php',
     'class-ocd-canvas-page-publisher.php',
+    'class-ocd-dynamic-token-resolver.php',
     'class-ocd-canvas-editor-admin.php',
   ]) {
     check(bootstrap.includes(file), `El bootstrap debe requerir ${file}.`);
@@ -613,6 +614,10 @@ async function checkIsolationAndAssets() {
   check(
     /new OCD_Canvas_Editor_Admin\(/.test(bootstrap) && /->register\(\)/.test(bootstrap),
     'El bootstrap debe registrar el módulo Canvas.',
+  );
+  check(
+    /new OCD_Dynamic_Token_Resolver\(\)/.test(bootstrap),
+    'El bootstrap debe instanciar el resolver de tokens dinámicos.',
   );
   check(
     /new OCD_Admin\(\$importer\)/.test(bootstrap),
@@ -625,6 +630,7 @@ async function checkIsolationAndAssets() {
     'open-codesign-publisher/includes/class-ocd-canvas-document-sanitizer.php',
     'open-codesign-publisher/includes/class-ocd-canvas-asset-resolver.php',
     'open-codesign-publisher/includes/class-ocd-canvas-page-publisher.php',
+    'open-codesign-publisher/includes/class-ocd-dynamic-token-resolver.php',
     'open-codesign-publisher/assets/js/ocd-canvas-editor.js',
     'open-codesign-publisher/assets/js/ocd-canvas-public.js',
     'open-codesign-publisher/assets/js/ocd-computed-inspector.js',
@@ -761,7 +767,113 @@ async function checkPublishingAndAssets() {
       publisher.source.includes('META_DOCUMENT_ID') && publisher.source.includes('post_status'),
       'La página publicada debe conservar identidad estable y estado editorial.',
     );
+    check(
+      publisher.source.includes('OCD_Dynamic_Token_Resolver'),
+      'El publicador debe declarar el resolver de tokens como dependencia opcional.',
+    );
+    check(
+      publisher.source.includes('$this->token_resolver->resolve'),
+      'render_shortcode() debe resolver tokens sobre el markup ensamblado.',
+    );
   }
+}
+
+// ---------------------------------------------------------------------------
+// Resolver de contenido dinámico (Etapa 1: cuatro built-ins).
+// ---------------------------------------------------------------------------
+
+async function checkDynamicTokenResolver() {
+  const { ast, source } = await parsePhp('open-codesign-publisher/includes/class-ocd-dynamic-token-resolver.php');
+  const resolver = classOf(ast, 'OCD_Dynamic_Token_Resolver');
+  check(resolver !== null, 'Falta la clase OCD_Dynamic_Token_Resolver.');
+  if (!resolver) return;
+
+  const resolve = methodOf(resolver, 'resolve');
+  check(resolve !== null, 'Falta OCD_Dynamic_Token_Resolver::resolve().');
+  if (resolve) {
+    check(resolve.visibility === 'public', 'resolve() debe ser público.');
+    check(
+      resolve.arguments?.length === 2 &&
+        resolve.arguments[0]?.type?.name === 'string' &&
+        resolve.arguments[1]?.type?.name === 'int',
+      'resolve() debe recibir string $html e int $post_id.',
+    );
+
+    const calls = callNames(resolve);
+    for (const method of ['replace_featured_image_tags', 'replace_permalink_tags', 'replace_text_tokens']) {
+      check(calls.includes(method), `resolve() debe ejecutar la pasada ${method}().`);
+    }
+    check(
+      calls.indexOf('replace_featured_image_tags') !== -1 &&
+        calls.indexOf('replace_featured_image_tags') < calls.indexOf('replace_permalink_tags') &&
+        calls.indexOf('replace_permalink_tags') < calls.indexOf('replace_text_tokens'),
+      'resolve() debe resolver imagen, enlace y texto en ese orden.',
+    );
+  }
+
+  check(source.includes('$post_id <= 0'), 'resolve() debe devolver el HTML sin tocar cuando $post_id <= 0.');
+  check(
+    source.includes("'{{'") && source.includes("'data-ocd-dynamic'"),
+    'resolve() debe devolver temprano cuando no hay ni "{{" ni data-ocd-dynamic.',
+  );
+
+  const featured = methodOf(resolver, 'replace_featured_image_tags');
+  check(featured !== null, 'Falta la pasada de imagen destacada.');
+  check(
+    featured !== null && callNames(featured).includes('get_the_post_thumbnail'),
+    'La imagen destacada debe reemplazarse con get_the_post_thumbnail().',
+  );
+  check(
+    source.includes("'featured_image'"),
+    'La pasada de imagen destacada debe reconocer data-ocd-dynamic="featured_image".',
+  );
+
+  const permalink = methodOf(resolver, 'replace_permalink_tags');
+  check(permalink !== null, 'Falta la pasada de enlace.');
+  if (permalink) {
+    const calls = callNames(permalink);
+    check(calls.includes('get_permalink'), 'La pasada de enlace debe resolver get_permalink().');
+    check(calls.includes('esc_url'), 'El href resuelto debe escaparse con esc_url().');
+  }
+  check(
+    source.includes("'permalink'"),
+    'La pasada de enlace debe reconocer data-ocd-dynamic="permalink".',
+  );
+
+  const text = methodOf(resolver, 'replace_text_tokens');
+  check(text !== null, 'Falta la pasada de texto.');
+  if (text) {
+    const calls = callNames(text);
+    check(calls.includes('preg_split'), 'La pasada de texto debe separar tags y texto con preg_split().');
+    check(
+      source.includes("'/(<[^>]*>)/'"),
+      'preg_split() debe usar la partición de tags "<[^>]*>".',
+    );
+    check(
+      source.includes('PREG_SPLIT_DELIM_CAPTURE'),
+      'preg_split() debe conservar los tags mediante PREG_SPLIT_DELIM_CAPTURE.',
+    );
+    check(
+      source.includes('$index & 1'),
+      'La pasada de texto debe saltar los índices impares (tags), nunca resolver tokens dentro de atributos.',
+    );
+    check(calls.includes('esc_html'), 'Los tokens de texto deben escaparse con esc_html().');
+    check(calls.includes('get_the_title'), '{{post_title}} debe resolverse con get_the_title().');
+    check(calls.includes('get_the_excerpt'), '{{post_excerpt}} debe resolverse con get_the_excerpt().');
+    check(
+      calls.includes('get_the_post_thumbnail_url'),
+      '{{featured_image}} en texto debe resolverse con get_the_post_thumbnail_url().',
+    );
+    check(calls.includes('esc_url'), 'Los tokens de URL en texto deben escaparse con esc_url().');
+  }
+
+  check(
+    source.includes('post_title|post_excerpt|featured_image|permalink'),
+    'La gramática debe ser estricta y limitarse a los cuatro built-ins de la Etapa 1.',
+  );
+  check(!source.includes('get_field'), 'Etapa 1 no debe implementar ACF.');
+  check(!source.includes('acf:'), 'Etapa 1 no debe reconocer el prefijo acf:.');
+  check(!source.includes('eval('), 'El resolver no debe usar eval().');
 }
 
 // ---------------------------------------------------------------------------
@@ -827,6 +939,7 @@ export async function runCanvasEditorChecks() {
   await checkRepository();
   await checkIsolationAndAssets();
   await checkPublishingAndAssets();
+  await checkDynamicTokenResolver();
   await checkVendor();
 
   if (failures.length > 0) {

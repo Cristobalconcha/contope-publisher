@@ -25,6 +25,7 @@ require_once OCD_PUBLISHER_DIR . 'includes/class-ocd-canvas-document-sanitizer.p
 require_once OCD_PUBLISHER_DIR . 'includes/class-ocd-canvas-document-repository.php';
 require_once OCD_PUBLISHER_DIR . 'includes/class-ocd-canvas-asset-resolver.php';
 require_once OCD_PUBLISHER_DIR . 'includes/class-ocd-template-region-resolver.php';
+require_once OCD_PUBLISHER_DIR . 'includes/class-ocd-dynamic-token-resolver.php';
 require_once OCD_PUBLISHER_DIR . 'includes/class-ocd-canvas-page-publisher.php';
 require_once OCD_PUBLISHER_DIR . 'includes/class-ocd-canvas-editor-admin.php';
 
@@ -38,7 +39,8 @@ add_action('plugins_loaded', static function (): void {
     $canvas_repository = new OCD_Canvas_Document_Repository();
     $canvas_repository->register();
     $region_resolver = new OCD_Template_Region_Resolver($canvas_repository);
-    $canvas_publisher = new OCD_Canvas_Page_Publisher($canvas_repository, $region_resolver);
+    $token_resolver = new OCD_Dynamic_Token_Resolver();
+    $canvas_publisher = new OCD_Canvas_Page_Publisher($canvas_repository, $region_resolver, $token_resolver);
     $canvas_publisher->register();
     (new OCD_Canvas_Editor_Admin(
         $canvas_repository,
