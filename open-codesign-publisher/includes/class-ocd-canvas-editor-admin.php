@@ -13,6 +13,7 @@ if (!defined('ABSPATH')) {
 final class OCD_Canvas_Editor_Admin
 {
     public const PAGE_SLUG = 'open-codesign-canvas-editor';
+    public const PARENT_SLUG = 'open-codesign-publisher';
     public const NONCE_ACTION = 'ocd_canvas_editor';
     public const AJAX_LOAD = 'ocd_canvas_editor_load';
     public const AJAX_SAVE = 'ocd_canvas_editor_save';
@@ -46,13 +47,69 @@ final class OCD_Canvas_Editor_Admin
         add_action('wp_ajax_' . self::AJAX_PUBLISH, [$this, 'handle_publish']);
         add_action('wp_ajax_' . self::AJAX_SAVE_REGION, [$this, 'handle_save_region']);
         add_action('wp_ajax_' . self::AJAX_RESOLVE_PAGE, [$this, 'handle_resolve_page']);
+        add_filter('page_row_actions', [$this, 'add_page_row_edit_with_ocd'], 10, 2);
+    }
+
+    /**
+     * Adds an "Editar con OCD" row action to the Pages list. The destination is
+     * the Canvas admin screen with the page ID and a nonce, so opening the
+     * editor can pre-load the target page without changing the existing manual
+     * page picker flow.
+     */
+    public function add_page_row_edit_with_ocd(array $actions, WP_Post $post): array
+    {
+        if (!current_user_can(self::CAPABILITY)) {
+            return $actions;
+        }
+
+        $url = add_query_arg(
+            [
+                'page'    => self::PAGE_SLUG,
+                'page_id' => $post->ID,
+            ],
+            admin_url('admin.php')
+        );
+
+        $actions['ocd_canvas_editor'] = sprintf(
+            '<a href="%s">%s</a>',
+            esc_url(wp_nonce_url($url, self::NONCE_ACTION, 'ocd_nonce')),
+            esc_html__('Editar con OCD', 'open-codesign-publisher')
+        );
+
+        return $actions;
+    }
+
+    /**
+     * Resolves the page ID passed in the URL for auto-loading, only when the
+     * request carries a valid nonce and a real WordPress page.
+     */
+    private function resolve_auto_load_page_id(): int
+    {
+        if (!isset($_GET['page_id'])) {
+            return 0;
+        }
+
+        $page_id = absint(wp_unslash($_GET['page_id']));
+        if ($page_id <= 0) {
+            return 0;
+        }
+
+        check_admin_referer(self::NONCE_ACTION, 'ocd_nonce');
+
+        $page = get_post($page_id);
+        if (!$page instanceof WP_Post || $page->post_type !== 'page') {
+            return 0;
+        }
+
+        return $page_id;
     }
 
     public function add_menu(): void
     {
-        $hook_suffix = add_management_page(
+        $hook_suffix = add_submenu_page(
+            self::PARENT_SLUG,
             'Open CoDesign Canvas (Experimental)',
-            'Open CoDesign Canvas (Experimental)',
+            'Editor de página',
             self::CAPABILITY,
             self::PAGE_SLUG,
             [$this, 'render_page']
@@ -140,6 +197,7 @@ final class OCD_Canvas_Editor_Admin
             'publishedPage' => $this->publisher->current(OCD_Canvas_Document_Repository::DOCUMENT_ID),
             'regionKinds' => OCD_Canvas_Document_Repository::REGION_KINDS,
             'regionDocuments' => $this->repository->list_region_documents(),
+            'autoLoadPageId' => $this->resolve_auto_load_page_id(),
         ];
 
         // JSON_HEX_TAG evita cualquier salida de `<` dentro del script en línea.

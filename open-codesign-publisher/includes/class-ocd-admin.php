@@ -8,6 +8,9 @@ final class OCD_Admin
 {
     private const ACTION = 'ocd_import_project';
 
+    public const MENU_SLUG = 'open-codesign-publisher';
+    public const CAPABILITY = 'manage_options';
+
     public function __construct(private OCD_Importer $importer)
     {
     }
@@ -20,18 +23,35 @@ final class OCD_Admin
 
     public function add_menu(): void
     {
-        add_management_page(
+        add_menu_page(
             'Open CoDesign',
             'Open CoDesign',
-            'manage_options',
-            'open-codesign-publisher',
+            self::CAPABILITY,
+            self::MENU_SLUG,
+            [$this, 'render_page'],
+            'dashicons-layout',
+            58
+        );
+
+        add_submenu_page(
+            self::MENU_SLUG,
+            'Importar proyecto',
+            'Importar proyecto',
+            self::CAPABILITY,
+            self::MENU_SLUG,
             [$this, 'render_page']
         );
+
+        // TODO (Pieza 1): Plantillas — listado y creación de Encabezado/Pie.
+        // add_submenu_page(self::MENU_SLUG, 'Plantillas', 'Plantillas', self::CAPABILITY, 'open-codesign-templates', ...);
+
+        // TODO (Pieza 5): Estilos — lectura y guardado de paleta/tipografías.
+        // add_submenu_page(self::MENU_SLUG, 'Estilos', 'Estilos', self::CAPABILITY, 'open-codesign-styles', ...);
     }
 
     public function render_page(): void
     {
-        if (!current_user_can('manage_options')) {
+        if (!current_user_can(self::CAPABILITY)) {
             wp_die(esc_html__('No tienes permisos para importar proyectos.', 'open-codesign-publisher'));
         }
         $status = isset($_GET['ocd_status']) ? sanitize_key(wp_unslash($_GET['ocd_status'])) : '';
@@ -57,7 +77,7 @@ final class OCD_Admin
 
     public function handle_import(): void
     {
-        if (!current_user_can('manage_options')) {
+        if (!current_user_can(self::CAPABILITY)) {
             wp_die(esc_html__('No tienes permisos para importar proyectos.', 'open-codesign-publisher'));
         }
         check_admin_referer(self::ACTION);
@@ -79,14 +99,14 @@ final class OCD_Admin
             $this->redirect_error($result->get_error_message());
         }
 
-        wp_safe_redirect(add_query_arg(['page' => 'open-codesign-publisher', 'ocd_status' => 'success'], admin_url('tools.php')));
+        wp_safe_redirect(add_query_arg(['page' => self::MENU_SLUG, 'ocd_status' => 'success'], admin_url('admin.php')));
         exit;
     }
 
     private function redirect_error(string $message): void
     {
         set_transient($this->error_key(), $message, MINUTE_IN_SECONDS);
-        wp_safe_redirect(add_query_arg(['page' => 'open-codesign-publisher', 'ocd_status' => 'error'], admin_url('tools.php')));
+        wp_safe_redirect(add_query_arg(['page' => self::MENU_SLUG, 'ocd_status' => 'error'], admin_url('admin.php')));
         exit;
     }
 

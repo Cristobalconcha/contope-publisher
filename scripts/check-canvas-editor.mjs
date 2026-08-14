@@ -138,6 +138,22 @@ function arrayEntries(node) {
   return entries;
 }
 
+/** `$page->post_type === 'page'` / `$page->post_type !== 'page'` inside a method. */
+function hasPostTypePageCheck(node) {
+  let found = false;
+  walk(node, (child) => {
+    if (child.kind !== 'bin') return;
+    const left = child.left;
+    const right = child.right;
+    const leftProp = left && left.kind === 'propertylookup' ? identifierName(left.offset) : null;
+    const rightValue = literal(right);
+    if (leftProp === 'post_type' && rightValue === 'page' && (child.type === '===' || child.type === '!==')) {
+      found = true;
+    }
+  });
+  return found;
+}
+
 function stringLiterals(node) {
   const values = [];
   walk(node, (child) => {
@@ -175,24 +191,33 @@ async function checkAdminSurface() {
     `GRAPESJS_VERSION debe declarar ${VENDOR.version}.`,
   );
 
-  // Menú bajo Herramientas con la capacidad exigida.
+  // Submenú de Open CoDesign con la capacidad exigida.
   const addMenu = methodOf(admin, 'add_menu');
   check(addMenu !== null, 'Falta OCD_Canvas_Editor_Admin::add_menu().');
-  const menuCall = addMenu && firstCall(addMenu, 'add_management_page');
-  check(menuCall !== null, 'add_menu() debe registrar la pantalla con add_management_page().');
+  const menuCall = addMenu && firstCall(addMenu, 'add_submenu_page');
+  check(menuCall !== null, 'add_menu() debe registrar la pantalla como submenú con add_submenu_page().');
   if (menuCall) {
     check(
-      selfConstant(menuCall.arguments[2]) === 'CAPABILITY',
-      'add_management_page() debe recibir self::CAPABILITY como capacidad.',
+      literal(menuCall.arguments[0]) === 'open-codesign-publisher' ||
+        selfConstant(menuCall.arguments[0]) === 'PARENT_SLUG',
+      'add_submenu_page() debe colgar del menú principal open-codesign-publisher.',
     );
     check(
-      constantOf(admin, 'PAGE_SLUG') === literal(menuCall.arguments[3]) ||
-        selfConstant(menuCall.arguments[3]) === 'PAGE_SLUG',
-      'add_management_page() debe usar self::PAGE_SLUG como slug.',
+      constantOf(admin, 'PARENT_SLUG') === 'open-codesign-publisher',
+      'OCD_Canvas_Editor_Admin::PARENT_SLUG debe ser open-codesign-publisher.',
     );
     check(
-      stringLiterals(menuCall.arguments[0]).join(' ').includes('Experimental'),
-      'El título del menú debe identificar la pantalla como experimental.',
+      selfConstant(menuCall.arguments[3]) === 'CAPABILITY',
+      'add_submenu_page() debe recibir self::CAPABILITY como capacidad.',
+    );
+    check(
+      constantOf(admin, 'PAGE_SLUG') === literal(menuCall.arguments[4]) ||
+        selfConstant(menuCall.arguments[4]) === 'PAGE_SLUG',
+      'add_submenu_page() debe usar self::PAGE_SLUG como slug.',
+    );
+    check(
+      stringLiterals(menuCall.arguments[1]).join(' ').includes('Experimental'),
+      'El título de la página debe identificar la pantalla como experimental.',
     );
   }
 
@@ -291,6 +316,92 @@ async function checkAdminSurface() {
     check(
       /JSON_HEX_TAG/.test(source),
       'La configuración en línea debe codificarse con JSON_HEX_TAG para no romper el <script>.',
+    );
+
+    check(
+      source.includes("'autoLoadPageId'"),
+      'La configuración JS debe incluir autoLoadPageId.',
+    );
+    check(
+      source.includes("'autoLoadPageId' => $this->resolve_auto_load_page_id()"),
+      'autoLoadPageId debe resolverse con resolve_auto_load_page_id().',
+    );
+  }
+
+  // Botón "Editar con OCD" en la lista de Páginas y auto-carga por URL.
+  const register = methodOf(admin, 'register');
+  check(register !== null, 'Falta OCD_Canvas_Editor_Admin::register().');
+  if (register) {
+    const pageRowFilter = callsOf(register).filter((entry) => entry.name === 'add_filter');
+    check(
+      pageRowFilter.some((entry) => literal(entry.node.arguments[0]) === 'page_row_actions'),
+      'register() debe registrar el filtro page_row_actions.',
+    );
+  }
+
+  const pageRowAction = methodOf(admin, 'add_page_row_edit_with_ocd');
+  check(pageRowAction !== null, 'Falta OCD_Canvas_Editor_Admin::add_page_row_edit_with_ocd().');
+  if (pageRowAction) {
+    const capabilityCall = firstCall(pageRowAction, 'current_user_can');
+    check(capabilityCall !== null, 'El enlace de fila debe comprobar current_user_can().');
+    check(
+      capabilityCall !== null && selfConstant(capabilityCall.arguments[0]) === 'CAPABILITY',
+      'El enlace de fila debe exigir self::CAPABILITY (manage_options).',
+    );
+
+    const adminUrlCall = firstCall(pageRowAction, 'admin_url');
+    check(adminUrlCall !== null, 'El enlace de fila debe construirse con admin_url().');
+    check(
+      adminUrlCall !== null && literal(adminUrlCall.arguments[0]) === 'admin.php',
+      'El enlace "Editar con OCD" debe apuntar a admin.php después de migrar el menú.',
+    );
+
+    const nonceUrlCall = firstCall(pageRowAction, 'wp_nonce_url');
+    check(nonceUrlCall !== null, 'El enlace de fila debe firmarse con wp_nonce_url().');
+    if (nonceUrlCall) {
+      check(
+        selfConstant(nonceUrlCall.arguments[1]) === 'NONCE_ACTION',
+        'wp_nonce_url() debe reutilizar self::NONCE_ACTION.',
+      );
+      check(
+        literal(nonceUrlCall.arguments[2]) === 'ocd_nonce',
+        'El nonce de la URL debe viajar en el campo ocd_nonce.',
+      );
+    }
+  }
+
+  const resolveAutoLoad = methodOf(admin, 'resolve_auto_load_page_id');
+  check(resolveAutoLoad !== null, 'Falta OCD_Canvas_Editor_Admin::resolve_auto_load_page_id().');
+  if (resolveAutoLoad) {
+    check(
+      resolveAutoLoad.type?.name === 'int',
+      'resolve_auto_load_page_id() debe declarar int como tipo de retorno.',
+    );
+    const calls = callNames(resolveAutoLoad);
+    check(
+      calls.includes('wp_unslash'),
+      'resolve_auto_load_page_id() debe desempaquetar $_GET con wp_unslash().',
+    );
+    check(calls.includes('absint'), 'resolve_auto_load_page_id() debe sanitizar page_id con absint().');
+    const nonceCall = firstCall(resolveAutoLoad, 'check_admin_referer');
+    check(
+      nonceCall !== null,
+      'resolve_auto_load_page_id() debe verificar el nonce con check_admin_referer().',
+    );
+    if (nonceCall) {
+      check(
+        selfConstant(nonceCall.arguments[0]) === 'NONCE_ACTION',
+        'check_admin_referer() debe reutilizar self::NONCE_ACTION.',
+      );
+      check(
+        literal(nonceCall.arguments[1]) === 'ocd_nonce',
+        'check_admin_referer() debe leer el nonce del campo ocd_nonce.',
+      );
+    }
+    check(calls.includes('get_post'), 'resolve_auto_load_page_id() debe validar la página con get_post().');
+    check(
+      hasPostTypePageCheck(resolveAutoLoad),
+      'resolve_auto_load_page_id() debe exigir post_type === page.',
     );
   }
 

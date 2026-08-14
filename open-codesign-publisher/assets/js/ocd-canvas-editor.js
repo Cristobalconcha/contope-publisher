@@ -911,12 +911,13 @@
         proceed();
     }
 
-    function loadTargetPage() {
+    function loadTargetPage(pageIdOverride) {
         if (pageLoadInFlight) {
             return;
         }
         var input = document.getElementById('ocd-page-target');
-        var pageId = input ? parseInt(input.value, 10) : 0;
+        var overrideId = Number(pageIdOverride);
+        var pageId = overrideId > 0 ? overrideId : (input ? parseInt(input.value, 10) : 0);
         if (!pageId || pageId <= 0) {
             pageStatus('Ingresá un ID de página válido.', 'error');
             return;
@@ -1054,6 +1055,13 @@
     // Abrir siempre con los controles Open CoDesign visibles. La pestaña de
     // componentes conserva GrapesJS, pero no debe ocultar Brand por un estado antiguo.
     activateSidePanel('inspector');
+    if (config.autoLoadPageId && config.autoLoadPageId > 0) {
+        var autoTarget = document.getElementById('ocd-page-target');
+        if (autoTarget) {
+            autoTarget.value = String(config.autoLoadPageId);
+        }
+        loadTargetPage(config.autoLoadPageId);
+    }
     window.setTimeout(function () {
         autosaveEnabled = true;
     }, 0);
