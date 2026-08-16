@@ -280,6 +280,11 @@ final class OCD_Canvas_Editor_Admin
             'pageTitle' => $auto_load_page_id > 0 ? get_the_title($auto_load_page_id) : '',
             'regionKinds' => OCD_Canvas_Document_Repository::REGION_KINDS,
             'regionDocuments' => $this->repository->list_region_documents(),
+            'ruleChoices' => [
+                'pages' => $this->rule_page_choices(),
+                'categories' => $this->rule_term_choices('category'),
+                'tags' => $this->rule_term_choices('post_tag'),
+            ],
             'autoLoadPageId' => $this->resolve_auto_load_page_id(),
             'siteFontCss' => OCD_Canvas_Page_Publisher::site_font_css(),
         ];
@@ -293,6 +298,48 @@ final class OCD_Canvas_Editor_Admin
             ) . ';',
             'before'
         );
+    }
+
+    /**
+     * Construye las opciones legibles para el picker de reglas de región:
+     * páginas, categorías y etiquetas. Los IDs van como enteros y los títulos
+     * pasan por sanitize_text_field() porque viajan en la configuración del
+     * cliente vía wp_json_encode() con JSON_HEX_*, y en el cliente sólo se usan
+     * para resolver nombres legibles (nunca como identidad).
+     *
+     * @return array<int, array{id: int, title: string}>
+     */
+    private function rule_page_choices(): array
+    {
+        $pages = [];
+        foreach (get_pages() as $page) {
+            $title = trim((string) $page->post_title);
+            $label = $title !== '' ? $title : sprintf('(Sin título) #%d', $page->ID);
+            $pages[] = [
+                'id' => (int) $page->ID,
+                'title' => sanitize_text_field($label),
+            ];
+        }
+        return $pages;
+    }
+
+    /**
+     * @return array<int, array{id: int, name: string}>
+     */
+    private function rule_term_choices(string $taxonomy): array
+    {
+        $terms = get_terms(['taxonomy' => $taxonomy, 'hide_empty' => false]);
+        if (is_wp_error($terms) || !is_array($terms)) {
+            return [];
+        }
+        $choices = [];
+        foreach ($terms as $term) {
+            $choices[] = [
+                'id' => (int) $term->term_id,
+                'name' => sanitize_text_field((string) $term->name),
+            ];
+        }
+        return $choices;
     }
 
     public function render_page(): void
@@ -431,42 +478,69 @@ final class OCD_Canvas_Editor_Admin
                             </select>
                         </td>
                     </tr>
-                    <tr>
-                        <th scope="row"><label for="ocd-region-targets">Destinos (solo si es Local)</label></th>
+                    <tr class="ocd-region-rules-row" data-ocd-rule-fieldset="targets">
+                        <th scope="row"><span id="ocd-region-targets-label">Destinos (solo si es Local)</span></th>
                         <td>
-                            <textarea id="ocd-region-targets" rows="3" spellcheck="false"
-                                placeholder='[{"type":"post","id":12},{"type":"category","id":4}]'></textarea>
-                            <p class="description">
-                                Lista JSON de destinos. Vocabulario de <code>type</code>:
-                                <code>"all_pages"</code> (todas las páginas),
-                                <code>"homepage"</code> (la portada),
-                                <code>"post"</code> + <code>id</code> (una página específica),
-                                <code>"children_of"</code> + <code>id</code> (todas las páginas hijas de esa página),
-                                <code>"all_posts"</code> (todas las entradas de blog),
-                                <code>"category"</code> + <code>id</code> (entradas de esa categoría) y
-                                <code>"tag"</code> + <code>id</code> (entradas de esa etiqueta).
-                                Los tipos sin <code>id</code> van como <code>{"type":"all_pages"}</code>, sin campo id.
+                            <div class="ocd-rule-picker">
+                                <select class="ocd-rule-type" data-ocd-rule-type="targets" aria-label="Tipo de destino">
+                                    <option value="">Elegir tipo…</option>
+                                    <option value="post">Página…</option>
+                                    <option value="children_of">Páginas hijas de…</option>
+                                    <option value="category">Categoría…</option>
+                                    <option value="tag">Etiqueta…</option>
+                                    <option value="homepage">La portada</option>
+                                    <option value="all_pages">Todas las páginas</option>
+                                    <option value="all_posts">Todas las entradas</option>
+                                </select>
+                                <select class="ocd-rule-entity" data-ocd-rule-entity="targets" aria-label="Elegir página, categoría o etiqueta" hidden>
+                                    <option value="">Elegir…</option>
+                                </select>
+                                <button type="button" class="button button-secondary" data-ocd-rule-add="targets">Agregar</button>
+                            </div>
+                            <div class="ocd-rule-list" data-ocd-rule-list="targets" role="list" aria-label="Destinos"></div>
+                            <p class="description ocd-rule-scope-hint" data-ocd-rule-scope-hint="targets" hidden>
+                                El alcance global aplica a todo el sitio; solo definí exclusiones.
                             </p>
+                            <input type="hidden" id="ocd-region-targets" value="">
                         </td>
                     </tr>
-                    <tr>
-                        <th scope="row"><label for="ocd-region-excludes">Exclusiones (opcional)</label></th>
+                    <tr class="ocd-region-rules-row" data-ocd-rule-fieldset="excludes">
+                        <th scope="row"><span id="ocd-region-excludes-label">Exclusiones (opcional)</span></th>
                         <td>
-                            <textarea id="ocd-region-excludes" rows="3" spellcheck="false"
-                                placeholder='[{"type":"post","id":99}]'></textarea>
-                            <p class="description">
-                                Lista JSON de exclusiones. Usa el mismo vocabulario que Destinos:
-                                <code>"all_pages"</code>, <code>"homepage"</code>,
-                                <code>"post"</code> + <code>id</code>,
-                                <code>"children_of"</code> + <code>id</code>,
-                                <code>"all_posts"</code>, <code>"category"</code> + <code>id</code> y
-                                <code>"tag"</code> + <code>id</code>.
-                                Una página que coincide con una exclusión no usa esta región aunque también
-                                coincida con un destino.
-                            </p>
+                            <div class="ocd-rule-picker">
+                                <select class="ocd-rule-type" data-ocd-rule-type="excludes" aria-label="Tipo de exclusión">
+                                    <option value="">Elegir tipo…</option>
+                                    <option value="post">Página…</option>
+                                    <option value="children_of">Páginas hijas de…</option>
+                                    <option value="category">Categoría…</option>
+                                    <option value="tag">Etiqueta…</option>
+                                    <option value="homepage">La portada</option>
+                                    <option value="all_pages">Todas las páginas</option>
+                                    <option value="all_posts">Todas las entradas</option>
+                                </select>
+                                <select class="ocd-rule-entity" data-ocd-rule-entity="excludes" aria-label="Elegir página, categoría o etiqueta" hidden>
+                                    <option value="">Elegir…</option>
+                                </select>
+                                <button type="button" class="button button-secondary" data-ocd-rule-add="excludes">Agregar</button>
+                            </div>
+                            <div class="ocd-rule-list" data-ocd-rule-list="excludes" role="list" aria-label="Exclusiones"></div>
+                            <input type="hidden" id="ocd-region-excludes" value="">
                         </td>
                     </tr>
                 </table>
+                <p class="ocd-region-reach" id="ocd-region-reach" role="status" aria-live="polite"></p>
+                <details class="ocd-region-advanced">
+                    <summary>Opciones avanzadas (JSON)</summary>
+                    <textarea id="ocd-region-json" rows="8" spellcheck="false"
+                        aria-label="JSON combinado de destinos y exclusiones"></textarea>
+                    <p class="description">
+                        Objeto <code>{"targets":[…],"excludes":[…]}</code> con el mismo vocabulario de
+                        <code>type</code>: <code>post</code> + <code>id</code>, <code>children_of</code> + <code>id</code>,
+                        <code>category</code> + <code>id</code>, <code>tag</code> + <code>id</code>, <code>homepage</code>,
+                        <code>all_pages</code> y <code>all_posts</code>. Al salir del campo, si el JSON es válido
+                        reconstruye los chips; si no, se conserva el último valor válido.
+                    </p>
+                </details>
                 <button type="button" class="button button-secondary" id="ocd-canvas-save-region">
                     Guardar región
                 </button>

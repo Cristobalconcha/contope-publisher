@@ -95,6 +95,27 @@
     var originalEditorShellParent = null;
     var pageLoadInFlight = false;
 
+    /**
+     * Fuente de verdad de las reglas de región en el cliente. Los campos
+     * ocultos #ocd-region-targets / #ocd-region-excludes se sincronizan desde
+     * acá en cada cambio y son lo que saveRegion() envía por AJAX.
+     */
+    var regionRules = { targets: [], excludes: [] };
+
+    /**
+     * Vocabulario de reglas espejo del sancionado por
+     * OCD_Canvas_Document_Repository::sanitize_match_rules(). Solo es UI.
+     */
+    var RULE_TYPE_DEFS = {
+        post: { entity: 'pages', prefix: 'Página', reachEntity: 'la página' },
+        children_of: { entity: 'pages', prefix: 'Hijas de', reachEntity: 'páginas hijas de' },
+        category: { entity: 'categories', prefix: 'Categoría', reachEntity: 'entradas de la categoría' },
+        tag: { entity: 'tags', prefix: 'Etiqueta', reachEntity: 'entradas de la etiqueta' },
+        homepage: { standalone: true, label: 'La portada', reach: 'la portada' },
+        all_pages: { standalone: true, label: 'Todas las páginas', reach: 'todas las páginas' },
+        all_posts: { standalone: true, label: 'Todas las entradas', reach: 'todas las entradas' }
+    };
+
     function updateMeta(doc) {
         var revision = document.getElementById('ocd-canvas-revision');
         var updated = document.getElementById('ocd-canvas-updated');
@@ -189,24 +210,405 @@
         return parsed;
     }
 
+    function ruleChoices() {
+        return (config && config.ruleChoices) ? config.ruleChoices : {};
+    }
+
+    function ruleEntityChoices(type) {
+        var def = RULE_TYPE_DEFS[type];
+        if (!def || !def.entity) {
+            return [];
+        }
+        return ruleChoices()[def.entity] || [];
+    }
+
+    function ruleEntityName(type, id) {
+        var idNumber = Number(id);
+        var list = ruleEntityChoices(type);
+        for (var i = 0; i < list.length; i++) {
+            if (Number(list[i].id) === idNumber) {
+                return list[i].title || list[i].name || '';
+            }
+        }
+        return '';
+    }
+
+    function ruleLabel(rule) {
+        if (!rule || !rule.type) {
+            return 'Regla sin tipo';
+        }
+        var type = String(rule.type);
+        var def = RULE_TYPE_DEFS[type];
+        if (!def) {
+            return 'Regla desconocida (' + type + ')';
+        }
+        if (def.standalone) {
+            return def.label;
+        }
+        var id = Number(rule.id);
+        var name = ruleEntityName(type, id);
+        if (name) {
+            return def.prefix + ': ' + name;
+        }
+        return def.prefix + ' #' + id + ' (inexistente)';
+    }
+
+    function ruleKey(rule) {
+        if (!rule || !rule.type) {
+            return '';
+        }
+        var type = String(rule.type);
+        var def = RULE_TYPE_DEFS[type];
+        if (def && def.standalone) {
+            return type;
+        }
+        return type + ':' + Number(rule.id || 0);
+    }
+
+    function isOrphanRule(rule) {
+        if (!rule || !rule.type) {
+            return false;
+        }
+        var def = RULE_TYPE_DEFS[String(rule.type)];
+        if (!def || def.standalone) {
+            return false;
+        }
+        return ruleEntityName(rule.type, rule.id) === '';
+    }
+
+    function hasRule(list, rule) {
+        var key = ruleKey(rule);
+        for (var i = 0; i < list.length; i++) {
+            if (ruleKey(list[i]) === key) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function normalizeRules(value) {
+        if (!Array.isArray(value)) {
+            return [];
+        }
+        return value.map(function (rule) {
+            if (!rule || typeof rule !== 'object') {
+                return { type: String(rule || '') };
+            }
+            var normalized = { type: String(rule.type || '') };
+            if (rule.id !== undefined && rule.id !== null && rule.id !== '') {
+                normalized.id = Number(rule.id);
+            }
+            return normalized;
+        });
+    }
+
+    function renderRuleChips(listName) {
+        var container = document.querySelector('[data-ocd-rule-list="' + listName + '"]');
+        if (!container) {
+            return;
+        }
+        container.innerHTML = '';
+        var rules = regionRules[listName] || [];
+        rules.forEach(function (rule) {
+            var chip = document.createElement('span');
+            chip.className = 'ocd-rule-chip';
+            chip.setAttribute('role', 'listitem');
+            if (isOrphanRule(rule)) {
+                chip.classList.add('is-orphan');
+            }
+
+            var label = document.createElement('span');
+            label.className = 'ocd-rule-chip__label';
+            label.textContent = ruleLabel(rule);
+            chip.appendChild(label);
+
+            var remove = document.createElement('button');
+            remove.type = 'button';
+            remove.className = 'ocd-rule-chip__remove';
+            remove.setAttribute('aria-label', 'Quitar ' + ruleLabel(rule));
+            remove.textContent = '×';
+            remove.addEventListener('click', function () {
+                removeRule(listName, rule);
+            });
+            chip.appendChild(remove);
+
+            container.appendChild(chip);
+        });
+    }
+
+    function removeRule(listName, rule) {
+        var key = ruleKey(rule);
+        regionRules[listName] = (regionRules[listName] || []).filter(function (existing) {
+            return ruleKey(existing) !== key;
+        });
+        syncRegionState();
+    }
+
+    function addRule(listName, rule) {
+        var list = regionRules[listName];
+        if (!Array.isArray(list)) {
+            list = regionRules[listName] = [];
+        }
+        if (hasRule(list, rule)) {
+            regionStatus('Esa regla ya está agregada.', 'error');
+            return;
+        }
+        list.push(rule);
+        syncRegionState();
+    }
+
+    function populateEntitySelect(listName, entityKind) {
+        var entitySelect = document.querySelector('[data-ocd-rule-entity="' + listName + '"]');
+        if (!entitySelect) {
+            return;
+        }
+        entitySelect.innerHTML = '';
+        var placeholder = document.createElement('option');
+        placeholder.value = '';
+        placeholder.textContent = 'Elegir…';
+        entitySelect.appendChild(placeholder);
+        var choices = ruleChoices()[entityKind] || [];
+        choices.forEach(function (choice) {
+            var option = document.createElement('option');
+            option.value = String(choice.id);
+            option.textContent = choice.title || choice.name || ('#' + choice.id);
+            entitySelect.appendChild(option);
+        });
+    }
+
+    function updateRulePicker(listName) {
+        var typeSelect = document.querySelector('[data-ocd-rule-type="' + listName + '"]');
+        var entitySelect = document.querySelector('[data-ocd-rule-entity="' + listName + '"]');
+        if (!typeSelect) {
+            return;
+        }
+        var type = typeSelect.value;
+        var def = RULE_TYPE_DEFS[type];
+        if (!def) {
+            if (entitySelect) {
+                entitySelect.hidden = true;
+            }
+            return;
+        }
+        if (def.standalone) {
+            // Los tipos sin id se agregan directamente al seleccionarlos.
+            if (entitySelect) {
+                entitySelect.hidden = true;
+            }
+            addRule(listName, { type: type });
+            typeSelect.value = '';
+            return;
+        }
+        populateEntitySelect(listName, def.entity);
+        if (entitySelect) {
+            entitySelect.hidden = false;
+        }
+    }
+
+    function addRuleFromPicker(listName) {
+        var typeSelect = document.querySelector('[data-ocd-rule-type="' + listName + '"]');
+        if (!typeSelect) {
+            return;
+        }
+        var type = typeSelect.value;
+        var def = RULE_TYPE_DEFS[type];
+        if (!def) {
+            regionStatus('Elegí un tipo de regla.', 'error');
+            return;
+        }
+        if (def.standalone) {
+            addRule(listName, { type: type });
+            typeSelect.value = '';
+            updateRulePicker(listName);
+            return;
+        }
+        var entitySelect = document.querySelector('[data-ocd-rule-entity="' + listName + '"]');
+        var entityId = entitySelect ? parseInt(entitySelect.value, 10) : 0;
+        if (!entityId || entityId <= 0) {
+            regionStatus('Elegí una opción de la lista.', 'error');
+            return;
+        }
+        addRule(listName, { type: type, id: entityId });
+        typeSelect.value = '';
+        if (entitySelect) {
+            entitySelect.value = '';
+            entitySelect.hidden = true;
+        }
+    }
+
+    function updateRuleFieldsetState() {
+        var scopeField = document.getElementById('ocd-region-scope');
+        var scope = scopeField ? scopeField.value : '';
+        var targetsFieldset = document.querySelector('[data-ocd-rule-fieldset="targets"]');
+        if (!targetsFieldset) {
+            return;
+        }
+        var isGlobal = scope === 'global';
+        targetsFieldset.classList.toggle('is-scoped-out', isGlobal);
+        var hint = targetsFieldset.querySelector('[data-ocd-rule-scope-hint="targets"]');
+        if (hint) {
+            hint.hidden = !isGlobal;
+        }
+        var controls = targetsFieldset.querySelectorAll('select, button');
+        Array.prototype.forEach.call(controls, function (control) {
+            control.disabled = isGlobal;
+        });
+    }
+
+    function describeRule(rule) {
+        if (!rule || !rule.type) {
+            return '';
+        }
+        var type = String(rule.type);
+        var def = RULE_TYPE_DEFS[type];
+        if (!def) {
+            return '';
+        }
+        if (def.standalone) {
+            return def.reach;
+        }
+        var name = ruleEntityName(type, rule.id);
+        if (!name) {
+            return '';
+        }
+        return def.reachEntity + ' «' + name + '»';
+    }
+
+    function describeRules(rules) {
+        var parts = [];
+        (rules || []).forEach(function (rule) {
+            var description = describeRule(rule);
+            if (description) {
+                parts.push(description);
+            }
+        });
+        return parts.join(', ');
+    }
+
+    function updateRegionReach() {
+        var node = document.getElementById('ocd-region-reach');
+        if (!node) {
+            return;
+        }
+        var scopeField = document.getElementById('ocd-region-scope');
+        var scope = scopeField ? scopeField.value : '';
+        var targets = regionRules.targets || [];
+        var excludes = regionRules.excludes || [];
+
+        if (scope === 'global') {
+            if (excludes.length === 0) {
+                node.textContent = 'Se aplica a: todo el sitio.';
+                return;
+            }
+            var excludedGlobal = describeRules(excludes);
+            node.textContent = excludedGlobal
+                ? 'Se aplica a: todo el sitio, salvo: ' + excludedGlobal + '.'
+                : 'Se aplica a: todo el sitio, salvo exclusiones.';
+            return;
+        }
+
+        if (scope === 'local') {
+            var label = describeRules(targets);
+            if (!label) {
+                node.textContent = 'El alcance local aún no define destinos.';
+                return;
+            }
+            var text = 'Se aplica a: ' + label;
+            if (excludes.length > 0) {
+                var excludedLocal = describeRules(excludes);
+                if (excludedLocal) {
+                    text += '; salvo ' + excludedLocal;
+                }
+            }
+            node.textContent = text + '.';
+            return;
+        }
+
+        node.textContent = '';
+    }
+
+    function advancedJsonValue() {
+        return JSON.stringify(
+            { targets: regionRules.targets || [], excludes: regionRules.excludes || [] },
+            null,
+            2
+        );
+    }
+
+    function updateAdvancedJson() {
+        var area = document.getElementById('ocd-region-json');
+        if (!area) {
+            return;
+        }
+        if (document.activeElement === area) {
+            return;
+        }
+        area.value = advancedJsonValue();
+    }
+
+    function syncRegionState() {
+        var targetsHidden = document.getElementById('ocd-region-targets');
+        var excludesHidden = document.getElementById('ocd-region-excludes');
+        if (targetsHidden) {
+            targetsHidden.value = JSON.stringify(regionRules.targets || []);
+        }
+        if (excludesHidden) {
+            excludesHidden.value = JSON.stringify(regionRules.excludes || []);
+        }
+        renderRuleChips('targets');
+        renderRuleChips('excludes');
+        updateRuleFieldsetState();
+        updateRegionReach();
+        updateAdvancedJson();
+    }
+
+    function onAdvancedJsonBlur() {
+        var area = document.getElementById('ocd-region-json');
+        if (!area) {
+            return;
+        }
+        var value = String(area.value || '').trim();
+        if (value === '') {
+            regionRules = { targets: [], excludes: [] };
+            syncRegionState();
+            regionStatus('JSON avanzado vacío: se vaciaron destinos y exclusiones.', 'ok');
+            return;
+        }
+        var parsed;
+        try {
+            parsed = JSON.parse(value);
+        } catch (_error) {
+            regionStatus('El JSON avanzado no es válido.', 'error');
+            area.value = advancedJsonValue();
+            return;
+        }
+        if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed) ||
+            !Array.isArray(parsed.targets) || !Array.isArray(parsed.excludes)) {
+            regionStatus('El JSON avanzado debe ser un objeto {"targets":[…],"excludes":[…]}.', 'error');
+            area.value = advancedJsonValue();
+            return;
+        }
+        regionRules.targets = normalizeRules(parsed.targets);
+        regionRules.excludes = normalizeRules(parsed.excludes);
+        syncRegionState();
+        regionStatus('Reglas reconstruidas desde el JSON avanzado.', 'ok');
+    }
+
     function populateRegionFields(doc) {
         var kindField = document.getElementById('ocd-region-kind');
         var scopeField = document.getElementById('ocd-region-scope');
-        var targetsField = document.getElementById('ocd-region-targets');
-        var excludesField = document.getElementById('ocd-region-excludes');
-        if (!doc || !kindField || !scopeField || !targetsField || !excludesField) {
-            return;
+        if (!doc) {
+            doc = {};
         }
-        kindField.value = doc.regionKind || '';
-        scopeField.value = doc.regionScope || '';
-        targetsField.value =
-            doc.regionTargets && doc.regionTargets.length
-                ? JSON.stringify(doc.regionTargets)
-                : '';
-        excludesField.value =
-            doc.regionExcludes && doc.regionExcludes.length
-                ? JSON.stringify(doc.regionExcludes)
-                : '';
+        if (kindField) {
+            kindField.value = doc.regionKind || '';
+        }
+        if (scopeField) {
+            scopeField.value = doc.regionScope || '';
+        }
+        regionRules.targets = normalizeRules(doc.regionTargets);
+        regionRules.excludes = normalizeRules(doc.regionExcludes);
+        syncRegionState();
     }
 
     function saveRegion() {
@@ -963,6 +1365,36 @@
         pageTarget.addEventListener('change', function () {
             loadTargetPage();
         });
+    }
+
+    Array.prototype.forEach.call(
+        document.querySelectorAll('[data-ocd-rule-type]'),
+        function (select) {
+            var listName = select.getAttribute('data-ocd-rule-type');
+            select.addEventListener('change', function () {
+                updateRulePicker(listName);
+            });
+        }
+    );
+    Array.prototype.forEach.call(
+        document.querySelectorAll('[data-ocd-rule-add]'),
+        function (button) {
+            var listName = button.getAttribute('data-ocd-rule-add');
+            button.addEventListener('click', function () {
+                addRuleFromPicker(listName);
+            });
+        }
+    );
+    var regionScopeSelect = document.getElementById('ocd-region-scope');
+    if (regionScopeSelect) {
+        regionScopeSelect.addEventListener('change', function () {
+            updateRuleFieldsetState();
+            updateRegionReach();
+        });
+    }
+    var advancedJsonArea = document.getElementById('ocd-region-json');
+    if (advancedJsonArea) {
+        advancedJsonArea.addEventListener('blur', onAdvancedJsonBlur);
     }
 
     on('ocd-canvas-toggle-import', function (event) {

@@ -460,3 +460,117 @@
     background: #f0f6fc;
     border-color: #72aee6;
 }
+
+/* ---------------------------------------------------------------------------
+ * Región de plantilla — picker y chips de destinos/exclusiones.
+ * --------------------------------------------------------------------------- */
+.ocd-rule-picker {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+}
+
+.ocd-rule-picker .ocd-rule-type {
+    min-width: 170px;
+    max-width: 100%;
+}
+
+.ocd-rule-picker .ocd-rule-entity {
+    min-width: 200px;
+    max-width: 100%;
+}
+
+.ocd-rule-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 4px 0 6px;
+}
+
+.ocd-rule-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 100%;
+    padding: 3px 8px;
+    border: 1px solid #c3c4c7;
+    border-radius: 999px;
+    background: #f0f6fc;
+    color: #1d2327;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.ocd-rule-chip__label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ocd-rule-chip__remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: #50575e;
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.ocd-rule-chip__remove:hover,
+.ocd-rule-chip__remove:focus {
+    background: #d63638;
+    color: #fff;
+}
+
+.ocd-rule-chip.is-orphan {
+    border-color: #dba617;
+    background: #fcf9e8;
+}
+
+.ocd-rule-chip.is-orphan .ocd-rule-chip__label {
+    font-style: italic;
+}
+
+.ocd-rule-scope-hint {
+    margin: 4px 0 0;
+}
+
+.ocd-region-rules-row.is-scoped-out {
+    opacity: 0.6;
+}
+
+.ocd-region-reach {
+    margin: 12px 0 0;
+    padding: 8px 10px;
+    border-left: 4px solid #72aee6;
+    background: #f0f6fc;
+    font-style: normal;
+}
+
+.ocd-region-advanced {
+    margin: 12px 0 0;
+    padding: 10px 12px;
+    border: 1px solid #c3c4c7;
+    background: #fff;
+}
+
+.ocd-region-advanced summary {
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.ocd-region-advanced textarea {
+    width: 100%;
+    margin-top: 8px;
+    font-family: Consolas, Monaco, monospace;
+    font-size: 12px;
+}
