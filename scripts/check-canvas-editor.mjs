@@ -980,10 +980,24 @@ async function checkDynamicTokenResolver() {
 
   check(
     source.includes('post_title|post_excerpt|featured_image|permalink'),
-    'La gramática debe ser estricta y limitarse a los cuatro built-ins de la Etapa 1.',
+    'La gramática debe mantener los cuatro built-ins de la Etapa 1 junto a los tokens ACF de la Etapa 3.',
   );
-  check(!source.includes('get_field'), 'Etapa 1 no debe implementar ACF.');
-  check(!source.includes('acf:'), 'Etapa 1 no debe reconocer el prefijo acf:.');
+  check(
+    source.includes('{{acf:'),
+    'La Etapa 3 debe resolver tokens {{acf:CAMPO}} y {{acf:CAMPO:html}}.',
+  );
+  check(
+    source.includes('acf_image:'),
+    'La Etapa 3 debe reconocer data-ocd-dynamic="acf_image:CAMPO" sobre etiquetas <img>.',
+  );
+  check(
+    source.includes("function_exists('get_field')"),
+    'Toda llamada a get_field() debe quedar detrás de function_exists().',
+  );
+  check(
+    source.includes('wp_kses_post'),
+    'El HTML de {{acf:CAMPO:html}} debe pasar por wp_kses_post().',
+  );
   check(!source.includes('eval('), 'El resolver no debe usar eval().');
 }
 

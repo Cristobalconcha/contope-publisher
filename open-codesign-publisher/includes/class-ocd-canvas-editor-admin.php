@@ -21,12 +21,48 @@ final class OCD_Canvas_Editor_Admin
     public const AJAX_PUBLISH = 'ocd_canvas_editor_publish';
     public const AJAX_SAVE_REGION = 'ocd_canvas_editor_save_region';
     public const AJAX_RESOLVE_PAGE = 'ocd_canvas_editor_resolve_page';
+    public const AJAX_ACF_FIELDS = 'ocd_canvas_editor_acf_fields';
     public const CAPABILITY = 'manage_options';
 
     /** Versión exacta del vendor incluido en `assets/vendor/grapesjs`. */
     public const GRAPESJS_VERSION = '0.23.4';
 
+    /**
+     * Prefijo de los document_id derivados de una página WordPress. El
+     * documento aislado original (OCD_Canvas_Document_Repository::DOCUMENT_ID)
+     * no usa este prefijo y conserva su comportamiento actual.
+     */
+    public const PAGE_DOCUMENT_PREFIX = 'ocd-canvas-page-';
+
     private string $hook_suffix = '';
+
+    /**
+     * Devuelve el ID estable de Open CoDesign para el documento Canvas del
+     * cuerpo de una página WordPress específica. Es determinístico y no usa
+     * el slug ni el ID numérico del post interno del repositorio.
+     */
+    public static function document_id_for_page(int $page_id): string
+    {
+        return self::PAGE_DOCUMENT_PREFIX . $page_id;
+    }
+
+    /**
+     * Inverso de document_id_for_page(): extrae el page_id de un document_id
+     * de página, o devuelve 0 si el document_id no es de página (por ejemplo
+     * el documento experimental compartido).
+     */
+    private static function page_id_from_document_id(string $document_id): int
+    {
+        if (strpos($document_id, self::PAGE_DOCUMENT_PREFIX) !== 0) {
+            return 0;
+        }
+        $suffix = substr($document_id, strlen(self::PAGE_DOCUMENT_PREFIX));
+        if ($suffix === '' || !preg_match('/^\d+$/', $suffix)) {
+            return 0;
+        }
+        $page_id = absint($suffix);
+        return $page_id > 0 ? $page_id : 0;
+    }
 
     public function __construct(
         private OCD_Canvas_Document_Repository $repository,
@@ -47,6 +83,7 @@ final class OCD_Canvas_Editor_Admin
         add_action('wp_ajax_' . self::AJAX_PUBLISH, [$this, 'handle_publish']);
         add_action('wp_ajax_' . self::AJAX_SAVE_REGION, [$this, 'handle_save_region']);
         add_action('wp_ajax_' . self::AJAX_RESOLVE_PAGE, [$this, 'handle_resolve_page']);
+        add_action('wp_ajax_' . self::AJAX_ACF_FIELDS, [$this, 'handle_acf_fields']);
         add_filter('page_row_actions', [$this, 'add_page_row_edit_with_ocd'], 10, 2);
     }
 
@@ -102,6 +139,34 @@ final class OCD_Canvas_Editor_Admin
         }
 
         return $page_id;
+    }
+
+    /**
+     * Resolves a region document ID passed directly in the URL (e.g. from
+     * the Theme Builder's "Editar en el editor Canvas" link), only when the
+     * request carries a valid nonce and the document actually exists. Only
+     * consulted when no `page_id` was given, since a page always takes
+     * priority over a raw document_id.
+     */
+    private function resolve_auto_load_document_id(): string
+    {
+        if (!isset($_GET['document_id'])) {
+            return '';
+        }
+
+        $document_id = sanitize_key((string) wp_unslash($_GET['document_id']));
+        if ($document_id === '') {
+            return '';
+        }
+
+        check_admin_referer(self::NONCE_ACTION, 'ocd_nonce');
+
+        $document = $this->repository->load($document_id);
+        if (is_wp_error($document)) {
+            return '';
+        }
+
+        return $document_id;
     }
 
     public function add_menu(): void
@@ -181,7 +246,16 @@ final class OCD_Canvas_Editor_Admin
             true
         );
 
-        $document = $this->repository->load(OCD_Canvas_Document_Repository::DOCUMENT_ID);
+        $auto_load_page_id = $this->resolve_auto_load_page_id();
+        $auto_load_document_id = $auto_load_page_id > 0 ? '' : $this->resolve_auto_load_document_id();
+        if ($auto_load_page_id > 0) {
+            $document_id = self::document_id_for_page($auto_load_page_id);
+        } elseif ($auto_load_document_id !== '') {
+            $document_id = $auto_load_document_id;
+        } else {
+            $document_id = OCD_Canvas_Document_Repository::DOCUMENT_ID;
+        }
+        $document = $this->repository->load($document_id);
         $config = [
             'ajaxUrl' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce(self::NONCE_ACTION),
@@ -191,10 +265,12 @@ final class OCD_Canvas_Editor_Admin
             'publishAction' => self::AJAX_PUBLISH,
             'saveRegionAction' => self::AJAX_SAVE_REGION,
             'resolvePageAction' => self::AJAX_RESOLVE_PAGE,
-            'documentId' => OCD_Canvas_Document_Repository::DOCUMENT_ID,
+            'acfFieldsAction' => self::AJAX_ACF_FIELDS,
+            'documentId' => $document_id,
             'document' => is_wp_error($document) ? null : $document,
             'loadError' => is_wp_error($document) ? $document->get_error_message() : '',
-            'publishedPage' => $this->publisher->current(OCD_Canvas_Document_Repository::DOCUMENT_ID),
+            'publishedPage' => $this->publisher->current($document_id),
+            'pageTitle' => $auto_load_page_id > 0 ? get_the_title($auto_load_page_id) : '',
             'regionKinds' => OCD_Canvas_Document_Repository::REGION_KINDS,
             'regionDocuments' => $this->repository->list_region_documents(),
             'autoLoadPageId' => $this->resolve_auto_load_page_id(),
@@ -515,7 +591,7 @@ final class OCD_Canvas_Editor_Admin
         }
 
         $title = isset($_POST['title']) ? sanitize_text_field((string) wp_unslash($_POST['title'])) : '';
-        $published = $this->publisher->publish($document_id, $title);
+        $published = $this->publisher->publish($document_id, $title, self::page_id_from_document_id($document_id));
         if (is_wp_error($published)) {
             wp_send_json_error(['message' => $published->get_error_message(), 'stage' => 'publish'], 400);
         }
@@ -599,5 +675,55 @@ final class OCD_Canvas_Editor_Admin
             'pageTitle' => $page->post_title,
             'regions' => $regions,
         ]);
+    }
+
+    /**
+     * Lists the ACF fields assigned to a specific post/page so the Canvas
+     * editor can offer them as draggable dynamic blocks. Uses ACF's
+     * `get_field_objects()` only when ACF is active; otherwise (or when the
+     * post has no fields) it returns an empty list instead of failing.
+     */
+    public function handle_acf_fields(): void
+    {
+        if (!current_user_can(self::CAPABILITY)) {
+            wp_send_json_error(['message' => 'Permisos insuficientes.'], 403);
+        }
+        check_ajax_referer(self::NONCE_ACTION, 'nonce');
+
+        $page_id = isset($_POST['page_id']) ? absint(wp_unslash($_POST['page_id'])) : 0;
+        if ($page_id <= 0) {
+            wp_send_json_error(['message' => 'page_id debe ser un entero positivo.'], 400);
+        }
+        $post = get_post($page_id);
+        if (!$post instanceof WP_Post) {
+            wp_send_json_success(['fields' => []]);
+        }
+
+        if (!function_exists('get_field_objects')) {
+            wp_send_json_success(['fields' => []]);
+        }
+
+        $objects = get_field_objects($page_id);
+        if (!is_array($objects)) {
+            wp_send_json_success(['fields' => []]);
+        }
+
+        $fields = [];
+        foreach ($objects as $field) {
+            if (!is_array($field) || !isset($field['name'])) {
+                continue;
+            }
+            $name = (string) $field['name'];
+            if (!preg_match('/^[a-zA-Z0-9_\-]+$/', $name)) {
+                continue;
+            }
+            $fields[] = [
+                'name' => $name,
+                'label' => isset($field['label']) ? sanitize_text_field((string) $field['label']) : $name,
+                'type' => isset($field['type']) ? sanitize_key((string) $field['type']) : 'text',
+            ];
+        }
+
+        wp_send_json_success(['fields' => $fields]);
     }
 }

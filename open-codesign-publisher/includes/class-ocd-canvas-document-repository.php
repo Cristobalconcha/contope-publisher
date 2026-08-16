@@ -65,6 +65,31 @@ final class OCD_Canvas_Document_Repository
      */
     public const META_REGION_EXCLUDES = '_ocd_region_excludes';
 
+    /**
+     * Stable template/group identity. Unlike the numeric WordPress post ID,
+     * this is generated once when the template is created and never derived
+     * from a title or slug, so renaming the template cannot break the group.
+     */
+    public const META_REGION_TEMPLATE_ID = '_ocd_region_template_id';
+
+    /**
+     * Human-readable template name, stored separately from the immutable ID.
+     * Kept on every region document (and on the group container) so the UI
+     * can render a card even when only one side of the group was fetched.
+     */
+    public const META_REGION_TEMPLATE_TITLE = '_ocd_region_template_title';
+
+    /**
+     * Template ID for the always-visible "site default" card (global scope).
+     */
+    public const DEFAULT_TEMPLATE_ID = 'ocd-site-default';
+
+    /** Prefix for generated template IDs (group identity). */
+    public const TEMPLATE_ID_PREFIX = 'ocd-region-template-';
+
+    /** Prefix for generated region document IDs. */
+    public const REGION_DOCUMENT_ID_PREFIX = 'ocd-template-';
+
     public const MATCH_TYPE_ALL_PAGES = 'all_pages';
     public const MATCH_TYPE_HOMEPAGE = 'homepage';
     public const MATCH_TYPE_POST = 'post';
@@ -126,6 +151,8 @@ final class OCD_Canvas_Document_Repository
             self::META_REGION_SCOPE,
             self::META_REGION_TARGETS,
             self::META_REGION_EXCLUDES,
+            self::META_REGION_TEMPLATE_ID,
+            self::META_REGION_TEMPLATE_TITLE,
         ] as $key) {
             register_post_meta(self::POST_TYPE, $key, [
                 'type' => 'string',
@@ -196,6 +223,8 @@ final class OCD_Canvas_Document_Repository
                 self::META_REGION_SCOPE => '',
                 self::META_REGION_TARGETS => '[]',
                 self::META_REGION_EXCLUDES => '[]',
+                self::META_REGION_TEMPLATE_ID => '',
+                self::META_REGION_TEMPLATE_TITLE => '',
             ],
         ], true);
 
@@ -266,6 +295,8 @@ final class OCD_Canvas_Document_Repository
             'regionScope' => (string) get_post_meta($post_id, self::META_REGION_SCOPE, true),
             'regionTargets' => $targets,
             'regionExcludes' => $excludes,
+            'regionTemplateId' => (string) get_post_meta($post_id, self::META_REGION_TEMPLATE_ID, true),
+            'regionTemplateTitle' => (string) get_post_meta($post_id, self::META_REGION_TEMPLATE_TITLE, true),
         ];
     }
 
@@ -397,5 +428,353 @@ final class OCD_Canvas_Document_Repository
             $documents[] = $this->read((int) $post_id, $document_id);
         }
         return $documents;
+    }
+
+    /**
+     * Clears the region role from a document without deleting the Canvas
+     * document itself. Also clears the template assignment so the post does
+     * not get misclassified as a template group container afterwards.
+     *
+     * @return array<string, mixed>|WP_Error
+     */
+    public function clear_region(string $document_id)
+    {
+        $post_id = $this->find_post_id($document_id);
+        if ($post_id === null) {
+            return new WP_Error('ocd_region_document_not_found', 'No existe un documento Canvas con ese ID.');
+        }
+
+        update_post_meta($post_id, self::META_REGION_KIND, '');
+        update_post_meta($post_id, self::META_REGION_SCOPE, '');
+        update_post_meta($post_id, self::META_REGION_TARGETS, '[]');
+        update_post_meta($post_id, self::META_REGION_EXCLUDES, '[]');
+        update_post_meta($post_id, self::META_REGION_TEMPLATE_ID, '');
+        update_post_meta($post_id, self::META_REGION_TEMPLATE_TITLE, '');
+
+        return $this->read($post_id, $document_id);
+    }
+
+    /**
+     * Creates the template group first (name + stable ID), not a loose region
+     * document. The group is represented by a private canvas post whose
+     * document ID equals the template ID and whose regionKind is empty, so
+     * `list_region_documents()` never leaks it into the page resolver.
+     *
+     * @return array<string, mixed>|WP_Error
+     */
+    public function create_template_group(string $title)
+    {
+        $title = trim($title);
+        if ($title === '') {
+            return new WP_Error('ocd_template_title_required', 'El nombre de la plantilla es obligatorio.');
+        }
+
+        $template_id = self::TEMPLATE_ID_PREFIX . wp_generate_uuid4();
+        $post_id = wp_insert_post([
+            'post_type' => self::POST_TYPE,
+            'post_status' => 'draft',
+            'post_title' => $title,
+            'post_content' => '',
+            'meta_input' => [
+                self::META_DOCUMENT_ID => $template_id,
+                self::META_PROJECT_DATA => '{}',
+                self::META_HTML => '',
+                self::META_CSS => '',
+                self::META_REVISION => 0,
+                self::META_UPDATED_AT => '',
+                self::META_REGION_KIND => '',
+                self::META_REGION_SCOPE => '',
+                self::META_REGION_TARGETS => '[]',
+                self::META_REGION_EXCLUDES => '[]',
+                self::META_REGION_TEMPLATE_ID => $template_id,
+                self::META_REGION_TEMPLATE_TITLE => $title,
+            ],
+        ], true);
+
+        if (is_wp_error($post_id)) {
+            return $post_id;
+        }
+
+        return $this->get_template($template_id);
+    }
+
+    /**
+     * Creates a new region document inside an existing template group.
+     * Scope defaults to global (the common case for a new template region);
+     * the user can narrow it per-row from the Plantillas screen.
+     *
+     * @return array<string, mixed>|WP_Error
+     */
+    public function add_region_to_template(string $template_id, string $kind)
+    {
+        if (!in_array($kind, self::REGION_KINDS, true)) {
+            return new WP_Error('ocd_region_kind_invalid', 'regionKind desconocido.');
+        }
+
+        $template = $this->get_template($template_id);
+        if ($template === null) {
+            return new WP_Error('ocd_template_not_found', 'La plantilla no existe.');
+        }
+        if (!empty($template['isLegacy'])) {
+            return new WP_Error('ocd_template_not_grouped', 'Las plantillas sin agrupar no aceptan nuevas regiones.');
+        }
+        if (!empty($template['regions'][$kind])) {
+            return new WP_Error('ocd_region_already_assigned', 'La plantilla ya tiene una región de ese tipo.');
+        }
+
+        $document_id = self::REGION_DOCUMENT_ID_PREFIX . wp_generate_uuid4();
+        $post_id = $this->ensure_post_id($document_id);
+        if (is_wp_error($post_id)) {
+            return $post_id;
+        }
+
+        $updated = wp_update_post([
+            'ID' => (int) $post_id,
+            'post_title' => (string) $template['title'],
+        ], true);
+        if (is_wp_error($updated)) {
+            return $updated;
+        }
+
+        $saved = $this->save_region($document_id, $kind, self::REGION_SCOPE_GLOBAL, [], []);
+        if (is_wp_error($saved)) {
+            return $saved;
+        }
+
+        update_post_meta((int) $post_id, self::META_REGION_TEMPLATE_ID, $template_id);
+        update_post_meta((int) $post_id, self::META_REGION_TEMPLATE_TITLE, (string) $template['title']);
+
+        return $this->read((int) $post_id, $document_id);
+    }
+
+    /**
+     * Renames a template group without touching its stable ID. The name is
+     * copied to every region document so cards stay coherent even if the group
+     * container is fetched independently.
+     *
+     * @return array<string, mixed>|WP_Error
+     */
+    public function rename_template(string $template_id, string $title)
+    {
+        $title = trim($title);
+        if ($title === '') {
+            return new WP_Error('ocd_template_title_required', 'El nombre de la plantilla es obligatorio.');
+        }
+        if ($template_id === self::DEFAULT_TEMPLATE_ID) {
+            return new WP_Error('ocd_template_not_renamable', 'La plantilla por defecto del sitio no se puede renombrar.');
+        }
+
+        $template = $this->get_template($template_id);
+        if ($template === null) {
+            return new WP_Error('ocd_template_not_found', 'La plantilla no existe.');
+        }
+        if (!empty($template['isLegacy'])) {
+            return new WP_Error('ocd_template_not_renamable', 'Las plantillas sin agrupar no se pueden renombrar.');
+        }
+
+        $container_post_id = $this->find_post_id($template_id);
+        if ($container_post_id !== null) {
+            $updated = wp_update_post([
+                'ID' => (int) $container_post_id,
+                'post_title' => $title,
+            ], true);
+            if (is_wp_error($updated)) {
+                return $updated;
+            }
+            update_post_meta((int) $container_post_id, self::META_REGION_TEMPLATE_TITLE, $title);
+        }
+
+        $region_post_ids = get_posts([
+            'post_type' => self::POST_TYPE,
+            'post_status' => 'any',
+            'numberposts' => -1,
+            'fields' => 'ids',
+            'no_found_rows' => true,
+            'meta_key' => self::META_REGION_TEMPLATE_ID,
+            'meta_value' => $template_id,
+        ]);
+        foreach ($region_post_ids as $post_id) {
+            update_post_meta((int) $post_id, self::META_REGION_TEMPLATE_TITLE, $title);
+        }
+
+        return $this->get_template($template_id);
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    public function get_template(string $template_id): ?array
+    {
+        foreach ($this->list_templates() as $template) {
+            if ($template['templateId'] === $template_id) {
+                return $template;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Groups every region document into template cards.
+     *
+     * The first card is always the special "site default" template (global
+     * scope). Named groups come next. Legacy region documents created before
+     * template IDs existed are surfaced as one-region "unnamed" cards so no
+     * saved data disappears, without migrating their meta in the database.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function list_templates(): array
+    {
+        $posts = get_posts([
+            'post_type' => self::POST_TYPE,
+            'post_status' => 'any',
+            'numberposts' => -1,
+            'orderby' => 'ID',
+            'order' => 'ASC',
+            'fields' => 'ids',
+            'no_found_rows' => true,
+        ]);
+
+        $region_documents = [];
+        $group_containers = [];
+        foreach ($posts as $post_id) {
+            $document_id = (string) get_post_meta((int) $post_id, self::META_DOCUMENT_ID, true);
+            if ($document_id === '') {
+                continue;
+            }
+            $document = $this->read((int) $post_id, $document_id);
+            $kind = (string) ($document['regionKind'] ?? '');
+            $template_id = (string) ($document['regionTemplateId'] ?? '');
+            if ($kind !== '') {
+                $region_documents[] = $document;
+            } elseif ($template_id !== '') {
+                if (!isset($group_containers[$template_id])) {
+                    $group_containers[$template_id] = $document;
+                }
+            }
+        }
+
+        $groups = [];
+        foreach ($group_containers as $template_id => $container) {
+            $groups[$template_id] = $this->empty_template_group(
+                $template_id,
+                $this->template_display_title($container, $template_id),
+                $template_id === self::DEFAULT_TEMPLATE_ID,
+                false
+            );
+        }
+
+        foreach ($region_documents as $document) {
+            $kind = (string) ($document['regionKind'] ?? '');
+            $template_id = (string) ($document['regionTemplateId'] ?? '');
+
+            if ($template_id === '') {
+                $legacy_id = 'legacy:' . (string) ($document['documentId'] ?? '');
+                if (!isset($groups[$legacy_id])) {
+                    $groups[$legacy_id] = $this->empty_template_group(
+                        $legacy_id,
+                        $this->legacy_template_title($document),
+                        false,
+                        true
+                    );
+                }
+                $this->assign_region($groups[$legacy_id], $kind, $document);
+                continue;
+            }
+
+            if (!isset($groups[$template_id])) {
+                $groups[$template_id] = $this->empty_template_group(
+                    $template_id,
+                    $this->template_display_title($document, $template_id),
+                    $template_id === self::DEFAULT_TEMPLATE_ID,
+                    false
+                );
+            }
+            $this->assign_region($groups[$template_id], $kind, $document);
+        }
+
+        if (!isset($groups[self::DEFAULT_TEMPLATE_ID])) {
+            $groups[self::DEFAULT_TEMPLATE_ID] = $this->empty_template_group(
+                self::DEFAULT_TEMPLATE_ID,
+                'Plantilla por defecto del sitio',
+                true,
+                false
+            );
+        }
+
+        $groups = array_values($groups);
+        usort($groups, static function (array $a, array $b): int {
+            if ($a['isDefault'] !== $b['isDefault']) {
+                return $a['isDefault'] ? -1 : 1;
+            }
+            if ($a['isLegacy'] !== $b['isLegacy']) {
+                return $a['isLegacy'] ? 1 : -1;
+            }
+            $title_cmp = strcasecmp((string) $a['title'], (string) $b['title']);
+            if ($title_cmp !== 0) {
+                return $title_cmp;
+            }
+            return strcmp((string) $a['templateId'], (string) $b['templateId']);
+        });
+
+        return $groups;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function empty_template_group(string $template_id, string $title, bool $is_default, bool $is_legacy): array
+    {
+        return [
+            'templateId' => $template_id,
+            'title' => $title,
+            'isDefault' => $is_default,
+            'isLegacy' => $is_legacy,
+            'allowAdd' => !$is_legacy,
+            'regions' => [
+                self::REGION_KIND_HEADER => null,
+                self::REGION_KIND_BODY => null,
+                self::REGION_KIND_FOOTER => null,
+            ],
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $group
+     * @param array<string, mixed> $document
+     */
+    private function assign_region(array &$group, string $kind, array $document): void
+    {
+        if (!array_key_exists($kind, $group['regions'])) {
+            return;
+        }
+        $current = $group['regions'][$kind];
+        if (
+            $current === null
+            || strcmp((string) $document['documentId'], (string) $current['documentId']) < 0
+        ) {
+            $group['regions'][$kind] = $document;
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $document
+     */
+    private function template_display_title(array $document, string $template_id): string
+    {
+        $title = trim((string) ($document['regionTemplateTitle'] ?? ''));
+        if ($title === '') {
+            $title = trim((string) ($document['title'] ?? ''));
+        }
+        return $title !== '' ? $title : $template_id;
+    }
+
+    /**
+     * @param array<string, mixed> $document
+     */
+    private function legacy_template_title(array $document): string
+    {
+        $title = trim((string) ($document['title'] ?? ''));
+        return $title !== '' ? $title : 'Plantilla sin nombre';
     }
 }

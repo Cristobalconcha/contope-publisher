@@ -18,9 +18,15 @@ final class OCD_Canvas_Document_Sanitizer
     public const MAX_PROJECT_DEPTH = 64;
 
     /**
-     * Etiquetas estructurales admitidas además de las de `post` de WordPress.
-     * `body` aparece porque GrapesJS envuelve el lienzo en el wrapper `<body>`.
-     * `iframe`, `script`, `style`, `object`, `embed` y `form` quedan fuera a propósito.
+     * Etiquetas estructurales admitidas de forma explícita.
+     *
+     * Muchas de ellas (incluidas table, caption, colgroup, col, thead, tbody,
+     * tfoot, tr, th y td) ya forman parte del conjunto `post` de WordPress; se
+     * repiten acá sólo como documentación, no para habilitarlas. El resto
+     * (svg, video, picture, source, audio, button, label, etc.) amplía el
+     * conjunto `post`. `body` aparece porque GrapesJS envuelve el lienzo en el
+     * wrapper `<body>`. `iframe`, `script`, `style`, `object`, `embed` y `form`
+     * quedan fuera a propósito.
      */
     private const STRUCTURAL_TAGS = [
         'body',
@@ -50,7 +56,24 @@ final class OCD_Canvas_Document_Sanitizer
         'polyline',
         'polygon',
         'hgroup',
+        'table',
+        'caption',
+        'colgroup',
+        'col',
+        'thead',
+        'tbody',
+        'tfoot',
+        'tr',
+        'th',
+        'td',
         'iframe',
+        'defs',
+        'symbol',
+        'use',
+        'text',
+        'tspan',
+        'select',
+        'option',
     ];
 
     /**
@@ -294,7 +317,9 @@ final class OCD_Canvas_Document_Sanitizer
     private function allowed_html(): array
     {
         $allowed = wp_kses_allowed_html('post');
-        foreach (['script', 'style', 'object', 'embed', 'form', 'input', 'select', 'textarea'] as $blocked) {
+        // `select` se admite como marcado estructural inerte (sin `form`/`input` no puede enviarse nada);
+        // `option` viaja con él para que los desplegables de filtro conserven su contenido.
+        foreach (['script', 'style', 'object', 'embed', 'form', 'input', 'textarea'] as $blocked) {
             unset($allowed[$blocked]);
         }
         foreach (self::STRUCTURAL_TAGS as $tag) {
@@ -336,6 +361,13 @@ final class OCD_Canvas_Document_Sanitizer
             'polyline' => ['points' => true, 'fill' => true, 'stroke' => true],
             'polygon' => ['points' => true, 'fill' => true, 'stroke' => true],
             'g' => ['fill' => true, 'fill-rule' => true, 'clip-rule' => true, 'stroke' => true, 'transform' => true],
+            'defs' => [],
+            'symbol' => ['viewbox' => true, 'fill' => true],
+            'use' => ['href' => true, 'xlink:href' => true, 'x' => true, 'y' => true, 'width' => true, 'height' => true, 'fill' => true, 'transform' => true],
+            'text' => ['x' => true, 'y' => true, 'dx' => true, 'dy' => true, 'font-family' => true, 'font-weight' => true, 'font-size' => true, 'font-style' => true, 'fill' => true, 'text-anchor' => true, 'letter-spacing' => true, 'transform' => true],
+            'tspan' => ['x' => true, 'y' => true, 'dx' => true, 'dy' => true, 'font-family' => true, 'font-weight' => true, 'font-size' => true, 'fill' => true, 'text-anchor' => true],
+            'select' => ['name' => true, 'multiple' => true, 'disabled' => true],
+            'option' => ['value' => true, 'selected' => true, 'disabled' => true],
         ];
         foreach ($specific as $tag => $attributes) {
             $allowed[$tag] = array_merge($allowed[$tag] ?? [], $attributes);

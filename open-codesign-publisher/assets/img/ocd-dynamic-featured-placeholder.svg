@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360" role="img" aria-label="Imagen destacada dinámica">
+  <rect width="100%" height="100%" fill="#f0f6fc"/>
+  <rect x="8" y="8" width="624" height="344" fill="none" stroke="#2271b1" stroke-width="2" stroke-dasharray="10 8"/>
+  <path d="M80 250l120-86 96 62 88-54 176 112v36H80z" fill="rgba(34,113,177,.14)" stroke="#2271b1" stroke-width="2" stroke-linejoin="round"/>
+  <circle cx="150" cy="116" r="26" fill="#72aee6" stroke="#2271b1" stroke-width="2"/>
+  <text x="320" y="316" font-family="Arial, sans-serif" font-size="24" fill="#2271b1" text-anchor="middle">Imagen destacada</text>
+</svg>

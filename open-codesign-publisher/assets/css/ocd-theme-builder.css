@@ -1,0 +1,296 @@
+/* Open CoDesign Publisher — pantalla Plantillas (Theme Builder simplificado). */
+
+.ocd-tb-wrap {
+    max-width: 1400px;
+}
+
+.ocd-tb-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 16px 0 20px;
+    padding: 20px 24px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #6c2bd9 0%, #8c4be8 100%);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(108, 43, 217, 0.22);
+}
+
+.ocd-tb-header h1 {
+    margin: 0 0 4px;
+    color: #fff;
+    font-size: 26px;
+}
+
+.ocd-tb-header p {
+    margin: 0;
+    max-width: 72ch;
+    color: #ede4ff;
+}
+
+.ocd-tb-create {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.ocd-tb-create label {
+    display: grid;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #ede4ff;
+}
+
+.ocd-tb-create input,
+.ocd-tb-create select {
+    min-width: 180px;
+    border-color: rgba(255, 255, 255, 0.35);
+}
+
+.ocd-tb-create .ocd-tb-status {
+    flex-basis: 100%;
+    margin: 0;
+    color: #fff;
+    background: transparent;
+    border-left-color: #c9b8f8;
+}
+
+.ocd-tb-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 20px;
+    align-items: start;
+}
+
+.ocd-tb-empty {
+    grid-column: 1 / -1;
+    padding: 20px;
+    border: 1px dashed #c3c4c7;
+    border-radius: 6px;
+    background: #fff;
+    color: #50575e;
+}
+
+.ocd-tb-card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 14px;
+    border: 1px solid #c3c4c7;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.ocd-tb-card.is-default {
+    border-color: #6c2bd9;
+    box-shadow: 0 1px 6px rgba(108, 43, 217, 0.16);
+}
+
+.ocd-tb-rename {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #dcdcde;
+}
+
+.ocd-tb-rename .ocd-tb-field {
+    flex: 1 1 220px;
+}
+
+.ocd-tb-card-rows {
+    border: 1px solid #dcdcde;
+    border-radius: 6px;
+    background: #f6f7f7;
+    overflow: hidden;
+}
+
+.ocd-tb-region {
+    background: #fff;
+}
+
+.ocd-tb-region + .ocd-tb-region {
+    border-top: 1px solid #dcdcde;
+}
+
+.ocd-tb-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+}
+
+.ocd-tb-row + .ocd-tb-row {
+    border-top: 1px solid #dcdcde;
+}
+
+.ocd-tb-empty-row {
+    justify-content: space-between;
+    background: #f6f7f7;
+}
+
+.ocd-tb-add-region {
+    white-space: nowrap;
+}
+
+.ocd-tb-icon.is-disabled {
+    opacity: 0.45;
+    cursor: default;
+}
+
+.ocd-tb-icon.is-disabled:hover,
+.ocd-tb-icon.is-disabled:focus {
+    border-color: transparent;
+    background: transparent;
+    color: #2271b1;
+}
+
+.ocd-tb-row-label {
+    flex: 1 1 auto;
+    font-weight: 600;
+    color: #1d2327;
+}
+
+.ocd-tb-row-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.ocd-tb-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    background: transparent;
+    color: #2271b1;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.ocd-tb-icon:hover,
+.ocd-tb-icon:focus {
+    border-color: #2271b1;
+    background: #f0f6fc;
+    color: #135e96;
+}
+
+.ocd-tb-icon .dashicons {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+}
+
+.ocd-tb-icon.ocd-tb-delete {
+    color: #b32d2e;
+}
+
+.ocd-tb-icon.ocd-tb-delete:hover,
+.ocd-tb-icon.ocd-tb-delete:focus {
+    border-color: #b32d2e;
+    background: #fcf0f1;
+    color: #8a1f11;
+}
+
+.ocd-tb-scope-form {
+    display: grid;
+    gap: 10px;
+    padding: 10px 12px 12px;
+    border-top: 1px solid #dcdcde;
+    background: #fbfbfb;
+}
+
+.ocd-tb-scope-summary {
+    margin: 0;
+    padding: 8px 10px;
+    border-left: 4px solid #72aee6;
+    background: #f0f6fc;
+    color: #1d2327;
+    line-height: 1.45;
+}
+
+.ocd-tb-field {
+    display: grid;
+    gap: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1d2327;
+}
+
+.ocd-tb-field select {
+    width: 100%;
+    max-width: 100%;
+}
+
+.ocd-tb-field select.is-disabled {
+    background: #f0f0f1;
+    color: #8c8f94;
+}
+
+.ocd-tb-form-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ocd-tb-status {
+    flex: 1 1 auto;
+    min-height: 24px;
+    margin: 0;
+    padding: 6px 8px;
+    border-left: 4px solid #72aee6;
+    background: #f0f6fc;
+    color: #1d2327;
+}
+
+.ocd-tb-status.is-ok {
+    border-left-color: #00a32a;
+    background: #edfaef;
+    color: #14622c;
+}
+
+.ocd-tb-status.is-error {
+    border-left-color: #d63638;
+    background: #fcf0f1;
+    color: #8a1f11;
+    font-weight: 600;
+}
+
+.ocd-tb-card-name {
+    margin: 0;
+    padding-top: 10px;
+    border-top: 1px solid #dcdcde;
+    font-size: 15px;
+    font-weight: 600;
+    color: #1d2327;
+}
+
+@media (max-width: 782px) {
+    .ocd-tb-header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .ocd-tb-create input,
+    .ocd-tb-create select {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .ocd-tb-grid {
+        grid-template-columns: 1fr;
+    }
+}

@@ -22,8 +22,15 @@ final class OCD_Canvas_Page_Publisher
         add_filter('template_include', [$this, 'standalone_template']);
     }
 
-    /** @return array<string, mixed>|WP_Error */
-    public function publish(string $document_id, string $title)
+    /**
+     * @param int $page_id Optional explicit WordPress page target. When
+     *                     greater than 0 it anchors the document to that
+     *                     existing page; otherwise the legacy meta lookup
+     *                     keeps mapping one page per document_id.
+     *
+     * @return array<string, mixed>|WP_Error
+     */
+    public function publish(string $document_id, string $title, int $page_id = 0)
     {
         $document = $this->repository->load($document_id);
         if (is_wp_error($document)) {
@@ -33,7 +40,15 @@ final class OCD_Canvas_Page_Publisher
             return new WP_Error('ocd_canvas_empty', 'Guarda contenido en el Canvas antes de publicarlo.');
         }
 
-        $page_id = $this->find_page_id($document_id);
+        if ($page_id > 0) {
+            $target = get_post($page_id);
+            if (!$target instanceof WP_Post || $target->post_type !== 'page') {
+                return new WP_Error('ocd_canvas_page_invalid', 'La página objetivo no existe o no es una página.');
+            }
+        } else {
+            $page_id = (int) ($this->find_page_id($document_id) ?? 0);
+        }
+
         $post = [
             'post_type' => 'page',
             'post_status' => 'publish',
@@ -41,7 +56,7 @@ final class OCD_Canvas_Page_Publisher
             'post_content' => sprintf('[open_codesign_canvas document_id="%s"]', esc_attr($document_id)),
             'meta_input' => [self::META_DOCUMENT_ID => $document_id],
         ];
-        if ($page_id !== null) {
+        if ($page_id > 0) {
             $post['ID'] = $page_id;
         }
         $saved_id = wp_insert_post($post, true);
