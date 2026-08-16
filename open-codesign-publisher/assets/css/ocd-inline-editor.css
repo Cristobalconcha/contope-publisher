@@ -1,0 +1,103 @@
+/* Open CoDesign Canvas — editor en línea sobre la página publicada (M2). */
+
+html,
+body {
+    margin: 0;
+    height: 100%;
+}
+
+body.ocd-inline-editor-body {
+    overflow: hidden;
+    background: #1d2327;
+}
+
+/* Barra superior fija del modo edición. */
+#ocd-inline-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100000;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    height: 44px;
+    padding: 0 14px;
+    box-sizing: border-box;
+    background: #1d2327;
+    color: #fff;
+    font: 13px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Badge de región activa. El cuerpo usa un tinte y el tema (header/footer) otro. */
+#ocd-inline-region {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 55%;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: #2271b1;
+    color: #fff;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#ocd-inline-region[data-ocd-region-kind="header"],
+#ocd-inline-region[data-ocd-region-kind="footer"] {
+    background: #6d4aff;
+}
+
+#ocd-inline-status {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #c7c7c7;
+}
+
+#ocd-inline-status.is-ok {
+    color: #46b450;
+}
+
+#ocd-inline-status.is-error {
+    color: #ff8085;
+    font-weight: 600;
+}
+
+#ocd-inline-bar a.ocd-inline-link {
+    color: #c7c7c7;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+#ocd-inline-bar a.ocd-inline-link:hover,
+#ocd-inline-bar a.ocd-inline-link:focus {
+    color: #fff;
+}
+
+#ocd-inline-exit {
+    padding: 4px 12px;
+    border-radius: 4px;
+    background: #fff;
+    color: #1d2327 !important;
+    font-weight: 600;
+}
+
+/* El lienzo ocupa todo el viewport restante bajo la barra. */
+#ocd-inline-canvas-root {
+    position: fixed;
+    top: 44px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #fff;
+}
+
+/* GrapesJS ocupa todo el contenedor asignado. */
+#ocd-inline-canvas-root .gjs-editor {
+    height: 100%;
+}

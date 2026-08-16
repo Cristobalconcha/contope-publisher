@@ -29,6 +29,7 @@ require_once OCD_PUBLISHER_DIR . 'includes/class-ocd-dynamic-token-resolver.php'
 require_once OCD_PUBLISHER_DIR . 'includes/class-ocd-canvas-page-publisher.php';
 require_once OCD_PUBLISHER_DIR . 'includes/class-ocd-canvas-editor-admin.php';
 require_once OCD_PUBLISHER_DIR . 'includes/class-ocd-theme-builder-admin.php';
+require_once OCD_PUBLISHER_DIR . 'includes/class-ocd-inline-editor-frontend.php';
 
 add_action('plugins_loaded', static function (): void {
     $validator = new OCD_Package_Validator();
@@ -51,5 +52,6 @@ add_action('plugins_loaded', static function (): void {
         $region_resolver
     ))->register();
     (new OCD_Theme_Builder_Admin($canvas_repository, $canvas_publisher))->register();
+    (new OCD_Inline_Editor_Frontend($canvas_repository, $region_resolver))->register();
 });
 
