@@ -62,7 +62,8 @@
 }
 
 #ocd-page-target {
-    width: 140px;
+    min-width: 240px;
+    max-width: 100%;
 }
 
 .ocd-region-tabs {

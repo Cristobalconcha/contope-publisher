@@ -251,6 +251,9 @@
          *   ajaxUrl, nonce    config de `request()` (admin-ajax).
          *   onDocumentApplied function (doc) — invocado tras aplicar un documento.
          *   onReady           function () — invocado al terminar el armado.
+         *   siteFontCss       string — CSS de @font-face autocontenido del sitio que
+         *                     se inyecta en el <head> del canvas antes del CSS fuente
+         *                     para que el documento gane en cascada (opcional).
          *
          * Devuelve null si faltan dependencias (informando por `status`).
          */
@@ -520,6 +523,7 @@
 
             var CSS_OVERRIDES_MARKER = '/* OCD-CANVAS-EDITABLE-OVERRIDES */';
             var sourceCss = '';
+            var siteFontCss = typeof options.siteFontCss === 'string' ? options.siteFontCss : '';
 
             function resolveMount(value) {
                 if (!value) {
@@ -592,13 +596,49 @@
                 if (!canvasDocument || !canvasDocument.head) {
                     return;
                 }
-                var style = canvasDocument.head.querySelector('style[data-ocd-source-css]');
+                var head = canvasDocument.head;
+                var style = head.querySelector('style[data-ocd-source-css]');
                 if (!style) {
                     style = canvasDocument.createElement('style');
                     style.setAttribute('data-ocd-source-css', 'preserved');
-                    canvasDocument.head.prepend(style);
+                    head.prepend(style);
                 }
                 style.textContent = sourceCss;
+
+                // El CSS fuente debe quedar DESPUÉS del CSS de fuentes para ganar
+                // la cascada: las reglas del documento anulan los estilos del sitio.
+                var fontStyle = head.querySelector('style[data-ocd-site-css]');
+                if (fontStyle && fontStyle !== style && fontStyle.nextSibling !== style) {
+                    head.insertBefore(style, fontStyle.nextSibling);
+                }
+            }
+
+            function ensureSiteFontCss() {
+                var canvasDocument = editor.Canvas.getDocument();
+                if (!canvasDocument || !canvasDocument.head) {
+                    return;
+                }
+                var head = canvasDocument.head;
+                var style = head.querySelector('style[data-ocd-site-css]');
+                if (!siteFontCss) {
+                    if (style) {
+                        style.parentNode.removeChild(style);
+                    }
+                    return;
+                }
+                if (!style) {
+                    style = canvasDocument.createElement('style');
+                    style.setAttribute('data-ocd-site-css', 'fonts');
+                    // Antes del CSS fuente para que el documento gane en cascada;
+                    // si aún no hay CSS fuente, se antepone al <head>.
+                    var sourceStyle = head.querySelector('style[data-ocd-source-css]');
+                    if (sourceStyle) {
+                        head.insertBefore(style, sourceStyle);
+                    } else {
+                        head.prepend(style);
+                    }
+                }
+                style.textContent = siteFontCss;
             }
 
             /**
@@ -649,6 +689,7 @@
             }
 
             function refreshPresentation() {
+                ensureSiteFontCss();
                 ensureSourceCss();
                 ensureDynamicPlaceholderCss();
                 var selected = editor.getSelected();
@@ -698,7 +739,10 @@
                 sourceCss = css.source;
                 editor.setComponents((doc && doc.html) || '');
                 editor.setStyle([sourceCss, css.overrides].filter(Boolean).join('\n'));
-                window.requestAnimationFrame(ensureSourceCss);
+                window.requestAnimationFrame(function () {
+                    ensureSiteFontCss();
+                    ensureSourceCss();
+                });
             }
 
             function applyDocument(doc) {
@@ -726,6 +770,7 @@
                 behaviorApi.refresh();
                 gridApi.scan();
                 window.requestAnimationFrame(function () {
+                    ensureSiteFontCss();
                     ensureSourceCss();
                     var selected = editor.getSelected();
                     if (!selected) {
@@ -797,6 +842,7 @@
                 serializedHtml: serializedHtml,
                 serializedCss: serializedCss,
                 ensureSourceCss: ensureSourceCss,
+                ensureSiteFontCss: ensureSiteFontCss,
                 refreshPresentation: refreshPresentation,
                 getSourceCss: getSourceCss,
                 setSourceCss: setSourceCss,

@@ -31,6 +31,7 @@
             status: setStatus,
             ajaxUrl: config.ajaxUrl,
             nonce: config.nonce,
+            siteFontCss: config.siteFontCss || '',
             inspectorMount: document.getElementById('ocd-canvas-inspector'),
             gridControlsMount: document.querySelector('#ocd-canvas-inspector .ocd-ci__head'),
             groupControlsMount: document.querySelector('#ocd-canvas-inspector .ocd-ci__head'),
@@ -840,7 +841,7 @@
         var overrideId = Number(pageIdOverride);
         var pageId = overrideId > 0 ? overrideId : (input ? parseInt(input.value, 10) : 0);
         if (!pageId || pageId <= 0) {
-            pageStatus('Ingresá un ID de página válido.', 'error');
+            pageStatus('Elegí una página de la lista.', 'error');
             return;
         }
 
@@ -873,7 +874,7 @@
         var overrideId = Number(pageIdOverride);
         var pageId = overrideId > 0 ? overrideId : (input ? parseInt(input.value, 10) : 0);
         if (!pageId || pageId <= 0) {
-            pageStatus('Ingresá un ID de página válido.', 'error');
+            pageStatus('Elegí una página de la lista.', 'error');
             return;
         }
 
@@ -959,11 +960,8 @@
     });
     var pageTarget = document.getElementById('ocd-page-target');
     if (pageTarget) {
-        pageTarget.addEventListener('keydown', function (event) {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                loadTargetPage();
-            }
+        pageTarget.addEventListener('change', function () {
+            loadTargetPage();
         });
     }
 

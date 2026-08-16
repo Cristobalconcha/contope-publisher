@@ -281,6 +281,7 @@ final class OCD_Canvas_Editor_Admin
             'regionKinds' => OCD_Canvas_Document_Repository::REGION_KINDS,
             'regionDocuments' => $this->repository->list_region_documents(),
             'autoLoadPageId' => $this->resolve_auto_load_page_id(),
+            'siteFontCss' => OCD_Canvas_Page_Publisher::site_font_css(),
         ];
 
         // JSON_HEX_TAG evita cualquier salida de `<` dentro del script en línea.
@@ -357,8 +358,20 @@ final class OCD_Canvas_Editor_Admin
             <div class="ocd-canvas-page-editor">
                 <div class="ocd-canvas-page-picker">
                     <label for="ocd-page-target">Página objetivo</label>
-                    <input type="number" id="ocd-page-target" min="1" step="1" inputmode="numeric"
-                        placeholder="ID de página">
+                    <select id="ocd-page-target">
+                        <option value="">Elegir página…</option>
+                        <?php
+                        foreach (get_pages() as $page) :
+                            $document_id = (string) get_post_meta($page->ID, OCD_Canvas_Page_Publisher::META_DOCUMENT_ID, true);
+                            $title = trim((string) $page->post_title);
+                            $option_label = $title !== '' ? $title : sprintf('(Sin título) #%d', $page->ID);
+                            if ($document_id !== '') {
+                                $option_label .= ' — Canvas';
+                            }
+                            ?>
+                            <option value="<?php echo esc_attr((string) $page->ID); ?>"><?php echo esc_html($option_label); ?></option>
+                        <?php endforeach; ?>
+                    </select>
                     <button type="button" class="button button-primary" id="ocd-page-load">Cargar página</button>
                     <span class="ocd-canvas-status" id="ocd-canvas-page-status" role="status" aria-live="polite"></span>
                 </div>

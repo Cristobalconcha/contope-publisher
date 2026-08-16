@@ -9,6 +9,9 @@ final class OCD_Canvas_Page_Publisher
 {
     public const META_DOCUMENT_ID = '_ocd_canvas_document_id';
 
+    /** @var string|null Cache por request del CSS de fuentes autocontenidas. */
+    private static ?string $site_font_css_cache = null;
+
     public function __construct(
         private OCD_Canvas_Document_Repository $repository,
         private ?OCD_Template_Region_Resolver $region_resolver = null,
@@ -20,6 +23,36 @@ final class OCD_Canvas_Page_Publisher
     {
         add_shortcode('open_codesign_canvas', [$this, 'render_shortcode']);
         add_filter('template_include', [$this, 'standalone_template']);
+    }
+
+    /**
+     * Devuelve el CSS de @font-face autocontenido de las tipografías del sitio.
+     *
+     * Lo genera scripts/build-fonts.mjs en uploads/open-codesign/fonts/fonts.css.
+     * Las URLs llegan con el placeholder {FONTS_BASE_URL}, que aquí se resuelve
+     * contra el directorio de uploads real (portable entre instalaciones). Si el
+     * archivo no existe devuelve cadena vacía y todo sigue funcionando como hoy.
+     */
+    public static function site_font_css(): string
+    {
+        if (self::$site_font_css_cache !== null) {
+            return self::$site_font_css_cache;
+        }
+
+        $uploads = wp_upload_dir();
+        $fonts_dir = trailingslashit((string) $uploads['basedir']) . 'open-codesign/fonts';
+        $file = trailingslashit($fonts_dir) . 'fonts.css';
+
+        if (!is_file($file)) {
+            self::$site_font_css_cache = '';
+            return '';
+        }
+
+        $css = (string) file_get_contents($file);
+        $base_url = trailingslashit((string) $uploads['baseurl']) . 'open-codesign/fonts';
+        self::$site_font_css_cache = str_replace('{FONTS_BASE_URL}', $base_url, $css);
+
+        return self::$site_font_css_cache;
     }
 
     /**
@@ -116,9 +149,10 @@ final class OCD_Canvas_Page_Publisher
             }
         }
 
+        $site_font_css = self::site_font_css();
         wp_register_style('ocd-canvas-public', false, [], OCD_PUBLISHER_VERSION);
         wp_enqueue_style('ocd-canvas-public');
-        wp_add_inline_style('ocd-canvas-public', $header_css . (string) $document['css'] . $footer_css);
+        wp_add_inline_style('ocd-canvas-public', $site_font_css . $header_css . (string) $document['css'] . $footer_css);
         wp_enqueue_script(
             'ocd-canvas-public',
             plugins_url('assets/js/ocd-canvas-public.js', OCD_PUBLISHER_FILE),
