@@ -55,6 +55,7 @@ window.fetch=async(_url,options)=>{if(String(_url).endsWith('/Logo.svg'))return 
 <script src="${asset('js/ocd-canvas-grid.global.js')}"></script>
 <script src="${asset('js/ocd-grid-controls.js')}"></script>
 <script src="${asset('js/ocd-behaviors.js')}"></script>
+<script src="${asset('js/ocd-editor-core.js')}"></script>
 <script src="${asset('js/ocd-canvas-editor.js')}"></script>
 <script src="${asset('js/ocd-canvas-public.js')}"></script>
 <script>

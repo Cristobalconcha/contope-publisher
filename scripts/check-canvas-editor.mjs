@@ -293,7 +293,7 @@ async function checkAdminSurface() {
     const enqueued = callsOf(enqueue).filter(
       (entry) => entry.name === 'wp_enqueue_script' || entry.name === 'wp_enqueue_style',
     );
-    check(enqueued.length === 8, 'enqueue_assets() debe encolar GrapesJS, los cuatro módulos Canvas y los assets propios.');
+    check(enqueued.length === 9, 'enqueue_assets() debe encolar GrapesJS, los módulos Canvas, el core y los assets propios.');
     for (const entry of enqueued) {
       check(
         firstCall(entry.node.arguments[1], 'plugins_url') !== null,
@@ -742,6 +742,7 @@ async function checkIsolationAndAssets() {
     'open-codesign-publisher/includes/class-ocd-canvas-asset-resolver.php',
     'open-codesign-publisher/includes/class-ocd-canvas-page-publisher.php',
     'open-codesign-publisher/includes/class-ocd-dynamic-token-resolver.php',
+    'open-codesign-publisher/assets/js/ocd-editor-core.js',
     'open-codesign-publisher/assets/js/ocd-canvas-editor.js',
     'open-codesign-publisher/assets/js/ocd-canvas-public.js',
     'open-codesign-publisher/assets/js/ocd-computed-inspector.js',
@@ -771,6 +772,10 @@ async function checkIsolationAndAssets() {
     fileURLToPath(new URL('open-codesign-publisher/assets/js/ocd-canvas-editor.js', repoRoot)),
     'utf8',
   );
+  const coreScript = await readFile(
+    fileURLToPath(new URL('open-codesign-publisher/assets/js/ocd-editor-core.js', repoRoot)),
+    'utf8',
+  );
   const inspectorSource = await readFile(
     fileURLToPath(new URL('open-codesign-publisher/assets/js/ocd-computed-inspector.js', repoRoot)),
     'utf8',
@@ -787,35 +792,35 @@ async function checkIsolationAndAssets() {
     check(script.includes(`'${controlId}'`), `El editor debe enlazar el control ${controlId}.`);
   }
   check(
-    /body\.set\('nonce', config\.nonce\)/.test(script),
+    /body\.set\('nonce', nonce\)/.test(coreScript),
     'Cada petición del editor debe enviar el nonce.',
   );
   check(
-    /credentials: 'same-origin'/.test(script),
+    /credentials: 'same-origin'/.test(coreScript),
     'Las peticiones del editor deben usar credenciales de la misma sesión.',
   );
   check(
-    /getProjectData\(\)/.test(script) && /getHtml\(\)/.test(script) && /getCss\(\)/.test(script),
+    /getProjectData\(\)/.test(coreScript) && /getHtml\(\)/.test(coreScript) && /getCss\(\)/.test(coreScript),
     'El editor debe enviar datos estructurados, HTML y CSS por separado.',
   );
   check(
-    /storageManager: false/.test(script),
+    /storageManager: false/.test(coreScript),
     'GrapesJS no debe usar su almacenamiento propio: la persistencia es de WordPress.',
   );
   check(
-    script.includes('OCD-CANVAS-EDITABLE-OVERRIDES') && script.includes('data-ocd-source-css'),
+    coreScript.includes('OCD-CANVAS-EDITABLE-OVERRIDES') && coreScript.includes('data-ocd-source-css'),
     'El editor debe preservar el CSS fuente literalmente y separar sus overrides editables.',
   );
   check(
-    /css: serializedCss\(\)/.test(script),
+    /css: serializedCss\(\)/.test(coreScript),
     'El guardado debe enviar el CSS fuente junto con la capa de overrides.',
   );
   check(
-    /Components\.addType\('ocd-video'/.test(script) && /tagName === 'VIDEO'/.test(script),
+    /Components\.addType\('ocd-video'/.test(coreScript) && /tagName === 'VIDEO'/.test(coreScript),
     'El editor debe preservar video como componente OCD sin controles añadidos.',
   );
   check(
-    script.includes("querySelectorAll('video[autoplay]')") && script.includes("setAttribute('muted', '')"),
+    coreScript.includes("querySelectorAll('video[autoplay]')") && coreScript.includes("setAttribute('muted', '')"),
     'La serialización debe conservar autoplay como video silencioso reproducible.',
   );
   check(

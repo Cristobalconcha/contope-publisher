@@ -239,9 +239,16 @@ final class OCD_Canvas_Editor_Admin
             true
         );
         wp_enqueue_script(
+            'ocd-editor-core',
+            plugins_url('assets/js/ocd-editor-core.js', OCD_PUBLISHER_FILE),
+            ['ocd-grapesjs', 'ocd-computed-inspector', 'ocd-canvas-grid', 'ocd-grid-controls', 'ocd-behaviors'],
+            OCD_PUBLISHER_VERSION,
+            true
+        );
+        wp_enqueue_script(
             'ocd-canvas-editor',
             plugins_url('assets/js/ocd-canvas-editor.js', OCD_PUBLISHER_FILE),
-            ['ocd-grapesjs', 'ocd-computed-inspector', 'ocd-canvas-grid', 'ocd-grid-controls', 'ocd-behaviors'],
+            ['ocd-editor-core'],
             OCD_PUBLISHER_VERSION,
             true
         );
