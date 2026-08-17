@@ -28,6 +28,10 @@ final class OCD_Theme_Builder_Admin
     public const AJAX_CREATE_TEMPLATE = 'ocd_theme_builder_create_template';
     public const AJAX_ADD_REGION = 'ocd_theme_builder_add_region';
     public const AJAX_RENAME_TEMPLATE = 'ocd_theme_builder_rename_template';
+    public const AJAX_ASSIGN_REGION = 'ocd_theme_builder_assign_region';
+    public const AJAX_CREATE_REGION = 'ocd_theme_builder_create_region';
+    public const AJAX_RENAME_REGION = 'ocd_theme_builder_rename_region';
+    public const AJAX_DELETE_TEMPLATE = 'ocd_theme_builder_delete_template';
     public const ADMIN_POST_PREVIEW = 'ocd_theme_builder_preview';
 
     private string $hook_suffix = '';
@@ -56,6 +60,10 @@ final class OCD_Theme_Builder_Admin
         add_action('wp_ajax_' . self::AJAX_CREATE_TEMPLATE, [$this, 'handle_create_template']);
         add_action('wp_ajax_' . self::AJAX_ADD_REGION, [$this, 'handle_add_region']);
         add_action('wp_ajax_' . self::AJAX_RENAME_TEMPLATE, [$this, 'handle_rename_template']);
+        add_action('wp_ajax_' . self::AJAX_ASSIGN_REGION, [$this, 'handle_assign_region']);
+        add_action('wp_ajax_' . self::AJAX_CREATE_REGION, [$this, 'handle_create_region']);
+        add_action('wp_ajax_' . self::AJAX_RENAME_REGION, [$this, 'handle_rename_region']);
+        add_action('wp_ajax_' . self::AJAX_DELETE_TEMPLATE, [$this, 'handle_delete_template']);
         add_action('admin_post_' . self::ADMIN_POST_PREVIEW, [$this, 'handle_preview']);
     }
 
@@ -105,6 +113,10 @@ final class OCD_Theme_Builder_Admin
                     'createTemplateAction' => self::AJAX_CREATE_TEMPLATE,
                     'addRegionAction' => self::AJAX_ADD_REGION,
                     'renameTemplateAction' => self::AJAX_RENAME_TEMPLATE,
+                    'assignRegionAction' => self::AJAX_ASSIGN_REGION,
+                    'createRegionAction' => self::AJAX_CREATE_REGION,
+                    'renameRegionAction' => self::AJAX_RENAME_REGION,
+                    'deleteTemplateAction' => self::AJAX_DELETE_TEMPLATE,
                 ],
                 JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
             ) . ';',
@@ -119,29 +131,37 @@ final class OCD_Theme_Builder_Admin
         }
 
         $templates = $this->repository->list_templates();
+        $region_documents_by_kind = $this->region_documents_by_kind();
         ?>
         <div class="wrap ocd-tb-wrap">
             <div class="ocd-tb-header">
                 <div>
-                    <h1>Plantillas</h1>
+                    <h1>Plantillas del tema</h1>
                     <p>
-                        Cada tarjeta es una plantilla con sus tres regiones (Encabezado, Cuerpo y Pie).
-                        Editalas en el Canvas y configurá el alcance de cada región acá mismo.
+                        Cada tarjeta agrupa las tres regiones de una plantilla. El selector comparte la
+                        región entre plantillas; el botón + crea una copia propia a partir de la seleccionada.
                     </p>
+                    <p class="ocd-tb-autosave-note">Los cambios se guardan automáticamente.</p>
                 </div>
-                <form class="ocd-tb-create" id="ocd-tb-create">
-                    <label>
-                        <span>Nueva plantilla</span>
-                        <input type="text" name="title" maxlength="160" placeholder="Nombre de la plantilla" required>
-                    </label>
-                    <button type="submit" class="button button-primary">Crear plantilla</button>
-                    <span class="ocd-tb-status" role="status" aria-live="polite"></span>
-                </form>
+                <button type="button" class="button button-primary" id="ocd-tb-new-template">+ Nueva plantilla</button>
             </div>
 
-            <div class="ocd-tb-grid">
+            <details class="ocd-tb-help">
+                <summary>¿Cómo funcionan las plantillas?</summary>
+                <ul>
+                    <li>Elegir una región en el selector la <strong>comparte</strong>: todas las plantillas que la
+                        tengan seleccionada ven los mismos cambios al editarla.</li>
+                    <li>El botón <strong>+</strong> crea una región nueva <strong>a partir del contenido</strong> de
+                        la seleccionada (o vacía si no hay ninguna) — la copia es propia y no afecta al donante.</li>
+                    <li>El <strong>ojo</strong> abre la región asignada en el editor Canvas, solamente esa región.</li>
+                    <li>El <strong>alcance</strong> (Global/Local con destinos y exclusiones) se edita desplegando
+                        cada fila con el chevron.</li>
+                </ul>
+            </details>
+
+            <div class="ocd-tb-grid" id="ocd-tb-grid">
                 <?php foreach ($templates as $template) : ?>
-                    <?php $this->render_template_card($template); ?>
+                    <?php echo $this->render_template_card_html($template, $region_documents_by_kind); ?>
                 <?php endforeach; ?>
             </div>
         </div>
@@ -149,60 +169,215 @@ final class OCD_Theme_Builder_Admin
     }
 
     /**
+     * Tarjeta de plantilla como string: sirve al render inicial y a las
+     * respuestas AJAX que re-renderizan la tarjeta sin recargar la página.
+     *
      * @param array<string, mixed> $template
+     * @param array<string, array<int, array<string, mixed>>> $region_documents_by_kind
      */
-    private function render_template_card(array $template): void
+    private function render_template_card_html(array $template, array $region_documents_by_kind): string
     {
         $template_id = (string) ($template['templateId'] ?? '');
         $title = (string) ($template['title'] ?? $template_id);
         $is_default = (bool) ($template['isDefault'] ?? false);
         $is_legacy = (bool) ($template['isLegacy'] ?? false);
-        $allow_add = (bool) ($template['allowAdd'] ?? false);
-        $regions = $template['regions'] ?? [];
+        $regions = is_array($template['regions'] ?? null) ? $template['regions'] : [];
+
+        $has_local = false;
+        foreach (OCD_Canvas_Document_Repository::REGION_KINDS as $kind) {
+            $document = $regions[$kind] ?? null;
+            if (is_array($document)
+                && (string) ($document['regionScope'] ?? '') === OCD_Canvas_Document_Repository::REGION_SCOPE_LOCAL) {
+                $has_local = true;
+                break;
+            }
+        }
+        $badge = $is_default ? 'Global · base' : ($is_legacy ? 'Sin agrupar' : ($has_local ? 'Local' : 'Plantilla'));
+
+        ob_start();
         ?>
         <article class="ocd-tb-card<?php echo $is_default ? ' is-default' : ''; ?><?php echo $is_legacy ? ' is-legacy' : ''; ?>"
             data-template-id="<?php echo esc_attr($template_id); ?>">
-            <div class="ocd-tb-card-rows">
-                <?php foreach (OCD_Canvas_Document_Repository::REGION_KINDS as $kind) : ?>
-                    <?php $document = $regions[$kind] ?? null; ?>
-                    <?php if (is_array($document)) : ?>
-                        <?php $this->render_assigned_region($document, $kind); ?>
-                    <?php elseif ($allow_add) : ?>
-                        <?php $this->render_empty_region($template, $kind); ?>
-                    <?php endif; ?>
-                <?php endforeach; ?>
-            </div>
+            <header class="ocd-tb-card-head">
+                <h2 class="ocd-tb-card-name"><?php echo esc_html($title); ?></h2>
+                <span class="ocd-tb-badge"><?php echo esc_html($badge); ?></span>
+                <?php if (!$is_default && !$is_legacy) : ?>
+                    <div class="ocd-tb-menu">
+                        <button type="button" class="ocd-tb-icon ocd-tb-menu-toggle" title="Opciones de la plantilla">
+                            <span class="dashicons dashicons-ellipsis" aria-hidden="true"></span>
+                            <span class="screen-reader-text">Opciones de la plantilla</span>
+                        </button>
+                        <div class="ocd-tb-menu-panel" hidden>
+                            <button type="button" class="ocd-tb-menu-rename">Renombrar plantilla</button>
+                            <button type="button" class="ocd-tb-menu-delete">Eliminar plantilla</button>
+                        </div>
+                    </div>
+                <?php endif; ?>
+            </header>
 
             <?php if (!$is_default && !$is_legacy) : ?>
-                <form class="ocd-tb-rename" data-template-id="<?php echo esc_attr($template_id); ?>">
+                <form class="ocd-tb-rename" data-template-id="<?php echo esc_attr($template_id); ?>" hidden>
                     <label class="ocd-tb-field" for="ocd-tb-name-<?php echo esc_attr($template_id); ?>">
                         <span>Nombre de la plantilla</span>
                         <input type="text" id="ocd-tb-name-<?php echo esc_attr($template_id); ?>" name="template_title"
                             maxlength="160" value="<?php echo esc_attr($title); ?>" required>
                     </label>
                     <button type="submit" class="button button-secondary">Guardar nombre</button>
+                    <button type="button" class="button ocd-tb-rename-cancel">Cancelar</button>
                     <span class="ocd-tb-status" role="status" aria-live="polite"></span>
                 </form>
-            <?php else : ?>
-                <h2 class="ocd-tb-card-name"><?php echo esc_html($title); ?></h2>
             <?php endif; ?>
+
+            <div class="ocd-tb-card-rows">
+                <?php foreach (OCD_Canvas_Document_Repository::REGION_KINDS as $kind) : ?>
+                    <?php if ($kind === '') { continue; } ?>
+                    <?php $document = $regions[$kind] ?? null; ?>
+                    <?php $this->render_region_row(
+                        $template,
+                        $kind,
+                        is_array($document) ? $document : null,
+                        is_array($region_documents_by_kind[$kind] ?? null) ? $region_documents_by_kind[$kind] : []
+                    ); ?>
+                <?php endforeach; ?>
+            </div>
         </article>
+        <?php
+        return (string) ob_get_clean();
+    }
+
+    /**
+     * Fila de región: etiqueta, selector con TODAS las regiones del tema de
+     * ese tipo, ojo (abrir la asignada en el Canvas), "+" (bifurcar la
+     * seleccionada o crear una vacía) y chevron que despliega alcance y
+     * nombre de la región.
+     *
+     * @param array<string, mixed> $template
+     * @param array<string, mixed>|null $document
+     * @param array<int, array<string, mixed>> $kind_documents
+     */
+    private function render_region_row(array $template, string $kind, ?array $document, array $kind_documents): void
+    {
+        $assigned_id = $document !== null ? (string) ($document['documentId'] ?? '') : '';
+        $is_legacy = (bool) ($template['isLegacy'] ?? false);
+        ?>
+        <section class="ocd-tb-region" data-region-kind="<?php echo esc_attr($kind); ?>"
+            data-assigned-document="<?php echo esc_attr($assigned_id); ?>">
+            <div class="ocd-tb-row">
+                <span class="ocd-tb-row-label"><?php echo esc_html($this->region_short_label($kind)); ?></span>
+                <select class="ocd-tb-region-select" data-region-select<?php echo $is_legacy ? ' disabled' : ''; ?>
+                    aria-label="Región de <?php echo esc_attr($this->region_short_label($kind)); ?>">
+                    <option value="" <?php selected($assigned_id, ''); ?>>Sin definir</option>
+                    <?php foreach ($kind_documents as $option_document) : ?>
+                        <?php $option_id = (string) ($option_document['documentId'] ?? ''); ?>
+                        <?php if ($option_id === '') { continue; } ?>
+                        <option value="<?php echo esc_attr($option_id); ?>" <?php selected($option_id, $assigned_id); ?>>
+                            <?php echo esc_html((string) ($option_document['title'] ?? $option_id)); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+                <div class="ocd-tb-row-actions">
+                    <?php if ($assigned_id !== '') : ?>
+                        <a class="ocd-tb-icon ocd-tb-eye" href="<?php echo esc_url($this->region_edit_url($assigned_id)); ?>"
+                            title="Abrir esta región en el editor Canvas">
+                            <span class="dashicons dashicons-visibility" aria-hidden="true"></span>
+                            <span class="screen-reader-text">Abrir esta región en el editor Canvas</span>
+                        </a>
+                    <?php else : ?>
+                        <span class="ocd-tb-icon ocd-tb-eye is-disabled" title="Sin región asignada">
+                            <span class="dashicons dashicons-visibility" aria-hidden="true"></span>
+                        </span>
+                    <?php endif; ?>
+                    <button type="button" class="ocd-tb-icon ocd-tb-fork<?php echo $is_legacy ? ' is-disabled' : ''; ?>"<?php echo $is_legacy ? ' disabled' : ''; ?>
+                        title="Crear una región nueva a partir de la seleccionada (o vacía)">
+                        <span class="dashicons dashicons-plus-alt2" aria-hidden="true"></span>
+                        <span class="screen-reader-text">Crear una región nueva</span>
+                    </button>
+                    <button type="button" class="ocd-tb-icon ocd-tb-chevron" title="Alcance y nombre de la región">
+                        <span class="dashicons dashicons-arrow-down" aria-hidden="true"></span>
+                        <span class="screen-reader-text">Alcance y nombre de la región</span>
+                    </button>
+                </div>
+            </div>
+            <span class="ocd-tb-status ocd-tb-row-status" role="status" aria-live="polite"></span>
+
+            <div class="ocd-tb-region-panel" hidden>
+                <?php if ($document !== null) : ?>
+                    <?php $this->render_region_panel($document); ?>
+                <?php else : ?>
+                    <p class="ocd-tb-panel-empty">Sin región asignada — elegí una existente en el selector o creala con +.</p>
+                <?php endif; ?>
+            </div>
+        </section>
         <?php
     }
 
     /**
+     * Panel desplegado de la fila: nombre propio de la región + formulario de
+     * alcance (idéntico al clásico: Global/Local, destinos, exclusiones).
+     *
      * @param array<string, mixed> $document
      */
-    private function render_assigned_region(array $document, string $kind): void
+    private function render_region_panel(array $document): void
     {
         $document_id = (string) ($document['documentId'] ?? '');
         $scope = (string) ($document['regionScope'] ?? '');
-        $targets = $document['regionTargets'] ?? [];
-        $excludes = $document['regionExcludes'] ?? [];
-        $targets = is_array($targets) ? $targets : [];
-        $excludes = is_array($excludes) ? $excludes : [];
+        $targets = is_array($document['regionTargets'] ?? null) ? $document['regionTargets'] : [];
+        $excludes = is_array($document['regionExcludes'] ?? null) ? $document['regionExcludes'] : [];
+        ?>
+        <form class="ocd-tb-region-name-form" data-document-id="<?php echo esc_attr($document_id); ?>">
+            <label class="ocd-tb-field">
+                <span>Nombre de la región</span>
+                <input type="text" name="region_title" maxlength="160"
+                    value="<?php echo esc_attr((string) ($document['title'] ?? $document_id)); ?>" required>
+            </label>
+            <button type="submit" class="button button-secondary">Guardar nombre</button>
+            <span class="ocd-tb-status" role="status" aria-live="polite"></span>
+        </form>
 
-        $edit_url = wp_nonce_url(
+        <form class="ocd-tb-scope-form">
+            <p class="ocd-tb-scope-summary"><?php echo esc_html($this->describe_scope($scope, $targets, $excludes)); ?></p>
+
+            <label class="ocd-tb-field">
+                <span>Alcance</span>
+                <select name="region_scope" class="ocd-tb-scope">
+                    <option value="global" <?php selected($scope, OCD_Canvas_Document_Repository::REGION_SCOPE_GLOBAL); ?>>
+                        Global — todo el sitio
+                    </option>
+                    <option value="local" <?php selected($scope, OCD_Canvas_Document_Repository::REGION_SCOPE_LOCAL); ?>>
+                        Local — destinos específicos
+                    </option>
+                </select>
+            </label>
+
+            <label class="ocd-tb-field">
+                <span>Destinos (solo si es Local)</span>
+                <select name="region_targets" multiple size="5" class="ocd-tb-targets">
+                    <?php $this->render_rule_options($targets); ?>
+                </select>
+            </label>
+
+            <label class="ocd-tb-field">
+                <span>Exclusiones (opcional)</span>
+                <select name="region_excludes" multiple size="4" class="ocd-tb-excludes">
+                    <?php $this->render_rule_options($excludes); ?>
+                </select>
+            </label>
+
+            <div class="ocd-tb-form-actions">
+                <button type="submit" class="button button-primary">Guardar alcance</button>
+                <span class="ocd-tb-status" role="status" aria-live="polite"></span>
+            </div>
+        </form>
+        <?php
+    }
+
+    /**
+     * URL del Canvas para editar una región aislada (mecanismo de
+     * resolve_auto_load_document_id(): page + document_id + nonce).
+     */
+    private function region_edit_url(string $document_id): string
+    {
+        return wp_nonce_url(
             add_query_arg(
                 [
                     'page' => OCD_Canvas_Editor_Admin::PAGE_SLUG,
@@ -213,103 +388,45 @@ final class OCD_Theme_Builder_Admin
             OCD_Canvas_Editor_Admin::NONCE_ACTION,
             'ocd_nonce'
         );
-        $published = $this->publisher->current($document_id);
-        if (is_array($published) && !empty($published['url'])) {
-            $preview_url = $published['url'];
-        } else {
-            $preview_url = wp_nonce_url(
-                add_query_arg(
-                    [
-                        'action' => self::ADMIN_POST_PREVIEW,
-                        'document_id' => $document_id,
-                    ],
-                    admin_url('admin-post.php')
-                ),
-                self::NONCE_ACTION
-            );
-        }
-        ?>
-        <div class="ocd-tb-region" data-document-id="<?php echo esc_attr($document_id); ?>" data-region-kind="<?php echo esc_attr($kind); ?>">
-            <div class="ocd-tb-row">
-                <a class="ocd-tb-icon ocd-tb-edit" href="<?php echo esc_url($edit_url); ?>"
-                    title="Editar en el editor Canvas">
-                    <span class="dashicons dashicons-edit" aria-hidden="true"></span>
-                    <span class="screen-reader-text">Editar en el editor Canvas</span>
-                </a>
-                <span class="ocd-tb-row-label"><?php echo esc_html($this->region_kind_label($kind)); ?></span>
-                <div class="ocd-tb-row-actions">
-                    <button type="button" class="ocd-tb-icon ocd-tb-delete" title="Quitar esta región de la plantilla">
-                        <span class="dashicons dashicons-trash" aria-hidden="true"></span>
-                        <span class="screen-reader-text">Quitar esta región de la plantilla</span>
-                    </button>
-                    <a class="ocd-tb-icon ocd-tb-preview" href="<?php echo esc_url($preview_url); ?>"
-                        target="_blank" rel="noopener" title="Previsualizar">
-                        <span class="dashicons dashicons-visibility" aria-hidden="true"></span>
-                        <span class="screen-reader-text">Previsualizar</span>
-                    </a>
-                </div>
-            </div>
-
-            <form class="ocd-tb-scope-form">
-                <p class="ocd-tb-scope-summary"><?php echo esc_html($this->describe_scope($scope, $targets, $excludes)); ?></p>
-
-                <label class="ocd-tb-field">
-                    <span>Alcance</span>
-                    <select name="region_scope" class="ocd-tb-scope">
-                        <option value="global" <?php selected($scope, OCD_Canvas_Document_Repository::REGION_SCOPE_GLOBAL); ?>>
-                            Global — todo el sitio
-                        </option>
-                        <option value="local" <?php selected($scope, OCD_Canvas_Document_Repository::REGION_SCOPE_LOCAL); ?>>
-                            Local — destinos específicos
-                        </option>
-                    </select>
-                </label>
-
-                <label class="ocd-tb-field">
-                    <span>Destinos (solo si es Local)</span>
-                    <select name="region_targets" multiple size="5" class="ocd-tb-targets">
-                        <?php $this->render_rule_options($targets); ?>
-                    </select>
-                </label>
-
-                <label class="ocd-tb-field">
-                    <span>Exclusiones (opcional)</span>
-                    <select name="region_excludes" multiple size="4" class="ocd-tb-excludes">
-                        <?php $this->render_rule_options($excludes); ?>
-                    </select>
-                </label>
-
-                <div class="ocd-tb-form-actions">
-                    <button type="submit" class="button button-primary">Guardar alcance</button>
-                    <span class="ocd-tb-status" role="status" aria-live="polite"></span>
-                </div>
-            </form>
-        </div>
-        <?php
     }
 
     /**
-     * @param array<string, mixed> $template
+     * Todos los documentos-región del tema agrupados por kind, para poblar
+     * los selectores compartidos.
+     *
+     * @return array<string, array<int, array<string, mixed>>>
      */
-    private function render_empty_region(array $template, string $kind): void
+    private function region_documents_by_kind(): array
     {
-        $is_default = (bool) ($template['isDefault'] ?? false);
-        ?>
-        <div class="ocd-tb-region ocd-tb-region-empty" data-region-kind="<?php echo esc_attr($kind); ?>">
-            <div class="ocd-tb-row ocd-tb-empty-row">
-                <span class="ocd-tb-row-label"><?php echo esc_html($this->region_short_label($kind)); ?></span>
-                <div class="ocd-tb-row-actions">
-                    <span class="ocd-tb-icon ocd-tb-preview is-disabled" aria-hidden="true"
-                        title="Previsualización no disponible hasta agregar la región">
-                        <span class="dashicons dashicons-visibility"></span>
-                    </span>
-                    <button type="button" class="button ocd-tb-add-region">
-                        <?php echo esc_html($this->empty_region_action_label($kind, $is_default)); ?>
-                    </button>
-                </div>
-            </div>
-        </div>
-        <?php
+        $grouped = [
+            OCD_Canvas_Document_Repository::REGION_KIND_HEADER => [],
+            OCD_Canvas_Document_Repository::REGION_KIND_BODY => [],
+            OCD_Canvas_Document_Repository::REGION_KIND_FOOTER => [],
+        ];
+        foreach ($this->repository->list_region_documents() as $document) {
+            $kind = (string) ($document['regionKind'] ?? '');
+            if (!isset($grouped[$kind])) {
+                continue;
+            }
+            $grouped[$kind][] = $document;
+        }
+        return $grouped;
+    }
+
+    /**
+     * Re-render de una tarjeta por template_id (para respuestas AJAX).
+     */
+    private function template_card_html_by_id(string $template_id): ?string
+    {
+        if ($template_id === '') {
+            return null;
+        }
+        foreach ($this->repository->list_templates() as $template) {
+            if ((string) ($template['templateId'] ?? '') === $template_id) {
+                return $this->render_template_card_html($template, $this->region_documents_by_kind());
+            }
+        }
+        return null;
     }
 
     /**
@@ -631,7 +748,10 @@ final class OCD_Theme_Builder_Admin
             wp_send_json_error(['message' => $created->get_error_message(), 'code' => $created->get_error_code()], 400);
         }
 
-        wp_send_json_success($created);
+        wp_send_json_success([
+            'template' => $created,
+            'cardHtml' => $this->template_card_html_by_id((string) ($created['templateId'] ?? '')),
+        ]);
     }
 
     public function handle_add_region(): void
@@ -682,7 +802,116 @@ final class OCD_Theme_Builder_Admin
             wp_send_json_error(['message' => $renamed->get_error_message(), 'code' => $renamed->get_error_code()], 400);
         }
 
-        wp_send_json_success($renamed);
+        wp_send_json_success([
+            'template' => $renamed,
+            'cardHtml' => $this->template_card_html_by_id($template_id),
+        ]);
+    }
+
+    public function handle_assign_region(): void
+    {
+        if (!current_user_can(self::CAPABILITY)) {
+            wp_send_json_error(['message' => 'Permisos insuficientes.'], 403);
+        }
+        check_ajax_referer(self::NONCE_ACTION, 'nonce');
+
+        $template_id = isset($_POST['template_id']) ? sanitize_key((string) wp_unslash($_POST['template_id'])) : '';
+        $kind = isset($_POST['region_kind']) ? sanitize_key((string) wp_unslash($_POST['region_kind'])) : '';
+        $document_id = isset($_POST['document_id']) ? sanitize_key((string) wp_unslash($_POST['document_id'])) : '';
+        if ($template_id === '' || $kind === '') {
+            wp_send_json_error(['message' => 'template_id y region_kind son obligatorios.'], 400);
+        }
+
+        $assigned = $this->repository->assign_region_to_template($template_id, $kind, $document_id);
+        if (is_wp_error($assigned)) {
+            wp_send_json_error(['message' => $assigned->get_error_message(), 'code' => $assigned->get_error_code()], 400);
+        }
+
+        wp_send_json_success([
+            'assignments' => $assigned,
+            'cardHtml' => $this->template_card_html_by_id($template_id),
+        ]);
+    }
+
+    public function handle_create_region(): void
+    {
+        if (!current_user_can(self::CAPABILITY)) {
+            wp_send_json_error(['message' => 'Permisos insuficientes.'], 403);
+        }
+        check_ajax_referer(self::NONCE_ACTION, 'nonce');
+
+        $template_id = isset($_POST['template_id']) ? sanitize_key((string) wp_unslash($_POST['template_id'])) : '';
+        $kind = isset($_POST['region_kind']) ? sanitize_key((string) wp_unslash($_POST['region_kind'])) : '';
+        if ($template_id === '' || $kind === '') {
+            wp_send_json_error(['message' => 'template_id y region_kind son obligatorios.'], 400);
+        }
+
+        $title = isset($_POST['title']) ? sanitize_text_field((string) wp_unslash($_POST['title'])) : '';
+        $source_document_id = isset($_POST['source_document_id'])
+            ? sanitize_key((string) wp_unslash($_POST['source_document_id']))
+            : '';
+
+        $created = $this->repository->duplicate_region($template_id, $kind, $title, $source_document_id);
+        if (is_wp_error($created)) {
+            wp_send_json_error(['message' => $created->get_error_message(), 'code' => $created->get_error_code()], 400);
+        }
+
+        $document_id = (string) ($created['documentId'] ?? '');
+        wp_send_json_success([
+            'document' => $created,
+            'documentId' => $document_id,
+            'editUrl' => $this->region_edit_url($document_id),
+        ]);
+    }
+
+    public function handle_rename_region(): void
+    {
+        if (!current_user_can(self::CAPABILITY)) {
+            wp_send_json_error(['message' => 'Permisos insuficientes.'], 403);
+        }
+        check_ajax_referer(self::NONCE_ACTION, 'nonce');
+
+        $document_id = isset($_POST['document_id']) ? sanitize_key((string) wp_unslash($_POST['document_id'])) : '';
+        $template_id = isset($_POST['template_id']) ? sanitize_key((string) wp_unslash($_POST['template_id'])) : '';
+        if ($document_id === '') {
+            wp_send_json_error(['message' => 'document_id es obligatorio.'], 400);
+        }
+
+        $title = isset($_POST['title']) ? sanitize_text_field((string) wp_unslash($_POST['title'])) : '';
+        $title = trim($title);
+        if ($title === '') {
+            wp_send_json_error(['message' => 'El nombre de la región es obligatorio.'], 400);
+        }
+
+        $renamed = $this->repository->rename_region($document_id, $title);
+        if (is_wp_error($renamed)) {
+            wp_send_json_error(['message' => $renamed->get_error_message(), 'code' => $renamed->get_error_code()], 400);
+        }
+
+        wp_send_json_success([
+            'document' => $renamed,
+            'cardHtml' => $this->template_card_html_by_id($template_id),
+        ]);
+    }
+
+    public function handle_delete_template(): void
+    {
+        if (!current_user_can(self::CAPABILITY)) {
+            wp_send_json_error(['message' => 'Permisos insuficientes.'], 403);
+        }
+        check_ajax_referer(self::NONCE_ACTION, 'nonce');
+
+        $template_id = isset($_POST['template_id']) ? sanitize_key((string) wp_unslash($_POST['template_id'])) : '';
+        if ($template_id === '') {
+            wp_send_json_error(['message' => 'template_id es obligatorio.'], 400);
+        }
+
+        $deleted = $this->repository->delete_template_group($template_id);
+        if (is_wp_error($deleted)) {
+            wp_send_json_error(['message' => $deleted->get_error_message(), 'code' => $deleted->get_error_code()], 400);
+        }
+
+        wp_send_json_success(['deleted' => true]);
     }
 
     public function handle_preview(): void

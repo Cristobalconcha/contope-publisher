@@ -1,11 +1,11 @@
 /**
- * Open CoDesign Publisher — pantalla Plantillas.
+ * Open CoDesign Publisher — pantalla Plantillas del tema.
  *
- * Maneja el guardado de alcance/destinos por región, la creación de grupos de
- * plantilla, el agregado de regiones a una plantilla, el renombrado y el
- * borrado de regiones mediante admin-ajax con nonce. Los selectores ya vienen
- * poblados por el servidor con páginas, categorías y etiquetas reales; acá
- * sólo se traducen a reglas y se envían como JSON estructurado.
+ * Tarjetas con las tres regiones (Encabezado/Cuerpo/Pie). El selector asigna
+ * una región existente COMPARTIÉNDOLA entre plantillas (misma región, mismos
+ * cambios para todas); el botón + bifurca la región seleccionada (o crea una
+ * vacía) y abre el Canvas para construirla. Todo se autoguarda por admin-ajax
+ * con nonce y las tarjetas se re-renderizan en el servidor, sin recargas.
  */
 (function (window, document) {
     'use strict';
@@ -64,18 +64,96 @@
         if (!status) {
             return;
         }
-        status.textContent = message;
-        status.className = 'ocd-tb-status' + (kind ? ' is-' + kind : '');
+        status.textContent = message || '';
+        status.classList.remove('is-ok', 'is-error');
+        if (kind) {
+            status.classList.add('is-' + kind);
+        }
     }
 
-    function closestRegion(node) {
-        while (node && node !== document) {
-            if (node.classList && node.classList.contains('ocd-tb-region')) {
-                return node;
-            }
-            node = node.parentNode;
+    function cardOf(node) {
+        return node ? node.closest('.ocd-tb-card') : null;
+    }
+
+    function regionOf(node) {
+        return node ? node.closest('.ocd-tb-region') : null;
+    }
+
+    function templateIdOf(card) {
+        return card ? card.getAttribute('data-template-id') || '' : '';
+    }
+
+    function cardNameOf(card) {
+        var name = card ? card.querySelector('.ocd-tb-card-name') : null;
+        return name ? name.textContent.trim() : '';
+    }
+
+    function regionLabelOf(kind) {
+        if (kind === 'header') {
+            return 'Encabezado';
         }
-        return null;
+        if (kind === 'footer') {
+            return 'Pie de página';
+        }
+        return 'Cuerpo';
+    }
+
+    function openRegion(region, isOpen) {
+        if (!region) {
+            return;
+        }
+        var panel = region.querySelector('.ocd-tb-region-panel');
+        var chevron = region.querySelector('.ocd-tb-chevron');
+        region.classList.toggle('is-open', isOpen);
+        if (panel) {
+            panel.hidden = !isOpen;
+        }
+        if (chevron) {
+            chevron.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        }
+    }
+
+    function openKindsOf(card) {
+        var kinds = [];
+        if (!card) {
+            return kinds;
+        }
+        card.querySelectorAll('.ocd-tb-region.is-open').forEach(function (region) {
+            var kind = region.getAttribute('data-region-kind');
+            if (kind) {
+                kinds.push(kind);
+            }
+        });
+        return kinds;
+    }
+
+    function replaceCard(cardHtml, oldCard) {
+        if (!cardHtml || !oldCard || !oldCard.parentNode) {
+            return null;
+        }
+        var openKinds = openKindsOf(oldCard);
+        var holder = document.createElement('div');
+        holder.innerHTML = cardHtml;
+        var fresh = holder.firstElementChild;
+        if (!fresh) {
+            return null;
+        }
+        oldCard.parentNode.replaceChild(fresh, oldCard);
+        openKinds.forEach(function (kind) {
+            openRegion(fresh.querySelector('.ocd-tb-region[data-region-kind="' + kind + '"]'), true);
+        });
+        return fresh;
+    }
+
+    function closeMenus(scope) {
+        var root = scope || document;
+        root.querySelectorAll('.ocd-tb-menu.is-open').forEach(function (menu) {
+            menu.classList.remove('is-open');
+            var panel = menu.querySelector('.ocd-tb-menu-panel');
+            if (panel) {
+                panel.hidden = true;
+            }
+        });
     }
 
     function parseRuleValue(value) {
@@ -129,6 +207,9 @@
     }
 
     function refreshScopeForm(form) {
+        if (!form) {
+            return;
+        }
         var scope = form.querySelector('.ocd-tb-scope');
         var targets = form.querySelector('.ocd-tb-targets');
         if (!scope || !targets) {
@@ -139,32 +220,231 @@
         targets.classList.toggle('is-disabled', !isLocal);
     }
 
-    document.querySelectorAll('.ocd-tb-scope-form').forEach(function (form) {
-        var scope = form.querySelector('.ocd-tb-scope');
-        var targets = form.querySelector('.ocd-tb-targets');
-        var excludes = form.querySelector('.ocd-tb-excludes');
-        var summary = form.querySelector('.ocd-tb-scope-summary');
-
-        if (scope) {
-            scope.addEventListener('change', function () {
-                refreshScopeForm(form);
-            });
+    document.addEventListener('click', function (event) {
+        var target = event.target;
+        if (!target || !target.closest) {
+            return;
         }
-        refreshScopeForm(form);
 
-        form.addEventListener('submit', function (event) {
+        var newButton = target.closest('#ocd-tb-new-template');
+        if (newButton) {
             event.preventDefault();
-            var region = closestRegion(form);
-            var documentId = region ? region.getAttribute('data-document-id') : '';
-            var kind = region ? region.getAttribute('data-region-kind') : '';
-            var scopeValue = scope ? scope.value : '';
-            var targetRules = targets ? rulesFromSelect(targets) : [];
-            var excludeRules = excludes ? rulesFromSelect(excludes) : [];
+            var title = (window.prompt('Nombre de la plantilla nueva:', '') || '').trim();
+            if (title === '') {
+                return;
+            }
+            newButton.disabled = true;
+            request(config.createTemplateAction, { title: title })
+                .then(function (data) {
+                    var grid = document.getElementById('ocd-tb-grid');
+                    if (grid && data.cardHtml) {
+                        var holder = document.createElement('div');
+                        holder.innerHTML = data.cardHtml;
+                        if (holder.firstElementChild) {
+                            grid.appendChild(holder.firstElementChild);
+                            holder.firstElementChild.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                        }
+                    }
+                })
+                .catch(function (error) {
+                    window.alert('No se pudo crear la plantilla: ' + error.message);
+                })
+                .then(function () {
+                    newButton.disabled = false;
+                });
+            return;
+        }
 
-            if (!documentId || !kind) {
+        var chevron = target.closest('.ocd-tb-chevron');
+        if (chevron) {
+            event.preventDefault();
+            var chevronRegion = regionOf(chevron);
+            openRegion(chevronRegion, !chevronRegion.classList.contains('is-open'));
+            return;
+        }
+
+        var fork = target.closest('.ocd-tb-fork');
+        if (fork) {
+            event.preventDefault();
+            var forkRegion = regionOf(fork);
+            var forkCard = cardOf(fork);
+            if (!forkRegion || !forkCard) {
+                return;
+            }
+            var kind = forkRegion.getAttribute('data-region-kind') || '';
+            var select = forkRegion.querySelector('[data-region-select]');
+            var sourceId = select ? select.value || '' : '';
+            var templateName = cardNameOf(forkCard);
+            var suggestion = regionLabelOf(kind) + (templateName !== '' ? ' — ' + templateName : '');
+            var origin = sourceId === '' ? 'una región vacía' : 'la región seleccionada';
+            var name = (window.prompt('Nombre de la región nueva (a partir de ' + origin + '):', suggestion) || '').trim();
+            if (name === '') {
+                return;
+            }
+            fork.disabled = true;
+            request(config.createRegionAction, {
+                template_id: templateIdOf(forkCard),
+                region_kind: kind,
+                title: name,
+                source_document_id: sourceId
+            })
+                .then(function (data) {
+                    if (data.editUrl) {
+                        window.location.href = data.editUrl;
+                    }
+                })
+                .catch(function (error) {
+                    fork.disabled = false;
+                    window.alert('No se pudo crear la región: ' + error.message);
+                });
+            return;
+        }
+
+        var menuToggle = target.closest('.ocd-tb-menu-toggle');
+        if (menuToggle) {
+            event.preventDefault();
+            var menu = menuToggle.closest('.ocd-tb-menu');
+            if (!menu) {
+                return;
+            }
+            var willOpen = !menu.classList.contains('is-open');
+            closeMenus(document);
+            if (willOpen) {
+                menu.classList.add('is-open');
+                var menuPanel = menu.querySelector('.ocd-tb-menu-panel');
+                if (menuPanel) {
+                    menuPanel.hidden = false;
+                }
+            }
+            return;
+        }
+
+        var menuRename = target.closest('.ocd-tb-menu-rename');
+        if (menuRename) {
+            event.preventDefault();
+            var renameCard = cardOf(menuRename);
+            closeMenus(document);
+            var renameForm = renameCard ? renameCard.querySelector('.ocd-tb-rename') : null;
+            if (renameForm) {
+                renameForm.hidden = false;
+                var renameInput = renameForm.querySelector('input[name="template_title"]');
+                if (renameInput) {
+                    renameInput.focus();
+                }
+            }
+            return;
+        }
+
+        var menuDelete = target.closest('.ocd-tb-menu-delete');
+        if (menuDelete) {
+            event.preventDefault();
+            var delCard = cardOf(menuDelete);
+            closeMenus(document);
+            if (!delCard) {
+                return;
+            }
+            var confirmed = window.confirm(
+                '¿Eliminar la plantilla «' + cardNameOf(delCard) + '»?\n\n' +
+                'Sus regiones NO se borran: quedan disponibles en los selectores del tema.'
+            );
+            if (!confirmed) {
+                return;
+            }
+            request(config.deleteTemplateAction, { template_id: templateIdOf(delCard) })
+                .then(function () {
+                    if (delCard.parentNode) {
+                        delCard.parentNode.removeChild(delCard);
+                    }
+                })
+                .catch(function (error) {
+                    window.alert('No se pudo eliminar: ' + error.message);
+                });
+            return;
+        }
+
+        var renameCancel = target.closest('.ocd-tb-rename-cancel');
+        if (renameCancel) {
+            event.preventDefault();
+            var cancelForm = renameCancel.closest('.ocd-tb-rename');
+            if (cancelForm) {
+                cancelForm.hidden = true;
+            }
+            return;
+        }
+
+        if (!target.closest('.ocd-tb-menu')) {
+            closeMenus(document);
+        }
+    });
+
+    document.addEventListener('change', function (event) {
+        var target = event.target;
+        if (!target || !target.closest) {
+            return;
+        }
+
+        var select = target.closest('[data-region-select]');
+        if (select) {
+            var region = regionOf(select);
+            var card = cardOf(select);
+            if (!region || !card) {
+                return;
+            }
+            var kind = region.getAttribute('data-region-kind') || '';
+            select.disabled = true;
+            setStatus(region, 'Guardando…');
+            request(config.assignRegionAction, {
+                template_id: templateIdOf(card),
+                region_kind: kind,
+                document_id: select.value || ''
+            })
+                .then(function (data) {
+                    var fresh = replaceCard(data.cardHtml, card);
+                    if (!fresh) {
+                        select.disabled = false;
+                        setStatus(region, 'Región actualizada (refrescá para ver la tarjeta).', 'ok');
+                        return;
+                    }
+                    var statusRegion = fresh.querySelector('.ocd-tb-region[data-region-kind="' + kind + '"]');
+                    setStatus(statusRegion, 'Región actualizada.', 'ok');
+                })
+                .catch(function (error) {
+                    select.disabled = false;
+                    select.value = region.getAttribute('data-assigned-document') || '';
+                    setStatus(region, 'No se pudo asignar: ' + error.message, 'error');
+                });
+            return;
+        }
+
+        var scope = target.closest('.ocd-tb-scope');
+        if (scope) {
+            refreshScopeForm(scope.closest('.ocd-tb-scope-form'));
+        }
+    });
+
+    document.addEventListener('submit', function (event) {
+        var form = event.target;
+        if (!form || !form.classList) {
+            return;
+        }
+
+        if (form.classList.contains('ocd-tb-scope-form')) {
+            event.preventDefault();
+            var region = regionOf(form);
+            var documentId = region ? region.getAttribute('data-assigned-document') || '' : '';
+            var kind = region ? region.getAttribute('data-region-kind') || '' : '';
+            var scopeSelect = form.querySelector('.ocd-tb-scope');
+            var targetsSelect = form.querySelector('.ocd-tb-targets');
+            var excludesSelect = form.querySelector('.ocd-tb-excludes');
+            var summary = form.querySelector('.ocd-tb-scope-summary');
+
+            if (!documentId || !kind || !scopeSelect || !targetsSelect) {
                 setStatus(form, 'No se pudo identificar la región.', 'error');
                 return;
             }
+            var scopeValue = scopeSelect.value;
+            var targetRules = rulesFromSelect(targetsSelect);
+            var excludeRules = rulesFromSelect(excludesSelect);
             if (scopeValue === 'local' && targetRules.length === 0) {
                 setStatus(form, 'Una región local necesita al menos un destino.', 'error');
                 return;
@@ -179,105 +459,21 @@
                 region_excludes: JSON.stringify(excludeRules)
             })
                 .then(function () {
-                    if (summary && scope && targets && excludes) {
-                        summary.textContent = scopeSummary(scope.value, targets, excludes);
+                    if (summary && scopeSelect && targetsSelect && excludesSelect) {
+                        summary.textContent = scopeSummary(scopeSelect.value, targetsSelect, excludesSelect);
                     }
                     setStatus(form, 'Alcance guardado.', 'ok');
                 })
                 .catch(function (error) {
                     setStatus(form, 'No se pudo guardar: ' + error.message, 'error');
                 });
-        });
-    });
-
-    document.addEventListener('click', function (event) {
-        var target = event.target;
-        if (!target || !target.closest) {
             return;
         }
 
-        var deleteButton = target.closest('.ocd-tb-delete');
-        if (deleteButton) {
+        if (form.classList.contains('ocd-tb-rename')) {
             event.preventDefault();
-            var region = deleteButton.closest('.ocd-tb-region');
-            var card = deleteButton.closest('.ocd-tb-card');
-            if (!region || !card) {
-                return;
-            }
-            var documentId = region.getAttribute('data-document-id');
-            var nameNode = card.querySelector('.ocd-tb-card-name') || card.querySelector('[name="template_title"]');
-            var cardName = nameNode
-                ? (nameNode.value || nameNode.textContent.trim())
-                : card.getAttribute('data-template-id');
-            var kind = region.getAttribute('data-region-kind');
-            var confirmed = window.confirm(
-                '¿Quitar la región «' + kind + '» de la plantilla «' + cardName + '»? ' +
-                'El documento Canvas no se borra; solo se le quita la asignación de región.'
-            );
-            if (!confirmed) {
-                return;
-            }
-
-            setStatus(region, 'Quitando región…');
-            request(config.deleteRegionAction, { document_id: documentId })
-                .then(function () {
-                    window.location.reload();
-                })
-                .catch(function (error) {
-                    setStatus(region, 'No se pudo quitar: ' + error.message, 'error');
-                });
-            return;
-        }
-
-        var addButton = target.closest('.ocd-tb-add-region');
-        if (addButton) {
-            event.preventDefault();
-            var addRegion = addButton.closest('.ocd-tb-region');
-            var addCard = addButton.closest('.ocd-tb-card');
-            var templateId = addCard ? addCard.getAttribute('data-template-id') : '';
-            var kind = addRegion ? addRegion.getAttribute('data-region-kind') : '';
-            if (!templateId || !kind) {
-                return;
-            }
-            addButton.disabled = true;
-            request(config.addRegionAction, { template_id: templateId, region_kind: kind })
-                .then(function () {
-                    window.location.reload();
-                })
-                .catch(function (error) {
-                    addButton.disabled = false;
-                    window.alert('No se pudo agregar la región: ' + error.message);
-                });
-        }
-    });
-
-    var createForm = document.getElementById('ocd-tb-create');
-    if (createForm) {
-        createForm.addEventListener('submit', function (event) {
-            event.preventDefault();
-            var titleInput = createForm.querySelector('[name="title"]');
-            var title = titleInput ? titleInput.value.trim() : '';
-            if (title === '') {
-                setStatus(createForm, 'Escribí un nombre para la plantilla.', 'error');
-                return;
-            }
-
-            setStatus(createForm, 'Creando plantilla…');
-            request(config.createTemplateAction, { title: title })
-                .then(function () {
-                    window.location.reload();
-                })
-                .catch(function (error) {
-                    setStatus(createForm, 'No se pudo crear: ' + error.message, 'error');
-                });
-        });
-    }
-
-    document.querySelectorAll('.ocd-tb-rename').forEach(function (form) {
-        form.addEventListener('submit', function (event) {
-            event.preventDefault();
-            var templateId = form.getAttribute('data-template-id');
-            var input = form.querySelector('[name="template_title"]');
+            var templateId = form.getAttribute('data-template-id') || '';
+            var input = form.querySelector('input[name="template_title"]');
             var title = input ? input.value.trim() : '';
             if (title === '') {
                 setStatus(form, 'Escribí un nombre para la plantilla.', 'error');
@@ -286,12 +482,48 @@
 
             setStatus(form, 'Guardando nombre…');
             request(config.renameTemplateAction, { template_id: templateId, template_title: title })
-                .then(function () {
-                    window.location.reload();
+                .then(function (data) {
+                    if (data.cardHtml) {
+                        replaceCard(data.cardHtml, cardOf(form));
+                    } else {
+                        form.hidden = true;
+                    }
                 })
                 .catch(function (error) {
                     setStatus(form, 'No se pudo guardar: ' + error.message, 'error');
                 });
-        });
+            return;
+        }
+
+        if (form.classList.contains('ocd-tb-region-name-form')) {
+            event.preventDefault();
+            var nameCard = cardOf(form);
+            var nameRegion = regionOf(form);
+            var nameDocumentId = form.getAttribute('data-document-id') || '';
+            var nameInput = form.querySelector('input[name="region_title"]');
+            var regionTitle = nameInput ? nameInput.value.trim() : '';
+            if (regionTitle === '') {
+                setStatus(form, 'Escribí un nombre para la región.', 'error');
+                return;
+            }
+
+            setStatus(form, 'Guardando nombre…');
+            request(config.renameRegionAction, {
+                document_id: nameDocumentId,
+                template_id: templateIdOf(nameCard),
+                title: regionTitle
+            })
+                .then(function (data) {
+                    if (data.cardHtml) {
+                        replaceCard(data.cardHtml, nameCard);
+                    } else {
+                        setStatus(form, 'Nombre guardado.', 'ok');
+                    }
+                })
+                .catch(function (error) {
+                    setStatus(form, 'No se pudo guardar: ' + error.message, 'error');
+                });
+            return;
+        }
     });
 })(window, document);

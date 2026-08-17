@@ -651,6 +651,50 @@ final class OCD_Canvas_Document_Repository
     }
 
     /**
+     * Elimina una plantilla con nombre: borra su contenedor (y con él el mapa
+     * de asignaciones) y desvincula a las regiones que la tenían como hogar.
+     * Los documentos-región NO se borran: quedan disponibles en los selectores
+     * del tema como catálogo (y como tarjetas sueltas si nadie más las agrupa).
+     * La plantilla global del sitio y las legacy no se eliminan por acá.
+     *
+     * @return true|WP_Error
+     */
+    public function delete_template_group(string $template_id)
+    {
+        $template = $this->get_template($template_id);
+        if ($template === null) {
+            return new WP_Error('ocd_template_not_found', 'La plantilla no existe.');
+        }
+        if (!empty($template['isDefault'])) {
+            return new WP_Error('ocd_template_default', 'La plantilla global del sitio no se puede eliminar.');
+        }
+        if (!empty($template['isLegacy'])) {
+            return new WP_Error('ocd_template_legacy', 'Las plantillas sin agrupar no se eliminan por acá.');
+        }
+
+        $container_post_id = $this->find_post_id($template_id);
+        if ($container_post_id !== null) {
+            wp_delete_post((int) $container_post_id, true);
+        }
+
+        $region_post_ids = get_posts([
+            'post_type' => self::POST_TYPE,
+            'post_status' => 'any',
+            'numberposts' => -1,
+            'fields' => 'ids',
+            'no_found_rows' => true,
+            'meta_key' => self::META_REGION_TEMPLATE_ID,
+            'meta_value' => $template_id,
+        ]);
+        foreach ($region_post_ids as $post_id) {
+            update_post_meta((int) $post_id, self::META_REGION_TEMPLATE_ID, '');
+            update_post_meta((int) $post_id, self::META_REGION_TEMPLATE_TITLE, '');
+        }
+
+        return true;
+    }
+
+    /**
      * Lee el mapa de asignaciones de una plantilla: `{header, body, footer}`
      * → documentId estable ('' = slot libre). Cuando la meta aún no existe
      * (plantillas anteriores a este sistema) reconstruye el mapa desde el
@@ -998,6 +1042,7 @@ final class OCD_Canvas_Document_Repository
         }
 
         $groups = [];
+        $assigned_document_ids = [];
         foreach ($template_sources as $template_id => $source) {
             $is_default = $template_id === self::DEFAULT_TEMPLATE_ID;
             $title = $source !== null
@@ -1015,12 +1060,18 @@ final class OCD_Canvas_Document_Repository
                     continue;
                 }
                 $this->assign_region($groups[$template_id], $kind, $document);
+                $assigned_document_ids[$document_id] = true;
             }
         }
 
         // Documentos legacy (región sin plantilla) como tarjetas sueltas de
-        // una sola región, para no perder nada guardado.
+        // una sola región, para no perder nada guardado. Los que siguen
+        // referenciados por algún mapa de asignaciones no duplican tarjeta.
         foreach ($documents_by_id as $document) {
+            $document_key = (string) ($document['documentId'] ?? '');
+            if (isset($assigned_document_ids[$document_key])) {
+                continue;
+            }
             $template_id = (string) ($document['regionTemplateId'] ?? '');
             $kind = (string) ($document['regionKind'] ?? '');
             if ($template_id !== '' || $kind === '') {
