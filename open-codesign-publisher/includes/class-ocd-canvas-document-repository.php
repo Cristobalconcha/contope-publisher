@@ -96,6 +96,16 @@ final class OCD_Canvas_Document_Repository
     public const META_REGION_TEMPLATE_TITLE = '_ocd_region_template_title';
 
     /**
+     * Template→region assignment map (shared references, many-to-many), stored
+     * as JSON `{header, body, footer}` on the template's container post. Each
+     * value is a stable document ID or '' (free slot). This map is the source
+     * of truth for card slots; the per-document META_REGION_TEMPLATE_ID keeps
+     * marking the template that CREATED the region (its "home") and doubles as
+     * the compatibility grouping when this meta does not exist yet.
+     */
+    public const META_REGION_ASSIGNMENTS = '_ocd_region_assignments';
+
+    /**
      * Template ID for the always-visible "site default" card (global scope).
      */
     public const DEFAULT_TEMPLATE_ID = 'ocd-site-default';
@@ -170,6 +180,7 @@ final class OCD_Canvas_Document_Repository
             self::META_REGION_EXCLUDES,
             self::META_REGION_TEMPLATE_ID,
             self::META_REGION_TEMPLATE_TITLE,
+            self::META_REGION_ASSIGNMENTS,
         ] as $key) {
             register_post_meta(self::POST_TYPE, $key, [
                 'type' => 'string',
@@ -468,7 +479,43 @@ final class OCD_Canvas_Document_Repository
         update_post_meta($post_id, self::META_REGION_TEMPLATE_ID, '');
         update_post_meta($post_id, self::META_REGION_TEMPLATE_TITLE, '');
 
+        $this->remove_document_from_assignments($document_id);
+
         return $this->read($post_id, $document_id);
+    }
+
+    /**
+     * Quita un documentId de todos los mapas de asignaciones que lo
+     * referencian (los slots quedan libres; el documento no se borra).
+     */
+    private function remove_document_from_assignments(string $document_id): void
+    {
+        $post_ids = get_posts([
+            'post_type' => self::POST_TYPE,
+            'post_status' => 'any',
+            'numberposts' => -1,
+            'fields' => 'ids',
+            'no_found_rows' => true,
+            'meta_key' => self::META_REGION_ASSIGNMENTS,
+            'meta_compare' => 'EXISTS',
+        ]);
+        foreach ($post_ids as $post_id) {
+            $raw = (string) get_post_meta((int) $post_id, self::META_REGION_ASSIGNMENTS, true);
+            $decoded = json_decode($raw === '' ? '[]' : $raw, true);
+            if (!is_array($decoded)) {
+                continue;
+            }
+            $changed = false;
+            foreach ($decoded as $kind => $assigned_id) {
+                if ($assigned_id === $document_id) {
+                    $decoded[$kind] = '';
+                    $changed = true;
+                }
+            }
+            if ($changed) {
+                update_post_meta((int) $post_id, self::META_REGION_ASSIGNMENTS, wp_json_encode($decoded));
+            }
+        }
     }
 
     /**
@@ -485,6 +532,10 @@ final class OCD_Canvas_Document_Repository
         if ($title === '') {
             return new WP_Error('ocd_template_title_required', 'El nombre de la plantilla es obligatorio.');
         }
+
+        // Una plantilla nueva arranca heredando los slots de la plantilla
+        // global del sitio (el selector muestra sus regiones por defecto).
+        $default_assignments = $this->get_template_assignments(self::DEFAULT_TEMPLATE_ID);
 
         $template_id = self::TEMPLATE_ID_PREFIX . wp_generate_uuid4();
         $post_id = wp_insert_post([
@@ -505,6 +556,7 @@ final class OCD_Canvas_Document_Repository
                 self::META_REGION_EXCLUDES => '[]',
                 self::META_REGION_TEMPLATE_ID => $template_id,
                 self::META_REGION_TEMPLATE_TITLE => $title,
+                self::META_REGION_ASSIGNMENTS => wp_json_encode($default_assignments),
             ],
         ], true);
 
@@ -518,7 +570,8 @@ final class OCD_Canvas_Document_Repository
     /**
      * Creates a new region document inside an existing template group.
      * Scope defaults to global (the common case for a new template region);
-     * the user can narrow it per-row from the Plantillas screen.
+     * the user can narrow it per-row from the Plantillas screen. Delegates the
+     * actual document creation to duplicate_region().
      *
      * @return array<string, mixed>|WP_Error
      */
@@ -539,29 +592,9 @@ final class OCD_Canvas_Document_Repository
             return new WP_Error('ocd_region_already_assigned', 'La plantilla ya tiene una región de ese tipo.');
         }
 
-        $document_id = self::REGION_DOCUMENT_ID_PREFIX . wp_generate_uuid4();
-        $post_id = $this->ensure_post_id($document_id);
-        if (is_wp_error($post_id)) {
-            return $post_id;
-        }
-
-        $updated = wp_update_post([
-            'ID' => (int) $post_id,
-            'post_title' => (string) $template['title'],
-        ], true);
-        if (is_wp_error($updated)) {
-            return $updated;
-        }
-
-        $saved = $this->save_region($document_id, $kind, self::REGION_SCOPE_GLOBAL, [], []);
-        if (is_wp_error($saved)) {
-            return $saved;
-        }
-
-        update_post_meta((int) $post_id, self::META_REGION_TEMPLATE_ID, $template_id);
-        update_post_meta((int) $post_id, self::META_REGION_TEMPLATE_TITLE, (string) $template['title']);
-
-        return $this->read((int) $post_id, $document_id);
+        // Región vacía nueva, hoy sobre la capa de asignaciones; la creación
+        // desde el contenido de otra región usa duplicate_region().
+        return $this->duplicate_region($template_id, $kind, '');
     }
 
     /**
@@ -618,6 +651,285 @@ final class OCD_Canvas_Document_Repository
     }
 
     /**
+     * Lee el mapa de asignaciones de una plantilla: `{header, body, footer}`
+     * → documentId estable ('' = slot libre). Cuando la meta aún no existe
+     * (plantillas anteriores a este sistema) reconstruye el mapa desde el
+     * agrupamiento clásico por META_REGION_TEMPLATE_ID; en empates gana el
+     * documentId menor, igual que la UI anterior.
+     *
+     * @return array<string, string>
+     */
+    public function get_template_assignments(string $template_id): array
+    {
+        $map = [
+            self::REGION_KIND_HEADER => '',
+            self::REGION_KIND_BODY => '',
+            self::REGION_KIND_FOOTER => '',
+        ];
+
+        $container_post_id = $this->find_post_id($template_id);
+        $stored = '';
+        if ($container_post_id !== null) {
+            $stored = (string) get_post_meta($container_post_id, self::META_REGION_ASSIGNMENTS, true);
+        }
+        if ($stored !== '') {
+            $decoded = json_decode($stored, true);
+            if (is_array($decoded)) {
+                foreach ($decoded as $kind => $document_id) {
+                    if (in_array($kind, self::REGION_KINDS, true) && is_string($document_id)) {
+                        $map[$kind] = $document_id;
+                    }
+                }
+                return $map;
+            }
+            // JSON corrupto: se cae al fallback en vez de devolver todo vacío.
+        }
+
+        // Fallback: agrupamiento clásico por META_REGION_TEMPLATE_ID. Se dejan
+        // pasar TODOS los candidatos del kind para que el desempate por
+        // documentId menor sea real (mismo criterio que la UI anterior).
+        $post_ids = get_posts([
+            'post_type' => self::POST_TYPE,
+            'post_status' => 'any',
+            'numberposts' => -1,
+            'fields' => 'ids',
+            'no_found_rows' => true,
+            'orderby' => 'ID',
+            'order' => 'ASC',
+            'meta_key' => self::META_REGION_TEMPLATE_ID,
+            'meta_value' => $template_id,
+        ]);
+        foreach ($post_ids as $post_id) {
+            $kind = (string) get_post_meta((int) $post_id, self::META_REGION_KIND, true);
+            if ($kind === '' || !isset($map[$kind])) {
+                continue;
+            }
+            $document_id = (string) get_post_meta((int) $post_id, self::META_DOCUMENT_ID, true);
+            if ($document_id === '') {
+                continue;
+            }
+            if ($map[$kind] === '' || strcmp($document_id, $map[$kind]) < 0) {
+                $map[$kind] = $document_id;
+            }
+        }
+        return $map;
+    }
+
+    /**
+     * Asigna (o libera con '') el slot de un kind dentro de una plantilla. La
+     * región queda amarrada POR REFERENCIA: si otras plantillas la tienen
+     * seleccionada, todas ven los mismos cambios (semántica de compartir, no
+     * de copiar — para bifurcar existe duplicate_region()).
+     *
+     * @return array<string, string>|WP_Error El mapa de asignaciones actualizado.
+     */
+    public function assign_region_to_template(string $template_id, string $kind, string $document_id)
+    {
+        if (!in_array($kind, self::REGION_KINDS, true)) {
+            return new WP_Error('ocd_region_kind_invalid', 'regionKind desconocido.');
+        }
+
+        $template = $this->get_template($template_id);
+        if ($template === null) {
+            return new WP_Error('ocd_template_not_found', 'La plantilla no existe.');
+        }
+        if (!empty($template['isLegacy'])) {
+            return new WP_Error('ocd_template_not_grouped', 'Las plantillas sin agrupar no aceptan asignaciones.');
+        }
+
+        if ($document_id !== '') {
+            $post_id = $this->find_post_id($document_id);
+            if ($post_id === null) {
+                return new WP_Error('ocd_region_document_not_found', 'No existe un documento Canvas con ese ID.');
+            }
+            $existing_kind = (string) get_post_meta($post_id, self::META_REGION_KIND, true);
+            if ($existing_kind !== $kind) {
+                return new WP_Error('ocd_region_kind_mismatch', 'El documento no es una región de ese tipo.');
+            }
+        }
+
+        $container_post_id = $this->ensure_template_container($template_id);
+        if (is_wp_error($container_post_id)) {
+            return $container_post_id;
+        }
+
+        $map = $this->get_template_assignments($template_id);
+        $map[$kind] = $document_id;
+        update_post_meta($container_post_id, self::META_REGION_ASSIGNMENTS, wp_json_encode($map));
+
+        return $map;
+    }
+
+    /**
+     * Bifurca una región existente (o crea una vacía si el source es '') como
+     * documento NUEVO asignado a la plantilla indicada. Copia
+     * projectData/html/css del donante SIN amarrarlo: los cambios posteriores
+     * en la copia no afectan al original, y viceversa. La copia nace SIN
+     * alcance (no hereda scope/targets/excludes del donante) y no copia
+     * snapshots (el historial de sesión pertenece al documento fuente).
+     *
+     * @return array<string, mixed>|WP_Error El documento región creado.
+     */
+    public function duplicate_region(string $template_id, string $kind, string $title, string $source_document_id = '')
+    {
+        if (!in_array($kind, self::REGION_KINDS, true)) {
+            return new WP_Error('ocd_region_kind_invalid', 'regionKind desconocido.');
+        }
+
+        $template = $this->get_template($template_id);
+        if ($template === null) {
+            return new WP_Error('ocd_template_not_found', 'La plantilla no existe.');
+        }
+        if (!empty($template['isLegacy'])) {
+            return new WP_Error('ocd_template_not_grouped', 'Las plantillas sin agrupar no aceptan regiones nuevas.');
+        }
+
+        // Materializa (o valida) el contenedor ANTES de crear nada: si la
+        // plantilla es una huérfana sin contenedor, falla acá y no queda un
+        // doc-región global fantasma que el resolver pueda renderizar.
+        $container_post_id = $this->ensure_template_container($template_id);
+        if (is_wp_error($container_post_id)) {
+            return $container_post_id;
+        }
+
+        $title = trim($title);
+        if ($title === '') {
+            $title = trim((string) $template['title']) . ' — ' . $kind;
+        }
+
+        $project_data = '{}';
+        $html = '';
+        $css = '';
+        if ($source_document_id !== '') {
+            $source_post_id = $this->find_post_id($source_document_id);
+            if ($source_post_id === null) {
+                return new WP_Error('ocd_region_document_not_found', 'No existe un documento Canvas con ese ID.');
+            }
+            $source = $this->read($source_post_id, $source_document_id);
+            if ((string) ($source['regionKind'] ?? '') !== $kind) {
+                return new WP_Error('ocd_region_kind_mismatch', 'La región de origen no es del mismo tipo.');
+            }
+            // Ya salió sanitizado del repositorio al guardarse.
+            $project_data = (string) $source['projectData'];
+            $html = (string) $source['html'];
+            $css = (string) $source['css'];
+        }
+
+        $document_id = self::REGION_DOCUMENT_ID_PREFIX . wp_generate_uuid4();
+        $post_id = $this->ensure_post_id($document_id);
+        if (is_wp_error($post_id)) {
+            return $post_id;
+        }
+
+        $updated = wp_update_post([
+            'ID' => (int) $post_id,
+            'post_title' => $title,
+        ], true);
+        if (is_wp_error($updated)) {
+            return $updated;
+        }
+
+        $saved = $this->save($document_id, $project_data, $html, $css);
+        if (is_wp_error($saved)) {
+            return $saved;
+        }
+
+        $region = $this->save_region($document_id, $kind, '', [], []);
+        if (is_wp_error($region)) {
+            return $region;
+        }
+
+        // Hogar del documento (qué plantilla lo creó); la presencia en
+        // tarjetas la da la asignación, no esta meta.
+        update_post_meta((int) $post_id, self::META_REGION_TEMPLATE_ID, $template_id);
+        update_post_meta((int) $post_id, self::META_REGION_TEMPLATE_TITLE, (string) $template['title']);
+
+        $assigned = $this->assign_region_to_template($template_id, $kind, $document_id);
+        if (is_wp_error($assigned)) {
+            return $assigned;
+        }
+
+        return $this->read((int) $post_id, $document_id);
+    }
+
+    /**
+     * Renombra una región (su nombre propio, visible en los selectores del
+     * tema). No toca la plantilla a la que pertenece.
+     *
+     * @return array<string, mixed>|WP_Error
+     */
+    public function rename_region(string $document_id, string $title)
+    {
+        $title = trim($title);
+        if ($title === '') {
+            return new WP_Error('ocd_region_title_required', 'El nombre de la región es obligatorio.');
+        }
+
+        $post_id = $this->find_post_id($document_id);
+        if ($post_id === null) {
+            return new WP_Error('ocd_region_document_not_found', 'No existe un documento Canvas con ese ID.');
+        }
+        $kind = (string) get_post_meta($post_id, self::META_REGION_KIND, true);
+        if ($kind === '') {
+            return new WP_Error('ocd_not_a_region', 'El documento no es una región de plantilla.');
+        }
+
+        $updated = wp_update_post([
+            'ID' => (int) $post_id,
+            'post_title' => $title,
+        ], true);
+        if (is_wp_error($updated)) {
+            return $updated;
+        }
+
+        return $this->read((int) $post_id, $document_id);
+    }
+
+    /**
+     * Garantiza el post contenedor de una plantilla (necesario para persistir
+     * asignaciones). Las plantillas con nombre ya lo tienen desde
+     * create_template_group(); la plantilla global del sitio se materializa
+     * acá la primera vez que se le asigna algo.
+     *
+     * @return int|WP_Error
+     */
+    private function ensure_template_container(string $template_id)
+    {
+        $existing = $this->find_post_id($template_id);
+        if ($existing !== null) {
+            return $existing;
+        }
+
+        if ($template_id !== self::DEFAULT_TEMPLATE_ID) {
+            return new WP_Error('ocd_template_not_found', 'La plantilla no existe.');
+        }
+
+        $title = 'Plantilla global del sitio';
+        $post_id = wp_insert_post([
+            'post_type' => self::POST_TYPE,
+            'post_status' => 'draft',
+            'post_title' => $title,
+            'post_content' => '',
+            'meta_input' => [
+                self::META_DOCUMENT_ID => $template_id,
+                self::META_PROJECT_DATA => '{}',
+                self::META_HTML => '',
+                self::META_CSS => '',
+                self::META_REVISION => 0,
+                self::META_UPDATED_AT => '',
+                self::META_REGION_KIND => '',
+                self::META_REGION_SCOPE => '',
+                self::META_REGION_TARGETS => '[]',
+                self::META_REGION_EXCLUDES => '[]',
+                self::META_REGION_TEMPLATE_ID => $template_id,
+                self::META_REGION_TEMPLATE_TITLE => $title,
+            ],
+        ], true);
+
+        return is_wp_error($post_id) ? $post_id : (int) $post_id;
+    }
+
+    /**
      * @return array<string, mixed>|null
      */
     public function get_template(string $template_id): ?array
@@ -633,10 +945,13 @@ final class OCD_Canvas_Document_Repository
     /**
      * Groups every region document into template cards.
      *
-     * The first card is always the special "site default" template (global
-     * scope). Named groups come next. Legacy region documents created before
-     * template IDs existed are surfaced as one-region "unnamed" cards so no
-     * saved data disappears, without migrating their meta in the database.
+     * Card membership comes from the template's assignment map
+     * (META_REGION_ASSIGNMENTS on the container post); when that meta does not
+     * exist yet, it is rebuilt from the classic per-document
+     * META_REGION_TEMPLATE_ID grouping so pre-existing sites render unchanged
+     * without any data migration. Legacy region documents created before
+     * template IDs existed still surface as one-region "unnamed" cards so no
+     * saved data disappears.
      *
      * @return array<int, array<string, mixed>>
      */
@@ -652,71 +967,75 @@ final class OCD_Canvas_Document_Repository
             'no_found_rows' => true,
         ]);
 
-        $region_documents = [];
-        $group_containers = [];
+        $documents_by_id = [];
+        $containers = [];
         foreach ($posts as $post_id) {
             $document_id = (string) get_post_meta((int) $post_id, self::META_DOCUMENT_ID, true);
             if ($document_id === '') {
                 continue;
             }
             $document = $this->read((int) $post_id, $document_id);
+            $documents_by_id[$document_id] = $document;
             $kind = (string) ($document['regionKind'] ?? '');
             $template_id = (string) ($document['regionTemplateId'] ?? '');
-            if ($kind !== '') {
-                $region_documents[] = $document;
-            } elseif ($template_id !== '') {
-                if (!isset($group_containers[$template_id])) {
-                    $group_containers[$template_id] = $document;
-                }
+            if ($kind === '' && $template_id !== '' && !isset($containers[$template_id])) {
+                $containers[$template_id] = $document;
             }
+        }
+
+        // Template IDs conocidos: contenedores reales, plantillas huérfanas
+        // (regiones cuyo contenedor no existe) y siempre la plantilla global.
+        $template_sources = $containers;
+        foreach ($documents_by_id as $document) {
+            $kind = (string) ($document['regionKind'] ?? '');
+            $template_id = (string) ($document['regionTemplateId'] ?? '');
+            if ($kind !== '' && $template_id !== '' && !isset($template_sources[$template_id])) {
+                $template_sources[$template_id] = $document;
+            }
+        }
+        if (!isset($template_sources[self::DEFAULT_TEMPLATE_ID])) {
+            $template_sources[self::DEFAULT_TEMPLATE_ID] = null;
         }
 
         $groups = [];
-        foreach ($group_containers as $template_id => $container) {
-            $groups[$template_id] = $this->empty_template_group(
-                $template_id,
-                $this->template_display_title($container, $template_id),
-                $template_id === self::DEFAULT_TEMPLATE_ID,
-                false
-            );
+        foreach ($template_sources as $template_id => $source) {
+            $is_default = $template_id === self::DEFAULT_TEMPLATE_ID;
+            $title = $source !== null
+                ? $this->template_display_title($source, (string) $template_id)
+                : 'Plantilla global del sitio';
+            $groups[$template_id] = $this->empty_template_group((string) $template_id, $title, $is_default, false);
+
+            $assignments = $this->get_template_assignments((string) $template_id);
+            foreach ($assignments as $kind => $document_id) {
+                if ($document_id === '' || !isset($documents_by_id[$document_id])) {
+                    continue;
+                }
+                $document = $documents_by_id[$document_id];
+                if ((string) ($document['regionKind'] ?? '') !== $kind) {
+                    continue;
+                }
+                $this->assign_region($groups[$template_id], $kind, $document);
+            }
         }
 
-        foreach ($region_documents as $document) {
-            $kind = (string) ($document['regionKind'] ?? '');
+        // Documentos legacy (región sin plantilla) como tarjetas sueltas de
+        // una sola región, para no perder nada guardado.
+        foreach ($documents_by_id as $document) {
             $template_id = (string) ($document['regionTemplateId'] ?? '');
-
-            if ($template_id === '') {
-                $legacy_id = 'legacy:' . (string) ($document['documentId'] ?? '');
-                if (!isset($groups[$legacy_id])) {
-                    $groups[$legacy_id] = $this->empty_template_group(
-                        $legacy_id,
-                        $this->legacy_template_title($document),
-                        false,
-                        true
-                    );
-                }
-                $this->assign_region($groups[$legacy_id], $kind, $document);
+            $kind = (string) ($document['regionKind'] ?? '');
+            if ($template_id !== '' || $kind === '') {
                 continue;
             }
-
-            if (!isset($groups[$template_id])) {
-                $groups[$template_id] = $this->empty_template_group(
-                    $template_id,
-                    $this->template_display_title($document, $template_id),
-                    $template_id === self::DEFAULT_TEMPLATE_ID,
-                    false
+            $legacy_id = 'legacy:' . (string) ($document['documentId'] ?? '');
+            if (!isset($groups[$legacy_id])) {
+                $groups[$legacy_id] = $this->empty_template_group(
+                    $legacy_id,
+                    $this->legacy_template_title($document),
+                    false,
+                    true
                 );
             }
-            $this->assign_region($groups[$template_id], $kind, $document);
-        }
-
-        if (!isset($groups[self::DEFAULT_TEMPLATE_ID])) {
-            $groups[self::DEFAULT_TEMPLATE_ID] = $this->empty_template_group(
-                self::DEFAULT_TEMPLATE_ID,
-                'Plantilla por defecto del sitio',
-                true,
-                false
-            );
+            $this->assign_region($groups[$legacy_id], $kind, $document);
         }
 
         $groups = array_values($groups);
