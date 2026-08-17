@@ -149,6 +149,22 @@ final class OCD_Inline_Editor_Frontend
             $regions['footer'] = $footer;
         }
 
+        // El cuerpo de la página se edita sobre el DOCUMENTO-REGIÓN `body`
+        // cuando una región de ese tipo resuelve para esta página CON HTML no
+        // vacío. Misma guarda que el render público: una región body vacía no
+        // debe presentar una página en blanco, así que se cae al documento
+        // propio de la página (que es el `$body` cargado arriba).
+        $body_region = $this->region_resolver->resolve(
+            OCD_Canvas_Document_Repository::REGION_KIND_BODY,
+            $page_id
+        );
+        $body_is_region = false;
+        if (is_array($body_region) && trim((string) ($body_region['html'] ?? '')) !== '') {
+            $body_region['reach'] = $this->describe_region_reach($body_region);
+            $body = $body_region;
+            $body_is_region = true;
+        }
+
         $this->enqueue_assets();
 
         $templates_url = admin_url('admin.php?page=' . OCD_Theme_Builder_Admin::PAGE_SLUG);
@@ -162,6 +178,7 @@ final class OCD_Inline_Editor_Frontend
             'pageId' => $page_id,
             'pageTitle' => get_the_title($page_id),
             'pageUrl' => get_permalink($page_id),
+            'bodyIsRegion' => $body_is_region,
             'bodyDocument' => $body,
             'regions' => $regions,
             'templatesUrl' => $templates_url,

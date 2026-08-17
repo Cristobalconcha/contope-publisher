@@ -218,6 +218,13 @@ final class OCD_Canvas_Page_Publisher
         $footer_html = '';
         $header_css = '';
         $footer_css = '';
+        // El cuerpo por defecto es el documento propio de la página. Una región
+        // `body` que resuelve Y tiene HTML no vacío lo reemplaza (estilo Divi:
+        // cuerpo dinámico ACF/tokens); si resuelve vacía, se conserva el
+        // documento propio para no publicar nunca una página en blanco.
+        $body_html = (string) $document['html'];
+        $body_css = (string) $document['css'];
+        $body_document_id = $document_id;
         if ($this->region_resolver !== null) {
             if ($post_id > 0) {
                 $header = $this->region_resolver->resolve(
@@ -236,6 +243,15 @@ final class OCD_Canvas_Page_Publisher
                     $footer_html = (string) $footer['html'];
                     $footer_css = (string) $footer['css'];
                 }
+                $body = $this->region_resolver->resolve(
+                    OCD_Canvas_Document_Repository::REGION_KIND_BODY,
+                    $post_id
+                );
+                if ($body !== null && trim((string) $body['html']) !== '') {
+                    $body_html = (string) $body['html'];
+                    $body_css = (string) $body['css'];
+                    $body_document_id = (string) $body['documentId'];
+                }
             }
         }
 
@@ -243,7 +259,7 @@ final class OCD_Canvas_Page_Publisher
         $theme_css = OCD_Theme_Definitions::css();
         wp_register_style('ocd-canvas-public', false, [], OCD_PUBLISHER_VERSION);
         wp_enqueue_style('ocd-canvas-public');
-        wp_add_inline_style('ocd-canvas-public', $theme_css . $site_font_css . $header_css . (string) $document['css'] . $footer_css);
+        wp_add_inline_style('ocd-canvas-public', $theme_css . $site_font_css . $header_css . $body_css . $footer_css);
         wp_enqueue_script(
             'ocd-canvas-public',
             plugins_url('assets/js/ocd-canvas-public.js', OCD_PUBLISHER_FILE),
@@ -256,8 +272,8 @@ final class OCD_Canvas_Page_Publisher
         if ($header_html !== '') {
             $markup .= '<header class="ocd-canvas-region ocd-canvas-region-header">' . $header_html . '</header>';
         }
-        $markup .= '<div class="ocd-canvas-published" data-ocd-document-id="' . esc_attr($document_id) . '">' .
-            (string) $document['html'] . '</div>';
+        $markup .= '<div class="ocd-canvas-published" data-ocd-document-id="' . esc_attr($body_document_id) . '">' .
+            $body_html . '</div>';
         if ($footer_html !== '') {
             $markup .= '<footer class="ocd-canvas-region ocd-canvas-region-footer">' . $footer_html . '</footer>';
         }

@@ -647,6 +647,17 @@
         return reach && String(reach).trim() !== '' ? reach : 'esta página y otras según sus reglas';
     }
 
+    /**
+     * ¿El cuerpo que se está editando es una región de tema `body` (no el
+     * documento propio de la página)? Cuando lo es, guardar afecta a todas las
+     * páginas de su alcance, igual que header/footer.
+     */
+    function bodyIsRegion() {
+        // La decisión real la toma el servidor (región body resuelta con html
+        // no vacío) y viaja explícita en la config.
+        return config.bodyIsRegion === true;
+    }
+
     function updateDirtyUi() {
         if (!hasActiveRegion()) {
             // Todavía no hay región activa (badge en "—"): nada que marcar.
@@ -766,7 +777,9 @@
 
         if (regionNode) {
             if (kind === 'body') {
-                regionNode.textContent = 'Cuerpo \u2014 esta página';
+                regionNode.textContent = bodyIsRegion()
+                    ? 'Cuerpo \u2014 ítem del tema · se aplica a: ' + reachFor('body')
+                    : 'Cuerpo \u2014 esta página';
             } else if (kind === 'header') {
                 regionNode.textContent = 'Encabezado \u2014 ítem del tema · se aplica a: ' + reachFor('header');
             } else if (kind === 'footer') {
@@ -778,7 +791,7 @@
         }
 
         if (templatesLink) {
-            templatesLink.hidden = kind === 'body';
+            templatesLink.hidden = kind === 'body' && !bodyIsRegion();
         }
 
         if (isDynamicComponent(selected)) {
@@ -873,7 +886,7 @@
             return;
         }
 
-        if (kind === 'header' || kind === 'footer') {
+        if (kind === 'header' || kind === 'footer' || (kind === 'body' && bodyIsRegion())) {
             var reach = doc.reach || 'esta página y otras según sus reglas';
             if (!window.confirm(
                 'Vas a guardar el ' + regionLabel(kind) +
@@ -924,7 +937,7 @@
 
                 setStatus(
                     'Guardado (revisión ' + savedDoc.revision + ') \u2014 se aplica a: ' +
-                    (kind === 'body' ? 'esta página' : reachFor(kind)),
+                    (kind === 'body' && !bodyIsRegion() ? 'esta página' : reachFor(kind)),
                     'ok'
                 );
             })

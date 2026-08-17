@@ -191,6 +191,7 @@
 
     function regionLabel(kind) {
         if (kind === 'header') return 'Encabezado';
+        if (kind === 'body') return 'Cuerpo';
         if (kind === 'footer') return 'Pie de página';
         return kind;
     }

@@ -567,6 +567,7 @@ final class OCD_Canvas_Editor_Admin
                             <select id="ocd-region-kind">
                                 <option value="">(ninguno — documento normal)</option>
                                 <option value="header">Encabezado</option>
+                                <option value="body">Cuerpo</option>
                                 <option value="footer">Pie de página</option>
                             </select>
                         </td>
