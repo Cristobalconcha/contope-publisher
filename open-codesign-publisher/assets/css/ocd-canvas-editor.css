@@ -352,6 +352,34 @@
     content: "Dinámico: permalink";
 }
 
+/* ---------------------------------------------------------------------------
+ * Formulario Orugantt (OF-BRIDGE) — estilos de edición exclusivos del canvas.
+ * Se copian al iframe de GrapesJS igual que los tokens dinámicos; el markup
+ * publicado conserva la clase `ocd-orugantt-form` sin estilos especiales
+ * (el runtime de Orugantt Forms lo reemplaza visualmente al hidratar).
+ * --------------------------------------------------------------------------- */
+.ocd-orugantt-form {
+    position: relative;
+    display: block;
+    width: 100%;
+    background: #f6f8fa;
+    border: 1px solid #c3d0dc;
+    border-radius: 6px;
+}
+
+.ocd-orugantt-form iframe {
+    display: block;
+    width: 100%;
+    height: 620px; /* la vista la sobrescribe con el trait "height" */
+    border: 0;
+    border-radius: 5px;
+}
+
+.ocd-orugantt-form.is-ocd-selected {
+    outline: 2px dashed #2271b1;
+    outline-offset: 2px;
+}
+
 /*
  * Barra de texto enriquecido nativa de GrapesJS, extendida con acciones OCD.
  * La barra por defecto es una fila; con veinticinco acciones conviene que

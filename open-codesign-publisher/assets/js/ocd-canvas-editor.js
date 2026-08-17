@@ -33,6 +33,8 @@
             nonce: config.nonce,
             siteFontCss: config.siteFontCss || '',
             themeDefinitionsCss: config.themeDefinitionsCss || '',
+            siteUrl: config.siteUrl || '',
+            oruganttForms: config.oruganttForms || [],
             inspectorMount: document.getElementById('ocd-canvas-inspector'),
             gridControlsMount: document.querySelector('#ocd-canvas-inspector .ocd-ci__head'),
             groupControlsMount: document.querySelector('#ocd-canvas-inspector .ocd-ci__head'),

@@ -258,6 +258,11 @@
          *                     de baja especificidad) inyectado ANTES del CSS de fuentes
          *                     y del CSS fuente para que el documento gane en cascada
          *                     (opcional).
+         *   siteUrl           string — base pública del sitio (con barra final) para
+         *                     vistas en iframe del canvas (opcional).
+         *   oruganttForms     array — lista [{slug, title}] de formularios publicados
+         *                     de Orugantt Forms; con lista vacía no se registra el
+         *                     bloque "Formulario Orugantt" (opcional).
          *
          * Devuelve null si faltan dependencias (informando por `status`).
          */
@@ -379,6 +384,178 @@
                     }
                 }
             });
+
+            // ------------------------------------------------------------------
+            // OF-BRIDGE: bloque "Formulario Orugantt" (Orugantt Forms).
+            // Solo se registra si el servidor envió formularios publicados.
+            // El iframe de preview vive ÚNICAMENTE en la vista del canvas: no es
+            // hijo del modelo, así que editor.getHtml() serializa solo el
+            // marcador <div data-orugantt-form="{slug}" class="ocd-orugantt-form">.
+            // ------------------------------------------------------------------
+            var oruganttForms = Array.isArray(options.oruganttForms) ? options.oruganttForms : [];
+            var oruganttSiteUrl = typeof options.siteUrl === 'string' ? options.siteUrl : '';
+            if (oruganttForms.length > 0) {
+                var oruganttFormChoices = oruganttForms
+                    .map(function (form) {
+                        var slug = String(form && form.slug ? form.slug : '');
+                        return {
+                            id: slug,
+                            name: String(form && form.title ? form.title : slug)
+                        };
+                    })
+                    .filter(function (choice) {
+                        return choice.id !== '';
+                    });
+
+                if (oruganttFormChoices.length > 0) {
+                    var oruganttFormFirstSlug = oruganttFormChoices[0].id;
+
+                    function oruganttFormPreviewUrl(slug) {
+                        if (!oruganttSiteUrl || !slug) {
+                            return '';
+                        }
+                        return (
+                            oruganttSiteUrl +
+                            'index.php?ofr_render=' + encodeURIComponent(slug) +
+                            '&ofr_ctx=canvas'
+                        );
+                    }
+
+                    editor.BlockManager.add('ocd-orugantt-form', {
+                        label: 'Formulario Orugantt',
+                        category: 'Open CoDesign — Formularios',
+                        media:
+                            '<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" ' +
+                            'fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' +
+                            '<rect x="4" y="4" width="16" height="16" rx="2"/>' +
+                            '<path d="M8 9h8M8 12h8M8 15h5"/>' +
+                            '</svg>',
+                        content:
+                            '<div data-orugantt-form="' + oruganttFormFirstSlug + '" class="ocd-orugantt-form"></div>'
+                    });
+
+                    editor.Components.addType('ocd-orugantt-form', {
+                        isComponent: function (element) {
+                            return (
+                                !!element &&
+                                element.nodeType === 1 &&
+                                typeof element.hasAttribute === 'function' &&
+                                element.hasAttribute('data-orugantt-form')
+                            );
+                        },
+                        model: {
+                            defaults: {
+                                tagName: 'div',
+                                draggable: true,
+                                droppable: false,
+                                traits: [
+                                    {
+                                        type: 'select',
+                                        name: 'form',
+                                        label: 'Formulario',
+                                        options: oruganttFormChoices,
+                                        default: oruganttFormFirstSlug
+                                    },
+                                    {
+                                        type: 'number',
+                                        name: 'height',
+                                        label: 'Alto del formulario (px)',
+                                        min: 240,
+                                        default: 620
+                                    }
+                                ]
+                            },
+                            init: function () {
+                                this.on('change:form', this.handleOruganttFormTraitChange);
+                            },
+                            handleOruganttFormTraitChange: function (model, value) {
+                                // El trait 'form' vive como atributo del modelo; el
+                                // marcador persistido usa data-orugantt-form.
+                                var slug = String(value || '');
+                                var attributes = model.getAttributes ? model.getAttributes() : {};
+                                if (slug !== '' && attributes['data-orugantt-form'] !== slug) {
+                                    model.addAttributes({ 'data-orugantt-form': slug });
+                                }
+                            }
+                        },
+                        view: {
+                            // El iframe es decoración SOLO del canvas: se inyecta
+                            // como nodo DOM de la vista, nunca como componente hijo.
+                            init: function () {
+                                // En GrapesJS 0.23 el set de attributes dispara
+                                // 'change:attributes' (no hay evento por atributo
+                                // individual), así que se escucha el genérico; el
+                                // render es idempotente (compara src y alto).
+                                this.listenTo(
+                                    this.model,
+                                    'change:attributes',
+                                    this.renderOruganttFormPreview
+                                );
+                                this.listenTo(
+                                    this.model,
+                                    'change:height',
+                                    this.renderOruganttFormPreview
+                                );
+
+                                // Documento cargado desde HTML: sincroniza el trait
+                                // "form" con el slug real del marcador (el default
+                                // del trait es el primer slug de la lista).
+                                var attributes = this.model.getAttributes ? this.model.getAttributes() : {};
+                                var slug = String(attributes['data-orugantt-form'] || '');
+                                if (slug !== '' && this.model.get('form') !== slug) {
+                                    this.model.set('form', slug, { silent: true });
+                                }
+                            },
+                            onRender: function () {
+                                this.renderOruganttFormPreview();
+                            },
+                            onActive: function () {
+                                if (this.el && this.el.classList) {
+                                    this.el.classList.add('is-ocd-selected');
+                                }
+                            },
+                            onInactive: function () {
+                                if (this.el && this.el.classList) {
+                                    this.el.classList.remove('is-ocd-selected');
+                                }
+                            },
+                            renderOruganttFormPreview: function () {
+                                var model = this.model;
+                                var attributes = model.getAttributes ? model.getAttributes() : {};
+                                var slug = String(attributes['data-orugantt-form'] || '');
+                                var height = parseInt(model.get('height'), 10);
+                                // Mismo umbral mínimo que el trait (240): por
+                                // debajo se vuelve al default.
+                                if (!isFinite(height) || height < 240) {
+                                    height = 620;
+                                }
+
+                                var iframe = this.oruganttFormPreviewEl;
+                                if (!iframe || !iframe.parentNode) {
+                                    iframe = document.createElement('iframe');
+                                    this.oruganttFormPreviewEl = iframe;
+                                    this.el.appendChild(iframe);
+                                }
+                                iframe.setAttribute('title', 'Formulario Orugantt');
+                                iframe.style.height = height + 'px';
+
+                                var src = oruganttFormPreviewUrl(slug);
+                                // Sin slug (atributo borrado a mano): se limpia el
+                                // iframe para no dejar una preview obsoleta.
+                                if (src === '') {
+                                    iframe.removeAttribute('src');
+                                    iframe.style.display = 'none';
+                                } else {
+                                    iframe.style.display = '';
+                                    if (iframe.getAttribute('src') !== src) {
+                                        iframe.setAttribute('src', src);
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            }
 
             function isOcdGroup(component) {
                 if (!component) {
@@ -681,9 +858,10 @@
 
             /**
              * Inyecta en el iframe de GrapesJS las reglas de edición de los tokens
-             * dinámicos. Se leen de `ocd-canvas-editor.css` (la hoja administrativa
-             * cargada en la página) y se copian a un `<style>` del canvas; nunca
-             * forman parte del CSS del documento ni del CSS exportado.
+             * dinámicos y del marcador del formulario Orugantt. Se leen de
+             * `ocd-canvas-editor.css` (la hoja administrativa cargada en la página)
+             * y se copian a un `<style>` del canvas; nunca forman parte del CSS del
+             * documento ni del CSS exportado.
              */
             function collectDynamicPlaceholderCss() {
                 var css = '';
@@ -700,7 +878,7 @@
                     }
                     for (var j = 0; j < rules.length; j++) {
                         var text = rules[j].cssText || '';
-                        if (/ocd-dynamic-placeholder|ocd-dynamic-post-title|ocd-dynamic-post-excerpt|ocd-dynamic-featured-image|ocd-dynamic-permalink/.test(text)) {
+                        if (/ocd-dynamic-placeholder|ocd-dynamic-post-title|ocd-dynamic-post-excerpt|ocd-dynamic-featured-image|ocd-dynamic-permalink|ocd-orugantt-form/.test(text)) {
                             css += text + '\n';
                         }
                     }

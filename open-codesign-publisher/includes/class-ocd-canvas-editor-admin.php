@@ -392,6 +392,13 @@ final class OCD_Canvas_Editor_Admin
             'autoLoadPageId' => $this->resolve_auto_load_page_id(),
             'siteFontCss' => OCD_Canvas_Page_Publisher::site_font_css(),
             'themeDefinitionsCss' => OCD_Theme_Definitions::css(),
+            // Base pública del sitio para las vistas en iframe del canvas
+            // (p. ej. la preview del bloque "Formulario Orugantt").
+            'siteUrl' => home_url('/'),
+            // Formularios publicados de Orugantt Forms (OF-BRIDGE). Vacío si
+            // el plugin está inactivo, desactualizado o sin forms publicados;
+            // con lista vacía el JS no registra el bloque.
+            'oruganttForms' => $this->orugantt_forms_config(),
         ];
 
         // JSON_HEX_TAG evita cualquier salida de `<` dentro del script en línea.
@@ -445,6 +452,34 @@ final class OCD_Canvas_Editor_Admin
             ];
         }
         return $choices;
+    }
+
+    /**
+     * Formularios publicados de Orugantt Forms para el bloque del Canvas
+     * (OF-BRIDGE). Defensivo: si el plugin no está activo o su runtime no
+     * expone published_forms() (versión antigua), devuelve lista vacía y el
+     * editor no registra el bloque.
+     *
+     * @return array<int, array{slug: string, title: string}>
+     */
+    private function orugantt_forms_config(): array
+    {
+        if (!class_exists('OFR_Runtime') || !method_exists('OFR_Runtime', 'published_forms')) {
+            return [];
+        }
+        $forms = [];
+        foreach (OFR_Runtime::published_forms() as $form) {
+            $slug = isset($form['slug']) ? sanitize_title((string) $form['slug']) : '';
+            if ($slug === '') {
+                continue;
+            }
+            $title = isset($form['title']) ? trim((string) $form['title']) : '';
+            $forms[] = [
+                'slug' => $slug,
+                'title' => $title !== '' ? sanitize_text_field($title) : $slug,
+            ];
+        }
+        return $forms;
     }
 
     public function render_page(): void
