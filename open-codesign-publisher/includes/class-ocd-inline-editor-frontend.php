@@ -166,6 +166,7 @@ final class OCD_Inline_Editor_Frontend
             'regions' => $regions,
             'templatesUrl' => $templates_url,
             'siteFontCss' => OCD_Canvas_Page_Publisher::site_font_css(),
+            'themeDefinitionsCss' => OCD_Theme_Definitions::css(),
         ];
 
         // JSON_HEX_* evita cualquier salida de `<` o `&` dentro del <script>.

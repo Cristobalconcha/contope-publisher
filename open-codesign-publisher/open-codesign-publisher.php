@@ -30,6 +30,8 @@ require_once OCD_PUBLISHER_DIR . 'includes/class-ocd-canvas-page-publisher.php';
 require_once OCD_PUBLISHER_DIR . 'includes/class-ocd-canvas-editor-admin.php';
 require_once OCD_PUBLISHER_DIR . 'includes/class-ocd-theme-builder-admin.php';
 require_once OCD_PUBLISHER_DIR . 'includes/class-ocd-inline-editor-frontend.php';
+require_once OCD_PUBLISHER_DIR . 'includes/class-ocd-theme-definitions.php';
+require_once OCD_PUBLISHER_DIR . 'includes/class-ocd-settings-admin.php';
 
 add_action('plugins_loaded', static function (): void {
     $validator = new OCD_Package_Validator();
@@ -53,5 +55,6 @@ add_action('plugins_loaded', static function (): void {
     ))->register();
     (new OCD_Theme_Builder_Admin($canvas_repository, $canvas_publisher))->register();
     (new OCD_Inline_Editor_Frontend($canvas_repository, $region_resolver))->register();
+    (new OCD_Settings_Admin())->register();
 });
 

@@ -389,6 +389,7 @@ final class OCD_Canvas_Editor_Admin
             ],
             'autoLoadPageId' => $this->resolve_auto_load_page_id(),
             'siteFontCss' => OCD_Canvas_Page_Publisher::site_font_css(),
+            'themeDefinitionsCss' => OCD_Theme_Definitions::css(),
         ];
 
         // JSON_HEX_TAG evita cualquier salida de `<` dentro del script en línea.

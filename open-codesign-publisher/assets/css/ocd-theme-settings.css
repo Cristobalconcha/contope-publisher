@@ -1,0 +1,161 @@
+/* Open CoDesign Publisher — pantalla Configuración (definiciones del tema). */
+
+.ocd-settings-wrap {
+    max-width: 1080px;
+}
+
+.ocd-settings-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 16px 0 20px;
+}
+
+.ocd-settings-header h1 {
+    margin: 0;
+}
+
+.ocd-settings-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.ocd-settings-status {
+    min-height: 24px;
+    padding: 6px 8px;
+    border-left: 4px solid #72aee6;
+    background: #f0f6fc;
+    color: #1d2327;
+    line-height: 1.3;
+}
+
+.ocd-settings-status.is-ok {
+    border-left-color: #00a32a;
+    background: #edfaef;
+    color: #14622c;
+}
+
+.ocd-settings-status.is-error {
+    border-left-color: #d63638;
+    background: #fcf0f1;
+    color: #8a1f11;
+    font-weight: 600;
+}
+
+.ocd-settings-sections {
+    display: grid;
+    gap: 20px;
+}
+
+.ocd-settings-section {
+    padding: 20px 24px;
+    border: 1px solid #c3c4c7;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.ocd-settings-section h2 {
+    margin: 0 0 8px;
+    font-size: 18px;
+}
+
+.ocd-settings-intro {
+    margin: 0 0 20px;
+    max-width: 72ch;
+    color: #50575e;
+}
+
+.ocd-settings-section form {
+    display: grid;
+    gap: 16px;
+}
+
+.ocd-settings-group {
+    margin: 0;
+    padding: 16px;
+    border: 1px solid #dcdcde;
+    border-radius: 6px;
+    background: #fbfbfb;
+}
+
+.ocd-settings-group legend {
+    padding: 0 8px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #1d2327;
+}
+
+.ocd-settings-fields {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+.ocd-settings-field {
+    display: grid;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1d2327;
+}
+
+.ocd-settings-field-label {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+}
+
+.ocd-settings-field-unit {
+    font-size: 11px;
+    font-weight: 400;
+    color: #787c82;
+}
+
+.ocd-settings-field select,
+.ocd-settings-field input[type="number"] {
+    width: 100%;
+    max-width: 100%;
+}
+
+.ocd-settings-color {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 30px;
+}
+
+.ocd-settings-color input[type="color"] {
+    width: 48px;
+    height: 30px;
+    padding: 1px;
+    border: 1px solid #8c8f94;
+    border-radius: 4px;
+    background: #fff;
+    cursor: pointer;
+}
+
+.ocd-settings-color-value {
+    font-size: 12px;
+    font-weight: 400;
+    color: #50575e;
+    font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 782px) {
+    .ocd-settings-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .ocd-settings-actions {
+        flex-wrap: wrap;
+    }
+
+    .ocd-settings-fields {
+        grid-template-columns: 1fr;
+    }
+}

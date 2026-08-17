@@ -254,6 +254,10 @@
          *   siteFontCss       string — CSS de @font-face autocontenido del sitio que
          *                     se inyecta en el <head> del canvas antes del CSS fuente
          *                     para que el documento gane en cascada (opcional).
+         *   themeDefinitionsCss string — CSS base del tema (variables :root + reglas
+         *                     de baja especificidad) inyectado ANTES del CSS de fuentes
+         *                     y del CSS fuente para que el documento gane en cascada
+         *                     (opcional).
          *
          * Devuelve null si faltan dependencias (informando por `status`).
          */
@@ -524,6 +528,7 @@
             var CSS_OVERRIDES_MARKER = '/* OCD-CANVAS-EDITABLE-OVERRIDES */';
             var sourceCss = '';
             var siteFontCss = typeof options.siteFontCss === 'string' ? options.siteFontCss : '';
+            var themeDefinitionsCss = typeof options.themeDefinitionsCss === 'string' ? options.themeDefinitionsCss : '';
 
             function resolveMount(value) {
                 if (!value) {
@@ -613,6 +618,39 @@
                 }
             }
 
+            function ensureThemeDefinitionsCss() {
+                var canvasDocument = editor.Canvas.getDocument();
+                if (!canvasDocument || !canvasDocument.head) {
+                    return;
+                }
+                var head = canvasDocument.head;
+                var style = head.querySelector('style[data-ocd-theme-css]');
+                if (!themeDefinitionsCss) {
+                    if (style) {
+                        style.parentNode.removeChild(style);
+                    }
+                    return;
+                }
+                if (!style) {
+                    style = canvasDocument.createElement('style');
+                    style.setAttribute('data-ocd-theme-css', 'definitions');
+                    head.prepend(style);
+                }
+                style.textContent = themeDefinitionsCss;
+
+                // El CSS base del tema debe quedar ANTES del CSS de fuentes y del
+                // CSS fuente para perder la cascada: las reglas base del tema son
+                // la capa más débil y las del documento la anulan.
+                var fontStyle = head.querySelector('style[data-ocd-site-css]');
+                var sourceStyle = head.querySelector('style[data-ocd-source-css]');
+                var anchor = fontStyle || sourceStyle;
+                if (anchor && anchor !== style && anchor.previousSibling !== style) {
+                    head.insertBefore(style, anchor);
+                } else if (!anchor && style.previousSibling !== null) {
+                    head.insertBefore(style, head.firstChild);
+                }
+            }
+
             function ensureSiteFontCss() {
                 var canvasDocument = editor.Canvas.getDocument();
                 if (!canvasDocument || !canvasDocument.head) {
@@ -691,6 +729,7 @@
             function refreshPresentation() {
                 ensureSiteFontCss();
                 ensureSourceCss();
+                ensureThemeDefinitionsCss();
                 ensureDynamicPlaceholderCss();
                 var selected = editor.getSelected();
                 if (inspector) {
@@ -742,6 +781,7 @@
                 window.requestAnimationFrame(function () {
                     ensureSiteFontCss();
                     ensureSourceCss();
+                    ensureThemeDefinitionsCss();
                 });
             }
 
@@ -772,6 +812,7 @@
                 window.requestAnimationFrame(function () {
                     ensureSiteFontCss();
                     ensureSourceCss();
+                    ensureThemeDefinitionsCss();
                     var selected = editor.getSelected();
                     if (!selected) {
                         var children = editor.getWrapper().components();
@@ -843,6 +884,7 @@
                 serializedCss: serializedCss,
                 ensureSourceCss: ensureSourceCss,
                 ensureSiteFontCss: ensureSiteFontCss,
+                ensureThemeDefinitionsCss: ensureThemeDefinitionsCss,
                 refreshPresentation: refreshPresentation,
                 getSourceCss: getSourceCss,
                 setSourceCss: setSourceCss,

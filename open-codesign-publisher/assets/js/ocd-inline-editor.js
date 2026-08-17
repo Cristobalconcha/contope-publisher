@@ -569,7 +569,8 @@
         blocks: [],
         ajaxUrl: config.ajaxUrl,
         nonce: config.nonce,
-        siteFontCss: config.siteFontCss || ''
+        siteFontCss: config.siteFontCss || '',
+        themeDefinitionsCss: config.themeDefinitionsCss || ''
     });
 
     if (!core) {

@@ -240,9 +240,10 @@ final class OCD_Canvas_Page_Publisher
         }
 
         $site_font_css = self::site_font_css();
+        $theme_css = OCD_Theme_Definitions::css();
         wp_register_style('ocd-canvas-public', false, [], OCD_PUBLISHER_VERSION);
         wp_enqueue_style('ocd-canvas-public');
-        wp_add_inline_style('ocd-canvas-public', $site_font_css . $header_css . (string) $document['css'] . $footer_css);
+        wp_add_inline_style('ocd-canvas-public', $theme_css . $site_font_css . $header_css . (string) $document['css'] . $footer_css);
         wp_enqueue_script(
             'ocd-canvas-public',
             plugins_url('assets/js/ocd-canvas-public.js', OCD_PUBLISHER_FILE),

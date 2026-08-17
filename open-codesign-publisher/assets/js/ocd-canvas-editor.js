@@ -32,6 +32,7 @@
             ajaxUrl: config.ajaxUrl,
             nonce: config.nonce,
             siteFontCss: config.siteFontCss || '',
+            themeDefinitionsCss: config.themeDefinitionsCss || '',
             inspectorMount: document.getElementById('ocd-canvas-inspector'),
             gridControlsMount: document.querySelector('#ocd-canvas-inspector .ocd-ci__head'),
             groupControlsMount: document.querySelector('#ocd-canvas-inspector .ocd-ci__head'),
