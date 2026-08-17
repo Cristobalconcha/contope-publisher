@@ -100,6 +100,96 @@ final class OCD_Canvas_Page_Publisher
         return $this->describe_page((int) $saved_id);
     }
 
+    /**
+     * Duplica una página Canvas completa: crea una página WordPress NUEVA y un
+     * documento de CUERPO NUEVO (projectData/html/css copiados del fuente).
+     *
+     * A diferencia de un duplicador genérico (que solo copia la cáscara de la
+     * página y por eso termina "duplicando solo el header"), aquí el cuerpo sí
+     * se recrea como un documento nuevo con id determinístico derivado del id
+     * de la página nueva. NO se copian las metas de región
+     * (regionKind/Scope/Targets/Excludes) ni los snapshots: el cuerpo de una
+     * página NO es una región de tema, y el historial de snapshots pertenece a
+     * la sesión de edición del documento fuente. El header/footer tampoco se
+     * copian porque son regiones de tema que se resuelven en vivo por reglas
+     * (OCD_Template_Region_Resolver) contra la página que se está viendo, así
+     * que la página nueva los recibe automáticamente por su propio ID.
+     *
+     * @param int $page_id ID de la página Canvas a duplicar.
+     * @return array<string, mixed>|WP_Error ['pageId' => int, 'documentId' => string]
+     */
+    public function duplicate_page(int $page_id)
+    {
+        $source = get_post($page_id);
+        if (!$source instanceof WP_Post || $source->post_type !== 'page') {
+            return new WP_Error('ocd_canvas_duplicate_not_page', 'La página a duplicar no existe o no es una página.');
+        }
+
+        $document_id = (string) get_post_meta($page_id, self::META_DOCUMENT_ID, true);
+        if ($document_id === '') {
+            return new WP_Error('ocd_canvas_duplicate_not_canvas', 'Esta página no es una página Canvas.');
+        }
+
+        $document = $this->repository->load($document_id);
+        if (is_wp_error($document)) {
+            return new WP_Error('ocd_canvas_duplicate_document_missing', 'El documento Canvas de la página fuente no se puede cargar.');
+        }
+
+        $title = trim((string) $source->post_title);
+        $new_title = sprintf('%s — Copia', $title !== '' ? $title : 'Página Open CoDesign Canvas');
+
+        // Creamos primero la página (sin content ni meta) para obtener su ID y
+        // poder derivar el document_id estable del cuerpo nuevo. El título
+        // colisionado lo resuelve WordPress solo añadiendo el sufijo al slug;
+        // el content se construye igual que publish(), nunca copiando el content
+        // fuente. El post_status se hereda del fuente (publish -> publish,
+        // draft -> draft).
+        $saved_id = wp_insert_post([
+            'post_type' => 'page',
+            'post_status' => $source->post_status,
+            'post_title' => $new_title,
+            'post_content' => '',
+        ], true);
+        if (is_wp_error($saved_id)) {
+            return $saved_id;
+        }
+        $new_page_id = (int) $saved_id;
+
+        $new_document_id = OCD_Canvas_Editor_Admin::document_id_for_page($new_page_id);
+
+        // projectData/html/css ya salieron sanitizados del repositorio, así que
+        // se copian tal cual (igual que publish() los consume desde el repo).
+        $saved = $this->repository->save(
+            $new_document_id,
+            (string) $document['projectData'],
+            (string) $document['html'],
+            (string) $document['css']
+        );
+        if (is_wp_error($saved)) {
+            // La página quedó creada pero sin documento: se elimina para no
+            // dejar una cáscara huérfana y se devuelve el error.
+            wp_delete_post($new_page_id, true);
+            return $saved;
+        }
+
+        $updated = wp_update_post([
+            'ID' => $new_page_id,
+            'post_content' => sprintf('[open_codesign_canvas document_id="%s"]', esc_attr($new_document_id)),
+        ], true);
+        if (is_wp_error($updated)) {
+            // Sin shortcode la página es una cáscara vacía: se elimina para no
+            // dejar residuo visible, igual que en el fallo de save().
+            wp_delete_post($new_page_id, true);
+            return $updated;
+        }
+        update_post_meta($new_page_id, self::META_DOCUMENT_ID, $new_document_id);
+
+        return [
+            'pageId' => $new_page_id,
+            'documentId' => $new_document_id,
+        ];
+    }
+
     /** @return array<string, mixed>|null */
     public function current(string $document_id): ?array
     {

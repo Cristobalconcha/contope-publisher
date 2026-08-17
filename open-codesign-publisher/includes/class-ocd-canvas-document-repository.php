@@ -26,6 +26,22 @@ final class OCD_Canvas_Document_Repository
     public const META_UPDATED_AT = '_ocd_canvas_updated_at';
 
     /**
+     * Índice JSON de snapshots de sesión por documento: arreglo de
+     * `{id, session, label, createdAt (ISO UTC), revision}`. Cada snapshot
+     * guarda además su contenido en una meta propia `_ocd_canvas_snap_<id>`.
+     */
+    public const META_SNAPSHOTS = '_ocd_canvas_snapshots';
+
+    /** Prefijo de las metas individuales que guardan el contenido de cada snapshot. */
+    public const SNAPSHOT_META_PREFIX = '_ocd_canvas_snap_';
+
+    /** Límite de snapshots conservados por documento. */
+    public const MAX_SNAPSHOTS = 15;
+
+    /** Etiqueta reservada para el snapshot de apertura de sesión. */
+    public const SNAPSHOT_SESSION_OPEN_LABEL = 'session-open';
+
+    /**
      * Region role this document plays when assembling a page: 'header',
      * 'body' or 'footer'. Empty string means "not a region" (the legacy
      * single-document behavior, kept so the existing experimental document
@@ -147,6 +163,7 @@ final class OCD_Canvas_Document_Repository
             self::META_HTML,
             self::META_CSS,
             self::META_UPDATED_AT,
+            self::META_SNAPSHOTS,
             self::META_REGION_KIND,
             self::META_REGION_SCOPE,
             self::META_REGION_TARGETS,
@@ -776,5 +793,217 @@ final class OCD_Canvas_Document_Repository
     {
         $title = trim((string) ($document['title'] ?? ''));
         return $title !== '' ? $title : 'Plantilla sin nombre';
+    }
+
+    /**
+     * Lee el índice de snapshots de un documento (solo metadatos, sin
+     * contenidos) y lo devuelve normalizado a un arreglo de entradas.
+     *
+     * @return array<int, array{id: string, session: string, label: string, createdAt: string, revision: int}>
+     */
+    private function read_snapshot_index(int $post_id): array
+    {
+        $raw = (string) get_post_meta($post_id, self::META_SNAPSHOTS, true);
+        $decoded = json_decode($raw === '' ? '[]' : $raw, true);
+        if (!is_array($decoded)) {
+            return [];
+        }
+
+        $index = [];
+        foreach ($decoded as $entry) {
+            if (!is_array($entry) || !isset($entry['id'])) {
+                continue;
+            }
+            $index[] = [
+                'id' => (string) $entry['id'],
+                'session' => (string) ($entry['session'] ?? ''),
+                'label' => (string) ($entry['label'] ?? ''),
+                'createdAt' => (string) ($entry['createdAt'] ?? ''),
+                'revision' => (int) ($entry['revision'] ?? 0),
+            ];
+        }
+        return $index;
+    }
+
+    /**
+     * @param array<int, array{id: string, session: string, label: string, createdAt: string, revision: int}> $index
+     */
+    private function write_snapshot_index(int $post_id, array $index): void
+    {
+        update_post_meta($post_id, self::META_SNAPSHOTS, wp_json_encode($index));
+    }
+
+    /**
+     * Persiste el estado ACTUAL del documento como un snapshot de sesión.
+     *
+     * Guarda una entrada en el índice `_ocd_canvas_snapshots` y el contenido
+     * completo (`{projectData, html, css}`) en una meta propia
+     * `_ocd_canvas_snap_<id>`. El identificador es `bin2hex(random_bytes(6))`.
+     *
+     * Límite de 15 por documento. Al superarlo se podan los más viejos por
+     * `createdAt`, PERO nunca se poda un snapshot con `label === 'session-open'`
+     * que pertenezca a la sesión más reciente: esos marcan el punto de partida
+     * de la sesión activa y deben sobrevivir para poder restaurar el estado de
+     * entrada aunque la sesión genere muchos guardados posteriores.
+     *
+     * @return array<string, mixed>|WP_Error La entrada del índice creada.
+     */
+    public function create_snapshot(string $document_id, string $session_id, string $label)
+    {
+        $post_id = $this->find_post_id($document_id);
+        if ($post_id === null) {
+            return new WP_Error('ocd_snapshot_document_not_found', 'No existe un documento Canvas con ese ID.');
+        }
+
+        $id = bin2hex(random_bytes(6));
+        $created_at = gmdate('c');
+        $revision = (int) get_post_meta($post_id, self::META_REVISION, true);
+
+        $content = wp_json_encode([
+            'projectData' => (string) get_post_meta($post_id, self::META_PROJECT_DATA, true),
+            'html' => (string) get_post_meta($post_id, self::META_HTML, true),
+            'css' => (string) get_post_meta($post_id, self::META_CSS, true),
+        ]);
+        update_post_meta($post_id, self::SNAPSHOT_META_PREFIX . $id, $content);
+
+        $entry = [
+            'id' => $id,
+            'session' => $session_id,
+            'label' => $label,
+            'createdAt' => $created_at,
+            'revision' => $revision,
+        ];
+
+        $index = $this->read_snapshot_index($post_id);
+        $index[] = $entry;
+        $index = $this->prune_snapshots($post_id, $index);
+        $this->write_snapshot_index($post_id, $index);
+
+        return $entry;
+    }
+
+    /**
+     * Aplica el límite de snapshots por documento, eliminando también la meta
+     * de contenido de cada snapshot podado.
+     *
+     * @param array<int, array{id: string, session: string, label: string, createdAt: string, revision: int}> $index
+     * @return array<int, array{id: string, session: string, label: string, createdAt: string, revision: int}>
+     */
+    private function prune_snapshots(int $post_id, array $index): array
+    {
+        if (count($index) <= self::MAX_SNAPSHOTS) {
+            return $index;
+        }
+
+        // Sesión más reciente: la del snapshot `session-open` con `createdAt`
+        // más reciente; si no hay ninguno, la de la entrada más reciente.
+        $recent_session = '';
+        $recent_created = '';
+        foreach ($index as $entry) {
+            $created = (string) $entry['createdAt'];
+            if ($entry['label'] === self::SNAPSHOT_SESSION_OPEN_LABEL && $created > $recent_created) {
+                $recent_created = $created;
+                $recent_session = (string) $entry['session'];
+            }
+        }
+        if ($recent_session === '') {
+            foreach ($index as $entry) {
+                $created = (string) $entry['createdAt'];
+                if ($created > $recent_created) {
+                    $recent_created = $created;
+                    $recent_session = (string) $entry['session'];
+                }
+            }
+        }
+
+        $is_protected = static function (array $entry) use ($recent_session): bool {
+            return $entry['label'] === self::SNAPSHOT_SESSION_OPEN_LABEL && $entry['session'] === $recent_session;
+        };
+
+        // Más nuevo primero: se podan los más viejos.
+        usort($index, static function (array $a, array $b): int {
+            return strcmp((string) $b['createdAt'], (string) $a['createdAt']);
+        });
+
+        $protected = [];
+        $regular = [];
+        foreach ($index as $entry) {
+            if ($is_protected($entry)) {
+                $protected[] = $entry;
+            } else {
+                $regular[] = $entry;
+            }
+        }
+
+        $budget = self::MAX_SNAPSHOTS - count($protected);
+        $budget = $budget < 0 ? 0 : $budget;
+        $kept = array_merge($protected, array_slice($regular, 0, $budget));
+
+        foreach (array_slice($regular, $budget) as $entry) {
+            delete_post_meta($post_id, self::SNAPSHOT_META_PREFIX . (string) $entry['id']);
+        }
+
+        usort($kept, static function (array $a, array $b): int {
+            return strcmp((string) $b['createdAt'], (string) $a['createdAt']);
+        });
+
+        return $kept;
+    }
+
+    /**
+     * Lista solo los metadatos del índice (sin contenidos), más nuevo primero.
+     *
+     * @return array<int, array{id: string, session: string, label: string, createdAt: string, revision: int}>
+     */
+    public function list_snapshots(string $document_id): array
+    {
+        $post_id = $this->find_post_id($document_id);
+        if ($post_id === null) {
+            return [];
+        }
+
+        $index = $this->read_snapshot_index($post_id);
+        usort($index, static function (array $a, array $b): int {
+            return strcmp((string) $b['createdAt'], (string) $a['createdAt']);
+        });
+        return $index;
+    }
+
+    /**
+     * Lee un snapshot completo: sus metadatos y su contenido
+     * `{projectData, html, css}`.
+     *
+     * @return array<string, mixed>|WP_Error
+     */
+    public function load_snapshot(string $document_id, string $snapshot_id)
+    {
+        $post_id = $this->find_post_id($document_id);
+        if ($post_id === null) {
+            return new WP_Error('ocd_snapshot_document_not_found', 'No existe un documento Canvas con ese ID.');
+        }
+
+        $entry = null;
+        foreach ($this->read_snapshot_index($post_id) as $candidate) {
+            if ($candidate['id'] === $snapshot_id) {
+                $entry = $candidate;
+                break;
+            }
+        }
+        if ($entry === null) {
+            return new WP_Error('ocd_snapshot_not_found', 'No existe un snapshot con ese ID.');
+        }
+
+        $raw = (string) get_post_meta($post_id, self::SNAPSHOT_META_PREFIX . $snapshot_id, true);
+        $content = json_decode($raw === '' ? '{}' : $raw, true);
+        if (!is_array($content)) {
+            $content = [];
+        }
+
+        return [
+            'meta' => $entry,
+            'projectData' => (string) ($content['projectData'] ?? ''),
+            'html' => (string) ($content['html'] ?? ''),
+            'css' => (string) ($content['css'] ?? ''),
+        ];
     }
 }

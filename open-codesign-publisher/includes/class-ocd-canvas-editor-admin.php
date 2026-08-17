@@ -22,6 +22,10 @@ final class OCD_Canvas_Editor_Admin
     public const AJAX_SAVE_REGION = 'ocd_canvas_editor_save_region';
     public const AJAX_RESOLVE_PAGE = 'ocd_canvas_editor_resolve_page';
     public const AJAX_ACF_FIELDS = 'ocd_canvas_editor_acf_fields';
+    public const AJAX_SESSION_OPEN = 'ocd_canvas_editor_session_open';
+    public const AJAX_SNAPSHOTS_LIST = 'ocd_canvas_editor_snapshots_list';
+    /** Acción admin-post del duplicado de páginas Canvas. */
+    public const ACTION_DUPLICATE = 'ocd_canvas_duplicate_page';
     public const CAPABILITY = 'manage_options';
 
     /** Versión exacta del vendor incluido en `assets/vendor/grapesjs`. */
@@ -84,7 +88,11 @@ final class OCD_Canvas_Editor_Admin
         add_action('wp_ajax_' . self::AJAX_SAVE_REGION, [$this, 'handle_save_region']);
         add_action('wp_ajax_' . self::AJAX_RESOLVE_PAGE, [$this, 'handle_resolve_page']);
         add_action('wp_ajax_' . self::AJAX_ACF_FIELDS, [$this, 'handle_acf_fields']);
+        add_action('wp_ajax_' . self::AJAX_SESSION_OPEN, [$this, 'handle_session_open']);
+        add_action('wp_ajax_' . self::AJAX_SNAPSHOTS_LIST, [$this, 'handle_snapshots_list']);
         add_filter('page_row_actions', [$this, 'add_page_row_edit_with_ocd'], 10, 2);
+        add_action('admin_post_' . self::ACTION_DUPLICATE, [$this, 'handle_duplicate_page']);
+        add_action('admin_notices', [$this, 'render_duplicate_notices']);
     }
 
     /**
@@ -113,7 +121,101 @@ final class OCD_Canvas_Editor_Admin
             esc_html__('Editar con OCD', 'open-codesign-publisher')
         );
 
+        // "Duplicar" SOLO para páginas Canvas (las que tienen documento de
+        // cuerpo asociado). La duplicación la maneja este plugin y no un
+        // duplicador externo, porque un duplicador genérico copia la cáscara
+        // de la página sin crear el documento de cuerpo nuevo.
+        if ((string) get_post_meta($post->ID, OCD_Canvas_Page_Publisher::META_DOCUMENT_ID, true) !== '') {
+            $duplicate_url = add_query_arg(
+                [
+                    'action' => self::ACTION_DUPLICATE,
+                    'page_id' => $post->ID,
+                ],
+                admin_url('admin-post.php')
+            );
+            $actions['ocd_canvas_duplicate'] = sprintf(
+                '<a href="%s">%s</a>',
+                esc_url(wp_nonce_url($duplicate_url, self::NONCE_ACTION, 'ocd_nonce')),
+                esc_html__('Duplicar', 'open-codesign-publisher')
+            );
+        }
+
         return $actions;
+    }
+
+    /**
+     * Handler admin-post del duplicado de páginas Canvas.
+     *
+     * Valida nonce y capacidad, delega en publisher->duplicate_page() y, según
+     * el estado editorial de la página nueva, redirige al editor en línea
+     * (publish) o al editor de WordPress (draft). Los errores vuelven al listado
+     * de páginas con un notice vía ?ocd-dup-error=.
+     */
+    public function handle_duplicate_page(): void
+    {
+        if (!current_user_can(self::CAPABILITY)) {
+            wp_die(esc_html__('No tienes permisos para duplicar esta página.', 'open-codesign-publisher'));
+        }
+        check_admin_referer(self::NONCE_ACTION, 'ocd_nonce');
+
+        $page_id = isset($_GET['page_id']) ? absint(wp_unslash($_GET['page_id'])) : 0;
+        if ($page_id <= 0) {
+            wp_safe_redirect(add_query_arg(
+                ['ocd-dup-error' => 'ID de página inválido.'],
+                admin_url('edit.php?post_type=page')
+            ));
+            exit;
+        }
+
+        $result = $this->publisher->duplicate_page($page_id);
+        if (is_wp_error($result)) {
+            wp_safe_redirect(add_query_arg(
+                ['ocd-dup-error' => $result->get_error_message()],
+                admin_url('edit.php?post_type=page')
+            ));
+            exit;
+        }
+
+        $new_page_id = (int) $result['pageId'];
+
+        // La página nueva hereda el estado del fuente: si quedó publicada se
+        // abre en el editor en línea (el shell inline ya existe y la meta de
+        // documento la hace editable); si quedó en draft no hay permalink
+        // estable para el modo inline, así que se redirige al editor de WP.
+        if (get_post_status($new_page_id) === 'publish') {
+            $edit_url = add_query_arg(
+                [
+                    OCD_Inline_Editor_Frontend::QUERY_EDIT => 1,
+                    OCD_Inline_Editor_Frontend::QUERY_NONCE => wp_create_nonce(OCD_Inline_Editor_Frontend::NONCE_ACTION),
+                ],
+                get_permalink($new_page_id)
+            );
+            wp_safe_redirect($edit_url);
+        } else {
+            $edit_link = get_edit_post_link($new_page_id, 'raw');
+            wp_safe_redirect($edit_link !== null ? $edit_link : admin_url('edit.php?post_type=page'));
+        }
+        exit;
+    }
+
+    /**
+     * Muestra un notice de error del duplicado, escapado, solo en pantallas
+     * admin y para quien tiene la capacidad. El mensaje llega por
+     * ?ocd-dup-error= tras un redirect al listado de páginas.
+     */
+    public function render_duplicate_notices(): void
+    {
+        if (!is_admin() || !current_user_can(self::CAPABILITY)) {
+            return;
+        }
+        if (!isset($_GET['ocd-dup-error']) || !is_string($_GET['ocd-dup-error'])) {
+            return;
+        }
+        $message = sanitize_text_field(wp_unslash($_GET['ocd-dup-error']));
+        if ($message === '') {
+            return;
+        }
+        echo '<div class="notice notice-error is-dismissible"><p>' . esc_html($message) . '</p></div>';
     }
 
     /**
@@ -621,6 +723,25 @@ final class OCD_Canvas_Editor_Admin
             wp_send_json_error(['message' => $css->get_error_message(), 'code' => $css->get_error_code()], 400);
         }
 
+        // Snapshots de sesión OPCIONALES. Solo el guardado del editor en línea
+        // envía `snapshot_session` (y opcionalmente `snapshot_label`): el
+        // autosave del editor admin (1200ms) NO los envía y por tanto NO crea
+        // snapshots, para no llenar el historial con cada autoguardado. El
+        // snapshot captura el estado ANTERIOR al guardado (de ahí que se cree
+        // antes de persistir): es el "antes del guardado N" que permite
+        // restaurar en M5.
+        $snapshot_session = isset($_POST['snapshot_session']) ? (string) wp_unslash($_POST['snapshot_session']) : '';
+        if ($snapshot_session !== '' && preg_match('/^[a-z0-9-]{1,64}$/', $snapshot_session)) {
+            $snapshot_label = isset($_POST['snapshot_label']) ? sanitize_text_field((string) wp_unslash($_POST['snapshot_label'])) : '';
+            if ($snapshot_label === '') {
+                $snapshot_label = 'guardado';
+            }
+            $snapshot_label = function_exists('mb_substr')
+                ? mb_substr($snapshot_label, 0, 120)
+                : substr($snapshot_label, 0, 120);
+            $this->repository->create_snapshot($document_id, $snapshot_session, $snapshot_label);
+        }
+
         $saved = $this->repository->save(
             $document_id,
             $project_data,
@@ -819,5 +940,79 @@ final class OCD_Canvas_Editor_Admin
         }
 
         wp_send_json_success(['fields' => $fields]);
+    }
+
+    /**
+     * Abre una sesión de edición en línea: crea un snapshot
+     * `session-open` por cada documento existente de la sesión, para poder
+     * restaurar el estado de entrada en M5.
+     */
+    public function handle_session_open(): void
+    {
+        if (!current_user_can(self::CAPABILITY)) {
+            wp_send_json_error(['message' => 'Permisos insuficientes.'], 403);
+        }
+        check_ajax_referer(self::NONCE_ACTION, 'nonce');
+
+        $session_id = isset($_POST['session_id']) ? (string) wp_unslash($_POST['session_id']) : '';
+        if ($session_id === '' || !preg_match('/^[a-z0-9-]{1,64}$/', $session_id)) {
+            wp_send_json_error(['message' => 'session_id inválido.'], 400);
+        }
+
+        $raw_ids = isset($_POST['document_ids']) ? wp_unslash($_POST['document_ids']) : [];
+        if (is_string($raw_ids)) {
+            // El cliente envía la lista como JSON porque el transporte del
+            // editor es un formulario URL-encoded sin claves repetidas.
+            $decoded = json_decode($raw_ids, true, 8);
+            $raw_ids = is_array($decoded) ? $decoded : [];
+        }
+        if (!is_array($raw_ids)) {
+            $raw_ids = [];
+        }
+
+        $snapshots = [];
+        $seen = [];
+        foreach ($raw_ids as $raw_id) {
+            $document_id = sanitize_key((string) $raw_id);
+            if ($document_id === '' || isset($seen[$document_id])) {
+                continue;
+            }
+            $seen[$document_id] = true;
+
+            // Solo se snapshot-mean documentos que existen de verdad.
+            $document = $this->repository->load($document_id);
+            if (is_wp_error($document)) {
+                continue;
+            }
+
+            $snapshot = $this->repository->create_snapshot(
+                $document_id,
+                $session_id,
+                OCD_Canvas_Document_Repository::SNAPSHOT_SESSION_OPEN_LABEL
+            );
+            if (!is_wp_error($snapshot)) {
+                $snapshots[] = $snapshot;
+            }
+        }
+
+        wp_send_json_success(['snapshots' => $snapshots]);
+    }
+
+    /**
+     * Lista los snapshots de un documento (solo metadatos, más nuevo primero).
+     */
+    public function handle_snapshots_list(): void
+    {
+        if (!current_user_can(self::CAPABILITY)) {
+            wp_send_json_error(['message' => 'Permisos insuficientes.'], 403);
+        }
+        check_ajax_referer(self::NONCE_ACTION, 'nonce');
+
+        $document_id = isset($_POST['document_id']) ? sanitize_key((string) wp_unslash($_POST['document_id'])) : '';
+        if ($document_id === '') {
+            wp_send_json_error(['message' => 'document_id es obligatorio.'], 400);
+        }
+
+        wp_send_json_success(['snapshots' => $this->repository->list_snapshots($document_id)]);
     }
 }

@@ -1,4 +1,4 @@
-/* Open CoDesign Canvas — editor en línea sobre la página publicada (M2). */
+/* Open CoDesign Canvas — editor en línea sobre la página publicada (M3). */
 
 html,
 body {
@@ -66,6 +66,50 @@ body.ocd-inline-editor-body {
 #ocd-inline-status.is-error {
     color: #ff8085;
     font-weight: 600;
+}
+
+#ocd-inline-status.is-warn {
+    color: #f5c04a;
+    font-weight: 600;
+}
+
+/* Marca de región sucia: un punto ámbar sobre el badge cuando la región
+   activa tiene cambios sin guardar. */
+#ocd-inline-region.is-dirty::after {
+    content: '';
+    width: 7px;
+    height: 7px;
+    margin-left: 2px;
+    border-radius: 50%;
+    background: #f5c04a;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
+    flex: 0 0 auto;
+}
+
+/* Botón Guardar: deshabilitado hasta que la región activa esté sucia. */
+#ocd-inline-save {
+    padding: 5px 14px;
+    border: 1px solid #46b450;
+    border-radius: 4px;
+    background: #46b450;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+#ocd-inline-save:disabled {
+    border-color: #4b535a;
+    background: #2c3338;
+    color: #7d858c;
+    cursor: not-allowed;
+}
+
+#ocd-inline-save.is-saving {
+    border-color: #f5c04a;
+    background: #f5c04a;
+    color: #1d2327;
+    cursor: progress;
 }
 
 #ocd-inline-bar a.ocd-inline-link {
