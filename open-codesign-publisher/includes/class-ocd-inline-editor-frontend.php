@@ -175,6 +175,7 @@ final class OCD_Inline_Editor_Frontend
             'saveAction' => OCD_Canvas_Editor_Admin::AJAX_SAVE,
             'sessionOpenAction' => OCD_Canvas_Editor_Admin::AJAX_SESSION_OPEN,
             'snapshotsListAction' => OCD_Canvas_Editor_Admin::AJAX_SNAPSHOTS_LIST,
+            'snapshotLoadAction' => OCD_Canvas_Editor_Admin::AJAX_SNAPSHOT_LOAD,
             'pageId' => $page_id,
             'pageTitle' => get_the_title($page_id),
             'pageUrl' => get_permalink($page_id),
@@ -217,6 +218,9 @@ final class OCD_Inline_Editor_Frontend
                 <span id="ocd-inline-status" class="ocd-inline-status" role="status" aria-live="polite"></span>
                 <button id="ocd-inline-save" class="ocd-inline-save" type="button" disabled>
                     <?php esc_html_e('Guardar', 'open-codesign-publisher'); ?>
+                </button>
+                <button id="ocd-inline-history" class="ocd-inline-history" type="button">
+                    <?php esc_html_e('Historial', 'open-codesign-publisher'); ?>
                 </button>
                 <a id="ocd-inline-templates" class="ocd-inline-link" href="<?php echo esc_url($templates_url); ?>" hidden>
                     <?php esc_html_e('Reglas en Plantillas', 'open-codesign-publisher'); ?>

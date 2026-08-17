@@ -24,6 +24,7 @@ final class OCD_Canvas_Editor_Admin
     public const AJAX_ACF_FIELDS = 'ocd_canvas_editor_acf_fields';
     public const AJAX_SESSION_OPEN = 'ocd_canvas_editor_session_open';
     public const AJAX_SNAPSHOTS_LIST = 'ocd_canvas_editor_snapshots_list';
+    public const AJAX_SNAPSHOT_LOAD = 'ocd_canvas_editor_snapshot_load';
     /** Acción admin-post del duplicado de páginas Canvas. */
     public const ACTION_DUPLICATE = 'ocd_canvas_duplicate_page';
     public const CAPABILITY = 'manage_options';
@@ -90,6 +91,7 @@ final class OCD_Canvas_Editor_Admin
         add_action('wp_ajax_' . self::AJAX_ACF_FIELDS, [$this, 'handle_acf_fields']);
         add_action('wp_ajax_' . self::AJAX_SESSION_OPEN, [$this, 'handle_session_open']);
         add_action('wp_ajax_' . self::AJAX_SNAPSHOTS_LIST, [$this, 'handle_snapshots_list']);
+        add_action('wp_ajax_' . self::AJAX_SNAPSHOT_LOAD, [$this, 'handle_snapshot_load']);
         add_filter('page_row_actions', [$this, 'add_page_row_edit_with_ocd'], 10, 2);
         add_action('admin_post_' . self::ACTION_DUPLICATE, [$this, 'handle_duplicate_page']);
         add_action('admin_notices', [$this, 'render_duplicate_notices']);
@@ -1016,5 +1018,57 @@ final class OCD_Canvas_Editor_Admin
         }
 
         wp_send_json_success(['snapshots' => $this->repository->list_snapshots($document_id)]);
+    }
+
+    /**
+     * Restaura el contenido de un snapshot sobre el documento, de forma
+     * append-only: el estado ACTUAL se congela primero como snapshot
+     * 'antes de restaurar' para que nada se pierda, y recién después se
+     * persiste el contenido del snapshot elegido.
+     */
+    public function handle_snapshot_load(): void
+    {
+        if (!current_user_can(self::CAPABILITY)) {
+            wp_send_json_error(['message' => 'Permisos insuficientes.'], 403);
+        }
+        check_ajax_referer(self::NONCE_ACTION, 'nonce');
+
+        $document_id = isset($_POST['document_id']) ? sanitize_key((string) wp_unslash($_POST['document_id'])) : '';
+        $snapshot_id = isset($_POST['snapshot_id']) ? sanitize_key((string) wp_unslash($_POST['snapshot_id'])) : '';
+        if ($document_id === '' || $snapshot_id === '') {
+            wp_send_json_error(['message' => 'document_id y snapshot_id son obligatorios.'], 400);
+        }
+
+        $snapshot = $this->repository->load_snapshot($document_id, $snapshot_id);
+        if (is_wp_error($snapshot)) {
+            $status = $snapshot->get_error_code() === 'ocd_snapshot_not_found' ? 404 : 400;
+            wp_send_json_error(['message' => $snapshot->get_error_message(), 'code' => $snapshot->get_error_code()], $status);
+        }
+
+        // Restauración append-only: congela el estado actual en el historial
+        // ANTES de pisar el documento, para poder volver atrás si hace falta.
+        $frozen = $this->repository->create_snapshot($document_id, 'restore', 'antes de restaurar');
+        if (is_wp_error($frozen)) {
+            wp_send_json_error(['message' => $frozen->get_error_message(), 'code' => $frozen->get_error_code()], 500);
+        }
+
+        // El contenido del snapshot ya salió sanitizado del repositorio (igual
+        // que duplicate_page/duplicate_region): NO se re-sanitiza con el
+        // sanitizador de entrada, pensado para payloads crudos del cliente.
+        $saved = $this->repository->save(
+            $document_id,
+            (string) $snapshot['projectData'],
+            (string) $snapshot['html'],
+            (string) $snapshot['css']
+        );
+        if (is_wp_error($saved)) {
+            wp_send_json_error(['message' => $saved->get_error_message()], 500);
+        }
+
+        wp_send_json_success([
+            'restored' => true,
+            'documentId' => $document_id,
+            'snapshotId' => $snapshot_id,
+        ]);
     }
 }

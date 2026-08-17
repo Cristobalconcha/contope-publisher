@@ -545,6 +545,7 @@
     var regionNode = document.getElementById('ocd-inline-region');
     var saveButton = document.getElementById('ocd-inline-save');
     var templatesLink = document.getElementById('ocd-inline-templates');
+    var historyButton = document.getElementById('ocd-inline-history');
 
     function setStatus(message, kind) {
         if (!statusNode) {
@@ -951,6 +952,293 @@
             });
     }
 
+    // ---------------------------------------------------------------------
+    // Historial de snapshots del documento activo (M5.2). Un modal simple
+    // (sin librerías) lista los snapshots del segmento activo y permite
+    // restaurar uno: el servidor congela primero el estado actual y después
+    // recarga la página para reflejar el estado restaurado.
+    // ---------------------------------------------------------------------
+    var historyOverlay = null;
+    var historyList = null;
+    var historyMessage = null;
+    var restoring = false;
+
+    function snapshotLabel(entry) {
+        var label = entry && entry.label ? String(entry.label) : '';
+        if (label === 'session-open') {
+            return 'Apertura de sesión';
+        }
+        return label === '' ? 'guardado' : label;
+    }
+
+    function snapshotOrigin(entry) {
+        return (entry && entry.label === 'session-open') ? 'Sesión' : 'Guardado';
+    }
+
+    function snapshotDateLabel(entry) {
+        var createdAt = entry && entry.createdAt;
+        if (!createdAt) {
+            return '';
+        }
+        var date = new Date(createdAt);
+        if (isNaN(date.getTime())) {
+            return String(createdAt);
+        }
+        return date.toLocaleString();
+    }
+
+    /**
+     * Documento del segmento activo, según el split real del lienzo
+     * (`computeSplit` → `split.documentId`), con fallback a la config cuando
+     * el compuesto todavía no está armado.
+     */
+    function activeSegmentDocumentId() {
+        var kind = activeRegionKind();
+        if (built) {
+            try {
+                var split = window.OCDInlineSplit.split(editor, config, built, kind);
+                if (split && split.documentId) {
+                    return split.documentId;
+                }
+            } catch (error) {
+                // Sin split utilizable se cae al documento resuelto por config.
+            }
+        }
+        var doc = docForKind(config, kind);
+        return doc && doc.documentId ? doc.documentId : null;
+    }
+
+    function setHistoryMessage(message, kind) {
+        if (!historyMessage) {
+            return;
+        }
+        historyMessage.textContent = message;
+        historyMessage.className = 'ocd-inline-history-message' + (kind ? ' is-' + kind : '');
+    }
+
+    function clearHistoryList() {
+        while (historyList && historyList.firstChild) {
+            historyList.removeChild(historyList.firstChild);
+        }
+    }
+
+    function historyEmptyNode(message) {
+        var node = document.createElement('li');
+        node.className = 'ocd-inline-history-empty';
+        node.textContent = message;
+        return node;
+    }
+
+    function disableHistoryItems(disabled) {
+        if (!historyList) {
+            return;
+        }
+        var buttons = historyList.querySelectorAll('.ocd-inline-history-restore');
+        for (var i = 0; i < buttons.length; i++) {
+            buttons[i].disabled = disabled;
+        }
+    }
+
+    function closeHistory() {
+        if (historyOverlay) {
+            historyOverlay.hidden = true;
+        }
+        if (!restoring) {
+            setHistoryMessage('', '');
+            clearHistoryList();
+        }
+        var history_button = document.getElementById('ocd-inline-history');
+        if (history_button) {
+            history_button.focus();
+        }
+    }
+
+    function buildHistoryOverlay() {
+        if (historyOverlay) {
+            return;
+        }
+
+        historyOverlay = document.createElement('div');
+        historyOverlay.className = 'ocd-inline-history-overlay';
+        historyOverlay.hidden = true;
+        historyOverlay.setAttribute('role', 'dialog');
+        historyOverlay.setAttribute('aria-modal', 'true');
+        historyOverlay.setAttribute('aria-label', 'Historial de snapshots');
+
+        var card = document.createElement('div');
+        card.className = 'ocd-inline-history-card';
+
+        var header = document.createElement('div');
+        header.className = 'ocd-inline-history-header';
+
+        var title = document.createElement('h2');
+        title.className = 'ocd-inline-history-title';
+        title.textContent = 'Historial';
+
+        var closeButton = document.createElement('button');
+        closeButton.type = 'button';
+        closeButton.className = 'ocd-inline-history-close';
+        closeButton.setAttribute('aria-label', 'Cerrar historial');
+        closeButton.textContent = '\u00d7';
+        closeButton.addEventListener('click', closeHistory);
+
+        header.appendChild(title);
+        header.appendChild(closeButton);
+
+        historyMessage = document.createElement('div');
+        historyMessage.className = 'ocd-inline-history-message';
+        historyMessage.setAttribute('role', 'status');
+        historyMessage.setAttribute('aria-live', 'polite');
+
+        historyList = document.createElement('ul');
+        historyList.className = 'ocd-inline-history-list';
+
+        card.appendChild(header);
+        card.appendChild(historyMessage);
+        card.appendChild(historyList);
+        historyOverlay.appendChild(card);
+        document.body.appendChild(historyOverlay);
+
+        historyOverlay.addEventListener('click', function (event) {
+            if (event.target === historyOverlay) {
+                closeHistory();
+            }
+        });
+        document.addEventListener('keydown', function (event) {
+            if ((event.key === 'Escape' || event.keyCode === 27) && historyOverlay && !historyOverlay.hidden) {
+                closeHistory();
+            }
+        });
+    }
+
+    function historyItem(entry) {
+        var item = document.createElement('li');
+        item.className = 'ocd-inline-history-item';
+
+        var meta = document.createElement('div');
+        meta.className = 'ocd-inline-history-meta';
+
+        var origin = document.createElement('span');
+        origin.className = 'ocd-inline-history-origin';
+        origin.textContent = snapshotOrigin(entry);
+
+        var label = document.createElement('span');
+        label.className = 'ocd-inline-history-label';
+        label.textContent = snapshotLabel(entry);
+
+        var date = document.createElement('span');
+        date.className = 'ocd-inline-history-date';
+        date.textContent = snapshotDateLabel(entry);
+
+        meta.appendChild(origin);
+        meta.appendChild(label);
+        meta.appendChild(date);
+
+        var restoreButton = document.createElement('button');
+        restoreButton.type = 'button';
+        restoreButton.className = 'ocd-inline-history-restore';
+        restoreButton.textContent = 'Restaurar';
+        restoreButton.disabled = restoring;
+        restoreButton.addEventListener('click', function () {
+            restoreSnapshot(entry);
+        });
+
+        item.appendChild(meta);
+        item.appendChild(restoreButton);
+        return item;
+    }
+
+    function renderHistoryList(data) {
+        var snapshots = data && Array.isArray(data.snapshots) ? data.snapshots : [];
+        clearHistoryList();
+        setHistoryMessage('', '');
+
+        if (!snapshots.length) {
+            historyList.appendChild(historyEmptyNode(
+                'Todavía no hay snapshots de este documento. Se crean al abrir sesión y al guardar desde el editor en línea.'
+            ));
+            return;
+        }
+
+        snapshots.forEach(function (entry) {
+            historyList.appendChild(historyItem(entry));
+        });
+    }
+
+    function restoreSnapshot(entry) {
+        if (restoring) {
+            return;
+        }
+        var documentId = activeSegmentDocumentId();
+        if (!documentId || !entry || !entry.id) {
+            setHistoryMessage('No se pudo restaurar: falta el documento o el snapshot.', 'error');
+            return;
+        }
+
+        if (typeof hasAnyDirty === 'function' && hasAnyDirty()) {
+            var dirty_ok = window.confirm(
+                'Hay cambios sin guardar en el lienzo que se perderán al restaurar. ¿Continuar?'
+            );
+            if (!dirty_ok) {
+                return;
+            }
+        }
+
+        var confirmed = window.confirm(
+            'Se restaurará el documento al estado del snapshot \u00ab' + snapshotLabel(entry) +
+            '\u00bb. El estado persistido se guarda en el historial antes de restaurar.'
+        );
+        if (!confirmed) {
+            return;
+        }
+
+        restoring = true;
+        setHistoryMessage('Restaurando\u2026', 'loading');
+        disableHistoryItems(true);
+
+        request(config.snapshotLoadAction, {
+            document_id: documentId,
+            snapshot_id: entry.id
+        })
+            .then(function () {
+                // Si el usuario cancela el beforeunload, el modal no queda
+                // atascado: se rehabilita antes de la recarga.
+                restoring = false;
+                setHistoryMessage('Restaurado. Recargando\u2026', 'loading');
+                window.location.reload();
+            })
+            .catch(function (error) {
+                restoring = false;
+                disableHistoryItems(false);
+                setHistoryMessage('No se pudo restaurar: ' + error.message, 'error');
+            });
+    }
+
+    function openHistory() {
+        buildHistoryOverlay();
+        historyOverlay.hidden = false;
+        var close_button = historyOverlay.querySelector('.ocd-inline-history-close');
+        if (close_button) {
+            close_button.focus();
+        }
+        setHistoryMessage('Cargando historial\u2026', 'loading');
+        clearHistoryList();
+
+        var documentId = activeSegmentDocumentId();
+        if (!documentId) {
+            setHistoryMessage('No se pudo determinar el documento del segmento activo.', 'error');
+            historyList.appendChild(historyEmptyNode('No hay un documento activo para listar su historial.'));
+            return;
+        }
+
+        request(config.snapshotsListAction, { document_id: documentId })
+            .then(renderHistoryList)
+            .catch(function (error) {
+                setHistoryMessage('No se pudo cargar el historial: ' + error.message, 'error');
+                historyList.appendChild(historyEmptyNode('No se pudo cargar el historial.'));
+            });
+    }
+
     function bootEditor() {
         var builtResult = window.OCDInlineSplit.build(editor, config);
         if (!builtResult.ok) {
@@ -999,6 +1287,10 @@
 
     if (saveButton) {
         saveButton.addEventListener('click', saveActiveRegion);
+    }
+
+    if (historyButton) {
+        historyButton.addEventListener('click', openHistory);
     }
 
     window.addEventListener('beforeunload', function (event) {
