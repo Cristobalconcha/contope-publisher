@@ -5,13 +5,16 @@ if (!defined('ABSPATH')) {
 }
 
 /**
- * Modo de edición en línea sobre la página YA publicada (Fase 2, M2).
+ * Modo de edición en línea sobre la página YA publicada (Fase 2, M3).
  *
  * Agrega un botón "Editar en la página" a la barra de administración de
  * WordPress para toda página Canvas publicada y, ante una petición firmada
  * (`?ocd_edit=1&ocd_nonce=...`), renderiza un shell a pantalla completa con
- * el lienzo compuesto (Encabezado + Cuerpo + Pie). En M2 es SOLO LECTURA y
- * únicamente se expone el botón "Salir": todavía no hay guardado.
+ * el lienzo compuesto (Encabezado + Cuerpo + Pie). Desde M3 el editor guarda
+ * por región vía AJAX (`saveAction`), abre sesiones con snapshots de entrada
+ * (`sessionOpenAction` / `snapshotsListAction`) y muestra un enlace a las
+ * reglas de plantillas; el botón "Salir" sigue disponible para volver a la
+ * página publicada.
  *
  * El header/footer NO son "globales de por sí": son ítems del tema con alcance
  * propio (global/local + destinos + exclusiones). La UI muestra el alcance real
@@ -162,6 +165,7 @@ final class OCD_Inline_Editor_Frontend
             'bodyDocument' => $body,
             'regions' => $regions,
             'templatesUrl' => $templates_url,
+            'siteFontCss' => OCD_Canvas_Page_Publisher::site_font_css(),
         ];
 
         // JSON_HEX_* evita cualquier salida de `<` o `&` dentro del <script>.

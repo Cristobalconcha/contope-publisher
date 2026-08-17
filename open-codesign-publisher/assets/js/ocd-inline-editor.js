@@ -568,7 +568,8 @@
         status: setStatus,
         blocks: [],
         ajaxUrl: config.ajaxUrl,
-        nonce: config.nonce
+        nonce: config.nonce,
+        siteFontCss: config.siteFontCss || ''
     });
 
     if (!core) {
