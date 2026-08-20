@@ -312,6 +312,24 @@
                     }
                 }
             });
+            editor.Components.addType('ocd-luma-matte', {
+                isComponent: function (element) {
+                    return (
+                        !!element &&
+                        element.nodeType === 1 &&
+                        typeof element.hasAttribute === 'function' &&
+                        element.getAttribute('data-ocd-luma-matte') === '1'
+                    );
+                },
+                model: {
+                    defaults: {
+                        tagName: 'div',
+                        classes: ['ocd-luma-matte'],
+                        droppable: false,
+                        draggable: true
+                    }
+                }
+            });
             editor.Components.addType('ocd-dynamic', {
                 isComponent: function (element) {
                     if (!element || element.nodeType !== 1) {
@@ -904,6 +922,42 @@
                 style.textContent = css;
             }
 
+            function installCanvasLumaRuntime() {
+                if (
+                    !window.OcdLumaMatteVideo ||
+                    typeof window.OcdLumaMatteVideo.createRuntime !== 'function'
+                ) {
+                    return;
+                }
+                if (!editor.Canvas || typeof editor.Canvas.getDocument !== 'function') {
+                    return;
+                }
+                var canvasDocument = null;
+                try {
+                    canvasDocument = editor.Canvas.getDocument();
+                } catch (_error) {
+                    return;
+                }
+                if (!canvasDocument) {
+                    return;
+                }
+                var canvasWindow =
+                    canvasDocument.defaultView ||
+                    (typeof editor.Canvas.getWindow === 'function' ? editor.Canvas.getWindow() : null);
+                if (!canvasWindow) {
+                    return;
+                }
+                try {
+                    window.OcdLumaMatteVideo.createRuntime({
+                        window: canvasWindow,
+                        document: canvasDocument
+                    });
+                } catch (_error) {
+                    // La composición es progresiva: si el iframe todavía no está
+                    // listo, no debe bloquear el resto de la presentación.
+                }
+            }
+
             function refreshPresentation() {
                 ensureSiteFontCss();
                 ensureSourceCss();
@@ -920,6 +974,7 @@
                     groupControls.refresh();
                 }
                 behaviorApi.installCanvasRuntime();
+                installCanvasLumaRuntime();
             }
 
             function request(action, params) {
@@ -1009,6 +1064,7 @@
                         groupControls.refresh();
                     }
                     behaviorApi.installCanvasRuntime();
+                    installCanvasLumaRuntime();
                 });
                 if (onDocumentApplied) {
                     onDocumentApplied(doc);

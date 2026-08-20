@@ -18,6 +18,12 @@
 
     function activateAutoplayVideos(root) {
         root.querySelectorAll('video[autoplay]').forEach(function (video) {
+            // Los videos con transparencia (luma matte) viven ocultos dentro de
+            // su wrapper y los arranca el compositor de canvas; no llevan botón
+            // de sonido porque no tienen pista audible que destapar.
+            if (typeof video.closest === 'function' && video.closest('[data-ocd-luma-matte="1"]')) {
+                return;
+            }
             video.muted = true;
             video.defaultMuted = true;
             video.setAttribute('muted', '');

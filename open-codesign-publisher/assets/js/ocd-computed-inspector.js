@@ -340,6 +340,12 @@
       .ocd-ci__header-grid label { display:grid; gap:4px; color:#c7d7e1; font-size:10px; }
       .ocd-ci__header-grid .is-wide { grid-column:1 / -1; }
       .ocd-ci__header-hint { margin-top:8px; color:#9eabb4; font-size:10px; }
+      .ocd-ci__luma { margin:8px 0; padding:10px; border:1px solid #8a7cf166; border-radius:6px; background:#5b4fb114; }
+      .ocd-ci__luma-title { margin-bottom:8px; color:#d9c9ff; font-weight:650; }
+      .ocd-ci__luma-field { display:grid; gap:4px; margin-bottom:8px; color:#c7bda9; font-size:10px; }
+      .ocd-ci__luma-toggle { display:flex; align-items:center; gap:7px; color:#ded8cc; cursor:pointer; }
+      .ocd-ci__luma-toggle input { width:auto; min-width:0; accent-color:#8a7cf1; }
+      .ocd-ci__luma-hint { margin-top:7px; color:#a9a39a; font-size:10px; }
       .gjs-toolbar-item.ocd-header-state-tool { position:relative; width:auto; min-width:28px; padding:5px 7px;
         border-left:1px solid #ffffff38; font-weight:750; text-align:center; }
       .gjs-toolbar-item.ocd-header-state-tool::before { display:block; min-width:14px; line-height:16px; }
@@ -384,6 +390,171 @@
       const tag = String(component.get?.('tagName') || '').toLowerCase();
       const attributes = componentAttributes(component);
       return tag === 'header' || tag === 'nav' || attributes['data-ocd-behavior'] === 'scroll-threshold';
+    }
+
+    function hasAttr(attributes, name) {
+      const value = attributes[name];
+      return value !== undefined && value !== null && value !== false;
+    }
+
+    function escapeAttr(value) {
+      return String(value == null ? '' : value)
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+
+    function isVideoComponent(component) {
+      return !!component && String(component.get?.('tagName') || '').toLowerCase() === 'video';
+    }
+
+    function isLumaMatteComponent(component) {
+      if (!component) return false;
+      const attributes = componentAttributes(component);
+      return attributes['data-ocd-luma-matte'] === '1' || attributes['data-ocd-luma-matte'] === 'true';
+    }
+
+    function lumaMatteTargetFor(component) {
+      if (!component) return null;
+      let current = component;
+      while (current) {
+        if (isLumaMatteComponent(current)) return { kind: 'luma', component: current };
+        current = typeof current.parent === 'function' ? current.parent() : null;
+      }
+      current = component;
+      while (current) {
+        if (isVideoComponent(current)) return { kind: 'video', component: current };
+        current = typeof current.parent === 'function' ? current.parent() : null;
+      }
+      return null;
+    }
+
+    function firstVideoComponent(component) {
+      if (!component || typeof component.find !== 'function') return null;
+      const found = component.find('video');
+      return found && found[0] ? found[0] : null;
+    }
+
+    function firstCanvasComponent(component) {
+      if (!component || typeof component.find !== 'function') return null;
+      const found = component.find('canvas');
+      return found && found[0] ? found[0] : null;
+    }
+
+    function videoSourceDescriptor(video) {
+      if (!video) return { src: '', type: '' };
+      const attributes = componentAttributes(video);
+      const src = String(attributes.src || '');
+      if (src) return { src, type: String(attributes.type || '') };
+      let source = null;
+      if (typeof video.find === 'function') {
+        const found = video.find('source');
+        source = found && found[0] ? found[0] : null;
+      }
+      if (!source) return { src: '', type: '' };
+      const sourceAttributes = componentAttributes(source);
+      return { src: String(sourceAttributes.src || ''), type: String(sourceAttributes.type || '') };
+    }
+
+    function lumaMatteMarkup(video) {
+      const attributes = componentAttributes(video);
+      const source = videoSourceDescriptor(video);
+      const classes = componentClasses(video).filter((name) => name !== 'ocd-luma-matte__video');
+      const id = attributes.id ? ` id="${escapeAttr(attributes.id)}"` : '';
+      const style = String(attributes.style || '');
+      const poster = attributes.poster ? ` poster="${escapeAttr(attributes.poster)}"` : '';
+      const width = attributes.width ? ` width="${escapeAttr(attributes.width)}"` : '';
+      const height = attributes.height ? ` height="${escapeAttr(attributes.height)}"` : '';
+      const preload = attributes.preload ? String(attributes.preload) : 'auto';
+      const controls = hasAttr(attributes, 'controls') ? ' controls' : '';
+      const videoClasses = ['ocd-luma-matte__video', ...classes];
+      const sourceHtml = source.src
+        ? `<source src="${escapeAttr(source.src)}"${source.type ? ` type="${escapeAttr(source.type)}"` : ''}>`
+        : '';
+      const canvasStyle = style ? ` style="${escapeAttr(style)}"` : '';
+      return (
+        '<div data-ocd-luma-matte="1" class="ocd-luma-matte">' +
+        `<video class="${escapeAttr(videoClasses.join(' '))}"${id}${controls} hidden autoplay muted loop playsinline preload="${escapeAttr(preload)}"${poster}${width}${height}>` +
+        sourceHtml +
+        '</video>' +
+        `<canvas class="ocd-luma-matte__canvas"${width}${height}${canvasStyle}></canvas>` +
+        '</div>'
+      );
+    }
+
+    function normalVideoMarkup(wrapper) {
+      const video = firstVideoComponent(wrapper);
+      const canvas = firstCanvasComponent(wrapper);
+      const videoAttributes = video ? componentAttributes(video) : {};
+      const canvasAttributes = canvas ? componentAttributes(canvas) : {};
+      const source = video ? videoSourceDescriptor(video) : { src: '', type: '' };
+      const classes = video
+        ? componentClasses(video).filter((name) => name !== 'ocd-luma-matte__video')
+        : [];
+      const id = videoAttributes.id ? ` id="${escapeAttr(videoAttributes.id)}"` : '';
+      const style = String(canvasAttributes.style || videoAttributes.style || '');
+      const poster = videoAttributes.poster ? ` poster="${escapeAttr(videoAttributes.poster)}"` : '';
+      const width = canvasAttributes.width || videoAttributes.width
+        ? ` width="${escapeAttr(canvasAttributes.width || videoAttributes.width)}"`
+        : '';
+      const height = canvasAttributes.height || videoAttributes.height
+        ? ` height="${escapeAttr(canvasAttributes.height || videoAttributes.height)}"`
+        : '';
+      const preload = videoAttributes.preload ? String(videoAttributes.preload) : 'auto';
+      const controls = hasAttr(videoAttributes, 'controls') ? ' controls' : '';
+      const loop = hasAttr(videoAttributes, 'loop') ? ' loop' : '';
+      const muted = hasAttr(videoAttributes, 'muted') ? ' muted' : '';
+      const autoplay = hasAttr(videoAttributes, 'autoplay') ? ' autoplay' : '';
+      const playsinline = hasAttr(videoAttributes, 'playsinline') ? ' playsinline' : '';
+      const classAttr = classes.length ? ` class="${escapeAttr(classes.join(' '))}"` : '';
+      const styleAttr = style ? ` style="${escapeAttr(style)}"` : '';
+      const srcAttr = source.src ? ` src="${escapeAttr(source.src)}"` : '';
+      return `<video${classAttr}${id}${srcAttr}${poster}${controls}${loop}${muted}${autoplay}${playsinline} preload="${escapeAttr(preload)}"${width}${height}${styleAttr}></video>`;
+    }
+
+    function inferVideoType(url, fallback) {
+      const clean = String(url || '').split(/[?#]/)[0].toLowerCase();
+      if (/\.mp4$/.test(clean)) return 'video/mp4';
+      if (/\.webm$/.test(clean)) return 'video/webm';
+      if (/\.mov$/.test(clean)) return 'video/quicktime';
+      if (/\.m4v$/.test(clean)) return 'video/mp4';
+      return fallback || '';
+    }
+
+    function setVideoSource(component, url) {
+      const target = lumaMatteTargetFor(component);
+      if (!target) return;
+      const video = target.kind === 'luma' ? firstVideoComponent(target.component) : target.component;
+      if (!video) return;
+      const source = url && url.trim() ? url.trim() : '';
+      if (typeof video.find === 'function') {
+        const sources = video.find('source');
+        if (sources && sources[0]) {
+          const existing = componentAttributes(sources[0]);
+          const type = inferVideoType(source, String(existing.type || 'video/mp4'));
+          sources[0].addAttributes({ src: source, type });
+          return;
+        }
+      }
+      video.addAttributes({ src: source });
+    }
+
+    function installCanvasLumaRuntime() {
+      if (!global.OcdLumaMatteVideo || typeof global.OcdLumaMatteVideo.createRuntime !== 'function') return;
+      let canvasDocument = null;
+      try { canvasDocument = editor.Canvas?.getDocument?.(); } catch (_error) { return; }
+      if (!canvasDocument) return;
+      const canvasWindow =
+        canvasDocument.defaultView ||
+        (typeof editor.Canvas?.getWindow === 'function' ? editor.Canvas.getWindow() : null);
+      if (!canvasWindow) return;
+      try {
+        global.OcdLumaMatteVideo.createRuntime({ window: canvasWindow, document: canvasDocument });
+      } catch (_error) {
+        // La composición es progresiva; si el lienzo no está listo se reintenta
+        // en la próxima selección o refresco del editor.
+      }
     }
 
     function headerForComponent(component) {
@@ -887,6 +1058,68 @@
       return panel;
     }
 
+    function renderLumaMattePanel(component) {
+      const target = lumaMatteTargetFor(component);
+      if (!target) return null;
+      const video = target.kind === 'luma' ? firstVideoComponent(target.component) : target.component;
+      const source = video ? videoSourceDescriptor(video) : { src: '', type: '' };
+      const panel = createElement(hostDocument, 'section', 'ocd-ci__luma');
+      panel.appendChild(createElement(hostDocument, 'div', 'ocd-ci__luma-title', 'Video · transparencia'));
+
+      const sourceLabel = createElement(hostDocument, 'label', 'ocd-ci__luma-field', 'Fuente del video (MP4/WebM)');
+      const sourceInput = createElement(hostDocument, 'input');
+      sourceInput.type = 'text';
+      sourceInput.value = source.src;
+      sourceInput.placeholder = 'https://…/video.mp4';
+      sourceInput.addEventListener('change', async () => {
+        setVideoSource(target.component, sourceInput.value);
+        installCanvasLumaRuntime();
+        await refreshAfterRender();
+      });
+      sourceLabel.appendChild(sourceInput);
+      panel.appendChild(sourceLabel);
+
+      const toggleLabel = createElement(hostDocument, 'label', 'ocd-ci__luma-toggle');
+      const toggle = createElement(hostDocument, 'input');
+      toggle.type = 'checkbox';
+      toggle.checked = target.kind === 'luma';
+      toggleLabel.append(
+        toggle,
+        createElement(hostDocument, 'span', '', 'Transparencia (matte apilado arriba/abajo)'),
+      );
+      panel.appendChild(toggleLabel);
+
+      toggle.addEventListener('change', async () => {
+        const currentTarget = lumaMatteTargetFor(editor.getSelected() || component);
+        if (!currentTarget) return;
+        if (toggle.checked && currentTarget.kind === 'video') {
+          const replacement = currentTarget.component.replaceWith(lumaMatteMarkup(currentTarget.component));
+          selected = Array.isArray(replacement) ? replacement[0] : replacement;
+          if (selected) editor.select(selected);
+          installCanvasLumaRuntime();
+          await refreshAfterRender();
+        } else if (!toggle.checked && currentTarget.kind === 'luma') {
+          const replacement = currentTarget.component.replaceWith(normalVideoMarkup(currentTarget.component));
+          selected = Array.isArray(replacement) ? replacement[0] : replacement;
+          if (selected) editor.select(selected);
+          installCanvasLumaRuntime();
+          await refreshAfterRender();
+        } else {
+          toggle.checked = currentTarget.kind === 'luma';
+        }
+      });
+
+      panel.appendChild(
+        createElement(
+          hostDocument,
+          'div',
+          'ocd-ci__luma-hint',
+          'Formato del archivo: un único MP4 H.264 con el video RGB arriba y la máscara blanco/negro abajo (mismo ancho, el doble de alto que el video final). Ej.: video final 1080×1920 → archivo 1080×3840 (mitad superior = RGB, mitad inferior = matte). Blanco = visible, negro = transparente. Exportalo desde After Effects + Media Encoder.',
+        ),
+      );
+      return panel;
+    }
+
     function render() {
       if (!root || !body || !targetLabel) return;
       targetLabel.textContent = snapshot?.description || 'Ningún elemento seleccionado';
@@ -908,6 +1141,8 @@
       }
       const headerPanel = renderHeaderStatePanel(headerForComponent(snapshot?.component));
       if (headerPanel) body.appendChild(headerPanel);
+      const lumaPanel = renderLumaMattePanel(snapshot?.component);
+      if (lumaPanel) body.appendChild(lumaPanel);
       const svgImage = externalSvgImageFor(snapshot?.component) || firstExternalSvgImage();
       const brandVector = firstBrandVector();
       if (svgImage || brandVector) {
@@ -1059,6 +1294,10 @@
       applySvgMask,
       headerForComponent,
       setHeaderPreviewState,
+      lumaMatteMarkup,
+      normalVideoMarkup,
+      lumaMatteTargetFor,
+      videoSourceDescriptor,
       mount,
       destroy() {
         editor.off('component:selected', onSelected);

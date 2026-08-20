@@ -299,9 +299,16 @@ final class OCD_Inline_Editor_Frontend
             true
         );
         wp_enqueue_script(
+            'ocd-luma-matte-video',
+            plugins_url('assets/js/ocd-luma-matte-video.js', OCD_PUBLISHER_FILE),
+            [],
+            OCD_PUBLISHER_VERSION,
+            true
+        );
+        wp_enqueue_script(
             'ocd-editor-core',
             plugins_url('assets/js/ocd-editor-core.js', OCD_PUBLISHER_FILE),
-            ['ocd-grapesjs', 'ocd-computed-inspector', 'ocd-canvas-grid', 'ocd-grid-controls', 'ocd-behaviors'],
+            ['ocd-grapesjs', 'ocd-computed-inspector', 'ocd-canvas-grid', 'ocd-grid-controls', 'ocd-behaviors', 'ocd-luma-matte-video'],
             OCD_PUBLISHER_VERSION,
             true
         );

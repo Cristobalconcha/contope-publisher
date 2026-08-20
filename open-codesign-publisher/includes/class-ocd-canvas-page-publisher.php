@@ -267,6 +267,13 @@ final class OCD_Canvas_Page_Publisher
             OCD_PUBLISHER_VERSION,
             true
         );
+        wp_enqueue_script(
+            'ocd-luma-matte-video',
+            plugins_url('assets/js/ocd-luma-matte-video.js', OCD_PUBLISHER_FILE),
+            [],
+            OCD_PUBLISHER_VERSION,
+            true
+        );
 
         $markup = '';
         if ($header_html !== '') {
