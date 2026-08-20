@@ -144,13 +144,13 @@ final class OCD_Template_Region_Resolver
             case OCD_Canvas_Document_Repository::MATCH_TYPE_HOMEPAGE:
                 return $context['isHomepage'];
             case OCD_Canvas_Document_Repository::MATCH_TYPE_POST:
-                return isset($rule['id']) && $rule['id'] === $context['postId'];
+                return isset($rule['id']) && (int) $rule['id'] === (int) $context['postId'];
             case OCD_Canvas_Document_Repository::MATCH_TYPE_CHILDREN_OF:
-                return isset($rule['id']) && in_array($rule['id'], $context['ancestorIds'], true);
+                return isset($rule['id']) && in_array((int) $rule['id'], $context['ancestorIds'], true);
             case OCD_Canvas_Document_Repository::MATCH_TYPE_CATEGORY:
-                return isset($rule['id']) && in_array($rule['id'], $context['categoryIds'], true);
+                return isset($rule['id']) && in_array((int) $rule['id'], $context['categoryIds'], true);
             case OCD_Canvas_Document_Repository::MATCH_TYPE_TAG:
-                return isset($rule['id']) && in_array($rule['id'], $context['tagIds'], true);
+                return isset($rule['id']) && in_array((int) $rule['id'], $context['tagIds'], true);
             default:
                 return false;
         }

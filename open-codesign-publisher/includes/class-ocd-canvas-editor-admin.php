@@ -367,7 +367,19 @@ final class OCD_Canvas_Editor_Admin
         $auto_load_page_id = $this->resolve_auto_load_page_id();
         $auto_load_document_id = $auto_load_page_id > 0 ? '' : $this->resolve_auto_load_document_id();
         if ($auto_load_page_id > 0) {
-            $document_id = self::document_id_for_page($auto_load_page_id);
+            // El document_id real es el guardado en la meta de la página, NO
+            // necesariamente "ocd-canvas-page-{ID}": ese nombre asume que el
+            // ID numérico de WordPress nunca cambió, lo cual es falso en
+            // cualquier sitio migrado (el document_id viaja con el paquete de
+            // Portabilidad, el ID numérico de post lo asigna cada instalación
+            // por su cuenta). Usar la convención acá era exactamente el bug
+            // detrás de "Editar con OCD" mostrando una página en blanco.
+            $real_document_id = (string) get_post_meta(
+                $auto_load_page_id,
+                OCD_Canvas_Page_Publisher::META_DOCUMENT_ID,
+                true
+            );
+            $document_id = $real_document_id !== '' ? $real_document_id : self::document_id_for_page($auto_load_page_id);
         } elseif ($auto_load_document_id !== '') {
             $document_id = $auto_load_document_id;
         } else {
@@ -563,151 +575,44 @@ final class OCD_Canvas_Editor_Admin
                                 $option_label .= ' — Canvas';
                             }
                             ?>
-                            <option value="<?php echo esc_attr((string) $page->ID); ?>"><?php echo esc_html($option_label); ?></option>
+                            <option value="<?php echo esc_attr((string) $page->ID); ?>" data-document-id="<?php echo esc_attr($document_id); ?>"><?php echo esc_html($option_label); ?></option>
                         <?php endforeach; ?>
                     </select>
                     <button type="button" class="button button-primary" id="ocd-page-load">Cargar página</button>
                     <span class="ocd-canvas-status" id="ocd-canvas-page-status" role="status" aria-live="polite"></span>
                 </div>
-
-                <div class="ocd-region-segments" data-ocd-active-segment="">
-                    <div class="ocd-region-tabs" role="tablist" aria-label="Segmentos de la página">
-                        <button type="button" class="button" role="tab" data-ocd-region-segment="header" aria-selected="false" disabled>
-                            Encabezado
-                        </button>
-                        <button type="button" class="button" role="tab" data-ocd-region-segment="footer" aria-selected="false" disabled>
-                            Pie de página
-                        </button>
-                    </div>
-
-                    <div class="ocd-region-panels">
-                        <section class="ocd-region-segment-panel" data-ocd-region-segment-panel="header">
-                            <div class="ocd-region-preview" data-ocd-region-preview="header">
-                                <p class="ocd-region-empty">Cargá una página para resolver el Encabezado.</p>
-                            </div>
-                            <div class="ocd-region-canvas-slot" data-ocd-region-canvas-slot="header"></div>
-                        </section>
-                        <section class="ocd-region-segment-panel" data-ocd-region-segment-panel="footer">
-                            <div class="ocd-region-preview" data-ocd-region-preview="footer">
-                                <p class="ocd-region-empty">Cargá una página para resolver el Pie de página.</p>
-                            </div>
-                            <div class="ocd-region-canvas-slot" data-ocd-region-canvas-slot="footer"></div>
-                        </section>
-                    </div>
-                </div>
             </div>
 
-            <div class="ocd-canvas-region-panel">
-                <h2>Región de plantilla (Encabezado / Pie de página)</h2>
-                <p class="description">
-                    Marca qué rol cumple este documento al armar una página. Global se usa en
-                    todo el sitio salvo que exista una región local más específica. Local aplica
-                    solo a las páginas o categorías que indiques.
-                </p>
-                <table class="form-table" role="presentation">
-                    <tr>
-                        <th scope="row"><label for="ocd-region-kind">Tipo de región</label></th>
-                        <td>
-                            <select id="ocd-region-kind">
-                                <option value="">(ninguno — documento normal)</option>
-                                <option value="header">Encabezado</option>
-                                <option value="body">Cuerpo</option>
-                                <option value="footer">Pie de página</option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row"><label for="ocd-region-scope">Alcance</label></th>
-                        <td>
-                            <select id="ocd-region-scope">
-                                <option value="">(sin definir)</option>
-                                <option value="global">Global — todo el sitio</option>
-                                <option value="local">Local — página(s) o categoría(s) específicas</option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr class="ocd-region-rules-row" data-ocd-rule-fieldset="targets">
-                        <th scope="row"><span id="ocd-region-targets-label">Destinos (solo si es Local)</span></th>
-                        <td>
-                            <div class="ocd-rule-picker">
-                                <select class="ocd-rule-type" data-ocd-rule-type="targets" aria-label="Tipo de destino">
-                                    <option value="">Elegir tipo…</option>
-                                    <option value="post">Página…</option>
-                                    <option value="children_of">Páginas hijas de…</option>
-                                    <option value="category">Categoría…</option>
-                                    <option value="tag">Etiqueta…</option>
-                                    <option value="homepage">La portada</option>
-                                    <option value="all_pages">Todas las páginas</option>
-                                    <option value="all_posts">Todas las entradas</option>
-                                </select>
-                                <select class="ocd-rule-entity" data-ocd-rule-entity="targets" aria-label="Elegir página, categoría o etiqueta" hidden>
-                                    <option value="">Elegir…</option>
-                                </select>
-                                <button type="button" class="button button-secondary" data-ocd-rule-add="targets">Agregar</button>
-                            </div>
-                            <div class="ocd-rule-list" data-ocd-rule-list="targets" role="list" aria-label="Destinos"></div>
-                            <p class="description ocd-rule-scope-hint" data-ocd-rule-scope-hint="targets" hidden>
-                                El alcance global aplica a todo el sitio; solo definí exclusiones.
-                            </p>
-                            <input type="hidden" id="ocd-region-targets" value="">
-                        </td>
-                    </tr>
-                    <tr class="ocd-region-rules-row" data-ocd-rule-fieldset="excludes">
-                        <th scope="row"><span id="ocd-region-excludes-label">Exclusiones (opcional)</span></th>
-                        <td>
-                            <div class="ocd-rule-picker">
-                                <select class="ocd-rule-type" data-ocd-rule-type="excludes" aria-label="Tipo de exclusión">
-                                    <option value="">Elegir tipo…</option>
-                                    <option value="post">Página…</option>
-                                    <option value="children_of">Páginas hijas de…</option>
-                                    <option value="category">Categoría…</option>
-                                    <option value="tag">Etiqueta…</option>
-                                    <option value="homepage">La portada</option>
-                                    <option value="all_pages">Todas las páginas</option>
-                                    <option value="all_posts">Todas las entradas</option>
-                                </select>
-                                <select class="ocd-rule-entity" data-ocd-rule-entity="excludes" aria-label="Elegir página, categoría o etiqueta" hidden>
-                                    <option value="">Elegir…</option>
-                                </select>
-                                <button type="button" class="button button-secondary" data-ocd-rule-add="excludes">Agregar</button>
-                            </div>
-                            <div class="ocd-rule-list" data-ocd-rule-list="excludes" role="list" aria-label="Exclusiones"></div>
-                            <input type="hidden" id="ocd-region-excludes" value="">
-                        </td>
-                    </tr>
-                </table>
-                <p class="ocd-region-reach" id="ocd-region-reach" role="status" aria-live="polite"></p>
-                <details class="ocd-region-advanced">
-                    <summary>Opciones avanzadas (JSON)</summary>
-                    <textarea id="ocd-region-json" rows="8" spellcheck="false"
-                        aria-label="JSON combinado de destinos y exclusiones"></textarea>
-                    <p class="description">
-                        Objeto <code>{"targets":[…],"excludes":[…]}</code> con el mismo vocabulario de
-                        <code>type</code>: <code>post</code> + <code>id</code>, <code>children_of</code> + <code>id</code>,
-                        <code>category</code> + <code>id</code>, <code>tag</code> + <code>id</code>, <code>homepage</code>,
-                        <code>all_pages</code> y <code>all_posts</code>. Al salir del campo, si el JSON es válido
-                        reconstruye los chips; si no, se conserva el último valor válido.
-                    </p>
-                </details>
-                <button type="button" class="button button-secondary" id="ocd-canvas-save-region">
-                    Guardar región
-                </button>
-                <span class="ocd-canvas-status" id="ocd-canvas-region-status" role="status" aria-live="polite"></span>
-            </div>
-
-            <div class="ocd-canvas-editor-shell">
-                <div class="ocd-canvas-side-tabs" role="tablist" aria-label="Panel lateral del editor">
-                    <button type="button" class="button" role="tab" data-ocd-side-panel="components" aria-selected="false">
-                        Estructura y componentes
-                    </button>
-                    <button type="button" class="button button-primary" role="tab" data-ocd-side-panel="inspector" aria-selected="true">
-                        Inspector Open CoDesign
-                    </button>
+            <div class="ocd-canvas-assembled">
+                <div class="ocd-assembled-slot" data-ocd-slot="header" hidden>
+                    <div class="ocd-assembled-slot-preview" data-ocd-slot-preview="header" role="button" tabindex="0"></div>
+                    <div class="ocd-assembled-slot-canvas" data-ocd-slot-canvas="header"></div>
                 </div>
 
-                <div class="ocd-canvas-workspace" data-ocd-active-panel="inspector">
-                    <div id="ocd-canvas-editor-root" class="ocd-canvas-editor-root"></div>
-                    <aside id="ocd-canvas-inspector" class="ocd-canvas-inspector" aria-label="Inspector de diseño efectivo"></aside>
+                <div class="ocd-assembled-slot ocd-assembled-slot--body" data-ocd-slot="body">
+                    <div class="ocd-assembled-slot-preview" data-ocd-slot-preview="body" role="button" tabindex="0" hidden></div>
+                    <div class="ocd-assembled-slot-canvas" data-ocd-slot-canvas="body">
+                        <div class="ocd-canvas-editor-shell" id="ocd-canvas-editor-shell">
+                            <div class="ocd-canvas-side-tabs" role="tablist" aria-label="Panel lateral del editor">
+                                <button type="button" class="button" role="tab" data-ocd-side-panel="components" aria-selected="false">
+                                    Estructura y componentes
+                                </button>
+                                <button type="button" class="button button-primary" role="tab" data-ocd-side-panel="inspector" aria-selected="true">
+                                    Inspector Open CoDesign
+                                </button>
+                            </div>
+
+                            <div class="ocd-canvas-workspace" data-ocd-active-panel="inspector">
+                                <div id="ocd-canvas-editor-root" class="ocd-canvas-editor-root"></div>
+                                <aside id="ocd-canvas-inspector" class="ocd-canvas-inspector" aria-label="Inspector de diseño efectivo"></aside>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ocd-assembled-slot" data-ocd-slot="footer" hidden>
+                    <div class="ocd-assembled-slot-preview" data-ocd-slot-preview="footer" role="button" tabindex="0"></div>
+                    <div class="ocd-assembled-slot-canvas" data-ocd-slot-canvas="footer"></div>
                 </div>
             </div>
         </div>

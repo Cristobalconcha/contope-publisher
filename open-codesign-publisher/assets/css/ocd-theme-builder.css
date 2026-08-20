@@ -82,6 +82,7 @@
 }
 
 .ocd-tb-card {
+	min-width: 0;
 	padding: 16px;
 	border: 1px solid #dcdcde;
 	border-radius: 8px;
@@ -239,8 +240,11 @@
 
 .ocd-tb-region-select {
 	flex: 1;
+	width: 0;
 	min-width: 0;
-	max-width: 320px;
+	max-width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 .ocd-tb-row-actions {

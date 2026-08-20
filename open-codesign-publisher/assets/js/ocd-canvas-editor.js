@@ -94,7 +94,18 @@
     var dirty = false;
     var pageRegionDocs = { header: null, footer: null };
     var pageContext = null;
+    // activeSegment: legado, solo lo lee código muerto (saveRegion(), nunca
+    // se dispara desde la interfaz) — se deja en null a propósito, no tocar.
     var activeSegment = null;
+    /**
+     * activeSlot: 'body'|'header'|'footer' — cuál de los tres espacios de
+     * la página ensamblada es el lienzo editable ahora mismo. Reemplaza a
+     * activeSegment para la interacción real (ver enterSlot()).
+     * pageBodyDocumentId guarda el document_id del cuerpo, para volver ahí
+     * cuando se entra a otro espacio.
+     */
+    var activeSlot = 'body';
+    var pageBodyDocumentId = '';
     var originalEditorShellParent = null;
     var pageLoadInFlight = false;
 
@@ -690,9 +701,9 @@
         setStatus('Recargando…');
         return request(config.loadAction, { document_id: activeDocumentId })
             .then(function (doc) {
-                if (activeSegment && pageRegionDocs[activeSegment]) {
-                    pageRegionDocs[activeSegment] = doc;
-                    setRegionPreview(activeSegment, doc);
+                if (activeSlot !== 'body' && pageRegionDocs[activeSlot]) {
+                    pageRegionDocs[activeSlot] = doc;
+                    renderSlotPreview(activeSlot, doc);
                 }
                 applyDocument(doc);
                 populateRegionFields(doc);
@@ -1035,26 +1046,38 @@
         node.className = 'ocd-canvas-status' + (kind ? ' is-' + kind : '');
     }
 
-    function getRegionPanel(kind) {
-        return document.querySelector('[data-ocd-region-segment-panel="' + kind + '"]');
+    function getSlotElement(kind) {
+        return document.querySelector('[data-ocd-slot="' + kind + '"]');
     }
 
-    function setRegionPreview(kind, doc) {
-        var panel = getRegionPanel(kind);
-        var preview = panel ? panel.querySelector('[data-ocd-region-preview]') : null;
-        if (!preview) {
+    function getSlotPreviewElement(kind) {
+        return document.querySelector('[data-ocd-slot-preview="' + kind + '"]');
+    }
+
+    function getSlotCanvasElement(kind) {
+        return document.querySelector('[data-ocd-slot-canvas="' + kind + '"]');
+    }
+
+    /**
+     * Dibuja el contenido estático (no editable) de un espacio que no está
+     * activo ahora mismo. Para header/footer, sin `doc` el espacio entero
+     * se oculta — esta página no tiene esa región en Plantillas, nada que
+     * mostrar ni que ofrecer editar ahí. El cuerpo nunca se oculta.
+     */
+    function renderSlotPreview(kind, doc) {
+        var slot = getSlotElement(kind);
+        var preview = getSlotPreviewElement(kind);
+        if (!slot || !preview) {
             return;
+        }
+        if (kind !== 'body') {
+            slot.hidden = !doc;
         }
         preview.innerHTML = '';
+        preview.hidden = false;
         if (!doc) {
-            var empty = document.createElement('p');
-            empty.className = 'ocd-region-empty';
-            empty.textContent = 'Sin ' + regionLabel(kind) + ' asignado.';
-            preview.appendChild(empty);
-            panel.classList.add('is-empty');
             return;
         }
-        panel.classList.remove('is-empty');
         if (doc.css) {
             var style = document.createElement('style');
             style.textContent = doc.css;
@@ -1066,212 +1089,150 @@
         preview.appendChild(content);
     }
 
-    function updateRegionSegmentTabs() {
-        var tabs = document.querySelectorAll('[data-ocd-region-segment]');
-        Array.prototype.forEach.call(tabs, function (tab) {
-            var kind = tab.getAttribute('data-ocd-region-segment');
-            var doc = pageRegionDocs && pageRegionDocs[kind] ? pageRegionDocs[kind] : null;
-            var active = kind === activeSegment && !!doc;
-            tab.disabled = !doc;
-            tab.setAttribute('aria-selected', active ? 'true' : 'false');
-            tab.classList.toggle('button-primary', active);
-            tab.classList.toggle('is-disabled', !doc);
-        });
-
-        var panels = document.querySelectorAll('[data-ocd-region-segment-panel]');
-        Array.prototype.forEach.call(panels, function (panel) {
-            var kind = panel.getAttribute('data-ocd-region-segment-panel');
-            var doc = pageRegionDocs && pageRegionDocs[kind] ? pageRegionDocs[kind] : null;
-            panel.classList.toggle('is-active', kind === activeSegment && !!doc);
-            panel.classList.toggle('is-empty', !doc);
-        });
-
-        var segmentRoot = document.querySelector('.ocd-region-segments');
-        if (segmentRoot) {
-            segmentRoot.setAttribute('data-ocd-active-segment', activeSegment || '');
-        }
-    }
-
-    function moveEditorShellInto(kind) {
-        var shell = document.querySelector('.ocd-canvas-editor-shell');
-        var slot = document.querySelector('[data-ocd-region-canvas-slot="' + kind + '"]');
-        if (!shell || !slot) {
-            return;
-        }
-        if (!originalEditorShellParent) {
-            originalEditorShellParent = shell.parentNode;
-        }
-        if (shell.parentNode !== slot) {
-            slot.appendChild(shell);
-        }
-        window.setTimeout(function () {
-            if (typeof editor.refresh === 'function') editor.refresh();
-        }, 0);
-    }
-
-    function clearActiveSegment() {
-        activeSegment = null;
-        window.clearTimeout(autosaveTimer);
-        autosaveTimer = null;
-        var shell = document.querySelector('.ocd-canvas-editor-shell');
-        if (shell && originalEditorShellParent && shell.parentNode !== originalEditorShellParent) {
-            originalEditorShellParent.appendChild(shell);
-        }
-        if (bodyDocument) {
-            applyDocument(bodyDocument);
-        } else {
-            activeDocumentId = bodyDocumentId;
-            config.documentId = bodyDocumentId;
-            current = null;
-            dirty = false;
-            editor.setComponents('');
-            editor.setStyle('');
-            behaviorApi.refresh();
-            gridApi.scan();
-            updateMeta(null);
-            window.requestAnimationFrame(function () {
-                dirty = false;
+    /**
+     * Resuelve y dibuja las previsualizaciones de Encabezado/Pie de página
+     * de una página, sin tocar el cuerpo (que ya está cargado y activo).
+     * Nunca bloquea nada: sin regiones asignadas, sus espacios quedan
+     * ocultos y listo.
+     */
+    function refreshRegionPreviews(pageId) {
+        return request(config.resolvePageAction, { page_id: String(pageId) })
+            .then(function (data) {
+                pageRegionDocs.header = (data.regions && data.regions.header) || null;
+                pageRegionDocs.footer = (data.regions && data.regions.footer) || null;
+                renderSlotPreview('header', pageRegionDocs.header);
+                renderSlotPreview('footer', pageRegionDocs.footer);
+            })
+            .catch(function () {
+                pageRegionDocs.header = null;
+                pageRegionDocs.footer = null;
+                renderSlotPreview('header', null);
+                renderSlotPreview('footer', null);
             });
+    }
+
+    /**
+     * Mueve el lienzo vivo (GrapesJS) al espacio `kind` y esconde su
+     * previsualización estática — es el mismo contenido, ahora editable.
+     */
+    function moveShellInto(kind) {
+        var shell = document.getElementById('ocd-canvas-editor-shell');
+        var target = getSlotCanvasElement(kind);
+        var preview = getSlotPreviewElement(kind);
+        if (!shell || !target) {
+            return;
         }
-        populateRegionFields(bodyDocument || {
-            regionKind: '',
-            regionScope: '',
-            regionTargets: [],
-            regionExcludes: []
-        });
-        updateRegionSegmentTabs();
+        if (shell.parentNode !== target) {
+            target.appendChild(shell);
+        }
+        if (preview) {
+            preview.hidden = true;
+        }
         window.setTimeout(function () {
             if (typeof editor.refresh === 'function') editor.refresh();
         }, 0);
-    }
-
-    function setActiveRegionSegment(kind, doc) {
-        if (!doc || !doc.documentId) {
-            pageStatus('La región ' + regionLabel(kind) + ' no tiene un documento editable.', 'error');
-            return;
-        }
-        activeSegment = kind;
-        pageRegionDocs[kind] = doc;
-        setRegionPreview(kind, doc);
-        window.clearTimeout(autosaveTimer);
-        autosaveTimer = null;
-        moveEditorShellInto(kind);
-        updateRegionSegmentTabs();
-        applyDocument(doc);
-        populateRegionFields(doc);
-        dirty = false;
-        pageStatus(
-            'Editando ' + regionLabel(kind) + ' de la página «' + (pageContext ? pageContext.pageTitle : '') + '».',
-            'ok'
-        );
     }
 
     function hasUnsavedChanges() {
         return dirty || autosaveTimer !== null;
     }
 
-    function activateRegionSegment(kind) {
-        var doc = pageRegionDocs && pageRegionDocs[kind] ? pageRegionDocs[kind] : null;
-        if (!doc) {
-            pageStatus('La región ' + regionLabel(kind) + ' no está asignada a esta página.', 'error');
+    /**
+     * Cambia cuál de los tres espacios (header/body/footer) es el lienzo
+     * editable ahora mismo. Se dispara con un clic en la previsualización
+     * del espacio al que se quiere entrar — no hay pestañas ni botón
+     * "volver" separados, entrar a cualquier otro espacio ES la salida del
+     * actual. Si el que se deja tiene cambios sin guardar, pregunta si
+     * guardarlos (avisando si es una región compartida con otras páginas)
+     * o descartarlos — nunca se guardan dos documentos juntos.
+     */
+    function enterSlot(kind) {
+        if (kind === activeSlot || pageLoadInFlight) {
             return;
         }
-        if (kind === activeSegment) {
-            function returnToBody() {
-                clearActiveSegment();
-                pageStatus('Volviendo al documento Canvas del cuerpo.', 'ok');
-            }
-            if (hasUnsavedChanges()) {
-                pageStatus('Guardando ' + regionLabel(kind) + ' antes de volver…');
-                return persist('manual').then(function (savedDoc) {
-                    if (savedDoc && savedDoc.documentId) {
-                        pageRegionDocs[kind] = savedDoc;
-                        setRegionPreview(kind, savedDoc);
-                    }
-                    returnToBody();
-                }).catch(function (error) {
-                    pageStatus('No se volvió al documento: ' + error.message, 'error');
-                });
-            }
-            returnToBody();
+        var targetId = kind === 'body' ? pageBodyDocumentId : ((pageRegionDocs[kind] || {}).documentId || '');
+        if (!targetId) {
             return;
         }
+        var leavingKind = activeSlot;
+        var leavingIsShared = leavingKind !== 'body';
 
-        var previousKind = activeSegment;
-        if (previousKind && current) {
-            pageRegionDocs[previousKind] = current;
-            setRegionPreview(previousKind, current);
+        function refreshLeavingPreview() {
+            var leavingId = leavingKind === 'body' ? pageBodyDocumentId : ((pageRegionDocs[leavingKind] || {}).documentId || '');
+            if (!leavingId) {
+                return Promise.resolve();
+            }
+            return request(config.loadAction, { document_id: leavingId }).then(function (freshDoc) {
+                if (leavingKind !== 'body') {
+                    pageRegionDocs[leavingKind] = freshDoc;
+                }
+                renderSlotPreview(leavingKind, freshDoc);
+            });
         }
 
         function proceed() {
-            setActiveRegionSegment(kind, doc);
+            pageStatus('Cargando…');
+            return request(config.loadAction, { document_id: targetId })
+                .then(function (doc) {
+                    activeDocumentId = targetId;
+                    config.documentId = targetId;
+                    moveShellInto(kind);
+                    applyDocument(doc);
+                    activeSlot = kind;
+                    pageStatus(
+                        kind === 'body'
+                            ? 'Editando el cuerpo de la página.'
+                            : 'Editando el ' + regionLabel(kind) + ' compartido — guardar acá afecta a todas las páginas que lo usan.',
+                        'ok'
+                    );
+                })
+                .catch(function (error) {
+                    pageStatus('No se pudo cargar: ' + error.message, 'error');
+                });
         }
 
-        if (hasUnsavedChanges()) {
-            pageStatus('Guardando el documento actual antes de cambiar…');
-            return persist('manual').then(function (savedDoc) {
-                if (previousKind && savedDoc && savedDoc.documentId) {
-                    pageRegionDocs[previousKind] = savedDoc;
-                    setRegionPreview(previousKind, savedDoc);
-                }
-                proceed();
-            }).catch(function (error) {
-                pageStatus('No se cambió de segmento: ' + error.message, 'error');
-            });
+        if (activeDocumentId && hasUnsavedChanges()) {
+            var question = leavingIsShared
+                ? 'Tenés cambios sin guardar en el ' + regionLabel(leavingKind) + ' compartido.\n\nGuardar afectará a TODAS las páginas que lo usan.\n\n¿Guardar los cambios? (Cancelar = descartarlos)'
+                : 'Tenés cambios sin guardar en el cuerpo de esta página.\n\n¿Guardar los cambios? (Cancelar = descartarlos)';
+            if (window.confirm(question)) {
+                pageStatus('Guardando antes de cambiar…');
+                return persist('manual').then(refreshLeavingPreview).then(proceed).catch(function (error) {
+                    pageStatus('No se guardó: ' + error.message, 'error');
+                });
+            }
+            dirty = false;
+            window.clearTimeout(autosaveTimer);
+            autosaveTimer = null;
+            return refreshLeavingPreview().then(proceed);
         }
-        proceed();
-    }
 
-    function setPageContext(data) {
-        pageContext = data;
-        pageRegionDocs = {
-            header: data.regions && data.regions.header ? data.regions.header : null,
-            footer: data.regions && data.regions.footer ? data.regions.footer : null
-        };
-        setRegionPreview('header', pageRegionDocs.header);
-        setRegionPreview('footer', pageRegionDocs.footer);
-        updateRegionSegmentTabs();
+        return refreshLeavingPreview().then(proceed);
     }
 
     /**
-     * Carga el contexto de una página (sus regiones resueltas) sin robar el
-     * foco al documento del cuerpo. Es la vía que usa "Editar con OCD": el
-     * documento activo sigue siendo el documento Canvas de la página, por lo
-     * que Guardar y Publicar operan sobre esa página, no sobre una región.
+     * Resuelve el contexto de una página (sus regiones) sin recargar el
+     * cuerpo, que ya llegó cargado desde PHP. Es la vía que usa "Editar con
+     * OCD" desde el listado de páginas.
      */
     function loadPageContext(pageIdOverride) {
-        if (pageLoadInFlight) {
-            return;
-        }
-        var input = document.getElementById('ocd-page-target');
-        var overrideId = Number(pageIdOverride);
-        var pageId = overrideId > 0 ? overrideId : (input ? parseInt(input.value, 10) : 0);
+        var pageId = Number(pageIdOverride);
         if (!pageId || pageId <= 0) {
-            pageStatus('Elegí una página de la lista.', 'error');
             return;
         }
-
-        pageLoadInFlight = true;
-        pageStatus('Resolviendo página ' + pageId + '…');
-        return request(config.resolvePageAction, { page_id: String(pageId) })
-            .then(function (data) {
-                setPageContext(data);
-                loadAcfFields(pageId);
-                pageStatus(
-                    'Editando el documento Canvas de «' + data.pageTitle +
-                        '». Usá Encabezado/Pie de página para editar regiones.',
-                    'ok'
-                );
-            })
-            .catch(function (error) {
-                clearAcfFieldBlocks();
-                pageStatus('No se pudo cargar la página: ' + error.message, 'error');
-            })
-            .finally(function () {
-                pageLoadInFlight = false;
-            });
+        pageBodyDocumentId = activeDocumentId;
+        activeSlot = 'body';
+        moveShellInto('body');
+        pageStatus('Editando la página «' + config.pageTitle + '».', 'ok');
+        refreshRegionPreviews(pageId);
     }
 
+    /**
+     * Carga el cuerpo propio de una página en el lienzo principal. Siempre
+     * funciona, tenga o no regiones de Encabezado/Pie de página asignadas
+     * en Plantillas — esa asignación es un dato de Plantillas, no un
+     * requisito para poder abrir y editar el contenido de la página.
+     */
     function loadTargetPage(pageIdOverride) {
         if (pageLoadInFlight) {
             return;
@@ -1284,58 +1245,44 @@
             return;
         }
 
-        pageLoadInFlight = true;
-        pageStatus('Resolviendo página ' + pageId + '…');
-        return request(config.resolvePageAction, { page_id: String(pageId) })
-            .then(function (data) {
-                setPageContext(data);
-                loadAcfFields(pageId);
+        var option = input ? input.querySelector('option[value="' + pageId + '"]') : null;
+        var documentId = option ? (option.getAttribute('data-document-id') || '') : '';
+        if (documentId === '') {
+            pageStatus('Esta página no tiene un documento Canvas asociado.', 'error');
+            return;
+        }
 
-                var preferredKind = null;
-                if (pageRegionDocs.header) {
-                    preferredKind = 'header';
-                } else if (pageRegionDocs.footer) {
-                    preferredKind = 'footer';
-                }
+        function proceedToLoad() {
+            pageLoadInFlight = true;
+            pageStatus('Cargando página ' + pageId + '…');
+            loadAcfFields(pageId);
+            pageBodyDocumentId = documentId;
+            activeSlot = 'body';
+            moveShellInto('body');
+            return request(config.loadAction, { document_id: documentId })
+                .then(function (doc) {
+                    activeDocumentId = documentId;
+                    config.documentId = documentId;
+                    applyDocument(doc);
+                    pageStatus('Página cargada.', 'ok');
+                    refreshRegionPreviews(pageId);
+                })
+                .catch(function (error) {
+                    clearAcfFieldBlocks();
+                    pageStatus('No se pudo cargar la página: ' + error.message, 'error');
+                })
+                .finally(function () {
+                    pageLoadInFlight = false;
+                });
+        }
 
-                function clearWithoutRegion() {
-                    clearActiveSegment();
-                    pageStatus(
-                        'Esta página no tiene regiones de Encabezado ni Pie de página asignadas.',
-                        'error'
-                    );
-                }
-
-                if (!preferredKind) {
-                    if (activeDocumentId && hasUnsavedChanges()) {
-                        pageStatus('Guardando el documento actual antes de descartar el segmento activo…');
-                        return persist('manual').then(clearWithoutRegion).catch(function (error) {
-                            pageStatus('No se cargó la página: ' + error.message, 'error');
-                        });
-                    }
-                    clearWithoutRegion();
-                    return;
-                }
-
-                function proceedToRegion() {
-                    setActiveRegionSegment(preferredKind, pageRegionDocs[preferredKind]);
-                }
-
-                if (activeDocumentId && hasUnsavedChanges()) {
-                    pageStatus('Guardando el documento actual antes de cargar la página…');
-                    return persist('manual').then(proceedToRegion).catch(function (error) {
-                        pageStatus('No se cargó la página: ' + error.message, 'error');
-                    });
-                }
-                proceedToRegion();
-            })
-            .catch(function (error) {
-                clearAcfFieldBlocks();
-                pageStatus('No se pudo cargar la página: ' + error.message, 'error');
-            })
-            .finally(function () {
-                pageLoadInFlight = false;
+        if (activeDocumentId && hasUnsavedChanges()) {
+            pageStatus('Guardando el documento actual antes de cargar la página…');
+            return persist('manual').then(proceedToLoad).catch(function (error) {
+                pageStatus('No se cargó la página: ' + error.message, 'error');
             });
+        }
+        return proceedToLoad();
     }
 
     on('ocd-canvas-save', save);
@@ -1359,9 +1306,16 @@
         });
     });
     on('ocd-page-load', loadTargetPage);
-    document.querySelectorAll('[data-ocd-region-segment]').forEach(function (tab) {
-        tab.addEventListener('click', function () {
-            activateRegionSegment(tab.getAttribute('data-ocd-region-segment'));
+    document.querySelectorAll('[data-ocd-slot-preview]').forEach(function (preview) {
+        var kind = preview.getAttribute('data-ocd-slot-preview');
+        preview.addEventListener('click', function () {
+            enterSlot(kind);
+        });
+        preview.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                enterSlot(kind);
+            }
         });
     });
     var pageTarget = document.getElementById('ocd-page-target');

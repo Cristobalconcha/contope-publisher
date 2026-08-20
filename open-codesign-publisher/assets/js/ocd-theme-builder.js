@@ -240,9 +240,10 @@
                     if (grid && data.cardHtml) {
                         var holder = document.createElement('div');
                         holder.innerHTML = data.cardHtml;
-                        if (holder.firstElementChild) {
-                            grid.appendChild(holder.firstElementChild);
-                            holder.firstElementChild.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                        var card = holder.firstElementChild;
+                        if (card) {
+                            grid.appendChild(card);
+                            card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                         }
                     }
                 })

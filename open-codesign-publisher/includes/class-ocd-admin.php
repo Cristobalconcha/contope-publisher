@@ -17,36 +17,12 @@ final class OCD_Admin
 
     public function register(): void
     {
-        add_action('admin_menu', [$this, 'add_menu']);
+        // Sin entrada de menú propia: OCD_Site_Package_Admin (Portabilidad)
+        // es ahora la única pantalla del menú "Open CoDesign" y cubre este
+        // caso de uso. El handler de abajo queda activo por compatibilidad
+        // con cualquier formulario ya enviado, pero no hay forma de llegar
+        // a esta pantalla desde la interfaz.
         add_action('admin_post_' . self::ACTION, [$this, 'handle_import']);
-    }
-
-    public function add_menu(): void
-    {
-        add_menu_page(
-            'Open CoDesign',
-            'Open CoDesign',
-            self::CAPABILITY,
-            self::MENU_SLUG,
-            [$this, 'render_page'],
-            'dashicons-layout',
-            58
-        );
-
-        add_submenu_page(
-            self::MENU_SLUG,
-            'Importar proyecto',
-            'Importar proyecto',
-            self::CAPABILITY,
-            self::MENU_SLUG,
-            [$this, 'render_page']
-        );
-
-        // TODO (Pieza 1): Plantillas — listado y creación de Encabezado/Pie.
-        // add_submenu_page(self::MENU_SLUG, 'Plantillas', 'Plantillas', self::CAPABILITY, 'open-codesign-templates', ...);
-
-        // TODO (Pieza 5): Estilos — lectura y guardado de paleta/tipografías.
-        // add_submenu_page(self::MENU_SLUG, 'Estilos', 'Estilos', self::CAPABILITY, 'open-codesign-styles', ...);
     }
 
     public function render_page(): void

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Open CoDesign Publisher
  * Description: Importa proyectos Open CoDesign como páginas Gutenberg nativas y editables.
- * Version: 0.1.17-dev
+ * Version: 0.1.29-dev
  * Requires at least: 6.5
  * Requires PHP: 8.0
  * Author: Open CoDesign Publisher contributors
@@ -13,7 +13,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('OCD_PUBLISHER_VERSION', '0.1.17-dev');
+define('OCD_PUBLISHER_VERSION', '0.1.29-dev');
 define('OCD_PUBLISHER_FILE', __FILE__);
 define('OCD_PUBLISHER_DIR', plugin_dir_path(__FILE__));
 
@@ -32,6 +32,10 @@ require_once OCD_PUBLISHER_DIR . 'includes/class-ocd-theme-builder-admin.php';
 require_once OCD_PUBLISHER_DIR . 'includes/class-ocd-inline-editor-frontend.php';
 require_once OCD_PUBLISHER_DIR . 'includes/class-ocd-theme-definitions.php';
 require_once OCD_PUBLISHER_DIR . 'includes/class-ocd-settings-admin.php';
+require_once OCD_PUBLISHER_DIR . 'includes/class-ocd-site-package-exporter.php';
+require_once OCD_PUBLISHER_DIR . 'includes/class-ocd-site-package-importer.php';
+require_once OCD_PUBLISHER_DIR . 'includes/class-ocd-site-package-admin.php';
+require_once OCD_PUBLISHER_DIR . 'includes/class-ocd-site-package-cli.php';
 
 add_action('plugins_loaded', static function (): void {
     $validator = new OCD_Package_Validator();
@@ -42,6 +46,16 @@ add_action('plugins_loaded', static function (): void {
     // Módulo experimental y aislado: no interviene en el importador anterior.
     $canvas_repository = new OCD_Canvas_Document_Repository();
     $canvas_repository->register();
+
+    $site_package_sanitizer = new OCD_Canvas_Document_Sanitizer();
+    $site_package_exporter = new OCD_Site_Package_Exporter($canvas_repository);
+    $site_package_importer = new OCD_Site_Package_Importer($canvas_repository, $site_package_sanitizer);
+    (new OCD_Site_Package_Admin($site_package_exporter, $site_package_importer))->register();
+
+    if (defined('WP_CLI') && WP_CLI) {
+        WP_CLI::add_command('ocd export-site', [new OCD_Site_Package_CLI($site_package_exporter, $site_package_importer), 'export_site']);
+        WP_CLI::add_command('ocd import-site', [new OCD_Site_Package_CLI($site_package_exporter, $site_package_importer), 'import_site']);
+    }
     $region_resolver = new OCD_Template_Region_Resolver($canvas_repository);
     $token_resolver = new OCD_Dynamic_Token_Resolver();
     $canvas_publisher = new OCD_Canvas_Page_Publisher($canvas_repository, $region_resolver, $token_resolver);
