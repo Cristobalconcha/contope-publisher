@@ -89,8 +89,8 @@ function normalizeWeights(weights) {
         .filter(Boolean)
         .map(Number);
 
-  if (parsed.length < 2 || parsed.some((number) => !Number.isFinite(number) || number <= 0)) {
-    throw new TypeError('A custom grid needs at least two positive numeric proportions.');
+  if (parsed.length < 1 || parsed.some((number) => !Number.isFinite(number) || number <= 0)) {
+    throw new TypeError('A custom grid needs at least one positive numeric proportion.');
   }
   return parsed;
 }
@@ -128,7 +128,8 @@ function resolveBreakpoint(editor, requested, breakpoints) {
   if (requested) return requested;
   const selected = editor.DeviceManager?.getSelected?.();
   const raw = selected?.get?.('id') || selected?.get?.('name') || 'desktop';
-  const normalized = String(raw).toLowerCase();
+  let normalized = String(raw).toLowerCase();
+  if (normalized.startsWith('mobile')) normalized = 'mobile';
   return Object.hasOwn(breakpoints, normalized) ? normalized : 'desktop';
 }
 
@@ -342,6 +343,7 @@ function createCanvasGridApi(editor, options = {}) {
     setGap,
     resizeBoundary,
     getHandleModel,
+    getActiveBreakpoint: () => resolveBreakpoint(editor, null, breakpoints),
     getConfig: (component) => component?.get?.(CONFIG_PROPERTY) ?? {},
   };
 }

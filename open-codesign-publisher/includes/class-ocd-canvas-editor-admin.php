@@ -69,6 +69,7 @@ final class OCD_Canvas_Editor_Admin
     public function register(): void
     {
         add_action('admin_menu', [$this, 'add_menu']);
+        add_action('admin_footer', [$this, 'render_visual_editor_page_menu']);
         add_action('admin_enqueue_scripts', [$this, 'enqueue_assets']);
         add_action('wp_ajax_' . self::AJAX_LOAD, [$this, 'handle_load']);
         add_action('wp_ajax_' . self::AJAX_SAVE, [$this, 'handle_save']);
@@ -269,12 +270,57 @@ final class OCD_Canvas_Editor_Admin
         $hook_suffix = add_submenu_page(
             self::PARENT_SLUG,
             'Open CoDesign Canvas (Experimental)',
-            'Editor de página',
+            'Editor visual',
             self::CAPABILITY,
             self::PAGE_SLUG,
             [$this, 'render_page']
         );
         $this->hook_suffix = is_string($hook_suffix) ? $hook_suffix : '';
+    }
+
+    /** Añade un tercer nivel visual con accesos directos a las páginas. */
+    public function render_visual_editor_page_menu(): void
+    {
+        if (!current_user_can(self::CAPABILITY)) {
+            return;
+        }
+        $items = [];
+        foreach (get_pages(['post_status' => ['publish', 'draft', 'pending', 'future'], 'sort_column' => 'post_title']) as $page) {
+            $title = trim((string) $page->post_title);
+            $url = add_query_arg(['page' => self::PAGE_SLUG, 'page_id' => $page->ID], admin_url('admin.php'));
+            $items[] = [
+                'title' => $title !== '' ? $title : sprintf('(Sin título) #%d', $page->ID),
+                'url' => wp_nonce_url($url, self::NONCE_ACTION, 'ocd_nonce'),
+            ];
+        }
+        ?>
+        <style>
+            #adminmenu .ocd-visual-pages { display:none; position:absolute; z-index:10000; left:100%; top:0; width:260px; max-height:70vh; overflow:auto; margin:0; padding:6px 0; background:#1d2327; box-shadow:4px 4px 12px #0005; }
+            #adminmenu li:hover > .ocd-visual-pages, #adminmenu li:focus-within > .ocd-visual-pages { display:block; }
+            #adminmenu .ocd-visual-pages a { display:block; padding:7px 12px; color:#dcdcde; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+            #adminmenu .ocd-visual-pages a:hover, #adminmenu .ocd-visual-pages a:focus { color:#72aee6; background:#2c3338; }
+        </style>
+        <script>
+        (function () {
+            var link = document.querySelector('#adminmenu a[href="admin.php?page=<?php echo esc_js(self::PAGE_SLUG); ?>"]');
+            if (!link || !link.parentElement || link.parentElement.querySelector('.ocd-visual-pages')) return;
+            var pages = <?php echo wp_json_encode($items); ?>;
+            var list = document.createElement('ul');
+            list.className = 'ocd-visual-pages';
+            pages.forEach(function (page) {
+                var item = document.createElement('li');
+                var anchor = document.createElement('a');
+                anchor.href = page.url;
+                anchor.textContent = page.title;
+                anchor.title = 'Editar visualmente: ' + page.title;
+                item.appendChild(anchor);
+                list.appendChild(item);
+            });
+            link.parentElement.style.position = 'relative';
+            link.parentElement.appendChild(list);
+        }());
+        </script>
+        <?php
     }
 
     public function enqueue_assets(string $hook_suffix): void

@@ -15,7 +15,7 @@
 
 .ocd-canvas-toolbar {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     align-items: center;
     gap: 8px;
     position: sticky;
@@ -26,6 +26,11 @@
     background: #f0f0f1;
     border-bottom: 1px solid #c3c4c7;
 }
+
+.ocd-canvas-toolbar > label { flex:none; font-size:11px; color:#50575e; }
+.ocd-canvas-toolbar #ocd-page-target { width:min(300px,24vw); min-width:170px; }
+.ocd-canvas-toolbar #ocd-canvas-page-title { width:min(250px,20vw); min-width:150px; }
+.ocd-canvas-toolbar #ocd-snapshots-open { min-width:34px; padding-inline:8px; font-size:18px; }
 
 .ocd-toolbar-menu { position: relative; }
 .ocd-toolbar-menu > summary { list-style: none; cursor: pointer; }

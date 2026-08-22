@@ -326,7 +326,8 @@
       .ocd-ci__title { font-size:13px; font-weight:650; }
       .ocd-ci__head-toggle { width:auto !important; padding:3px 7px !important; font-size:10px !important; cursor:pointer; }
       .ocd-ci__head.is-collapsed { padding:8px 14px; }
-      .ocd-ci__head.is-collapsed .ocd-ci__target,.ocd-ci__head.is-collapsed .ocd-ci__scope { display:none; }
+      .ocd-ci__identity { min-width:0; }
+      .ocd-ci__head.is-collapsed .ocd-ci__scope { display:none; }
       .ocd-ci__target { margin-top:5px; color:#f0cfa6; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
       .ocd-ci__scope { display:grid; gap:8px; margin-top:12px; }
       .ocd-ci__scope-label { display:grid; gap:4px; color:#d9d2c7; font-size:10px; }
@@ -1986,7 +1987,8 @@
       const dynamicSourcePanel = renderDynamicSourcePanel(snapshot?.component);
       if (dynamicSourcePanel) body.appendChild(dynamicSourcePanel);
       const columnPresetsPanel = renderColumnPresetsPanel(snapshot?.component);
-      if (columnPresetsPanel) body.appendChild(columnPresetsPanel);
+      // La paleta visual se abre desde el control principal de Columnas;
+      // no se repite como una sección separada más abajo en el inspector.
       const saveModulePanel = renderSaveModulePanel(snapshot?.component);
       if (saveModulePanel) body.appendChild(saveModulePanel);
       const svgImage = externalSvgImageFor(snapshot?.component) || firstExternalSvgImage();
@@ -2076,7 +2078,11 @@
       const head = createElement(hostDocument, 'div', 'ocd-ci__head');
       head.classList.add('is-collapsed');
       const headbar = createElement(hostDocument, 'div', 'ocd-ci__headbar');
-      headbar.appendChild(createElement(hostDocument, 'div', 'ocd-ci__title', 'Elemento seleccionado'));
+      const identity = createElement(hostDocument, 'div', 'ocd-ci__identity');
+      identity.appendChild(createElement(hostDocument, 'div', 'ocd-ci__title', 'Elemento seleccionado'));
+      targetLabel = createElement(hostDocument, 'div', 'ocd-ci__target', 'Ningún elemento seleccionado');
+      identity.appendChild(targetLabel);
+      headbar.appendChild(identity);
       const headToggle = createElement(hostDocument, 'button', 'ocd-ci__head-toggle', 'Mostrar alcance');
       headToggle.type = 'button';
       headToggle.setAttribute('aria-expanded', 'false');
@@ -2085,10 +2091,8 @@
         headToggle.textContent = expanded ? 'Ocultar alcance' : 'Mostrar alcance';
         headToggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
       });
-      headbar.appendChild(headToggle);
       head.appendChild(headbar);
-      targetLabel = createElement(hostDocument, 'div', 'ocd-ci__target', 'Ningún elemento seleccionado');
-      head.appendChild(targetLabel);
+      head.appendChild(headToggle);
       const scope = createElement(hostDocument, 'div', 'ocd-ci__scope');
       const scopeField = createElement(hostDocument, 'label', 'ocd-ci__scope-label');
       scopeField.appendChild(createElement(hostDocument, 'span', '', '¿Dónde aplicar los cambios?'));
@@ -2177,6 +2181,11 @@
       normalVideoMarkup,
       lumaMatteTargetFor,
       videoSourceDescriptor,
+      openColumnPresets(component, anchor) {
+        if (!component || !anchor) return;
+        if (columnPresetsPopoverEl) closeColumnPresetsPopover();
+        else openColumnPresetsPopover(component, anchor);
+      },
       mount,
       destroy() {
         editor.off('component:selected', onSelected);

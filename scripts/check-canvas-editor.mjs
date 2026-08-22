@@ -1103,6 +1103,14 @@ async function checkDevicePresentation() {
     fileURLToPath(new URL('includes/class-ocd-canvas-editor-admin.php', pluginRoot)),
     'utf8',
   );
+  const gridControls = await readFile(
+    fileURLToPath(new URL('assets/js/ocd-grid-controls.js', pluginRoot)),
+    'utf8',
+  );
+  const canvasGrid = await readFile(
+    fileURLToPath(new URL('assets/js/ocd-canvas-grid.global.js', pluginRoot)),
+    'utf8',
+  );
 
   check(
     !canvasEditor.includes('ignoreHeight: true'),
@@ -1135,6 +1143,8 @@ async function checkDevicePresentation() {
   check(admin.includes('id="ocd-canvas-height"'), 'La barra debe permitir variar el alto de la vista previa.');
   check(admin.includes('Agregar y ordenar'), 'La pestaña de componentes debe describir su acción con lenguaje claro.');
   check(admin.includes('Editar diseño'), 'La pestaña del inspector debe describir su acción con lenguaje claro.');
+  check(admin.includes("'Editor visual'"), 'El menú administrativo debe llamarse Editor visual.');
+  check(admin.includes('ocd-visual-pages'), 'Editor visual debe desplegar accesos directos a las páginas.');
   check(!admin.includes('<h1>Open CoDesign Canvas'), 'El editor no debe reservar altura para una cabecera técnica.');
   check(!admin.includes('data-ocd-slot="header"'), 'El encabezado no debe editarse como una región separada sobre la página.');
   check(!admin.includes('data-ocd-slot="footer"'), 'El pie no debe editarse como una región separada bajo la página.');
@@ -1145,6 +1155,8 @@ async function checkDevicePresentation() {
   check(canvasEditor.includes("menu('Vista'"), 'Los controles de vista deben vivir en un menú compacto.');
   check(canvasEditor.includes("menu('Archivo'"), 'Las acciones secundarias deben vivir en un menú compacto.');
   check(canvasEditor.includes('2600'), 'Los mensajes informativos deben desaparecer como notificaciones temporales.');
+  check(canvasEditor.includes("'ocd-page-target', 'ocd-page-create', 'ocd-snapshots-open'"), 'Página, nueva página e historial deben integrarse en la barra única.');
+  check(canvasEditor.includes("historyButton.textContent = '◷'"), 'Historial debe representarse con un reloj accesible.');
   for (const property of ['position', 'min-height', 'top', 'right', 'bottom', 'left']) {
     check(inspector.includes(`'${property}'`), `Presentación responsive debe editar ${property}.`);
   }
@@ -1157,6 +1169,15 @@ async function checkDevicePresentation() {
     'El selector técnico de clase debe ocultarse mientras el alcance sea sólo el elemento.',
   );
   check(inspector.includes("head.classList.add('is-collapsed')"), 'El bloque de alcance debe iniciar contraído.');
+  check(inspector.includes('openColumnPresets(component, anchor)'), 'La paleta visual existente debe exponerse al control principal de columnas.');
+  check(!inspector.includes('if (columnPresetsPanel) body.appendChild(columnPresetsPanel)'), 'La paleta de columnas no debe repetirse más abajo.');
+  check(gridControls.includes("'Manual'"), 'Columnas debe ofrecer un campo Manual explícito.');
+  check(gridControls.includes("'Gap'"), 'Columnas debe ofrecer Gap en la misma fila.');
+  check(gridControls.includes('ocd-gc__breakpoints'), 'Los tres breakpoints deben mostrarse como iconos superiores.');
+  check(!gridControls.includes('Aplicar proporción'), 'La edición manual no debe depender de un botón redundante.');
+  check(!gridControls.includes("'Dispositivo'"), 'Columnas no debe repetir un selector textual de dispositivo.');
+  check(canvasGrid.includes('parsed.length < 1'), 'La notación manual debe aceptar una sola columna con valor 1.');
+  check(canvasGrid.includes("normalized.startsWith('mobile')"), 'Los dispositivos Mobile deben resolver el breakpoint mobile real.');
 }
 
 export async function runCanvasEditorChecks() {

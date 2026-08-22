@@ -60,8 +60,20 @@
             toolbar.insertBefore(details, document.getElementById('ocd-canvas-publish'));
         }
 
+        var publishButton = document.getElementById('ocd-canvas-publish');
         var pagePicker = document.querySelector('.ocd-canvas-page-picker');
-        if (pagePicker) moveWithLabel('ocd-canvas-page-title', pagePicker);
+        ['ocd-page-target', 'ocd-page-create', 'ocd-snapshots-open', 'ocd-canvas-page-title', 'ocd-canvas-page-status'].forEach(function (id) {
+            var staging = document.createDocumentFragment();
+            moveWithLabel(id, staging);
+            toolbar.insertBefore(staging, publishButton);
+        });
+        if (pagePicker && pagePicker.parentElement) pagePicker.parentElement.remove();
+        var historyButton = document.getElementById('ocd-snapshots-open');
+        if (historyButton) {
+            historyButton.textContent = '◷';
+            historyButton.title = 'Historial de versiones';
+            historyButton.setAttribute('aria-label', 'Historial de versiones');
+        }
         menu('Vista', ['ocd-canvas-zoom', 'ocd-canvas-width', 'ocd-canvas-height']);
         menu('Archivo', ['ocd-canvas-reload', 'ocd-canvas-export-html', 'ocd-canvas-export-css', 'ocd-canvas-toggle-import']);
     }
