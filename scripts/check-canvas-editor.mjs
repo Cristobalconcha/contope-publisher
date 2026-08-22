@@ -1133,6 +1133,8 @@ async function checkDevicePresentation() {
     'hero-collapse debe quedar desactivado dentro del editor.',
   );
   check(admin.includes('id="ocd-canvas-height"'), 'La barra debe permitir variar el alto de la vista previa.');
+  check(admin.includes('Agregar y ordenar'), 'La pestaña de componentes debe describir su acción con lenguaje claro.');
+  check(admin.includes('Editar diseño'), 'La pestaña del inspector debe describir su acción con lenguaje claro.');
   check(
     canvasEditor.includes("device.set('height', height + 'px')"),
     'El alto personalizado debe aplicarse al dispositivo seleccionado.',
@@ -1143,6 +1145,10 @@ async function checkDevicePresentation() {
   check(
     inspector.includes("{ position: 'relative' }"),
     'Al activar posición absoluta, el contenedor padre debe convertirse en ancla relativa.',
+  );
+  check(
+    inspector.includes("classField.hidden = scopeSelect?.value !== 'class'"),
+    'El selector técnico de clase debe ocultarse mientras el alcance sea sólo el elemento.',
   );
 }
 

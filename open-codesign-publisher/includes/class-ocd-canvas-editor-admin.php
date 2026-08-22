@@ -635,11 +635,11 @@ final class OCD_Canvas_Editor_Admin
                     <div class="ocd-assembled-slot-canvas" data-ocd-slot-canvas="body">
                         <div class="ocd-canvas-editor-shell" id="ocd-canvas-editor-shell">
                             <div class="ocd-canvas-side-tabs" role="tablist" aria-label="Panel lateral del editor">
-                                <button type="button" class="button" role="tab" data-ocd-side-panel="components" aria-selected="false">
-                                    Estructura y componentes
+							<button type="button" class="button" role="tab" data-ocd-side-panel="components" aria-selected="false" title="Agregar componentes y ordenar la estructura de la página">
+								Agregar y ordenar
                                 </button>
-                                <button type="button" class="button button-primary" role="tab" data-ocd-side-panel="inspector" aria-selected="true">
-                                    Inspector Open CoDesign
+							<button type="button" class="button button-primary" role="tab" data-ocd-side-panel="inspector" aria-selected="true" title="Editar contenido, tamaño, posición y apariencia del elemento seleccionado">
+								Editar diseño
                                 </button>
                             </div>
 

@@ -298,6 +298,10 @@
     if (!component) return 'Ningún elemento seleccionado';
     const tag = component.get('tagName') || component.get('type') || 'elemento';
     const classes = componentClasses(component);
+    if (classes.includes('ocd-luma-matte__canvas')) return 'Transparencia del video';
+    if (classes.includes('ocd-luma-matte')) return 'Video con transparencia';
+    if (String(tag).toLowerCase() === 'header') return 'Encabezado';
+    if (String(tag).toLowerCase() === 'img') return 'Imagen';
     return `${tag}${classes.length ? `.${classes.join('.')}` : ''}`;
   }
 
@@ -319,10 +323,15 @@
       .ocd-ci * { box-sizing:border-box; }
       .ocd-ci__head { position:sticky; top:0; z-index:2; padding:14px; background:#181b20; border-bottom:1px solid #ffffff18; }
       .ocd-ci__title { font-size:13px; font-weight:650; }
-      .ocd-ci__target { margin-top:5px; color:#c7bda9; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-      .ocd-ci__scope { display:grid; grid-template-columns:1fr 1fr; gap:7px; margin-top:10px; }
+      .ocd-ci__target { margin-top:5px; color:#f0cfa6; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+      .ocd-ci__scope { display:grid; gap:8px; margin-top:12px; }
+      .ocd-ci__scope-label { display:grid; gap:4px; color:#d9d2c7; font-size:10px; }
+      .ocd-ci__scope-label > span { font-weight:650; letter-spacing:.01em; }
+      .ocd-ci__scope-help { color:#aaa397; font-size:10px; line-height:1.35; }
+      .ocd-ci__scope-class[hidden] { display:none; }
       .ocd-ci select,.ocd-ci input { width:100%; min-width:0; border:1px solid #ffffff24; border-radius:5px;
         background:#2a2e36; color:#fff; padding:6px 7px; font:inherit; }
+      .ocd-ci select:disabled,.ocd-ci input:disabled,.ocd-ci button:disabled { color:#d5d0c8; opacity:.62; }
       .ocd-ci__body { padding:8px 12px 22px; }
       .ocd-ci__row { padding:9px 0; border-bottom:1px solid #ffffff12; }
       .ocd-ci__label { display:flex; justify-content:space-between; gap:8px; margin-bottom:5px; color:#ded8cc; }
@@ -434,6 +443,7 @@
     let targetLabel = null;
     let scopeSelect = null;
     let classSelect = null;
+    let classField = null;
     let headerState = 'entry';
     let previewHeaderElement = null;
     let headerIdentityCounter = 0;
@@ -1959,6 +1969,7 @@
             classSelect.appendChild(option);
           }
         }
+        if (classField) classField.hidden = scopeSelect?.value !== 'class';
       }
       const headerPanel = renderHeaderStatePanel(headerForComponent(snapshot?.component));
       if (headerPanel) body.appendChild(headerPanel);
@@ -2059,21 +2070,34 @@
       root.classList.add('ocd-ci');
       root.replaceChildren();
       const head = createElement(hostDocument, 'div', 'ocd-ci__head');
-      head.appendChild(createElement(hostDocument, 'div', 'ocd-ci__title', 'Diseño efectivo'));
+      head.appendChild(createElement(hostDocument, 'div', 'ocd-ci__title', 'Elemento seleccionado'));
       targetLabel = createElement(hostDocument, 'div', 'ocd-ci__target', 'Ningún elemento seleccionado');
       head.appendChild(targetLabel);
       const scope = createElement(hostDocument, 'div', 'ocd-ci__scope');
+      const scopeField = createElement(hostDocument, 'label', 'ocd-ci__scope-label');
+      scopeField.appendChild(createElement(hostDocument, 'span', '', '¿Dónde aplicar los cambios?'));
       scopeSelect = createElement(hostDocument, 'select');
       for (const [key, text] of [
-        ['local', 'Sólo este elemento'],
-        ['class', 'Estilo reutilizable'],
+        ['local', 'Solamente al elemento seleccionado'],
+        ['class', 'A todos los elementos de una clase'],
       ]) {
         const option = createElement(hostDocument, 'option', '', text);
         option.value = key;
         scopeSelect.appendChild(option);
       }
+      scopeField.append(
+        scopeSelect,
+        createElement(hostDocument, 'div', 'ocd-ci__scope-help', 'Normalmente usa la primera opción. La segunda permite compartir el mismo diseño entre varios elementos.'),
+      );
+      classField = createElement(hostDocument, 'label', 'ocd-ci__scope-label ocd-ci__scope-class');
+      classField.appendChild(createElement(hostDocument, 'span', '', 'Clase que compartirá el diseño'));
       classSelect = createElement(hostDocument, 'select');
-      scope.append(scopeSelect, classSelect);
+      classField.appendChild(classSelect);
+      classField.hidden = true;
+      scopeSelect.addEventListener('change', () => {
+        classField.hidden = scopeSelect.value !== 'class';
+      });
+      scope.append(scopeField, classField);
       head.appendChild(scope);
       body = createElement(hostDocument, 'div', 'ocd-ci__body');
       root.append(head, body);
