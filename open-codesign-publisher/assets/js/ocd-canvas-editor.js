@@ -2065,7 +2065,13 @@
         if (autoTarget) {
             autoTarget.value = String(config.autoLoadPageId);
         }
-        loadPageContext(config.autoLoadPageId);
+        if (current && activeDocumentId) {
+            loadPageContext(config.autoLoadPageId);
+        } else {
+            // Un acceso directo nunca debe dejar un lienzo editable sin
+            // documento: reintenta por el flujo AJAX normal de selección.
+            loadTargetPage(config.autoLoadPageId);
+        }
     }
     window.setTimeout(function () {
         autosaveEnabled = true;

@@ -1145,6 +1145,7 @@ async function checkDevicePresentation() {
   check(admin.includes('Editar diseño'), 'La pestaña del inspector debe describir su acción con lenguaje claro.');
   check(admin.includes("'Editor visual'"), 'El menú administrativo debe llamarse Editor visual.');
   check(admin.includes('ocd-visual-pages'), 'Editor visual debe desplegar accesos directos a las páginas.');
+  check(admin.includes("'ocd_nonce' => wp_create_nonce(self::NONCE_ACTION)"), 'Los enlaces JSON del submenú deben llevar un nonce sin entidades HTML.');
   check(!admin.includes('<h1>Open CoDesign Canvas'), 'El editor no debe reservar altura para una cabecera técnica.');
   check(!admin.includes('data-ocd-slot="header"'), 'El encabezado no debe editarse como una región separada sobre la página.');
   check(!admin.includes('data-ocd-slot="footer"'), 'El pie no debe editarse como una región separada bajo la página.');
@@ -1157,6 +1158,7 @@ async function checkDevicePresentation() {
   check(canvasEditor.includes('2600'), 'Los mensajes informativos deben desaparecer como notificaciones temporales.');
   check(canvasEditor.includes("'ocd-page-target', 'ocd-page-create', 'ocd-snapshots-open'"), 'Página, nueva página e historial deben integrarse en la barra única.');
   check(canvasEditor.includes("historyButton.textContent = '◷'"), 'Historial debe representarse con un reloj accesible.');
+  check(canvasEditor.includes('if (current && activeDocumentId)'), 'El acceso directo debe reintentar la carga si falta el documento inicial.');
   for (const property of ['position', 'min-height', 'top', 'right', 'bottom', 'left']) {
     check(inspector.includes(`'${property}'`), `Presentación responsive debe editar ${property}.`);
   }

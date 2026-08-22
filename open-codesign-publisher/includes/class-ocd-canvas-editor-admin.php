@@ -287,10 +287,19 @@ final class OCD_Canvas_Editor_Admin
         $items = [];
         foreach (get_pages(['post_status' => ['publish', 'draft', 'pending', 'future'], 'sort_column' => 'post_title']) as $page) {
             $title = trim((string) $page->post_title);
-            $url = add_query_arg(['page' => self::PAGE_SLUG, 'page_id' => $page->ID], admin_url('admin.php'));
+            $url = add_query_arg(
+                [
+                    'page' => self::PAGE_SLUG,
+                    'page_id' => $page->ID,
+                    'ocd_nonce' => wp_create_nonce(self::NONCE_ACTION),
+                ],
+                admin_url('admin.php')
+            );
             $items[] = [
                 'title' => $title !== '' ? $title : sprintf('(Sin título) #%d', $page->ID),
-                'url' => wp_nonce_url($url, self::NONCE_ACTION, 'ocd_nonce'),
+                // Esta URL viaja en JSON/JS, no en markup HTML. wp_nonce_url()
+                // la devolvería con `&amp;` y rompería page_id al asignarla a href.
+                'url' => $url,
             ];
         }
         ?>
