@@ -38,47 +38,75 @@
                 '<text x="320" y="190" font-family="Arial, sans-serif" font-size="28" fill="#2271b1" text-anchor="middle">Imagen ACF</text>' +
             '</svg>'
         );
+    var dynamicGroupImageSrc =
+        'data:image/svg+xml;charset=utf-8,' +
+        encodeURIComponent(
+            '<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360">' +
+                '<rect width="100%" height="100%" fill="#f6f8fa"/>' +
+                '<rect x="8" y="8" width="624" height="344" fill="none" stroke="#2271b1" stroke-width="2" stroke-dasharray="10 8"/>' +
+                '<text x="320" y="190" font-family="Arial, sans-serif" font-size="28" fill="#2271b1" text-anchor="middle">Imagen de tarjeta</text>' +
+            '</svg>'
+        );
 
     var BLOCKS = [
         {
             id: 'ocd-section',
             label: 'Sección',
             category: 'Open CoDesign',
+            media: '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="16" rx="1.5"/><line x1="3" y1="9" x2="21" y2="9"/></svg>',
+            // Una Sección es solo estructura (fondo, padding) — nunca guarda
+            // contenido propio. Antes traía un <h2>/<p> pegados directo a la
+            // sección, sin Fila ni Columna ni módulos reales de por medio;
+            // eso rompía la jerarquía Sección > Fila > Módulo (una sección
+            // no puede tener título ni texto, solo un módulo de Título o de
+            // Párrafo puede). Ahora viene con una Fila+Columna real adentro,
+            // con un Título y un Párrafo como módulos de verdad — mismo
+            // markup exacto que producen los bloques "Fila"/"Título"/
+            // "Párrafo" por separado, para que sean módulos independientes
+            // seleccionables/movibles, no texto atado a la sección.
             content:
                 '<section class="ocd-section" style="padding:48px 24px">' +
-                '<h2>Título de sección</h2>' +
-                '<p>Texto editable de la sección.</p>' +
+                '<div class="ocd-columns ocd-columns--single" style="display:grid;grid-template-columns:minmax(0, 1fr);gap:24px">' +
+                '<div class="ocd-column" style="min-width:0">' +
+                '<h2 class="ocd-heading">Título de sección</h2>' +
+                '<p class="ocd-paragraph">Texto editable de la sección.</p>' +
+                '</div>' +
+                '</div>' +
                 '</section>'
         },
         {
             id: 'ocd-columns',
             label: 'Dos columnas',
             category: 'Open CoDesign',
+            media: '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="7.5" height="16" rx="1"/><rect x="13.5" y="4" width="7.5" height="16" rx="1"/></svg>',
             content:
                 '<div class="ocd-columns" style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:24px;padding:24px">' +
-                '<div class="ocd-column" style="min-width:0"><p>Columna izquierda.</p></div>' +
-                '<div class="ocd-column" style="min-width:0"><p>Columna derecha.</p></div>' +
+                '<div class="ocd-column" style="min-width:0"><p class="ocd-paragraph">Columna izquierda.</p></div>' +
+                '<div class="ocd-column" style="min-width:0"><p class="ocd-paragraph">Columna derecha.</p></div>' +
                 '</div>'
         },
         {
             id: 'ocd-row',
             label: 'Fila',
             category: 'Open CoDesign',
+            media: '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="6.5" rx="1"/><rect x="3" y="13.5" width="18" height="6.5" rx="1"/></svg>',
             content:
                 '<div class="ocd-columns ocd-columns--single" style="display:grid;grid-template-columns:minmax(0, 1fr);gap:24px;padding:24px">' +
-                '<div class="ocd-column" style="min-width:0"><p>Contenido de la fila.</p></div>' +
+                '<div class="ocd-column" style="min-width:0"><p class="ocd-paragraph">Contenido de la fila.</p></div>' +
                 '</div>'
         },
         {
             id: 'ocd-heading',
             label: 'Título',
             category: 'Open CoDesign',
+            media: '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="14" y2="12"/></svg>',
             content: '<h2 class="ocd-heading">Título editable</h2>'
         },
         {
             id: 'ocd-paragraph',
             label: 'Párrafo',
             category: 'Open CoDesign',
+            media: '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="11" x2="20" y2="11"/><line x1="4" y1="16" x2="14" y2="16"/></svg>',
             content: '<p class="ocd-paragraph">Párrafo editable.</p>'
         },
         {
@@ -86,12 +114,23 @@
             label: 'Imagen',
             category: 'Open CoDesign',
             select: true,
+            media: '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="16" rx="1.5"/><circle cx="8.5" cy="9.5" r="1.7"/><path d="M4 17l5-5 3.5 3.5L16 12l4 5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
             content: { type: 'image' }
+        },
+        {
+            id: 'ocd-video',
+            label: 'Video',
+            category: 'Open CoDesign',
+            media: '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="1.5"/><path d="M10 9.5l5 2.5-5 2.5z" stroke-linejoin="round"/></svg>',
+            content:
+                '<video class="ocd-video" controls muted playsinline preload="auto" ' +
+                'style="width:100%;height:auto;display:block"><source src="" type="video/mp4"></video>'
         },
         {
             id: 'ocd-button',
             label: 'Botón',
             category: 'Open CoDesign',
+            media: '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="8" width="18" height="8" rx="4"/><line x1="8" y1="12" x2="14" y2="12" stroke-linecap="round"/></svg>',
             content:
                 '<a class="ocd-button" href="#" style="display:inline-block;padding:12px 24px;border-radius:4px;' +
                 'background:#1d2327;color:#fff;text-decoration:none">Acción</a>'
@@ -100,18 +139,21 @@
             id: 'ocd-dynamic-post-title',
             label: 'Título del artículo',
             category: 'Open CoDesign — Dinámico',
+            media: '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="1.5" stroke-dasharray="2.4 2"/><line x1="7" y1="9" x2="17" y2="9" stroke-width="1.8"/><line x1="7" y1="13" x2="13" y2="13"/></svg>',
             content: '<h2 class="ocd-dynamic-placeholder ocd-dynamic-post-title">{{post_title}}</h2>'
         },
         {
             id: 'ocd-dynamic-post-excerpt',
             label: 'Extracto',
             category: 'Open CoDesign — Dinámico',
+            media: '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="1.5" stroke-dasharray="2.4 2"/><line x1="7" y1="9" x2="17" y2="9"/><line x1="7" y1="13" x2="15" y2="13"/></svg>',
             content: '<p class="ocd-dynamic-placeholder ocd-dynamic-post-excerpt">{{post_excerpt}}</p>'
         },
         {
             id: 'ocd-dynamic-featured-image',
             label: 'Imagen destacada',
             category: 'Open CoDesign — Dinámico',
+            media: '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="16" rx="1.5" stroke-dasharray="2.4 2"/><circle cx="8.5" cy="9.5" r="1.7"/><path d="M4 17l5-5 3.5 3.5L16 12l4 5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
             content:
                 '<img class="ocd-dynamic-placeholder ocd-dynamic-featured-image" ' +
                 'data-ocd-dynamic="featured_image" src="' + featuredImageSrc + '" alt="">'
@@ -120,9 +162,29 @@
             id: 'ocd-dynamic-permalink',
             label: 'Enlace al artículo',
             category: 'Open CoDesign — Dinámico',
+            media: '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 15l6-6"/><path d="M10 7l1-1a3 3 0 0 1 4.2 4.2l-1 1"/><path d="M14 17l-1 1a3 3 0 0 1-4.2-4.2l1-1"/></svg>',
             content:
                 '<a class="ocd-dynamic-placeholder ocd-dynamic-permalink" ' +
                 'data-ocd-dynamic="permalink" href="#">Ver más</a>'
+        },
+        {
+            id: 'ocd-dynamic-group',
+            label: 'Grupo Dinámico',
+            category: 'Open CoDesign — Dinámico',
+            media: '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg>',
+            content:
+                '<div data-ocd-dynamic-group class="ocd-dynamic-group ocd-dynamic-group--grid-2">' +
+                '<div class="ocd-dynamic-group__card">' +
+                '<img class="ocd-dynamic-group__image" src="' + dynamicGroupImageSrc + '" alt="">' +
+                '<h3 class="ocd-dynamic-group__title">Título de tarjeta</h3>' +
+                '<p class="ocd-dynamic-group__text">Texto editable de la tarjeta.</p>' +
+                '</div>' +
+                '<div class="ocd-dynamic-group__card">' +
+                '<img class="ocd-dynamic-group__image" src="' + dynamicGroupImageSrc + '" alt="">' +
+                '<h3 class="ocd-dynamic-group__title">Título de tarjeta</h3>' +
+                '<p class="ocd-dynamic-group__text">Texto editable de la tarjeta.</p>' +
+                '</div>' +
+                '</div>'
         },
         // Mapa de ubicación (OSM): ejemplo funcional con datos de muestra y
         // todos los data-ocd-geo-* que espera el runtime. Para un proyecto real
@@ -133,6 +195,7 @@
             id: 'ocd-geo-map',
             label: 'Mapa de ubicación (OSM)',
             category: 'Open CoDesign — Mapas',
+            media: '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z" stroke-linejoin="round"/><circle cx="12" cy="9.5" r="2.3"/></svg>',
             content:
                 '<div class="ocd-geo-map" data-ocd-behavior="geo-map" ' +
                 'data-ocd-geo-places="[{&quot;nombre&quot;:&quot;Consultorio El Alba&quot;,&quot;categoria&quot;:&quot;salud&quot;,&quot;dist&quot;:1.2,&quot;contacto&quot;:&quot;+56 9 1234 5678&quot;,&quot;x&quot;:180,&quot;y&quot;:420},' +
@@ -188,6 +251,7 @@
             id: 'ocd-parcel-map',
             label: 'Mapa de lotes/parcelas',
             category: 'Open CoDesign — Mapas',
+            media: '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg>',
             content:
                 '<div class="ocd-parcel-map" data-ocd-behavior="parcel-map" ' +
                 'data-ocd-parcel-item-selector=".lote" data-ocd-parcel-id-attr="data-lote" data-ocd-parcel-superficie="5.000 m²" ' +
@@ -221,6 +285,7 @@
             id: 'ocd-chart',
             label: 'Gráfico',
             category: 'Open CoDesign — Gráficos',
+            media: '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><line x1="4" y1="21" x2="4" y2="10"/><line x1="10" y1="21" x2="10" y2="4"/><line x1="16" y1="21" x2="16" y2="14"/><line x1="3" y1="21" x2="21" y2="21"/></svg>',
             content:
                 '<div class="ocd-chart" data-ocd-behavior="chart" ' +
                 'data-ocd-chart-type="bar" ' +
@@ -245,6 +310,7 @@
          *   container         selector del contenedor (requerido).
          *   status            function (message, kind) — informa estado (opcional).
          *   blocks            arreglo de bloques (default: BLOCKS del core; `[]` para ninguno).
+         *   canvasWidth       ancho REAL de escritorio en px (default: 1920).
          *   inspectorMount    elemento o selector del inspector (opcional).
          *   gridControlsMount elemento o selector de los controles de grilla (opcional).
          *   groupControlsMount elemento o selector de los controles de grupo (opcional).
@@ -287,6 +353,19 @@
 
             var blocks = Array.isArray(options.blocks) ? options.blocks : BLOCKS;
 
+            // Ancho REAL de escritorio al que debe renderizar el iframe del
+            // lienzo. El zoom-to-fit se aplica por encima con el mecanismo
+            // nativo de GrapesJS (`editor.Canvas.setZoom`), de modo que el
+            // documento se calcula siempre a este ancho y el navegador sólo
+            // escala la presentación. Mantenemos `widthMedia` vacío en
+            // desktop para que `getCurrentMedia()` no envuelva el CSS nuevo
+            // en un `@media (max-width: …)` — el comportamiento histórico del
+            // editor es CSS sin media query de escritorio.
+            var canvasWidth = parseInt(options.canvasWidth, 10);
+            if (isNaN(canvasWidth) || canvasWidth < 320) {
+                canvasWidth = 1920;
+            }
+
             var editor = window.grapesjs.init({
                 container: options.container,
                 height: '100%',
@@ -299,7 +378,16 @@
                 // para que un cambio de versión no desactive la función en silencio.
                 multipleSelection: true,
                 assetManager: { upload: false, custom: false },
-                blockManager: { blocks: blocks }
+                blockManager: { blocks: blocks },
+                deviceManager: {
+                    default: 'desktop',
+                    devices: [
+                        { id: 'desktop', name: 'Desktop', width: canvasWidth + 'px', widthMedia: '' },
+                        { id: 'tablet', name: 'Tablet', width: '770px', widthMedia: '992px' },
+                        { id: 'mobileLandscape', name: 'Mobile landscape', width: '568px', widthMedia: '768px' },
+                        { id: 'mobilePortrait', name: 'Mobile portrait', width: '320px', widthMedia: '480px' }
+                    ]
+                }
             });
             editor.Components.addType('ocd-video', {
                 isComponent: function (element) {
@@ -399,6 +487,121 @@
                         classes: ['ocd-column'],
                         draggable: true,
                         droppable: true
+                    }
+                }
+            });
+
+            // ------------------------------------------------------------------
+            // Grupo Dinámico (`ocd-dynamic-group`): contenedor de tarjetas con
+            // presets de layout por clase CSS. La repetición es manual (el editor
+            // agrega/quita tarjetas), sin dependencia de ACF PRO.
+            // ------------------------------------------------------------------
+            var DYNAMIC_GROUP_LAYOUTS = ['grid-2', 'grid-3', 'grid-4', 'list', 'carousel'];
+            var DYNAMIC_GROUP_BASE_CLASS = 'ocd-dynamic-group';
+            var DYNAMIC_GROUP_LAYOUT_PREFIX = 'ocd-dynamic-group--';
+
+            function dynamicGroupLayoutFromClasses(component) {
+                if (!component || typeof component.getClasses !== 'function') {
+                    return 'grid-2';
+                }
+                var classes = component.getClasses() || [];
+                for (var i = 0; i < classes.length; i++) {
+                    var className = classes[i];
+                    if (className && className.indexOf(DYNAMIC_GROUP_LAYOUT_PREFIX) === 0) {
+                        var layout = className.slice(DYNAMIC_GROUP_LAYOUT_PREFIX.length);
+                        if (DYNAMIC_GROUP_LAYOUTS.indexOf(layout) !== -1) {
+                            return layout;
+                        }
+                    }
+                }
+                return 'grid-2';
+            }
+
+            function applyDynamicGroupLayout(component, layout) {
+                if (!component || typeof component.setClass !== 'function') {
+                    return;
+                }
+                if (DYNAMIC_GROUP_LAYOUTS.indexOf(layout) === -1) {
+                    layout = 'grid-2';
+                }
+                var classes = (component.getClasses && component.getClasses()) || [];
+                var next = [];
+                for (var i = 0; i < classes.length; i++) {
+                    var className = classes[i];
+                    if (
+                        className !== DYNAMIC_GROUP_BASE_CLASS &&
+                        className.indexOf(DYNAMIC_GROUP_LAYOUT_PREFIX) !== 0
+                    ) {
+                        next.push(className);
+                    }
+                }
+                next.push(DYNAMIC_GROUP_BASE_CLASS);
+                next.push(DYNAMIC_GROUP_LAYOUT_PREFIX + layout);
+                component.setClass(next);
+            }
+
+            editor.Components.addType('ocd-dynamic-group', {
+                isComponent: function (element) {
+                    if (!element || element.nodeType !== 1) {
+                        return false;
+                    }
+                    if (element.hasAttribute && element.hasAttribute('data-ocd-dynamic-group')) {
+                        return true;
+                    }
+                    if (element.classList && element.classList.contains) {
+                        return element.classList.contains(DYNAMIC_GROUP_BASE_CLASS);
+                    }
+                    return (' ' + (element.className || '') + ' ').indexOf(' ' + DYNAMIC_GROUP_BASE_CLASS + ' ') !== -1;
+                },
+                model: {
+                    defaults: {
+                        tagName: 'div',
+                        classes: [DYNAMIC_GROUP_BASE_CLASS, 'ocd-dynamic-group--grid-2'],
+                        draggable: true,
+                        droppable: true,
+                        traits: [
+                            {
+                                type: 'select',
+                                name: 'layout',
+                                label: 'Layout',
+                                changeProp: true,
+                                options: [
+                                    { id: 'grid-2', name: 'Grid 2 columnas' },
+                                    { id: 'grid-3', name: 'Grid 3 columnas' },
+                                    { id: 'grid-4', name: 'Grid 4 columnas' },
+                                    { id: 'list', name: 'Lista (apilado vertical)' },
+                                    { id: 'carousel', name: 'Carrusel (scroll horizontal)' }
+                                ],
+                                getValue: function (opts) {
+                                    return dynamicGroupLayoutFromClasses(opts && opts.component);
+                                }
+                            },
+                            {
+                                type: 'button',
+                                name: 'add-card',
+                                label: 'Tarjetas',
+                                text: '+ Agregar tarjeta',
+                                full: true,
+                                command: function (editor, trait) {
+                                    var component = trait && trait.target ? trait.target : editor.getSelected();
+                                    if (!component) {
+                                        return;
+                                    }
+                                    var cards = component.components ? component.components() : null;
+                                    var last = cards && cards.length ? cards.at(cards.length - 1) : null;
+                                    if (!last || typeof last.clone !== 'function') {
+                                        return;
+                                    }
+                                    component.append(last.clone());
+                                }
+                            }
+                        ]
+                    },
+                    init: function () {
+                        this.on('change:layout', this.handleDynamicGroupLayoutChange);
+                    },
+                    handleDynamicGroupLayoutChange: function (model, layout) {
+                        applyDynamicGroupLayout(model || this, layout);
                     }
                 }
             });
@@ -736,14 +939,24 @@
             }
 
             var inspectorMount = resolveMount(options.inspectorMount);
-            var gridControlsMount = resolveMount(options.gridControlsMount);
-            var groupControlsMount = resolveMount(options.groupControlsMount);
 
             var gridApi = window.OCDCanvasGrid.plugin(editor);
             var behaviorApi = window.OcdBehaviors.grapesjsPlugin(editor, { threshold: 40 });
             var inspector = inspectorMount
                 ? window.OCDComputedInspector.create(editor, { mount: inspectorMount })
                 : null;
+
+            // gridControlsMount/groupControlsMount se resuelven RECIEN ACA,
+            // despues de crear el inspector: apuntan a ".ocd-ci__head", un
+            // elemento que el propio OCDComputedInspector.create() recien
+            // construye arriba. Bug encontrado 2026-08-21: antes,
+            // ocd-canvas-editor.js resolvia ese selector con
+            // document.querySelector() de entrada, ANTES de que el inspector
+            // existiera, asi que siempre llegaba null y ni los controles de
+            // grilla (con los manejadores para arrastrar el borde entre
+            // columnas) ni los de grupo se llegaban a montar nunca.
+            var gridControlsMount = resolveMount(options.gridControlsMount);
+            var groupControlsMount = resolveMount(options.groupControlsMount);
             var gridControls = gridControlsMount
                 ? window.OCDGridControls.create(editor, gridApi, { mount: gridControlsMount })
                 : null;
@@ -770,12 +983,52 @@
                 var marker = css.indexOf(CSS_OVERRIDES_MARKER);
                 return {
                     source: marker === -1 ? css : css.slice(0, marker).trimEnd(),
-                    overrides: marker === -1 ? '' : css.slice(marker + CSS_OVERRIDES_MARKER.length).trim()
+                    overrides: marker === -1 ? '' : dedupeCssRules(css.slice(marker + CSS_OVERRIDES_MARKER.length).trim())
                 };
             }
 
+            /**
+             * Bug de larga data (encontrado 2026-08-21): setStyle() cargaba
+             * sourceCss DENTRO del composer de GrapesJS ademas de guardarlo
+             * aparte como prefijo -- cada ciclo de abrir->guardar sumaba una
+             * copia mas de las reglas base (reset, body, html, el SVG del
+             * logo) dentro de "overrides". Un documento con muchos ciclos
+             * llego a tener la misma regla repetida 10-20 veces, superando
+             * el limite de tamano. Esto limpia duplicados EXACTOS (mismo
+             * selector + mismo contenido) conservando solo la primera
+             * aparicion, sin tocar reglas distintas aunque compartan
+             * selector (esas SI pueden ser cascada intencional).
+             */
+            function dedupeCssRules(css) {
+                if (!css) {
+                    return css;
+                }
+                var seen = Object.create(null);
+                var parts = css.split('}');
+                var out = [];
+                for (var i = 0; i < parts.length; i++) {
+                    var chunk = parts[i];
+                    var trimmed = chunk.trim();
+                    if (trimmed === '') {
+                        continue;
+                    }
+                    var rule = trimmed + '}';
+                    if (seen[rule]) {
+                        continue;
+                    }
+                    seen[rule] = true;
+                    out.push(rule);
+                }
+                return out.join('');
+            }
+
             function serializedCss() {
-                return sourceCss.trimEnd() + '\n\n' + CSS_OVERRIDES_MARKER + '\n' + (editor.getCss() || '');
+                var dynamicGroupCss = collectDynamicGroupCss().trim();
+                return (
+                    sourceCss.trimEnd() +
+                    (dynamicGroupCss ? '\n\n' + dynamicGroupCss : '') +
+                    '\n\n' + CSS_OVERRIDES_MARKER + '\n' + dedupeCssRules(editor.getCss() || '')
+                );
             }
 
             function serializedHtml() {
@@ -922,6 +1175,54 @@
                 style.textContent = css;
             }
 
+            /**
+             * Recolecta las reglas funcionales del Grupo Dinámico desde
+             * `ocd-canvas-editor.css` (misma estrategia que los tokens dinámicos)
+             * para poder aplicarlas en el iframe del canvas. A diferencia de los
+             * placeholders, estas reglas SÍ se exportan: `serializedCss()` las
+             * incorpora al CSS del documento para que el layout funcione publicado.
+             */
+            function collectDynamicGroupCss() {
+                var css = '';
+                var sheets = document.styleSheets;
+                for (var i = 0; i < sheets.length; i++) {
+                    var rules = null;
+                    try {
+                        rules = sheets[i].cssRules;
+                    } catch (_error) {
+                        continue;
+                    }
+                    if (!rules) {
+                        continue;
+                    }
+                    for (var j = 0; j < rules.length; j++) {
+                        var text = rules[j].cssText || '';
+                        if (/ocd-dynamic-group/.test(text)) {
+                            css += text + '\n';
+                        }
+                    }
+                }
+                return css;
+            }
+
+            function ensureDynamicGroupCss() {
+                var canvasDocument = editor.Canvas.getDocument();
+                if (!canvasDocument || !canvasDocument.head) {
+                    return;
+                }
+                var css = collectDynamicGroupCss();
+                if (!css) {
+                    return;
+                }
+                var style = canvasDocument.head.querySelector('style[data-ocd-dynamic-group-css]');
+                if (!style) {
+                    style = canvasDocument.createElement('style');
+                    style.setAttribute('data-ocd-dynamic-group-css', 'layout');
+                    canvasDocument.head.appendChild(style);
+                }
+                style.textContent = css;
+            }
+
             function installCanvasLumaRuntime() {
                 if (
                     !window.OcdLumaMatteVideo ||
@@ -958,11 +1259,53 @@
                 }
             }
 
+            /**
+             * Instala en el iframe del canvas el runtime de interacciones
+             * (`data-ocd-interaction`). Mismo patrón dual que el luma matte:
+             * el mismo motor que corre publicado se ejecuta acá para previsualizar.
+             */
+            function installCanvasInteractionsRuntime() {
+                if (
+                    !window.OcdInteractions ||
+                    typeof window.OcdInteractions.createRuntime !== 'function'
+                ) {
+                    return;
+                }
+                if (!editor.Canvas || typeof editor.Canvas.getDocument !== 'function') {
+                    return;
+                }
+                var canvasDocument = null;
+                try {
+                    canvasDocument = editor.Canvas.getDocument();
+                } catch (_error) {
+                    return;
+                }
+                if (!canvasDocument) {
+                    return;
+                }
+                var canvasWindow =
+                    canvasDocument.defaultView ||
+                    (typeof editor.Canvas.getWindow === 'function' ? editor.Canvas.getWindow() : null);
+                if (!canvasWindow) {
+                    return;
+                }
+                try {
+                    window.OcdInteractions.createRuntime({
+                        window: canvasWindow,
+                        document: canvasDocument
+                    });
+                } catch (_error) {
+                    // Progresivo: si el iframe todavía no está listo, se reintenta
+                    // en el próximo refresco de presentación.
+                }
+            }
+
             function refreshPresentation() {
                 ensureSiteFontCss();
                 ensureSourceCss();
                 ensureThemeDefinitionsCss();
                 ensureDynamicPlaceholderCss();
+                ensureDynamicGroupCss();
                 var selected = editor.getSelected();
                 if (inspector) {
                     inspector.refresh(selected);
@@ -975,6 +1318,7 @@
                 }
                 behaviorApi.installCanvasRuntime();
                 installCanvasLumaRuntime();
+                installCanvasInteractionsRuntime();
             }
 
             function request(action, params) {
@@ -1010,7 +1354,13 @@
                 var css = splitStoredCss(doc && doc.css);
                 sourceCss = css.source;
                 editor.setComponents((doc && doc.html) || '');
-                editor.setStyle([sourceCss, css.overrides].filter(Boolean).join('\n'));
+                // sourceCss NO va acá: ensureSourceCss() ya lo inyecta directo
+                // en el iframe del canvas por separado. Meterlo tambien en el
+                // composer de GrapesJS (via setStyle) era la causa real de la
+                // duplicacion -- serializedCss() lo vuelve a agregar como
+                // prefijo al guardar, así que quedaba dos veces, y cada ciclo
+                // de abrir->guardar sumaba una copia mas.
+                editor.setStyle(css.overrides || '');
                 window.requestAnimationFrame(function () {
                     ensureSiteFontCss();
                     ensureSourceCss();
@@ -1046,14 +1396,11 @@
                     ensureSiteFontCss();
                     ensureSourceCss();
                     ensureThemeDefinitionsCss();
+                    // No se auto-selecciona nada al cargar: en la vista ensamblada
+                    // de página esto hacía que el header quedara seleccionado (y su
+                    // panel de estados abierto) apenas se entraba al editor, sin que
+                    // el usuario hubiera tocado nada.
                     var selected = editor.getSelected();
-                    if (!selected) {
-                        var children = editor.getWrapper().components();
-                        selected = children && children.length ? children.at(0) : null;
-                        if (selected) {
-                            editor.select(selected);
-                        }
-                    }
                     if (inspector) {
                         inspector.refresh(selected);
                     }
@@ -1065,6 +1412,7 @@
                     }
                     behaviorApi.installCanvasRuntime();
                     installCanvasLumaRuntime();
+                    installCanvasInteractionsRuntime();
                 });
                 if (onDocumentApplied) {
                     onDocumentApplied(doc);

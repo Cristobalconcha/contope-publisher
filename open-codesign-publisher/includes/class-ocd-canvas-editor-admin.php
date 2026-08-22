@@ -25,6 +25,11 @@ final class OCD_Canvas_Editor_Admin
     public const AJAX_SESSION_OPEN = 'ocd_canvas_editor_session_open';
     public const AJAX_SNAPSHOTS_LIST = 'ocd_canvas_editor_snapshots_list';
     public const AJAX_SNAPSHOT_LOAD = 'ocd_canvas_editor_snapshot_load';
+    /** "Guardar como módulo" (Súper-Módulo, MVP): guardar y listar bloques reutilizables. */
+    public const AJAX_CUSTOM_MODULE_SAVE = 'ocd_canvas_editor_custom_module_save';
+    public const AJAX_CUSTOM_MODULE_LIST = 'ocd_canvas_editor_custom_module_list';
+    /** Botón "+ Nueva página" del editor: crea página + documento Canvas vinculados. */
+    public const AJAX_CREATE_PAGE = 'ocd_canvas_editor_create_page';
     /** Acción admin-post del duplicado de páginas Canvas. */
     public const ACTION_DUPLICATE = 'ocd_canvas_duplicate_page';
     public const CAPABILITY = 'manage_options';
@@ -51,30 +56,13 @@ final class OCD_Canvas_Editor_Admin
         return self::PAGE_DOCUMENT_PREFIX . $page_id;
     }
 
-    /**
-     * Inverso de document_id_for_page(): extrae el page_id de un document_id
-     * de página, o devuelve 0 si el document_id no es de página (por ejemplo
-     * el documento experimental compartido).
-     */
-    private static function page_id_from_document_id(string $document_id): int
-    {
-        if (strpos($document_id, self::PAGE_DOCUMENT_PREFIX) !== 0) {
-            return 0;
-        }
-        $suffix = substr($document_id, strlen(self::PAGE_DOCUMENT_PREFIX));
-        if ($suffix === '' || !preg_match('/^\d+$/', $suffix)) {
-            return 0;
-        }
-        $page_id = absint($suffix);
-        return $page_id > 0 ? $page_id : 0;
-    }
-
     public function __construct(
         private OCD_Canvas_Document_Repository $repository,
         private OCD_Canvas_Document_Sanitizer $sanitizer,
         private OCD_Canvas_Asset_Resolver $asset_resolver,
         private OCD_Canvas_Page_Publisher $publisher,
-        private OCD_Template_Region_Resolver $region_resolver
+        private OCD_Template_Region_Resolver $region_resolver,
+        private OCD_Custom_Module_Library $custom_module_library
     ) {
     }
 
@@ -92,6 +80,9 @@ final class OCD_Canvas_Editor_Admin
         add_action('wp_ajax_' . self::AJAX_SESSION_OPEN, [$this, 'handle_session_open']);
         add_action('wp_ajax_' . self::AJAX_SNAPSHOTS_LIST, [$this, 'handle_snapshots_list']);
         add_action('wp_ajax_' . self::AJAX_SNAPSHOT_LOAD, [$this, 'handle_snapshot_load']);
+        add_action('wp_ajax_' . self::AJAX_CUSTOM_MODULE_SAVE, [$this, 'handle_custom_module_save']);
+        add_action('wp_ajax_' . self::AJAX_CUSTOM_MODULE_LIST, [$this, 'handle_custom_module_list']);
+        add_action('wp_ajax_' . self::AJAX_CREATE_PAGE, [$this, 'handle_create_page']);
         add_filter('page_row_actions', [$this, 'add_page_row_edit_with_ocd'], 10, 2);
         add_action('admin_post_' . self::ACTION_DUPLICATE, [$this, 'handle_duplicate_page']);
         add_action('admin_notices', [$this, 'render_duplicate_notices']);
@@ -315,9 +306,16 @@ final class OCD_Canvas_Editor_Admin
             true
         );
         wp_enqueue_script(
+            'ocd-interactions',
+            plugins_url('assets/js/ocd-interactions.js', OCD_PUBLISHER_FILE),
+            [],
+            OCD_PUBLISHER_VERSION,
+            true
+        );
+        wp_enqueue_script(
             'ocd-computed-inspector',
             plugins_url('assets/js/ocd-computed-inspector.js', OCD_PUBLISHER_FILE),
-            ['ocd-grapesjs'],
+            ['ocd-grapesjs', 'ocd-interactions'],
             OCD_PUBLISHER_VERSION,
             true
         );
@@ -352,7 +350,7 @@ final class OCD_Canvas_Editor_Admin
         wp_enqueue_script(
             'ocd-editor-core',
             plugins_url('assets/js/ocd-editor-core.js', OCD_PUBLISHER_FILE),
-            ['ocd-grapesjs', 'ocd-computed-inspector', 'ocd-canvas-grid', 'ocd-grid-controls', 'ocd-behaviors', 'ocd-luma-matte-video'],
+            ['ocd-grapesjs', 'ocd-computed-inspector', 'ocd-canvas-grid', 'ocd-grid-controls', 'ocd-behaviors', 'ocd-luma-matte-video', 'ocd-interactions'],
             OCD_PUBLISHER_VERSION,
             true
         );
@@ -360,6 +358,15 @@ final class OCD_Canvas_Editor_Admin
             'ocd-canvas-editor',
             plugins_url('assets/js/ocd-canvas-editor.js', OCD_PUBLISHER_FILE),
             ['ocd-editor-core'],
+            OCD_PUBLISHER_VERSION,
+            true
+        );
+        // Inspector modal por componente (primera versión, sólo Título/ocd-heading).
+        // Se monta después de ocd-canvas-editor para poder leer window.ocdCanvas.
+        wp_enqueue_script(
+            'ocd-inspector-modal',
+            plugins_url('assets/js/ocd-inspector-modal.js', OCD_PUBLISHER_FILE),
+            ['ocd-canvas-editor'],
             OCD_PUBLISHER_VERSION,
             true
         );
@@ -383,9 +390,14 @@ final class OCD_Canvas_Editor_Admin
         } elseif ($auto_load_document_id !== '') {
             $document_id = $auto_load_document_id;
         } else {
-            $document_id = OCD_Canvas_Document_Repository::DOCUMENT_ID;
+            // Sin page_id ni document_id explícitos en la URL: no hay ninguna
+            // página elegida todavía. Antes acá se caía a un documento
+            // experimental genérico y se mostraba igual, como si fuera la
+            // página elegida — confuso, porque no lo era. El lienzo arranca
+            // vacío hasta que el usuario elige una página con el selector.
+            $document_id = '';
         }
-        $document = $this->repository->load($document_id);
+        $document = $document_id !== '' ? $this->repository->load($document_id) : null;
         $config = [
             'ajaxUrl' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce(self::NONCE_ACTION),
@@ -396,10 +408,16 @@ final class OCD_Canvas_Editor_Admin
             'saveRegionAction' => self::AJAX_SAVE_REGION,
             'resolvePageAction' => self::AJAX_RESOLVE_PAGE,
             'acfFieldsAction' => self::AJAX_ACF_FIELDS,
+            'customModuleSaveAction' => self::AJAX_CUSTOM_MODULE_SAVE,
+            'customModuleListAction' => self::AJAX_CUSTOM_MODULE_LIST,
+            'createPageAction' => self::AJAX_CREATE_PAGE,
+            'snapshotsListAction' => self::AJAX_SNAPSHOTS_LIST,
+            'snapshotLoadAction' => self::AJAX_SNAPSHOT_LOAD,
+            'sessionOpenAction' => self::AJAX_SESSION_OPEN,
             'documentId' => $document_id,
-            'document' => is_wp_error($document) ? null : $document,
+            'document' => (!is_wp_error($document) && $document !== null) ? $document : null,
             'loadError' => is_wp_error($document) ? $document->get_error_message() : '',
-            'publishedPage' => $this->publisher->current($document_id),
+            'publishedPage' => $document_id !== '' ? $this->publisher->current($document_id) : null,
             'pageTitle' => $auto_load_page_id > 0 ? get_the_title($auto_load_page_id) : '',
             'regionKinds' => OCD_Canvas_Document_Repository::REGION_KINDS,
             'regionDocuments' => $this->repository->list_region_documents(),
@@ -443,7 +461,7 @@ final class OCD_Canvas_Editor_Admin
     private function rule_page_choices(): array
     {
         $pages = [];
-        foreach (get_pages() as $page) {
+        foreach (get_pages(['post_status' => ['publish', 'draft', 'pending', 'future']]) as $page) {
             $title = trim((string) $page->post_title);
             $label = $title !== '' ? $title : sprintf('(Sin título) #%d', $page->ID);
             $pages[] = [
@@ -527,6 +545,19 @@ final class OCD_Canvas_Editor_Admin
                 </button>
                 <label class="ocd-canvas-title-label" for="ocd-canvas-page-title">Título público</label>
                 <input type="text" id="ocd-canvas-page-title" value="Página Open CoDesign Canvas" maxlength="160">
+                <label class="ocd-canvas-title-label" for="ocd-canvas-zoom">Zoom</label>
+                <select id="ocd-canvas-zoom">
+                    <option value="fit">Ajustar a pantalla</option>
+                    <option value="100">100%</option>
+                    <option value="75">75%</option>
+                    <option value="50">50%</option>
+                </select>
+                <label class="ocd-canvas-title-label" for="ocd-canvas-width">Ancho de página</label>
+                <select id="ocd-canvas-width">
+                    <option value="1920">1920px</option>
+                    <option value="1440">1440px</option>
+                    <option value="1280">1280px</option>
+                </select>
                 <button type="button" class="button button-primary" id="ocd-canvas-publish">Publicar/actualizar página</button>
                 <a id="ocd-canvas-view-page" class="button" href="#" target="_blank" rel="noopener" hidden>Ver página</a>
                 <span class="ocd-canvas-status" id="ocd-canvas-status" role="status" aria-live="polite"></span>
@@ -567,7 +598,13 @@ final class OCD_Canvas_Editor_Admin
                     <select id="ocd-page-target">
                         <option value="">Elegir página…</option>
                         <?php
-                        foreach (get_pages() as $page) :
+                        // get_pages() sin argumentos solo trae páginas publicadas; las
+                        // páginas nuevas creadas con "+ Nueva página" quedan como
+                        // borrador (ver OCD_Canvas_Page_Publisher::create_page()), así
+                        // que sin este override desaparecían del selector en cuanto se
+                        // recargaba la pantalla, aunque seguían intactas en la base de
+                        // datos (confirmado 2026-08-21).
+                        foreach (get_pages(['post_status' => ['publish', 'draft', 'pending', 'future']]) as $page) :
                             $document_id = (string) get_post_meta($page->ID, OCD_Canvas_Page_Publisher::META_DOCUMENT_ID, true);
                             $title = trim((string) $page->post_title);
                             $option_label = $title !== '' ? $title : sprintf('(Sin título) #%d', $page->ID);
@@ -579,6 +616,8 @@ final class OCD_Canvas_Editor_Admin
                         <?php endforeach; ?>
                     </select>
                     <button type="button" class="button button-primary" id="ocd-page-load">Cargar página</button>
+                    <button type="button" class="button" id="ocd-page-create">+ Nueva página</button>
+                    <button type="button" class="button" id="ocd-snapshots-open">Versiones anteriores</button>
                     <span class="ocd-canvas-status" id="ocd-canvas-page-status" role="status" aria-live="polite"></span>
                 </div>
             </div>
@@ -757,7 +796,11 @@ final class OCD_Canvas_Editor_Admin
         }
 
         $title = isset($_POST['title']) ? sanitize_text_field((string) wp_unslash($_POST['title'])) : '';
-        $published = $this->publisher->publish($document_id, $title, self::page_id_from_document_id($document_id));
+        // No adivinamos el page_id desde el document_id (no es portable entre
+        // instalaciones): dejamos que publish() lo resuelva por el postmeta
+        // real (_ocd_canvas_document_id), igual que hace para documentos sin
+        // página anclada.
+        $published = $this->publisher->publish($document_id, $title, 0);
         if (is_wp_error($published)) {
             wp_send_json_error(['message' => $published->get_error_message(), 'stage' => 'publish'], 400);
         }
@@ -1017,5 +1060,83 @@ final class OCD_Canvas_Editor_Admin
             'documentId' => $document_id,
             'snapshotId' => $snapshot_id,
         ]);
+    }
+
+    /**
+     * "Guardar como módulo" (Súper-Módulo, MVP): recibe el HTML/CSS ya
+     * serializados de un componente del lienzo (un contenedor con su
+     * contenido adentro) y los persiste como un bloque reutilizable nuevo en
+     * OCD_Custom_Module_Library. Reutiliza el mismo sanitizador que el resto
+     * del documento Canvas (sanitize_html()/sanitize_css()) en vez de escribir
+     * uno nuevo, para no abrir una segunda superficie de saneamiento de
+     * marcado en este plugin.
+     */
+    public function handle_custom_module_save(): void
+    {
+        if (!current_user_can(self::CAPABILITY)) {
+            wp_send_json_error(['message' => 'Permisos insuficientes.'], 403);
+        }
+        check_ajax_referer(self::NONCE_ACTION, 'nonce');
+
+        $label = isset($_POST['label']) ? sanitize_text_field((string) wp_unslash($_POST['label'])) : '';
+        $category = isset($_POST['category']) ? sanitize_text_field((string) wp_unslash($_POST['category'])) : '';
+        $raw_html = isset($_POST['html']) ? (string) wp_unslash($_POST['html']) : '';
+        $raw_css = isset($_POST['css']) ? (string) wp_unslash($_POST['css']) : '';
+
+        if (trim($raw_html) === '') {
+            wp_send_json_error(['message' => 'El módulo no tiene contenido para guardar.'], 400);
+        }
+
+        $html = $this->sanitizer->sanitize_html($raw_html);
+        if (is_wp_error($html)) {
+            wp_send_json_error(['message' => $html->get_error_message(), 'code' => $html->get_error_code()], 400);
+        }
+        $css = $this->sanitizer->sanitize_css($raw_css);
+        if (is_wp_error($css)) {
+            wp_send_json_error(['message' => $css->get_error_message(), 'code' => $css->get_error_code()], 400);
+        }
+
+        $entry = $this->custom_module_library->save($label, $category, $html, $css);
+
+        wp_send_json_success($entry);
+    }
+
+    /**
+     * Lista los módulos personalizados guardados, para que el editor los
+     * registre como bloques del BlockManager al arrancar (misma idea que los
+     * campos ACF y el bloque de Orugantt Forms, cargados desde el servidor).
+     */
+    public function handle_custom_module_list(): void
+    {
+        if (!current_user_can(self::CAPABILITY)) {
+            wp_send_json_error(['message' => 'Permisos insuficientes.'], 403);
+        }
+        check_ajax_referer(self::NONCE_ACTION, 'nonce');
+
+        wp_send_json_success(['modules' => $this->custom_module_library->list_all()]);
+    }
+
+    /**
+     * Botón "+ Nueva página" del editor. Crea una página WordPress en borrador
+     * con su documento Canvas propio ya vinculado (vía
+     * OCD_Canvas_Page_Publisher::create_page()) y devuelve los datos para que
+     * el JS la agregue al selector y la cargue de inmediato, sin recargar la
+     * pantalla.
+     */
+    public function handle_create_page(): void
+    {
+        if (!current_user_can(self::CAPABILITY)) {
+            wp_send_json_error(['message' => 'Permisos insuficientes.'], 403);
+        }
+        check_ajax_referer(self::NONCE_ACTION, 'nonce');
+
+        $title = isset($_POST['title']) ? sanitize_text_field((string) wp_unslash($_POST['title'])) : '';
+
+        $result = $this->publisher->create_page($title);
+        if (is_wp_error($result)) {
+            wp_send_json_error(['message' => $result->get_error_message()], 400);
+        }
+
+        wp_send_json_success($result);
     }
 }

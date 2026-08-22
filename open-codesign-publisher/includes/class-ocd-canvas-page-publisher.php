@@ -85,12 +85,21 @@ final class OCD_Canvas_Page_Publisher
         $post = [
             'post_type' => 'page',
             'post_status' => 'publish',
-            'post_title' => $title !== '' ? $title : 'Página Open CoDesign Canvas',
             'post_content' => sprintf('[open_codesign_canvas document_id="%s"]', esc_attr($document_id)),
             'meta_input' => [self::META_DOCUMENT_ID => $document_id],
         ];
         if ($page_id > 0) {
+            // Página ya existente: solo tocamos el título si mandaron uno
+            // real. Antes esto pisaba el título ya puesto por el título
+            // genérico cada vez que se publicaba sin pasar uno (ej. desde un
+            // flujo que no reenvía el campo) — un usuario podía renombrar su
+            // página y perder el nombre en la siguiente publicación.
             $post['ID'] = $page_id;
+            if ($title !== '') {
+                $post['post_title'] = $title;
+            }
+        } else {
+            $post['post_title'] = $title !== '' ? $title : 'Página Open CoDesign Canvas';
         }
         $saved_id = wp_insert_post($post, true);
         if (is_wp_error($saved_id)) {
@@ -190,6 +199,55 @@ final class OCD_Canvas_Page_Publisher
         ];
     }
 
+    /**
+     * Crea una página WordPress nueva, vacía, con su documento Canvas propio
+     * ya vinculado — para el botón "+ Nueva página" del editor. Mismo patrón
+     * que duplicate_page(), sin copiar contenido de ninguna fuente: el
+     * documento nuevo lo crea el repositorio en blanco (load() lo inicializa
+     * si el post del documento todavía no existe).
+     *
+     * @return array<string, mixed>|WP_Error
+     */
+    public function create_page(string $title = '')
+    {
+        $post_title = trim($title) !== '' ? trim($title) : 'Página sin título';
+
+        $saved_id = wp_insert_post([
+            'post_type' => 'page',
+            'post_status' => 'draft',
+            'post_title' => $post_title,
+            'post_content' => '',
+        ], true);
+        if (is_wp_error($saved_id)) {
+            return $saved_id;
+        }
+        $new_page_id = (int) $saved_id;
+
+        $new_document_id = OCD_Canvas_Editor_Admin::document_id_for_page($new_page_id);
+
+        $document = $this->repository->load($new_document_id);
+        if (is_wp_error($document)) {
+            wp_delete_post($new_page_id, true);
+            return $document;
+        }
+
+        $updated = wp_update_post([
+            'ID' => $new_page_id,
+            'post_content' => sprintf('[open_codesign_canvas document_id="%s"]', esc_attr($new_document_id)),
+        ], true);
+        if (is_wp_error($updated)) {
+            wp_delete_post($new_page_id, true);
+            return $updated;
+        }
+        update_post_meta($new_page_id, self::META_DOCUMENT_ID, $new_document_id);
+
+        return [
+            'pageId' => $new_page_id,
+            'documentId' => $new_document_id,
+            'title' => $post_title,
+        ];
+    }
+
     /** @return array<string, mixed>|null */
     public function current(string $document_id): ?array
     {
@@ -261,9 +319,16 @@ final class OCD_Canvas_Page_Publisher
         wp_enqueue_style('ocd-canvas-public');
         wp_add_inline_style('ocd-canvas-public', $theme_css . $site_font_css . $header_css . $body_css . $footer_css);
         wp_enqueue_script(
+            'ocd-interactions',
+            plugins_url('assets/js/ocd-interactions.js', OCD_PUBLISHER_FILE),
+            [],
+            OCD_PUBLISHER_VERSION,
+            true
+        );
+        wp_enqueue_script(
             'ocd-canvas-public',
             plugins_url('assets/js/ocd-canvas-public.js', OCD_PUBLISHER_FILE),
-            [],
+            ['ocd-interactions'],
             OCD_PUBLISHER_VERSION,
             true
         );

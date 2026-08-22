@@ -293,7 +293,7 @@ async function checkAdminSurface() {
     const enqueued = callsOf(enqueue).filter(
       (entry) => entry.name === 'wp_enqueue_script' || entry.name === 'wp_enqueue_style',
     );
-    check(enqueued.length === 9, 'enqueue_assets() debe encolar GrapesJS, los módulos Canvas, el core y los assets propios.');
+    check(enqueued.length === 12, 'enqueue_assets() debe encolar GrapesJS, los módulos Canvas, Luma, Interacciones, el core y los assets propios.');
     for (const entry of enqueued) {
       check(
         firstCall(entry.node.arguments[1], 'plugins_url') !== null,
@@ -810,6 +810,11 @@ async function checkIsolationAndAssets() {
   check(
     coreScript.includes('OCD-CANVAS-EDITABLE-OVERRIDES') && coreScript.includes('data-ocd-source-css'),
     'El editor debe preservar el CSS fuente literalmente y separar sus overrides editables.',
+  );
+  check(
+    /editor\.setStyle\(css\.overrides \|\| ''\)/.test(coreScript) &&
+      !/editor\.setStyle\(\[sourceCss, css\.overrides\]/.test(coreScript),
+    'La reconstruccion plana debe cargar en GrapesJS solo los overrides, no duplicar el CSS fuente.',
   );
   check(
     /css: serializedCss\(\)/.test(coreScript),

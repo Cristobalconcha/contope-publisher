@@ -1018,6 +1018,13 @@
         installGeoMap(geoMapNodes);
         installChart(chartNodes);
 
+        // Interacciones tipo Webflow (data-ocd-interaction): el mismo motor que
+        // corre en el iframe del editor (ocd-interactions.js) se instala acá
+        // sobre el documento publicado, sin duplicar la lógica de interpolación.
+        if (window.OcdInteractions && typeof window.OcdInteractions.createRuntime === 'function') {
+            window.OcdInteractions.createRuntime({ window: window, document: document });
+        }
+
         window.addEventListener('resize', function () {
             Array.prototype.forEach.call(roots, compensateWordPressAdminBar);
         }, { passive: true });

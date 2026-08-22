@@ -54,6 +54,15 @@
     'row-gap': ['gap'],
   };
 
+  // Etiquetas de "contenido" que puede tomar el control universal "Fuente de
+  // contenido": título/párrafo/botón/etiqueta de texto. Los contenedores
+  // estructurales (sección/fila/columnas) son <section>/<div> y quedan fuera
+  // a propósito porque no están en esta lista.
+  const DYNAMIC_TEXT_TAGS = new Set([
+    'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+    'p', 'span', 'a', 'button', 'label', 'li', 'strong', 'em',
+  ]);
+
   function splitSelectors(selectorText) {
     const result = [];
     let current = '';
@@ -344,8 +353,54 @@
       .ocd-ci__luma-title { margin-bottom:8px; color:#d9c9ff; font-weight:650; }
       .ocd-ci__luma-field { display:grid; gap:4px; margin-bottom:8px; color:#c7bda9; font-size:10px; }
       .ocd-ci__luma-toggle { display:flex; align-items:center; gap:7px; color:#ded8cc; cursor:pointer; }
-      .ocd-ci__luma-toggle input { width:auto; min-width:0; accent-color:#8a7cf1; }
+      /* GrapesJS resetea appearance y fuerza width:100% en TODO input de
+         forma global -- sin esto el checkbox queda estirado e irreconocible
+         (invisible en la practica) en vez de un cuadradito tildable. */
+      .ocd-ci__luma-toggle input[type="checkbox"] {
+        -webkit-appearance: checkbox; -moz-appearance: checkbox; appearance: checkbox;
+        width: 16px; height: 16px; min-width: 16px; flex: none;
+        margin: 0; accent-color: #8a7cf1; cursor: pointer;
+      }
       .ocd-ci__luma-hint { margin-top:7px; color:#a9a39a; font-size:10px; }
+      .ocd-ci__interactions { margin:8px 0; padding:10px; border:1px solid #b98ae666; border-radius:6px; background:#8a6df114; }
+      .ocd-ci__interactions-title { margin-bottom:8px; color:#e2c7ff; font-weight:650; }
+      .ocd-ci__interactions-field { display:grid; gap:4px; margin-bottom:8px; color:#c7bda9; font-size:10px; }
+      .ocd-ci__interactions-buttons { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+      .ocd-ci__interactions-buttons button { border:1px solid #ffffff26; border-radius:5px; padding:7px; background:#2a2e36; color:#ded8cc; cursor:pointer; font:inherit; font-weight:650; }
+      .ocd-ci__interactions-buttons button:hover { border-color:#b98ae6; color:#fff; }
+      .ocd-ci__interactions-status { margin-top:8px; color:#a9a39a; font-size:10px; }
+      .ocd-ci__interactions-clear { width:100%; margin-top:8px; border:1px solid #ffffff26; border-radius:5px; padding:7px; background:transparent; color:#c7bda9; cursor:pointer; font:inherit; }
+      .ocd-ci__interactions-clear:hover { border-color:#e06c6c; color:#ffb4b4; }
+      .ocd-ci__dyn { margin:8px 0; padding:10px; border:1px solid #4fb1a166; border-radius:6px; background:#1f8f7a14; }
+      .ocd-ci__dyn-title { margin-bottom:8px; color:#8fe0cd; font-weight:650; }
+      .ocd-ci__dyn select { width:100%; }
+      .ocd-ci__dyn-hint { margin-top:7px; color:#a9a39a; font-size:10px; }
+      .ocd-ci__save-module { margin:8px 0; }
+      .ocd-ci__save-module button { width:100%; border:1px solid #ffffff26; border-radius:5px;
+        padding:8px; background:#2a2e36; color:#ded8cc; cursor:pointer; font:inherit; font-weight:650; }
+      .ocd-ci__save-module button:hover { border-color:#70b9e9; color:#fff; }
+      .ocd-ci__save-module button:disabled { opacity:.6; cursor:default; }
+      .ocd-ci__col-presets { margin:8px 0; padding:10px; border:1px solid #d8872966; border-radius:6px; background:#a7641a14; }
+      .ocd-ci__col-presets-title { margin-bottom:8px; color:#f0c28e; font-weight:650; }
+      .ocd-ci__col-presets-toggle { width:100%; border:1px solid #b8752a; border-radius:5px;
+        padding:8px; background:#a7641a; color:#fff; cursor:pointer; font:inherit; font-weight:650; }
+      .ocd-ci__col-presets-toggle:hover { background:#c07620; }
+      .ocd-ci__col-presets-pop { position:fixed; z-index:2147483647; width:280px; max-height:min(70vh, 520px);
+        overflow-y:auto; overflow-x:hidden; background:#1f2228; color:#f4f1eb; border:1px solid #ffffff2e;
+        border-radius:8px; box-shadow:0 12px 32px #0008; padding:12px; font:12px/1.4 Inter,system-ui,sans-serif; }
+      .ocd-ci__col-presets-pop * { box-sizing:border-box; }
+      .ocd-ci__col-presets-device { margin-bottom:10px; padding-bottom:8px; border-bottom:1px solid #ffffff18;
+        color:#c7bda9; font-size:10px; text-transform:uppercase; letter-spacing:.04em; }
+      .ocd-ci__col-presets-group { margin-bottom:12px; }
+      .ocd-ci__col-presets-group:last-child { margin-bottom:0; }
+      .ocd-ci__col-presets-group-title { font-size:10px; text-transform:uppercase; letter-spacing:.04em;
+        color:#c7bda9; margin-bottom:6px; }
+      .ocd-ci__col-presets-grid { display:flex; flex-wrap:wrap; gap:6px; }
+      .ocd-ci__col-presets-thumb { display:flex; align-items:center; justify-content:center; width:52px; height:34px;
+        border:1px solid #ffffff26; border-radius:5px; background:#2a2e36; color:#d8b98a; padding:5px; cursor:pointer;
+        line-height:0; }
+      .ocd-ci__col-presets-thumb:hover { border-color:#d88729; color:#d88729; background:#33291d; }
+      .ocd-ci__col-presets-thumb svg { display:block; width:100%; height:100%; }
       .gjs-toolbar-item.ocd-header-state-tool { position:relative; width:auto; min-width:28px; padding:5px 7px;
         border-left:1px solid #ffffff38; font-weight:750; text-align:center; }
       .gjs-toolbar-item.ocd-header-state-tool::before { display:block; min-width:14px; line-height:16px; }
@@ -374,6 +429,8 @@
     let headerIdentityCounter = 0;
     let toolbarComponent = null;
     let toolbarOriginal = null;
+    let columnPresetsPopoverEl = null;
+    let columnPresetsAnchorEl = null;
 
     function getElement(component) {
       return component && typeof component.getEl === 'function' ? component.getEl() : null;
@@ -407,6 +464,33 @@
 
     function isVideoComponent(component) {
       return !!component && String(component.get?.('tagName') || '').toLowerCase() === 'video';
+    }
+
+    function isImageComponent(component) {
+      return !!component && String(component.get?.('tagName') || '').toLowerCase() === 'img';
+    }
+
+    function isDynamicTextComponent(component) {
+      if (!component) return false;
+      const tag = String(component.get?.('tagName') || '').toLowerCase();
+      return DYNAMIC_TEXT_TAGS.has(tag);
+    }
+
+    function dynamicSourceApplicable(component) {
+      return isImageComponent(component) || isDynamicTextComponent(component);
+    }
+
+    function currentAcfFields() {
+      const fields = global.OCDCanvasEditor && global.OCDCanvasEditor.acfFields;
+      return Array.isArray(fields) ? fields : [];
+    }
+
+    function currentAcfImageSrc() {
+      return (global.OCDCanvasEditor && global.OCDCanvasEditor.acfImageSrc) || '';
+    }
+
+    function acfFieldByName(fields, name) {
+      return fields.find((field) => field && String(field.name || '') === name) || null;
     }
 
     function isLumaMatteComponent(component) {
@@ -554,6 +638,27 @@
       } catch (_error) {
         // La composición es progresiva; si el lienzo no está listo se reintenta
         // en la próxima selección o refresco del editor.
+      }
+    }
+
+    function interactionsApi() {
+      return global.OcdInteractions || null;
+    }
+
+    function installCanvasInteractionsRuntime() {
+      const api = interactionsApi();
+      if (!api || typeof api.createRuntime !== 'function') return;
+      let canvasDocument = null;
+      try { canvasDocument = editor.Canvas?.getDocument?.(); } catch (_error) { return; }
+      if (!canvasDocument) return;
+      const canvasWindow =
+        canvasDocument.defaultView ||
+        (typeof editor.Canvas?.getWindow === 'function' ? editor.Canvas.getWindow() : null);
+      if (!canvasWindow) return;
+      try {
+        api.createRuntime({ window: canvasWindow, document: canvasDocument });
+      } catch (_error) {
+        // Progresivo: el runtime se reintenta en la próxima selección/refresco.
       }
     }
 
@@ -796,6 +901,424 @@
       editor.Css.setRule(selector, styles, { addStyles: true });
       selected = component;
       return refreshAfterRender();
+    }
+
+    /**
+     * Control universal "Fuente de contenido": conecta un componente de
+     * contenido ya puesto en el lienzo (texto o imagen) a un campo ACF de la
+     * página actual, siguiendo exactamente la misma convención que ya usa
+     * `acfFieldBlockContent()` en ocd-canvas-editor.js (mismo atributo
+     * `data-ocd-dynamic`, mismo placeholder `{{acf:CAMPO}}`, misma imagen de
+     * marcador de posición) para que el resultado sea indistinguible de un
+     * bloque ACF prearmado. `data-ocd-dynamic-original` guarda el contenido
+     * fijo original para poder restaurarlo al volver a "Fijo".
+     */
+    function applyDynamicSource(component, fieldName) {
+      const element = getElement(component);
+      if (!component || !element) return refreshAfterRender();
+      const isImage = isImageComponent(component);
+      const attributes = componentAttributes(component);
+      const hadDynamic = !!attributes['data-ocd-dynamic'];
+
+      if (!fieldName) {
+        const original = attributes['data-ocd-dynamic-original'];
+        component.removeAttributes(['data-ocd-dynamic']);
+        if (original !== undefined && original !== null) {
+          if (isImage) setImageSrc(component, original);
+          else component.components(original);
+          component.removeAttributes(['data-ocd-dynamic-original']);
+        }
+        selected = component;
+        return refreshAfterRender();
+      }
+
+      const field = acfFieldByName(currentAcfFields(), fieldName);
+      const type = field && field.type ? String(field.type) : 'text';
+
+      if (!hadDynamic) {
+        const originalValue = isImage ? getImageSrc(component, element) : element.innerHTML;
+        component.addAttributes({ 'data-ocd-dynamic-original': originalValue });
+      }
+
+      if (isImage) {
+        component.addAttributes({ 'data-ocd-dynamic': 'acf_image:' + fieldName });
+        setImageSrc(component, currentAcfImageSrc());
+      } else {
+        const htmlSuffix = type === 'wysiwyg' ? ':html' : '';
+        component.addAttributes({ 'data-ocd-dynamic': 'acf:' + fieldName + htmlSuffix });
+        component.components('{{acf:' + fieldName + htmlSuffix + '}}');
+      }
+      selected = component;
+      return refreshAfterRender();
+    }
+
+    /**
+     * El tipo de componente Image nativo de GrapesJS guarda su origen real en
+     * la propiedad de modelo `src` (no sólo en `attributes.src`) y la vuelve a
+     * escribir sobre los atributos en cada render (`updateSrc()`); si sólo
+     * tocáramos `attributes.src` un refresco posterior del lienzo podría pisar
+     * el cambio. Por eso getImageSrc/setImageSrc leen y escriben ambos lugares.
+     */
+    function getImageSrc(component, element) {
+      const modelSrc = component?.get?.('src');
+      if (typeof modelSrc === 'string' && modelSrc) return modelSrc;
+      return element?.getAttribute?.('src') || '';
+    }
+
+    function setImageSrc(component, url) {
+      component.set?.('src', url);
+      component.addAttributes({ src: url });
+    }
+
+    function dynamicSourceFieldFromAttribute(value) {
+      const match = /^acf(?:_image)?:([a-zA-Z0-9_-]+)(?::html)?$/.exec(String(value || ''));
+      return match ? match[1] : '';
+    }
+
+    /**
+     * "Presets de columnas": picker flotante de miniaturas para el contenedor
+     * Fila/Columnas (`.ocd-columns`, tipo de componente `ocd-columns` — ver
+     * `ocd-editor-core.js`). Escribe el ancho de cada columna con el MISMO
+     * mecanismo que ya usa el control "Columnas" (sección `.ocd-gc`, montada en
+     * `.ocd-ci__head` por `ocd-grid-controls.js`) y que respalda su fila
+     * "Proporción" del Style Manager nativo de GrapesJS (`ocd-canvas-grid.js`,
+     * compilado a `ocd-canvas-grid.global.js`): siempre `editor.OcdCanvasGrid`
+     * (`applyCustom` → `applyTemplate` → `editor.Css.setRule(...)`), nunca un
+     * atributo o estilo paralelo. Así el arrastre de los separadores (mismo
+     * archivo `ocd-grid-controls.js`) y este picker quedan sobre la misma
+     * fuente de verdad (`component.get('ocdGridConfig')` + la regla CSS real).
+     */
+    const COLUMN_PRESET_GROUPS = [
+      {
+        count: 2,
+        variants: [
+          { label: '50 / 50', weights: [1, 1] },
+          { label: '33 / 67', weights: [1, 2] },
+          { label: '67 / 33', weights: [2, 1] },
+          { label: '25 / 75', weights: [1, 3] },
+          { label: '75 / 25', weights: [3, 1] },
+        ],
+      },
+      {
+        count: 3,
+        variants: [
+          { label: '33 / 33 / 33', weights: [1, 1, 1] },
+          { label: '25 / 50 / 25', weights: [1, 2, 1] },
+          { label: '50 / 25 / 25', weights: [2, 1, 1] },
+          { label: '25 / 25 / 50', weights: [1, 1, 2] },
+        ],
+      },
+      {
+        count: 4,
+        variants: [
+          { label: 'Iguales', weights: [1, 1, 1, 1] },
+          { label: 'Primera doble', weights: [2, 1, 1, 1] },
+        ],
+      },
+      {
+        count: 5,
+        variants: [
+          { label: 'Iguales', weights: [1, 1, 1, 1, 1] },
+          { label: 'Primera doble', weights: [2, 1, 1, 1, 1] },
+        ],
+      },
+      {
+        count: 6,
+        variants: [
+          { label: 'Iguales', weights: [1, 1, 1, 1, 1, 1] },
+          { label: 'Primera doble', weights: [2, 1, 1, 1, 1, 1] },
+        ],
+      },
+    ];
+
+    function isColumnsContainer(component) {
+      return !!component && componentClasses(component).includes('ocd-columns');
+    }
+
+    /**
+     * Techo de columnas por breakpoint (criterio de diseño responsivo,
+     * recuperado del picker equivalente que ya existía en Orugantt): en
+     * mobile no tiene sentido ofrecer una fila de 6 columnas, y 2 columnas ya
+     * es angosto ahí, así que el techo se baja escalonadamente en vez de
+     * mostrar siempre los mismos 5 grupos sin importar el dispositivo activo.
+     */
+    const COLUMN_PRESET_MAX_BY_BREAKPOINT = { desktop: 6, tablet: 4, mobile: 3 };
+    const COLUMN_PRESET_BREAKPOINT_LABEL = { desktop: 'Escritorio', tablet: 'Tablet', mobile: 'Móvil' };
+
+    function activeColumnPresetBreakpoint() {
+      const gridApi = editor.OcdCanvasGrid;
+      const breakpoint = gridApi && typeof gridApi.getActiveBreakpoint === 'function'
+        ? gridApi.getActiveBreakpoint()
+        : 'desktop';
+      return Object.hasOwn(COLUMN_PRESET_MAX_BY_BREAKPOINT, breakpoint) ? breakpoint : 'desktop';
+    }
+
+    function columnPresetGroupsForBreakpoint(breakpoint) {
+      const max = COLUMN_PRESET_MAX_BY_BREAKPOINT[breakpoint] ?? COLUMN_PRESET_MAX_BY_BREAKPOINT.desktop;
+      return COLUMN_PRESET_GROUPS.filter((group) => group.count <= max);
+    }
+
+    function svgColumnPresetIcon(weights) {
+      const total = weights.reduce((sum, weight) => sum + weight, 0) || 1;
+      const width = 40;
+      const height = 24;
+      const gap = 2;
+      const pad = 1;
+      const usable = width - pad * 2 - gap * (weights.length - 1);
+      let x = pad;
+      let rects = '';
+      for (const weight of weights) {
+        const rectWidth = Math.max(1, (weight / total) * usable);
+        rects += `<rect x="${x.toFixed(1)}" y="${pad}" width="${rectWidth.toFixed(1)}" height="${height - pad * 2}" rx="1.5"/>`;
+        x += rectWidth + gap;
+      }
+      return `<svg viewBox="0 0 ${width} ${height}" fill="none" stroke="currentColor" stroke-width="1.4">${rects}</svg>`;
+    }
+
+    function columnDefinition() {
+      return {
+        tagName: 'div',
+        type: 'ocd-column',
+        classes: ['ocd-column'],
+        style: { 'min-width': '0' },
+        components: [{ tagName: 'p', content: 'Columna' }],
+      };
+    }
+
+    /**
+     * Iguala la cantidad de columnas hijas al preset elegido: clona la última
+     * columna existente para crecer (conserva su contenido/clases, igual que
+     * "+ Agregar tarjeta" en `ocd-dynamic-group` un poco más arriba en este
+     * mismo archivo) y quita desde el final para achicar.
+     */
+    function ensureColumnCount(component, targetCount) {
+      const collection = component && typeof component.components === 'function' ? component.components() : null;
+      if (!collection) return;
+      let models = collection.models ? collection.models.slice() : [];
+      while (models.length > targetCount) {
+        const last = models.pop();
+        if (last && typeof last.remove === 'function') last.remove();
+      }
+      while (models.length < targetCount) {
+        const template = models.length ? models[models.length - 1] : null;
+        const source = template && typeof template.clone === 'function' ? template.clone() : columnDefinition();
+        const appended = typeof component.append === 'function' ? component.append(source) : null;
+        const added = Array.isArray(appended) ? appended[0] : appended;
+        models.push(added || source);
+      }
+    }
+
+    function closeColumnPresetsPopover() {
+      if (columnPresetsPopoverEl) {
+        columnPresetsPopoverEl.remove();
+        columnPresetsPopoverEl = null;
+      }
+      columnPresetsAnchorEl = null;
+      hostDocument.removeEventListener('pointerdown', onColumnPresetsOutsideClick, true);
+      hostDocument.removeEventListener('keydown', onColumnPresetsKeydown, true);
+    }
+
+    function onColumnPresetsOutsideClick(event) {
+      if (!columnPresetsPopoverEl) return;
+      if (columnPresetsPopoverEl.contains(event.target)) return;
+      if (columnPresetsAnchorEl && columnPresetsAnchorEl.contains(event.target)) return;
+      closeColumnPresetsPopover();
+    }
+
+    function onColumnPresetsKeydown(event) {
+      if (event.key === 'Escape') closeColumnPresetsPopover();
+    }
+
+    function applyColumnPreset(component, weights) {
+      if (!component) return;
+      const gridApi = editor.OcdCanvasGrid;
+      if (!gridApi || typeof gridApi.applyCustom !== 'function') {
+        global.alert?.('El motor de columnas (OcdCanvasGrid) no está disponible todavía.');
+        return;
+      }
+      ensureColumnCount(component, weights.length);
+      try {
+        gridApi.applyCustom(component, weights, {});
+      } catch (error) {
+        global.alert?.('No se pudo aplicar el preset de columnas: ' + (error && error.message ? error.message : 'error desconocido'));
+        return;
+      }
+      selected = component;
+      closeColumnPresetsPopover();
+      refreshAfterRender();
+    }
+
+    function openColumnPresetsPopover(component, anchorEl) {
+      closeColumnPresetsPopover();
+      const breakpoint = activeColumnPresetBreakpoint();
+      const groups = columnPresetGroupsForBreakpoint(breakpoint);
+      const popover = createElement(hostDocument, 'div', 'ocd-ci__col-presets-pop');
+      popover.appendChild(
+        createElement(
+          hostDocument,
+          'div',
+          'ocd-ci__col-presets-device',
+          `Dispositivo activo: ${COLUMN_PRESET_BREAKPOINT_LABEL[breakpoint] || 'Escritorio'}`,
+        ),
+      );
+      for (const group of groups) {
+        const section = createElement(hostDocument, 'div', 'ocd-ci__col-presets-group');
+        section.appendChild(
+          createElement(hostDocument, 'div', 'ocd-ci__col-presets-group-title', `${group.count} columnas`),
+        );
+        const grid = createElement(hostDocument, 'div', 'ocd-ci__col-presets-grid');
+        for (const variant of group.variants) {
+          const thumb = createElement(hostDocument, 'button', 'ocd-ci__col-presets-thumb');
+          thumb.type = 'button';
+          thumb.title = `${group.count} columnas — ${variant.label}`;
+          thumb.setAttribute('aria-label', `Aplicar ${group.count} columnas, proporción ${variant.label}`);
+          thumb.innerHTML = svgColumnPresetIcon(variant.weights);
+          thumb.addEventListener('click', () => applyColumnPreset(component, variant.weights));
+          grid.appendChild(thumb);
+        }
+        section.appendChild(grid);
+        popover.appendChild(section);
+      }
+      hostDocument.body.appendChild(popover);
+
+      const rect = anchorEl.getBoundingClientRect();
+      const view = hostDocument.defaultView || global;
+      const viewportWidth = view.innerWidth || 1024;
+      const viewportHeight = view.innerHeight || 768;
+      const popRect = popover.getBoundingClientRect();
+      // El picker se ancla junto al botón que lo abre. El inspector `.ocd-ci`
+      // vive pegado al borde derecho de la pantalla, así que por defecto el
+      // panel se abre hacia la izquierda del botón para no salirse del
+      // viewport (a diferencia del bug de Orugantt: acá nunca queda recortado
+      // ni depende de scroll horizontal, ver comentario de clase arriba).
+      let left = rect.left - popRect.width - 8;
+      if (left < 8) left = Math.max(8, Math.min(rect.right - popRect.width, viewportWidth - popRect.width - 8));
+      let top = rect.top;
+      if (top + popRect.height > viewportHeight - 8) top = Math.max(8, viewportHeight - popRect.height - 8);
+      popover.style.left = `${left}px`;
+      popover.style.top = `${top}px`;
+
+      columnPresetsPopoverEl = popover;
+      columnPresetsAnchorEl = anchorEl;
+      hostDocument.addEventListener('pointerdown', onColumnPresetsOutsideClick, true);
+      hostDocument.addEventListener('keydown', onColumnPresetsKeydown, true);
+    }
+
+    function renderColumnPresetsPanel(component) {
+      if (!isColumnsContainer(component)) return null;
+      const panel = createElement(hostDocument, 'section', 'ocd-ci__col-presets');
+      panel.appendChild(createElement(hostDocument, 'div', 'ocd-ci__col-presets-title', 'Presets de columnas'));
+      const button = createElement(hostDocument, 'button', 'ocd-ci__col-presets-toggle', 'Elegir preset…');
+      button.type = 'button';
+      button.addEventListener('click', (event) => {
+        event.stopPropagation();
+        if (columnPresetsPopoverEl) {
+          closeColumnPresetsPopover();
+          return;
+        }
+        openColumnPresetsPopover(component, button);
+      });
+      panel.appendChild(button);
+      return panel;
+    }
+
+    /**
+     * "Guardar como módulo" (Súper-Módulo, MVP): botón que aparece con
+     * cualquier componente seleccionado que tenga hijos adentro (no se filtra
+     * de forma estricta por tipo de contenedor — con hijos alcanza para este
+     * alcance). Pide nombre y categoría por prompt() (no hay ningún modal de
+     * GrapesJS ya en uso en este código para justificar construir uno propio)
+     * y delega el guardado real en `window.OCDCanvasEditor.saveCustomModule`,
+     * expuesto por ocd-canvas-editor.js — este archivo no tiene `ajaxUrl`/
+     * `nonce` propios, así que no puede hablar con el servidor por su cuenta.
+     */
+    function componentHasChildren(component) {
+      if (!component || typeof component.components !== 'function') return false;
+      const children = component.components();
+      return !!(children && typeof children.length === 'number' && children.length > 0);
+    }
+
+    function renderSaveModulePanel(component) {
+      if (!componentHasChildren(component)) return null;
+      const bridge = global.OCDCanvasEditor;
+      if (!bridge || typeof bridge.saveCustomModule !== 'function') return null;
+
+      const panel = createElement(hostDocument, 'section', 'ocd-ci__save-module');
+      const button = createElement(hostDocument, 'button', '', 'Guardar como módulo');
+      button.type = 'button';
+      button.addEventListener('click', async () => {
+        const rawLabel = global.prompt?.('Nombre del módulo guardado:', '');
+        if (!rawLabel) return;
+        const label = String(rawLabel).trim();
+        if (!label) return;
+        const rawCategory = global.prompt?.(
+          'Categoría (agrupa este módulo con otros del mismo nombre en la paleta):',
+          'Módulos guardados',
+        );
+        if (rawCategory === null || rawCategory === undefined) return;
+        const category = String(rawCategory).trim() || 'Módulos guardados';
+
+        button.disabled = true;
+        try {
+          await bridge.saveCustomModule(component, label, category);
+        } catch (error) {
+          global.alert?.('No se pudo guardar el módulo: ' + (error && error.message ? error.message : 'error desconocido'));
+        } finally {
+          button.disabled = false;
+        }
+      });
+      panel.appendChild(button);
+      return panel;
+    }
+
+    function renderDynamicSourcePanel(component) {
+      if (!dynamicSourceApplicable(component)) return null;
+      const attributes = componentAttributes(component);
+      const currentFieldName = dynamicSourceFieldFromAttribute(attributes['data-ocd-dynamic']);
+      const fields = currentAcfFields();
+
+      const panel = createElement(hostDocument, 'section', 'ocd-ci__dyn');
+      panel.appendChild(createElement(hostDocument, 'div', 'ocd-ci__dyn-title', 'Fuente de contenido'));
+
+      const select = createElement(hostDocument, 'select');
+      const fixedOption = createElement(hostDocument, 'option', '', 'Fijo');
+      fixedOption.value = '';
+      select.appendChild(fixedOption);
+
+      let matchedCurrent = false;
+      for (const field of fields) {
+        const name = field && field.name ? String(field.name) : '';
+        if (!name) continue;
+        const option = createElement(hostDocument, 'option', '', field.label ? String(field.label) : name);
+        option.value = name;
+        select.appendChild(option);
+        if (name === currentFieldName) matchedCurrent = true;
+      }
+      // El componente ya venía con un campo dinámico de una sesión anterior
+      // pero la lista de campos ACF todavía no cargó (o el campo ya no existe):
+      // igual se refleja el estado real en el select, con su nombre técnico
+      // como texto visible.
+      if (currentFieldName && !matchedCurrent) {
+        const fallbackOption = createElement(hostDocument, 'option', '', currentFieldName);
+        fallbackOption.value = currentFieldName;
+        select.appendChild(fallbackOption);
+      }
+      select.value = currentFieldName;
+
+      select.addEventListener('change', async () => {
+        await applyDynamicSource(editor.getSelected() || component, select.value);
+      });
+
+      panel.appendChild(select);
+      panel.appendChild(
+        createElement(
+          hostDocument,
+          'div',
+          'ocd-ci__dyn-hint',
+          'Conecta este elemento ya puesto en el lienzo a un campo ACF de la página actual, en vez de arrastrar un bloque nuevo.',
+        ),
+      );
+      return panel;
     }
 
     function isExternalSvgImage(component) {
@@ -1120,8 +1643,176 @@
       return panel;
     }
 
+    function interactionsFor(component) {
+      const api = interactionsApi();
+      if (!api || typeof api.parseInteraction !== 'function') return null;
+      return api.parseInteraction(componentAttributes(component));
+    }
+
+    async function saveInteractionModel(component, model) {
+      if (!component) return refreshAfterRender();
+      const api = interactionsApi();
+      if (!api) return refreshAfterRender();
+      if (!model) {
+        component.removeAttributes?.([api.ATTR || 'data-ocd-interaction']);
+      } else {
+        const serialized = api.serializeInteraction(model);
+        if (serialized) {
+          component.addAttributes({ [api.ATTR || 'data-ocd-interaction']: serialized });
+        } else {
+          component.removeAttributes?.([api.ATTR || 'data-ocd-interaction']);
+        }
+      }
+      selected = component;
+      installCanvasInteractionsRuntime();
+      return refreshAfterRender();
+    }
+
+    async function captureInteractionState(component, stateLabel) {
+      const api = interactionsApi();
+      if (!api) return;
+      const element = getElement(component);
+      if (!element) {
+        global.alert?.('No se pudo leer el elemento para fijar el estado.');
+        return;
+      }
+      const properties = api.captureState(element);
+      if (!properties) {
+        global.alert?.('No se pudo capturar el estado actual del elemento.');
+        return;
+      }
+      const current = interactionsFor(component);
+      const trigger = current && current.trigger
+        ? current.trigger
+        : { tipo: api.TRIGGER_SCROLL, threshold: api.DEFAULT_SCROLL_THRESHOLD || 200 };
+      const states = current
+        ? current.states.map((state) => ({ properties: state.properties }))
+        : [{ properties: {} }, { properties: {} }];
+      if (stateLabel === api.STATE_FINAL) states[1] = { properties };
+      else states[0] = { properties };
+      await saveInteractionModel(component, api.buildInteraction(trigger, states));
+    }
+
+    function renderInteractionsPanel(component) {
+      if (!component) return null;
+      const api = interactionsApi();
+      if (!api || !getElement(component)) return null;
+
+      const interaction = interactionsFor(component);
+      const triggerType = interaction ? interaction.trigger.tipo : '';
+      const threshold = interaction && interaction.trigger.threshold != null
+        ? interaction.trigger.threshold
+        : api.DEFAULT_SCROLL_THRESHOLD || 200;
+      const duration = interaction && interaction.trigger.duration != null
+        ? interaction.trigger.duration
+        : api.DEFAULT_LOAD_DURATION || 600;
+      const hasInitial = !!interaction && Object.keys(interaction.states[0].properties).length > 0;
+      const hasFinal = !!interaction && Object.keys(interaction.states[1].properties).length > 0;
+
+      const panel = createElement(hostDocument, 'section', 'ocd-ci__interactions');
+      panel.appendChild(createElement(hostDocument, 'div', 'ocd-ci__interactions-title', 'Interacciones'));
+
+      const triggerField = createElement(hostDocument, 'label', 'ocd-ci__interactions-field');
+      triggerField.appendChild(createElement(hostDocument, 'span', '', 'Disparador'));
+      const triggerSelect = createElement(hostDocument, 'select');
+      const noneOption = createElement(hostDocument, 'option', '', 'Sin interacción');
+      noneOption.value = '';
+      const loadOption = createElement(hostDocument, 'option', '', 'Al cargar la página');
+      loadOption.value = api.TRIGGER_LOAD;
+      const scrollOption = createElement(hostDocument, 'option', '', 'Al hacer scroll (con umbral en px)');
+      scrollOption.value = api.TRIGGER_SCROLL;
+      triggerSelect.append(noneOption, loadOption, scrollOption);
+      triggerSelect.value = triggerType;
+      triggerField.appendChild(triggerSelect);
+      panel.appendChild(triggerField);
+
+      const paramField = createElement(hostDocument, 'label', 'ocd-ci__interactions-field');
+      const paramInput = createElement(hostDocument, 'input');
+      paramInput.type = 'number';
+      paramInput.min = '0';
+      paramInput.step = '1';
+      if (triggerType === api.TRIGGER_SCROLL) {
+        paramField.appendChild(createElement(hostDocument, 'span', '', 'Umbral (px)'));
+        paramInput.value = String(threshold);
+      } else if (triggerType === api.TRIGGER_LOAD) {
+        paramField.appendChild(createElement(hostDocument, 'span', '', 'Duración (ms)'));
+        paramInput.value = String(duration);
+      } else {
+        paramField.style.display = 'none';
+      }
+      paramField.appendChild(paramInput);
+      panel.appendChild(paramField);
+
+      triggerSelect.addEventListener('change', async () => {
+        const target = editor.getSelected() || component;
+        const value = triggerSelect.value;
+        if (!value) {
+          await saveInteractionModel(target, null);
+          return;
+        }
+        const current = interactionsFor(target);
+        const states = current
+          ? current.states.map((state) => ({ properties: state.properties }))
+          : [{ properties: {} }, { properties: {} }];
+        const fallback = value === api.TRIGGER_SCROLL
+          ? api.DEFAULT_SCROLL_THRESHOLD || 200
+          : api.DEFAULT_LOAD_DURATION || 600;
+        const numeric = Number.parseFloat(paramInput.value);
+        const currentParameter = value === api.TRIGGER_SCROLL
+          ? current && current.trigger.threshold
+          : current && current.trigger.duration;
+        const parameter = Number.isFinite(currentParameter) && currentParameter >= 0
+          ? currentParameter
+          : Number.isFinite(numeric) && numeric >= 0 ? numeric : fallback;
+        const trigger = value === api.TRIGGER_SCROLL
+          ? { tipo: api.TRIGGER_SCROLL, threshold: parameter }
+          : { tipo: api.TRIGGER_LOAD, duration: parameter };
+        await saveInteractionModel(target, api.buildInteraction(trigger, states));
+      });
+
+      paramInput.addEventListener('change', async () => {
+        const target = editor.getSelected() || component;
+        const current = interactionsFor(target);
+        if (!current) return;
+        const value = Number.parseFloat(paramInput.value);
+        if (!Number.isFinite(value) || value < 0) return;
+        if (current.trigger.tipo === api.TRIGGER_SCROLL) current.trigger.threshold = value;
+        else current.trigger.duration = value;
+        await saveInteractionModel(target, current);
+      });
+
+      const buttons = createElement(hostDocument, 'div', 'ocd-ci__interactions-buttons');
+      const initialButton = createElement(hostDocument, 'button', '', 'Fijar estado inicial');
+      initialButton.type = 'button';
+      initialButton.addEventListener('click', () => captureInteractionState(component, api.STATE_INITIAL));
+      const finalButton = createElement(hostDocument, 'button', '', 'Fijar estado final');
+      finalButton.type = 'button';
+      finalButton.addEventListener('click', () => captureInteractionState(component, api.STATE_FINAL));
+      buttons.append(initialButton, finalButton);
+      panel.appendChild(buttons);
+
+      const statusText = interaction
+        ? `${interaction.trigger.tipo === api.TRIGGER_SCROLL ? 'Scroll' : 'Carga'} · inicio ${hasInitial ? 'fijado' : 'pendiente'} · fin ${hasFinal ? 'fijado' : 'pendiente'}${hasInitial && hasFinal ? ' (interpolando)' : ''}`
+        : 'Fijá ambos estados para interpolar.';
+      panel.appendChild(createElement(hostDocument, 'div', 'ocd-ci__interactions-status', statusText));
+
+      if (interaction) {
+        const clear = createElement(hostDocument, 'button', 'ocd-ci__interactions-clear', 'Quitar interacción');
+        clear.type = 'button';
+        clear.addEventListener('click', () => saveInteractionModel(editor.getSelected() || component, null));
+        panel.appendChild(clear);
+      }
+
+      return panel;
+    }
+
     function render() {
       if (!root || !body || !targetLabel) return;
+      // Cualquier render (cambio de selección, edición, etc.) invalida el
+      // botón que ancla el picker de presets — ciérralo siempre para no dejar
+      // un popover flotante apuntando a un componente que ya no es el
+      // seleccionado.
+      closeColumnPresetsPopover();
       targetLabel.textContent = snapshot?.description || 'Ningún elemento seleccionado';
       body.replaceChildren();
       const classes = snapshot?.classes || [];
@@ -1143,6 +1834,14 @@
       if (headerPanel) body.appendChild(headerPanel);
       const lumaPanel = renderLumaMattePanel(snapshot?.component);
       if (lumaPanel) body.appendChild(lumaPanel);
+      const interactionsPanel = renderInteractionsPanel(snapshot?.component);
+      if (interactionsPanel) body.appendChild(interactionsPanel);
+      const dynamicSourcePanel = renderDynamicSourcePanel(snapshot?.component);
+      if (dynamicSourcePanel) body.appendChild(dynamicSourcePanel);
+      const columnPresetsPanel = renderColumnPresetsPanel(snapshot?.component);
+      if (columnPresetsPanel) body.appendChild(columnPresetsPanel);
+      const saveModulePanel = renderSaveModulePanel(snapshot?.component);
+      if (saveModulePanel) body.appendChild(saveModulePanel);
       const svgImage = externalSvgImageFor(snapshot?.component) || firstExternalSvgImage();
       const brandVector = firstBrandVector();
       if (svgImage || brandVector) {
@@ -1281,9 +1980,17 @@
       setHeaderPreviewState('scrolled', editor.getSelected() || selected);
     });
 
+    function onAcfFieldsLoaded() {
+      // La lista de campos ACF puede llegar después de que el panel ya esté
+      // montado y un componente de contenido ya esté seleccionado; re-renderiza
+      // para que el <select> "Fuente de contenido" ofrezca las opciones.
+      render();
+    }
+
     editor.on('component:selected', onSelected);
     editor.on('component:deselected', onDeselected);
     editor.on('component:styleUpdate', refreshAfterRender);
+    hostDocument?.addEventListener?.('ocd:acf-fields-loaded', onAcfFieldsLoaded);
 
     const api = {
       inspect,
@@ -1303,6 +2010,7 @@
         editor.off('component:selected', onSelected);
         editor.off('component:deselected', onDeselected);
         editor.off('component:styleUpdate', refreshAfterRender);
+        hostDocument?.removeEventListener?.('ocd:acf-fields-loaded', onAcfFieldsLoaded);
         previewHeaderElement?.removeAttribute('data-ocd-preview-scroll-state');
         previewHeaderElement?.classList.remove('nav--scrolled');
         previewHeaderElement = null;
