@@ -840,6 +840,19 @@ async function checkIsolationAndAssets() {
     'El inspector debe editar SVG inline y colorear SVG externos en modos claro/oscuro.',
   );
   check(
+    inspectorSource.includes('data-ocd-presentation-id') &&
+      inspectorSource.includes("tablet: '(max-width: 992px)'") &&
+      inspectorSource.includes("mobile: '(max-width: 480px)'") &&
+      inspectorSource.includes("{ translate }") &&
+      inspectorSource.includes('Presentación · posición'),
+    'El inspector debe editar la posición vertical por dispositivo mediante CSS contextual portable.',
+  );
+  check(
+    inspectorSource.includes('data-ocd-interaction') &&
+      !inspectorSource.includes('data-ocd-interaction="hero-collapse"'),
+    'Presentación e Interacciones deben conservarse separadas del behavior hero-collapse.',
+  );
+  check(
     /saveInFlight\.then\([\s\S]*return persist\(kind\)/.test(script),
     'El autoguardado debe encolar un estado nuevo si ya existe una escritura en curso.',
   );

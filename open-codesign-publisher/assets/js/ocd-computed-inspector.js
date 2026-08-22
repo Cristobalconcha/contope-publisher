@@ -371,6 +371,11 @@
       .ocd-ci__interactions-status { margin-top:8px; color:#a9a39a; font-size:10px; }
       .ocd-ci__interactions-clear { width:100%; margin-top:8px; border:1px solid #ffffff26; border-radius:5px; padding:7px; background:transparent; color:#c7bda9; cursor:pointer; font:inherit; }
       .ocd-ci__interactions-clear:hover { border-color:#e06c6c; color:#ffb4b4; }
+      .ocd-ci__presentation { margin:8px 0; padding:10px; border:1px solid #62a8df66; border-radius:6px; background:#397ba114; }
+      .ocd-ci__presentation-title { margin-bottom:8px; color:#b9ddf5; font-weight:650; }
+      .ocd-ci__presentation-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }
+      .ocd-ci__presentation-grid label { display:grid; gap:4px; color:#c7d7e1; font-size:10px; }
+      .ocd-ci__presentation-hint { margin-top:8px; color:#9eabb4; font-size:10px; }
       .ocd-ci__dyn { margin:8px 0; padding:10px; border:1px solid #4fb1a166; border-radius:6px; background:#1f8f7a14; }
       .ocd-ci__dyn-title { margin-bottom:8px; color:#8fe0cd; font-weight:650; }
       .ocd-ci__dyn select { width:100%; }
@@ -1806,6 +1811,73 @@
       return panel;
     }
 
+    const PRESENTATION_BREAKPOINTS = {
+      desktop: null,
+      tablet: '(max-width: 992px)',
+      mobile: '(max-width: 480px)',
+    };
+
+    function ensurePresentationIdentity(component) {
+      const attributes = componentAttributes(component);
+      let identity = String(attributes['data-ocd-presentation-id'] || '').trim();
+      if (!identity) {
+        identity = `ocd-presentation-${normalizeClassName(component.getId?.() || component.cid || 'elemento')}`;
+        component.addAttributes({ 'data-ocd-presentation-id': identity });
+      }
+      return identity;
+    }
+
+    function presentationRule(component, breakpoint) {
+      const selector = `[data-ocd-presentation-id="${ensurePresentationIdentity(component)}"]`;
+      const media = PRESENTATION_BREAKPOINTS[breakpoint];
+      const options = media ? { atRuleType: 'media', atRuleParams: media } : {};
+      return { selector, options, rule: editor.Css.getRule(selector, options) };
+    }
+
+    function presentationOffset(component, breakpoint) {
+      const { rule } = presentationRule(component, breakpoint);
+      const value = String(rule?.getStyle?.()?.translate || '').trim();
+      const match = /^0(?:px)?\s+(-?\d*\.?\d+)px$/.exec(value);
+      return match ? match[1] : '';
+    }
+
+    async function setPresentationOffset(component, breakpoint, rawValue) {
+      const numeric = Number.parseFloat(rawValue);
+      const { selector, options } = presentationRule(component, breakpoint);
+      const translate = Number.isFinite(numeric) ? `0 ${numeric}px` : '';
+      editor.Css.setRule(selector, { translate }, { ...options, addStyles: true });
+      selected = component;
+      await refreshAfterRender();
+    }
+
+    function renderPresentationPanel(component) {
+      if (!component || !getElement(component)) return null;
+      const panel = createElement(hostDocument, 'section', 'ocd-ci__presentation');
+      panel.appendChild(createElement(hostDocument, 'div', 'ocd-ci__presentation-title', 'Presentación · posición'));
+      const grid = createElement(hostDocument, 'div', 'ocd-ci__presentation-grid');
+      for (const [breakpoint, labelText] of [['desktop', 'Escritorio'], ['tablet', 'Tablet'], ['mobile', 'Móvil']]) {
+        const label = createElement(hostDocument, 'label', '', `${labelText} (Y px)`);
+        const input = createElement(hostDocument, 'input');
+        input.type = 'number';
+        input.step = '1';
+        input.placeholder = breakpoint === 'desktop' ? '0' : 'hereda';
+        input.value = presentationOffset(component, breakpoint);
+        input.addEventListener('change', () => setPresentationOffset(component, breakpoint, input.value));
+        label.appendChild(input);
+        grid.appendChild(label);
+      }
+      panel.append(
+        grid,
+        createElement(
+          hostDocument,
+          'div',
+          'ocd-ci__presentation-hint',
+          'Usá valores negativos para subir el elemento (por ejemplo, -30). Tablet y Móvil heredan Escritorio mientras estén vacíos.',
+        ),
+      );
+      return panel;
+    }
+
     function render() {
       if (!root || !body || !targetLabel) return;
       // Cualquier render (cambio de selección, edición, etc.) invalida el
@@ -1834,6 +1906,8 @@
       if (headerPanel) body.appendChild(headerPanel);
       const lumaPanel = renderLumaMattePanel(snapshot?.component);
       if (lumaPanel) body.appendChild(lumaPanel);
+      const presentationPanel = renderPresentationPanel(snapshot?.component);
+      if (presentationPanel) body.appendChild(presentationPanel);
       const interactionsPanel = renderInteractionsPanel(snapshot?.component);
       if (interactionsPanel) body.appendChild(interactionsPanel);
       const dynamicSourcePanel = renderDynamicSourcePanel(snapshot?.component);
