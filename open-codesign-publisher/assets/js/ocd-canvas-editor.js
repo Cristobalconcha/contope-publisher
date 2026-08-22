@@ -492,6 +492,12 @@
         if (!config.customModuleSaveAction || !component || typeof component.toHTML !== 'function') {
             return Promise.reject(new Error('Guardado de módulos no disponible.'));
         }
+        // La marca permite que, al reinsertarlo desde la paleta, el inspector
+        // reconozca el contenedor como supermódulo y muestre sus entidades con
+        // un engranaje de configuración propio.
+        if (typeof component.addAttributes === 'function') {
+            component.addAttributes({ 'data-ocd-supermodule': '1' });
+        }
         var html = String(component.toHTML() || '').trim();
         if (!html) {
             return Promise.reject(new Error('El elemento seleccionado no tiene contenido para guardar.'));

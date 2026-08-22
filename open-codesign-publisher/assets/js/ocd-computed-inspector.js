@@ -404,6 +404,15 @@
         padding:8px; background:#2a2e36; color:#ded8cc; cursor:pointer; font:inherit; font-weight:650; }
       .ocd-ci__save-module button:hover { border-color:#70b9e9; color:#fff; }
       .ocd-ci__save-module button:disabled { opacity:.6; cursor:default; }
+      .ocd-ci__supermodule { margin:0 0 14px; padding:12px; border:1px solid #ffffff20; border-radius:7px; background:#20242c; }
+      .ocd-ci__supermodule-title { margin-bottom:9px; color:#fff; font-size:12px; font-weight:700; }
+      .ocd-ci__supermodule-list { display:grid; gap:7px; }
+      .ocd-ci__supermodule-item { display:flex; align-items:center; min-height:38px; padding:0 5px 0 11px; border:1px solid #ffffff12; border-radius:5px; background:#2a2f39; }
+      .ocd-ci__supermodule-name { min-width:0; flex:1; overflow:hidden; color:#f2f4f7; font-size:11px; text-overflow:ellipsis; white-space:nowrap; }
+      .ocd-ci__supermodule-settings { display:grid; width:30px; height:30px; padding:0; place-items:center; border:0; border-radius:4px; background:transparent; color:#bec6d1; font-size:15px; cursor:pointer; }
+      .ocd-ci__supermodule-settings:hover, .ocd-ci__supermodule-settings:focus-visible { background:#405de6; color:#fff; outline:none; }
+      .ocd-ci__supermodule-trail { display:flex; align-items:center; gap:7px; margin:0 0 12px; color:#aeb7c5; font-size:10px; }
+      .ocd-ci__supermodule-trail button { padding:4px 7px; border:0; border-radius:4px; background:#343a46; color:#fff; cursor:pointer; }
       .ocd-ci__col-presets { margin:8px 0; padding:10px; border:1px solid #d8872966; border-radius:6px; background:#a7641a14; }
       .ocd-ci__col-presets-title { margin-bottom:8px; color:#f0c28e; font-weight:650; }
       .ocd-ci__col-presets-toggle { width:100%; border:1px solid #b8752a; border-radius:5px;
@@ -456,6 +465,7 @@
     let toolbarOriginal = null;
     let columnPresetsPopoverEl = null;
     let columnPresetsAnchorEl = null;
+    let supermoduleContext = null;
 
     function getElement(component) {
       return component && typeof component.getEl === 'function' ? component.getEl() : null;
@@ -799,7 +809,7 @@
 
     function updateHeaderToolbar(component) {
       const header = headerForComponent(component);
-      if (!header) {
+      if (!component) {
         restoreHeaderToolbar();
         editor.refresh?.({ tools: true });
         return;
@@ -818,14 +828,24 @@
       const tools = [
         {
           attributes: {
+            class: 'fa fa-cog ocd-entity-settings-tool',
+            title: 'Configurar esta entidad',
+            'aria-label': 'Configurar esta entidad',
+          },
+          command: 'ocd-entity-settings-open',
+        },
+      ];
+      if (header) tools.push(
+        {
+          attributes: {
             class: 'ocd-header-state-tool ocd-header-state-pin',
             title: headerIsActive(header) ? 'Abrir estados del encabezado' : 'Guardar estado y agregar estado Scroll',
             'data-ocd-header-tool': 'pin',
           },
           command: 'ocd-header-states-open',
         },
-      ];
-      if (headerIsActive(header)) {
+      );
+      if (header && headerIsActive(header)) {
         tools.push(
           {
             attributes: {
@@ -1261,6 +1281,91 @@
       if (!component || typeof component.components !== 'function') return false;
       const children = component.components();
       return !!(children && typeof children.length === 'number' && children.length > 0);
+    }
+
+    function componentClasses(component) {
+      return component && typeof component.getClasses === 'function' ? component.getClasses() : [];
+    }
+
+    function isSupermodule(component) {
+      if (!componentHasChildren(component)) return false;
+      const attributes = componentAttributes(component);
+      const classes = componentClasses(component);
+      return (
+        attributes['data-ocd-supermodule'] === '1' ||
+        classes.includes('ocd-group') ||
+        classes.includes('ocd-dynamic-group')
+      );
+    }
+
+    function componentDisplayName(component, index) {
+      const attributes = componentAttributes(component);
+      const explicit = attributes['data-ocd-module-label'] || attributes['aria-label'] || attributes.alt;
+      if (explicit) return String(explicit);
+      const classes = componentClasses(component);
+      const usefulClass = classes.find((name) => !/^ocd-(?:column|group|dynamic-group)/.test(name));
+      if (usefulClass) return `.${usefulClass}`;
+      const type = String(component?.get?.('type') || '');
+      const tag = String(component?.get?.('tagName') || '').toLowerCase();
+      const names = {
+        text: 'Texto', image: 'Imagen', video: 'Video', link: 'Enlace',
+        'ocd-video': 'Video', 'ocd-luma-matte': 'Video con transparencia',
+        'ocd-dynamic-group': 'Grupo dinámico', 'ocd-group': 'Grupo de módulos',
+      };
+      return names[type] || names[tag] || (tag ? tag.toUpperCase() : `Entidad ${index + 1}`);
+    }
+
+    function directChildren(component) {
+      if (!component || typeof component.components !== 'function') return [];
+      const collection = component.components();
+      return collection?.models ? collection.models.slice() : [];
+    }
+
+    function renderSupermodulePanel(component) {
+      if (!isSupermodule(component)) return null;
+      const panel = createElement(hostDocument, 'section', 'ocd-ci__supermodule');
+      panel.appendChild(createElement(hostDocument, 'div', 'ocd-ci__supermodule-title', 'Entidades del supermódulo'));
+      const list = createElement(hostDocument, 'div', 'ocd-ci__supermodule-list');
+      directChildren(component).forEach((child, index) => {
+        const row = createElement(hostDocument, 'div', 'ocd-ci__supermodule-item');
+        const name = createElement(hostDocument, 'span', 'ocd-ci__supermodule-name', componentDisplayName(child, index));
+        const settings = createElement(hostDocument, 'button', 'ocd-ci__supermodule-settings', '⚙');
+        settings.type = 'button';
+        settings.title = `Configurar ${name.textContent}`;
+        settings.setAttribute('aria-label', settings.title);
+        settings.addEventListener('click', () => {
+          supermoduleContext = component;
+          editor.select(child);
+          openInspectorPanel();
+        });
+        row.append(name, settings);
+        list.appendChild(row);
+      });
+      panel.appendChild(list);
+      return panel;
+    }
+
+    function renderSupermoduleBreadcrumb(component) {
+      if (!supermoduleContext || component === supermoduleContext) return null;
+      let current = component;
+      let belongs = false;
+      while (current) {
+        if (current === supermoduleContext) {
+          belongs = true;
+          break;
+        }
+        current = current.parent?.();
+      }
+      if (!belongs) {
+        supermoduleContext = null;
+        return null;
+      }
+      const trail = createElement(hostDocument, 'nav', 'ocd-ci__supermodule-trail');
+      const back = createElement(hostDocument, 'button', '', '← Supermódulo');
+      back.type = 'button';
+      back.addEventListener('click', () => editor.select(supermoduleContext));
+      trail.append(back, createElement(hostDocument, 'span', '', `› ${componentDisplayName(component, 0)}`));
+      return trail;
     }
 
     function renderSaveModulePanel(component) {
@@ -1978,6 +2083,10 @@
       }
       const headerPanel = renderHeaderStatePanel(headerForComponent(snapshot?.component));
       if (headerPanel) body.appendChild(headerPanel);
+      const supermoduleTrail = renderSupermoduleBreadcrumb(snapshot?.component);
+      if (supermoduleTrail) body.appendChild(supermoduleTrail);
+      const supermodulePanel = renderSupermodulePanel(snapshot?.component);
+      if (supermodulePanel) body.appendChild(supermodulePanel);
       const lumaPanel = renderLumaMattePanel(snapshot?.component);
       if (lumaPanel) body.appendChild(lumaPanel);
       const presentationPanel = renderPresentationPanel(snapshot?.component);
@@ -2147,6 +2256,12 @@
         updateHeaderToolbar(target);
         refresh(target);
       }
+      openInspectorPanel();
+    });
+    editor.Commands.add('ocd-entity-settings-open', () => {
+      const target = editor.getSelected() || selected;
+      if (!target) return;
+      refresh(target);
       openInspectorPanel();
     });
     editor.Commands.add('ocd-header-state-entry', () => {
