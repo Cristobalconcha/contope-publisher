@@ -59,30 +59,24 @@
             // sección, sin Fila ni Columna ni módulos reales de por medio;
             // eso rompía la jerarquía Sección > Fila > Módulo (una sección
             // no puede tener título ni texto, solo un módulo de Título o de
-            // Párrafo puede). Ahora viene con una Fila+Columna real adentro,
-            // con un Título y un Párrafo como módulos de verdad — mismo
-            // markup exacto que producen los bloques "Fila"/"Título"/
-            // "Párrafo" por separado, para que sean módulos independientes
-            // seleccionables/movibles, no texto atado a la sección.
+            // Párrafo puede). Ahora viene sólo con una Fila y una Columna
+            // vacía: el contenido se agrega exclusivamente mediante módulos.
             content:
                 '<section class="ocd-section" style="padding:48px 24px">' +
                 '<div class="ocd-columns ocd-columns--single" style="display:grid;grid-template-columns:minmax(0, 1fr);gap:24px">' +
-                '<div class="ocd-column" style="min-width:0">' +
-                '<h2 class="ocd-heading">Título de sección</h2>' +
-                '<p class="ocd-paragraph">Texto editable de la sección.</p>' +
-                '</div>' +
+                '<div class="ocd-column" style="min-width:0"></div>' +
                 '</div>' +
                 '</section>'
         },
         {
             id: 'ocd-columns',
-            label: 'Dos columnas',
+            label: 'Fila de 2 columnas',
             category: 'Open CoDesign',
             media: '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="7.5" height="16" rx="1"/><rect x="13.5" y="4" width="7.5" height="16" rx="1"/></svg>',
             content:
                 '<div class="ocd-columns" style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:24px;padding:24px">' +
-                '<div class="ocd-column" style="min-width:0"><p class="ocd-paragraph">Columna izquierda.</p></div>' +
-                '<div class="ocd-column" style="min-width:0"><p class="ocd-paragraph">Columna derecha.</p></div>' +
+                '<div class="ocd-column" style="min-width:0"></div>' +
+                '<div class="ocd-column" style="min-width:0"></div>' +
                 '</div>'
         },
         {
@@ -92,7 +86,7 @@
             media: '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="6.5" rx="1"/><rect x="3" y="13.5" width="18" height="6.5" rx="1"/></svg>',
             content:
                 '<div class="ocd-columns ocd-columns--single" style="display:grid;grid-template-columns:minmax(0, 1fr);gap:24px;padding:24px">' +
-                '<div class="ocd-column" style="min-width:0"><p class="ocd-paragraph">Contenido de la fila.</p></div>' +
+                '<div class="ocd-column" style="min-width:0"></div>' +
                 '</div>'
         },
         {
@@ -452,7 +446,27 @@
                     }
                 }
             });
-            editor.Components.addType('ocd-columns', {
+            // Estructura estricta: Sección > Fila/contenedor de columnas >
+            // Columna > Módulo. Las tres primeras capas no son editables.
+            editor.Components.addType('ocd-section', {
+                isComponent: function (element) {
+                    return !!(
+                        element &&
+                        element.nodeType === 1 &&
+                        element.classList &&
+                        element.classList.contains('ocd-section')
+                    );
+                },
+                model: {
+                    defaults: {
+                        tagName: 'section',
+                        classes: ['ocd-section'],
+                        editable: false,
+                        droppable: '.ocd-columns'
+                    }
+                }
+            });
+editor.Components.addType('ocd-columns', {
                 isComponent: function (element) {
                     if (!element || element.nodeType !== 1) {
                         return false;
@@ -466,8 +480,9 @@
                     defaults: {
                         tagName: 'div',
                         classes: ['ocd-columns'],
-                        draggable: true,
-                        droppable: true
+                        editable: false,
+                        draggable: '.ocd-section',
+                        droppable: '.ocd-column'
                     }
                 }
             });
@@ -485,7 +500,8 @@
                     defaults: {
                         tagName: 'div',
                         classes: ['ocd-column'],
-                        draggable: true,
+                        editable: false,
+                        draggable: '.ocd-columns',
                         droppable: true
                     }
                 }
