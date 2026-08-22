@@ -1078,6 +1078,54 @@ async function checkVendor() {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Presentación completa por dispositivo y aislamiento del scroll del editor.
+// ---------------------------------------------------------------------------
+
+async function checkDevicePresentation() {
+  const canvasEditor = await readFile(
+    fileURLToPath(new URL('assets/js/ocd-canvas-editor.js', pluginRoot)),
+    'utf8',
+  );
+  const editorCore = await readFile(
+    fileURLToPath(new URL('assets/js/ocd-editor-core.js', pluginRoot)),
+    'utf8',
+  );
+  const behaviors = await readFile(
+    fileURLToPath(new URL('assets/js/ocd-behaviors.js', pluginRoot)),
+    'utf8',
+  );
+
+  check(
+    !canvasEditor.includes('ignoreHeight: true'),
+    'Ajustar a pantalla no debe ignorar el alto del dispositivo.',
+  );
+  check(
+    canvasEditor.includes('fitViewport({ ignoreHeight: false, gap: 16 })'),
+    'Ajustar a pantalla debe hacer caber el ancho y el alto completos.',
+  );
+  check(
+    canvasEditor.includes("editor.on('device:select'"),
+    'El zoom debe recalcularse al cambiar de dispositivo.',
+  );
+  for (const dimension of [
+    "height: '1080px'",
+    "height: '1024px'",
+    "height: '320px'",
+    "height: '568px'",
+  ]) {
+    check(editorCore.includes(dimension), `La definición de dispositivos debe incluir ${dimension}.`);
+  }
+  check(
+    editorCore.includes('editorPreview: true'),
+    'El iframe de edición debe instalar los behaviors en modo editorPreview.',
+  );
+  check(
+    behaviors.includes('if (!opts.editorPreview) installHeroCollapseRuntime'),
+    'hero-collapse debe quedar desactivado dentro del editor.',
+  );
+}
+
 export async function runCanvasEditorChecks() {
   assertions = 0;
   failures.length = 0;
@@ -1088,6 +1136,7 @@ export async function runCanvasEditorChecks() {
   await checkIsolationAndAssets();
   await checkPublishingAndAssets();
   await checkDynamicTokenResolver();
+  await checkDevicePresentation();
   await checkVendor();
 
   if (failures.length > 0) {

@@ -1609,6 +1609,7 @@
         chartWidth: DEFAULT_CHART_WIDTH,
         chartHeight: DEFAULT_CHART_HEIGHT,
         autoRemove: true,
+        editorPreview: false,
       },
       options || {},
     );
@@ -1617,7 +1618,9 @@
     if (!win || !doc || typeof doc.querySelectorAll !== 'function') return function () {};
 
     var cleanups = [];
-    installHeroCollapseRuntime(win, doc, opts, cleanups);
+    // El scroll dentro del iframe del editor sólo desplaza la maqueta: no debe
+    // ejecutar la coreografía pública ni colapsar el banner mientras se edita.
+    if (!opts.editorPreview) installHeroCollapseRuntime(win, doc, opts, cleanups);
     installScrollRuntime(win, doc, opts, cleanups);
     installNavToggleRuntime(win, doc, opts, cleanups);
     installCarouselRuntime(win, doc, opts, cleanups);

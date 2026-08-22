@@ -382,10 +382,10 @@
                 deviceManager: {
                     default: 'desktop',
                     devices: [
-                        { id: 'desktop', name: 'Desktop', width: canvasWidth + 'px', widthMedia: '' },
-                        { id: 'tablet', name: 'Tablet', width: '770px', widthMedia: '992px' },
-                        { id: 'mobileLandscape', name: 'Mobile landscape', width: '568px', widthMedia: '768px' },
-                        { id: 'mobilePortrait', name: 'Mobile portrait', width: '320px', widthMedia: '480px' }
+                        { id: 'desktop', name: 'Desktop', width: canvasWidth + 'px', height: '1080px', widthMedia: '' },
+                        { id: 'tablet', name: 'Tablet', width: '770px', height: '1024px', widthMedia: '992px' },
+                        { id: 'mobileLandscape', name: 'Mobile landscape', width: '568px', height: '320px', widthMedia: '768px' },
+                        { id: 'mobilePortrait', name: 'Mobile portrait', width: '320px', height: '568px', widthMedia: '480px' }
                     ]
                 }
             });
@@ -941,7 +941,10 @@
             var inspectorMount = resolveMount(options.inspectorMount);
 
             var gridApi = window.OCDCanvasGrid.plugin(editor);
-            var behaviorApi = window.OcdBehaviors.grapesjsPlugin(editor, { threshold: 40 });
+            var behaviorApi = window.OcdBehaviors.grapesjsPlugin(editor, {
+                threshold: 40,
+                editorPreview: true
+            });
             var inspector = inspectorMount
                 ? window.OCDComputedInspector.create(editor, { mount: inspectorMount })
                 : null;

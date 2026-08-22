@@ -25,6 +25,50 @@
         statusNode.className = 'ocd-canvas-status' + (kind ? ' is-' + kind : '');
     }
 
+    // ------------------------------------------------------------------
+    // Zoom-to-fit del lienzo. La preferencia vive en `localStorage` (no en
+    // el documento guardado) y el escalado usa el mecanismo NATIVO de
+    // GrapesJS 0.23.4 (`editor.Canvas.setZoom` / `fitViewport`), que ya
+    // corrige las coordenadas de mouse y los badges de selección con el
+    // zoom aplicado. El ancho de página se configura también en la toolbar.
+    // ------------------------------------------------------------------
+    var ZOOM_STORAGE_KEY = 'ocdCanvasEditor:zoom';
+    var WIDTH_STORAGE_KEY = 'ocdCanvasEditor:canvasWidth';
+    var DEFAULT_CANVAS_WIDTH = 1920;
+    var CANVAS_WIDTH_OPTIONS = [1920, 1440, 1280];
+    var ZOOM_MODES = ['fit', '100', '75', '50'];
+
+    function readStoredCanvasWidth() {
+        var fallback = parseInt(config.canvasWidth, 10);
+        if (isNaN(fallback) || CANVAS_WIDTH_OPTIONS.indexOf(fallback) === -1) {
+            fallback = DEFAULT_CANVAS_WIDTH;
+        }
+        try {
+            var stored = parseInt(window.localStorage.getItem(WIDTH_STORAGE_KEY), 10);
+            if (CANVAS_WIDTH_OPTIONS.indexOf(stored) !== -1) {
+                return stored;
+            }
+        } catch (_error) {
+            // Sin acceso a localStorage el editor sigue con el ancho por defecto.
+        }
+        return fallback;
+    }
+
+    function readStoredZoom() {
+        try {
+            var stored = window.localStorage.getItem(ZOOM_STORAGE_KEY);
+            if (ZOOM_MODES.indexOf(stored) !== -1) {
+                return stored;
+            }
+        } catch (_error) {
+            // Sin acceso a localStorage el editor arranca en "Ajustar a pantalla".
+        }
+        return 'fit';
+    }
+
+    var initialCanvasWidth = readStoredCanvasWidth();
+    var currentZoomMode = readStoredZoom();
+
     var core = window.OCDEditorCore && typeof window.OCDEditorCore.create === 'function'
         ? window.OCDEditorCore.create({
             container: '#ocd-canvas-editor-root',
@@ -35,9 +79,10 @@
             themeDefinitionsCss: config.themeDefinitionsCss || '',
             siteUrl: config.siteUrl || '',
             oruganttForms: config.oruganttForms || [],
+            canvasWidth: initialCanvasWidth,
             inspectorMount: document.getElementById('ocd-canvas-inspector'),
-            gridControlsMount: document.querySelector('#ocd-canvas-inspector .ocd-ci__head'),
-            groupControlsMount: document.querySelector('#ocd-canvas-inspector .ocd-ci__head'),
+            gridControlsMount: '#ocd-canvas-inspector .ocd-ci__head',
+            groupControlsMount: '#ocd-canvas-inspector .ocd-ci__head',
             onDocumentApplied: function (doc) {
                 current = doc;
                 if (doc && doc.documentId) {
@@ -65,12 +110,18 @@
     var behaviorApi = core.behaviors;
     var gridApi = core.grid;
     var acfImageSrc = core.acfImageSrc;
+    // Expuesto para que ocd-computed-inspector.js (control universal "Fuente
+    // de contenido") pueda usar el mismo placeholder de imagen ACF sin
+    // duplicar el data URI ni importar este closure.
+    window.OCDCanvasEditor = window.OCDCanvasEditor || {};
+    window.OCDCanvasEditor.acfImageSrc = acfImageSrc;
     var snapshot = core.snapshot;
     var applyDocument = core.applyDocument;
     var request = core.request;
     var refreshPresentation = core.refreshPresentation;
     var getSourceCss = core.getSourceCss;
     var setSourceCss = core.setSourceCss;
+    var serializedCss = core.serializedCss;
 
     window.ocdCanvas = {
         editor: editor,
@@ -81,6 +132,300 @@
         groupControls: core.groupControls,
         behaviors: behaviorApi
     };
+
+    // ------------------------------------------------------------------
+    // Zoom-to-fit del lienzo (control de toolbar). No se guarda en el
+    // documento: es una preferencia de la sesión de edición.
+    // ------------------------------------------------------------------
+    var zoomSelect = document.getElementById('ocd-canvas-zoom');
+    var widthSelect = document.getElementById('ocd-canvas-width');
+    var canvasRoot = document.getElementById('ocd-canvas-editor-root');
+
+    function persistZoomMode(mode) {
+        try {
+            window.localStorage.setItem(ZOOM_STORAGE_KEY, mode);
+        } catch (_error) {
+            // El editor sigue funcionando cuando el almacenamiento local está bloqueado.
+        }
+    }
+
+    function persistCanvasWidth(width) {
+        try {
+            window.localStorage.setItem(WIDTH_STORAGE_KEY, String(width));
+        } catch (_error) {
+            // El editor sigue funcionando cuando el almacenamiento local está bloqueado.
+        }
+    }
+
+    function applyZoomMode(mode) {
+        currentZoomMode = mode;
+        if (!editor || !editor.Canvas) {
+            return;
+        }
+        if (mode === 'fit') {
+            if (typeof editor.Canvas.fitViewport === 'function') {
+                // El dispositivo debe caber COMPLETO en el área de edición.
+                // Ajustar sólo por ancho agrandaba Mobile hasta sacar su alto
+                // fuera del canvas y obligaba a desplazar la página exterior.
+                editor.Canvas.fitViewport({ ignoreHeight: false, gap: 16 });
+            }
+            return;
+        }
+        var zoom = parseInt(mode, 10);
+        if (isNaN(zoom)) {
+            return;
+        }
+        if (typeof editor.Canvas.setZoom === 'function') {
+            // Al salir de "Ajustar a pantalla" conviene devolver el origen
+            // arriba a la izquierda: `fitViewport` centra el lienzo y, si
+            // sólo se cambiara el zoom, un 100% posterior podría quedar
+            // desplazado fuera del área visible.
+            if (typeof editor.Canvas.setCoords === 'function') {
+                editor.Canvas.setCoords(0, 0);
+            }
+            editor.Canvas.setZoom(zoom);
+        }
+    }
+
+    function updateCanvasWidth(width) {
+        if (!editor) {
+            return;
+        }
+        var device = editor.Devices && typeof editor.Devices.get === 'function'
+            ? editor.Devices.get('desktop')
+            : null;
+        if (device && typeof device.set === 'function') {
+            device.set({ width: String(width) + 'px', widthMedia: '' });
+        }
+        if (editor.Canvas && typeof editor.Canvas.updateDevice === 'function') {
+            editor.Canvas.updateDevice();
+        }
+        persistCanvasWidth(width);
+        if (widthSelect) {
+            widthSelect.value = String(width);
+        }
+        applyZoomMode(currentZoomMode);
+        window.setTimeout(function () {
+            if (typeof editor.refresh === 'function') {
+                editor.refresh({ tools: true });
+            }
+        }, 0);
+    }
+
+    if (zoomSelect) {
+        zoomSelect.value = currentZoomMode;
+        zoomSelect.addEventListener('change', function () {
+            persistZoomMode(zoomSelect.value);
+            applyZoomMode(zoomSelect.value);
+        });
+    }
+
+    if (widthSelect) {
+        widthSelect.value = String(initialCanvasWidth);
+        widthSelect.addEventListener('change', function () {
+            var width = parseInt(widthSelect.value, 10);
+            if (CANVAS_WIDTH_OPTIONS.indexOf(width) === -1) {
+                width = DEFAULT_CANVAS_WIDTH;
+            }
+            updateCanvasWidth(width);
+        });
+    }
+
+    // `load` se emite de forma asíncrona una vez que GrapesJS ya renderizó
+    // el canvas; es el momento correcto para un primer "Ajustar a pantalla"
+    // (necesita dimensiones reales del viewport). Para porcentajes fijos no
+    // esperamos y se aplica de inmediato para que el usuario no vea un
+    // flash del layout anterior.
+    if (currentZoomMode !== 'fit') {
+        applyZoomMode(currentZoomMode);
+    }
+    editor.on('load', function () {
+        applyZoomMode(currentZoomMode);
+    });
+
+    // Recalcula "Ajustar a pantalla" cuando cambia el ancho disponible del
+    // panel del lienzo. El listener de `window.resize` cumple el caso
+    // explícito de redimensionar la ventana; `ResizeObserver` sobre el
+    // contenedor cubre además el cambio de panel lateral (inspector ⇄
+    // componentes), que modifica el ancho del lienzo sin `window.resize`.
+    var fitRecalcFrame = null;
+    function scheduleFitRecalc() {
+        if (currentZoomMode !== 'fit') {
+            return;
+        }
+        if (fitRecalcFrame) {
+            return;
+        }
+        fitRecalcFrame = window.requestAnimationFrame(function () {
+            fitRecalcFrame = null;
+            if (currentZoomMode === 'fit' && editor.Canvas && typeof editor.Canvas.fitViewport === 'function') {
+                editor.Canvas.fitViewport({ ignoreHeight: false, gap: 16 });
+            }
+        });
+    }
+
+    window.addEventListener('resize', scheduleFitRecalc);
+    editor.on('device:select', function () {
+        // El frame cambia sus dos dimensiones al alternar Desktop/Tablet/Móvil;
+        // esperar un frame evita medir todavía el dispositivo anterior.
+        window.requestAnimationFrame(scheduleFitRecalc);
+    });
+    if (canvasRoot && typeof window.ResizeObserver === 'function') {
+        // Cubre además el cambio de panel lateral (inspector ⇄ componentes),
+        // que modifica el ancho del lienzo sin disparar `window.resize`.
+        new window.ResizeObserver(scheduleFitRecalc).observe(canvasRoot);
+    }
+
+    // ------------------------------------------------------------------
+    // "Guardar como módulo" (Súper-Módulo, MVP): registra en el
+    // BlockManager los módulos personalizados que el usuario ya guardó
+    // (icono genérico + categoría propia elegida al guardar, así cada
+    // categoría inventada se vuelve su propia sección de la paleta) y
+    // expone `window.OCDCanvasEditor.saveCustomModule()` para que el botón
+    // del inspector (ocd-computed-inspector.js) pueda guardar uno nuevo sin
+    // que ese archivo necesite conocer `ajaxUrl`/`nonce` — mismo puente
+    // `window.OCDCanvasEditor` que ya usan `acfFields` y `acfImageSrc`.
+    // ------------------------------------------------------------------
+    window.OCDCanvasEditor = window.OCDCanvasEditor || {};
+
+    function customModuleBlockIcon() {
+        return (
+            '<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" ' +
+            'fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' +
+            '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>' +
+            '<rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>' +
+            '</svg>'
+        );
+    }
+
+    /**
+     * Extrae del CSS completo del lienzo sólo las reglas relevantes al HTML
+     * del componente guardado: por CLASE (estilos reutilizables) y por ID
+     * (estilos locales — GrapesJS también guarda el estilo "sólo este
+     * elemento" del inspector como una regla `#id{...}` propia del
+     * componente, no sólo como clase). Es un filtro de texto simple (no un
+     * parser CSS completo: no distingue @media anidados), en la misma línea
+     * que collectDynamicGroupCss() del núcleo — suficiente para el MVP,
+     * documentado como límite conocido.
+     */
+    function extractRelevantCss(fullCss, html) {
+        var selectors = [];
+        var seen = {};
+
+        function collectAttr(attrName, prefix) {
+            var pattern = new RegExp(attrName + '="([^"]*)"', 'g');
+            var match;
+            while ((match = pattern.exec(String(html || ''))) !== null) {
+                match[1].split(/\s+/).forEach(function (name) {
+                    var trimmed = name.trim();
+                    var key = prefix + trimmed;
+                    if (trimmed && !seen[key]) {
+                        seen[key] = true;
+                        selectors.push(prefix + trimmed.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+                    }
+                });
+            }
+        }
+
+        collectAttr('class', '\\.');
+        collectAttr('id', '#');
+
+        if (!selectors.length) {
+            return '';
+        }
+        var combinedRegex = new RegExp('(?:' + selectors.join('|') + ')(?![a-zA-Z0-9_-])');
+        var blocks = String(fullCss || '').match(/[^{}]+\{[^{}]*\}/g) || [];
+        return blocks
+            .filter(function (block) {
+                var selector = block.split('{')[0];
+                return combinedRegex.test(selector);
+            })
+            .join('\n');
+    }
+
+    var customModuleBlockIds = [];
+
+    /**
+     * Registra (o vuelve a registrar) un módulo guardado como bloque del
+     * BlockManager. Se usa tanto al arrancar el editor (lista completa) como
+     * justo después de guardar uno nuevo, para que quede usable sin recargar.
+     */
+    function registerCustomModuleBlock(module) {
+        var id = module && module.id ? String(module.id) : '';
+        var html = module && module.html ? String(module.html) : '';
+        if (!id || !html || !editor.BlockManager) {
+            return;
+        }
+        if (module.css && editor.Css && typeof editor.Css.addRules === 'function') {
+            try {
+                editor.Css.addRules(String(module.css));
+            } catch (_error) {
+                // Un CSS guardado inválido no debe impedir registrar el bloque.
+            }
+        }
+        try {
+            editor.BlockManager.add(id, {
+                label: module.label ? String(module.label) : id,
+                category: module.category ? String(module.category) : 'Módulos guardados',
+                media: customModuleBlockIcon(),
+                content: html
+            });
+            customModuleBlockIds.push(id);
+        } catch (_error) {
+            // Un módulo guardado corrupto no debe tumbar el arranque del editor.
+        }
+    }
+
+    /**
+     * Pide al servidor la lista de módulos guardados y los registra todos.
+     * Se llama una única vez al arrancar el editor (no depende de qué página
+     * esté cargada: los módulos guardados son globales al sitio), mismo
+     * momento en que se cargan los campos ACF y el bloque de Orugantt.
+     */
+    function loadCustomModuleBlocks() {
+        if (!config.customModuleListAction) {
+            return;
+        }
+        request(config.customModuleListAction, {})
+            .then(function (data) {
+                var list = data && Array.isArray(data.modules) ? data.modules : [];
+                list.forEach(registerCustomModuleBlock);
+            })
+            .catch(function () {
+                // Sin lista de módulos guardados el editor sigue funcionando
+                // con los bloques base; no es un error bloqueante.
+            });
+    }
+
+    /**
+     * Guarda el componente seleccionado (con todo su contenido adentro) como
+     * un módulo reutilizable nuevo. Llamado desde el botón "Guardar como
+     * módulo" del inspector, que ya recogió label/category por prompt().
+     * Registra el bloque nuevo de inmediato al terminar, para que quede
+     * disponible sin recargar el editor.
+     */
+    window.OCDCanvasEditor.saveCustomModule = function (component, label, category) {
+        if (!config.customModuleSaveAction || !component || typeof component.toHTML !== 'function') {
+            return Promise.reject(new Error('Guardado de módulos no disponible.'));
+        }
+        var html = String(component.toHTML() || '').trim();
+        if (!html) {
+            return Promise.reject(new Error('El elemento seleccionado no tiene contenido para guardar.'));
+        }
+        var css = extractRelevantCss(editor.getCss() || '', html);
+
+        return request(config.customModuleSaveAction, {
+            label: String(label || ''),
+            category: String(category || ''),
+            html: html,
+            css: css
+        }).then(function (entry) {
+            registerCustomModuleBlock(entry);
+            return entry;
+        });
+    };
+
+    loadCustomModuleBlocks();
 
     /** Estado del documento tal como lo devolvió el servidor por última vez. */
     var current = config.document || null;
@@ -745,12 +1090,17 @@
     }
 
     function exportCss() {
+        // El CSS real que se valida/guarda es serializedCss() (fuente +
+        // reglas de Grupo Dinamico + overrides de GrapesJS), no solo la
+        // fuente base -- exportar solo la fuente ocultaba por completo el
+        // problema real de tamaño la primera vez que se diagnostico esto.
+        var full = typeof serializedCss === 'function' ? serializedCss() : '';
         download(
             'open-codesign-canvas.css',
             'text/css;charset=utf-8',
-            getSourceCss() + '\n' + (behaviorApi.buildExport().css || '')
+            full || (getSourceCss() + '\n' + (behaviorApi.buildExport().css || ''))
         );
-        setStatus('CSS exportado.', 'ok');
+        setStatus('CSS exportado (' + Math.round((full || '').length / 1024) + ' KB, el mismo que se guarda).', 'ok');
     }
 
     /**
@@ -879,6 +1229,16 @@
         acfBlockIds = [];
     }
 
+    function acfFieldBlockIcon(type) {
+        if (type === 'image') {
+            return '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="16" rx="1.5"/><circle cx="9" cy="10" r="1.6"/><path d="M4 17l5-5 3 3 3-4 5 6"/></svg>';
+        }
+        if (type === 'wysiwyg') {
+            return '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="16" rx="1.5"/><line x1="6" y1="8" x2="18" y2="8"/><line x1="6" y1="12" x2="18" y2="12"/><line x1="6" y1="16" x2="13" y2="16"/></svg>';
+        }
+        return '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="6" width="18" height="4" rx="1"/><rect x="3" y="14" width="18" height="4" rx="1"/></svg>';
+    }
+
     function acfFieldBlockContent(name, type) {
         if (type === 'image') {
             return (
@@ -900,10 +1260,19 @@
 
     function renderAcfFieldBlocks(fields) {
         clearAcfFieldBlocks();
-        if (!fields || !fields.length) {
+        var list = fields || [];
+        // Única fuente de verdad de los campos ACF cargados, expuesta fuera de
+        // este closure para que el control universal "Fuente de contenido" del
+        // inspector (ocd-computed-inspector.js) los pueda leer. El evento cubre
+        // el caso en que el inspector ya esté montado y escuchando antes de que
+        // esta lista exista.
+        window.OCDCanvasEditor = window.OCDCanvasEditor || {};
+        window.OCDCanvasEditor.acfFields = list;
+        document.dispatchEvent(new CustomEvent('ocd:acf-fields-loaded', { detail: { fields: list } }));
+        if (!list.length) {
             return;
         }
-        fields.forEach(function (field) {
+        list.forEach(function (field) {
             var name = field && field.name ? String(field.name) : '';
             if (!name) {
                 return;
@@ -915,6 +1284,7 @@
                 editor.BlockManager.add(id, {
                     label: label + ' (ACF)',
                     category: 'Open CoDesign — Dinámico',
+                    media: acfFieldBlockIcon(type),
                     content: acfFieldBlockContent(name, type)
                 });
                 acfBlockIds.push(id);
@@ -936,8 +1306,11 @@
             })
             .catch(function (_error) {
                 // Sin conexión o sin ACF el editor sigue funcionando; sólo no
-                // se ofrecen bloques de campos ACF.
-                clearAcfFieldBlocks();
+                // se ofrecen bloques de campos ACF. Pasa por renderAcfFieldBlocks
+                // (en vez de sólo clearAcfFieldBlocks) para que la lista expuesta
+                // en window.OCDCanvasEditor.acfFields también quede vacía y no
+                // arrastre campos de una página anterior.
+                renderAcfFieldBlocks([]);
             });
     }
 
@@ -1233,6 +1606,207 @@
      * en Plantillas — esa asignación es un dato de Plantillas, no un
      * requisito para poder abrir y editar el contenido de la página.
      */
+    /**
+     * "Versiones anteriores": el servidor ya crea automáticamente un
+     * snapshot al abrir cada sesión de edición (y otro "antes de restaurar"
+     * cada vez que se restaura uno), pero nunca existió una interfaz para
+     * verlos ni usarlos — se armó recién ahora, en una emergencia real de
+     * recuperación, reusando los endpoints AJAX ya construidos.
+     */
+    function closeSnapshotsPanel() {
+        var existing = document.getElementById('ocd-snapshots-panel');
+        if (existing) existing.remove();
+        document.removeEventListener('keydown', onSnapshotsKeydown);
+    }
+
+    function onSnapshotsKeydown(event) {
+        if (event.key === 'Escape') closeSnapshotsPanel();
+    }
+
+    function formatSnapshotDate(iso) {
+        try {
+            var date = new Date(iso);
+            if (isNaN(date.getTime())) return iso || '';
+            return date.toLocaleString();
+        } catch (_error) {
+            return iso || '';
+        }
+    }
+
+    function restoreSnapshot(snapshotId, label) {
+        if (!activeDocumentId) return;
+        var ok = window.confirm(
+            'Restaurar "' + (label || snapshotId) + '"?\n\n' +
+            'El estado actual se guarda como una versión nueva antes de restaurar, no se pierde nada.'
+        );
+        if (!ok) return;
+        pageStatus('Restaurando versión…');
+        request(config.snapshotLoadAction, { document_id: activeDocumentId, snapshot_id: snapshotId })
+            .then(function () {
+                return request(config.loadAction, { document_id: activeDocumentId });
+            })
+            .then(function (doc) {
+                applyDocument(doc);
+                closeSnapshotsPanel();
+                pageStatus('Versión restaurada.', 'ok');
+            })
+            .catch(function (error) {
+                pageStatus('No se pudo restaurar: ' + error.message, 'error');
+            });
+    }
+
+    function openSnapshotsPanel() {
+        if (!activeDocumentId) {
+            pageStatus('Cargá una página primero.', 'error');
+            return;
+        }
+        closeSnapshotsPanel();
+        var panel = document.createElement('div');
+        panel.id = 'ocd-snapshots-panel';
+        panel.style.cssText =
+            'position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;' +
+            'background:rgba(0,0,0,.45);';
+        var box = document.createElement('div');
+        box.style.cssText =
+            'background:#1d2327;color:#f0f0f1;border-radius:8px;max-width:480px;width:90%;max-height:70vh;' +
+            'overflow-y:auto;padding:20px;box-shadow:0 12px 40px rgba(0,0,0,.4);';
+        var title = document.createElement('h2');
+        title.textContent = 'Versiones anteriores de esta página';
+        title.style.cssText = 'margin:0 0 12px;font-size:16px;';
+        box.appendChild(title);
+        var list = document.createElement('div');
+        list.textContent = 'Cargando…';
+        box.appendChild(list);
+        var closeBtn = document.createElement('button');
+        closeBtn.type = 'button';
+        closeBtn.className = 'button';
+        closeBtn.textContent = 'Cerrar';
+        closeBtn.style.cssText = 'margin-top:14px;';
+        closeBtn.addEventListener('click', closeSnapshotsPanel);
+        box.appendChild(closeBtn);
+        panel.appendChild(box);
+        panel.addEventListener('click', function (event) {
+            if (event.target === panel) closeSnapshotsPanel();
+        });
+        document.body.appendChild(panel);
+        document.addEventListener('keydown', onSnapshotsKeydown);
+
+        request(config.snapshotsListAction, { document_id: activeDocumentId })
+            .then(function (result) {
+                var snapshots = (result && result.snapshots) || [];
+                list.textContent = '';
+                if (!snapshots.length) {
+                    list.textContent = 'Todavía no hay versiones guardadas para esta página.';
+                    return;
+                }
+                snapshots.forEach(function (snap) {
+                    var row = document.createElement('div');
+                    row.style.cssText =
+                        'display:flex;justify-content:space-between;align-items:center;gap:10px;' +
+                        'padding:10px 0;border-bottom:1px solid #3c434a;';
+                    var info = document.createElement('div');
+                    var labelEl = document.createElement('div');
+                    labelEl.textContent = snap.label || snap.session || snap.id;
+                    labelEl.style.cssText = 'font-weight:600;';
+                    var dateEl = document.createElement('div');
+                    dateEl.textContent = formatSnapshotDate(snap.createdAt) + ' · revisión ' + snap.revision;
+                    dateEl.style.cssText = 'font-size:12px;color:#a7aaad;';
+                    info.appendChild(labelEl);
+                    info.appendChild(dateEl);
+                    var restoreBtn = document.createElement('button');
+                    restoreBtn.type = 'button';
+                    restoreBtn.className = 'button button-primary';
+                    restoreBtn.textContent = 'Restaurar';
+                    restoreBtn.addEventListener('click', function () {
+                        restoreSnapshot(snap.id, snap.label || snap.session);
+                    });
+                    row.appendChild(info);
+                    row.appendChild(restoreBtn);
+                    list.appendChild(row);
+                });
+            })
+            .catch(function (error) {
+                list.textContent = 'No se pudieron cargar las versiones: ' + error.message;
+            });
+    }
+
+    /**
+     * Bug encontrado 2026-08-21: el snapshot de "entrada de sesión" (el que
+     * hace que "Versiones anteriores" tenga algo para mostrar) solo se
+     * disparaba desde ocd-inline-editor.js (edición en línea sobre la
+     * página publicada) -- nunca desde esta pantalla (Editor de página),
+     * que es la que realmente se usa. Por eso el panel siempre aparecía
+     * vacío. Se llama una vez por documento cargado, sin bloquear nada si
+     * falla (mismo criterio que ocd-inline-editor.js).
+     */
+    var ocdSessionId = null;
+    function ocdSessionOpenId() {
+        if (ocdSessionId) return ocdSessionId;
+        var key = 'ocd-canvas-editor-session';
+        try {
+            var existing = window.sessionStorage.getItem(key);
+            if (existing) {
+                ocdSessionId = existing;
+                return ocdSessionId;
+            }
+        } catch (_error) { /* sin sessionStorage, seguimos igual */ }
+        ocdSessionId = 'sid-' + Date.now() + '-' + Math.floor(Math.random() * 1000000000);
+        try { window.sessionStorage.setItem(key, ocdSessionId); } catch (_error) {}
+        return ocdSessionId;
+    }
+    function openSessionForDocument(documentIdForSession) {
+        if (!config.sessionOpenAction || !documentIdForSession) return;
+        request(config.sessionOpenAction, {
+            session_id: ocdSessionOpenId(),
+            document_ids: JSON.stringify([documentIdForSession])
+        }).catch(function () {
+            // Sin snapshot de entrada el editor sigue funcionando igual;
+            // solo "Versiones anteriores" quedaría sin esa entrada puntual.
+        });
+    }
+
+    var pageCreateInFlight = false;
+
+    /**
+     * Botón "+ Nueva página": crea una página WordPress en borrador con su
+     * documento Canvas ya vinculado, la agrega al selector sin recargar la
+     * pantalla, y la carga de inmediato para que el usuario empiece a
+     * construir. No pasa por el flujo normal de "Páginas" de WordPress
+     * porque una página Canvas creada ahí queda vacía (solo el shortcode)
+     * hasta vincularla a mano — acá se resuelve en un solo paso.
+     */
+    function createNewPage() {
+        if (pageCreateInFlight) {
+            return;
+        }
+        var title = window.prompt('Título de la nueva página:', '');
+        if (title === null) {
+            return;
+        }
+        pageCreateInFlight = true;
+        pageStatus('Creando página nueva…');
+        request(config.createPageAction, { title: title })
+            .then(function (result) {
+                var select = document.getElementById('ocd-page-target');
+                if (select) {
+                    var option = document.createElement('option');
+                    option.value = String(result.pageId);
+                    option.setAttribute('data-document-id', result.documentId);
+                    option.textContent = (result.title || 'Página sin título') + ' — Canvas';
+                    select.appendChild(option);
+                    select.value = String(result.pageId);
+                }
+                pageStatus('Página creada.', 'ok');
+                loadTargetPage(result.pageId);
+            })
+            .catch(function (error) {
+                pageStatus('No se pudo crear la página: ' + error.message, 'error');
+            })
+            .finally(function () {
+                pageCreateInFlight = false;
+            });
+    }
+
     function loadTargetPage(pageIdOverride) {
         if (pageLoadInFlight) {
             return;
@@ -1264,6 +1838,7 @@
                     activeDocumentId = documentId;
                     config.documentId = documentId;
                     applyDocument(doc);
+                    openSessionForDocument(documentId);
                     pageStatus('Página cargada.', 'ok');
                     refreshRegionPreviews(pageId);
                 })
@@ -1306,6 +1881,8 @@
         });
     });
     on('ocd-page-load', loadTargetPage);
+    on('ocd-page-create', createNewPage);
+    on('ocd-snapshots-open', openSnapshotsPanel);
     document.querySelectorAll('[data-ocd-slot-preview]').forEach(function (preview) {
         var kind = preview.getAttribute('data-ocd-slot-preview');
         preview.addEventListener('click', function () {
@@ -1385,7 +1962,7 @@
         populateRegionFields(current);
         setStatus('Documento ' + activeDocumentId + ' listo (revisión ' + current.revision + ').');
     } else {
-        setStatus('Sin documento inicial; usa Recargar.', 'error');
+        setStatus('Elegí una página en «Página objetivo» y hacé clic en «Cargar página» para empezar a editar.');
     }
     updatePublishedPage(config.publishedPage || null);
     var pageTitleInput = document.getElementById('ocd-canvas-page-title');
