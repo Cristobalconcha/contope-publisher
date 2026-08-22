@@ -375,6 +375,11 @@
       .ocd-ci__presentation-title { margin-bottom:8px; color:#b9ddf5; font-weight:650; }
       .ocd-ci__presentation-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }
       .ocd-ci__presentation-grid label { display:grid; gap:4px; color:#c7d7e1; font-size:10px; }
+      .ocd-ci__presentation-responsive { display:grid; gap:8px; margin-top:10px; }
+      .ocd-ci__presentation-device { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; margin:0; padding:8px; border:1px solid #ffffff18; border-radius:5px; }
+      .ocd-ci__presentation-device legend { padding:0 4px; color:#b9ddf5; font-size:11px; font-weight:650; }
+      .ocd-ci__presentation-device label { display:grid; gap:3px; color:#c7d7e1; font-size:10px; }
+      .ocd-ci__presentation-device select { width:100%; }
       .ocd-ci__presentation-hint { margin-top:8px; color:#9eabb4; font-size:10px; }
       .ocd-ci__dyn { margin:8px 0; padding:10px; border:1px solid #4fb1a166; border-radius:6px; background:#1f8f7a14; }
       .ocd-ci__dyn-title { margin-bottom:8px; color:#8fe0cd; font-weight:650; }
@@ -1850,6 +1855,37 @@
       await refreshAfterRender();
     }
 
+    function presentationValue(component, breakpoint, property) {
+      const { rule } = presentationRule(component, breakpoint);
+      return String(rule?.getStyle?.()?.[property] || '').trim();
+    }
+
+    async function setPresentationValue(component, breakpoint, property, rawValue) {
+      const value = String(rawValue || '').trim();
+      const { selector, options } = presentationRule(component, breakpoint);
+      editor.Css.setRule(selector, { [property]: value }, { ...options, addStyles: true });
+      if (property === 'position' && value === 'absolute') {
+        const parent = component.parent?.();
+        if (parent && !presentationValue(parent, breakpoint, 'position')) {
+          const parentRule = presentationRule(parent, breakpoint);
+          editor.Css.setRule(parentRule.selector, { position: 'relative' }, { ...parentRule.options, addStyles: true });
+        }
+      }
+      selected = component;
+      await refreshAfterRender();
+    }
+
+    function appendPresentationField(container, component, breakpoint, property, labelText, placeholder) {
+      const label = createElement(hostDocument, 'label', '', labelText);
+      const input = createElement(hostDocument, 'input');
+      input.type = 'text';
+      input.placeholder = placeholder || (breakpoint === 'desktop' ? 'sin definir' : 'hereda');
+      input.value = presentationValue(component, breakpoint, property);
+      input.addEventListener('change', () => setPresentationValue(component, breakpoint, property, input.value));
+      label.appendChild(input);
+      container.appendChild(label);
+    }
+
     function renderPresentationPanel(component) {
       if (!component || !getElement(component)) return null;
       const panel = createElement(hostDocument, 'section', 'ocd-ci__presentation');
@@ -1866,13 +1902,35 @@
         label.appendChild(input);
         grid.appendChild(label);
       }
+      const responsive = createElement(hostDocument, 'div', 'ocd-ci__presentation-responsive');
+      for (const [breakpoint, labelText] of [['desktop', 'Escritorio'], ['tablet', 'Tablet'], ['mobile', 'Móvil']]) {
+        const group = createElement(hostDocument, 'fieldset', 'ocd-ci__presentation-device');
+        group.appendChild(createElement(hostDocument, 'legend', '', labelText));
+        const positionLabel = createElement(hostDocument, 'label', '', 'Posición');
+        const position = createElement(hostDocument, 'select');
+        for (const [value, text] of [['', 'Heredar / normal'], ['relative', 'Relativa'], ['absolute', 'Absoluta'], ['fixed', 'Fija'], ['sticky', 'Sticky']]) {
+          const option = createElement(hostDocument, 'option', '', text);
+          option.value = value;
+          position.appendChild(option);
+        }
+        position.value = presentationValue(component, breakpoint, 'position');
+        position.addEventListener('change', () => setPresentationValue(component, breakpoint, 'position', position.value));
+        positionLabel.appendChild(position);
+        group.appendChild(positionLabel);
+        appendPresentationField(group, component, breakpoint, 'min-height', 'Alto mínimo', '30vh / 30svh');
+        for (const property of ['top', 'right', 'bottom', 'left']) {
+          appendPresentationField(group, component, breakpoint, property, property, 'auto / 5px / 3vh / 10%');
+        }
+        responsive.appendChild(group);
+      }
       panel.append(
         grid,
+        responsive,
         createElement(
           hostDocument,
           'div',
           'ocd-ci__presentation-hint',
-          'Usá valores negativos para subir el elemento (por ejemplo, -30). Tablet y Móvil heredan Escritorio mientras estén vacíos.',
+          'Los valores aceptan px, %, vh y svh. Al elegir posición absoluta, el contenedor padre se ancla automáticamente como relativo. Tablet y Móvil heredan Escritorio mientras estén vacíos.',
         ),
       );
       return panel;

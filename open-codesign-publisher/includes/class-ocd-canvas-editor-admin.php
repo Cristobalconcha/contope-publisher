@@ -553,11 +553,13 @@ final class OCD_Canvas_Editor_Admin
                     <option value="50">50%</option>
                 </select>
                 <label class="ocd-canvas-title-label" for="ocd-canvas-width">Ancho de página</label>
-                <select id="ocd-canvas-width">
+					<select id="ocd-canvas-width">
                     <option value="1920">1920px</option>
                     <option value="1440">1440px</option>
                     <option value="1280">1280px</option>
-                </select>
+					</select>
+					<label class="ocd-canvas-title-label" for="ocd-canvas-height">Alto vista</label>
+					<input type="number" id="ocd-canvas-height" min="240" max="2000" step="1" value="1080" aria-label="Alto de la previsualización en píxeles">
                 <button type="button" class="button button-primary" id="ocd-canvas-publish">Publicar/actualizar página</button>
                 <a id="ocd-canvas-view-page" class="button" href="#" target="_blank" rel="noopener" hidden>Ver página</a>
                 <span class="ocd-canvas-status" id="ocd-canvas-status" role="status" aria-live="polite"></span>

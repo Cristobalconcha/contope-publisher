@@ -139,6 +139,7 @@
     // ------------------------------------------------------------------
     var zoomSelect = document.getElementById('ocd-canvas-zoom');
     var widthSelect = document.getElementById('ocd-canvas-width');
+    var heightInput = document.getElementById('ocd-canvas-height');
     var canvasRoot = document.getElementById('ocd-canvas-editor-root');
 
     function persistZoomMode(mode) {
@@ -231,6 +232,33 @@
         });
     }
 
+    function selectedDeviceModel() {
+        if (!editor || !editor.Devices) return null;
+        if (typeof editor.Devices.getSelected === 'function') return editor.Devices.getSelected();
+        var selectedId = typeof editor.getDevice === 'function' ? editor.getDevice() : '';
+        return selectedId && typeof editor.Devices.get === 'function' ? editor.Devices.get(selectedId) : null;
+    }
+
+    function syncPreviewHeightInput() {
+        if (!heightInput) return;
+        var device = selectedDeviceModel();
+        var height = parseInt(device && typeof device.get === 'function' ? device.get('height') : '', 10);
+        if (Number.isFinite(height)) heightInput.value = String(height);
+    }
+
+    if (heightInput) {
+        heightInput.addEventListener('change', function () {
+            var height = Math.max(240, Math.min(2000, parseInt(heightInput.value, 10) || 568));
+            var device = selectedDeviceModel();
+            if (device && typeof device.set === 'function') {
+                device.set('height', height + 'px');
+                if (editor.Canvas && typeof editor.Canvas.updateDevice === 'function') editor.Canvas.updateDevice();
+                scheduleFitRecalc();
+            }
+            heightInput.value = String(height);
+        });
+    }
+
     // `load` se emite de forma asíncrona una vez que GrapesJS ya renderizó
     // el canvas; es el momento correcto para un primer "Ajustar a pantalla"
     // (necesita dimensiones reales del viewport). Para porcentajes fijos no
@@ -269,6 +297,7 @@
         // El frame cambia sus dos dimensiones al alternar Desktop/Tablet/Móvil;
         // esperar un frame evita medir todavía el dispositivo anterior.
         window.requestAnimationFrame(scheduleFitRecalc);
+        syncPreviewHeightInput();
     });
     if (canvasRoot && typeof window.ResizeObserver === 'function') {
         // Cubre además el cambio de panel lateral (inspector ⇄ componentes),

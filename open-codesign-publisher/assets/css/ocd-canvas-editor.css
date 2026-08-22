@@ -205,6 +205,10 @@
     color: #50575e;
 }
 
+#ocd-canvas-height {
+  width: 84px;
+}
+
 #ocd-canvas-page-title {
     width: min(260px, 100%);
 }

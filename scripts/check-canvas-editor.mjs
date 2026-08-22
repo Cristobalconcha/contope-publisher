@@ -1095,6 +1095,14 @@ async function checkDevicePresentation() {
     fileURLToPath(new URL('assets/js/ocd-behaviors.js', pluginRoot)),
     'utf8',
   );
+  const inspector = await readFile(
+    fileURLToPath(new URL('assets/js/ocd-computed-inspector.js', pluginRoot)),
+    'utf8',
+  );
+  const admin = await readFile(
+    fileURLToPath(new URL('includes/class-ocd-canvas-editor-admin.php', pluginRoot)),
+    'utf8',
+  );
 
   check(
     !canvasEditor.includes('ignoreHeight: true'),
@@ -1123,6 +1131,18 @@ async function checkDevicePresentation() {
   check(
     behaviors.includes('if (!opts.editorPreview) installHeroCollapseRuntime'),
     'hero-collapse debe quedar desactivado dentro del editor.',
+  );
+  check(admin.includes('id="ocd-canvas-height"'), 'La barra debe permitir variar el alto de la vista previa.');
+  check(
+    canvasEditor.includes("device.set('height', height + 'px')"),
+    'El alto personalizado debe aplicarse al dispositivo seleccionado.',
+  );
+  for (const property of ['position', 'min-height', 'top', 'right', 'bottom', 'left']) {
+    check(inspector.includes(`'${property}'`), `Presentación responsive debe editar ${property}.`);
+  }
+  check(
+    inspector.includes("{ position: 'relative' }"),
+    'Al activar posición absoluta, el contenedor padre debe convertirse en ancla relativa.',
   );
 }
 
