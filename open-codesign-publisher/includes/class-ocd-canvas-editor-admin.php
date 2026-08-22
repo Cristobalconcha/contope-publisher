@@ -526,15 +526,6 @@ final class OCD_Canvas_Editor_Admin
         }
         ?>
         <div class="wrap ocd-canvas-wrap">
-            <h1>Open CoDesign Canvas (Experimental)</h1>
-            <p class="ocd-canvas-intro">
-                Slice vertical aislado. Edita documentos experimentales con ID estable
-                <code><?php echo esc_html(OCD_Canvas_Document_Repository::DOCUMENT_ID); ?></code>
-                y guarda datos estructurados, HTML y CSS por separado. Podés editar el documento
-                individual o cargar una página WordPress para ver y editar sus regiones de
-                Encabezado y Pie de página juntas.
-            </p>
-
             <div class="ocd-canvas-toolbar">
                 <button type="button" class="button button-primary" id="ocd-canvas-save">Guardar</button>
                 <button type="button" class="button" id="ocd-canvas-reload">Recargar</button>
@@ -587,12 +578,7 @@ final class OCD_Canvas_Editor_Admin
                 </p>
             </div>
 
-            <div class="ocd-canvas-meta">
-                <span>Revisión: <strong id="ocd-canvas-revision">—</strong></span>
-                <span>Actualizado: <strong id="ocd-canvas-updated">—</strong></span>
-                <span>Entidad: <code><?php echo esc_html(OCD_Canvas_Document_Repository::POST_TYPE); ?></code></span>
-                <span>GrapesJS <?php echo esc_html(self::GRAPESJS_VERSION); ?> (BSD-3-Clause, local)</span>
-            </div>
+            <span class="screen-reader-text">Revisión <strong id="ocd-canvas-revision">—</strong>, actualizado <strong id="ocd-canvas-updated">—</strong></span>
 
             <div class="ocd-canvas-page-editor">
                 <div class="ocd-canvas-page-picker">
@@ -625,11 +611,6 @@ final class OCD_Canvas_Editor_Admin
             </div>
 
             <div class="ocd-canvas-assembled">
-                <div class="ocd-assembled-slot" data-ocd-slot="header" hidden>
-                    <div class="ocd-assembled-slot-preview" data-ocd-slot-preview="header" role="button" tabindex="0"></div>
-                    <div class="ocd-assembled-slot-canvas" data-ocd-slot-canvas="header"></div>
-                </div>
-
                 <div class="ocd-assembled-slot ocd-assembled-slot--body" data-ocd-slot="body">
                     <div class="ocd-assembled-slot-preview" data-ocd-slot-preview="body" role="button" tabindex="0" hidden></div>
                     <div class="ocd-assembled-slot-canvas" data-ocd-slot-canvas="body">
@@ -651,10 +632,6 @@ final class OCD_Canvas_Editor_Admin
                     </div>
                 </div>
 
-                <div class="ocd-assembled-slot" data-ocd-slot="footer" hidden>
-                    <div class="ocd-assembled-slot-preview" data-ocd-slot-preview="footer" role="button" tabindex="0"></div>
-                    <div class="ocd-assembled-slot-canvas" data-ocd-slot-canvas="footer"></div>
-                </div>
             </div>
         </div>
         <?php

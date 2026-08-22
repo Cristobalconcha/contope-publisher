@@ -322,7 +322,11 @@
         font:12px/1.4 Inter,system-ui,sans-serif; }
       .ocd-ci * { box-sizing:border-box; }
       .ocd-ci__head { position:sticky; top:0; z-index:2; padding:14px; background:#181b20; border-bottom:1px solid #ffffff18; }
+      .ocd-ci__headbar { display:flex; align-items:center; justify-content:space-between; gap:8px; }
       .ocd-ci__title { font-size:13px; font-weight:650; }
+      .ocd-ci__head-toggle { width:auto !important; padding:3px 7px !important; font-size:10px !important; cursor:pointer; }
+      .ocd-ci__head.is-collapsed { padding:8px 14px; }
+      .ocd-ci__head.is-collapsed .ocd-ci__target,.ocd-ci__head.is-collapsed .ocd-ci__scope { display:none; }
       .ocd-ci__target { margin-top:5px; color:#f0cfa6; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
       .ocd-ci__scope { display:grid; gap:8px; margin-top:12px; }
       .ocd-ci__scope-label { display:grid; gap:4px; color:#d9d2c7; font-size:10px; }
@@ -2070,7 +2074,19 @@
       root.classList.add('ocd-ci');
       root.replaceChildren();
       const head = createElement(hostDocument, 'div', 'ocd-ci__head');
-      head.appendChild(createElement(hostDocument, 'div', 'ocd-ci__title', 'Elemento seleccionado'));
+      head.classList.add('is-collapsed');
+      const headbar = createElement(hostDocument, 'div', 'ocd-ci__headbar');
+      headbar.appendChild(createElement(hostDocument, 'div', 'ocd-ci__title', 'Elemento seleccionado'));
+      const headToggle = createElement(hostDocument, 'button', 'ocd-ci__head-toggle', 'Mostrar alcance');
+      headToggle.type = 'button';
+      headToggle.setAttribute('aria-expanded', 'false');
+      headToggle.addEventListener('click', () => {
+        const expanded = head.classList.toggle('is-collapsed') === false;
+        headToggle.textContent = expanded ? 'Ocultar alcance' : 'Mostrar alcance';
+        headToggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+      });
+      headbar.appendChild(headToggle);
+      head.appendChild(headbar);
       targetLabel = createElement(hostDocument, 'div', 'ocd-ci__target', 'Ningún elemento seleccionado');
       head.appendChild(targetLabel);
       const scope = createElement(hostDocument, 'div', 'ocd-ci__scope');

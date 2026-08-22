@@ -23,7 +23,50 @@
         }
         statusNode.textContent = message;
         statusNode.className = 'ocd-canvas-status' + (kind ? ' is-' + kind : '');
+        window.clearTimeout(statusNode._ocdHideTimer);
+        if (kind !== 'error' && message) {
+            statusNode._ocdHideTimer = window.setTimeout(function () { statusNode.textContent = ''; }, 2600);
+        }
     }
+
+    function compactEditorToolbar() {
+        var toolbar = document.querySelector('.ocd-canvas-toolbar');
+        if (!toolbar || toolbar.dataset.compact === 'true') return;
+        toolbar.dataset.compact = 'true';
+
+        function moveWithLabel(id, target) {
+            var field = document.getElementById(id);
+            var label = document.querySelector('label[for="' + id + '"]');
+            if (label) target.appendChild(label);
+            if (field) target.appendChild(field);
+        }
+
+        function menu(labelText, ids) {
+            var details = document.createElement('details');
+            details.className = 'ocd-toolbar-menu';
+            var summary = document.createElement('summary');
+            summary.className = 'button';
+            summary.textContent = labelText;
+            var panel = document.createElement('div');
+            panel.className = 'ocd-toolbar-menu__panel';
+            ids.forEach(function (id) { moveWithLabel(id, panel); });
+            details.append(summary, panel);
+            details.addEventListener('toggle', function () {
+                if (!details.open) return;
+                toolbar.querySelectorAll('.ocd-toolbar-menu[open]').forEach(function (other) {
+                    if (other !== details) other.open = false;
+                });
+            });
+            toolbar.insertBefore(details, document.getElementById('ocd-canvas-publish'));
+        }
+
+        var pagePicker = document.querySelector('.ocd-canvas-page-picker');
+        if (pagePicker) moveWithLabel('ocd-canvas-page-title', pagePicker);
+        menu('Vista', ['ocd-canvas-zoom', 'ocd-canvas-width', 'ocd-canvas-height']);
+        menu('Archivo', ['ocd-canvas-reload', 'ocd-canvas-export-html', 'ocd-canvas-export-css', 'ocd-canvas-toggle-import']);
+    }
+
+    compactEditorToolbar();
 
     // ------------------------------------------------------------------
     // Zoom-to-fit del lienzo. La preferencia vive en `localStorage` (no en
@@ -1446,6 +1489,10 @@
         }
         node.textContent = message;
         node.className = 'ocd-canvas-status' + (kind ? ' is-' + kind : '');
+        window.clearTimeout(node._ocdHideTimer);
+        if (kind !== 'error' && message) {
+            node._ocdHideTimer = window.setTimeout(function () { node.textContent = ''; }, 2600);
+        }
     }
 
     function getSlotElement(kind) {

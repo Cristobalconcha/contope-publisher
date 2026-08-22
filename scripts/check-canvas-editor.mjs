@@ -1135,10 +1135,16 @@ async function checkDevicePresentation() {
   check(admin.includes('id="ocd-canvas-height"'), 'La barra debe permitir variar el alto de la vista previa.');
   check(admin.includes('Agregar y ordenar'), 'La pestaña de componentes debe describir su acción con lenguaje claro.');
   check(admin.includes('Editar diseño'), 'La pestaña del inspector debe describir su acción con lenguaje claro.');
+  check(!admin.includes('<h1>Open CoDesign Canvas'), 'El editor no debe reservar altura para una cabecera técnica.');
+  check(!admin.includes('data-ocd-slot="header"'), 'El encabezado no debe editarse como una región separada sobre la página.');
+  check(!admin.includes('data-ocd-slot="footer"'), 'El pie no debe editarse como una región separada bajo la página.');
   check(
     canvasEditor.includes("device.set('height', height + 'px')"),
     'El alto personalizado debe aplicarse al dispositivo seleccionado.',
   );
+  check(canvasEditor.includes("menu('Vista'"), 'Los controles de vista deben vivir en un menú compacto.');
+  check(canvasEditor.includes("menu('Archivo'"), 'Las acciones secundarias deben vivir en un menú compacto.');
+  check(canvasEditor.includes('2600'), 'Los mensajes informativos deben desaparecer como notificaciones temporales.');
   for (const property of ['position', 'min-height', 'top', 'right', 'bottom', 'left']) {
     check(inspector.includes(`'${property}'`), `Presentación responsive debe editar ${property}.`);
   }
@@ -1150,6 +1156,7 @@ async function checkDevicePresentation() {
     inspector.includes("classField.hidden = scopeSelect?.value !== 'class'"),
     'El selector técnico de clase debe ocultarse mientras el alcance sea sólo el elemento.',
   );
+  check(inspector.includes("head.classList.add('is-collapsed')"), 'El bloque de alcance debe iniciar contraído.');
 }
 
 export async function runCanvasEditorChecks() {

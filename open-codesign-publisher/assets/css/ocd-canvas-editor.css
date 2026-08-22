@@ -4,24 +4,67 @@
     max-width: 68ch;
 }
 
+/* El editor comienza en la herramienta, sin la ficha técnica experimental. */
+.ocd-canvas-wrap > h1,
+.ocd-canvas-wrap > .ocd-canvas-intro,
+.ocd-canvas-meta,
+.ocd-assembled-slot[data-ocd-slot="header"],
+.ocd-assembled-slot[data-ocd-slot="footer"] {
+    display: none !important;
+}
+
 .ocd-canvas-toolbar {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 8px;
-    margin: 16px 0 8px;
+    position: sticky;
+    z-index: 20;
+    top: 32px;
+    margin: 0;
+    padding: 6px 8px;
+    background: #f0f0f1;
+    border-bottom: 1px solid #c3c4c7;
 }
 
+.ocd-toolbar-menu { position: relative; }
+.ocd-toolbar-menu > summary { list-style: none; cursor: pointer; }
+.ocd-toolbar-menu > summary::-webkit-details-marker { display: none; }
+.ocd-toolbar-menu[open] > summary { border-color: #2271b1; color: #2271b1; }
+.ocd-toolbar-menu__panel {
+    position: absolute;
+    z-index: 30;
+    top: calc(100% + 5px);
+    left: 0;
+    display: grid;
+    grid-template-columns: auto minmax(120px, 1fr);
+    align-items: center;
+    gap: 8px;
+    min-width: 300px;
+    padding: 12px;
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+    background: #fff;
+    box-shadow: 0 8px 24px #0003;
+}
+.ocd-toolbar-menu__panel .button { grid-column: 1 / -1; }
+
 .ocd-canvas-status {
-    flex: 1 0 100%;
+    position: fixed;
+    z-index: 100000;
+    right: 18px;
+    bottom: 18px;
     box-sizing: border-box;
-    min-height: 32px;
-    margin: 4px 0 0;
+    max-width: min(420px, calc(100vw - 36px));
+    margin: 0;
     padding: 7px 10px;
     border-left: 4px solid #72aee6;
     background: #f0f6fc;
     font-style: normal;
+    box-shadow: 0 5px 20px #0003;
 }
+
+.ocd-canvas-status:empty { display: none; }
 
 .ocd-canvas-status.is-ok {
     color: #14622c;
@@ -46,7 +89,13 @@
 }
 
 .ocd-canvas-page-editor {
-    margin: 16px 0;
+    position: sticky;
+    z-index: 19;
+    top: 76px;
+    margin: 0 0 6px;
+    padding: 5px 8px;
+    background: #f0f0f1;
+    border-bottom: 1px solid #c3c4c7;
 }
 
 .ocd-canvas-page-picker {
@@ -54,11 +103,11 @@
     flex-wrap: wrap;
     align-items: center;
     gap: 8px;
-    margin-bottom: 8px;
+    margin-bottom: 0;
 }
 
 .ocd-canvas-page-picker .ocd-canvas-status {
-    flex-basis: 100%;
+    flex-basis: auto;
 }
 
 #ocd-page-target {
@@ -151,7 +200,7 @@
     --ocd-side-panel-width: 320px;
     display: grid;
     grid-template-columns: minmax(0, 1fr) var(--ocd-side-panel-width);
-    height: 70vh;
+    height: calc(100vh - 150px);
     min-height: 520px;
     border: 1px solid #c3c4c7;
     background: #fff;
@@ -205,6 +254,8 @@
     color: #50575e;
 }
 
+#ocd-page-load { display: none; }
+
 #ocd-canvas-height {
   width: 84px;
 }
@@ -215,7 +266,7 @@
 
 .ocd-canvas-editor-root {
     min-width: 0;
-    height: 70vh;
+    height: calc(100vh - 150px);
     min-height: 520px;
     background: #fff;
 }
