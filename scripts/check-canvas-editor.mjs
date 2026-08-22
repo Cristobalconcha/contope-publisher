@@ -1174,6 +1174,8 @@ async function checkDevicePresentation() {
   check(gridControls.includes("'Manual'"), 'Columnas debe ofrecer un campo Manual explícito.');
   check(gridControls.includes("'Gap'"), 'Columnas debe ofrecer Gap en la misma fila.');
   check(gridControls.includes('ocd-gc__breakpoints'), 'Los tres breakpoints deben mostrarse como iconos superiores.');
+  check(gridControls.includes('draggingBoundary = true'), 'El arrastre debe mantener vivo el manejador hasta soltar el puntero.');
+  check(gridControls.includes('grip.style.left'), 'El manejador debe moverse sin reconstruir el overlay durante el drag.');
   check(!gridControls.includes('Aplicar proporción'), 'La edición manual no debe depender de un botón redundante.');
   check(!gridControls.includes("'Dispositivo'"), 'Columnas no debe repetir un selector textual de dispositivo.');
   check(canvasGrid.includes('parsed.length < 1'), 'La notación manual debe aceptar una sola columna con valor 1.');

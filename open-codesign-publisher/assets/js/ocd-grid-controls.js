@@ -120,6 +120,7 @@
 
     let selectedGrid = null;
     let overlay = null;
+    let draggingBoundary = false;
     let activeBreakpoint = typeof gridApi.getActiveBreakpoint === 'function' ? gridApi.getActiveBreakpoint() : 'desktop';
 
     function findGrid(component) {
@@ -177,6 +178,7 @@
           event.preventDefault();
           event.stopPropagation();
           grip.setPointerCapture?.(event.pointerId);
+          draggingBoundary = true;
           let lastX = event.clientX;
           let currentOffset = (rect.width * handle.positionPercent) / 100;
           const guides = snapGuidesPx(handles, handle.boundaryIndex, rect.width);
@@ -193,9 +195,12 @@
             currentOffset = Array.isArray(resized)
               ? boundaryOffsetPxFromWeights(resized, handle.boundaryIndex, rect.width)
               : targetOffset;
-            global.requestAnimationFrame(renderHandles);
+            // No reconstruir el overlay durante el gesto: eliminar el grip
+            // corta pointer capture y el drag muere en el primer movimiento.
+            grip.style.left = `${rect.left + currentOffset - 5}px`;
           };
           const onUp = () => {
+            draggingBoundary = false;
             grip.removeEventListener('pointermove', onMove);
             grip.removeEventListener('pointerup', onUp);
             grip.removeEventListener('pointercancel', onUp);
@@ -259,7 +264,9 @@
     }));
 
     const onSelected = (component) => refresh(component);
-    const onUpdated = ({ component }) => refresh(component);
+    const onUpdated = ({ component }) => {
+      if (!draggingBoundary) refresh(component);
+    };
     const onDeviceSelected = () => {
       activeBreakpoint = typeof gridApi.getActiveBreakpoint === 'function' ? gridApi.getActiveBreakpoint() : 'desktop';
       refresh(selectedGrid || editor.getSelected?.());
