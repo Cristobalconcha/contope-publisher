@@ -37,7 +37,9 @@
   }
 
   const SNAP_THRESHOLD_PX = 6;
-  const SNAP_FRACTIONS = [1 / 4, 1 / 3, 1 / 2, 2 / 3, 3 / 4];
+  // Doce columnas virtuales cubren tercios, cuartos, mitades y sextos con
+  // una sola lógica, además de permitir 1/12…11/12 como en una grilla editorial.
+  const SNAP_FRACTIONS = Array.from({ length: 11 }, (_, index) => (index + 1) / 12);
 
   function snapGuidesPx(handles, currentBoundaryIndex, rectWidth) {
     const guides = new Set();

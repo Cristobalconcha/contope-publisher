@@ -1,5 +1,39 @@
 /* Open CoDesign Canvas — pantalla experimental del editor. */
 
+/* Chrome propio del Editor visual: aislado de las demás pantallas de WP. */
+body.toplevel_page_open-codesign-publisher:has(.ocd-canvas-wrap),
+body:has(.ocd-canvas-wrap) { background:#15181d; }
+body:has(.ocd-canvas-wrap) #wpcontent { padding-left:0; }
+body:has(.ocd-canvas-wrap) #wpbody-content { padding-bottom:0; }
+body:has(.ocd-canvas-wrap) #wpfooter { display:none; }
+.ocd-canvas-wrap { margin:0; color:#e8eaed; }
+.ocd-canvas-wrap .button {
+    min-height:34px;
+    border:1px solid #3e4652;
+    border-radius:6px;
+    background:#252a32;
+    color:#e8eaed;
+    box-shadow:none;
+    font-weight:600;
+}
+.ocd-canvas-wrap .button:hover,.ocd-canvas-wrap .button:focus {
+    border-color:#7296ff;
+    background:#303744;
+    color:#fff;
+}
+.ocd-canvas-wrap .button-primary {
+    border-color:#4964e9;
+    background:#4458dc;
+    color:#fff;
+}
+.ocd-canvas-wrap input,.ocd-canvas-wrap select,.ocd-canvas-wrap textarea {
+    border-color:#414955;
+    border-radius:6px;
+    background:#20242b;
+    color:#f2f3f5;
+    box-shadow:none;
+}
+
 .ocd-canvas-wrap .ocd-canvas-intro {
     max-width: 68ch;
 }
@@ -23,11 +57,12 @@
     top: 32px;
     margin: 0;
     padding: 6px 8px;
-    background: #f0f0f1;
-    border-bottom: 1px solid #c3c4c7;
+    background:#191d23;
+    border-bottom:1px solid #343a44;
+    box-shadow:0 4px 14px #0004;
 }
 
-.ocd-canvas-toolbar > label { flex:none; font-size:11px; color:#50575e; }
+.ocd-canvas-toolbar > label { flex:none; font-size:11px; color:#aeb5c0; }
 .ocd-canvas-toolbar #ocd-page-target { width:min(300px,24vw); min-width:170px; }
 .ocd-canvas-toolbar #ocd-canvas-page-title { width:min(250px,20vw); min-width:150px; }
 .ocd-canvas-toolbar #ocd-snapshots-open { min-width:34px; padding-inline:8px; font-size:18px; }
@@ -35,7 +70,7 @@
 .ocd-toolbar-menu { position: relative; }
 .ocd-toolbar-menu > summary { list-style: none; cursor: pointer; }
 .ocd-toolbar-menu > summary::-webkit-details-marker { display: none; }
-.ocd-toolbar-menu[open] > summary { border-color: #2271b1; color: #2271b1; }
+.ocd-toolbar-menu[open] > summary { border-color:#7296ff; color:#fff; }
 .ocd-toolbar-menu__panel {
     position: absolute;
     z-index: 30;
@@ -47,9 +82,10 @@
     gap: 8px;
     min-width: 300px;
     padding: 12px;
-    border: 1px solid #c3c4c7;
+    border:1px solid #414955;
     border-radius: 4px;
-    background: #fff;
+    background:#20242b;
+    color:#e8eaed;
     box-shadow: 0 8px 24px #0003;
 }
 .ocd-toolbar-menu__panel .button { grid-column: 1 / -1; }

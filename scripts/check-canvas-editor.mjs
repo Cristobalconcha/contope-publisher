@@ -1111,6 +1111,10 @@ async function checkDevicePresentation() {
     fileURLToPath(new URL('assets/js/ocd-canvas-grid.global.js', pluginRoot)),
     'utf8',
   );
+  const canvasCss = await readFile(
+    fileURLToPath(new URL('assets/css/ocd-canvas-editor.css', pluginRoot)),
+    'utf8',
+  );
 
   check(
     !canvasEditor.includes('ignoreHeight: true'),
@@ -1178,10 +1182,13 @@ async function checkDevicePresentation() {
   check(gridControls.includes('ocd-gc__breakpoints'), 'Los tres breakpoints deben mostrarse como iconos superiores.');
   check(gridControls.includes('draggingBoundary = true'), 'El arrastre debe mantener vivo el manejador hasta soltar el puntero.');
   check(gridControls.includes('grip.style.left'), 'El manejador debe moverse sin reconstruir el overlay durante el drag.');
+  check(gridControls.includes('Array.from({ length: 11 }'), 'El snap debe usar las once guías internas de una grilla virtual de 12 columnas.');
   check(!gridControls.includes('Aplicar proporción'), 'La edición manual no debe depender de un botón redundante.');
   check(!gridControls.includes("'Dispositivo'"), 'Columnas no debe repetir un selector textual de dispositivo.');
   check(canvasGrid.includes('parsed.length < 1'), 'La notación manual debe aceptar una sola columna con valor 1.');
   check(canvasGrid.includes("normalized.startsWith('mobile')"), 'Los dispositivos Mobile deben resolver el breakpoint mobile real.');
+  check(canvasCss.includes('body:has(.ocd-canvas-wrap)'), 'El look propio debe quedar aislado a la pantalla del Editor visual.');
+  check(canvasCss.includes('background:#191d23'), 'La barra superior debe usar el chrome oscuro del editor.');
 }
 
 export async function runCanvasEditorChecks() {
