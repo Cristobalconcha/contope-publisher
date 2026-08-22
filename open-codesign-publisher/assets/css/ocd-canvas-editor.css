@@ -65,7 +65,22 @@ body:has(.ocd-canvas-wrap) #wpfooter { display:none; }
 .ocd-canvas-toolbar > label { flex:none; font-size:11px; color:#aeb5c0; }
 .ocd-canvas-toolbar #ocd-page-target { width:min(300px,24vw); min-width:170px; }
 .ocd-canvas-toolbar #ocd-canvas-page-title { width:min(250px,20vw); min-width:150px; }
-.ocd-canvas-toolbar #ocd-snapshots-open { min-width:34px; padding-inline:8px; font-size:18px; }
+.ocd-canvas-toolbar #ocd-snapshots-open {
+    min-width:34px;
+    padding-inline:8px;
+    border-color:transparent;
+    background:transparent;
+    color:#aeb5c0;
+    font-size:20px;
+}
+.ocd-canvas-toolbar #ocd-snapshots-open:hover,
+.ocd-canvas-toolbar #ocd-snapshots-open:focus-visible {
+    border-color:transparent;
+    background:#ffffff12;
+    color:#fff;
+    outline:2px solid #7296ff;
+    outline-offset:-2px;
+}
 
 .ocd-toolbar-menu { position: relative; }
 .ocd-toolbar-menu > summary { list-style: none; cursor: pointer; }

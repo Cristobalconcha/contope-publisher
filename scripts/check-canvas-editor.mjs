@@ -1189,6 +1189,7 @@ async function checkDevicePresentation() {
   check(canvasGrid.includes("normalized.startsWith('mobile')"), 'Los dispositivos Mobile deben resolver el breakpoint mobile real.');
   check(canvasCss.includes('body:has(.ocd-canvas-wrap)'), 'El look propio debe quedar aislado a la pantalla del Editor visual.');
   check(canvasCss.includes('background:#191d23'), 'La barra superior debe usar el chrome oscuro del editor.');
+  check(canvasCss.includes('#ocd-snapshots-open') && canvasCss.includes('background:transparent'), 'Historial debe mostrarse como icono sin contorno de botón.');
 }
 
 export async function runCanvasEditorChecks() {
