@@ -1,13 +1,13 @@
-# Plan de implementación — Open CoDesign para WordPress
+# Plan de implementación — ContOpe Design para WordPress
 
 ## Resultado de producto
 
 Construir un sistema abierto capaz de:
 
-1. recibir diseños de Open CoDesign Desktop y convertirlos en WordPress nativo y editable;
+1. recibir diseños de ContOpe Design Desktop y convertirlos en WordPress nativo y editable;
 2. hidratar esos contenidos mediante un tema de bloques propio;
 3. exportar el proyecto completo y reconstruirlo con fidelidad en otro WordPress;
-4. abrir el paquete exportado en Open CoDesign Desktop directamente en flujo de Edición;
+4. abrir el paquete exportado en ContOpe Design Desktop directamente en flujo de Edición;
 5. incorporar posteriormente sitios creados con Gutenberg, HTML/CSS y otros page builders mediante adaptadores;
 6. permitir intervención remota controlada mediante MCP, sin hacer que el funcionamiento normal dependa de IA.
 
@@ -21,13 +21,13 @@ Los tres dominios comparten sistema visual, contenidos, activos, estructura, pro
 
 ## Arquitectura objetivo
 
-### Tema padre: Open CoDesign Canvas
+### Tema padre: ContOpe Canvas
 
 Motor neutro y versionado. Contiene retículas, contenedores, comportamiento responsive, estilos estructurales, templates mínimos y capacidades comunes. No contiene identidad ni contenido de Santa Luisa.
 
 ### Tema hijo generado por proyecto
 
-Contiene tokens visuales, estilos, templates, parts, patterns, fuentes y activos propios del proyecto. Debe declarar la versión compatible de Canvas y separar archivos administrados por Open CoDesign de personalizaciones humanas.
+Contiene tokens visuales, estilos, templates, parts, patterns, fuentes y activos propios del proyecto. Debe declarar la versión compatible de Canvas y separar archivos administrados por ContOpe Design de personalizaciones humanas.
 
 ### Plugin Publisher/Tools
 
@@ -41,7 +41,7 @@ El manifiesto no determina por sí solo la representación canónica del diseño
 
 ### LayoutScene e IDML
 
-Open CoDesign Desktop incorporará un `LayoutScene` neutral inspirado en conceptos maduros de IDML: páginas, spreads, masters, stories, frames, estilos, colores y vínculos. IDML será un adaptador editorial de primera clase y podrá ser la representación maestra de una publicación fija, pero no sustituirá por sí solo responsive, componentes, interacción, datos o accesibilidad web.
+ContOpe Design Desktop incorporará un `LayoutScene` neutral inspirado en conceptos maduros de IDML: páginas, spreads, masters, stories, frames, estilos, colores y vínculos. IDML será un adaptador editorial de primera clase y podrá ser la representación maestra de una publicación fija, pero no sustituirá por sí solo responsive, componentes, interacción, datos o accesibilidad web.
 
 Canvas interpretará la intención estructural de una composición desktop y aplicará reglas responsive explícitas. El motor recomendado usa CSS Grid propio con presets familiares de doce columnas y breakpoints, proporciones exactas como 45/55, anidación, orden, gaps y stack por breakpoint. Gutenberg aporta bloques y responsive básico; Canvas completa los controles avanzados.
 
@@ -68,7 +68,7 @@ Canvas interpretará la intención estructural de una composición desktop y apl
 
 ### Fase 1 — Hidratación correcta
 
-- extraer `open-codesign-canvas` como tema padre;
+- extraer `contope-canvas` como tema padre;
 - convertir Santa Luisa en tema hijo;
 - corregir templates de bloques;
 - desplegar ambos temas en el WordPress de prueba;
@@ -113,7 +113,7 @@ Canvas interpretará la intención estructural de una composición desktop y apl
 
 ### Fase 7 — Migradores
 
-Orden inicial: Gutenberg/Open CoDesign, HTML/CSS, Divi y luego otros builders. Cada adaptador ejecuta detección, preflight, extracción, normalización e informe de fidelidad.
+Orden inicial: Gutenberg/ContOpe Design, HTML/CSS, Divi y luego otros builders. Cada adaptador ejecuta detección, preflight, extracción, normalización e informe de fidelidad.
 
 ### Frente paralelo — IDML
 
@@ -121,7 +121,7 @@ Orden inicial: Gutenberg/Open CoDesign, HTML/CSS, Divi y luego otros builders. C
 - ZIP IDML válido con `mimetype` primero y sin compresión;
 - apertura real en InDesign 2026 sin reparación;
 - reexportación y comprobación de editabilidad;
-- después, varias páginas, masters, texto enlazado, estilos, assets y roundtrip IDML → Open CoDesign.
+- después, varias páginas, masters, texto enlazado, estilos, assets y roundtrip IDML → ContOpe Design.
 
 ## Sprint demostrable de una semana
 

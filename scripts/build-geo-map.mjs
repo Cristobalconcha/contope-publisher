@@ -7,9 +7,9 @@
  *   1. Fetch a Overpass API (calles y, opcionalmente, landuse/place).
  *   2. Proyección equirectangular lat/lng → unidades de canvas.
  *   3. Simplificación Ramer-Douglas-Peucker de las calles.
- *   4. Generación del <svg> con todos los atributos data-ocd-geo-* ya puestos
- *      (incluidos data-ocd-geo-places, data-ocd-geo-categories y
- *      data-ocd-geo-data-bounds como JSON válido) + CSS con
+ *   4. Generación del <svg> con todos los atributos data-cod-geo-* ya puestos
+ *      (incluidos data-cod-geo-places, data-cod-geo-categories y
+ *      data-cod-geo-data-bounds como JSON válido) + CSS con
  *      vector-effect: non-scaling-stroke y .zoom-constant.
  *
  * Uso recomendado (archivo de configuración):
@@ -321,11 +321,11 @@ function pathD(points, close) {
 }
 
 function highwayClass(highway) {
-  return 'ocd-geo-road--' + (highway || 'other');
+  return 'cod-geo-road--' + (highway || 'other');
 }
 
 function landuseClass(landuse) {
-  return 'ocd-geo-landuse--' + (landuse || 'other');
+  return 'cod-geo-landuse--' + (landuse || 'other');
 }
 
 function placeRank(place) {
@@ -338,7 +338,7 @@ async function fetchOverpass(query) {
   const url = 'https://overpass-api.de/api/interpreter?data=' + encodeURIComponent(query);
   const response = await fetch(url, {
     headers: {
-      'User-Agent': 'open-codesign-build-geo-map/1.0 (local build script)',
+      'User-Agent': 'contope-build-geo-map/1.0 (local build script)',
       'Accept': 'application/json'
     }
   });
@@ -394,10 +394,10 @@ function collectRawBounds(projection, cfg, places, roads, landuseWays, placeNode
 
 function generateCss() {
   return [
-    '/* Open CoDesign - geo-map generado por scripts/build-geo-map.mjs',
+    '/* ContOpe Design - geo-map generado por scripts/build-geo-map.mjs',
     '   Atribución obligatoria por la licencia ODbL de OpenStreetMap:',
     '   (c) OpenStreetMap contributors (ODbL). */',
-    '.ocd-geo-map {',
+    '.cod-geo-map {',
     '  position: relative;',
     '  width: 100%;',
     '  min-height: 520px;',
@@ -408,36 +408,36 @@ function generateCss() {
     '  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;',
     '  color: #27312c;',
     '}',
-    '.ocd-geo-map__body { position: absolute; inset: 0; }',
-    '.ocd-geo-map svg { display: block; width: 100%; height: 100%; touch-action: none; }',
-    '.ocd-geo-map__landuse { stroke: none; }',
-    '.ocd-geo-map__landuse--residential { fill: #e4ddc9; }',
-    '.ocd-geo-map__landuse--commercial { fill: #eadfc8; }',
-    '.ocd-geo-map__landuse--industrial { fill: #dcd7c5; }',
-    '.ocd-geo-map__landuse--retail { fill: #e8dcc3; }',
-    '.ocd-geo-map__landuse--other { fill: #e6e0cf; }',
-    '.ocd-geo-map__road { fill: none; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }',
-    '.ocd-geo-map__road--motorway { stroke: #e0a13c; stroke-width: 3.2; }',
-    '.ocd-geo-map__road--trunk { stroke: #e6ab54; stroke-width: 2.8; }',
-    '.ocd-geo-map__road--primary { stroke: #f4c37a; stroke-width: 2.4; }',
-    '.ocd-geo-map__road--secondary { stroke: #f6e3c4; stroke-width: 1.9; }',
-    '.ocd-geo-map__road--tertiary { stroke: #ffffff; stroke-width: 1.4; }',
-    '.ocd-geo-map__road--other { stroke: #faf7ef; stroke-width: 1.1; }',
-    '.ocd-geo-map .zoom-constant { transform: scale(var(--zoom-k, 1)); transform-origin: 0 0; }',
-    '.ocd-geo-map__project { pointer-events: none; }',
-    '.ocd-geo-map__selectors { position: absolute; top: 12px; left: 12px; z-index: 5; display: flex; flex-wrap: wrap; gap: 8px; padding: 8px; background: rgba(255, 255, 255, 0.86); border: 1px solid rgba(0, 0, 0, 0.08); border-radius: 8px; backdrop-filter: blur(8px); }',
-    '.ocd-geo-map__select { min-width: 160px; padding: 8px 10px; border: 1px solid #cdd3ca; border-radius: 6px; background: #fff; color: inherit; font: inherit; }',
-    '.ocd-geo-map__panel { position: absolute; right: 12px; bottom: 12px; z-index: 5; min-width: 220px; padding: 12px; background: rgba(255, 255, 255, 0.92); border: 1px solid rgba(0, 0, 0, 0.08); border-radius: 8px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.10); }',
-    '.ocd-geo-map__panel[data-empty="true"] { visibility: hidden; }',
-    '.ocd-geo-map__accent { height: 4px; margin-bottom: 8px; border-radius: 999px; background: var(--ocd-geo-accent, #b8860b); }',
-    '.ocd-geo-map__nombre { margin: 0 0 2px; font-size: 16px; font-weight: 700; }',
-    '.ocd-geo-map__meta { margin: 0; font-size: 13px; color: #5c635c; }',
-    '.ocd-geo-map__attribution { position: absolute; left: 12px; bottom: 10px; z-index: 4; margin: 0; font-size: 11px; color: #5c635c; background: rgba(255, 255, 255, 0.72); padding: 2px 6px; border-radius: 4px; }',
+    '.cod-geo-map__body { position: absolute; inset: 0; }',
+    '.cod-geo-map svg { display: block; width: 100%; height: 100%; touch-action: none; }',
+    '.cod-geo-map__landuse { stroke: none; }',
+    '.cod-geo-map__landuse--residential { fill: #e4ddc9; }',
+    '.cod-geo-map__landuse--commercial { fill: #eadfc8; }',
+    '.cod-geo-map__landuse--industrial { fill: #dcd7c5; }',
+    '.cod-geo-map__landuse--retail { fill: #e8dcc3; }',
+    '.cod-geo-map__landuse--other { fill: #e6e0cf; }',
+    '.cod-geo-map__road { fill: none; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }',
+    '.cod-geo-map__road--motorway { stroke: #e0a13c; stroke-width: 3.2; }',
+    '.cod-geo-map__road--trunk { stroke: #e6ab54; stroke-width: 2.8; }',
+    '.cod-geo-map__road--primary { stroke: #f4c37a; stroke-width: 2.4; }',
+    '.cod-geo-map__road--secondary { stroke: #f6e3c4; stroke-width: 1.9; }',
+    '.cod-geo-map__road--tertiary { stroke: #ffffff; stroke-width: 1.4; }',
+    '.cod-geo-map__road--other { stroke: #faf7ef; stroke-width: 1.1; }',
+    '.cod-geo-map .zoom-constant { transform: scale(var(--zoom-k, 1)); transform-origin: 0 0; }',
+    '.cod-geo-map__project { pointer-events: none; }',
+    '.cod-geo-map__selectors { position: absolute; top: 12px; left: 12px; z-index: 5; display: flex; flex-wrap: wrap; gap: 8px; padding: 8px; background: rgba(255, 255, 255, 0.86); border: 1px solid rgba(0, 0, 0, 0.08); border-radius: 8px; backdrop-filter: blur(8px); }',
+    '.cod-geo-map__select { min-width: 160px; padding: 8px 10px; border: 1px solid #cdd3ca; border-radius: 6px; background: #fff; color: inherit; font: inherit; }',
+    '.cod-geo-map__panel { position: absolute; right: 12px; bottom: 12px; z-index: 5; min-width: 220px; padding: 12px; background: rgba(255, 255, 255, 0.92); border: 1px solid rgba(0, 0, 0, 0.08); border-radius: 8px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.10); }',
+    '.cod-geo-map__panel[data-empty="true"] { visibility: hidden; }',
+    '.cod-geo-map__accent { height: 4px; margin-bottom: 8px; border-radius: 999px; background: var(--cod-geo-accent, #b8860b); }',
+    '.cod-geo-map__nombre { margin: 0 0 2px; font-size: 16px; font-weight: 700; }',
+    '.cod-geo-map__meta { margin: 0; font-size: 13px; color: #5c635c; }',
+    '.cod-geo-map__attribution { position: absolute; left: 12px; bottom: 10px; z-index: 4; margin: 0; font-size: 11px; color: #5c635c; background: rgba(255, 255, 255, 0.72); padding: 2px 6px; border-radius: 4px; }',
     '@media (max-width: 560px) {',
-    '  .ocd-geo-map { min-height: 420px; }',
-    '  .ocd-geo-map__selectors { left: 8px; right: 8px; top: 8px; }',
-    '  .ocd-geo-map__select { flex: 1 1 100%; }',
-    '  .ocd-geo-map__panel { right: 8px; bottom: 8px; left: 8px; min-width: 0; }',
+    '  .cod-geo-map { min-height: 420px; }',
+    '  .cod-geo-map__selectors { left: 8px; right: 8px; top: 8px; }',
+    '  .cod-geo-map__select { flex: 1 1 100%; }',
+    '  .cod-geo-map__panel { right: 8px; bottom: 8px; left: 8px; min-width: 0; }',
     '}',
     ''
   ].join('\n');
@@ -483,50 +483,50 @@ function buildHtml(cfg, bounds, places, categories, icons, roads, landuseWays, p
   const viewW = round(bounds.maxX - bounds.minX, 2);
   const viewH = round(bounds.maxY - bounds.minY, 2);
   const parts = [];
-  parts.push('<div class="ocd-geo-map" data-ocd-behavior="geo-map"');
-  parts.push('  data-ocd-geo-places="' + jsonAttr(placesData) + '"');
-  parts.push('  data-ocd-geo-categories="' + jsonAttr(categories) + '"');
+  parts.push('<div class="cod-geo-map" data-cod-behavior="geo-map"');
+  parts.push('  data-cod-geo-places="' + jsonAttr(placesData) + '"');
+  parts.push('  data-cod-geo-categories="' + jsonAttr(categories) + '"');
   if (icons && Object.keys(icons).length) {
-    parts.push('  data-ocd-geo-category-icons="' + jsonAttr(icons) + '"');
+    parts.push('  data-cod-geo-category-icons="' + jsonAttr(icons) + '"');
   }
-  parts.push('  data-ocd-geo-data-bounds="' + jsonAttr(boundsData) + '"');
-  parts.push('  data-ocd-geo-initial-center="' + project.x + ',' + project.y + '"');
-  parts.push('  data-ocd-geo-proyecto="' + project.x + ',' + project.y + '"');
-  parts.push('  data-ocd-geo-min-zoom-ratio="' + escapeHtml(String(cfg.minZoomRatio)) + '"');
-  parts.push('  data-ocd-geo-svg="#' + slug + '-svg"');
-  parts.push('  data-ocd-geo-select-categoria="#' + slug + '-cat"');
-  parts.push('  data-ocd-geo-select-lugar="#' + slug + '-lugar"');
-  parts.push('  data-ocd-geo-marker="#' + slug + '-marker"');
-  parts.push('  data-ocd-geo-panel="#' + slug + '-panel"');
-  parts.push('  data-ocd-geo-accent="#' + slug + '-accent"');
-  parts.push('  data-ocd-geo-field-nombre="#' + slug + '-nombre"');
-  parts.push('  data-ocd-geo-field-categoria="#' + slug + '-categoria"');
-  parts.push('  data-ocd-geo-field-distancia="#' + slug + '-distancia"');
-  parts.push('  data-ocd-geo-field-descripcion="#' + slug + '-descripcion"');
-  parts.push('  data-ocd-geo-field-contacto="#' + slug + '-contacto"');
-  parts.push('  data-ocd-geo-accent-color="' + escapeHtml(accentColor) + '"');
-  parts.push('  style="--ocd-geo-accent:' + escapeHtml(accentColor) + '">');
-  parts.push('  <div class="ocd-geo-map__body">');
+  parts.push('  data-cod-geo-data-bounds="' + jsonAttr(boundsData) + '"');
+  parts.push('  data-cod-geo-initial-center="' + project.x + ',' + project.y + '"');
+  parts.push('  data-cod-geo-proyecto="' + project.x + ',' + project.y + '"');
+  parts.push('  data-cod-geo-min-zoom-ratio="' + escapeHtml(String(cfg.minZoomRatio)) + '"');
+  parts.push('  data-cod-geo-svg="#' + slug + '-svg"');
+  parts.push('  data-cod-geo-select-categoria="#' + slug + '-cat"');
+  parts.push('  data-cod-geo-select-lugar="#' + slug + '-lugar"');
+  parts.push('  data-cod-geo-marker="#' + slug + '-marker"');
+  parts.push('  data-cod-geo-panel="#' + slug + '-panel"');
+  parts.push('  data-cod-geo-accent="#' + slug + '-accent"');
+  parts.push('  data-cod-geo-field-nombre="#' + slug + '-nombre"');
+  parts.push('  data-cod-geo-field-categoria="#' + slug + '-categoria"');
+  parts.push('  data-cod-geo-field-distancia="#' + slug + '-distancia"');
+  parts.push('  data-cod-geo-field-descripcion="#' + slug + '-descripcion"');
+  parts.push('  data-cod-geo-field-contacto="#' + slug + '-contacto"');
+  parts.push('  data-cod-geo-accent-color="' + escapeHtml(accentColor) + '"');
+  parts.push('  style="--cod-geo-accent:' + escapeHtml(accentColor) + '">');
+  parts.push('  <div class="cod-geo-map__body">');
   parts.push('    <svg id="' + slug + '-svg" viewBox="' + boundsData.minX + ' ' + boundsData.minY + ' ' + viewW + ' ' + viewH + '" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Mapa de ubicación de ' + escapeHtml(cfg.name) + '">');
 
   if (landuseWays.length) {
-    parts.push('      <g class="ocd-geo-map__landuse">');
+    parts.push('      <g class="cod-geo-map__landuse">');
     landuseWays.forEach((way) => {
-      parts.push('        <path class="ocd-geo-map__landuse ' + landuseClass(way.landuse) + '" d="' + escapeHtml(pathD(way.canvas, true)) + '" />');
+      parts.push('        <path class="cod-geo-map__landuse ' + landuseClass(way.landuse) + '" d="' + escapeHtml(pathD(way.canvas, true)) + '" />');
     });
     parts.push('      </g>');
   }
 
   if (roads.length) {
-    parts.push('      <g class="ocd-geo-map__roads">');
+    parts.push('      <g class="cod-geo-map__roads">');
     roads.forEach((road) => {
-      parts.push('        <path class="ocd-geo-road ' + highwayClass(road.highway) + '" d="' + escapeHtml(pathD(road.canvas)) + '" />');
+      parts.push('        <path class="cod-geo-road ' + highwayClass(road.highway) + '" d="' + escapeHtml(pathD(road.canvas)) + '" />');
     });
     parts.push('      </g>');
   }
 
   if (sortedPlaceNodes.length) {
-    parts.push('      <g class="ocd-geo-map__place-labels">');
+    parts.push('      <g class="cod-geo-map__place-labels">');
     sortedPlaceNodes.forEach((node) => {
       parts.push('        <g transform="translate(' + round(node.x, 2) + ' ' + round(node.y, 2) + ')">');
       parts.push('          <g class="zoom-constant"><circle r="3" fill="#7b6f5a" /><text y="-8" text-anchor="middle" font-size="12" fill="#4b4437">' + escapeHtml(node.name) + '</text></g>');
@@ -535,36 +535,36 @@ function buildHtml(cfg, bounds, places, categories, icons, roads, landuseWays, p
     parts.push('      </g>');
   }
 
-  parts.push('      <g class="ocd-geo-map__project" transform="translate(' + project.x + ' ' + project.y + ')">');
+  parts.push('      <g class="cod-geo-map__project" transform="translate(' + project.x + ' ' + project.y + ')">');
   parts.push('        <g class="zoom-constant"><circle r="18" fill="rgba(184,134,11,.20)"/><circle r="7" fill="' + escapeHtml(accentColor) + '" stroke="#ffffff" stroke-width="2"/><text y="-14" text-anchor="middle" font-size="12" font-weight="700" fill="#27312c">Proyecto</text></g>');
   parts.push('      </g>');
   parts.push('      <g id="' + slug + '-marker" transform="translate(0 0)" style="display:none">');
-  parts.push('        <g class="zoom-constant"><path class="ocd-geo-map__marker-icon" d="M0 -18 L8 -6 L14 -6 L10 4 L12 16 L0 10 L-12 16 L-10 4 L-14 -6 L-8 -6 Z" fill="' + escapeHtml(accentColor) + '" stroke="#ffffff" stroke-width="1.5"/></g>');
+  parts.push('        <g class="zoom-constant"><path class="cod-geo-map__marker-icon" d="M0 -18 L8 -6 L14 -6 L10 4 L12 16 L0 10 L-12 16 L-10 4 L-14 -6 L-8 -6 Z" fill="' + escapeHtml(accentColor) + '" stroke="#ffffff" stroke-width="1.5"/></g>');
   parts.push('      </g>');
   parts.push('    </svg>');
 
-  parts.push('    <div class="ocd-geo-map__selectors">');
-  parts.push('      <select id="' + slug + '-cat" class="ocd-geo-map__select" aria-label="Categoría">');
+  parts.push('    <div class="cod-geo-map__selectors">');
+  parts.push('      <select id="' + slug + '-cat" class="cod-geo-map__select" aria-label="Categoría">');
   parts.push('        <option value="">Elige una categoría</option>');
   Object.keys(categories).forEach((key) => {
     parts.push('        <option value="' + escapeHtml(key) + '">' + escapeHtml(categories[key]) + '</option>');
   });
   parts.push('      </select>');
-  parts.push('      <select id="' + slug + '-lugar" class="ocd-geo-map__select" aria-label="Lugar" disabled>');
+  parts.push('      <select id="' + slug + '-lugar" class="cod-geo-map__select" aria-label="Lugar" disabled>');
   parts.push('        <option value="">Elige una categoría primero</option>');
   parts.push('      </select>');
   parts.push('    </div>');
   parts.push('  </div>');
 
-  parts.push('  <div class="ocd-geo-map__panel" id="' + slug + '-panel" data-empty="true">');
-  parts.push('    <div class="ocd-geo-map__accent" id="' + slug + '-accent"></div>');
-  parts.push('    <p class="ocd-geo-map__nombre" id="' + slug + '-nombre"></p>');
-  parts.push('    <p class="ocd-geo-map__meta" id="' + slug + '-categoria"></p>');
-  parts.push('    <p class="ocd-geo-map__meta" id="' + slug + '-distancia"></p>');
-  parts.push('    <p class="ocd-geo-map__descripcion" id="' + slug + '-descripcion"></p>');
-  parts.push('    <p class="ocd-geo-map__meta" id="' + slug + '-contacto"></p>');
+  parts.push('  <div class="cod-geo-map__panel" id="' + slug + '-panel" data-empty="true">');
+  parts.push('    <div class="cod-geo-map__accent" id="' + slug + '-accent"></div>');
+  parts.push('    <p class="cod-geo-map__nombre" id="' + slug + '-nombre"></p>');
+  parts.push('    <p class="cod-geo-map__meta" id="' + slug + '-categoria"></p>');
+  parts.push('    <p class="cod-geo-map__meta" id="' + slug + '-distancia"></p>');
+  parts.push('    <p class="cod-geo-map__descripcion" id="' + slug + '-descripcion"></p>');
+  parts.push('    <p class="cod-geo-map__meta" id="' + slug + '-contacto"></p>');
   parts.push('  </div>');
-  parts.push('  <p class="ocd-geo-map__attribution">© OpenStreetMap contributors (ODbL)</p>');
+  parts.push('  <p class="cod-geo-map__attribution">© OpenStreetMap contributors (ODbL)</p>');
   parts.push('</div>');
 
   return parts.join('\n');

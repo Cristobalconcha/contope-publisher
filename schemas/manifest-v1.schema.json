@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://open-codesign.org/schemas/package/manifest-v1.schema.json",
-  "title": "Open CoDesign portable site package manifest (format v1)",
+  "$id": "https://contope.org/schemas/package/manifest-v1.schema.json",
+  "title": "ContOpe Design portable site package manifest (format v1)",
   "description": "Strict contract for the manifest.json file inside a .ocdsite container. The schema validates the declared manifest document only; it cannot inspect ZIP bytes and therefore does not promise protection against ZIP traversal, ZIP bombs, deceptive MIME truth or excessive file counts at extraction time. Those runtime limits are documented in docs/package-format-v1.md and must be enforced by the packager/extractor. Note: additionalProperties:false only rejects UNKNOWN fields; it does NOT detect secrets hidden inside allowed fields, nor executable code (e.g. PHP) declared with a valid role/path. Secret scanning and the executable-code policy are the packager/importer's responsibility (see docs §7).",
   "type": "object",
   "additionalProperties": false,
@@ -18,7 +18,7 @@
   ],
   "properties": {
     "$schema": {
-      "const": "https://open-codesign.org/schemas/package/manifest-v1.schema.json",
+      "const": "https://contope.org/schemas/package/manifest-v1.schema.json",
       "description": "Canonical URI of this manifest schema. Optional but, when present, must equal the $id EXACTLY; a foreign $schema is rejected with SCHEMA_ID_MISMATCH so a manifest cannot silently claim conformance to another contract."
     },
     "formatVersion": {
@@ -51,11 +51,11 @@
       "type": "object",
       "additionalProperties": false,
       "required": ["id", "name"],
-      "description": "Identity of the Open CoDesign PROJECT this package belongs to. A project can have many package revisions; this is the stable cross-revision identity. Domain urn:ocd:project.",
+      "description": "Identity of the ContOpe Design PROJECT this package belongs to. A project can have many package revisions; this is the stable cross-revision identity. Domain urn:ocd:project.",
       "properties": {
         "id": {
           "$ref": "#/$defs/ocdProjectId",
-          "description": "Stable, opaque Open CoDesign project identifier. Domain urn:ocd:project. Never a WordPress slug."
+          "description": "Stable, opaque ContOpe Design project identifier. Domain urn:ocd:project. Never a WordPress slug."
         },
         "name": {
           "type": "string",
@@ -74,7 +74,7 @@
           "type": "string",
           "minLength": 1,
           "maxLength": 80,
-          "description": "Tool that produced the package, e.g. open-codesign-publisher or open-codesign-desktop."
+          "description": "Tool that produced the package, e.g. contope-publisher or contope-desktop."
         },
         "producerVersion": {
           "$ref": "#/$defs/version"
@@ -102,11 +102,11 @@
       "properties": {
         "canvas": {
           "$ref": "#/$defs/version",
-          "description": "Required Open CoDesign Canvas (parent theme engine) version."
+          "description": "Required ContOpe Canvas (parent theme engine) version."
         },
         "publisher": {
           "$ref": "#/$defs/version",
-          "description": "Required Open CoDesign Publisher plugin version."
+          "description": "Required ContOpe Publisher plugin version."
         },
         "wordpress": {
           "$ref": "#/$defs/version",
@@ -118,7 +118,7 @@
       "type": "object",
       "additionalProperties": false,
       "required": ["content", "theme"],
-      "description": "Named references into the file inventory. Every value must resolve to a files[].path and values must be unique. content and theme are required; wordpressState and the Open CoDesign Desktop interchange entrypoints (designModel, desktopSource, idml) are optional.",
+      "description": "Named references into the file inventory. Every value must resolve to a files[].path and values must be unique. content and theme are required; wordpressState and the ContOpe Design Desktop interchange entrypoints (designModel, desktopSource, idml) are optional.",
       "properties": {
         "content": {
           "$ref": "#/$defs/portablePath",
@@ -134,11 +134,11 @@
         },
         "designModel": {
           "$ref": "#/$defs/portablePath",
-          "description": "Optional Open CoDesign design model interchange file (role design-model)."
+          "description": "Optional ContOpe Design design model interchange file (role design-model)."
         },
         "desktopSource": {
           "$ref": "#/$defs/portablePath",
-          "description": "Optional Open CoDesign Desktop source project file (role desktop-source)."
+          "description": "Optional ContOpe Design Desktop source project file (role desktop-source)."
         },
         "idml": {
           "$ref": "#/$defs/portablePath",
@@ -211,7 +211,7 @@
     "ocdProjectId": {
       "type": "string",
       "pattern": "^urn:ocd:project:[A-Za-z0-9._-]+$",
-      "description": "Opaque URN-form Open CoDesign project identifier. Domain urn:ocd:project. Deliberately not a slug."
+      "description": "Opaque URN-form ContOpe Design project identifier. Domain urn:ocd:project. Deliberately not a slug."
     },
     "ocdSiteId": {
       "type": "string",
@@ -221,7 +221,7 @@
     "ocdAssetId": {
       "type": "string",
       "pattern": "^urn:ocd:asset:[A-Za-z0-9._-]+$",
-      "description": "Opaque URN-form Open CoDesign asset identifier. Domain urn:ocd:asset."
+      "description": "Opaque URN-form ContOpe Design asset identifier. Domain urn:ocd:asset."
     },
     "revision": {
       "type": "string",

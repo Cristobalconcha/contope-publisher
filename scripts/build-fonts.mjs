@@ -24,11 +24,11 @@
  *
  * Las URLs de los `src` se escriben con el placeholder `{FONTS_BASE_URL}`, que
  * el plugin reemplaza en runtime con `wp_get_upload_dir()['baseurl'] .
- * '/open-codesign/fonts'`. Así el CSS sigue siendo portátil entre instalaciones
+ * '/contope/fonts'`. Así el CSS sigue siendo portátil entre instalaciones
  * (los archivos viven en uploads, no en rutas absolutas hardcodeadas).
  *
  * Uso:
- *   node scripts/build-fonts.mjs --out-dir=/ruta/a/wp-content/uploads/open-codesign/fonts
+ *   node scripts/build-fonts.mjs --out-dir=/ruta/a/wp-content/uploads/contope/fonts
  *
  * Salida (en --out-dir):
  *   <familia>-<peso>[-italic]-<subset>.woff2   archivos de fuente (latin/latin-ext)
@@ -171,7 +171,7 @@ async function main() {
   const header = [
     '/* Tipografías autocontenidas del sitio — generado por scripts/build-fonts.mjs. */',
     '/* Fuente de verdad: scripts/build-fonts.mjs. Re-ejecutalo para regenerar. */',
-    `/* {${FONTS_BASE_URL_PLACEHOLDER.replace(/[{}]/g, '')}} lo reemplaza el plugin con uploads/open-codesign/fonts. */`,
+    `/* {${FONTS_BASE_URL_PLACEHOLDER.replace(/[{}]/g, '')}} lo reemplaza el plugin con uploads/contope/fonts. */`,
     '',
   ].join('\n');
 

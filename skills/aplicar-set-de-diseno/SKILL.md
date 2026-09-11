@@ -27,7 +27,7 @@ Orden de autoridad, sin excepciones: **confirmado por una persona > guía aproba
 
 ## Lo que Desktop emite
 
-`design/model.json` dentro del paquete portable (`kind: open-codesign/design-model`, esquema 1). Adentro, el contrato:
+`design/model.json` dentro del paquete portable (`kind: contope/design-model`, esquema 1). Adentro, el contrato:
 
 ```
 design:            { id, revision, createdAt, updatedAt }
@@ -57,7 +57,7 @@ rules[]:       { id, kind, scope, provenance, status, value }
 - `status` ∈ proposed | reviewed
 - `reviewState` ∈ session | reviewed
 
-Consultar siempre `ocd_get_capabilities` antes de construir: trae el catálogo vigente y el esquema de valor de cada `kind`. **Nunca declarar una regla que no esté en ese catálogo.**
+Consultar siempre `cod_get_capabilities` antes de construir: trae el catálogo vigente y el esquema de valor de cada `kind`. **Nunca declarar una regla que no esté en ese catálogo.**
 
 ## La traducción
 
@@ -95,7 +95,7 @@ Consultar siempre `ocd_get_capabilities` antes de construir: trae el catálogo v
 
 Declararlas al empezar; no descubrirlas a mitad de camino.
 
-**1. El MCP no lee el contrato de Desktop.** `ocd_get_capabilities` lo dice: `readsDesktopContract:false`, `writesDesktopContract:false`, `portableContractPersisted:false`. Canvas recibe la instantánea y **no la guarda como contrato**: no se puede leer de vuelta desde el sitio. La trazabilidad vive en Desktop, no en el destino.
+**1. El MCP no lee el contrato de Desktop.** `cod_get_capabilities` lo dice: `readsDesktopContract:false`, `writesDesktopContract:false`, `portableContractPersisted:false`. Canvas recibe la instantánea y **no la guarda como contrato**: no se puede leer de vuelta desde el sitio. La trazabilidad vive en Desktop, no en el destino.
 
 **2. Desktop no emite `scope`.** El contrato no tiene breakpoint ni estado. Al traducir hay que declararlo, y lo honesto es `{breakpoint:"all", state:"default"}` salvo que la definición diga otra cosa explícitamente. Inventar un valor para móvil que nadie aprobó es fabricar diseño.
 
@@ -103,28 +103,28 @@ Declararlas al empezar; no descubrirlas a mitad de camino.
 
 | Intención | Herramienta real |
 |---|---|
-| descubrir capacidades | `ocd_get_capabilities` |
-| listar páginas | `ocd_list_canvas_pages` |
-| estado y revisión | `ocd_get_canvas_page_state` |
-| leer lo ya aplicado | `ocd_read_canvas_composition` |
-| resolver material | `ocd_resolve_canvas_assets` |
-| formularios publicados | `ocd_list_canvas_forms` |
-| ensayar sin escribir | `ocd_preview_canvas_composition` |
-| aplicar | `ocd_apply_canvas_composition` (con el `previewId` exacto) |
-| editar un nodo puntual | `ocd_grapes_edit_node`, o el runner del repo |
-| publicar | `ocd_publish_canvas_page` |
+| descubrir capacidades | `cod_get_capabilities` |
+| listar páginas | `cod_list_canvas_pages` |
+| estado y revisión | `cod_get_canvas_page_state` |
+| leer lo ya aplicado | `cod_read_canvas_composition` |
+| resolver material | `cod_resolve_canvas_assets` |
+| formularios publicados | `cod_list_canvas_forms` |
+| ensayar sin escribir | `cod_preview_canvas_composition` |
+| aplicar | `cod_apply_canvas_composition` (con el `previewId` exacto) |
+| editar un nodo puntual | `cod_grapes_edit_node`, o el runner del repo |
+| publicar | `cod_publish_canvas_page` |
 
 ## El recorrido
 
 1. Leer el contrato: `design.id`, `design.revision`, definiciones confirmadas, tareas activas y sus restricciones.
-2. `ocd_get_capabilities` y el estado de la página objetivo. Usar identificadores estables, nunca un título o una dirección como identidad.
+2. `cod_get_capabilities` y el estado de la página objetivo. Usar identificadores estables, nunca un título o una dirección como identidad.
 3. Comparar revisiones. Si no calzan, **detenerse y refrescar**: jamás pisar una edición manual más nueva.
-4. Si la página ya existe, `ocd_read_canvas_composition`. Con `found:true` se modifica solo lo que corresponde y se conserva el resto; con `found:false` la página se armó a mano y una composición nueva **reemplazaría todo su contenido** — ahí se edita nodo a nodo, no se recompone.
+4. Si la página ya existe, `cod_read_canvas_composition`. Con `found:true` se modifica solo lo que corresponde y se conserva el resto; con `found:false` la página se armó a mano y una composición nueva **reemplazaría todo su contenido** — ahí se edita nodo a nodo, no se recompone.
 5. Traducir según las tablas de arriba. Toda definición no traducible se informa.
-6. `ocd_preview_canvas_composition` y revisar su evidencia.
-7. `ocd_apply_canvas_composition` con el `previewId` exacto. Canvas crea una instantánea de respaldo.
+6. `cod_preview_canvas_composition` y revisar su evidencia.
+7. `cod_apply_canvas_composition` con el `previewId` exacto. Canvas crea una instantánea de respaldo.
 8. Revisar **mirando la página**, no solo la estructura.
-9. `ocd_publish_canvas_page` solo con intención humana explícita. Guardar un borrador no es publicar.
+9. `cod_publish_canvas_page` solo con intención humana explícita. Guardar un borrador no es publicar.
 
 ## Tareas de desarrollo
 

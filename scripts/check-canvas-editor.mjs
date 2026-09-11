@@ -1,5 +1,5 @@
 /**
- * Pruebas estáticas del slice experimental "Open CoDesign Canvas (Experimental)".
+ * Pruebas estáticas del slice experimental "ContOpe Canvas (Experimental)".
  *
  * Verifican sobre el AST de PHP —no por coincidencia de texto— que la pantalla
  * comprueba capacidad y nonce, que sanea y valida las tres representaciones, y
@@ -12,7 +12,7 @@ import { fileURLToPath } from 'node:url';
 import parser from 'php-parser';
 
 const repoRoot = new URL('../', import.meta.url);
-const pluginRoot = new URL('open-codesign-publisher/', repoRoot);
+const pluginRoot = new URL('contope-publisher/', repoRoot);
 
 /** Vendor esperado: GrapesJS 0.23.4, BSD-3-Clause, copiado sin CDN. */
 const VENDOR = {
@@ -173,38 +173,38 @@ async function parsePhp(relativePath) {
 // ---------------------------------------------------------------------------
 
 async function checkAdminSurface() {
-  const { ast, source } = await parsePhp('open-codesign-publisher/includes/class-ocd-canvas-editor-admin.php');
-  const admin = classOf(ast, 'OCD_Canvas_Editor_Admin');
-  check(admin !== null, 'Falta la clase OCD_Canvas_Editor_Admin.');
+  const { ast, source } = await parsePhp('contope-publisher/includes/class-cod-canvas-editor-admin.php');
+  const admin = classOf(ast, 'COD_Canvas_Editor_Admin');
+  check(admin !== null, 'Falta la clase COD_Canvas_Editor_Admin.');
   if (!admin) return;
 
   check(
     constantOf(admin, 'CAPABILITY') === 'manage_options',
-    'OCD_Canvas_Editor_Admin::CAPABILITY debe ser manage_options.',
+    'COD_Canvas_Editor_Admin::CAPABILITY debe ser manage_options.',
   );
   check(
     typeof constantOf(admin, 'NONCE_ACTION') === 'string' && constantOf(admin, 'NONCE_ACTION') !== '',
-    'OCD_Canvas_Editor_Admin::NONCE_ACTION debe ser una cadena no vacía.',
+    'COD_Canvas_Editor_Admin::NONCE_ACTION debe ser una cadena no vacía.',
   );
   check(
     constantOf(admin, 'GRAPESJS_VERSION') === VENDOR.version,
     `GRAPESJS_VERSION debe declarar ${VENDOR.version}.`,
   );
 
-  // Submenú de Open CoDesign con la capacidad exigida.
+  // Submenú de ContOpe Design con la capacidad exigida.
   const addMenu = methodOf(admin, 'add_menu');
-  check(addMenu !== null, 'Falta OCD_Canvas_Editor_Admin::add_menu().');
+  check(addMenu !== null, 'Falta COD_Canvas_Editor_Admin::add_menu().');
   const menuCall = addMenu && firstCall(addMenu, 'add_submenu_page');
   check(menuCall !== null, 'add_menu() debe registrar la pantalla como submenú con add_submenu_page().');
   if (menuCall) {
     check(
-      literal(menuCall.arguments[0]) === 'open-codesign-publisher' ||
+      literal(menuCall.arguments[0]) === 'contope-publisher' ||
         selfConstant(menuCall.arguments[0]) === 'PARENT_SLUG',
-      'add_submenu_page() debe colgar del menú principal open-codesign-publisher.',
+      'add_submenu_page() debe colgar del menú principal contope-publisher.',
     );
     check(
-      constantOf(admin, 'PARENT_SLUG') === 'open-codesign-publisher',
-      'OCD_Canvas_Editor_Admin::PARENT_SLUG debe ser open-codesign-publisher.',
+      constantOf(admin, 'PARENT_SLUG') === 'contope-publisher',
+      'COD_Canvas_Editor_Admin::PARENT_SLUG debe ser contope-publisher.',
     );
     check(
       selfConstant(menuCall.arguments[3]) === 'CAPABILITY',
@@ -224,7 +224,7 @@ async function checkAdminSurface() {
   // Los dos endpoints AJAX y el render exigen capacidad antes que nada.
   for (const name of ['handle_load', 'handle_save', 'handle_resolve_assets', 'handle_publish', 'render_page']) {
     const method = methodOf(admin, name);
-    check(method !== null, `Falta OCD_Canvas_Editor_Admin::${name}().`);
+    check(method !== null, `Falta COD_Canvas_Editor_Admin::${name}().`);
     if (!method) continue;
 
     const first = method.body.children[0];
@@ -276,7 +276,7 @@ async function checkAdminSurface() {
 
   // El nonce que consume el navegador se emite con la misma acción.
   const enqueue = methodOf(admin, 'enqueue_assets');
-  check(enqueue !== null, 'Falta OCD_Canvas_Editor_Admin::enqueue_assets().');
+  check(enqueue !== null, 'Falta COD_Canvas_Editor_Admin::enqueue_assets().');
   if (enqueue) {
     const nonceCreate = firstCall(enqueue, 'wp_create_nonce');
     check(nonceCreate !== null, 'enqueue_assets() debe emitir el nonce con wp_create_nonce().');
@@ -330,7 +330,7 @@ async function checkAdminSurface() {
 
   // Botón "Editar con OCD" en la lista de Páginas y auto-carga por URL.
   const register = methodOf(admin, 'register');
-  check(register !== null, 'Falta OCD_Canvas_Editor_Admin::register().');
+  check(register !== null, 'Falta COD_Canvas_Editor_Admin::register().');
   if (register) {
     const pageRowFilter = callsOf(register).filter((entry) => entry.name === 'add_filter');
     check(
@@ -340,7 +340,7 @@ async function checkAdminSurface() {
   }
 
   const pageRowAction = methodOf(admin, 'add_page_row_edit_with_ocd');
-  check(pageRowAction !== null, 'Falta OCD_Canvas_Editor_Admin::add_page_row_edit_with_ocd().');
+  check(pageRowAction !== null, 'Falta COD_Canvas_Editor_Admin::add_page_row_edit_with_ocd().');
   if (pageRowAction) {
     const capabilityCall = firstCall(pageRowAction, 'current_user_can');
     check(capabilityCall !== null, 'El enlace de fila debe comprobar current_user_can().');
@@ -364,14 +364,14 @@ async function checkAdminSurface() {
         'wp_nonce_url() debe reutilizar self::NONCE_ACTION.',
       );
       check(
-        literal(nonceUrlCall.arguments[2]) === 'ocd_nonce',
-        'El nonce de la URL debe viajar en el campo ocd_nonce.',
+        literal(nonceUrlCall.arguments[2]) === 'cod_nonce',
+        'El nonce de la URL debe viajar en el campo cod_nonce.',
       );
     }
   }
 
   const resolveAutoLoad = methodOf(admin, 'resolve_auto_load_page_id');
-  check(resolveAutoLoad !== null, 'Falta OCD_Canvas_Editor_Admin::resolve_auto_load_page_id().');
+  check(resolveAutoLoad !== null, 'Falta COD_Canvas_Editor_Admin::resolve_auto_load_page_id().');
   if (resolveAutoLoad) {
     check(
       resolveAutoLoad.type?.name === 'int',
@@ -394,8 +394,8 @@ async function checkAdminSurface() {
         'check_admin_referer() debe reutilizar self::NONCE_ACTION.',
       );
       check(
-        literal(nonceCall.arguments[1]) === 'ocd_nonce',
-        'check_admin_referer() debe leer el nonce del campo ocd_nonce.',
+        literal(nonceCall.arguments[1]) === 'cod_nonce',
+        'check_admin_referer() debe leer el nonce del campo cod_nonce.',
       );
     }
     check(calls.includes('get_post'), 'resolve_auto_load_page_id() debe validar la página con get_post().');
@@ -461,9 +461,9 @@ async function checkAdminSurface() {
 // ---------------------------------------------------------------------------
 
 async function checkSanitizer() {
-  const { ast, source } = await parsePhp('open-codesign-publisher/includes/class-ocd-canvas-document-sanitizer.php');
-  const sanitizer = classOf(ast, 'OCD_Canvas_Document_Sanitizer');
-  check(sanitizer !== null, 'Falta la clase OCD_Canvas_Document_Sanitizer.');
+  const { ast, source } = await parsePhp('contope-publisher/includes/class-cod-canvas-document-sanitizer.php');
+  const sanitizer = classOf(ast, 'COD_Canvas_Document_Sanitizer');
+  check(sanitizer !== null, 'Falta la clase COD_Canvas_Document_Sanitizer.');
   if (!sanitizer) return;
 
   for (const [name, max] of [
@@ -577,9 +577,9 @@ async function checkSanitizer() {
 // ---------------------------------------------------------------------------
 
 async function checkRepository() {
-  const { ast } = await parsePhp('open-codesign-publisher/includes/class-ocd-canvas-document-repository.php');
-  const repository = classOf(ast, 'OCD_Canvas_Document_Repository');
-  check(repository !== null, 'Falta la clase OCD_Canvas_Document_Repository.');
+  const { ast } = await parsePhp('contope-publisher/includes/class-cod-canvas-document-repository.php');
+  const repository = classOf(ast, 'COD_Canvas_Document_Repository');
+  check(repository !== null, 'Falta la clase COD_Canvas_Document_Repository.');
   if (!repository) return;
 
   const documentId = constantOf(repository, 'DOCUMENT_ID');
@@ -695,10 +695,10 @@ async function checkRepository() {
 
 async function checkIsolationAndAssets() {
   const untouched = [
-    'open-codesign-publisher/includes/class-ocd-admin.php',
-    'open-codesign-publisher/includes/class-ocd-importer.php',
-    'open-codesign-publisher/includes/class-ocd-block-serializer.php',
-    'open-codesign-publisher/includes/class-ocd-package-validator.php',
+    'contope-publisher/includes/class-cod-admin.php',
+    'contope-publisher/includes/class-cod-importer.php',
+    'contope-publisher/includes/class-cod-block-serializer.php',
+    'contope-publisher/includes/class-cod-package-validator.php',
   ];
   for (const relativePath of untouched) {
     const source = await readFile(fileURLToPath(new URL(relativePath, repoRoot)), 'utf8');
@@ -709,53 +709,53 @@ async function checkIsolationAndAssets() {
   }
 
   const bootstrap = await readFile(
-    fileURLToPath(new URL('open-codesign-publisher/open-codesign-publisher.php', repoRoot)),
+    fileURLToPath(new URL('contope-publisher/contope-publisher.php', repoRoot)),
     'utf8',
   );
   for (const file of [
-    'class-ocd-canvas-document-sanitizer.php',
-    'class-ocd-canvas-document-repository.php',
-    'class-ocd-canvas-asset-resolver.php',
-    'class-ocd-canvas-page-publisher.php',
-    'class-ocd-dynamic-token-resolver.php',
-    'class-ocd-canvas-editor-admin.php',
+    'class-cod-canvas-document-sanitizer.php',
+    'class-cod-canvas-document-repository.php',
+    'class-cod-canvas-asset-resolver.php',
+    'class-cod-canvas-page-publisher.php',
+    'class-cod-dynamic-token-resolver.php',
+    'class-cod-canvas-editor-admin.php',
   ]) {
     check(bootstrap.includes(file), `El bootstrap debe requerir ${file}.`);
   }
   check(
-    /new OCD_Canvas_Editor_Admin\(/.test(bootstrap) && /->register\(\)/.test(bootstrap),
+    /new COD_Canvas_Editor_Admin\(/.test(bootstrap) && /->register\(\)/.test(bootstrap),
     'El bootstrap debe registrar el módulo Canvas.',
   );
   check(
-    /new OCD_Dynamic_Token_Resolver\(\)/.test(bootstrap),
+    /new COD_Dynamic_Token_Resolver\(\)/.test(bootstrap),
     'El bootstrap debe instanciar el resolver de tokens dinámicos.',
   );
   check(
-    /new OCD_Admin\(\$importer\)/.test(bootstrap),
+    /new COD_Admin\(\$importer\)/.test(bootstrap),
     'El bootstrap no debe alterar el registro del importador existente.',
   );
 
   const authored = [
-    'open-codesign-publisher/includes/class-ocd-canvas-editor-admin.php',
-    'open-codesign-publisher/includes/class-ocd-canvas-document-repository.php',
-    'open-codesign-publisher/includes/class-ocd-canvas-document-sanitizer.php',
-    'open-codesign-publisher/includes/class-ocd-canvas-asset-resolver.php',
-    'open-codesign-publisher/includes/class-ocd-canvas-page-publisher.php',
-    'open-codesign-publisher/includes/class-ocd-dynamic-token-resolver.php',
-    'open-codesign-publisher/assets/js/ocd-editor-core.js',
-    'open-codesign-publisher/assets/js/ocd-canvas-editor.js',
-    'open-codesign-publisher/assets/js/ocd-canvas-public.js',
-    'open-codesign-publisher/assets/js/ocd-computed-inspector.js',
-    'open-codesign-publisher/assets/js/ocd-canvas-grid.global.js',
-    'open-codesign-publisher/assets/js/ocd-grid-controls.js',
-    'open-codesign-publisher/assets/js/ocd-behaviors.js',
-    'open-codesign-publisher/assets/css/ocd-canvas-editor.css',
+    'contope-publisher/includes/class-cod-canvas-editor-admin.php',
+    'contope-publisher/includes/class-cod-canvas-document-repository.php',
+    'contope-publisher/includes/class-cod-canvas-document-sanitizer.php',
+    'contope-publisher/includes/class-cod-canvas-asset-resolver.php',
+    'contope-publisher/includes/class-cod-canvas-page-publisher.php',
+    'contope-publisher/includes/class-cod-dynamic-token-resolver.php',
+    'contope-publisher/assets/js/cod-editor-core.js',
+    'contope-publisher/assets/js/cod-canvas-editor.js',
+    'contope-publisher/assets/js/cod-canvas-public.js',
+    'contope-publisher/assets/js/cod-computed-inspector.js',
+    'contope-publisher/assets/js/cod-canvas-grid.global.js',
+    'contope-publisher/assets/js/cod-grid-controls.js',
+    'contope-publisher/assets/js/cod-behaviors.js',
+    'contope-publisher/assets/css/cod-canvas-editor.css',
   ];
   const cdnPattern = /(unpkg\.com|jsdelivr\.net|cdnjs\.|cdn\.|fonts\.googleapis\.com|grapesjs\.com\/)/i;
   for (const relativePath of authored) {
     const source = await readFile(fileURLToPath(new URL(relativePath, repoRoot)), 'utf8');
     check(!cdnPattern.test(source), `${relativePath} no debe referenciar un CDN.`);
-    if (!relativePath.endsWith('class-ocd-canvas-document-sanitizer.php')) {
+    if (!relativePath.endsWith('class-cod-canvas-document-sanitizer.php')) {
       check(
         !/<iframe/i.test(source),
         `${relativePath} no debe emitir un iframe como formato publicado.`,
@@ -765,28 +765,28 @@ async function checkIsolationAndAssets() {
 
   // La pantalla y el script comparten exactamente los mismos controles.
   const adminSource = await readFile(
-    fileURLToPath(new URL('open-codesign-publisher/includes/class-ocd-canvas-editor-admin.php', repoRoot)),
+    fileURLToPath(new URL('contope-publisher/includes/class-cod-canvas-editor-admin.php', repoRoot)),
     'utf8',
   );
   const script = await readFile(
-    fileURLToPath(new URL('open-codesign-publisher/assets/js/ocd-canvas-editor.js', repoRoot)),
+    fileURLToPath(new URL('contope-publisher/assets/js/cod-canvas-editor.js', repoRoot)),
     'utf8',
   );
   const coreScript = await readFile(
-    fileURLToPath(new URL('open-codesign-publisher/assets/js/ocd-editor-core.js', repoRoot)),
+    fileURLToPath(new URL('contope-publisher/assets/js/cod-editor-core.js', repoRoot)),
     'utf8',
   );
   const inspectorSource = await readFile(
-    fileURLToPath(new URL('open-codesign-publisher/assets/js/ocd-computed-inspector.js', repoRoot)),
+    fileURLToPath(new URL('contope-publisher/assets/js/cod-computed-inspector.js', repoRoot)),
     'utf8',
   );
   for (const controlId of [
-    'ocd-canvas-save',
-    'ocd-canvas-reload',
-    'ocd-canvas-export-html',
-    'ocd-canvas-export-css',
-    'ocd-canvas-import-apply',
-    'ocd-canvas-publish',
+    'cod-canvas-save',
+    'cod-canvas-reload',
+    'cod-canvas-export-html',
+    'cod-canvas-export-css',
+    'cod-canvas-import-apply',
+    'cod-canvas-publish',
   ]) {
     check(adminSource.includes(`"${controlId}"`), `La pantalla debe exponer el control ${controlId}.`);
     check(script.includes(`'${controlId}'`), `El editor debe enlazar el control ${controlId}.`);
@@ -808,7 +808,7 @@ async function checkIsolationAndAssets() {
     'GrapesJS no debe usar su almacenamiento propio: la persistencia es de WordPress.',
   );
   check(
-    coreScript.includes('OCD-CANVAS-EDITABLE-OVERRIDES') && coreScript.includes('data-ocd-source-css'),
+    coreScript.includes('OCD-CANVAS-EDITABLE-OVERRIDES') && coreScript.includes('data-cod-source-css'),
     'El editor debe preservar el CSS fuente literalmente y separar sus overrides editables.',
   );
   check(
@@ -821,7 +821,7 @@ async function checkIsolationAndAssets() {
     'El guardado debe enviar el CSS fuente junto con la capa de overrides.',
   );
   check(
-    /Components\.addType\('ocd-video'/.test(coreScript) && /tagName === 'VIDEO'/.test(coreScript),
+    /Components\.addType\('cod-video'/.test(coreScript) && /tagName === 'VIDEO'/.test(coreScript),
     'El editor debe preservar video como componente OCD sin controles añadidos.',
   );
   check(
@@ -840,7 +840,7 @@ async function checkIsolationAndAssets() {
     'El inspector debe editar SVG inline y colorear SVG externos en modos claro/oscuro.',
   );
   check(
-    inspectorSource.includes('data-ocd-presentation-id') &&
+    inspectorSource.includes('data-cod-presentation-id') &&
       inspectorSource.includes("tablet: '(max-width: 992px)'") &&
       inspectorSource.includes("mobile: '(max-width: 480px)'") &&
       inspectorSource.includes("{ translate }") &&
@@ -848,8 +848,8 @@ async function checkIsolationAndAssets() {
     'El inspector debe editar la posición vertical por dispositivo mediante CSS contextual portable.',
   );
   check(
-    inspectorSource.includes('data-ocd-interaction') &&
-      !inspectorSource.includes('data-ocd-interaction="hero-collapse"'),
+    inspectorSource.includes('data-cod-interaction') &&
+      !inspectorSource.includes('data-cod-interaction="hero-collapse"'),
     'Presentación e Interacciones deben conservarse separadas del behavior hero-collapse.',
   );
   check(
@@ -857,23 +857,23 @@ async function checkIsolationAndAssets() {
     'El autoguardado debe encolar un estado nuevo si ya existe una escritura en curso.',
   );
   check(
-    adminSource.includes('data-ocd-side-panel="components"') &&
-      adminSource.includes('data-ocd-side-panel="inspector"') &&
+    adminSource.includes('data-cod-side-panel="components"') &&
+      adminSource.includes('data-cod-side-panel="inspector"') &&
       script.includes('activateSidePanel'),
-    'Los paneles nativo y Open CoDesign deben alternarse mediante pestañas.',
+    'Los paneles nativo y ContOpe Design deben alternarse mediante pestañas.',
   );
 }
 
 async function checkPublishingAndAssets() {
-  const resolver = await parsePhp('open-codesign-publisher/includes/class-ocd-canvas-asset-resolver.php');
-  const resolverClass = classOf(resolver.ast, 'OCD_Canvas_Asset_Resolver');
-  check(resolverClass !== null, 'Falta OCD_Canvas_Asset_Resolver.');
+  const resolver = await parsePhp('contope-publisher/includes/class-cod-canvas-asset-resolver.php');
+  const resolverClass = classOf(resolver.ast, 'COD_Canvas_Asset_Resolver');
+  check(resolverClass !== null, 'Falta COD_Canvas_Asset_Resolver.');
   if (resolverClass) {
     const resolve = methodOf(resolverClass, 'resolve');
     check(resolve !== null, 'El resolver debe exponer resolve().');
     check(
-      resolver.source.includes("'open-codesign'") && resolver.source.includes('RecursiveDirectoryIterator'),
-      'El resolver debe limitar su búsqueda al árbol administrado open-codesign.',
+      resolver.source.includes("'contope'") && resolver.source.includes('RecursiveDirectoryIterator'),
+      'El resolver debe limitar su búsqueda al árbol administrado contope.',
     );
     check(
       typeof constantOf(resolverClass, 'MAX_REFERENCES') === 'number' &&
@@ -882,9 +882,9 @@ async function checkPublishingAndAssets() {
     );
   }
 
-  const publisher = await parsePhp('open-codesign-publisher/includes/class-ocd-canvas-page-publisher.php');
-  const publisherClass = classOf(publisher.ast, 'OCD_Canvas_Page_Publisher');
-  check(publisherClass !== null, 'Falta OCD_Canvas_Page_Publisher.');
+  const publisher = await parsePhp('contope-publisher/includes/class-cod-canvas-page-publisher.php');
+  const publisherClass = classOf(publisher.ast, 'COD_Canvas_Page_Publisher');
+  check(publisherClass !== null, 'Falta COD_Canvas_Page_Publisher.');
   if (publisherClass) {
     for (const method of ['publish', 'render_shortcode', 'standalone_template']) {
       check(methodOf(publisherClass, method) !== null, `El publicador debe implementar ${method}().`);
@@ -902,7 +902,7 @@ async function checkPublishingAndAssets() {
       'La página publicada debe conservar identidad estable y estado editorial.',
     );
     check(
-      publisher.source.includes('OCD_Dynamic_Token_Resolver'),
+      publisher.source.includes('COD_Dynamic_Token_Resolver'),
       'El publicador debe declarar el resolver de tokens como dependencia opcional.',
     );
     check(
@@ -917,13 +917,13 @@ async function checkPublishingAndAssets() {
 // ---------------------------------------------------------------------------
 
 async function checkDynamicTokenResolver() {
-  const { ast, source } = await parsePhp('open-codesign-publisher/includes/class-ocd-dynamic-token-resolver.php');
-  const resolver = classOf(ast, 'OCD_Dynamic_Token_Resolver');
-  check(resolver !== null, 'Falta la clase OCD_Dynamic_Token_Resolver.');
+  const { ast, source } = await parsePhp('contope-publisher/includes/class-cod-dynamic-token-resolver.php');
+  const resolver = classOf(ast, 'COD_Dynamic_Token_Resolver');
+  check(resolver !== null, 'Falta la clase COD_Dynamic_Token_Resolver.');
   if (!resolver) return;
 
   const resolve = methodOf(resolver, 'resolve');
-  check(resolve !== null, 'Falta OCD_Dynamic_Token_Resolver::resolve().');
+  check(resolve !== null, 'Falta COD_Dynamic_Token_Resolver::resolve().');
   if (resolve) {
     check(resolve.visibility === 'public', 'resolve() debe ser público.');
     check(
@@ -947,8 +947,8 @@ async function checkDynamicTokenResolver() {
 
   check(source.includes('$post_id <= 0'), 'resolve() debe devolver el HTML sin tocar cuando $post_id <= 0.');
   check(
-    source.includes("'{{'") && source.includes("'data-ocd-dynamic'"),
-    'resolve() debe devolver temprano cuando no hay ni "{{" ni data-ocd-dynamic.',
+    source.includes("'{{'") && source.includes("'data-cod-dynamic'"),
+    'resolve() debe devolver temprano cuando no hay ni "{{" ni data-cod-dynamic.',
   );
 
   const featured = methodOf(resolver, 'replace_featured_image_tags');
@@ -959,7 +959,7 @@ async function checkDynamicTokenResolver() {
   );
   check(
     source.includes("'featured_image'"),
-    'La pasada de imagen destacada debe reconocer data-ocd-dynamic="featured_image".',
+    'La pasada de imagen destacada debe reconocer data-cod-dynamic="featured_image".',
   );
 
   const permalink = methodOf(resolver, 'replace_permalink_tags');
@@ -971,7 +971,7 @@ async function checkDynamicTokenResolver() {
   }
   check(
     source.includes("'permalink'"),
-    'La pasada de enlace debe reconocer data-ocd-dynamic="permalink".',
+    'La pasada de enlace debe reconocer data-cod-dynamic="permalink".',
   );
 
   const text = methodOf(resolver, 'replace_text_tokens');
@@ -1011,7 +1011,7 @@ async function checkDynamicTokenResolver() {
   );
   check(
     source.includes('acf_image:'),
-    'La Etapa 3 debe reconocer data-ocd-dynamic="acf_image:CAMPO" sobre etiquetas <img>.',
+    'La Etapa 3 debe reconocer data-cod-dynamic="acf_image:CAMPO" sobre etiquetas <img>.',
   );
   check(
     source.includes("function_exists('get_field')"),
@@ -1084,35 +1084,35 @@ async function checkVendor() {
 
 async function checkDevicePresentation() {
   const canvasEditor = await readFile(
-    fileURLToPath(new URL('assets/js/ocd-canvas-editor.js', pluginRoot)),
+    fileURLToPath(new URL('assets/js/cod-canvas-editor.js', pluginRoot)),
     'utf8',
   );
   const editorCore = await readFile(
-    fileURLToPath(new URL('assets/js/ocd-editor-core.js', pluginRoot)),
+    fileURLToPath(new URL('assets/js/cod-editor-core.js', pluginRoot)),
     'utf8',
   );
   const behaviors = await readFile(
-    fileURLToPath(new URL('assets/js/ocd-behaviors.js', pluginRoot)),
+    fileURLToPath(new URL('assets/js/cod-behaviors.js', pluginRoot)),
     'utf8',
   );
   const inspector = await readFile(
-    fileURLToPath(new URL('assets/js/ocd-computed-inspector.js', pluginRoot)),
+    fileURLToPath(new URL('assets/js/cod-computed-inspector.js', pluginRoot)),
     'utf8',
   );
   const admin = await readFile(
-    fileURLToPath(new URL('includes/class-ocd-canvas-editor-admin.php', pluginRoot)),
+    fileURLToPath(new URL('includes/class-cod-canvas-editor-admin.php', pluginRoot)),
     'utf8',
   );
   const gridControls = await readFile(
-    fileURLToPath(new URL('assets/js/ocd-grid-controls.js', pluginRoot)),
+    fileURLToPath(new URL('assets/js/cod-grid-controls.js', pluginRoot)),
     'utf8',
   );
   const canvasGrid = await readFile(
-    fileURLToPath(new URL('assets/js/ocd-canvas-grid.global.js', pluginRoot)),
+    fileURLToPath(new URL('assets/js/cod-canvas-grid.global.js', pluginRoot)),
     'utf8',
   );
   const canvasCss = await readFile(
-    fileURLToPath(new URL('assets/css/ocd-canvas-editor.css', pluginRoot)),
+    fileURLToPath(new URL('assets/css/cod-canvas-editor.css', pluginRoot)),
     'utf8',
   );
 
@@ -1144,15 +1144,15 @@ async function checkDevicePresentation() {
     behaviors.includes('if (!opts.editorPreview) installHeroCollapseRuntime'),
     'hero-collapse debe quedar desactivado dentro del editor.',
   );
-  check(admin.includes('id="ocd-canvas-height"'), 'La barra debe permitir variar el alto de la vista previa.');
+  check(admin.includes('id="cod-canvas-height"'), 'La barra debe permitir variar el alto de la vista previa.');
   check(admin.includes('Agregar y ordenar'), 'La pestaña de componentes debe describir su acción con lenguaje claro.');
   check(admin.includes('Editar diseño'), 'La pestaña del inspector debe describir su acción con lenguaje claro.');
   check(admin.includes("'Editor visual'"), 'El menú administrativo debe llamarse Editor visual.');
-  check(admin.includes('ocd-visual-pages'), 'Editor visual debe desplegar accesos directos a las páginas.');
-  check(admin.includes("'ocd_nonce' => wp_create_nonce(self::NONCE_ACTION)"), 'Los enlaces JSON del submenú deben llevar un nonce sin entidades HTML.');
-  check(!admin.includes('<h1>Open CoDesign Canvas'), 'El editor no debe reservar altura para una cabecera técnica.');
-  check(!admin.includes('data-ocd-slot="header"'), 'El encabezado no debe editarse como una región separada sobre la página.');
-  check(!admin.includes('data-ocd-slot="footer"'), 'El pie no debe editarse como una región separada bajo la página.');
+  check(admin.includes('cod-visual-pages'), 'Editor visual debe desplegar accesos directos a las páginas.');
+  check(admin.includes("'cod_nonce' => wp_create_nonce(self::NONCE_ACTION)"), 'Los enlaces JSON del submenú deben llevar un nonce sin entidades HTML.');
+  check(!admin.includes('<h1>ContOpe Canvas'), 'El editor no debe reservar altura para una cabecera técnica.');
+  check(!admin.includes('data-cod-slot="header"'), 'El encabezado no debe editarse como una región separada sobre la página.');
+  check(!admin.includes('data-cod-slot="footer"'), 'El pie no debe editarse como una región separada bajo la página.');
   check(
     canvasEditor.includes("device.set('height', height + 'px')"),
     'El alto personalizado debe aplicarse al dispositivo seleccionado.',
@@ -1160,7 +1160,7 @@ async function checkDevicePresentation() {
   check(canvasEditor.includes("menu('Vista'"), 'Los controles de vista deben vivir en un menú compacto.');
   check(canvasEditor.includes("menu('Archivo'"), 'Las acciones secundarias deben vivir en un menú compacto.');
   check(canvasEditor.includes('2600'), 'Los mensajes informativos deben desaparecer como notificaciones temporales.');
-  check(canvasEditor.includes("'ocd-page-target', 'ocd-page-create', 'ocd-snapshots-open'"), 'Página, nueva página e historial deben integrarse en la barra única.');
+  check(canvasEditor.includes("'cod-page-target', 'cod-page-create', 'cod-snapshots-open'"), 'Página, nueva página e historial deben integrarse en la barra única.');
   check(canvasEditor.includes("historyButton.textContent = '◷'"), 'Historial debe representarse con un reloj accesible.');
   check(canvasEditor.includes('if (current && activeDocumentId)'), 'El acceso directo debe reintentar la carga si falta el documento inicial.');
   for (const property of ['position', 'min-height', 'top', 'right', 'bottom', 'left']) {
@@ -1179,7 +1179,7 @@ async function checkDevicePresentation() {
   check(!inspector.includes('if (columnPresetsPanel) body.appendChild(columnPresetsPanel)'), 'La paleta de columnas no debe repetirse más abajo.');
   check(gridControls.includes("'Manual'"), 'Columnas debe ofrecer un campo Manual explícito.');
   check(gridControls.includes("'Gap'"), 'Columnas debe ofrecer Gap en la misma fila.');
-  check(gridControls.includes('ocd-gc__breakpoints'), 'Los tres breakpoints deben mostrarse como iconos superiores.');
+  check(gridControls.includes('cod-gc__breakpoints'), 'Los tres breakpoints deben mostrarse como iconos superiores.');
   check(gridControls.includes('draggingBoundary = true'), 'El arrastre debe mantener vivo el manejador hasta soltar el puntero.');
   check(gridControls.includes('grip.style.left'), 'El manejador debe moverse sin reconstruir el overlay durante el drag.');
   check(gridControls.includes('Array.from({ length: 11 }'), 'El snap debe usar las once guías internas de una grilla virtual de 12 columnas.');
@@ -1187,9 +1187,9 @@ async function checkDevicePresentation() {
   check(!gridControls.includes("'Dispositivo'"), 'Columnas no debe repetir un selector textual de dispositivo.');
   check(canvasGrid.includes('parsed.length < 1'), 'La notación manual debe aceptar una sola columna con valor 1.');
   check(canvasGrid.includes("normalized.startsWith('mobile')"), 'Los dispositivos Mobile deben resolver el breakpoint mobile real.');
-  check(canvasCss.includes('body:has(.ocd-canvas-wrap)'), 'El look propio debe quedar aislado a la pantalla del Editor visual.');
+  check(canvasCss.includes('body:has(.cod-canvas-wrap)'), 'El look propio debe quedar aislado a la pantalla del Editor visual.');
   check(canvasCss.includes('background:#191d23'), 'La barra superior debe usar el chrome oscuro del editor.');
-  check(canvasCss.includes('#ocd-snapshots-open') && canvasCss.includes('background:transparent'), 'Historial debe mostrarse como icono sin contorno de botón.');
+  check(canvasCss.includes('#cod-snapshots-open') && canvasCss.includes('background:transparent'), 'Historial debe mostrarse como icono sin contorno de botón.');
 }
 
 export async function runCanvasEditorChecks() {

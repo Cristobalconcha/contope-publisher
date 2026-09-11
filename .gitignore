@@ -10,5 +10,5 @@ node_modules/
 
 
 # Credenciales locales del runner de Grapes — nunca subir
-scripts/ocd-grapes-runner/ocd-grapes-runner.config.json
-scripts/ocd-grapes-runner/backups/
+scripts/cod-grapes-runner/cod-grapes-runner.config.json
+scripts/cod-grapes-runner/backups/

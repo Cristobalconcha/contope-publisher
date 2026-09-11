@@ -10,12 +10,12 @@ $expectedThemeRoot = '/wp-content/themes/'
 $allowedExtensions = @('.css', '.html', '.json', '.php')
 $themes = @(
     @{
-        Slug = 'open-codesign-canvas'
-        Root = Join-Path $repoRoot 'open-codesign-canvas'
+        Slug = 'contope-canvas'
+        Root = Join-Path $repoRoot 'contope-canvas'
     },
     @{
-        Slug = 'open-codesign-santa-luisa'
-        Root = Join-Path $repoRoot 'open-codesign-santa-luisa'
+        Slug = 'contope-santa-luisa'
+        Root = Join-Path $repoRoot 'contope-santa-luisa'
     }
 )
 
@@ -38,11 +38,11 @@ function New-FtpRequest([string]$uri, [string]$method, [hashtable]$config) {
     $request = [System.Net.FtpWebRequest]::Create([Uri]::new($uri))
     $request.Method = $method
     $request.Credentials = [System.Net.NetworkCredential]::new(
-        $config['OCD_FTP_USERNAME'],
-        $config['OCD_FTP_PASSWORD']
+        $config['COD_FTP_USERNAME'],
+        $config['COD_FTP_PASSWORD']
     )
-    $request.EnableSsl = $config['OCD_FTP_TLS'].Trim().ToLowerInvariant() -eq 'true'
-    $request.UsePassive = $config['OCD_FTP_PASSIVE'].Trim().ToLowerInvariant() -ne 'false'
+    $request.EnableSsl = $config['COD_FTP_TLS'].Trim().ToLowerInvariant() -eq 'true'
+    $request.UsePassive = $config['COD_FTP_PASSIVE'].Trim().ToLowerInvariant() -ne 'false'
     $request.UseBinary = $true
     $request.KeepAlive = $false
     $request.Timeout = 30000
@@ -50,8 +50,8 @@ function New-FtpRequest([string]$uri, [string]$method, [hashtable]$config) {
 }
 
 function Remote-Uri([hashtable]$config, [string]$path) {
-    $hostName = $config['OCD_FTP_HOST'].Trim() -replace '^ftps?://', '' -replace '/.*$', ''
-    $port = if ($config['OCD_FTP_PORT'] -match '^\d+$') { [int]$config['OCD_FTP_PORT'] } else { 21 }
+    $hostName = $config['COD_FTP_HOST'].Trim() -replace '^ftps?://', '' -replace '/.*$', ''
+    $port = if ($config['COD_FTP_PORT'] -match '^\d+$') { [int]$config['COD_FTP_PORT'] } else { 21 }
     $normalized = '/' + $path.Trim().TrimStart('/')
     return 'ftp://{0}:{1}{2}' -f $hostName, $port, $normalized
 }
@@ -85,13 +85,13 @@ function Remote-FileSize([hashtable]$config, [string]$remotePath) {
 }
 
 $config = Read-DotEnv $envFile
-$required = @('OCD_FTP_HOST', 'OCD_FTP_USERNAME', 'OCD_FTP_PASSWORD', 'OCD_FTP_REMOTE_PATH')
+$required = @('COD_FTP_HOST', 'COD_FTP_USERNAME', 'COD_FTP_PASSWORD', 'COD_FTP_REMOTE_PATH')
 $missing = @($required | Where-Object {
     -not $config.ContainsKey($_) -or [string]::IsNullOrWhiteSpace($config[$_])
 })
 if ($missing.Count -gt 0) { throw "Faltan variables locales: $($missing -join ', ')" }
 
-$configuredRoot = '/' + $config['OCD_FTP_REMOTE_PATH'].Trim().Trim('/') + '/'
+$configuredRoot = '/' + $config['COD_FTP_REMOTE_PATH'].Trim().Trim('/') + '/'
 if ($configuredRoot -notin @($expectedPluginRoot, $expectedThemeRoot)) {
     throw "Ruta base rechazada. Se esperaba exactamente $expectedPluginRoot o $expectedThemeRoot"
 }

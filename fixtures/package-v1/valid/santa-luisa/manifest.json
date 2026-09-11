@@ -1,5 +1,5 @@
 {
-  "$schema": "https://open-codesign.org/schemas/package/manifest-v1.schema.json",
+  "$schema": "https://contope.org/schemas/package/manifest-v1.schema.json",
   "formatVersion": 1,
   "package": {
     "id": "urn:ocd:package:4b3f9c2e-8a7d-4f1e-9b6c-1d2e3f4a5b6c",
@@ -11,7 +11,7 @@
     "name": "Santa Luisa de Palpi"
   },
   "origin": {
-    "producer": "open-codesign-publisher",
+    "producer": "contope-publisher",
     "producerVersion": "0.1.0",
     "siteId": "urn:ocd:site:9c8d7e6f-5a4b-3c2d-1e0f-1234567890ab",
     "siteUrl": "https://santaluisadepalpi.kpispublicitarios.com",

@@ -1,4 +1,4 @@
-# CLAUDE.md — open-codesign-publisher (Santa Luisa de Palpi)
+# CLAUDE.md — contope-publisher (Santa Luisa de Palpi)
 
 ## Regla no negociable: infraestructura y credenciales
 
@@ -33,13 +33,13 @@ completo.
   credencial FTP encontrada en este repo pertenece a otro proyecto; no
   usarla aquí sin confirmación explícita y fresca de Cristobal.
 - **Cómo se despliega el plugin:** construir un `.zip` de la carpeta
-  `open-codesign-publisher/` y subirlo a mano por el panel de WordPress
+  `contope-publisher/` y subirlo a mano por el panel de WordPress
   (Plugins → Añadir nuevo → Subir plugin, reemplazando la versión
   instalada). El .zip se construye con `System.IO.Compression.ZipFile`
   directo (rutas internas con `/`) — **nunca** con `Compress-Archive` de
   PowerShell, que genera rutas con `\` y WordPress lo rechaza con "El
   archivo del plugin no existe".
-- **Contraseña de aplicación de WordPress** (`OCD_WP_APPLICATION_PASSWORD`
+- **Contraseña de aplicación de WordPress** (`COD_WP_APPLICATION_PASSWORD`
   en `.env.local`, bajo el usuario real `cristobal concha`): sirve solo
   para la API REST/MCP (Basic Auth). No sirve para el login normal de
   wp-admin ni para subir plugins por el panel — son mecanismos distintos.

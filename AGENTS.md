@@ -1,4 +1,4 @@
-# Open CoDesign WordPress — Agent Rules
+# ContOpe Design WordPress — Agent Rules
 
 Read this file before changing the repository.
 
@@ -6,11 +6,11 @@ Read this file before changing the repository.
 
 This repository builds the WordPress side of an open, bidirectional design workflow:
 
-- `Open CoDesign Canvas`: a generic block-theme engine.
-- `Open CoDesign Publisher/Tools`: import, export, identity, assets, editor extensions, synchronization, and a future MCP surface.
+- `ContOpe Canvas`: a generic block-theme engine.
+- `ContOpe Publisher/Tools`: import, export, identity, assets, editor extensions, synchronization, and a future MCP surface.
 - generated project child themes such as Santa Luisa de Palpi.
 
-WordPress must remain fully usable without AI or Open CoDesign Desktop. Imports must create native, editable WordPress entities rather than an iframe or opaque HTML blob. Export must support a faithful, editable reconstruction in another WordPress installation and must also be readable by Open CoDesign Desktop as an existing project.
+WordPress must remain fully usable without AI or ContOpe Design Desktop. Imports must create native, editable WordPress entities rather than an iframe or opaque HTML blob. Export must support a faithful, editable reconstruction in another WordPress installation and must also be readable by ContOpe Design Desktop as an existing project.
 
 ## Safety and ownership
 
@@ -28,7 +28,7 @@ WordPress must remain fully usable without AI or Open CoDesign Desktop. Imports 
 
 - PHP must target WordPress APIs and PHP 8.0+.
 - Prefer core Gutenberg blocks and standard WordPress entities.
-- Treat stable Open CoDesign IDs as immutable external identity; never use slugs as identity.
+- Treat stable ContOpe Design IDs as immutable external identity; never use slugs as identity.
 - Reject unknown or lossy package data explicitly instead of silently dropping it.
 - Portable paths must be relative, normalized, and protected against traversal.
 - The site must function without MCP, external AI, or network fonts.

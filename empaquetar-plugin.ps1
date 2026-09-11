@@ -1,7 +1,7 @@
 # Empaqueta el plugin para subir a WordPress.
 #
 # POR QUÉ EXISTE ESTE SCRIPT: `Compress-Archive` de Windows PowerShell 5.1
-# escribe las rutas internas del zip con CONTRABARRA (open-codesign-publisher\assets\...).
+# escribe las rutas internas del zip con CONTRABARRA (contope-publisher\assets\...).
 # Windows lo abre igual, así que el zip "se ve bien" en el equipo — pero WordPress
 # descomprime en Linux, donde la contrabarra es parte del nombre y no un separador
 # de carpetas. Resultado: el plugin se sube, y al activarlo WordPress dice que el
@@ -10,8 +10,8 @@
 # Acá se arman las entradas a mano justamente para forzar la barra normal.
 
 param(
-    [string]$Origen  = "$PSScriptRoot\open-codesign-publisher",
-    [string]$Destino = "$env:USERPROFILE\wp-local\releases\open-codesign-publisher"
+    [string]$Origen  = "$PSScriptRoot\contope-publisher",
+    [string]$Destino = "$env:USERPROFILE\wp-local\releases\contope-publisher"
 )
 
 Add-Type -AssemblyName System.IO.Compression
@@ -19,7 +19,7 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 
 if (-not (Test-Path $Origen)) { throw "No existe la carpeta del plugin: $Origen" }
 
-$principal = Join-Path $Origen 'open-codesign-publisher.php'
+$principal = Join-Path $Origen 'contope-publisher.php'
 if (-not (Test-Path $principal)) { throw "Falta el archivo principal del plugin: $principal" }
 
 $version = (Select-String -Path $principal -Pattern '^\s*\*\s*Version:\s*(.+)$' |
@@ -27,7 +27,7 @@ $version = (Select-String -Path $principal -Pattern '^\s*\*\s*Version:\s*(.+)$' 
 if (-not $version) { throw "No pude leer la version del encabezado del plugin." }
 
 if (-not (Test-Path $Destino)) { New-Item -ItemType Directory -Path $Destino | Out-Null }
-$salida = Join-Path $Destino "open-codesign-publisher-$version.zip"
+$salida = Join-Path $Destino "contope-publisher-$version.zip"
 if (Test-Path $salida) { Remove-Item $salida -Force }
 
 $raiz = Split-Path $Origen -Parent
@@ -69,7 +69,7 @@ try {
 $zip = [System.IO.Compression.ZipFile]::OpenRead($salida)
 try {
     $malas   = @($zip.Entries | Where-Object { $_.FullName -like '*\*' })
-    $tieneMain = @($zip.Entries | Where-Object { $_.FullName -eq 'open-codesign-publisher/open-codesign-publisher.php' }).Count -eq 1
+    $tieneMain = @($zip.Entries | Where-Object { $_.FullName -eq 'contope-publisher/contope-publisher.php' }).Count -eq 1
     $total   = $zip.Entries.Count
 } finally {
     $zip.Dispose()
@@ -81,7 +81,7 @@ if ($malas.Count -gt 0) {
 }
 if (-not $tieneMain) {
     Remove-Item $salida -Force
-    throw "Zip invalido: no esta open-codesign-publisher/open-codesign-publisher.php en la raiz. Se borro."
+    throw "Zip invalido: no esta contope-publisher/contope-publisher.php en la raiz. Se borro."
 }
 
 $kb = [int]((Get-Item $salida).Length / 1KB)

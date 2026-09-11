@@ -8,10 +8,10 @@ $envFile = Join-Path $repoRoot '.env.local'
 $expectedPluginRoot = '/wp-content/plugins/'
 $expectedThemeRoot = '/wp-content/themes/'
 $remoteMuPluginDirectory = '/wp-content/mu-plugins'
-$remoteHelperPath = "$remoteMuPluginDirectory/ocd-one-time-theme-switch.php"
-$routePath = '/wp-json/open-codesign/v1/one-time-theme-switch'
-$parentSlug = 'open-codesign-canvas'
-$childSlug = 'open-codesign-santa-luisa'
+$remoteHelperPath = "$remoteMuPluginDirectory/cod-one-time-theme-switch.php"
+$routePath = '/wp-json/contope/v1/one-time-theme-switch'
+$parentSlug = 'contope-canvas'
+$childSlug = 'contope-santa-luisa'
 
 function Read-DotEnv([string]$path) {
     if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
@@ -32,11 +32,11 @@ function New-FtpRequest([string]$uri, [string]$method, [hashtable]$config) {
     $request = [System.Net.FtpWebRequest]::Create([Uri]::new($uri))
     $request.Method = $method
     $request.Credentials = [System.Net.NetworkCredential]::new(
-        $config['OCD_FTP_USERNAME'],
-        $config['OCD_FTP_PASSWORD']
+        $config['COD_FTP_USERNAME'],
+        $config['COD_FTP_PASSWORD']
     )
-    $request.EnableSsl = $config['OCD_FTP_TLS'].Trim().ToLowerInvariant() -eq 'true'
-    $request.UsePassive = $config['OCD_FTP_PASSIVE'].Trim().ToLowerInvariant() -ne 'false'
+    $request.EnableSsl = $config['COD_FTP_TLS'].Trim().ToLowerInvariant() -eq 'true'
+    $request.UsePassive = $config['COD_FTP_PASSIVE'].Trim().ToLowerInvariant() -ne 'false'
     $request.UseBinary = $true
     $request.KeepAlive = $false
     $request.Timeout = 30000
@@ -44,8 +44,8 @@ function New-FtpRequest([string]$uri, [string]$method, [hashtable]$config) {
 }
 
 function Remote-Uri([hashtable]$config, [string]$path) {
-    $hostName = $config['OCD_FTP_HOST'].Trim() -replace '^ftps?://', '' -replace '/.*$', ''
-    $port = if ($config['OCD_FTP_PORT'] -match '^\d+$') { [int]$config['OCD_FTP_PORT'] } else { 21 }
+    $hostName = $config['COD_FTP_HOST'].Trim() -replace '^ftps?://', '' -replace '/.*$', ''
+    $port = if ($config['COD_FTP_PORT'] -match '^\d+$') { [int]$config['COD_FTP_PORT'] } else { 21 }
     $normalized = '/' + $path.Trim().TrimStart('/')
     return 'ftp://{0}:{1}{2}' -f $hostName, $port, $normalized
 }
@@ -94,20 +94,20 @@ function Remove-RemoteFile([hashtable]$config, [string]$remotePath) {
 }
 
 $config = Read-DotEnv $envFile
-$required = @('OCD_WP_URL', 'OCD_FTP_HOST', 'OCD_FTP_USERNAME', 'OCD_FTP_PASSWORD', 'OCD_FTP_REMOTE_PATH')
+$required = @('COD_WP_URL', 'COD_FTP_HOST', 'COD_FTP_USERNAME', 'COD_FTP_PASSWORD', 'COD_FTP_REMOTE_PATH')
 $missing = @($required | Where-Object {
     -not $config.ContainsKey($_) -or [string]::IsNullOrWhiteSpace($config[$_])
 })
 if ($missing.Count -gt 0) { throw "Faltan variables locales: $($missing -join ', ')" }
 
-$configuredRoot = '/' + $config['OCD_FTP_REMOTE_PATH'].Trim().Trim('/') + '/'
+$configuredRoot = '/' + $config['COD_FTP_REMOTE_PATH'].Trim().Trim('/') + '/'
 if ($configuredRoot -notin @($expectedPluginRoot, $expectedThemeRoot)) {
     throw "Ruta base rechazada. Se esperaba exactamente $expectedPluginRoot o $expectedThemeRoot"
 }
 
-$siteUrl = $config['OCD_WP_URL'].Trim().TrimEnd('/')
+$siteUrl = $config['COD_WP_URL'].Trim().TrimEnd('/')
 if ($siteUrl -notmatch '^https://[^/]+$') {
-    throw 'OCD_WP_URL debe ser el origen HTTPS del sitio, sin ruta adicional.'
+    throw 'COD_WP_URL debe ser el origen HTTPS del sitio, sin ruta adicional.'
 }
 
 Write-Output "Modo: $(if ($Apply) { 'APLICAR' } else { 'SIMULACION' })"
@@ -138,28 +138,28 @@ if (!defined('ABSPATH')) {
 }
 
 add_action('rest_api_init', static function (): void {
-    register_rest_route('open-codesign/v1', '/one-time-theme-switch', array(
+    register_rest_route('contope/v1', '/one-time-theme-switch', array(
         'methods' => WP_REST_Server::CREATABLE,
         'permission_callback' => '__return_true',
         'callback' => static function (WP_REST_Request $request) {
-            $provided = $request->get_header('x-ocd-one-time-token');
+            $provided = $request->get_header('x-cod-one-time-token');
             if (!is_string($provided) || !hash_equals('__TOKEN__', $provided)) {
-                return new WP_Error('ocd_forbidden', 'Token invalido.', array('status' => 403));
+                return new WP_Error('cod_forbidden', 'Token invalido.', array('status' => 403));
             }
 
-            $parent = wp_get_theme('open-codesign-canvas');
-            $child = wp_get_theme('open-codesign-santa-luisa');
+            $parent = wp_get_theme('contope-canvas');
+            $child = wp_get_theme('contope-santa-luisa');
             if (!$parent->exists() || !$child->exists()) {
-                return new WP_Error('ocd_theme_missing', 'Falta el tema padre o hijo.', array('status' => 409));
+                return new WP_Error('cod_theme_missing', 'Falta el tema padre o hijo.', array('status' => 409));
             }
-            if ($child->get_template() !== 'open-codesign-canvas') {
-                return new WP_Error('ocd_parent_mismatch', 'El tema hijo no declara el padre esperado.', array('status' => 409));
+            if ($child->get_template() !== 'contope-canvas') {
+                return new WP_Error('cod_parent_mismatch', 'El tema hijo no declara el padre esperado.', array('status' => 409));
             }
 
-            switch_theme('open-codesign-santa-luisa');
+            switch_theme('contope-santa-luisa');
             $active = wp_get_theme();
-            if ($active->get_stylesheet() !== 'open-codesign-santa-luisa' || $active->get_template() !== 'open-codesign-canvas') {
-                return new WP_Error('ocd_switch_failed', 'WordPress no confirmo el tema esperado.', array('status' => 500));
+            if ($active->get_stylesheet() !== 'contope-santa-luisa' || $active->get_template() !== 'contope-canvas') {
+                return new WP_Error('cod_switch_failed', 'WordPress no confirmo el tema esperado.', array('status' => 500));
             }
 
             return rest_ensure_response(array(
@@ -218,12 +218,12 @@ if ($null -ne (Remote-FileSizeOrNull $config $remoteHelperPath)) {
     throw 'El helper temporal sigue presente despues de la eliminacion.'
 }
 
-$verificationUri = $siteUrl + '/?ocd_verify_theme=' + [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
+$verificationUri = $siteUrl + '/?cod_verify_theme=' + [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
 $homeResponse = Invoke-WebRequest -UseBasicParsing -Uri $verificationUri -Method Get -TimeoutSec 30
 if ([int]$homeResponse.StatusCode -ne 200) {
     throw "La portada respondio HTTP $([int]$homeResponse.StatusCode) despues del cambio de tema."
 }
-if ($homeResponse.Content -notmatch 'open-codesign-santa-luisa') {
+if ($homeResponse.Content -notmatch 'contope-santa-luisa') {
     throw 'La portada no contiene una referencia al tema hijo activo.'
 }
 

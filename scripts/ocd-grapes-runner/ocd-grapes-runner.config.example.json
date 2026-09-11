@@ -1,7 +1,0 @@
-{
-  "_comentario": "Copiá este archivo como ocd-grapes-runner.config.json y completá tus datos. Ese archivo queda solo en tu máquina — está en .gitignore y nunca se sube al repositorio ni pasa por el chat.",
-  "_comoObtenerLaClave": "En wp-admin: Usuarios → tu perfil → 'Contraseñas de aplicación' → crear una nueva (nombre sugerido: 'Grapes runner'). WordPress te muestra la clave UNA sola vez; copiala acá. No es tu contraseña normal, y podés revocarla cuando quieras desde ese mismo lugar.",
-  "siteUrl": "https://santaluisadepalpi.kpispublicitarios.com",
-  "username": "tu-usuario-de-wordpress",
-  "applicationPassword": "xxxx xxxx xxxx xxxx xxxx xxxx"
-}

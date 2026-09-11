@@ -1,6 +1,6 @@
 # Formato de importación v0
 
-Este contrato es deliberadamente pequeño. Sirve para validar el recorrido Open CoDesign → Gutenberg y no pretende ser un lenguaje universal de interfaz.
+Este contrato es deliberadamente pequeño. Sirve para validar el recorrido ContOpe Design → Gutenberg y no pretende ser un lenguaje universal de interfaz.
 
 ## Documento
 
@@ -38,4 +38,4 @@ Los nodos desconocidos invalidan la importación. Esta decisión evita pérdidas
 
 ## Autoridad
 
-La importación inicial crea borradores. Una reimportación futura deberá diferenciar estructura controlada por Open CoDesign y contenido editorial controlado por WordPress; esa política todavía no forma parte de v0.
+La importación inicial crea borradores. Una reimportación futura deberá diferenciar estructura controlada por ContOpe Design y contenido editorial controlado por WordPress; esa política todavía no forma parte de v0.

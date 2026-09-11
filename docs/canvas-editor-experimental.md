@@ -1,4 +1,4 @@
-# Open CoDesign Canvas (Experimental) — slice vertical del editor
+# ContOpe Canvas (Experimental) — slice vertical del editor
 
 Pantalla de administración aislada que edita **un** documento experimental con
 GrapesJS y lo persiste en WordPress. No es un page builder: no publica páginas,
@@ -6,13 +6,13 @@ no genera bloques Gutenberg y no interviene en el importador de paquetes.
 
 ## Qué hace
 
-1. Registra `Herramientas → Open CoDesign Canvas (Experimental)` con capacidad
+1. Registra `Herramientas → ContOpe Canvas (Experimental)` con capacidad
    `manage_options`.
-2. Carga GrapesJS **0.23.4** desde `open-codesign-publisher/assets/vendor/grapesjs`
+2. Carga GrapesJS **0.23.4** desde `contope-publisher/assets/vendor/grapesjs`
    con `plugins_url()`. Sin CDN y sin ninguna petición de red.
 3. Acepta HTML y CSS pegados o cargados desde archivo (lectura en el navegador,
    nunca subida) y los vuelca en el lienzo.
-4. Permite editar el lienzo con el conjunto mínimo de bloques `Open CoDesign`
+4. Permite editar el lienzo con el conjunto mínimo de bloques `ContOpe Design`
    (sección, dos columnas, título, párrafo, imagen, botón).
 5. Lee estilos efectivos desde el iframe del lienzo y muestra su procedencia
    (selector y variables CSS). Los cambios pueden aplicarse sólo al elemento o
@@ -31,7 +31,7 @@ no genera bloques Gutenberg y no interviene en el importador de paquetes.
 9. Exporta HTML autosuficiente —CSS y runtime declarativo incluidos— o CSS por
    separado desde el navegador.
 10. Resuelve referencias locales `file://` y `assets/` contra el árbol administrado
-    `wp-content/uploads/open-codesign`, usando nombre normalizado y sin exponer
+    `wp-content/uploads/contope`, usando nombre normalizado y sin exponer
     rutas arbitrarias del servidor.
 11. `Publicar/actualizar página` guarda primero el Canvas y crea o actualiza una
     página WordPress identificada por el ID estable del documento. La página usa
@@ -41,7 +41,7 @@ no genera bloques Gutenberg y no interviene en el importador de paquetes.
 
 GrapesJS no conserva necesariamente toda declaración que todavía no comprende;
 por ejemplo, puede normalizar o descartar un `border-radius` expresado mediante
-`var()`. Por eso `_ocd_canvas_css` contiene dos capas delimitadas por
+`var()`. Por eso `_cod_canvas_css` contiene dos capas delimitadas por
 `OCD-CANVAS-EDITABLE-OVERRIDES`:
 
 1. CSS fuente preservado literalmente, que sigue siendo la autoridad visual.
@@ -55,14 +55,14 @@ Así el inspector ve los valores reales y una reapertura no degrada el diseño.
 
 | Concepto | Valor |
 | --- | --- |
-| Post type | `ocd_canvas_doc` (privado: `public`, `publicly_queryable`, `show_ui` y `show_in_rest` en `false`) |
-| ID estable del documento | `ocd-canvas-experimental-0001` |
-| Meta de identidad | `_ocd_canvas_document_id` |
-| Datos estructurados | `_ocd_canvas_project_data` (JSON canónico del `projectData` de GrapesJS) |
-| HTML | `_ocd_canvas_html` |
-| CSS | `_ocd_canvas_css` |
-| Revisión | `_ocd_canvas_revision` (entero monótono) |
-| Marca temporal | `_ocd_canvas_updated_at` (ISO-8601 UTC) |
+| Post type | `cod_canvas_doc` (privado: `public`, `publicly_queryable`, `show_ui` y `show_in_rest` en `false`) |
+| ID estable del documento | `cod-canvas-experimental-0001` |
+| Meta de identidad | `_cod_canvas_document_id` |
+| Datos estructurados | `_cod_canvas_project_data` (JSON canónico del `projectData` de GrapesJS) |
+| HTML | `_cod_canvas_html` |
+| CSS | `_cod_canvas_css` |
+| Revisión | `_cod_canvas_revision` (entero monótono) |
+| Marca temporal | `_cod_canvas_updated_at` (ISO-8601 UTC) |
 
 El documento se localiza **siempre** por su ID estable mediante `meta_query`,
 nunca por slug ni por el ID numérico del post, que es un detalle interno de cada
@@ -74,7 +74,7 @@ CSS no se mezcla con el HTML.
 
 - **Capacidad**: `manage_options` en el registro del menú, en el render, en el
   encolado de assets y como primera sentencia de cada endpoint AJAX.
-- **Nonce**: acción `ocd_canvas_editor`, emitida con `wp_create_nonce()` y
+- **Nonce**: acción `cod_canvas_editor`, emitida con `wp_create_nonce()` y
   verificada con `check_ajax_referer()` justo después de la capacidad.
 - **Metas**: registradas con `auth_callback` que exige `manage_options` y con
   `show_in_rest => false`.
@@ -110,7 +110,7 @@ el navegador: es un detalle de la herramienta de edición, no del formato.
 GrapesJS 0.23.4, licencia **BSD-3-Clause**. `grapes.min.js` (1 150 929 bytes) y
 `grapes.min.css` (61 053 bytes), con SHA-256 documentados y verificados por
 `npm run check`. Detalle completo en
-`open-codesign-publisher/assets/vendor/grapesjs/README.md`.
+`contope-publisher/assets/vendor/grapesjs/README.md`.
 
 ## Verificación
 
@@ -132,7 +132,7 @@ con enlace resultante.
 - Es un **slice vertical**, no un page builder: un único documento, sin lista de
   documentos, sin publicación a páginas y sin bloques Gutenberg.
 - No hay subida de imágenes: el gestor de activos de GrapesJS está sin `upload`.
-  El resolver reutiliza activos ya existentes bajo `uploads/open-codesign`; un
+  El resolver reutiliza activos ya existentes bajo `uploads/contope`; un
   activo nuevo todavía debe subirse previamente a ese árbol administrado.
 - Los límites de saneamiento (2 MB + 512 kB + 4 MB) son mayores que el
   `post_max_size` habitual de PHP (8 MB) una vez aplicada la codificación

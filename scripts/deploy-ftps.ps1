@@ -4,11 +4,11 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $repoRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
-$pluginRoot = Join-Path $repoRoot 'open-codesign-publisher'
+$pluginRoot = Join-Path $repoRoot 'contope-publisher'
 $pluginRootPrefix = $pluginRoot.TrimEnd('\') + '\'
 $envFile = Join-Path $repoRoot '.env.local'
 $expectedRemoteRoot = '/wp-content/plugins/'
-$pluginSlug = 'open-codesign-publisher'
+$pluginSlug = 'contope-publisher'
 
 function Read-DotEnv([string]$path) {
     if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
@@ -28,11 +28,11 @@ function New-FtpRequest([string]$uri, [string]$method, [hashtable]$config) {
     $request = [System.Net.FtpWebRequest]::Create([Uri]::new($uri))
     $request.Method = $method
     $request.Credentials = [System.Net.NetworkCredential]::new(
-        $config['OCD_FTP_USERNAME'],
-        $config['OCD_FTP_PASSWORD']
+        $config['COD_FTP_USERNAME'],
+        $config['COD_FTP_PASSWORD']
     )
-    $request.EnableSsl = $config['OCD_FTP_TLS'].Trim().ToLowerInvariant() -eq 'true'
-    $request.UsePassive = $config['OCD_FTP_PASSIVE'].Trim().ToLowerInvariant() -ne 'false'
+    $request.EnableSsl = $config['COD_FTP_TLS'].Trim().ToLowerInvariant() -eq 'true'
+    $request.UsePassive = $config['COD_FTP_PASSIVE'].Trim().ToLowerInvariant() -ne 'false'
     $request.UseBinary = $true
     $request.KeepAlive = $false
     $request.Timeout = 30000
@@ -40,8 +40,8 @@ function New-FtpRequest([string]$uri, [string]$method, [hashtable]$config) {
 }
 
 function Remote-Uri([hashtable]$config, [string]$path) {
-    $hostName = $config['OCD_FTP_HOST'].Trim() -replace '^ftps?://', '' -replace '/.*$', ''
-    $port = if ($config['OCD_FTP_PORT'] -match '^\d+$') { [int]$config['OCD_FTP_PORT'] } else { 21 }
+    $hostName = $config['COD_FTP_HOST'].Trim() -replace '^ftps?://', '' -replace '/.*$', ''
+    $port = if ($config['COD_FTP_PORT'] -match '^\d+$') { [int]$config['COD_FTP_PORT'] } else { 21 }
     $normalized = '/' + $path.Trim().TrimStart('/')
     return 'ftp://{0}:{1}{2}' -f $hostName, $port, $normalized
 }
@@ -75,13 +75,13 @@ function Remote-FileSize([hashtable]$config, [string]$remotePath) {
 }
 
 $config = Read-DotEnv $envFile
-$required = @('OCD_FTP_HOST', 'OCD_FTP_USERNAME', 'OCD_FTP_PASSWORD', 'OCD_FTP_REMOTE_PATH')
+$required = @('COD_FTP_HOST', 'COD_FTP_USERNAME', 'COD_FTP_PASSWORD', 'COD_FTP_REMOTE_PATH')
 $missing = @($required | Where-Object {
     -not $config.ContainsKey($_) -or [string]::IsNullOrWhiteSpace($config[$_])
 })
 if ($missing.Count -gt 0) { throw "Faltan variables locales: $($missing -join ', ')" }
 
-$remoteRoot = '/' + $config['OCD_FTP_REMOTE_PATH'].Trim().Trim('/') + '/'
+$remoteRoot = '/' + $config['COD_FTP_REMOTE_PATH'].Trim().Trim('/') + '/'
 if ($remoteRoot -ne $expectedRemoteRoot) {
     throw "Ruta remota rechazada: $remoteRoot. Se esperaba exactamente $expectedRemoteRoot"
 }
@@ -91,7 +91,7 @@ if (-not (Test-Path -LiteralPath $pluginRoot -PathType Container)) {
 
 $files = @(Get-ChildItem -LiteralPath $pluginRoot -Recurse -File | Sort-Object FullName)
 if ($files.Count -eq 0) { throw 'El plugin local no contiene archivos.' }
-$allowedRuntimePath = '^(open-codesign-publisher\.php|includes/[^/]+\.php|templates/[^/]+\.php|tools/[^/]+.mjs|blocks/[^/]+/[^/]+\.(php|json|js|css)|assets/(css|js)/[^/]+\.(css|js)|assets/img/[^/]+\.(svg|png|jpg|jpeg|webp)|assets/vendor/grapesjs/(grapes\.min\.(css|js)|LICENSE|README\.md))$'
+$allowedRuntimePath = '^(contope-publisher\.php|includes/[^/]+\.php|templates/[^/]+\.php|tools/[^/]+.mjs|blocks/[^/]+/[^/]+\.(php|json|js|css)|assets/(css|js)/[^/]+\.(css|js)|assets/img/[^/]+\.(svg|png|jpg|jpeg|webp)|assets/vendor/grapesjs/(grapes\.min\.(css|js)|LICENSE|README\.md))$'
 $unexpected = @($files | Where-Object {
     $relative = $_.FullName.Substring($pluginRootPrefix.Length).Replace('\', '/')
     $relative -notmatch $allowedRuntimePath

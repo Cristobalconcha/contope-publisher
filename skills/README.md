@@ -40,4 +40,4 @@ edítalo acá y vuelve a correrlo.
 |---|---|
 | `node scripts/auditar-abreviadas.mjs` | Lista los estilos que desaparecieron sin que nadie lo viera. |
 | `node scripts/revisar-php.mjs` | Sintaxis de todos los PHP del plugin, sin PHP instalado. |
-| `--dry-run` en `ocd-grapes-runner` | Simula la edición y deja el resultado completo para revisar. |
+| `--dry-run` en `cod-grapes-runner` | Simula la edición y deja el resultado completo para revisar. |

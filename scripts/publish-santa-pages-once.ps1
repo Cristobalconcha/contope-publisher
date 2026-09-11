@@ -8,8 +8,8 @@ $envFile = Join-Path $repoRoot '.env.local'
 $expectedPluginRoot = '/wp-content/plugins/'
 $expectedThemeRoot = '/wp-content/themes/'
 $remoteMuPluginDirectory = '/wp-content/mu-plugins'
-$remoteHelperPath = "$remoteMuPluginDirectory/ocd-one-time-santa-publish.php"
-$routePath = '/wp-json/open-codesign/v1/one-time-santa-publish'
+$remoteHelperPath = "$remoteMuPluginDirectory/cod-one-time-santa-publish.php"
+$routePath = '/wp-json/contope/v1/one-time-santa-publish'
 
 function Read-DotEnv([string]$path) {
     if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
@@ -30,11 +30,11 @@ function New-FtpRequest([string]$uri, [string]$method, [hashtable]$config) {
     $request = [System.Net.FtpWebRequest]::Create([Uri]::new($uri))
     $request.Method = $method
     $request.Credentials = [System.Net.NetworkCredential]::new(
-        $config['OCD_FTP_USERNAME'],
-        $config['OCD_FTP_PASSWORD']
+        $config['COD_FTP_USERNAME'],
+        $config['COD_FTP_PASSWORD']
     )
-    $request.EnableSsl = $config['OCD_FTP_TLS'].Trim().ToLowerInvariant() -eq 'true'
-    $request.UsePassive = $config['OCD_FTP_PASSIVE'].Trim().ToLowerInvariant() -ne 'false'
+    $request.EnableSsl = $config['COD_FTP_TLS'].Trim().ToLowerInvariant() -eq 'true'
+    $request.UsePassive = $config['COD_FTP_PASSIVE'].Trim().ToLowerInvariant() -ne 'false'
     $request.UseBinary = $true
     $request.KeepAlive = $false
     $request.Timeout = 30000
@@ -42,8 +42,8 @@ function New-FtpRequest([string]$uri, [string]$method, [hashtable]$config) {
 }
 
 function Remote-Uri([hashtable]$config, [string]$path) {
-    $hostName = $config['OCD_FTP_HOST'].Trim() -replace '^ftps?://', '' -replace '/.*$', ''
-    $port = if ($config['OCD_FTP_PORT'] -match '^\d+$') { [int]$config['OCD_FTP_PORT'] } else { 21 }
+    $hostName = $config['COD_FTP_HOST'].Trim() -replace '^ftps?://', '' -replace '/.*$', ''
+    $port = if ($config['COD_FTP_PORT'] -match '^\d+$') { [int]$config['COD_FTP_PORT'] } else { 21 }
     $normalized = '/' + $path.Trim().TrimStart('/')
     return 'ftp://{0}:{1}{2}' -f $hostName, $port, $normalized
 }
@@ -92,20 +92,20 @@ function Remove-RemoteFile([hashtable]$config, [string]$remotePath) {
 }
 
 $config = Read-DotEnv $envFile
-$required = @('OCD_WP_URL', 'OCD_FTP_HOST', 'OCD_FTP_USERNAME', 'OCD_FTP_PASSWORD', 'OCD_FTP_REMOTE_PATH')
+$required = @('COD_WP_URL', 'COD_FTP_HOST', 'COD_FTP_USERNAME', 'COD_FTP_PASSWORD', 'COD_FTP_REMOTE_PATH')
 $missing = @($required | Where-Object {
     -not $config.ContainsKey($_) -or [string]::IsNullOrWhiteSpace($config[$_])
 })
 if ($missing.Count -gt 0) { throw "Faltan variables locales: $($missing -join ', ')" }
 
-$configuredRoot = '/' + $config['OCD_FTP_REMOTE_PATH'].Trim().Trim('/') + '/'
+$configuredRoot = '/' + $config['COD_FTP_REMOTE_PATH'].Trim().Trim('/') + '/'
 if ($configuredRoot -notin @($expectedPluginRoot, $expectedThemeRoot)) {
     throw "Ruta base rechazada. Se esperaba exactamente $expectedPluginRoot o $expectedThemeRoot"
 }
 
-$siteUrl = $config['OCD_WP_URL'].Trim().TrimEnd('/')
+$siteUrl = $config['COD_WP_URL'].Trim().TrimEnd('/')
 if ($siteUrl -notmatch '^https://[^/]+$') {
-    throw 'OCD_WP_URL debe ser el origen HTTPS del sitio, sin ruta adicional.'
+    throw 'COD_WP_URL debe ser el origen HTTPS del sitio, sin ruta adicional.'
 }
 
 Write-Output "Modo: $(if ($Apply) { 'APLICAR' } else { 'SIMULACION' })"
@@ -136,13 +136,13 @@ if (!defined('ABSPATH')) {
 }
 
 add_action('rest_api_init', static function (): void {
-    register_rest_route('open-codesign/v1', '/one-time-santa-publish', array(
+    register_rest_route('contope/v1', '/one-time-santa-publish', array(
         'methods' => WP_REST_Server::CREATABLE,
         'permission_callback' => '__return_true',
         'callback' => static function (WP_REST_Request $request) {
-            $provided = $request->get_header('x-ocd-one-time-token');
+            $provided = $request->get_header('x-cod-one-time-token');
             if (!is_string($provided) || !hash_equals('__TOKEN__', $provided)) {
-                return new WP_Error('ocd_forbidden', 'Token invalido.', array('status' => 403));
+                return new WP_Error('cod_forbidden', 'Token invalido.', array('status' => 403));
             }
 
             $expected = array(
@@ -156,20 +156,20 @@ add_action('rest_api_init', static function (): void {
                 'posts_per_page' => -1,
                 'orderby' => 'ID',
                 'order' => 'DESC',
-                'meta_key' => '_ocd_project_id',
+                'meta_key' => '_cod_project_id',
                 'meta_value' => 'santa-luisa-de-palpi-real',
             ));
 
             $selected = array();
             foreach ($expected as $page_key => $slug) {
                 foreach ($posts as $post) {
-                    if (get_post_meta($post->ID, '_ocd_page_id', true) === $page_key) {
+                    if (get_post_meta($post->ID, '_cod_page_id', true) === $page_key) {
                         $selected[$page_key] = $post;
                         break;
                     }
                 }
                 if (!isset($selected[$page_key])) {
-                    return new WP_Error('ocd_page_missing', 'Falta una pagina importada requerida: ' . $page_key, array('status' => 409));
+                    return new WP_Error('cod_page_missing', 'Falta una pagina importada requerida: ' . $page_key, array('status' => 409));
                 }
             }
 
@@ -198,7 +198,7 @@ add_action('rest_api_init', static function (): void {
             update_option('show_on_front', 'page');
             update_option('page_on_front', (int) $result['home-real']['id']);
             if (get_option('show_on_front') !== 'page' || (int) get_option('page_on_front') !== (int) $result['home-real']['id']) {
-                return new WP_Error('ocd_front_assignment_failed', 'WordPress no confirmo la portada esperada.', array('status' => 500));
+                return new WP_Error('cod_front_assignment_failed', 'WordPress no confirmo la portada esperada.', array('status' => 500));
             }
 
             return rest_ensure_response(array(
@@ -272,7 +272,7 @@ $checks = @(
 )
 foreach ($check in $checks) {
     $separator = if ($check.Path.Contains('?')) { '&' } else { '?' }
-    $verificationUri = $siteUrl + $check.Path + $separator + 'ocd_verify_content=' + [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+    $verificationUri = $siteUrl + $check.Path + $separator + 'cod_verify_content=' + [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
     $pageResponse = Invoke-WebRequest -UseBasicParsing -Uri $verificationUri -Method Get -TimeoutSec 30
     if ([int]$pageResponse.StatusCode -ne 200) {
         throw "$($check.Name) respondio HTTP $([int]$pageResponse.StatusCode)."

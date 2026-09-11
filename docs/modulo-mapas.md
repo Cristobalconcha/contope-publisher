@@ -114,19 +114,19 @@ Ramer-Douglas-Peucker y genera:
   `<style>` automáticamente.
 - `<out-dir>/<name>.css` — CSS solo, por si preferís pegarlo en el textarea CSS.
 
-El HTML generado ya trae `data-ocd-behavior="geo-map"` y todos los
-`data-ocd-geo-*` (`data-ocd-geo-places`, `data-ocd-geo-categories`,
-`data-ocd-geo-data-bounds`) como JSON válido.
+El HTML generado ya trae `data-cod-behavior="geo-map"` y todos los
+`data-cod-geo-*` (`data-cod-geo-places`, `data-cod-geo-categories`,
+`data-cod-geo-data-bounds`) como JSON válido.
 
 ### 4. Pegar en el editor
 
-1. Abrí **Herramientas → Open CoDesign Canvas (Experimental)**.
+1. Abrí **Herramientas → ContOpe Canvas (Experimental)**.
 2. Abrí el panel **Importar**.
 3. En el textarea **HTML** pegá el contenido de `<name>.fragment.html` (o el
    markup y en **CSS** el contenido de `<name>.css`).
 4. Aplicá la importación y guardá.
 
-El runtime reconoce el nodo por `data-ocd-behavior="geo-map"` y el mapa queda
+El runtime reconoce el nodo por `data-cod-behavior="geo-map"` y el mapa queda
 interactivo: pan por arrastre, zoom con rueda y selector Categoría → Lugar.
 
 ---
@@ -139,8 +139,8 @@ atributos:
 
 ```html
 <g class="lote" data-lote="L-01"
-   data-ocd-parcel-estado="disponible"
-   data-ocd-parcel-valor="145.000.000">
+   data-cod-parcel-estado="disponible"
+   data-cod-parcel-valor="145.000.000">
   <polygon points="60,80 280,80 270,220 70,210" .../>
 </g>
 ```
@@ -148,11 +148,11 @@ atributos:
 Cada lote es un `<g class="lote">` con:
 
 - `data-lote` — identificador visible.
-- `data-ocd-parcel-estado` — `disponible` o `vendido`.
-- `data-ocd-parcel-valor` — texto que muestra el panel al fijar el lote.
+- `data-cod-parcel-estado` — `disponible` o `vendido`.
+- `data-cod-parcel-valor` — texto que muestra el panel al fijar el lote.
 
 El panel, el acento de color y los contadores se referencian por selector en el
-root con `data-ocd-parcel-*`.
+root con `data-cod-parcel-*`.
 
 ---
 
@@ -188,8 +188,8 @@ root con `data-ocd-parcel-*`.
 
 - El runtime busca los nodos por `document.querySelector` desde selectores en el
   root. Si una página lleva más de un `geo-map` (o más de un `parcel-map`), cada
-  instancia necesita IDs únicos en sus atributos `data-ocd-geo-svg`,
-  `data-ocd-geo-panel`, etc. El script ya genera IDs derivados del `name`; si
+  instancia necesita IDs únicos en sus atributos `data-cod-geo-svg`,
+  `data-cod-geo-panel`, etc. El script ya genera IDs derivados del `name`; si
   pegás dos fragmentos, cambiá el `name` y regenerá.
 - El saneador del editor admite `select`/`option` como marcado inerte, pero
   retira `script`, `style`, `form`, `input` y `textarea`. Por eso el CSS va en

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "package": { "id": "urn:ocd:package:00000000-0000-0000-0000-000000000001", "revision": "r1" },
   "project": { "id": "urn:ocd:project:00000000-0000-0000-0000-000000000002", "name": "Negative case base" },
-  "origin": { "producer": "open-codesign-publisher", "producerVersion": "0.1.0" },
+  "origin": { "producer": "contope-publisher", "producerVersion": "0.1.0" },
   "requirements": { "canvas": "0.1.0", "publisher": "0.1.0", "wordpress": "6.5" },
   "entrypoints": { "content": "content/missing.json", "theme": "themes/t/theme.json" },
   "files": [

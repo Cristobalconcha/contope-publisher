@@ -7,7 +7,7 @@
 
 Este documento es la especificación del contenedor `.ocdsite` versión 1 y reemplaza
 a `docs/package-format-v0.md` para el paquete completo. El contrato v0 (nodos del
-recorrido Open CoDesign → Gutenberg) sigue vigente para el documento de
+recorrido ContOpe Design → Gutenberg) sigue vigente para el documento de
 **contenido** que vive dentro de este contenedor.
 
 - Esquema JSON estricto (draft 2020-12): [`../schemas/manifest-v1.schema.json`](../schemas/manifest-v1.schema.json)
@@ -35,7 +35,7 @@ con contenido editorial ni con estado de base de datos.
 
 > Tras la separación del tema padre Canvas, el tema hijo de Santa Luisa sólo
 > aporta `templates/index.html` y las `parts/` del proyecto; `front-page.html` y
-> `page.html` viven en el tema padre `open-codesign-canvas`. El fixture válido
+> `page.html` viven en el tema padre `contope-canvas`. El fixture válido
 > refleja exactamente eso.
 
 ## 2. Contenedor `.ocdsite`
@@ -65,7 +65,7 @@ fiel de este layout para Santa Luisa de Palpi.
 
 ## 3. Manifiesto `manifest.json`
 
-Esquema: `https://open-codesign.org/schemas/package/manifest-v1.schema.json`
+Esquema: `https://contope.org/schemas/package/manifest-v1.schema.json`
 (`$schema` dentro del documento, draft 2020-12).
 
 Campos de primer nivel (todos requeridos salvo `$schema`):
@@ -79,26 +79,26 @@ Campos de primer nivel (todos requeridos salvo `$schema`):
   - `revision` *(cadena)*: revisión inmutable del contenido (timestamp, semver
     u opaco). Permite detectar reimportaciones del mismo paquete.
   - `createdAt` *(fecha-hora, opcional)*.
-- **`project`**: identidad del **proyecto** Open CoDesign al que pertenece el
+- **`project`**: identidad del **proyecto** ContOpe Design al que pertenece el
   paquete. Identidad estable entre revisiones; distinta de la identidad del
   paquete y de la del sitio.
   - `id` *(URN `urn:ocd:project:<opaco>`)*: identificador estable, opaco e
     inmutable del proyecto.
   - `name` *(cadena)*: nombre humano del proyecto.
 - **`origin`**: procedencia.
-  - `producer` *(p. ej. `open-codesign-publisher`)* y `producerVersion`
+  - `producer` *(p. ej. `contope-publisher`)* y `producerVersion`
     *(requeridos)*.
   - `siteId` *(URN `urn:ocd:site:<opaco>`, opcional)*: identificador estable del
     sitio WordPress de origen. Distinto del proyecto.
   - `siteUrl` *(URI absoluta, opcional)* y `exportedAt` *(fecha-hora, opcional)*.
 - **`requirements`**: versiones mínimas requeridas para reconstruir con
   fidelidad. Los tres son requeridos:
-  - `canvas` (Open CoDesign Canvas / tema padre), `publisher` (plugin),
+  - `canvas` (ContOpe Canvas / tema padre), `publisher` (plugin),
     `wordpress` (versión mínima de WordPress). Patrón semver-like.
 - **`entrypoints`**: referencias con nombre hacia el inventario `files[]`.
   - `content` y `theme` requeridos; `wordpressState`, `designModel`,
     `desktopSource` e `idml` opcionales. Los tres últimos son puntos de
-    intercambio con Open CoDesign Desktop (modelo de diseño, fuente de proyecto
+    intercambio con ContOpe Design Desktop (modelo de diseño, fuente de proyecto
     e IDML para *round-trip* de diseño); **no** se exigen en un paquete sólo
     WordPress como el de Santa Luisa.
   - Cada valor **debe** resolverse a un `files[].path` y los valores **deben**

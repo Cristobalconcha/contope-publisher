@@ -2,7 +2,7 @@
  * Prueba headless del split-back del editor en línea (corrección de M3).
  *
  * Sin WordPress: carga el vendor local de GrapesJS 0.23.4 y el IIFE real de
- * `ocd-inline-editor.js` (que expone `window.OCDInlineSplit.build/split`), arma
+ * `cod-inline-editor.js` (que expone `window.OCDInlineSplit.build/split`), arma
  * el compuesto con la MISMA lógica del plugin, edita un texto del Encabezado y
  * otro del Cuerpo vía la API de GrapesJS, corre el split-back y verifica que:
  *
@@ -26,16 +26,16 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const repoRoot = fileURLToPath(new URL('../', import.meta.url));
 const asset = (relative) =>
-  pathToFileURL(path.join(repoRoot, 'open-codesign-publisher', 'assets', relative)).href;
+  pathToFileURL(path.join(repoRoot, 'contope-publisher', 'assets', relative)).href;
 const edge = 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe';
-const temp = mkdtempSync(path.join(tmpdir(), 'ocd-inline-split-'));
+const temp = mkdtempSync(path.join(tmpdir(), 'cod-inline-split-'));
 const fixture = path.join(temp, 'index.html');
 
 // Escenario A: docs con `frames` (forma real de getProjectData) + estilos y
-// assets. El estilo `ocd-shared` es byte-idéntico en header y body.
-const sharedStyle = { selectors: ['ocd-shared'], style: { 'max-width': '1140px' } };
-const headerOnlyStyle = { selectors: ['ocd-header-only'], style: { color: '#111111' } };
-const footerOnlyStyle = { selectors: ['ocd-footer-only'], style: { color: '#222222' } };
+// assets. El estilo `cod-shared` es byte-idéntico en header y body.
+const sharedStyle = { selectors: ['cod-shared'], style: { 'max-width': '1140px' } };
+const headerOnlyStyle = { selectors: ['cod-header-only'], style: { color: '#111111' } };
+const footerOnlyStyle = { selectors: ['cod-footer-only'], style: { color: '#222222' } };
 
 function makeDocFrames(documentId, kind, text, styles, assetSrc) {
   return {
@@ -57,14 +57,14 @@ function makeDocFrames(documentId, kind, text, styles, assetSrc) {
       styles: styles,
     }),
     html: '<p>' + text + '</p>',
-    css: '.ocd-' + kind + '{color:#111}',
+    css: '.cod-' + kind + '{color:#111}',
   };
 }
 
 const docsA = {
-  header: makeDocFrames('ocd-doc-header', 'header', 'ENCABEZADO-ORIGINAL', [sharedStyle, headerOnlyStyle], 'https://example.test/h.png'),
-  body: makeDocFrames('ocd-doc-body', 'body', 'CUERPO-ORIGINAL', [sharedStyle], 'https://example.test/b.png'),
-  footer: makeDocFrames('ocd-doc-footer', 'footer', 'PIE-ORIGINAL', [footerOnlyStyle], 'https://example.test/f.png'),
+  header: makeDocFrames('cod-doc-header', 'header', 'ENCABEZADO-ORIGINAL', [sharedStyle, headerOnlyStyle], 'https://example.test/h.png'),
+  body: makeDocFrames('cod-doc-body', 'body', 'CUERPO-ORIGINAL', [sharedStyle], 'https://example.test/b.png'),
+  footer: makeDocFrames('cod-doc-footer', 'footer', 'PIE-ORIGINAL', [footerOnlyStyle], 'https://example.test/f.png'),
 };
 
 // Escenario B: docs con `pages[0].component` (sin frames), solo contenido.
@@ -83,9 +83,9 @@ function makeDocNoFrames(documentId, text) {
 }
 
 const docsB = {
-  header: makeDocNoFrames('ocd-doc-h-noframes', 'ENCABEZADO-NOFRAMES'),
-  body: makeDocNoFrames('ocd-doc-b-noframes', 'CUERPO-NOFRAMES'),
-  footer: makeDocNoFrames('ocd-doc-f-noframes', 'PIE-NOFRAMES'),
+  header: makeDocNoFrames('cod-doc-h-noframes', 'ENCABEZADO-NOFRAMES'),
+  body: makeDocNoFrames('cod-doc-b-noframes', 'CUERPO-NOFRAMES'),
+  footer: makeDocNoFrames('cod-doc-f-noframes', 'PIE-NOFRAMES'),
 };
 
 // El harness no usa secuencias de escape problemáticas (`\n`), para poder
@@ -97,7 +97,7 @@ const harness = `(function () {
     var models = editor.getWrapper().components().models;
     for (var i = 0; i < models.length; i++) {
       var attr = models[i].getAttributes();
-      if (attr && attr['data-ocd-inline-region'] === kind) {
+      if (attr && attr['data-cod-inline-region'] === kind) {
         return models[i];
       }
     }
@@ -180,15 +180,15 @@ const harness = `(function () {
       footerExcludesEdits: footerProject.indexOf('ENCABEZADO-EDITADO') === -1 && footerProject.indexOf('CUERPO-EDITADO') === -1 && A.footer.html.indexOf('ENCABEZADO-EDITADO') === -1 && A.footer.html.indexOf('CUERPO-EDITADO') === -1,
 
       // Estilos: el compartido queda en AMBOS docs; cada exclusivo solo en el suyo.
-      sharedInHeader: hasSelector(headerProject, 'ocd-shared'),
-      sharedInBody: hasSelector(bodyProject, 'ocd-shared'),
-      sharedNotInFooter: !hasSelector(footerProject, 'ocd-shared'),
-      headerOnlyInHeader: hasSelector(headerProject, 'ocd-header-only'),
-      headerOnlyNotInBody: !hasSelector(bodyProject, 'ocd-header-only'),
-      headerOnlyNotInFooter: !hasSelector(footerProject, 'ocd-header-only'),
-      footerOnlyInFooter: hasSelector(footerProject, 'ocd-footer-only'),
-      footerOnlyNotInHeader: !hasSelector(headerProject, 'ocd-footer-only'),
-      footerOnlyNotInBody: !hasSelector(bodyProject, 'ocd-footer-only'),
+      sharedInHeader: hasSelector(headerProject, 'cod-shared'),
+      sharedInBody: hasSelector(bodyProject, 'cod-shared'),
+      sharedNotInFooter: !hasSelector(footerProject, 'cod-shared'),
+      headerOnlyInHeader: hasSelector(headerProject, 'cod-header-only'),
+      headerOnlyNotInBody: !hasSelector(bodyProject, 'cod-header-only'),
+      headerOnlyNotInFooter: !hasSelector(footerProject, 'cod-header-only'),
+      footerOnlyInFooter: hasSelector(footerProject, 'cod-footer-only'),
+      footerOnlyNotInHeader: !hasSelector(headerProject, 'cod-footer-only'),
+      footerOnlyNotInBody: !hasSelector(bodyProject, 'cod-footer-only'),
       headerStyleCount: selectorNames(headerProject).length === 2,
       bodyStyleCount: selectorNames(bodyProject).length === 1,
       footerStyleCount: selectorNames(footerProject).length === 1,
@@ -228,7 +228,7 @@ const harness = `(function () {
   } catch (error) {
     result.details.error = String(error && error.message) + ' | ' + String(error && error.stack);
   }
-  document.documentElement.setAttribute('data-ocd-split', window.btoa(JSON.stringify(result)));
+  document.documentElement.setAttribute('data-cod-split', window.btoa(JSON.stringify(result)));
 })();`;
 
 const html = `<!doctype html>
@@ -236,7 +236,7 @@ const html = `<!doctype html>
 <body>
 <div id="r"></div><div id="r2"></div><div id="fresh" style="display:none"></div>
 <script src="${asset('vendor/grapesjs/grapes.min.js')}"></script>
-<script src="${asset('js/ocd-inline-editor.js')}"></script>
+<script src="${asset('js/cod-inline-editor.js')}"></script>
 <script>${harness}</script>
 </body></html>`;
 
@@ -257,7 +257,7 @@ try {
   );
   if (result.error) throw result.error;
   const output = result.stdout || '';
-  const match = output.match(/data-ocd-split="([^"]+)"/);
+  const match = output.match(/data-cod-split="([^"]+)"/);
   if (!match) {
     throw new Error('El resultado del split-back no se pudo leer del DOM: ' + (result.stderr || ''));
   }

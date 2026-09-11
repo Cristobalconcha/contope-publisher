@@ -1,0 +1,51 @@
+/*
+Theme Name: ContOpe Canvas
+Description: Motor de tema de bloques genérico de ContOpe Design. Aporta layout, contenedores, columnas, comportamiento responsive y plantillas mínimas reutilizables para temas hijos de proyecto. No contiene identidad de ningún proyecto concreto.
+Version: 0.1.0-dev
+Requires at least: 6.5
+Requires PHP: 8.0
+Text Domain: cod-canvas
+*/
+
+/*
+ * Reglas estructurales reutilizables del motor Canvas.
+ * Los colores concretos se inyectan por variables (--cod-*) que cada tema hijo
+ * define; aquí sólo se usan fallbacks neutros para que el padre funcione solo.
+ */
+
+.wp-site-blocks { min-height: 100vh; }
+
+.cod-site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  border-bottom: 1px solid var(--cod-border-color, rgba(0, 0, 0, 0.12));
+  backdrop-filter: blur(14px);
+}
+
+.cod-main { margin-block-start: 0; }
+.cod-main > .wp-block-post-content { margin-block-start: 0; }
+.cod-main .wp-block-group { padding-block: clamp(2rem, 5vw, 5rem); }
+.cod-main .wp-block-group .wp-block-group { padding-block: 1.25rem; }
+.cod-main .wp-block-columns { gap: clamp(1.25rem, 3vw, 3rem); }
+.cod-main .wp-block-column { min-width: 0; }
+
+.cod-main .wp-block-image img,
+.cod-main .wp-block-video video { width: 100%; }
+
+.cod-main .wp-block-button__link { transition: transform .2s ease, background .2s ease; }
+.cod-main .wp-block-button__link:hover { transform: translateY(-1px); }
+
+.cod-main .wp-block-details {
+  border-bottom: 1px solid var(--cod-border-color, rgba(0, 0, 0, 0.12));
+  padding: 1rem 0;
+}
+.cod-main .wp-block-details summary { cursor: pointer; font-weight: 600; }
+
+.cod-site-footer { border-top: 1px solid var(--cod-border-color, rgba(0, 0, 0, 0.12)); }
+
+@media (max-width: 781px) {
+  .cod-main .wp-block-columns { flex-wrap: wrap !important; }
+  .cod-main .wp-block-column[style] { flex-basis: 100% !important; }
+  .cod-site-header { position: relative; }
+}

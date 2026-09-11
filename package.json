@@ -1,8 +1,8 @@
 {
-  "name": "open-codesign-wordpress",
+  "name": "contope-publisher",
   "version": "0.1.0",
   "private": true,
-  "description": "Development checks for Open CoDesign Publisher",
+  "description": "Development checks for ContOpe Publisher",
   "scripts": {
     "check": "node scripts/check.mjs",
     "check:package": "node scripts/check-package-v1.mjs",

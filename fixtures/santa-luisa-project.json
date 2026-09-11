@@ -9,7 +9,7 @@
       "nodes": [
         {
           "id": "home.hero", "type": "section", "children": [
-            { "id": "home.hero.image", "type": "image", "url": "https://santaluisadepalpi.kpispublicitarios.com/wp-content/uploads/open-codesign/santa-luisa/BannerFamilia.jpg", "alt": "Vista panorámica de Santa Luisa de Palpi" },
+            { "id": "home.hero.image", "type": "image", "url": "https://santaluisadepalpi.kpispublicitarios.com/wp-content/uploads/contope/santa-luisa/BannerFamilia.jpg", "alt": "Vista panorámica de Santa Luisa de Palpi" },
             { "id": "home.hero.label", "type": "paragraph", "content": "<strong>Paine · Región Metropolitana</strong>" },
             { "id": "home.hero.title", "type": "heading", "level": 1, "content": "Santa Luisa de Palpi" },
             { "id": "home.hero.copy", "type": "paragraph", "content": "Parcelas rurales en un entorno privilegiado. Un proyecto pensado para quienes valoran el paisaje, la amplitud y la vida al aire libre." },
@@ -41,7 +41,7 @@
             { "id": "home.parcels.label", "type": "paragraph", "content": "<strong>EL TERRENO</strong>" },
             { "id": "home.parcels.title", "type": "heading", "level": 2, "content": "Plano de parcelas" },
             { "id": "home.parcels.copy", "type": "paragraph", "content": "Seis lotes disponibles desde 5.000 m²." },
-            { "id": "home.parcels.image", "type": "image", "url": "https://santaluisadepalpi.kpispublicitarios.com/wp-content/uploads/open-codesign/santa-luisa/DJI_0174-scaled.jpg", "alt": "Vista aérea del terreno" }
+            { "id": "home.parcels.image", "type": "image", "url": "https://santaluisadepalpi.kpispublicitarios.com/wp-content/uploads/contope/santa-luisa/DJI_0174-scaled.jpg", "alt": "Vista aérea del terreno" }
           ]
         },
         {
@@ -54,7 +54,7 @@
                 { "id": "home.location.list", "type": "list", "items": ["Ruta 5 Sur · Salida Paine", "45 minutos de Santiago", "15 minutos de servicios y colegios", "Acceso pavimentado durante todo el año"] }
               ] },
               { "id": "home.location.visual", "type": "column", "width": "55%", "children": [
-                { "id": "home.location.image", "type": "image", "url": "https://santaluisadepalpi.kpispublicitarios.com/wp-content/uploads/open-codesign/santa-luisa/DJI_0256-scaled.jpg", "alt": "Entorno de Santa Luisa de Palpi" }
+                { "id": "home.location.image", "type": "image", "url": "https://santaluisadepalpi.kpispublicitarios.com/wp-content/uploads/contope/santa-luisa/DJI_0256-scaled.jpg", "alt": "Entorno de Santa Luisa de Palpi" }
               ] }
             ] }
           ]
@@ -62,16 +62,16 @@
         {
           "id": "home.video", "type": "section", "children": [
             { "id": "home.video.title", "type": "heading", "level": 2, "content": "Conoce el entorno" },
-            { "id": "home.video.media", "type": "video", "url": "https://santaluisadepalpi.kpispublicitarios.com/wp-content/uploads/open-codesign/santa-luisa/Simular-drone.mp4", "poster": "https://santaluisadepalpi.kpispublicitarios.com/wp-content/uploads/open-codesign/santa-luisa/drone-aerial-placeholder.png" }
+            { "id": "home.video.media", "type": "video", "url": "https://santaluisadepalpi.kpispublicitarios.com/wp-content/uploads/contope/santa-luisa/Simular-drone.mp4", "poster": "https://santaluisadepalpi.kpispublicitarios.com/wp-content/uploads/contope/santa-luisa/drone-aerial-placeholder.png" }
           ]
         },
         {
           "id": "home.gallery", "type": "section", "children": [
             { "id": "home.gallery.title", "type": "heading", "level": 2, "content": "Santa Luisa de Palpi en imágenes" },
             { "id": "home.gallery.columns", "type": "columns", "children": [
-              { "id": "home.gallery.one", "type": "column", "width": "33.3%", "children": [{ "id": "home.gallery.one.image", "type": "image", "url": "https://santaluisadepalpi.kpispublicitarios.com/wp-content/uploads/open-codesign/santa-luisa/DSCF9680.jpg", "alt": "Paisaje de Santa Luisa de Palpi" }] },
-              { "id": "home.gallery.two", "type": "column", "width": "33.3%", "children": [{ "id": "home.gallery.two.image", "type": "image", "url": "https://santaluisadepalpi.kpispublicitarios.com/wp-content/uploads/open-codesign/santa-luisa/DJI_0256-scaled.jpg", "alt": "Vista aérea del terreno" }] },
-              { "id": "home.gallery.three", "type": "column", "width": "33.4%", "children": [{ "id": "home.gallery.three.image", "type": "image", "url": "https://santaluisadepalpi.kpispublicitarios.com/wp-content/uploads/open-codesign/santa-luisa/DSCF9630.jpg", "alt": "Entorno natural" }] }
+              { "id": "home.gallery.one", "type": "column", "width": "33.3%", "children": [{ "id": "home.gallery.one.image", "type": "image", "url": "https://santaluisadepalpi.kpispublicitarios.com/wp-content/uploads/contope/santa-luisa/DSCF9680.jpg", "alt": "Paisaje de Santa Luisa de Palpi" }] },
+              { "id": "home.gallery.two", "type": "column", "width": "33.3%", "children": [{ "id": "home.gallery.two.image", "type": "image", "url": "https://santaluisadepalpi.kpispublicitarios.com/wp-content/uploads/contope/santa-luisa/DJI_0256-scaled.jpg", "alt": "Vista aérea del terreno" }] },
+              { "id": "home.gallery.three", "type": "column", "width": "33.4%", "children": [{ "id": "home.gallery.three.image", "type": "image", "url": "https://santaluisadepalpi.kpispublicitarios.com/wp-content/uploads/contope/santa-luisa/DSCF9630.jpg", "alt": "Entorno natural" }] }
             ] }
           ]
         },

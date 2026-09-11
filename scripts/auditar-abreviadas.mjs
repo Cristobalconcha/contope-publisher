@@ -32,20 +32,20 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const aqui = path.dirname(fileURLToPath(import.meta.url));
-const dirRunner = path.join(aqui, 'ocd-grapes-runner');
+const dirRunner = path.join(aqui, 'cod-grapes-runner');
 const backups = path.join(dirRunner, 'backups');
-const cfg = JSON.parse(fs.readFileSync(path.join(dirRunner, 'ocd-grapes-runner.config.json'), 'utf8'));
-const ep = cfg.siteUrl.replace(/\/+$/, '') + '/wp-json/open-codesign/v1/mcp';
+const cfg = JSON.parse(fs.readFileSync(path.join(dirRunner, 'cod-grapes-runner.config.json'), 'utf8'));
+const ep = cfg.siteUrl.replace(/\/+$/, '') + '/wp-json/contope/v1/mcp';
 const auth = 'Basic ' + Buffer.from(
   cfg.username + ':' + cfg.applicationPassword.replace(/\s+/g, '')).toString('base64');
 
 const PAGINAS = [
-  { pageId: 43, documentId: 'ocd-canvas-page-7', nombre: 'Inicio' },
-  { pageId: 44, documentId: 'ocd-canvas-page-14', nombre: 'Contacto' },
-  { pageId: 45, documentId: 'ocd-canvas-page-12', nombre: 'Preguntas frecuentes' },
-  { pageId: 46, documentId: 'ocd-canvas-page-10', nombre: 'Diferenciales' },
+  { pageId: 43, documentId: 'cod-canvas-page-7', nombre: 'Inicio' },
+  { pageId: 44, documentId: 'cod-canvas-page-14', nombre: 'Contacto' },
+  { pageId: 45, documentId: 'cod-canvas-page-12', nombre: 'Preguntas frecuentes' },
+  { pageId: 46, documentId: 'cod-canvas-page-10', nombre: 'Diferenciales' },
   // El documento compartido no es una página: su CSS se carga en TODAS.
-  { pageId: 0, documentId: 'ocd-shared-styles', nombre: 'Compartido (todas las páginas)' },
+  { pageId: 0, documentId: 'cod-shared-styles', nombre: 'Compartido (todas las páginas)' },
 ];
 
 /** Las que duelen al perderse: dejan un bloque sin fondo, sin borde o sin color. */
@@ -119,7 +119,7 @@ async function leer(pageId, documentId) {
         headers: { 'Content-Type': 'application/json', Authorization: auth },
         body: JSON.stringify({
           jsonrpc: '2.0', id: i, method: 'tools/call',
-          params: { name: 'ocd_read_canvas_document', arguments: { pageId, documentId } },
+          params: { name: 'cod_read_canvas_document', arguments: { pageId, documentId } },
         }),
       });
       return (await r.json()).result.structuredContent;

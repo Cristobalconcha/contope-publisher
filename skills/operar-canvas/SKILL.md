@@ -1,6 +1,6 @@
 ---
 name: operar-canvas
-description: Operar el page builder de Open CoDesign / Contope Design en WordPress a través de su servidor MCP — crear y editar páginas dentro de la herramienta real, con las reglas que impiden romper el sitio. Usar en cualquier tarea que toque un sitio Canvas (crear una página o sección, cambiar textos, estilos, imágenes, mapas o formularios), antes de escribir nada.
+description: Operar el page builder de ContOpe Design / Contope Design en WordPress a través de su servidor MCP — crear y editar páginas dentro de la herramienta real, con las reglas que impiden romper el sitio. Usar en cualquier tarea que toque un sitio Canvas (crear una página o sección, cambiar textos, estilos, imágenes, mapas o formularios), antes de escribir nada.
 ---
 
 # Operar el page builder
@@ -21,14 +21,14 @@ Nunca arreglar un defecto visual con una búsqueda-y-reemplazo sobre el CSS o el
 
 **1. Composición MCP — para crear.** Se declara un conjunto de reglas de diseño (color, tipografía, espaciado, layout, superficie, forma, media, botón, galería, tabla, formulario, motion, interacción, cadencia, ancla) y un árbol de nodos (section, header, group, heading, image, video, gallery, form…). El servidor lo compila llamando al motor real.
 
-Circuito: consultar capacidades y páginas → si la página ya existe, `ocd_read_canvas_composition` y **modificar solo lo que corresponde, conservando el resto** → `ocd_preview_canvas_composition` → `ocd_apply_canvas_composition` con el `previewId` exacto → revisar → `ocd_publish_canvas_page`.
+Circuito: consultar capacidades y páginas → si la página ya existe, `cod_read_canvas_composition` y **modificar solo lo que corresponde, conservando el resto** → `cod_preview_canvas_composition` → `cod_apply_canvas_composition` con el `previewId` exacto → revisar → `cod_publish_canvas_page`.
 
-Ojo: si `ocd_read_canvas_composition` responde `found:false`, esa página se armó a mano en el editor y **una composición nueva reemplazaría todo su contenido**. En ese caso se usa la vía 2.
+Ojo: si `cod_read_canvas_composition` responde `found:false`, esa página se armó a mano en el editor y **una composición nueva reemplazaría todo su contenido**. En ese caso se usa la vía 2.
 
-**2. Puente headless (`ocd-grapes-runner`) — para editar lo que ya existe.** Corre el motor real de GrapesJS fuera del servidor, sobre el documento vivo. Es la vía para cambiar un texto, un atributo, una imagen o un estilo de una página existente sin tocar el resto.
+**2. Puente headless (`cod-grapes-runner`) — para editar lo que ya existe.** Corre el motor real de GrapesJS fuera del servidor, sobre el documento vivo. Es la vía para cambiar un texto, un atributo, una imagen o un estilo de una página existente sin tocar el resto.
 
 ```
-node scripts/ocd-grapes-runner/ocd-grapes-runner.mjs \
+node scripts/cod-grapes-runner/cod-grapes-runner.mjs \
   --page <id> --document <documento> --selector "<css>" \
   [--set-content "texto" | --set-content-file archivo] \
   [--attributes '{...}' | --attributes-file archivo] \
@@ -40,39 +40,39 @@ node scripts/ocd-grapes-runner/ocd-grapes-runner.mjs \
 
 **Siempre `--dry-run` primero** en cualquier cambio grande, y revisar el archivo de simulación que deja en `backups/`.
 
-## El CSS compartido entre páginas (`ocd-shared-styles`)
+## El CSS compartido entre páginas (`cod-shared-styles`)
 
 Hasta el 2026-09-09 cada página guardaba su CSS por separado, sin ninguna capa
-común — copiar una clase reutilizable como `.ocd-btn` a cada documento a mano
+común — copiar una clase reutilizable como `.cod-btn` a cada documento a mano
 era el único camino, y eso fue lo que rompió el sistema de botones: quedó
 definido en una página y ausente en las otras tres. Cristóbal lo señaló
 explícitamente: **"no podemos trabajar como si la web fueran compartimientos
 estancos"** — no es una advertencia a recordar, es un defecto de arquitectura
 que había que corregir en el propio Page Builder, y ya está corregido.
 
-Existe un documento especial, `ocd-shared-styles`, cuyo CSS se carga en la
+Existe un documento especial, `cod-shared-styles`, cuyo CSS se carga en la
 cabecera de **todas** las páginas, antes del CSS propio de cada una. No
 corresponde a ninguna página real: se edita con las mismas herramientas que
 cualquier documento, usando `--page 0`:
 
 ```
-node scripts/ocd-grapes-runner/ocd-grapes-runner.mjs \
-  --page 0 --document ocd-shared-styles --build receta.json
+node scripts/cod-grapes-runner/cod-grapes-runner.mjs \
+  --page 0 --document cod-shared-styles --build receta.json
 ```
 
 **Cuándo va ahí y cuándo va en la página:**
 - Una clase que un elemento pueda tener en **más de una página** — el sistema
-  de botones (`.ocd-btn`, `.ocd-btn--primario`), un componente compartido —
-  va en `ocd-shared-styles`. Una sola fuente, nunca copiada.
+  de botones (`.cod-btn`, `.cod-btn--primario`), un componente compartido —
+  va en `cod-shared-styles`. Una sola fuente, nunca copiada.
 - Un estilo propio de una sección de una sola página (el layout del hero, el
   fondo de una sección puntual) sigue en el documento de esa página.
 
 Antes de escribir una clase nueva de uso general, revisar si ya existe en
-`ocd-shared-styles` con `inventariar-regla.mjs` — evita crear una segunda
+`cod-shared-styles` con `inventariar-regla.mjs` — evita crear una segunda
 copia divergente de lo mismo.
 
 **Para quitar una regla que ya se migró** (la copia de página que sobra una
-vez que la clase vive en `ocd-shared-styles`): `--build` con
+vez que la clase vive en `cod-shared-styles`): `--build` con
 `{selector, remove:true}`, por la API real de Grapes (`Css.getRule` +
 `Css.remove`), nunca editando el CSS como texto.
 
@@ -145,7 +145,7 @@ una herramienta de producción, y el panel de control — donde ya se ajusta
 forma, color y estilo — debía poder editar el **contenido** también, no solo
 la presentación.
 
-Desde 0.2.88 el panel de control (`ocd-computed-inspector.js`) tiene una
+Desde 0.2.88 el panel de control (`cod-computed-inspector.js`) tiene una
 sección **"Contenido de texto"** que aparece cuando el elemento seleccionado
 es una hoja de texto simple (un botón, un enlace, un título, un párrafo — sin
 componentes hijos propios adentro). Escribe con normalidad ahí; Enter o clic
@@ -170,7 +170,7 @@ Vale para `background`, `border`, `font`, `margin`, `padding`. Siempre en forma 
 
 **Una regla se reemplaza entera.** `Css.setRule` no fusiona: reparar una declaración borra las demás. Hay que leer el cuerpo actual y devolverlo completo con el cambio.
 
-**El runtime está duplicado.** `ocd-canvas-public.js` (página publicada) y `ocd-behaviors.js` (editor, más una copia serializada adentro). Un cambio de comportamiento se aplica en **las tres** o el editor y el sitio se comportan distinto.
+**El runtime está duplicado.** `cod-canvas-public.js` (página publicada) y `cod-behaviors.js` (editor, más una copia serializada adentro). Un cambio de comportamiento se aplica en **las tres** o el editor y el sitio se comportan distinto.
 
 **Los identificadores numéricos no son portables.** El id de página cambia en cada instalación; solo el `document_id` y la meta viajan.
 
@@ -182,7 +182,7 @@ Vale para `background`, `border`, `font`, `margin`, `padding`. Siempre en forma 
 
 **La conexión se corta sola con documentos cercanos al mega.** No es un límite del servidor: el mismo pedido funciona al segundo intento. El runner ya reintenta cuatro veces; cualquier cliente nuevo debe hacerlo igual. Reintentar un guardado es seguro porque el número de revisión rechaza el duplicado.
 
-**Al desplegar, subir la versión del plugin.** En el encabezado y en `OCD_PUBLISHER_VERSION`, los dos. WordPress usa ese número para refrescar los archivos en el navegador: con el mismo número, el visitante sigue viendo el código viejo. Empaquetar con `empaquetar-plugin.ps1`, nunca con `Compress-Archive`.
+**Al desplegar, subir la versión del plugin.** En el encabezado y en `COD_PUBLISHER_VERSION`, los dos. WordPress usa ese número para refrescar los archivos en el navegador: con el mismo número, el visitante sigue viendo el código viejo. Empaquetar con `empaquetar-plugin.ps1`, nunca con `Compress-Archive`.
 
 ## Verificar
 
@@ -201,10 +201,10 @@ El runner ya informa por su cuenta si perdió reglas de estilo, si desapareciero
 
 ## Lo que todavía no es alcanzable
 
-`ocd_get_capabilities` lo dice al día en `existingButNotCallableYet`. Hoy: colecciones dinámicas con consulta remota, los mapas geográfico y de lotes (existen como bloque y runtime, falta contrato para sus datos), el encogimiento del banner al hacer scroll, los embeds externos y el estilo de un campo concreto de formulario.
+`cod_get_capabilities` lo dice al día en `existingButNotCallableYet`. Hoy: colecciones dinámicas con consulta remota, los mapas geográfico y de lotes (existen como bloque y runtime, falta contrato para sus datos), el encogimiento del banner al hacer scroll, los embeds externos y el estilo de un campo concreto de formulario.
 
 Si la tarea cae ahí, **decirlo** y decidir con Cristóbal: hacerlo alcanzable de verdad, o autorizar explícitamente un parche temporal y anotarlo como deuda. Nunca elegir el parche por cuenta propia.
 
 ## Configuración
 
-`scripts/ocd-grapes-runner/ocd-grapes-runner.config.json` guarda `siteUrl`, `username` y `applicationPassword` (contraseña de aplicación de WordPress, no la del usuario). El servidor MCP se llama `santaluisa-wordpress` en esta instalación; el endpoint es `<sitio>/wp-json/open-codesign/v1/mcp`.
+`scripts/cod-grapes-runner/cod-grapes-runner.config.json` guarda `siteUrl`, `username` y `applicationPassword` (contraseña de aplicación de WordPress, no la del usuario). El servidor MCP se llama `santaluisa-wordpress` en esta instalación; el endpoint es `<sitio>/wp-json/contope/v1/mcp`.

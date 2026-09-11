@@ -98,7 +98,7 @@ function archivosPhp(dir) {
   return salida;
 }
 
-const raiz = process.argv[2] || path.join(process.cwd(), 'open-codesign-publisher');
+const raiz = process.argv[2] || path.join(process.cwd(), 'contope-publisher');
 const archivos = archivosPhp(raiz);
 let conProblemas = 0;
 for (const archivo of archivos) {

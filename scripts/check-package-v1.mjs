@@ -32,7 +32,7 @@ import path from 'node:path';
 import Ajv2020 from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 
-export const EXPECTED_ID = 'https://open-codesign.org/schemas/package/manifest-v1.schema.json';
+export const EXPECTED_ID = 'https://contope.org/schemas/package/manifest-v1.schema.json';
 
 // Ordered so that reference resolution diagnostics are stable.
 export const ENTRY_KEYS = ['content', 'theme', 'wordpressState', 'designModel', 'desktopSource', 'idml'];

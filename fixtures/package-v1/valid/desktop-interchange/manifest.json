@@ -1,5 +1,5 @@
 {
-  "$schema": "https://open-codesign.org/schemas/package/manifest-v1.schema.json",
+  "$schema": "https://contope.org/schemas/package/manifest-v1.schema.json",
   "formatVersion": 1,
   "package": {
     "id": "urn:ocd:package:11111111-0000-0000-0000-000000000001",
@@ -8,13 +8,13 @@
   },
   "project": {
     "id": "urn:ocd:project:22222222-0000-0000-0000-000000000002",
-    "name": "Open CoDesign desktop interchange sample"
+    "name": "ContOpe Design desktop interchange sample"
   },
   "origin": {
-    "producer": "open-codesign-desktop",
+    "producer": "contope-desktop",
     "producerVersion": "0.1.0",
     "siteId": "urn:ocd:site:33333333-0000-0000-0000-000000000003",
-    "siteUrl": "https://desktop.open-codesign.org",
+    "siteUrl": "https://desktop.contope.org",
     "exportedAt": "2026-08-03T03:00:00Z"
   },
   "requirements": { "canvas": "0.1.0", "publisher": "0.1.0", "wordpress": "6.5" },
