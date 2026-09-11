@@ -1,0 +1,20 @@
+{
+  "_nota": "La rosa estaba a 48px del borde del marco, que es la zona de encabezado: en el mapa de ubicación cae encima del texto de cómo llegar. 250px la deja dentro del área del mapa en las dos secciones y en todos los anchos: medido de 960 a 2200 px, el mapa del plano empieza entre 209 y 241, el de ubicación entre 171 y 202, y el encabezado más alto termina en 204. La regla de pantallas angostas no se toca.",
+  "mode": "append",
+  "styles": [
+    {
+      "selector": ".plano-frame__compass",
+      "style": {
+        "position": "absolute",
+        "top": "250px",
+        "right": "48px",
+        "bottom": "auto",
+        "left": "auto",
+        "width": "64px",
+        "aspect-ratio": "1 / 1",
+        "opacity": "0.82"
+      }
+    }
+  ],
+  "structure": []
+}

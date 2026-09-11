@@ -1,0 +1,22 @@
+{
+  "_nota": "El fondo (.faq-cover__bg) va con inset:0 sobre el marco, así que crecía y se encogía con él al abrir preguntas. Se le da al marco una altura mínima igual a la de la pregunta más alta, de modo que el marco —y con él el fondo y la foto— mide siempre lo mismo, y lo único que cambia es el alto del recuadro de preguntas por dentro. Medido pregunta por pregunta: la más alta es siempre la segunda, y necesita 1332 px desde 1200 de ancho, 1394 a 1024 y 1563 a 900, porque el texto se reparte en más líneas al angostar. Por eso van tres tramos que no se pisan, en vez de un solo valor que estiraría de más las pantallas grandes. Es min-height y no height: si algún día se agrega una respuesta más larga, el marco crece en vez de recortarla. El alto de más no deja hueco: el fondo es una foto con object-fit:cover, así que simplemente se ve más foto.",
+  "mode": "append",
+  "styles": [
+    {
+      "selector": ".faq-section__frame",
+      "media": "(min-width: 900px) and (max-width: 1023px)",
+      "style": { "min-height": "1570px" }
+    },
+    {
+      "selector": ".faq-section__frame",
+      "media": "(min-width: 1024px) and (max-width: 1199px)",
+      "style": { "min-height": "1400px" }
+    },
+    {
+      "selector": ".faq-section__frame",
+      "media": "(min-width: 1200px)",
+      "style": { "min-height": "1345px" }
+    }
+  ],
+  "structure": []
+}

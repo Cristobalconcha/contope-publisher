@@ -1,0 +1,30 @@
+{
+  "_nota": "La foto baja 50 px mas (bottom -105 a -155) para que el corte de la imagen quede tapado por la barra del pie en vez de verse. Para que quede DEBAJO del pie y no encima hace falta la segunda regla: el marco del bloque es position:relative con z-index:1, asi que se pinta por encima de todo lo que venga despues sin z-index, y el pie es estatico. Dandole al pie position:relative y z-index 5 recupera la prioridad y tapa los pies. La regla vive en el documento de esta pagina, asi que no afecta a las demas.",
+  "mode": "append",
+  "styles": [
+    {
+      "selector": ".faq-cover__person",
+      "media": "(min-width: 900px)",
+      "style": {
+        "display": "block",
+        "position": "absolute",
+        "right": "130px",
+        "top": "auto",
+        "bottom": "-155px",
+        "width": "25%",
+        "height": "auto",
+        "z-index": "3",
+        "clip-path": "inset(0px 0px 9%)"
+      }
+    },
+    {
+      "selector": "footer",
+      "media": "(min-width: 900px)",
+      "style": {
+        "position": "relative",
+        "z-index": "5"
+      }
+    }
+  ],
+  "structure": []
+}
