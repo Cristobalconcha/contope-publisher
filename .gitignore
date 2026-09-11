@@ -10,5 +10,9 @@ node_modules/
 
 
 # Credenciales locales del runner de Grapes — nunca subir
+# Credenciales locales del runner de Grapes — nunca subir.
+# La carpeta vieja queda en disco tras el renombre y NO debe versionarse:
+# tiene la configuración con credenciales y 212 MB de respaldos del sitio.
+scripts/ocd-grapes-runner/
 scripts/cod-grapes-runner/cod-grapes-runner.config.json
 scripts/cod-grapes-runner/backups/

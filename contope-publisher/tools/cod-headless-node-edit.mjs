@@ -26,6 +26,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { pathToFileURL, fileURLToPath } from 'node:url';
+import { aplicarSalvaguardas } from './cod-salvaguardas.mjs';
 
 const pluginRoot = fileURLToPath(new URL('../', import.meta.url));
 const asset = (relative) => pathToFileURL(path.join(pluginRoot, 'assets', relative)).href;
@@ -289,7 +290,35 @@ try {
     }));
     process.exit(1);
   }
-  process.stdout.write(decoded + '\n');
+  // Salvaguardas: GrapesJS reexporta la hoja completa y puede perder reglas
+  // que no conoce. Acá se repone lo reponible y se mide lo que igual se
+  // perdería. Ver cod-salvaguardas.mjs.
+  //
+  // Acá NO hay selectores tocados a propósito: este motor muta un nodo, no
+  // declara reglas. Si una regla desaparece es efecto secundario y hay que
+  // salvarla — a diferencia de cod-headless-build.mjs, donde el pedido sí
+  // puede nombrar un selector justamente para quitarlo.
+  process.stdout.write(conSalvaguardas(decoded, css) + '\n');
 } finally {
   rmSync(temp, { recursive: true, force: true });
+}
+
+/**
+ * Pasa el resultado del navegador por las salvaguardas y lo devuelve con el
+ * informe adjunto. Si no es un guardado válido lo deja intacto: un error del
+ * motor no debe convertirse en un error del módulo.
+ */
+function conSalvaguardas(crudo, cssOriginal) {
+  let payload;
+  try {
+    payload = JSON.parse(crudo);
+  } catch {
+    return crudo;
+  }
+  if (!payload || payload.ok !== true || typeof payload.css !== 'string') return crudo;
+
+  const { css: cssSeguro, informe } = aplicarSalvaguardas(cssOriginal, payload.css);
+  payload.css = cssSeguro;
+  payload.salvaguardas = informe;
+  return JSON.stringify(payload);
 }

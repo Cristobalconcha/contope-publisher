@@ -40,6 +40,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { pathToFileURL, fileURLToPath } from 'node:url';
+import { aplicarSalvaguardas } from './cod-salvaguardas.mjs';
 
 const pluginRoot = fileURLToPath(new URL('../', import.meta.url));
 const asset = (relative) => pathToFileURL(path.join(pluginRoot, 'assets', relative)).href;
@@ -319,7 +320,33 @@ try {
     }));
     process.exit(1);
   }
-  process.stdout.write(decoded + '\n');
+  // Salvaguardas: GrapesJS reexporta la hoja completa y en esa reexportación
+  // puede perder reglas que no conoce. Acá se repone lo reponible y se mide lo
+  // que igual se perdería, para que quien llama pueda decidir si guarda o si
+  // aparta la versión. Ver cod-salvaguardas.mjs.
+  process.stdout.write(conSalvaguardas(decoded, css, styles.map((s) => (s && typeof s.selector === 'string' ? s.selector : ''))) + '\n');
 } finally {
   rmSync(temp, { recursive: true, force: true });
+}
+
+/**
+ * Pasa el resultado del navegador por las salvaguardas y lo devuelve con el
+ * informe adjunto. Si el resultado no es un guardado válido, lo deja intacto:
+ * un error del motor no debe convertirse en un error del módulo.
+ */
+function conSalvaguardas(crudo, cssOriginal, selectoresTocados) {
+  let payload;
+  try {
+    payload = JSON.parse(crudo);
+  } catch {
+    return crudo;
+  }
+  if (!payload || payload.ok !== true || typeof payload.css !== 'string') return crudo;
+
+  const { css: cssSeguro, informe } = aplicarSalvaguardas(cssOriginal, payload.css, {
+    selectoresTocados,
+  });
+  payload.css = cssSeguro;
+  payload.salvaguardas = informe;
+  return JSON.stringify(payload);
 }
