@@ -2,35 +2,109 @@
 Theme Name: Open CoDesign — Santa Luisa de Palpi
 Template: open-codesign-canvas
 Description: Tema hijo del motor Open CoDesign Canvas para el proyecto Santa Luisa de Palpi. Aporta paleta, tipografía e identidad del proyecto sobre las reglas estructurales del padre.
-Version: 0.1.0-dev
+Version: 0.2.0
 Requires at least: 6.5
 Requires PHP: 8.0
 Text Domain: ocd-santa-luisa
 */
 
+/*
+ * La paleta y las tipografías del proyecto viven acá y en theme.json, no en el
+ * CSS de cada página. WordPress emite sus propias reglas globales sobre body y
+ * sobre h1–h6 a partir de theme.json; si esas reglas apuntan a otra familia, le
+ * ganan al lienzo por especificidad y el sitio se ve con dos identidades según
+ * la página. Por eso el orden correcto es: el tema declara la identidad, y el
+ * lienzo la extiende. Nunca al revés.
+ *
+ * Las tres familias reales del proyecto (Montserrat, Birthstone y Lora) se
+ * sirven como @font-face propias, sin pedirle nada a Google.
+ */
+
 :root {
-  --slp-accent: #a7641a;
-  --slp-accent-deep: #7b4a13;
-  --slp-green: #2d4a22;
-  --slp-bg: #f5f0eb;
-  --slp-surface: #faf6f2;
-  --slp-text: #1a1a1a;
-  --slp-muted: #5c4f42;
-  --slp-border: #ddd5cb;
+  /* Dorado */
+  --slp-dorado-50: #f9f6e8;
+  --slp-dorado-100: #f1eacb;
+  --slp-dorado-300: #eed495;
+  --slp-dorado-500: #ddb441;
+  --slp-dorado-600: #cda23c;
+
+  /* Oliva */
+  --slp-oliva-50: #f5f9f6;
+  --slp-oliva-100: #ebf0e3;
+  --slp-oliva-300: #babba4;
+  --slp-oliva-500: #8e9075;
+  --slp-oliva-700: #70745e;
+
+  /* Tierra */
+  --slp-tierra-50: #f6f6f3;
+  --slp-tierra-100: #ecebe8;
+  --slp-tierra-300: #cdc8c6;
+  --slp-tierra-500: #968b8a;
+  --slp-tierra-700: #6e5f5f;
+
+  /* Roles, para no repetir el valor crudo en el resto de las reglas. */
+  --slp-accent: var(--slp-dorado-600);
+  --slp-accent-deep: #b58c2c;
+  --slp-green: var(--slp-oliva-700);
+  --slp-bg: var(--slp-tierra-50);
+  --slp-surface: #ffffff;
+  --slp-text: var(--slp-oliva-700);
+  --slp-muted: var(--slp-tierra-500);
+  --slp-border: var(--slp-tierra-300);
+
   /* Alimenta los ganchos estructurales del motor Canvas con la paleta del proyecto. */
   --ocd-border-color: var(--slp-border);
+
+  /* Los mismos nombres que usa el lienzo, para que una pieza pegada en una
+     página suelta herede la identidad aunque no traiga su propio :root. */
+  --font-hero: 'Birthstone', 'Segoe Script', cursive;
+  --font-body: 'Montserrat', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-quote: 'Lora', Georgia, 'Times New Roman', serif;
+  --max-width: 1180px;
 }
 
-body { background: var(--slp-bg); color: var(--slp-text); }
+body {
+  background: var(--slp-bg);
+  color: var(--slp-text);
+  font-family: var(--font-body);
+}
 
-.ocd-site-header .wp-block-site-title { font-family: var(--wp--preset--font-family--display); }
+/* Los títulos del proyecto son Montserrat en versales, no una serif. La regla
+   global de WordPress ya apunta a la familia correcta desde theme.json; esto
+   solo fija el peso y el interlineado para los encabezados que no pasan por el
+   lienzo (páginas de sistema, resultados de búsqueda, 404). */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-body);
+  font-weight: 700;
+  line-height: 1.05;
+  color: var(--slp-text);
+}
+
+.ocd-site-header .wp-block-site-title {
+  font-family: var(--font-body);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
 
 .ocd-main .wp-block-image img,
 .ocd-main .wp-block-video video { border-radius: 16px; }
 
+.ocd-main .wp-block-button__link {
+  font-family: var(--font-body);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 .ocd-main .wp-block-button__link:hover { background: var(--slp-accent-deep); }
 
 .ocd-main .wp-block-details summary {
-  font-family: var(--wp--preset--font-family--display);
-  font-size: 1.25rem;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.ocd-main a:where(:not(.wp-element-button)) {
+  color: var(--slp-text);
+  text-decoration-color: var(--slp-accent);
 }

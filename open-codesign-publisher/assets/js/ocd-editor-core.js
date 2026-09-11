@@ -192,10 +192,11 @@
             media: '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z" stroke-linejoin="round"/><circle cx="12" cy="9.5" r="2.3"/></svg>',
             content:
                 '<div class="ocd-geo-map" data-ocd-behavior="geo-map" ' +
-                'data-ocd-geo-places="[{&quot;nombre&quot;:&quot;Consultorio El Alba&quot;,&quot;categoria&quot;:&quot;salud&quot;,&quot;dist&quot;:1.2,&quot;contacto&quot;:&quot;+56 9 1234 5678&quot;,&quot;x&quot;:180,&quot;y&quot;:420},' +
-                '{&quot;nombre&quot;:&quot;Colegio Los Tilos&quot;,&quot;categoria&quot;:&quot;educacion&quot;,&quot;dist&quot;:2.4,&quot;contacto&quot;:&quot;+56 9 8765 4321&quot;,&quot;x&quot;:610,&quot;y&quot;:160},' +
-                '{&quot;nombre&quot;:&quot;Feria Libre&quot;,&quot;categoria&quot;:&quot;comercio&quot;,&quot;dist&quot;:0.8,&quot;contacto&quot;:&quot;+56 9 5555 0000&quot;,&quot;x&quot;:300,&quot;y&quot;:80}]" ' +
+                'data-ocd-geo-places="[{&quot;nombre&quot;:&quot;Consultorio El Alba&quot;,&quot;categoria&quot;:&quot;salud&quot;,&quot;tiempoMin&quot;:6,&quot;dist&quot;:1.2,&quot;contacto&quot;:&quot;+56 9 1234 5678&quot;,&quot;descripcionLarga&quot;:&quot;Urgencia y consultas generales, atención todo el día.&quot;,&quot;x&quot;:180,&quot;y&quot;:420},' +
+                '{&quot;nombre&quot;:&quot;Colegio Los Tilos&quot;,&quot;categoria&quot;:&quot;educacion&quot;,&quot;tiempoMin&quot;:10,&quot;dist&quot;:2.4,&quot;contacto&quot;:&quot;+56 9 8765 4321&quot;,&quot;descripcionLarga&quot;:&quot;Educación básica y media, transporte escolar disponible.&quot;,&quot;x&quot;:610,&quot;y&quot;:160},' +
+                '{&quot;nombre&quot;:&quot;Feria Libre&quot;,&quot;categoria&quot;:&quot;comercio&quot;,&quot;tiempoMin&quot;:4,&quot;dist&quot;:0.8,&quot;contacto&quot;:&quot;+56 9 5555 0000&quot;,&quot;descripcionLarga&quot;:&quot;Frutas, verduras y productos locales, martes y viernes.&quot;,&quot;x&quot;:300,&quot;y&quot;:80}]" ' +
                 'data-ocd-geo-categories="{&quot;salud&quot;:&quot;Salud&quot;,&quot;educacion&quot;:&quot;Educación&quot;,&quot;comercio&quot;:&quot;Comercio&quot;}" ' +
+                'data-ocd-geo-category-icons="{&quot;salud&quot;:&quot;M19 3H5c-1.1 0-1.99.9-1.99 2L3 19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-8.5-2h3v-3.5H17v-3h-3.5V7h-3v3.5H7v3h3.5z&quot;,&quot;educacion&quot;:&quot;M12 3 1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z&quot;,&quot;comercio&quot;:&quot;m21.9 8.89-1.05-4.37c-.22-.9-1-1.52-1.91-1.52H5.05c-.9 0-1.69.63-1.9 1.52L2.1 8.89c-.24 1.02-.02 2.06.62 2.88.08.11.19.19.28.29V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-6.94c.09-.09.2-.18.28-.28.64-.82.87-1.87.62-2.89zm-2.99-3.9 1.05 4.37c.1.42.01.84-.25 1.17-.14.18-.44.47-.94.47-.61 0-1.14-.49-1.21-1.14L16.98 5l1.93-.01zM13 5h1.96l.54 4.52c.05.39-.07.78-.33 1.07-.22.26-.54.41-.95.41-.67 0-1.22-.59-1.22-1.31V5zM8.49 9.52 9.04 5H11v4.69c0 .72-.55 1.31-1.29 1.31-.34 0-.65-.15-.89-.41a1.42 1.42 0 0 1-.33-1.07zm-4.45-.16L5.05 5h1.97l-.58 4.86c-.08.65-.6 1.14-1.21 1.14-.49 0-.8-.29-.93-.47-.27-.32-.36-.75-.26-1.17zM5 19v-6.03c.08.01.15.03.23.03.87 0 1.66-.36 2.24-.95.6.6 1.4.95 2.31.95.87 0 1.65-.36 2.23-.93.59.57 1.39.93 2.29.93.84 0 1.64-.35 2.24-.95.58.59 1.37.95 2.24.95.08 0 .15-.02.23-.03V19H5z&quot;}" ' +
                 'data-ocd-geo-data-bounds="{&quot;minX&quot;:0,&quot;minY&quot;:0,&quot;maxX&quot;:800,&quot;maxY&quot;:600}" ' +
                 'data-ocd-geo-initial-center="400,320" data-ocd-geo-proyecto="400,320" data-ocd-geo-min-zoom-ratio="0.2" ' +
                 'data-ocd-geo-svg="#ocd-geo-map-demo-svg" ' +
@@ -207,6 +208,7 @@
                 'data-ocd-geo-field-nombre="#ocd-geo-map-demo-nombre" ' +
                 'data-ocd-geo-field-categoria="#ocd-geo-map-demo-categoria" ' +
                 'data-ocd-geo-field-distancia="#ocd-geo-map-demo-distancia" ' +
+                'data-ocd-geo-field-descripcion="#ocd-geo-map-demo-descripcion" ' +
                 'data-ocd-geo-field-contacto="#ocd-geo-map-demo-contacto" ' +
                 'data-ocd-geo-accent-color="#b8860b" ' +
                 'style="position:relative;width:100%;min-height:440px;overflow:hidden;background:#eef3ee;border:1px solid #d5dcd2;border-radius:6px;color:#27312c;--ocd-geo-accent:#b8860b">' +
@@ -221,7 +223,7 @@
                 '<path class="ocd-geo-road ocd-geo-road--tertiary" d="M240 -20 L260 140 L220 300 L300 620" fill="none" stroke="#ffffff" stroke-width="1.4" style="vector-effect:non-scaling-stroke"/>' +
                 '</g>' +
                 '<g class="ocd-geo-map__project" transform="translate(400 320)" style="pointer-events:none"><g class="zoom-constant" style="transform:scale(var(--zoom-k,1));transform-origin:0 0"><circle r="18" fill="rgba(184,134,11,.20)"/><circle r="7" fill="#b8860b" stroke="#ffffff" stroke-width="2"/><text y="-14" text-anchor="middle" font-size="12" font-weight="700" fill="#27312c">Proyecto</text></g></g>' +
-                '<g id="ocd-geo-map-demo-marker" transform="translate(0 0)" style="display:none"><g class="zoom-constant" style="transform:scale(var(--zoom-k,1));transform-origin:0 0"><path d="M0 -18 L8 -6 L14 -6 L10 4 L12 16 L0 10 L-12 16 L-10 4 L-14 -6 L-8 -6 Z" fill="#b8860b" stroke="#ffffff" stroke-width="1.5"/></g></g>' +
+                '<g id="ocd-geo-map-demo-marker" transform="translate(0 0)" style="display:none"><g class="zoom-constant" style="transform:scale(var(--zoom-k,1));transform-origin:0 0"><path class="ocd-geo-map__marker-icon" d="M0 -18 L8 -6 L14 -6 L10 4 L12 16 L0 10 L-12 16 L-10 4 L-14 -6 L-8 -6 Z" fill="#b8860b" stroke="#ffffff" stroke-width="1.5"/></g></g>' +
                 '</svg>' +
                 '<div class="ocd-geo-map__selectors" style="position:absolute;top:12px;left:12px;display:flex;flex-wrap:wrap;gap:8px;padding:8px;background:rgba(255,255,255,.86);border-radius:8px">' +
                 '<select id="ocd-geo-map-demo-cat" class="ocd-geo-map__select" aria-label="Categoría" style="min-width:160px;padding:8px 10px;border:1px solid #cdd3ca;border-radius:6px;background:#fff"><option value="">Elige una categoría</option><option value="salud">Salud</option><option value="educacion">Educación</option><option value="comercio">Comercio</option></select>' +
@@ -233,6 +235,7 @@
                 '<p class="ocd-geo-map__nombre" id="ocd-geo-map-demo-nombre" style="margin:0 0 2px;font-size:16px;font-weight:700"></p>' +
                 '<p class="ocd-geo-map__meta" id="ocd-geo-map-demo-categoria" style="margin:0;font-size:13px"></p>' +
                 '<p class="ocd-geo-map__meta" id="ocd-geo-map-demo-distancia" style="margin:0;font-size:13px"></p>' +
+                '<p class="ocd-geo-map__descripcion" id="ocd-geo-map-demo-descripcion" style="margin:6px 0 0;font-size:12px;line-height:1.4"></p>' +
                 '<p class="ocd-geo-map__meta" id="ocd-geo-map-demo-contacto" style="margin:0;font-size:13px"></p>' +
                 '</div>' +
                 '<p class="ocd-geo-map__attribution" style="position:absolute;left:12px;bottom:10px;margin:0;font-size:11px;background:rgba(255,255,255,.72);padding:2px 6px;border-radius:4px">© OpenStreetMap contributors (ODbL)</p>' +
@@ -631,6 +634,48 @@ editor.Components.addType('ocd-columns', {
             // ------------------------------------------------------------------
             var oruganttForms = Array.isArray(options.oruganttForms) ? options.oruganttForms : [];
             var oruganttSiteUrl = typeof options.siteUrl === 'string' ? options.siteUrl : '';
+
+            // Variables de diseño publicadas por el runtime de formularios.
+            // El inspector arma sus controles con esta lista: si el runtime
+            // suma una variable, aparece sola; si no hay lista, no hay
+            // controles de diseño (mejor eso que perillas que no hacen nada).
+            var oruganttFormTokens = Array.isArray(options.oruganttFormTokens)
+                ? options.oruganttFormTokens.filter(function (t) {
+                    return t && typeof t.key === 'string' && typeof t.token === 'string';
+                })
+                : [];
+
+            /**
+             * Traits de diseño, uno por variable. Las curadas van primero y
+             * las avanzadas después, con el grupo en la etiqueta para que se
+             * lean agrupadas aunque el inspector las muestre en una lista.
+             */
+            function oruganttThemeTraits() {
+                var curadas = [];
+                var avanzadas = [];
+                oruganttFormTokens.forEach(function (token) {
+                    var trait = {
+                        // El prefijo evita chocar con traits existentes
+                        // ('form', 'height') y con futuros atributos.
+                        name: 'ofrtheme__' + token.key,
+                        label: token.label,
+                        type: token.type === 'color' ? 'color' : 'text'
+                    };
+                    if (token.type === 'length') {
+                        trait.placeholder = 'ej. 12px';
+                    } else if (token.type === 'font') {
+                        trait.placeholder = 'ej. Montserrat, sans-serif';
+                    }
+                    if (token.curated) {
+                        curadas.push(trait);
+                    } else {
+                        trait.label = '· ' + token.group + ': ' + token.label;
+                        avanzadas.push(trait);
+                    }
+                });
+
+                return curadas.concat(avanzadas);
+            }
             if (oruganttForms.length > 0) {
                 var oruganttFormChoices = oruganttForms
                     .map(function (form) {
@@ -700,10 +745,56 @@ editor.Components.addType('ocd-columns', {
                                         min: 240,
                                         default: 620
                                     }
-                                ]
+                                ].concat(oruganttThemeTraits())
                             },
                             init: function () {
                                 this.on('change:form', this.handleOruganttFormTraitChange);
+                                // Un solo escucha para todas las variables de
+                                // diseño: cambiar cualquiera reescribe la regla
+                                // completa del formulario.
+                                oruganttFormTokens.forEach(function (token) {
+                                    this.on('change:ofrtheme__' + token.key, this.applyOruganttTheme);
+                                }, this);
+                            },
+
+                            /**
+                             * Escribe las variables como una regla CSS real del
+                             * documento.
+                             *
+                             * POR QUÉ NO BASTA CON EL ESTILO DEL PROPIO NODO:
+                             * el runtime del formulario declara sus valores por
+                             * defecto sobre `.ofr-form`, que está DENTRO de este
+                             * contenedor. Una variable puesta en el contenedor
+                             * se hereda, pero una declaración sobre el propio
+                             * elemento siempre gana sobre lo heredado. Por eso
+                             * la regla apunta al elemento interno.
+                             */
+                            applyOruganttTheme: function () {
+                                if (!editor || !editor.Css || oruganttFormTokens.length === 0) {
+                                    return;
+                                }
+                                var declaraciones = {};
+                                var hayAlguna = false;
+                                oruganttFormTokens.forEach(function (token) {
+                                    var valor = this.get('ofrtheme__' + token.key);
+                                    if (typeof valor === 'string' && valor.trim() !== '') {
+                                        declaraciones[token.token] = valor.trim();
+                                        hayAlguna = true;
+                                    }
+                                }, this);
+
+                                var id = typeof this.getId === 'function' ? this.getId() : '';
+                                if (id === '') {
+                                    return;
+                                }
+                                var selector = '#' + id + ' .ofr-form';
+                                if (!hayAlguna) {
+                                    // Sin ninguna variable puesta, la regla se
+                                    // vacía en vez de quedar como resto muerto.
+                                    editor.Css.setRule(selector, {});
+                                    return;
+                                }
+                                editor.Css.setRule(selector, declaraciones);
                             },
                             handleOruganttFormTraitChange: function (model, value) {
                                 // El trait 'form' vive como atributo del modelo; el
@@ -741,6 +832,25 @@ editor.Components.addType('ocd-columns', {
                                 var slug = String(attributes['data-orugantt-form'] || '');
                                 if (slug !== '' && this.model.get('form') !== slug) {
                                     this.model.set('form', slug, { silent: true });
+                                }
+
+                                // Documento guardado: los controles de diseño
+                                // deben mostrar lo que la regla ya dice, o el
+                                // primer cambio borraría el resto del tema.
+                                if (oruganttFormTokens.length > 0 && editor && editor.Css) {
+                                    var id = this.model.getId ? this.model.getId() : '';
+                                    if (id !== '') {
+                                        var regla = editor.Css.getRule('#' + id + ' .ofr-form');
+                                        var estilo = regla && typeof regla.getStyle === 'function' ? regla.getStyle() : null;
+                                        if (estilo) {
+                                            oruganttFormTokens.forEach(function (token) {
+                                                var valor = estilo[token.token];
+                                                if (typeof valor === 'string' && valor !== '') {
+                                                    this.model.set('ofrtheme__' + token.key, valor, { silent: true });
+                                                }
+                                            }, this);
+                                        }
+                                    }
                                 }
                             },
                             onRender: function () {
@@ -1408,6 +1518,20 @@ editor.Components.addType('ocd-columns', {
                     }
                 } else {
                     applyFlatDocument(doc);
+                    // Distinguir "documento nuevo o vacío" de "documento con el
+                    // árbol ILEGIBLE". El segundo caso se reconstruía en
+                    // silencio, y eso esconde un daño real: pasó con la portada
+                    // de Santa Luisa, cuyo projectData quedó sin las barras de
+                    // escape y no era JSON válido (2026-09-08). Reconstruir
+                    // está bien; callarlo, no.
+                    if (typeof (doc && doc.projectData) === 'string' && doc.projectData !== '' && !project) {
+                        status(
+                            'Atención: los datos estructurados de este documento están dañados y no se pudieron leer. ' +
+                                'El lienzo se reconstruyó desde el HTML y el CSS guardados, que están intactos. ' +
+                                'Al guardar quedarán reparados.',
+                            'error'
+                        );
+                    }
                 }
                 behaviorApi.refresh();
                 gridApi.scan();

@@ -188,6 +188,17 @@
             try {
                 // 1) Mitad superior del frame fuente = video RGB final.
                 ctx.globalCompositeOperation = 'source-over';
+
+                // Primer cuadro compuesto: recién ahora hay algo que mostrar.
+                if (!state.primerCuadro) {
+                    state.primerCuadro = true;
+                    wrapper.classList.add('ocd-luma-matte--listo');
+                    try {
+                        wrapper.dispatchEvent(new CustomEvent('ocd-luma-matte-listo', { bubbles: true }));
+                    } catch (_error) {
+                        // Navegadores sin CustomEvent: la clase basta.
+                    }
+                }
                 ctx.clearRect(0, 0, state.width, state.height);
                 ctx.drawImage(video, 0, 0, state.width, state.height, 0, 0, state.width, state.height);
 

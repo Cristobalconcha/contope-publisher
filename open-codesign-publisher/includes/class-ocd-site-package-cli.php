@@ -12,7 +12,8 @@ final class OCD_Site_Package_CLI
 {
     public function __construct(
         private OCD_Site_Package_Exporter $exporter,
-        private OCD_Site_Package_Importer $importer
+        private OCD_Site_Package_Importer $importer,
+        private OCD_Media_Attachment_Sync $media_sync
     ) {
     }
 
@@ -81,5 +82,85 @@ final class OCD_Site_Package_CLI
             count($result['documents']),
             $result['mediaCopied']
         ));
+    }
+
+    /**
+     * Registra como adjuntos reales los archivos que ya están en
+     * `wp-content/uploads/open-codesign/` desde antes de que existiera la
+     * sincronización automática en la importación.
+     *
+     * Recorre el mismo árbol que escanea OCD_Canvas_Asset_Resolver, pero no
+     * modifica la resolución de URLs: solo completa la Biblioteca de medios.
+     *
+     * ## EXAMPLES
+     *
+     *     wp ocd backfill-media-attachments
+     */
+    public function backfill_media_attachments(array $args, array $assoc_args): void
+    {
+        $upload_dir = wp_get_upload_dir();
+        if (!empty($upload_dir['error'])) {
+            WP_CLI::error((string) $upload_dir['error']);
+            return;
+        }
+
+        $root = trailingslashit(wp_normalize_path((string) $upload_dir['basedir'])) . 'open-codesign';
+        if (!is_dir($root)) {
+            WP_CLI::warning('No existe el directorio de medios gestionado: ' . $root);
+            return;
+        }
+
+        $created = 0;
+        $existing = 0;
+        $skipped = 0;
+        $errors = [];
+        $count = 0;
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($root, FilesystemIterator::SKIP_DOTS)
+        );
+
+        foreach ($iterator as $file) {
+            if (++$count > OCD_Canvas_Asset_Resolver::MAX_FILES_SCANNED) {
+                WP_CLI::warning(sprintf('Se alcanzó el límite de %d archivos escaneados.', OCD_Canvas_Asset_Resolver::MAX_FILES_SCANNED));
+                break;
+            }
+            if (!$file->isFile()) {
+                continue;
+            }
+
+            $path = wp_normalize_path($file->getPathname());
+            // Los tamaños intermedios que genera WordPress para los adjuntos
+            // originales viven en el mismo árbol, pero no son archivos
+            // fuente: no deben convertirse en adjuntos propios.
+            if ($this->media_sync->is_generated_image_size($path)) {
+                $skipped++;
+                continue;
+            }
+
+            $result = $this->media_sync->sync_file_with_status($path);
+            if (is_wp_error($result)) {
+                $errors[] = $file->getFilename() . ': ' . $result->get_error_message();
+                continue;
+            }
+
+            if ($result['created']) {
+                $created++;
+            } else {
+                $existing++;
+            }
+        }
+
+        WP_CLI::success(sprintf(
+            '%d adjuntos nuevos, %d ya existían, %d tamaños intermedios omitidos, %d archivos recorridos, %d errores.',
+            $created,
+            $existing,
+            $skipped,
+            $count,
+            count($errors)
+        ));
+
+        foreach ($errors as $error) {
+            WP_CLI::warning($error);
+        }
     }
 }

@@ -1,0 +1,31 @@
+{
+  "_comentario": "El fondo del banner pasa de una sola imagen a <picture> con dos archivos: el navegador descarga SOLO el que le corresponde. La condición del source es la misma que usa el banner para cambiar de disposición, así que la foto cambia exactamente cuando cambia el diseño. width/height reservan el espacio y evitan el salto de maquetación (CLS). Se usan los archivos ORIGINALES, no las versiones -scaled que genera WordPress: esas vienen recortadas a 2560px y perderían justamente la nitidez que buscamos.",
+  "mode": "append",
+  "structure": [
+    {
+      "tag": "picture",
+      "parent": ".hero-bg",
+      "children": [
+        {
+          "tag": "source",
+          "attributes": {
+            "media": "(max-width: 900px), (max-aspect-ratio: 4 / 5)",
+            "srcset": "https://santaluisadepalpi.kpispublicitarios.com/wp-content/uploads/2026/09/fondo-portada-celular.webp",
+            "type": "image/webp"
+          }
+        },
+        {
+          "tag": "img",
+          "attributes": {
+            "src": "https://santaluisadepalpi.kpispublicitarios.com/wp-content/uploads/2026/09/fondo-portada-escritorio.webp",
+            "alt": "Casa en Santa Luisa de Palpi vista desde el camino, entre pasto alto con espigas y un cerco de madera, con los cerros al fondo",
+            "width": "2880",
+            "height": "1800",
+            "decoding": "async"
+          }
+        }
+      ]
+    }
+  ],
+  "styles": []
+}

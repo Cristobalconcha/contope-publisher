@@ -198,6 +198,23 @@ final class OCD_Theme_Definitions
      * CSS de baja especificidad (variables `:root` + reglas base) solo con las
      * propiedades definidas. Si no hay NINGÚN valor no-vacío devuelve ''.
      */
+    /**
+     * Color de fondo para la cortina de precarga.
+     *
+     * Es el mismo fondo del sitio, así la cortina no se distingue de la
+     * página: no se ve una pantalla de carga, se ve el sitio todavía vacío.
+     * Si el tema no lo tiene definido, se usa el blanco cálido de partida.
+     */
+    public static function preload_background(): string
+    {
+        $valores = self::get();
+        $fondo = isset($valores['color_bg']) ? trim((string) $valores['color_bg']) : '';
+        if ($fondo !== '' && preg_match('/^#[0-9a-fA-F]{3,8}$/', $fondo) === 1) {
+            return $fondo;
+        }
+        return '#f6f6f3';
+    }
+
     public static function css(): string
     {
         $v = self::get();

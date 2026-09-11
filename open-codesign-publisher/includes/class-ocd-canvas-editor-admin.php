@@ -281,26 +281,12 @@ final class OCD_Canvas_Editor_Admin
     /** Añade un tercer nivel visual con accesos directos a las páginas. */
     public function render_visual_editor_page_menu(): void
     {
-        if (!current_user_can(self::CAPABILITY)) {
-            return;
-        }
+        if (!current_user_can(self::CAPABILITY)) return;
         $items = [];
         foreach (get_pages(['post_status' => ['publish', 'draft', 'pending', 'future'], 'sort_column' => 'post_title']) as $page) {
             $title = trim((string) $page->post_title);
-            $url = add_query_arg(
-                [
-                    'page' => self::PAGE_SLUG,
-                    'page_id' => $page->ID,
-                    'ocd_nonce' => wp_create_nonce(self::NONCE_ACTION),
-                ],
-                admin_url('admin.php')
-            );
-            $items[] = [
-                'title' => $title !== '' ? $title : sprintf('(Sin título) #%d', $page->ID),
-                // Esta URL viaja en JSON/JS, no en markup HTML. wp_nonce_url()
-                // la devolvería con `&amp;` y rompería page_id al asignarla a href.
-                'url' => $url,
-            ];
+            $url = add_query_arg(['page' => self::PAGE_SLUG, 'page_id' => $page->ID, 'ocd_nonce' => wp_create_nonce(self::NONCE_ACTION)], admin_url('admin.php'));
+            $items[] = ['title' => $title !== '' ? $title : sprintf('(Sin título) #%d', $page->ID), 'url' => $url];
         }
         ?>
         <style>
@@ -314,19 +300,9 @@ final class OCD_Canvas_Editor_Admin
             var link = document.querySelector('#adminmenu a[href="admin.php?page=<?php echo esc_js(self::PAGE_SLUG); ?>"]');
             if (!link || !link.parentElement || link.parentElement.querySelector('.ocd-visual-pages')) return;
             var pages = <?php echo wp_json_encode($items); ?>;
-            var list = document.createElement('ul');
-            list.className = 'ocd-visual-pages';
-            pages.forEach(function (page) {
-                var item = document.createElement('li');
-                var anchor = document.createElement('a');
-                anchor.href = page.url;
-                anchor.textContent = page.title;
-                anchor.title = 'Editar visualmente: ' + page.title;
-                item.appendChild(anchor);
-                list.appendChild(item);
-            });
-            link.parentElement.style.position = 'relative';
-            link.parentElement.appendChild(list);
+            var list = document.createElement('ul'); list.className = 'ocd-visual-pages';
+            pages.forEach(function (page) { var item = document.createElement('li'); var anchor = document.createElement('a'); anchor.href = page.url; anchor.textContent = page.title; anchor.title = 'Editar visualmente: ' + page.title; item.appendChild(anchor); list.appendChild(item); });
+            link.parentElement.style.position = 'relative'; link.parentElement.appendChild(list);
         }());
         </script>
         <?php
@@ -482,7 +458,11 @@ final class OCD_Canvas_Editor_Admin
                 'tags' => $this->rule_term_choices('post_tag'),
             ],
             'autoLoadPageId' => $this->resolve_auto_load_page_id(),
-            'siteFontCss' => OCD_Canvas_Page_Publisher::site_font_css(),
+            // Este bloque es el CSS del sitio que el lienzo necesita para verse
+            // como se verá publicado (va al <style data-ocd-site-css>): tipografías
+            // y el giro de imágenes, para que girar en el inspector se vea al
+            // instante y no recién al publicar.
+            'siteFontCss' => OCD_Canvas_Page_Publisher::site_font_css() . OCD_Canvas_Page_Publisher::rotation_css() . OCD_Canvas_Page_Publisher::carousel_rows_css() . OCD_Canvas_Page_Publisher::shortcode_marker_css(),
             'themeDefinitionsCss' => OCD_Theme_Definitions::css(),
             // Base pública del sitio para las vistas en iframe del canvas
             // (p. ej. la preview del bloque "Formulario Orugantt").
@@ -491,6 +471,10 @@ final class OCD_Canvas_Editor_Admin
             // el plugin está inactivo, desactualizado o sin forms publicados;
             // con lista vacía el JS no registra el bloque.
             'oruganttForms' => $this->orugantt_forms_config(),
+            // Variables de diseño publicadas por el runtime de formularios:
+            // con ellas el inspector arma sus controles. Lista vacía = sin
+            // pestaña de diseño (nunca controles que no hacen nada).
+            'oruganttFormTokens' => $this->orugantt_form_tokens_config(),
         ];
 
         // JSON_HEX_TAG evita cualquier salida de `<` dentro del script en línea.
@@ -572,6 +556,41 @@ final class OCD_Canvas_Editor_Admin
             ];
         }
         return $forms;
+    }
+
+    /**
+     * Variables de diseño que el runtime de formularios publica, para armar
+     * los controles del inspector.
+     *
+     * La lista NO se escribe acá: la publica el propio plugin de formularios.
+     * Si no está instalado, se devuelve vacía y el inspector simplemente no
+     * muestra la pestaña de diseño — nunca controles que no hacen nada.
+     *
+     * @return array<int, array{key: string, token: string, label: string, type: string, group: string, curated: bool}>
+     */
+    private function orugantt_form_tokens_config(): array
+    {
+        if (!class_exists('OFR_Design_Tokens')) {
+            return [];
+        }
+
+        $curadas = array_keys(OFR_Design_Tokens::curated());
+        $salida = [];
+        foreach (OFR_Design_Tokens::advanced() as $clave => $def) {
+            if (!is_array($def) || !isset($def['token'], $def['label'], $def['type'])) {
+                continue;
+            }
+            $salida[] = [
+                'key' => (string) $clave,
+                'token' => (string) $def['token'],
+                'label' => sanitize_text_field((string) $def['label']),
+                'type' => (string) $def['type'],
+                'group' => sanitize_text_field((string) ($def['group'] ?? 'Diseño')),
+                'curated' => in_array($clave, $curadas, true),
+            ];
+        }
+
+        return $salida;
     }
 
     public function render_page(): void

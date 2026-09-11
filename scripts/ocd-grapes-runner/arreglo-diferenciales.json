@@ -1,0 +1,66 @@
+{
+  "_comentario": "Corrección responsive de la página Diferenciales. Solo reglas de estilo: no toca la estructura ni el contenido. Cada regla apunta a una causa verificada en el navegador, no a un síntoma.",
+  "mode": "append",
+  "structure": [],
+  "styles": [
+    {
+      "_causa": "Los iconos caían a 1 columna por un tercer escalón bajo 520px. En Inicio esos mismos iconos se quedan en 2 y se ven bien. Se iguala el criterio.",
+      "selector": ".pilares__grid",
+      "style": {
+        "grid-template-columns": "repeat(2, 1fr)"
+      },
+      "media": "(max-width: 520px)"
+    },
+    {
+      "_causa": "Estas 4 secciones llevan la clase de sección y .wrap en el MISMO elemento. La regla de sección declara padding completo (48px 0 56px) y borra el padding lateral de .wrap. Se devuelve el margen lateral con un selector de mayor especificidad, sin tocar el vertical.",
+      "selector": ".hero-open.wrap",
+      "style": {
+        "padding-left": "24px",
+        "padding-right": "24px"
+      }
+    },
+    {
+      "selector": ".agua.wrap",
+      "style": {
+        "padding-left": "24px",
+        "padding-right": "24px"
+      }
+    },
+    {
+      "selector": ".proyecto.wrap",
+      "style": {
+        "padding-left": "24px",
+        "padding-right": "24px"
+      }
+    },
+    {
+      "selector": ".infra.wrap",
+      "style": {
+        "padding-left": "24px",
+        "padding-right": "24px"
+      }
+    },
+    {
+      "selector": ".cierre.wrap",
+      "style": {
+        "padding-left": "24px",
+        "padding-right": "24px"
+      }
+    },
+    {
+      "_causa": "La flecha del carrusel está en right:-18px a propósito (queda linda por fuera en escritorio). En móvil el carrusel ocupa todo el ancho y esa flecha se sale de la pantalla, provocando 18px de desborde horizontal. En móvil se la trae adentro.",
+      "selector": ".gallery-carousel__arrow--next",
+      "style": {
+        "right": "4px"
+      },
+      "media": "(max-width: 720px)"
+    },
+    {
+      "selector": ".gallery-carousel__arrow--prev",
+      "style": {
+        "left": "4px"
+      },
+      "media": "(max-width: 720px)"
+    }
+  ]
+}

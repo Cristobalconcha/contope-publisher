@@ -28,7 +28,6 @@
             video.defaultMuted = true;
             video.setAttribute('muted', '');
             video.setAttribute('playsinline', '');
-            installSoundToggle(video);
             var playback = video.play();
             if (playback && typeof playback.catch === 'function') {
                 playback.catch(function () {
@@ -37,56 +36,6 @@
                 });
             }
         });
-    }
-
-    function installSoundToggle(video) {
-        if (video.getAttribute('data-ocd-sound-toggle') === 'installed') return;
-
-        var container = video.parentElement;
-        if (!container) return;
-
-        video.setAttribute('data-ocd-sound-toggle', 'installed');
-        container.classList.add('ocd-video-sound-container');
-
-        var button = document.createElement('button');
-        button.type = 'button';
-        button.className = 'ocd-video-sound-toggle';
-        button.setAttribute('aria-pressed', 'false');
-        button.setAttribute('aria-label', 'Activar sonido ambiental');
-        button.innerHTML = '<span aria-hidden="true">&#128263;</span><span>Activar sonido</span>';
-
-        button.addEventListener('click', function () {
-            var enableSound = video.muted;
-            video.muted = !enableSound;
-            video.defaultMuted = !enableSound;
-            if (enableSound) video.removeAttribute('muted');
-            else video.setAttribute('muted', '');
-
-            button.setAttribute('aria-pressed', enableSound ? 'true' : 'false');
-            button.setAttribute('aria-label', enableSound ? 'Silenciar sonido ambiental' : 'Activar sonido ambiental');
-            button.innerHTML = enableSound
-                ? '<span aria-hidden="true">&#128266;</span><span>Silenciar</span>'
-                : '<span aria-hidden="true">&#128263;</span><span>Activar sonido</span>';
-
-            var playback = video.play();
-            if (playback && typeof playback.catch === 'function') playback.catch(function () {});
-        });
-
-        container.appendChild(button);
-    }
-
-    function installSoundToggleStyles() {
-        if (document.getElementById('ocd-video-sound-toggle-styles')) return;
-        var style = document.createElement('style');
-        style.id = 'ocd-video-sound-toggle-styles';
-        style.textContent = [
-            '.ocd-video-sound-container{position:relative}',
-            '.ocd-video-sound-toggle{position:absolute;right:1rem;bottom:1rem;z-index:20;display:inline-flex;align-items:center;gap:.5rem;padding:.65rem .9rem;border:1px solid rgba(255,255,255,.58);border-radius:999px;background:rgba(20,20,20,.68);color:#fff;font:600 13px/1.2 system-ui,sans-serif;cursor:pointer;backdrop-filter:blur(8px);box-shadow:0 4px 18px rgba(0,0,0,.2)}',
-            '.ocd-video-sound-toggle:hover{background:rgba(20,20,20,.84)}',
-            '.ocd-video-sound-toggle:focus-visible{outline:3px solid #fff;outline-offset:3px}',
-            '@media (max-width:600px){.ocd-video-sound-toggle{right:.65rem;bottom:.65rem}.ocd-video-sound-toggle span:last-child{display:none}}'
-        ].join('');
-        document.head.appendChild(style);
     }
 
     function parseClass(raw, fallback) {
@@ -144,6 +93,56 @@
         });
     }
 
+    // anchor: regla genérica de posicionamiento+animación (borde/esquina +
+    // offset + entrada) aplicable a CUALQUIER nodo, no solo whatsapp — un
+    // módulo estático (whatsapp, imagen, botón, precio, red social...)
+    // puede vivir dentro de un contenedor con esta regla. El nodo YA trae su
+    // estado inicial (oculto, desplazado en la dirección desde la que
+    // "nace") en su propio atributo style; acá solo se escribe el estado
+    // final (data-ocd-anchor-reveal-transform) cuando entra en el viewport,
+    // igual que installReveal.
+    function installAnchor(nodes) {
+        var hasIO = typeof window.IntersectionObserver === 'function';
+        function reveal(el) {
+            var transform = el.getAttribute('data-ocd-anchor-reveal-transform');
+            if (transform) el.style.transform = transform;
+            el.style.opacity = '1';
+        }
+        function hide(el) {
+            var initial = el.getAttribute('data-ocd-anchor-initial-transform');
+            if (initial) el.style.transform = initial;
+            el.style.opacity = '0';
+        }
+        // repeat es una propiedad real de la regla anchor (ver
+        // normalize_anchor_rule en el compilador), no una decisión fija acá:
+        // con repeat="1" la entrada vuelve a jugar cada vez que el nodo sale
+        // y vuelve a aparecer (guardando su transform inicial, que si no se
+        // pierde apenas se revela una vez); con repeat="0" se comporta como
+        // antes — se revela una sola vez y deja de observarse.
+        var observer = hasIO
+            ? new window.IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    var node = entry.target;
+                    var repeat = node.getAttribute('data-ocd-anchor-repeat') !== '0';
+                    if (entry.isIntersecting) {
+                        reveal(node);
+                        if (!repeat) observer.unobserve(node);
+                    } else if (repeat) {
+                        hide(node);
+                    }
+                });
+            }, { threshold: 0.3 })
+            : null;
+        Array.prototype.forEach.call(nodes, function (node) {
+            node.setAttribute('data-ocd-anchor-initial-transform', node.style.transform || '');
+            if (!hasIO) {
+                reveal(node);
+                return;
+            }
+            observer.observe(node);
+        });
+    }
+
     function installNavToggle(nodes) {
         Array.prototype.forEach.call(nodes, function (button) {
             var targetSelector = String(button.getAttribute('data-ocd-toggle-target') || '').trim();
@@ -185,6 +184,8 @@
         var visibleMobileRaw = root.getAttribute('data-ocd-carousel-visible-mobile');
         var visibleMobile = visibleMobileRaw ? parseIndex(visibleMobileRaw, visible) : visible;
         var breakpoint = parseIndex(root.getAttribute('data-ocd-carousel-mobile-breakpoint'), 860);
+        // filas: 1 por defecto. Con 2 la pista se llena por columnas.
+        var rows = parseIndex(root.getAttribute('data-ocd-carousel-rows'), 1) || 1;
 
         var track = null;
         try { track = root.querySelector(trackSelector); } catch (error) { return; }
@@ -198,13 +199,22 @@
         var index = 0;
 
         function visibleCount() { return window.innerWidth <= breakpoint ? visibleMobile : visible; }
-        function maxIndex() { return Math.max(0, slides.length - visibleCount()); }
+        function columnCount() { return Math.ceil(slides.length / rows); }
+        function maxIndex() { return Math.max(0, columnCount() - visibleCount()); }
         function slideStep() {
+            // Con varias filas el paso es el ancho de una COLUMNA: la distancia
+            // hasta la diapositiva que abre la columna siguiente. Medir contra
+            // la segunda diapositiva daría cero, porque queda justo debajo.
+            if (rows > 1 && slides.length > rows) {
+                return slides[rows].getBoundingClientRect().left - slides[0].getBoundingClientRect().left;
+            }
             if (slides.length < 2) return slides[0].getBoundingClientRect().width;
             return slides[1].getBoundingClientRect().left - slides[0].getBoundingClientRect().left;
         }
         function update() {
             var step = slideStep();
+            // El CSS reparte el ancho según cuántas columnas caben.
+            track.style.setProperty('--ocd-carousel-columnas', String(visibleCount()));
             track.style.transform = 'translateX(' + (-index * step) + 'px)';
             if (previousButton) previousButton.disabled = index <= 0;
             if (nextButton) nextButton.disabled = index >= maxIndex();
@@ -337,10 +347,41 @@
             if (!bigImg) return;
 
             var current = 0;
+            // El lightbox arma su imagen ampliada copiando solo src y alt, así
+            // que un giro puesto como clase en la miniatura no llega hasta acá.
+            // Por eso el giro viaja en data-ocd-rotation sobre la propia <img> y
+            // se repone al ampliar. En 90/270 la imagen ocupa al revés, de modo
+            // que sus dos límites se intercambian; si no, se recorta contra el
+            // borde equivocado.
+            function aplicarGiro(destino, origen) {
+                var giro = parseInt(origen.getAttribute('data-ocd-rotation') || '0', 10);
+                if (giro !== 90 && giro !== 180 && giro !== 270) {
+                    destino.style.transform = '';
+                    destino.style.maxWidth = '';
+                    destino.style.maxHeight = '';
+                    destino.removeAttribute('data-ocd-rotation');
+                    return;
+                }
+                destino.setAttribute('data-ocd-rotation', String(giro));
+                destino.style.transform = 'rotate(' + giro + 'deg)';
+                if (giro === 180) {
+                    destino.style.maxWidth = '';
+                    destino.style.maxHeight = '';
+                    return;
+                }
+                var caja = destino.parentNode && destino.parentNode.getBoundingClientRect
+                    ? destino.parentNode.getBoundingClientRect()
+                    : null;
+                var ancho = caja && caja.width ? caja.width : window.innerWidth;
+                var alto = caja && caja.height ? caja.height : window.innerHeight;
+                destino.style.maxWidth = Math.round(alto) + 'px';
+                destino.style.maxHeight = Math.round(ancho) + 'px';
+            }
             function open(index) {
                 current = ((index % images.length) + images.length) % images.length;
                 bigImg.src = images[current].currentSrc || images[current].src;
                 bigImg.alt = images[current].alt || '';
+                aplicarGiro(bigImg, images[current]);
                 root.classList.add(openClass);
             }
             function close() { root.classList.remove(openClass); }
@@ -499,9 +540,22 @@
             var fieldNombre = bySelector('data-ocd-geo-field-nombre');
             var fieldCategoria = bySelector('data-ocd-geo-field-categoria');
             var fieldDistancia = bySelector('data-ocd-geo-field-distancia');
+            var fieldDescripcion = bySelector('data-ocd-geo-field-descripcion');
             var fieldContacto = bySelector('data-ocd-geo-field-contacto');
             var accentColor = parseClass(root.getAttribute('data-ocd-geo-accent-color'), 'var(--dorado-600)');
+            var categoryIcons = parseJsonAttr(root, 'data-ocd-geo-category-icons');
+            if (!categoryIcons || typeof categoryIcons !== 'object') categoryIcons = {};
+            var markerIcon = marker ? marker.querySelector('.ocd-geo-map__marker-icon') : null;
+            var DEFAULT_MARKER_PATH = 'M0 -18 L8 -6 L14 -6 L10 4 L12 16 L0 10 L-12 16 L-10 4 L-14 -6 L-8 -6 Z';
             if (!svg) return;
+
+            // cercanía: minutos si el lugar los trae cargados, si no la
+            // distancia en km. Ambos datos se cargan a mano mirando la ruta
+            // real en Google — medir en línea recta no representa nada útil.
+            function formatCercania(lugar) {
+                if (lugar.tiempoMin != null && Number.isFinite(Number(lugar.tiempoMin))) return Number(lugar.tiempoMin) + ' min';
+                return lugar.dist + ' km';
+            }
 
             var bounds = parseJsonAttr(root, 'data-ocd-geo-data-bounds') || {};
             var DATA = {
@@ -514,6 +568,9 @@
             var proyecto = parsePoint(root.getAttribute('data-ocd-geo-proyecto'), 300, 270);
             var minZoomRatio = Number.parseFloat(root.getAttribute('data-ocd-geo-min-zoom-ratio'));
             if (!Number.isFinite(minZoomRatio) || minZoomRatio <= 0 || minZoomRatio >= 1) minZoomRatio = 0.2;
+            var initialZoom = Number.parseFloat(root.getAttribute('data-ocd-geo-initial-zoom'));
+            if (!Number.isFinite(initialZoom) || initialZoom <= 0 || initialZoom > 1) initialZoom = 1;
+            if (initialZoom < minZoomRatio) initialZoom = minZoomRatio;
 
             var FULL_W = DATA.maxX - DATA.minX;
             var FULL_H = DATA.maxY - DATA.minY;
@@ -545,6 +602,10 @@
                 MIN_W = MAX_W * minZoomRatio;
             }
             computeBaseline();
+            // El acercamiento inicial es una fracción del alcance total: el
+            // mapa puede cubrir mucho territorio y aun así abrir de cerca.
+            view.w = MAX_W * initialZoom;
+            view.h = view.w * containerAspect;
             view.x = initialCenter.x - view.w / 2;
             view.y = initialCenter.y - view.h / 2;
 
@@ -663,13 +724,16 @@
                     return;
                 }
                 selLugar.disabled = false;
+                function orderKey(lugar) {
+                    return (lugar.tiempoMin != null && Number.isFinite(Number(lugar.tiempoMin))) ? Number(lugar.tiempoMin) : Number(lugar.dist);
+                }
                 places
                     .filter(function (lugar) { return lugar.categoria === categoria; })
-                    .sort(function (a, b) { return a.dist - b.dist; })
+                    .sort(function (a, b) { return orderKey(a) - orderKey(b); })
                     .forEach(function (lugar) {
                         var opt = document.createElement('option');
                         opt.value = lugar.nombre;
-                        opt.textContent = lugar.nombre + ' · ' + lugar.dist + ' km';
+                        opt.textContent = lugar.nombre + ' · ' + formatCercania(lugar);
                         selLugar.appendChild(opt);
                     });
             }
@@ -697,12 +761,23 @@
                     marker.setAttribute('transform', 'translate(' + lugar.x + ',' + lugar.y + ')');
                     marker.style.display = '';
                 }
+                if (markerIcon) {
+                    var iconPath = categoryIcons[lugar.categoria];
+                    if (typeof iconPath === 'string' && iconPath) {
+                        markerIcon.setAttribute('d', iconPath);
+                        markerIcon.setAttribute('transform', 'scale(1.3) translate(-12,-12)');
+                    } else {
+                        markerIcon.setAttribute('d', DEFAULT_MARKER_PATH);
+                        markerIcon.removeAttribute('transform');
+                    }
+                }
                 panToLugar(lugar.x, lugar.y);
                 if (panel) panel.setAttribute('data-empty', 'false');
                 if (accent) accent.style.background = accentColor;
                 if (fieldNombre) fieldNombre.textContent = lugar.nombre;
                 if (fieldCategoria) fieldCategoria.textContent = categoryLabels[lugar.categoria] || lugar.categoria;
-                if (fieldDistancia) fieldDistancia.textContent = lugar.dist + ' km';
+                if (fieldDistancia) fieldDistancia.textContent = formatCercania(lugar);
+                if (fieldDescripcion) fieldDescripcion.textContent = lugar.descripcionLarga || '';
                 if (fieldContacto) fieldContacto.textContent = lugar.contacto || '—';
             }
 
@@ -980,7 +1055,6 @@
 
     function boot() {
         var roots = document.querySelectorAll('.ocd-canvas-published');
-        installSoundToggleStyles();
         Array.prototype.forEach.call(roots, function (root) {
             compensateWordPressAdminBar(root);
             activateAutoplayVideos(root);
@@ -996,6 +1070,7 @@
         var geoMapNodes = [];
         var heroCollapseNodes = [];
         var chartNodes = [];
+        var anchorNodes = [];
         Array.prototype.forEach.call(behaviorNodes, function (node) {
             var behavior = node.getAttribute('data-ocd-behavior');
             if (behavior === 'scroll-threshold') scrollNodes.push(node);
@@ -1007,6 +1082,7 @@
             else if (behavior === 'geo-map') geoMapNodes.push(node);
             else if (behavior === 'hero-collapse') heroCollapseNodes.push(node);
             else if (behavior === 'chart') chartNodes.push(node);
+            else if (behavior === 'anchor') anchorNodes.push(node);
         });
         installHeroCollapse(heroCollapseNodes);
         installScrollThreshold(scrollNodes);
@@ -1017,6 +1093,7 @@
         installParcelMap(parcelMapNodes);
         installGeoMap(geoMapNodes);
         installChart(chartNodes);
+        installAnchor(anchorNodes);
 
         // Interacciones tipo Webflow (data-ocd-interaction): el mismo motor que
         // corre en el iframe del editor (ocd-interactions.js) se instala acá

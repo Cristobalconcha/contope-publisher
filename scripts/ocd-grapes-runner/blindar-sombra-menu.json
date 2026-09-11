@@ -1,0 +1,25 @@
+{
+  "_comentario": "box-shadow no tiene forma expandida, así que dentro de un @media GrapesJS lo descarta cuando lleva var(). Se deja el valor literal solo ahí; el token sigue siendo la referencia en :root.",
+  "mode": "append",
+  "structure": [],
+  "styles": [
+    {
+      "selector": ".site-nav__links",
+      "media": "(max-width: 720px)",
+      "style": {
+        "flex-direction": "column",
+        "row-gap": "0px", "column-gap": "0px",
+        "position": "absolute",
+        "top": "100%", "left": "0px", "right": "0px",
+        "background-color": "var(--tierra-50)",
+        "box-shadow": "0 14px 28px rgba(40,35,20,0.14)",
+        "max-height": "0px",
+        "overflow-x": "hidden", "overflow-y": "hidden",
+        "transition-property": "max-height",
+        "transition-duration": "0.3s",
+        "transition-timing-function": "ease",
+        "transition-delay": "0s"
+      }
+    }
+  ]
+}

@@ -24,6 +24,20 @@ final class OCD_Settings_Admin
         add_action('admin_menu', [$this, 'add_menu']);
         add_action('admin_enqueue_scripts', [$this, 'enqueue_assets']);
         add_action('wp_ajax_' . OCD_Theme_Definitions::AJAX_SAVE, [$this, 'handle_save']);
+        add_action('admin_post_ocd_save_whatsapp_number', [$this, 'handle_save_whatsapp']);
+    }
+
+    public function handle_save_whatsapp(): void
+    {
+        if (!current_user_can(self::CAPABILITY)) {
+            wp_die(esc_html__('No tienes permisos para gestionar la configuración.', 'open-codesign-publisher'));
+        }
+        check_admin_referer('ocd_save_whatsapp_number');
+        $raw = isset($_POST['ocd_whatsapp_number']) ? wp_unslash($_POST['ocd_whatsapp_number']) : '';
+        $number = preg_replace('/[^0-9]/', '', (string) $raw);
+        update_option('ocd_whatsapp_number', $number, false);
+        wp_safe_redirect(add_query_arg('ocd_whatsapp_saved', '1', admin_url('admin.php?page=' . self::PAGE_SLUG)));
+        exit;
     }
 
     public function add_menu(): void
@@ -112,6 +126,29 @@ final class OCD_Settings_Admin
                                 </div>
                             </fieldset>
                         <?php endforeach; ?>
+                    </form>
+                </section>
+
+                <section class="ocd-settings-section">
+                    <h2>WhatsApp</h2>
+                    <p class="ocd-settings-intro">
+                        Número usado por el ícono de contacto de WhatsApp que aparece en las
+                        secciones que lo tengan configurado. El mensaje de cada instancia se edita
+                        aparte, en el propio contenido de la página.
+                    </p>
+                    <?php if (isset($_GET['ocd_whatsapp_saved'])) : ?>
+                        <div class="notice notice-success"><p>Número de WhatsApp guardado.</p></div>
+                    <?php endif; ?>
+                    <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+                        <input type="hidden" name="action" value="ocd_save_whatsapp_number">
+                        <?php wp_nonce_field('ocd_save_whatsapp_number'); ?>
+                        <p>
+                            <label for="ocd_whatsapp_number">Número (solo dígitos, con código de país, sin +)</label><br>
+                            <input type="text" id="ocd_whatsapp_number" name="ocd_whatsapp_number"
+                                value="<?php echo esc_attr((string) get_option('ocd_whatsapp_number', '')); ?>"
+                                placeholder="56981396967" class="regular-text">
+                        </p>
+                        <p><button type="submit" class="button button-primary">Guardar número</button></p>
                     </form>
                 </section>
             </div>

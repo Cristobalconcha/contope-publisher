@@ -1,0 +1,12 @@
+{
+  "_comentario": "En móvil el bloque de logo + título estaba anclado al 15% del alto del banner, demasiado arriba. Se baja al 26%. La regla original tenía una sola declaración (top), así que este cuerpo está completo.",
+  "mode": "append",
+  "structure": [],
+  "styles": [
+    {
+      "selector": ".hero-content",
+      "media": "(max-width: 900px)",
+      "style": { "top": "26%" }
+    }
+  ]
+}

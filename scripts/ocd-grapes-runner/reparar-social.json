@@ -1,0 +1,25 @@
+{
+  "_comentario": "Repara las tarjetas de contacto del bloque de Instagram (los dos posts simulados de Carlos Valdivieso). Al expandir la abreviada background puse el degradado en background-color, que no admite degradados: el navegador descartaba la declaración y las tarjetas quedaban sin fondo, con el texto blanco invisible. Un degradado es una IMAGEN de fondo.",
+  "mode": "append",
+  "structure": [],
+  "styles": [
+    {
+      "selector": ".social-card--contact",
+      "style": {
+        "display": "flex",
+        "flex-direction": "column",
+        "align-items": "center",
+        "justify-content": "center",
+        "row-gap": "10px",
+        "column-gap": "10px",
+        "background-image": "linear-gradient(160deg, var(--oliva-700), var(--oliva-500))",
+        "color": "#ffffff",
+        "padding-top": "18px",
+        "padding-right": "18px",
+        "padding-bottom": "18px",
+        "padding-left": "18px",
+        "text-align": "center"
+      }
+    }
+  ]
+}

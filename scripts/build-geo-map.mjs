@@ -48,10 +48,18 @@ Config JSON mínimo:
 Archivo de lugares:
   {
     "categories": { "salud": "Salud", "educacion": "Educación" },
+    "icons": { "salud": "<svg path d, opcional>", "educacion": "<svg path d, opcional>" },
     "places": [
-      { "nombre": "Hospital", "categoria": "salud", "lat": -38.74, "lng": -72.59, "dist": 1.2, "contacto": "+56 9 1234 5678" }
+      { "nombre": "Hospital", "categoria": "salud", "lat": -38.74, "lng": -72.59,
+        "dist": 1.2, "tiempoMin": 8, "contacto": "+56 9 1234 5678",
+        "descripcionLarga": "Urgencia y consultas generales." }
     ]
   }
+
+  dist y tiempoMin se cargan a mano mirando la ruta real en Google (auto o
+  caminata, según el proyecto) — igual que nombre/categoria/contacto. Medir
+  en línea recta no representa nada útil. Si se muestra tiempoMin, ese es
+  el dato que se ve en el mapa; dist queda solo de respaldo.
 
 Flags que sobrescriben la config: --south, --west, --north, --east, --lat, --lng,
 --scale, --places, --out-dir, --name.`);
@@ -184,6 +192,10 @@ function loadPlaces(cfg) {
   const categories = source.categories && typeof source.categories === 'object'
     ? source.categories
     : keys.reduce((acc, key) => { acc[key] = key; return acc; }, {});
+  // icons: { categoria: "<svg path d>" } opcional, un ícono por categoría
+  // (mismo set de Material Symbols que el resto del sitio). Si una
+  // categoría no tiene ícono, el marcador cae en la estrella por defecto.
+  const icons = source.icons && typeof source.icons === 'object' ? source.icons : {};
 
   const places = source.places.map((place, index) => {
     if (!place || typeof place.nombre !== 'string' || place.nombre.trim() === '') fail('places[' + index + '].nombre es obligatorio.');
@@ -196,12 +208,18 @@ function loadPlaces(cfg) {
       categoria: place.categoria.trim(),
       lat: lat,
       lng: lng,
+      // dist y tiempoMin se cargan a mano mirando la ruta real en Google
+      // (auto/caminata) — medir en línea recta no representa nada útil.
+      // Si se omite dist, se completa más abajo con Haversine solo para no
+      // dejar el campo vacío; tiempoMin nunca se calcula solo.
       dist: Number.isFinite(Number(place.dist)) ? Number(place.dist) : null,
-      contacto: place.contacto == null ? '' : String(place.contacto)
+      tiempoMin: Number.isFinite(Number(place.tiempoMin)) ? Number(place.tiempoMin) : null,
+      contacto: place.contacto == null ? '' : String(place.contacto),
+      descripcionLarga: place.descripcionLarga == null ? '' : String(place.descripcionLarga)
     };
   });
 
-  return { categories: categories, places: places };
+  return { categories: categories, icons: icons, places: places };
 }
 
 function round(value, decimals) {
@@ -429,7 +447,7 @@ function slugify(name) {
   return String(name || 'geo-map').toLowerCase().replace(/[^a-z0-9_-]+/g, '-').replace(/^-+|-+$/g, '') || 'geo-map';
 }
 
-function buildHtml(cfg, bounds, places, categories, roads, landuseWays, placeNodes) {
+function buildHtml(cfg, bounds, places, categories, icons, roads, landuseWays, placeNodes) {
   const slug = slugify(cfg.name);
   const accentColor = cfg.accentColor;
   const placeNodeRender = (cfg.placeNodes && Array.isArray(cfg.placeNodes.render) && cfg.placeNodes.render.length)
@@ -444,8 +462,12 @@ function buildHtml(cfg, bounds, places, categories, roads, landuseWays, placeNod
   const placesData = places.map((place) => ({
     nombre: place.nombre,
     categoria: place.categoria,
+    // dist es fallback (línea recta) solo si nadie cargó el dato real a
+    // mano; tiempoMin nunca se inventa y sólo aparece si se cargó.
     dist: round(place.dist != null ? place.dist : haversineKm(cfg.project, place), 2),
+    tiempoMin: place.tiempoMin,
     contacto: place.contacto,
+    descripcionLarga: place.descripcionLarga,
     x: round(place.x, 2),
     y: round(place.y, 2)
   }));
@@ -464,6 +486,9 @@ function buildHtml(cfg, bounds, places, categories, roads, landuseWays, placeNod
   parts.push('<div class="ocd-geo-map" data-ocd-behavior="geo-map"');
   parts.push('  data-ocd-geo-places="' + jsonAttr(placesData) + '"');
   parts.push('  data-ocd-geo-categories="' + jsonAttr(categories) + '"');
+  if (icons && Object.keys(icons).length) {
+    parts.push('  data-ocd-geo-category-icons="' + jsonAttr(icons) + '"');
+  }
   parts.push('  data-ocd-geo-data-bounds="' + jsonAttr(boundsData) + '"');
   parts.push('  data-ocd-geo-initial-center="' + project.x + ',' + project.y + '"');
   parts.push('  data-ocd-geo-proyecto="' + project.x + ',' + project.y + '"');
@@ -477,6 +502,7 @@ function buildHtml(cfg, bounds, places, categories, roads, landuseWays, placeNod
   parts.push('  data-ocd-geo-field-nombre="#' + slug + '-nombre"');
   parts.push('  data-ocd-geo-field-categoria="#' + slug + '-categoria"');
   parts.push('  data-ocd-geo-field-distancia="#' + slug + '-distancia"');
+  parts.push('  data-ocd-geo-field-descripcion="#' + slug + '-descripcion"');
   parts.push('  data-ocd-geo-field-contacto="#' + slug + '-contacto"');
   parts.push('  data-ocd-geo-accent-color="' + escapeHtml(accentColor) + '"');
   parts.push('  style="--ocd-geo-accent:' + escapeHtml(accentColor) + '">');
@@ -513,7 +539,7 @@ function buildHtml(cfg, bounds, places, categories, roads, landuseWays, placeNod
   parts.push('        <g class="zoom-constant"><circle r="18" fill="rgba(184,134,11,.20)"/><circle r="7" fill="' + escapeHtml(accentColor) + '" stroke="#ffffff" stroke-width="2"/><text y="-14" text-anchor="middle" font-size="12" font-weight="700" fill="#27312c">Proyecto</text></g>');
   parts.push('      </g>');
   parts.push('      <g id="' + slug + '-marker" transform="translate(0 0)" style="display:none">');
-  parts.push('        <g class="zoom-constant"><path d="M0 -18 L8 -6 L14 -6 L10 4 L12 16 L0 10 L-12 16 L-10 4 L-14 -6 L-8 -6 Z" fill="' + escapeHtml(accentColor) + '" stroke="#ffffff" stroke-width="1.5"/></g>');
+  parts.push('        <g class="zoom-constant"><path class="ocd-geo-map__marker-icon" d="M0 -18 L8 -6 L14 -6 L10 4 L12 16 L0 10 L-12 16 L-10 4 L-14 -6 L-8 -6 Z" fill="' + escapeHtml(accentColor) + '" stroke="#ffffff" stroke-width="1.5"/></g>');
   parts.push('      </g>');
   parts.push('    </svg>');
 
@@ -535,6 +561,7 @@ function buildHtml(cfg, bounds, places, categories, roads, landuseWays, placeNod
   parts.push('    <p class="ocd-geo-map__nombre" id="' + slug + '-nombre"></p>');
   parts.push('    <p class="ocd-geo-map__meta" id="' + slug + '-categoria"></p>');
   parts.push('    <p class="ocd-geo-map__meta" id="' + slug + '-distancia"></p>');
+  parts.push('    <p class="ocd-geo-map__descripcion" id="' + slug + '-descripcion"></p>');
   parts.push('    <p class="ocd-geo-map__meta" id="' + slug + '-contacto"></p>');
   parts.push('  </div>');
   parts.push('  <p class="ocd-geo-map__attribution">© OpenStreetMap contributors (ODbL)</p>');
@@ -620,7 +647,7 @@ async function main() {
     place.y = raw.y + offsetY;
   });
 
-  const html = buildHtml(cfg, bounds, placesInput.places, placesInput.categories, roads, landuseWays, placeNodes);
+  const html = buildHtml(cfg, bounds, placesInput.places, placesInput.categories, placesInput.icons, roads, landuseWays, placeNodes);
   const css = generateCss();
   const fragment = '<style>\n' + css + '\n</style>\n\n' + html;
 

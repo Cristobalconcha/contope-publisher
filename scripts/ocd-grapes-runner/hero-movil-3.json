@@ -1,0 +1,16 @@
+{
+  "_comentario": "Los pies quedaban flotando: la caja del video tenía alto fijo (38% del banner) y el video, que conserva su proporción, se apoyaba ARRIBA de esa caja, terminando 36px antes del borde inferior. Con height:auto la caja se ajusta exactamente al alto del video, y con bottom:0 el borde inferior del video coincide con el del banner.",
+  "mode": "append",
+  "structure": [],
+  "styles": [
+    {
+      "selector": ".hero-family",
+      "media": "(max-width: 900px), (max-aspect-ratio: 4 / 5)",
+      "style": {
+        "width": "130vw",
+        "height": "auto",
+        "bottom": "0px"
+      }
+    }
+  ]
+}

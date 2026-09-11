@@ -1,6 +1,6 @@
 /dist/
 /vendor/
-/node_modules/
+node_modules/
 /.phpunit.cache/
 /.wordpress-org/
 *.zip
@@ -8,3 +8,7 @@
 .env.*
 !.env.example
 
+
+# Credenciales locales del runner de Grapes — nunca subir
+scripts/ocd-grapes-runner/ocd-grapes-runner.config.json
+scripts/ocd-grapes-runner/backups/

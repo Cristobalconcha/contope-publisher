@@ -334,7 +334,7 @@
       .ocd-ci__scope-label > span { font-weight:650; letter-spacing:.01em; }
       .ocd-ci__scope-help { color:#aaa397; font-size:10px; line-height:1.35; }
       .ocd-ci__scope-class[hidden] { display:none; }
-      .ocd-ci select,.ocd-ci input { width:100%; min-width:0; border:1px solid #ffffff24; border-radius:5px;
+      .ocd-ci select,.ocd-ci input,.ocd-ci textarea { width:100%; min-width:0; border:1px solid #ffffff24; border-radius:5px;
         background:#2a2e36; color:#fff; padding:6px 7px; font:inherit; }
       .ocd-ci select:disabled,.ocd-ci input:disabled,.ocd-ci button:disabled { color:#d5d0c8; opacity:.62; }
       .ocd-ci__body { padding:8px 12px 22px; }
@@ -376,6 +376,13 @@
         margin: 0; accent-color: #8a7cf1; cursor: pointer;
       }
       .ocd-ci__luma-hint { margin-top:7px; color:#a9a39a; font-size:10px; }
+      .ocd-ci__rotacion { display:grid; grid-template-columns:repeat(4,1fr); gap:5px; }
+      .ocd-ci__rotacion-boton {
+        padding:6px 4px; border:1px solid #8a7cf155; border-radius:5px;
+        background:#2b2740; color:#ded8cc; font-size:10px; cursor:pointer;
+      }
+      .ocd-ci__rotacion-boton:hover { border-color:#8a7cf1aa; }
+      .ocd-ci__rotacion-boton.is-active { background:#5b4fb1; border-color:#8a7cf1; color:#fff; font-weight:650; }
       .ocd-ci__interactions { margin:8px 0; padding:10px; border:1px solid #b98ae666; border-radius:6px; background:#8a6df114; }
       .ocd-ci__interactions-title { margin-bottom:8px; color:#e2c7ff; font-weight:650; }
       .ocd-ci__interactions-field { display:grid; gap:4px; margin-bottom:8px; color:#c7bda9; font-size:10px; }
@@ -385,6 +392,10 @@
       .ocd-ci__interactions-status { margin-top:8px; color:#a9a39a; font-size:10px; }
       .ocd-ci__interactions-clear { width:100%; margin-top:8px; border:1px solid #ffffff26; border-radius:5px; padding:7px; background:transparent; color:#c7bda9; cursor:pointer; font:inherit; }
       .ocd-ci__interactions-clear:hover { border-color:#e06c6c; color:#ffb4b4; }
+      .ocd-ci__content { margin:8px 0; padding:10px; border:1px solid #e0b34d80; border-radius:6px; background:#e0b34d14; }
+      .ocd-ci__content-title { margin-bottom:8px; color:#f0d9a6; font-weight:650; }
+      .ocd-ci__content-field { min-height:64px; resize:vertical; line-height:1.4; }
+      .ocd-ci__content-hint { margin-top:7px; color:#a9a39a; font-size:10px; line-height:1.35; }
       .ocd-ci__presentation { margin:8px 0; padding:10px; border:1px solid #62a8df66; border-radius:6px; background:#397ba114; }
       .ocd-ci__presentation-title { margin-bottom:8px; color:#b9ddf5; font-weight:650; }
       .ocd-ci__presentation-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }
@@ -1291,11 +1302,7 @@
       if (!componentHasChildren(component)) return false;
       const attributes = componentAttributes(component);
       const classes = componentClasses(component);
-      return (
-        attributes['data-ocd-supermodule'] === '1' ||
-        classes.includes('ocd-group') ||
-        classes.includes('ocd-dynamic-group')
-      );
+      return attributes['data-ocd-supermodule'] === '1' || classes.includes('ocd-group') || classes.includes('ocd-dynamic-group');
     }
 
     function componentDisplayName(component, index) {
@@ -1307,11 +1314,7 @@
       if (usefulClass) return `.${usefulClass}`;
       const type = String(component?.get?.('type') || '');
       const tag = String(component?.get?.('tagName') || '').toLowerCase();
-      const names = {
-        text: 'Texto', image: 'Imagen', video: 'Video', link: 'Enlace',
-        'ocd-video': 'Video', 'ocd-luma-matte': 'Video con transparencia',
-        'ocd-dynamic-group': 'Grupo dinámico', 'ocd-group': 'Grupo de módulos',
-      };
+      const names = { text: 'Texto', image: 'Imagen', video: 'Video', link: 'Enlace', 'ocd-video': 'Video', 'ocd-luma-matte': 'Video con transparencia', 'ocd-dynamic-group': 'Grupo dinámico', 'ocd-group': 'Grupo de módulos' };
       return names[type] || names[tag] || (tag ? tag.toUpperCase() : `Entidad ${index + 1}`);
     }
 
@@ -1333,11 +1336,7 @@
         settings.type = 'button';
         settings.title = `Configurar ${name.textContent}`;
         settings.setAttribute('aria-label', settings.title);
-        settings.addEventListener('click', () => {
-          supermoduleContext = component;
-          editor.select(child);
-          openInspectorPanel();
-        });
+        settings.addEventListener('click', () => { supermoduleContext = component; editor.select(child); openInspectorPanel(); });
         row.append(name, settings);
         list.appendChild(row);
       });
@@ -1350,16 +1349,77 @@
       let current = component;
       let belongs = false;
       while (current) {
-        if (current === supermoduleContext) {
-          belongs = true;
-          break;
-        }
+        if (current === supermoduleContext) { belongs = true; break; }
         current = current.parent?.();
       }
-      if (!belongs) {
-        supermoduleContext = null;
-        return null;
+      if (!belongs) { supermoduleContext = null; return null; }
+      const trail = createElement(hostDocument, 'nav', 'ocd-ci__supermodule-trail');
+      const back = createElement(hostDocument, 'button', '', '← Supermódulo');
+      back.type = 'button';
+      back.addEventListener('click', () => editor.select(supermoduleContext));
+      trail.append(back, createElement(hostDocument, 'span', '', `› ${componentDisplayName(component, 0)}`));
+      return trail;
+    }
+
+    function componentClasses(component) {
+      return component && typeof component.getClasses === 'function' ? component.getClasses() : [];
+    }
+
+    function isSupermodule(component) {
+      if (!componentHasChildren(component)) return false;
+      const attributes = componentAttributes(component);
+      const classes = componentClasses(component);
+      return attributes['data-ocd-supermodule'] === '1' || classes.includes('ocd-group') || classes.includes('ocd-dynamic-group');
+    }
+
+    function componentDisplayName(component, index) {
+      const attributes = componentAttributes(component);
+      const explicit = attributes['data-ocd-module-label'] || attributes['aria-label'] || attributes.alt;
+      if (explicit) return String(explicit);
+      const classes = componentClasses(component);
+      const usefulClass = classes.find((name) => !/^ocd-(?:column|group|dynamic-group)/.test(name));
+      if (usefulClass) return `.${usefulClass}`;
+      const type = String(component?.get?.('type') || '');
+      const tag = String(component?.get?.('tagName') || '').toLowerCase();
+      const names = { text: 'Texto', image: 'Imagen', video: 'Video', link: 'Enlace', 'ocd-video': 'Video', 'ocd-luma-matte': 'Video con transparencia', 'ocd-dynamic-group': 'Grupo dinámico', 'ocd-group': 'Grupo de módulos' };
+      return names[type] || names[tag] || (tag ? tag.toUpperCase() : `Entidad ${index + 1}`);
+    }
+
+    function directChildren(component) {
+      if (!component || typeof component.components !== 'function') return [];
+      const collection = component.components();
+      return collection?.models ? collection.models.slice() : [];
+    }
+
+    function renderSupermodulePanel(component) {
+      if (!isSupermodule(component)) return null;
+      const panel = createElement(hostDocument, 'section', 'ocd-ci__supermodule');
+      panel.appendChild(createElement(hostDocument, 'div', 'ocd-ci__supermodule-title', 'Entidades del supermódulo'));
+      const list = createElement(hostDocument, 'div', 'ocd-ci__supermodule-list');
+      directChildren(component).forEach((child, index) => {
+        const row = createElement(hostDocument, 'div', 'ocd-ci__supermodule-item');
+        const name = createElement(hostDocument, 'span', 'ocd-ci__supermodule-name', componentDisplayName(child, index));
+        const settings = createElement(hostDocument, 'button', 'ocd-ci__supermodule-settings', '⚙');
+        settings.type = 'button';
+        settings.title = `Configurar ${name.textContent}`;
+        settings.setAttribute('aria-label', settings.title);
+        settings.addEventListener('click', () => { supermoduleContext = component; editor.select(child); openInspectorPanel(); });
+        row.append(name, settings);
+        list.appendChild(row);
+      });
+      panel.appendChild(list);
+      return panel;
+    }
+
+    function renderSupermoduleBreadcrumb(component) {
+      if (!supermoduleContext || component === supermoduleContext) return null;
+      let current = component;
+      let belongs = false;
+      while (current) {
+        if (current === supermoduleContext) { belongs = true; break; }
+        current = current.parent?.();
       }
+      if (!belongs) { supermoduleContext = null; return null; }
       const trail = createElement(hostDocument, 'nav', 'ocd-ci__supermodule-trail');
       const back = createElement(hostDocument, 'button', '', '← Supermódulo');
       back.type = 'button';
@@ -1773,6 +1833,100 @@
       return panel;
     }
 
+    /**
+     * Giro de una imagen, en cuartos de vuelta. El giro es propiedad de la
+     * IMAGEN y no del marco: dentro de una galería cada foto lleva el suyo, y
+     * el lightbox arma su vista ampliada copiando sólo src y alt, así que el
+     * dato viaja en la propia <img> (clase para verse sin JavaScript,
+     * data-ocd-rotation para que el runtime lo reponga al ampliar).
+     *
+     * El caso real: WordPress borra la orientación EXIF al generar las copias
+     * pero no gira los píxeles, así que el material vertical de teléfono llega
+     * acostado.
+     */
+    const ROTACIONES = [0, 90, 180, 270];
+
+    function imageRotationTargetFor(component) {
+      if (!component) return null;
+      if (isImageComponent(component)) return component;
+      // Si el clic cayó en el <figure> que la envuelve, se toma su imagen.
+      if (typeof component.find === 'function') {
+        const found = component.find('img');
+        if (found && found[0]) return found[0];
+      }
+      return null;
+    }
+
+    function currentRotation(image) {
+      const attributes = componentAttributes(image);
+      const raw = Number.parseInt(attributes['data-ocd-rotation'] || '0', 10);
+      return ROTACIONES.indexOf(raw) >= 0 ? raw : 0;
+    }
+
+    function applyRotation(image, rotation) {
+      const parent = typeof image.parent === 'function' ? image.parent() : null;
+      ROTACIONES.forEach((value) => {
+        if (value !== 0) image.removeClass(`ocd-rot-${value}`);
+      });
+      if (parent && typeof parent.removeClass === 'function') parent.removeClass('ocd-marco-girado');
+
+      if (rotation === 0) {
+        image.addAttributes({ 'data-ocd-rotation': '0' });
+        return;
+      }
+      image.addClass(`ocd-rot-${rotation}`);
+      image.addAttributes({ 'data-ocd-rotation': String(rotation) });
+      // 90 y 270 cambian la forma de la caja, así que el marco tiene que pasar
+      // a ser contenedor de tamaño para poder intercambiar alto y ancho. 180 no
+      // la cambia y no necesita marco especial.
+      if ((rotation === 90 || rotation === 270) && parent && typeof parent.addClass === 'function') {
+        parent.addClass('ocd-marco-girado');
+      }
+    }
+
+    function renderImageRotationPanel(component) {
+      const image = imageRotationTargetFor(component);
+      if (!image) return null;
+
+      const panel = createElement(hostDocument, 'section', 'ocd-ci__luma');
+      panel.appendChild(createElement(hostDocument, 'div', 'ocd-ci__luma-title', 'Imagen · giro'));
+
+      const grid = createElement(hostDocument, 'div', 'ocd-ci__rotacion');
+      const botones = [];
+      const pintarActivo = (valor) => {
+        botones.forEach((boton) => {
+          boton.classList.toggle('is-active', Number(boton.dataset.rotacion) === valor);
+        });
+      };
+
+      ROTACIONES.forEach((valor) => {
+        const boton = createElement(hostDocument, 'button', 'ocd-ci__rotacion-boton', valor === 0 ? 'Sin giro' : `${valor}°`);
+        boton.type = 'button';
+        boton.dataset.rotacion = String(valor);
+        boton.addEventListener('click', async () => {
+          const objetivo = imageRotationTargetFor(editor.getSelected() || component);
+          if (!objetivo) return;
+          applyRotation(objetivo, valor);
+          pintarActivo(valor);
+          await refreshAfterRender();
+        });
+        botones.push(boton);
+        grid.appendChild(boton);
+      });
+      pintarActivo(currentRotation(image));
+      panel.appendChild(grid);
+
+      panel.appendChild(
+        createElement(
+          hostDocument,
+          'div',
+          'ocd-ci__luma-hint',
+          'El giro viaja con la imagen: se respeta en la página y también al ampliarla en el lightbox. Útil cuando una foto vertical de teléfono se ve acostada, porque WordPress borra la orientación del archivo al generar sus copias.',
+        ),
+      );
+      return panel;
+    }
+
     function interactionsFor(component) {
       const api = interactionsApi();
       if (!api || typeof api.parseInteraction !== 'function') return null;
@@ -2006,6 +2160,73 @@
       container.appendChild(label);
     }
 
+    /**
+     * Etiquetas que NUNCA se editan como texto simple: tienen su propio
+     * significado (fuente, medio) y ya cuentan con un panel dedicado, o no
+     * son elementos de contenido en absoluto.
+     */
+    const TEXTO_NO_APLICA = new Set(['img', 'video', 'audio', 'source', 'picture', 'svg', 'iframe', 'canvas', 'input', 'select', 'textarea', 'br', 'hr']);
+
+    /**
+     * Un componente es "texto simple" cuando es una hoja: no tiene
+     * componentes hijos propios (nada seleccionable por separado adentro).
+     * Eso cubre exactamente lo que hoy solo se puede tocar entrando al
+     * lienzo — un botón, un enlace, un título, un párrafo — y excluye
+     * naturalmente los contenedores (secciones, columnas, grupos), que sí
+     * tienen estructura interna y no tienen "el" contenido como un único
+     * texto.
+     */
+    function esTextoSimple(component) {
+      if (!component) return false;
+      const el = getElement(component);
+      if (!el) return false;
+      const tag = String(component.get?.('tagName') || '').toLowerCase();
+      if (TEXTO_NO_APLICA.has(tag)) return false;
+      const hijos = typeof component.components === 'function' ? component.components() : null;
+      if (hijos && typeof hijos.length === 'number' && hijos.length > 0) return false;
+      return true;
+    }
+
+    function textoActual(component) {
+      const el = getElement(component);
+      return el ? el.textContent.trim() : '';
+    }
+
+    function renderContentPanel(component) {
+      if (!esTextoSimple(component)) return null;
+      const panel = createElement(hostDocument, 'section', 'ocd-ci__content');
+      panel.appendChild(createElement(hostDocument, 'div', 'ocd-ci__content-title', 'Contenido de texto'));
+      const campo = createElement(hostDocument, 'textarea', 'ocd-ci__content-field');
+      campo.rows = 2;
+      campo.value = textoActual(component);
+      campo.placeholder = 'Texto de este elemento…';
+      let ultimoAplicado = campo.value;
+      function aplicar() {
+        const nuevo = campo.value;
+        if (nuevo === ultimoAplicado) return;
+        ultimoAplicado = nuevo;
+        // Misma vía que usa el puente headless para lo mismo: reemplaza los
+        // hijos del componente por el texto, por la API real de Grapes — no
+        // innerHTML a mano, y sin pasar por el editor de texto del lienzo,
+        // que es donde vive el defecto de los espacios.
+        component.components(nuevo);
+      }
+      campo.addEventListener('blur', aplicar);
+      campo.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter' && !event.shiftKey) {
+          event.preventDefault();
+          aplicar();
+          campo.blur();
+        }
+      });
+      panel.appendChild(campo);
+      panel.appendChild(createElement(
+        hostDocument, 'div', 'ocd-ci__content-hint',
+        'Enter o clic afuera para aplicar. Reemplaza el uso del editor del lienzo para este texto.',
+      ));
+      return panel;
+    }
+
     function renderPresentationPanel(component) {
       if (!component || !getElement(component)) return null;
       const panel = createElement(hostDocument, 'section', 'ocd-ci__presentation');
@@ -2081,6 +2302,8 @@
         }
         if (classField) classField.hidden = scopeSelect?.value !== 'class';
       }
+      const contentPanel = renderContentPanel(snapshot?.component);
+      if (contentPanel) body.appendChild(contentPanel);
       const headerPanel = renderHeaderStatePanel(headerForComponent(snapshot?.component));
       if (headerPanel) body.appendChild(headerPanel);
       const supermoduleTrail = renderSupermoduleBreadcrumb(snapshot?.component);
@@ -2089,6 +2312,8 @@
       if (supermodulePanel) body.appendChild(supermodulePanel);
       const lumaPanel = renderLumaMattePanel(snapshot?.component);
       if (lumaPanel) body.appendChild(lumaPanel);
+      const rotationPanel = renderImageRotationPanel(snapshot?.component);
+      if (rotationPanel) body.appendChild(rotationPanel);
       const presentationPanel = renderPresentationPanel(snapshot?.component);
       if (presentationPanel) body.appendChild(presentationPanel);
       const interactionsPanel = renderInteractionsPanel(snapshot?.component);
@@ -2096,8 +2321,7 @@
       const dynamicSourcePanel = renderDynamicSourcePanel(snapshot?.component);
       if (dynamicSourcePanel) body.appendChild(dynamicSourcePanel);
       const columnPresetsPanel = renderColumnPresetsPanel(snapshot?.component);
-      // La paleta visual se abre desde el control principal de Columnas;
-      // no se repite como una sección separada más abajo en el inspector.
+      // La paleta visual se abre desde el control principal de Columnas.
       const saveModulePanel = renderSaveModulePanel(snapshot?.component);
       if (saveModulePanel) body.appendChild(saveModulePanel);
       const svgImage = externalSvgImageFor(snapshot?.component) || firstExternalSvgImage();

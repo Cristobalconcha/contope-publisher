@@ -127,10 +127,28 @@ function resizeTrackBoundary(weights, boundaryIndex, delta, minimum = 0.1) {
 function resolveBreakpoint(editor, requested, breakpoints) {
   if (requested) return requested;
   const selected = editor.DeviceManager?.getSelected?.();
-  const raw = selected?.get?.('id') || selected?.get?.('name') || 'desktop';
-  let normalized = String(raw).toLowerCase();
-  if (normalized.startsWith('mobile')) normalized = 'mobile';
-  return Object.hasOwn(breakpoints, normalized) ? normalized : 'desktop';
+  const id = String(selected?.get?.('id') || '').toLowerCase();
+  const name = String(selected?.get?.('name') || '').toLowerCase();
+  const keys = Object.keys(breakpoints);
+
+  // Coincidencia exacta primero: soporta breakpoints personalizados con
+  // claves arbitrarias (`options.breakpoints` en `ocdCanvasGrid`).
+  for (const key of keys) {
+    if (id === key || name === key) return key;
+  }
+
+  // Los dispositivos por defecto de GrapesJS traen id/nombre compuestos
+  // ("Mobile landscape", "mobilePortrait", "Tablet"...) que nunca calzan
+  // exacto contra claves simples como "mobile"/"tablet" (confirmado leyendo
+  // los dispositivos vendorizados en assets/vendor/grapesjs/grapes.min.js:
+  // sólo existen "Desktop", "Tablet", "Mobile landscape", "Mobile portrait",
+  // nunca un dispositivo llamado literalmente "Mobile"). Sin este fallback
+  // por sub-cadena, cualquier dispositivo móvil caía siempre a "desktop".
+  for (const key of keys) {
+    if (id.includes(key) || name.includes(key)) return key;
+  }
+
+  return Object.hasOwn(breakpoints, 'desktop') ? 'desktop' : keys[0] || 'desktop';
 }
 
 function mediaOptions(breakpoint, breakpoints) {
@@ -222,18 +240,18 @@ function addGridStyleSector(editor) {
       input.value = known ? '' : value;
     },
   });
+  // "Proporción" (grid-template-columns crudo) se sacó de acá 2026-08-21:
+  // no agrega ni quita columnas por si sola, solo cambia el CSS -- confundía
+  // porque parecia la forma de armar el layout cuando la forma real es
+  // "Presets de columnas" (agrega/quita columnas Y fija la proporcion en un
+  // solo paso). Lo que queda acá (separación/gap) SÍ es unico, ningún otro
+  // control ajusta el espacio entre columnas ya puestas.
   editor.StyleManager.addSector(
     'ocd-canvas-grid',
     {
-      name: 'Columnas OCD',
+      name: 'Espaciado de columnas',
       open: true,
       properties: [
-        {
-          property: 'grid-template-columns',
-          name: 'Proporción',
-          type: 'ocd-grid-template',
-          default: GRID_PRESETS['1/1/1'],
-        },
         { property: 'gap', name: 'Separación', type: 'number', units: ['px', 'rem', 'em', '%'] },
         { property: 'column-gap', name: 'Separación horizontal', type: 'number', units: ['px', 'rem', 'em', '%'] },
         { property: 'row-gap', name: 'Separación vertical', type: 'number', units: ['px', 'rem', 'em', '%'] },
@@ -241,14 +259,83 @@ function addGridStyleSector(editor) {
     },
     { at: 0 },
   );
+
+  // Bug encontrado 2026-08-21: "Columnas OCD" quedaba visible SIEMPRE, sin
+  // importar qué estuviera seleccionado -- aparecia hasta con un Texto
+  // plano seleccionado, donde no tiene ningun sentido. El sector solo
+  // debe verse cuando el componente seleccionado es realmente una fila/
+  // columnas (grid), para no mezclar propiedades irrelevantes con las que
+  // si aplican al elemento activo.
+  const gridSector = editor.StyleManager.getSector('ocd-canvas-grid');
+  function syncGridSectorVisibility(component) {
+    if (!gridSector) return;
+    gridSector.set('visible', isGridComponent(component));
+  }
+  editor.on('component:selected', (component) => syncGridSectorVisibility(component));
+  editor.on('component:deselected', () => syncGridSectorVisibility(null));
+  syncGridSectorVisibility(editor.getSelected?.());
 }
 
 function createCanvasGridApi(editor, options = {}) {
   const breakpoints = { ...DEFAULT_BREAKPOINTS, ...(options.breakpoints ?? {}) };
 
+  // Bug encontrado 2026-08-21, documentos ya guardados: la limpieza de
+  // applyTemplate() solo corre al hacer clic en un preset. Un documento
+  // guardado ANTES de que esa limpieza existiera (o donde el preset se
+  // aplicó y nunca se volvió a tocar) se queda con la regla local #<id>
+  // vieja para siempre, aunque el motor esté arreglado — nada dispara la
+  // limpieza en ese caso. Por eso también se sanea acá, en recognize(),
+  // que corre para CADA componente al cargar cualquier documento
+  // (component:add) además de al seleccionarlo, así el contenido viejo se
+  // autocura sin que el usuario tenga que volver a aplicar el preset.
+  function sanitizeLocalGridOverride(component, gridId) {
+    if (typeof component.getStyle !== 'function' || typeof component.setStyle !== 'function') return;
+    const localStyle = component.getStyle();
+    if (!localStyle || localStyle['grid-template-columns'] === undefined) return;
+    const classRules = editor.Css?.getAll?.();
+    const rules = classRules?.models ?? classRules?.toArray?.() ?? [];
+    const hasConflictingClassRule = rules.some((rule) => {
+      const selector = rule.getSelectorsString ? rule.getSelectorsString() : '';
+      if (!selector.includes(gridId) || selector.startsWith('#')) return false;
+      const ruleStyle = rule.getStyle ? rule.getStyle() : {};
+      return ruleStyle['grid-template-columns'] !== undefined;
+    });
+    if (!hasConflictingClassRule) return;
+    const cleaned = { ...localStyle };
+    delete cleaned['grid-template-columns'];
+    component.setStyle(cleaned);
+  }
+
+  // Segunda causa encontrada 2026-08-21, mismo día: además de la regla por
+  // ID, también quedan reglas de clase VIEJAS con más clases encadenadas
+  // (ej. ".ocd-columns.ocd-columns--single.ocd-grid-<id>", especificidad
+  // 0-3-0) que le ganan a la regla canónica de una sola clase
+  // ".ocd-grid-<id>" (especificidad 0-1-0) que este motor usa siempre para
+  // escribir cada preset nuevo (ver setGridRule/ensureGridIdentity). Una
+  // vez que existe esa regla vieja de más clases, ningún preset nuevo se
+  // ve nunca — siempre gana la vieja congelada. Se limpia esa propiedad de
+  // cualquier otra regla de clase que no sea la canónica.
+  function sanitizeStaleClassGridRules(gridId) {
+    const canonicalSelector = `.${gridId}`;
+    const classRules = editor.Css?.getAll?.();
+    const rules = classRules?.models ?? classRules?.toArray?.() ?? [];
+    for (const rule of rules) {
+      const selector = rule.getSelectorsString ? rule.getSelectorsString() : '';
+      if (!selector || selector.startsWith('#') || selector === canonicalSelector) continue;
+      if (!selector.includes(gridId)) continue;
+      const ruleStyle = rule.getStyle ? rule.getStyle() : {};
+      if (ruleStyle['grid-template-columns'] === undefined) continue;
+      const cleaned = { ...ruleStyle };
+      delete cleaned['grid-template-columns'];
+      if (typeof rule.setStyle === 'function') rule.setStyle(cleaned);
+    }
+  }
+
   function recognize(component) {
     if (!isGridComponent(component)) return null;
-    ensureGridIdentity(component);
+    const { gridId } = ensureGridIdentity(component);
+    sanitizeLocalGridOverride(component, gridId);
+    sanitizeStaleClassGridRules(gridId);
     component.set?.('ocdGridRecognized', true);
     return component;
   }
@@ -276,6 +363,24 @@ function createCanvasGridApi(editor, options = {}) {
     const style = { display: 'grid', 'grid-template-columns': template };
     if (settings.gap != null) style.gap = normalizeGap(settings.gap);
     setGridRule(editor, component, breakpoint, style, breakpoints);
+
+    // Bug encontrado 2026-08-21, confirmado en vivo: los bloques de Fila/
+    // Columnas traen grid-template-columns en un style="" inline, que
+    // GrapesJS promueve automaticamente a una regla por ID (#id{...}) al
+    // insertar el bloque. Un selector de ID le gana en especificidad a la
+    // clase .ocd-grid-<id> que usa este motor, asi que la regla de acá
+    // nunca se veia aplicada -- quedaba pegado en 1 columna sin importar
+    // que preset se eligiera despues. Se limpia esa propiedad puntual de
+    // la regla local/por-ID del componente cada vez que este motor la fija
+    // por su cuenta, para que deje de competir.
+    if (typeof component.setStyle === 'function') {
+      const localStyle = { ...(component.getStyle ? component.getStyle() : {}) };
+      if (localStyle['grid-template-columns'] !== undefined) {
+        delete localStyle['grid-template-columns'];
+        component.setStyle(localStyle);
+      }
+    }
+
     updateStoredConfig(component, breakpoint, { template, ...(settings.gap != null ? { gap: normalizeGap(settings.gap) } : {}) });
     editor.trigger?.('ocd:grid:update', { component, breakpoint, style });
     return style;
@@ -343,8 +448,12 @@ function createCanvasGridApi(editor, options = {}) {
     setGap,
     resizeBoundary,
     getHandleModel,
-    getActiveBreakpoint: () => resolveBreakpoint(editor, null, breakpoints),
     getConfig: (component) => component?.get?.(CONFIG_PROPERTY) ?? {},
+    // Expuesto para que otros paneles (p.ej. el picker de presets de columnas
+    // en ocd-computed-inspector.js) lean el mismo breakpoint activo que ya
+    // usa este módulo para aplicar reglas, en vez de reimplementar su propia
+    // detección de dispositivo.
+    getActiveBreakpoint: (requested) => resolveBreakpoint(editor, requested, breakpoints),
   };
 }
 

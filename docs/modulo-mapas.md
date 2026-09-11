@@ -30,8 +30,21 @@ fetch a Overpass desde el navegador: el pipeline es un paso de terminal/Node.
 
 ### 1. Crear el archivo de lugares curados
 
-Es un JSON a mano. `dist` se expresa en km; si se omite, el script lo calcula
-con Haversine desde las coordenadas del proyecto.
+Es un JSON a mano. `dist` (km) y `tiempoMin` (minutos) se cargan a mano
+mirando la ruta real en Google Maps — igual que se hace hoy con
+nombre/categoría/contacto. Medir en línea recta no representa nada útil
+("un gimnasio a 10 km" suena lejos; "a 10 minutos" suena cerca, y eso es lo
+que el cliente pidió mostrar). Si se carga `tiempoMin`, ese es el dato que
+se muestra en el mapa; `dist` queda solo de respaldo si algún lugar no
+tiene tiempo cargado. El script todavía completa `dist` con Haversine
+(línea recta) cuando ninguno de los dos se cargó, solo para no dejar el
+campo vacío — no lo tomes como el dato real de ningún lugar.
+
+`icons` es un mapa opcional `categoria → path SVG` (mismo set de Material
+Symbols que el resto del sitio, viewBox 24×24). Si una categoría no tiene
+ícono, el marcador usa la estrella por defecto.
+
+`descripcionLarga` es un texto opcional por lugar para la ficha del mapa.
 
 ```json
 {
@@ -40,6 +53,9 @@ con Haversine desde las coordenadas del proyecto.
     "educacion": "Educación",
     "comercio": "Comercio"
   },
+  "icons": {
+    "salud": "M19 3H5c-1.1 0-1.99.9-1.99 2L3 19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-8.5-2h3v-3.5H17v-3h-3.5V7h-3v3.5H7v3h3.5z"
+  },
   "places": [
     {
       "nombre": "Hospital Regional",
@@ -47,7 +63,9 @@ con Haversine desde las coordenadas del proyecto.
       "lat": -38.7392,
       "lng": -72.5854,
       "dist": 1.8,
-      "contacto": "+56 45 220 5000"
+      "tiempoMin": 6,
+      "contacto": "+56 45 220 5000",
+      "descripcionLarga": "Urgencia y consultas generales, atención todo el día."
     }
   ]
 }
@@ -159,6 +177,10 @@ root con `data-ocd-parcel-*`.
    correr el script y pegá el fragmento nuevo. No edites a mano coordenadas del
    SVG: los errores de este mapa siempre aparecieron por coordenadas
    copiadas/obsoletas después de un re-fetch.
+7. **Íconos del marcador: mismo set de Material Symbols del resto del sitio.**
+   No inventes un ícono nuevo por mapa; reusá el path ya usado en otra parte
+   del sitio si la categoría coincide (p. ej. naturaleza). El marcador cae
+   solo en la estrella por defecto si la categoría no tiene ícono en `icons`.
 
 ---
 

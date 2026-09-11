@@ -1,0 +1,37 @@
+{
+  "_comentario": "Repara .plano-frame__body. El original tenía DOS reglas base que se sumaban en cascada más una de móvil; al reponer la abreviada con var() se escribió solo la primera y setRule reemplazó todo, dejando el contenedor del mapa sin display/position/min-height. Acá va el cuerpo COMPLETO fusionado, en longhand.",
+  "mode": "append",
+  "structure": [],
+  "styles": [
+    {
+      "selector": ".plano-frame__body",
+      "style": {
+        "border-top-width": "1px",
+        "border-top-style": "solid",
+        "border-top-color": "var(--tierra-300)",
+        "margin-top": "10px",
+        "padding-top": "10px",
+        "position": "relative",
+        "flex-grow": "1",
+        "flex-shrink": "1",
+        "flex-basis": "0%",
+        "display": "flex",
+        "row-gap": "5%",
+        "column-gap": "5%",
+        "min-height": "0",
+        "text-align": "left"
+      }
+    },
+    {
+      "_causa": "La variante de móvil: apila en columna.",
+      "selector": ".plano-frame__body",
+      "media": "(max-width: 860px)",
+      "style": {
+        "flex-direction": "column",
+        "row-gap": "24px",
+        "column-gap": "24px",
+        "min-width": "0"
+      }
+    }
+  ]
+}

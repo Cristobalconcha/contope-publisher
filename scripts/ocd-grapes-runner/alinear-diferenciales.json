@@ -1,0 +1,21 @@
+{
+  "_comentario": "Alinear Diferenciales con los estilos de la portada. Diferencias medidas comparando ambas páginas en el navegador, no supuestas.",
+  "mode": "append",
+  "structure": [],
+  "styles": [
+    {
+      "_causa": "Inicio declara el fondo del body con el color de la paleta (#F6F6F3 = --tierra-50). Diferenciales no lo declara, así que se filtra el fondo del tema de WordPress (#F5F0EB), un color que no es del proyecto.",
+      "selector": "body",
+      "style": {
+        "background-color": "var(--tierra-50)"
+      }
+    },
+    {
+      "_causa": "En Inicio los párrafos de sección separan 20px abajo. En Diferenciales quedó en 0 y el texto se apelmaza con lo que sigue.",
+      "selector": ".section__body",
+      "style": {
+        "margin-bottom": "20px"
+      }
+    }
+  ]
+}

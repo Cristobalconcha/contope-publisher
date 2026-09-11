@@ -1,0 +1,15 @@
+{
+  "_comentario": "Complemento del ajuste anterior: mostrar la franja de tarjetas cuando el banner marca que hubo scroll, sin depender del revelado por observador. Así el estado visible no queda atado a que el observador haya disparado, que es lo que hacía impredecible el resultado.",
+  "mode": "append",
+  "structure": [],
+  "styles": [
+    {
+      "selector": ".hero.is-handoff .features",
+      "media": "(max-width: 900px), (max-aspect-ratio: 4 / 5)",
+      "style": {
+        "opacity": "1",
+        "pointer-events": "auto"
+      }
+    }
+  ]
+}

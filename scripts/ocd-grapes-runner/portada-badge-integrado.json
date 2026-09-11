@@ -1,0 +1,24 @@
+{
+  "_comentario": "En la portada el header nace transparente sobre el banner y se solidifica al hacer scroll: logo, enlaces y botón de menú están invisibles hasta entonces. El badge de WhatsApp no seguía esa regla y quedaba flotando solo sobre la foto. Acá se le da el mismo comportamiento. Selectores nuevos: no reemplazan ninguna regla existente.",
+  "mode": "append",
+  "structure": [],
+  "styles": [
+    {
+      "selector": ".site-nav .header-wa",
+      "style": {
+        "opacity": "0",
+        "pointer-events": "none",
+        "transition-property": "opacity, transform, filter",
+        "transition-duration": "0.5s",
+        "transition-timing-function": "ease"
+      }
+    },
+    {
+      "selector": ".site-nav.is-crystallized .header-wa",
+      "style": {
+        "opacity": "1",
+        "pointer-events": "auto"
+      }
+    }
+  ]
+}

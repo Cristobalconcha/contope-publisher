@@ -13,7 +13,12 @@ if (!defined('ABSPATH')) {
 final class OCD_Canvas_Document_Sanitizer
 {
     public const MAX_HTML_BYTES = 2097152;
-    public const MAX_CSS_BYTES = 524288;
+    // Subido de 512 KB a 2 MB en caliente (2026-08-21) para destrabar un
+    // guardado real bloqueado en una sesión larga de edición: el CSS del
+    // documento ya superaba el límite anterior. Investigar por qué se
+    // acumuló tanto CSS (posibles reglas huérfanas de componentes borrados
+    // sin limpiar) queda pendiente como tarea aparte, no urgente.
+    public const MAX_CSS_BYTES = 2097152;
     public const MAX_PROJECT_BYTES = 4194304;
     public const MAX_PROJECT_DEPTH = 64;
 
@@ -112,6 +117,8 @@ final class OCD_Canvas_Document_Sanitizer
         'object-fit',
         'object-position',
         'aspect-ratio',
+        'transition',
+        'box-shadow',
     ];
 
     /**
@@ -347,7 +354,12 @@ final class OCD_Canvas_Document_Sanitizer
 
         $specific = [
             'a' => ['href' => true, 'target' => true, 'rel' => true, 'download' => true],
-            'img' => ['src' => true, 'srcset' => true, 'sizes' => true, 'alt' => true, 'width' => true, 'height' => true, 'loading' => true, 'decoding' => true],
+            // fetchpriority le dice al navegador cuál imagen pedir primero. En un
+            // banner a pantalla completa esa imagen ES la métrica LCP que mide
+            // Google, así que poder marcarla como prioritaria no es cosmético.
+            // Valor seguro: solo lo escribe quien edita el documento, y el
+            // navegador ignora cualquier valor que no sea high/low/auto.
+            'img' => ['src' => true, 'srcset' => true, 'sizes' => true, 'alt' => true, 'width' => true, 'height' => true, 'loading' => true, 'decoding' => true, 'fetchpriority' => true],
             'source' => ['src' => true, 'srcset' => true, 'sizes' => true, 'type' => true, 'media' => true],
             'video' => ['src' => true, 'poster' => true, 'controls' => true, 'loop' => true, 'muted' => true, 'autoplay' => true, 'playsinline' => true, 'preload' => true, 'width' => true, 'height' => true],
             'canvas' => ['width' => true, 'height' => true],

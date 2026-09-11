@@ -1,0 +1,58 @@
+{
+  "_comentario": "REPARACIÓN. Al pasar la página por Grapes se perdieron 8 declaraciones abreviadas que usaban variables (background: var(--x)): Grapes las expande a sus partes y no puede resolver la variable, así que las descarta. Se reponen en forma expandida (background-color, border-bottom-*), que sí sobrevive.",
+  "mode": "append",
+  "structure": [],
+  "styles": [
+    {
+      "_causa": "El recuadro de naturaleza perdió su fondo oliva y el texto blanco quedó ilegible.",
+      "selector": ".agua__box",
+      "style": {
+        "background-color": "var(--oliva-700)"
+      }
+    },
+    {
+      "_causa": "El bloque de cierre perdió su fondo oliva.",
+      "selector": ".cierre",
+      "style": {
+        "background-color": "var(--oliva-700)"
+      }
+    },
+    {
+      "_causa": "El botón del cierre perdió su fondo dorado.",
+      "selector": ".cierre a",
+      "style": {
+        "background-color": "var(--dorado-600)"
+      }
+    },
+    {
+      "_causa": "Las líneas separadoras entre pilares son el fondo de la grilla asomando por el gap de 1px.",
+      "selector": ".pilares__grid",
+      "style": {
+        "background-color": "var(--tierra-100)"
+      }
+    },
+    {
+      "_causa": "Las tres barras del menú hamburguesa quedaron sin color.",
+      "selector": ".site-nav__burger span",
+      "style": {
+        "background-color": "var(--oliva-700)"
+      }
+    },
+    {
+      "_causa": "El desplegable del menú en móvil quedó sin fondo (se veía el contenido por detrás).",
+      "selector": ".site-nav__links",
+      "style": {
+        "background-color": "var(--tierra-50)"
+      }
+    },
+    {
+      "_causa": "Los separadores entre enlaces del menú móvil.",
+      "selector": ".site-nav__links a",
+      "style": {
+        "border-bottom-width": "1px",
+        "border-bottom-style": "solid",
+        "border-bottom-color": "var(--tierra-100)"
+      }
+    }
+  ]
+}

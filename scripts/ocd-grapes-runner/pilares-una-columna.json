@@ -1,0 +1,14 @@
+{
+  "_comentario": "Revertir los pilares a una sola columna bajo 520px. En Diferenciales cada pilar lleva texto largo, así que dos columnas los aprietan — a diferencia de la portada, donde los iconos tienen texto corto.",
+  "mode": "append",
+  "structure": [],
+  "styles": [
+    {
+      "selector": ".pilares__grid",
+      "style": {
+        "grid-template-columns": "1fr"
+      },
+      "media": "(max-width: 520px)"
+    }
+  ]
+}

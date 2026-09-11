@@ -19,9 +19,16 @@ final class OCD_Canvas_Page_Publisher
     ) {
     }
 
+    /** Evita que el CSS se emita dos veces cuando ya salió en la cabecera. */
+    private static bool $css_ya_emitido = false;
+
+    private static ?string $shared_css_cache = null;
+
     public function register(): void
     {
         add_shortcode('open_codesign_canvas', [$this, 'render_shortcode']);
+        add_action('wp_enqueue_scripts', [$this, 'estilos_en_cabecera'], 5);
+        add_action('wp_head', [self::class, 'precarga_en_cabecera'], 1);
         add_filter('template_include', [$this, 'standalone_template']);
     }
 
@@ -33,6 +40,113 @@ final class OCD_Canvas_Page_Publisher
      * contra el directorio de uploads real (portable entre instalaciones). Si el
      * archivo no existe devuelve cadena vacía y todo sigue funcionando como hoy.
      */
+    /**
+     * Carrusel en varias filas. Es el MISMO módulo de siempre con un parámetro
+     * (data-ocd-carousel-rows); con 1 fila —el valor por defecto— este CSS no
+     * aplica y nada cambia.
+     *
+     * La pista pasa de fila flexible a grilla que se llena por columnas: cada
+     * columna trae `rows` diapositivas y el motor avanza de a una columna. El
+     * ancho de columna sale de --ocd-carousel-columnas, que el motor escribe
+     * según cuántas caben (escritorio o móvil), porque el CSS no puede leer el
+     * atributo.
+     */
+    /**
+     * Rótulo del marcador de shortcode DENTRO DEL EDITOR. En la página
+     * publicada el marcador ya no existe —se reemplazó por la salida real—,
+     * así que este CSS solo tiene sentido en el lienzo: sin él sería un
+     * rectángulo vacío imposible de encontrar y de seleccionar.
+     */
+    public static function shortcode_marker_css(): string
+    {
+        return '[data-ocd-shortcode]{display:flex;align-items:center;justify-content:center;'
+            . 'min-height:120px;padding:16px;border:1px dashed rgb(201,154,46);border-radius:8px;'
+            . 'background:rgba(255,243,214,.5);color:rgb(138,90,0);'
+            . 'font-family:system-ui,sans-serif;font-size:12px;font-weight:600;letter-spacing:.04em;}'
+            . '[data-ocd-shortcode]::before{content:"⧉ " attr(data-ocd-shortcode);}';
+    }
+
+    public static function carousel_rows_css(): string
+    {
+        $css = '';
+        foreach ([2, 3] as $filas) {
+            $sel = '[data-ocd-carousel-rows="' . $filas . '"]';
+            $css .= $sel . ' .gallery-carousel__track,' . $sel . ' .ocd-carousel__track{'
+                . 'display:grid;grid-auto-flow:column;'
+                . 'grid-template-rows:repeat(' . $filas . ',auto);'
+                . 'grid-auto-columns:calc((100% - (var(--ocd-carousel-columnas,4) - 1) * var(--ocd-carousel-gap,12px)) / var(--ocd-carousel-columnas,4));'
+                . '}';
+            // En grilla, el flex-basis de cada diapositiva ya no manda: el ancho
+            // lo pone la columna. Se neutraliza para que no compita.
+            $css .= $sel . ' .gallery-carousel__slide,' . $sel . ' .ocd-carousel__slide{'
+                . 'flex-basis:auto;width:auto;min-width:0;'
+                . '}';
+        }
+        return $css;
+    }
+
+    /**
+     * Giro de imágenes para páginas armadas en el editor (las compiladas por
+     * MCP lo traen en sus propios estilos base). El giro vive en la <img>, no
+     * en el marco, porque dentro de una galería cada foto lleva el suyo.
+     *
+     * 90 y 270 cambian la forma de la caja: la imagen girada necesita medir el
+     * ALTO del marco de ancho y el ANCHO de alto, y eso lo resuelven las
+     * unidades de contenedor sobre el marco marcado como tal. Sin ese
+     * intercambio, girar deja franjas vacías a los lados.
+     */
+    public static function rotation_css(): string
+    {
+        return '.ocd-rot-180{transform:rotate(180deg);}'
+            . '.ocd-marco-girado{position:relative;overflow:hidden;container-type:size;}'
+            . '.ocd-marco-girado>.ocd-rot-90,.ocd-marco-girado>.ocd-rot-270'
+            . '{position:absolute;top:50%;left:50%;width:100cqh;height:100cqw;max-width:none;object-fit:cover;}'
+            . '.ocd-marco-girado>.ocd-rot-90{transform:translate(-50%,-50%) rotate(90deg);}'
+            . '.ocd-marco-girado>.ocd-rot-270{transform:translate(-50%,-50%) rotate(270deg);}'
+            . '@supports not (width:100cqh){.ocd-marco-girado>.ocd-rot-90,.ocd-marco-girado>.ocd-rot-270'
+            . '{position:static;width:100%;height:auto;transform:rotate(90deg);}}';
+    }
+
+    /**
+     * Cortina de precarga: cubre la página con el color de fondo del sitio
+     * hasta que la portada está lista de verdad (tipografías, imágenes, el
+     * símbolo del logotipo y el primer cuadro del video con máscara).
+     *
+     * Se escribe directo en la cabecera, no como archivo aparte: esperar una
+     * descarga dejaría ver justo lo que se quiere ocultar. El retiro lo hace
+     * assets/js/ocd-preload.js, que además tiene un tope de tiempo para que
+     * la página nunca quede tapada.
+     */
+    public static function precarga_en_cabecera(): void
+    {
+        if (!is_singular()) {
+            return;
+        }
+        $post = get_post();
+        if (!$post || !has_shortcode((string) $post->post_content, 'open_codesign_canvas')) {
+            return;
+        }
+
+        $fondo = esc_attr(OCD_Theme_Definitions::preload_background());
+        $estilo = '.ocd-precarga, .ocd-precarga body { overflow: hidden !important; }'
+            . '.ocd-precarga body::after, .ocd-precarga-lista body::after {'
+            . ' content: ""; position: fixed; inset: 0; z-index: 2147483000;'
+            . ' pointer-events: none; background: ' . $fondo . '; }'
+            . '.ocd-precarga-lista body::after { opacity: 0; transition: opacity .45s ease; }'
+            . '@media (prefers-reduced-motion: reduce) {'
+            . ' .ocd-precarga-lista body::after { transition: none; } }';
+
+        // El tope de tiempo va acá además de en el script: si el archivo del
+        // retiro no llegara a cargar, la página se destapa igual.
+        $marca = "document.documentElement.classList.add('ocd-precarga');"
+            . "setTimeout(function(){"
+            . "document.documentElement.classList.remove('ocd-precarga');"
+            . "}, 6000);";
+
+        echo '<style id="ocd-precarga-estilo">' . $estilo . '</style>';
+        echo '<script id="ocd-precarga-marca">' . $marca . '</script>';
+    }
+
     public static function site_font_css(): string
     {
         if (self::$site_font_css_cache !== null) {
@@ -107,6 +221,110 @@ final class OCD_Canvas_Page_Publisher
         }
 
         return $this->describe_page((int) $saved_id);
+    }
+
+    /**
+     * Publica únicamente una página Canvas ya existente. Es la ruta de
+     * dominio para MCP: no llama load(), no puede crear un documento por un ID
+     * remoto erróneo y conserva un snapshot previo antes de cambiar la
+     * visibilidad de la página.
+     *
+     * @return array<string, mixed>|WP_Error
+     */
+    public function publish_existing_if_revision(
+        int $page_id,
+        string $document_id,
+        int $expected_revision,
+        string $snapshot_session,
+        string $snapshot_label
+    ) {
+        $page = $this->describe_canvas_page($page_id);
+        if ($page === null) {
+            return new WP_Error('ocd_mcp_canvas_page_not_found', 'No existe una página Canvas con ese pageId.');
+        }
+        if ((string) $page['documentId'] !== $document_id) {
+            return new WP_Error('ocd_mcp_canvas_target_mismatch', 'pageId y documentId no pertenecen a la misma página Canvas.');
+        }
+
+        $document = $this->repository->load_existing($document_id);
+        if (is_wp_error($document)) {
+            return $document;
+        }
+        $actual_revision = (int) $document['revision'];
+        if ($actual_revision !== $expected_revision) {
+            return $this->revision_conflict($expected_revision, $actual_revision);
+        }
+        if (trim((string) $document['html']) === '') {
+            return new WP_Error('ocd_canvas_empty', 'Aplica una receta Canvas antes de publicar la página.');
+        }
+
+        // Publicar una página que ya está pública no altera nada ni genera un
+        // snapshot redundante. También hace que la llamada sea idempotente.
+        if ($page['status'] === 'publish') {
+            return [
+                'page' => $page,
+                'snapshot' => null,
+                'alreadyPublished' => true,
+            ];
+        }
+
+        $snapshot = $this->repository->create_snapshot_if_revision(
+            $document_id,
+            $expected_revision,
+            $snapshot_session,
+            $snapshot_label
+        );
+        if (is_wp_error($snapshot)) {
+            return $snapshot;
+        }
+
+        // La creación de snapshot libera su bloqueo; antes de exponer la
+        // página revalidamos que nadie haya editado el documento entre ambos
+        // pasos. En tal caso no publicamos una versión distinta de la que el
+        // cliente revisó y el snapshot adicional deja evidencia recuperable.
+        $current = $this->repository->describe_existing($document_id);
+        if ($current === null) {
+            return new WP_Error('ocd_canvas_document_not_found', 'El documento Canvas dejó de estar disponible.');
+        }
+        if ((int) $current['revision'] !== $expected_revision) {
+            return $this->revision_conflict($expected_revision, (int) $current['revision']);
+        }
+
+        $published = wp_update_post([
+            'ID' => $page_id,
+            'post_type' => 'page',
+            'post_status' => 'publish',
+            'post_content' => sprintf('[open_codesign_canvas document_id="%s"]', esc_attr($document_id)),
+        ], true);
+        if (is_wp_error($published)) {
+            return $published;
+        }
+
+        $published_page = $this->describe_canvas_page($page_id);
+        if ($published_page === null) {
+            return new WP_Error('ocd_mcp_canvas_page_unavailable', 'La página Canvas no pudo leerse después de publicarla.');
+        }
+
+        return [
+            'page' => $published_page,
+            'snapshot' => $snapshot,
+            'alreadyPublished' => false,
+        ];
+    }
+
+    /** @return WP_Error */
+    private function revision_conflict(int $expected_revision, int $actual_revision): WP_Error
+    {
+        $error = new WP_Error(
+            'ocd_canvas_revision_conflict',
+            'La revisión de la página cambió; vuelve a consultar o previsualizar antes de aplicar la operación.'
+        );
+        $error->add_data([
+            'expectedRevision' => $expected_revision,
+            'actualRevision' => $actual_revision,
+        ]);
+
+        return $error;
     }
 
     /**
@@ -255,7 +473,151 @@ final class OCD_Canvas_Page_Publisher
         return $page_id === null ? null : $this->describe_page($page_id);
     }
 
+    /**
+     * Lista páginas WordPress que ya están vinculadas a un documento Canvas.
+     * No crea páginas ni documentos y omite la URL de administración, que es
+     * un detalle de la interfaz local y no parte del contrato semántico.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function list_canvas_pages(): array
+    {
+        $page_ids = get_posts([
+            'post_type' => 'page',
+            'post_status' => 'any',
+            'numberposts' => -1,
+            'orderby' => 'ID',
+            'order' => 'ASC',
+            'fields' => 'ids',
+            'no_found_rows' => true,
+            'meta_key' => self::META_DOCUMENT_ID,
+            'meta_compare' => 'EXISTS',
+        ]);
+
+        $pages = [];
+        foreach ($page_ids as $page_id) {
+            $page = $this->describe_canvas_page((int) $page_id);
+            if ($page !== null) {
+                $pages[] = $page;
+            }
+        }
+
+        return $pages;
+    }
+
+    /**
+     * Devuelve la identidad semántica de una página Canvas existente, o null
+     * si el ID no es una página Canvas. No carga ni inicializa el documento.
+     *
+     * @return array<string, mixed>|null
+     */
+    public function describe_canvas_page(int $page_id): ?array
+    {
+        $post = get_post($page_id);
+        if (!$post instanceof WP_Post || $post->post_type !== 'page') {
+            return null;
+        }
+
+        $document_id = (string) get_post_meta($page_id, self::META_DOCUMENT_ID, true);
+        if ($document_id === '') {
+            return null;
+        }
+
+        $url = get_permalink($page_id);
+
+        return [
+            'pageId' => $page_id,
+            'documentId' => $document_id,
+            'title' => $post->post_title,
+            'status' => $post->post_status,
+            'url' => is_string($url) ? $url : '',
+        ];
+    }
+
     /** @param array<string, mixed> $attributes */
+    /**
+     * Emite el CSS del sitio en la CABECERA, antes de que haya nada pintado.
+     *
+     * Sin esto los estilos salían desde el render del contenido, o sea casi al
+     * final del documento, y el navegador alcanzaba a pintar la página cruda:
+     * el logotipo negro a pantalla completa y el menú como lista suelta.
+     *
+     * Resuelve lo mismo que el shortcode (documento propio más las regiones de
+     * encabezado, cuerpo y pie) pero solo para quedarse con los estilos. Si algo
+     * no se puede resolver acá, no pasa nada: el shortcode sigue emitiéndolos
+     * como antes.
+     */
+    /**
+     * CSS compartido por todas las páginas: clases reutilizables como
+     * .ocd-btn, no tokens de tema (eso ya lo cubre OCD_Theme_Definitions)
+     * ni contenido propio de una página. Se cachea por request porque se
+     * pide desde dos puntos (la cabecera y, como respaldo, el shortcode).
+     */
+    private function shared_components_css(): string
+    {
+        if (self::$shared_css_cache !== null) {
+            return self::$shared_css_cache;
+        }
+        $documento = $this->repository->load(OCD_Canvas_Document_Repository::SHARED_STYLES_DOCUMENT_ID);
+        self::$shared_css_cache = is_wp_error($documento) ? '' : (string) $documento['css'];
+        return self::$shared_css_cache;
+    }
+
+    public function estilos_en_cabecera(): void
+    {
+        if (self::$css_ya_emitido || !is_singular()) {
+            return;
+        }
+        $post = get_post();
+        if (!$post) {
+            return;
+        }
+        $contenido = (string) $post->post_content;
+        if (!has_shortcode($contenido, 'open_codesign_canvas')) {
+            return;
+        }
+        if (preg_match('/document_id=[\x22\x27]?([a-z0-9_-]+)/i', $contenido, $coincidencias) !== 1) {
+            return;
+        }
+        $document = $this->repository->load(sanitize_key($coincidencias[1]));
+        if (is_wp_error($document)) {
+            return;
+        }
+
+        $post_id = (int) $post->ID;
+        $body_css = (string) $document['css'];
+        $header_css = '';
+        $footer_css = '';
+        if ($this->region_resolver !== null && $post_id > 0) {
+            $header = $this->region_resolver->resolve(
+                OCD_Canvas_Document_Repository::REGION_KIND_HEADER,
+                $post_id
+            );
+            if ($header !== null) { $header_css = (string) $header['css']; }
+            $footer = $this->region_resolver->resolve(
+                OCD_Canvas_Document_Repository::REGION_KIND_FOOTER,
+                $post_id
+            );
+            if ($footer !== null) { $footer_css = (string) $footer['css']; }
+            $body = $this->region_resolver->resolve(
+                OCD_Canvas_Document_Repository::REGION_KIND_BODY,
+                $post_id
+            );
+            if ($body !== null && trim((string) $body['html']) !== '') {
+                $body_css = (string) $body['css'];
+            }
+        }
+
+        wp_register_style('ocd-canvas-public', false, [], OCD_PUBLISHER_VERSION);
+        wp_enqueue_style('ocd-canvas-public');
+        wp_add_inline_style(
+            'ocd-canvas-public',
+            OCD_Theme_Definitions::css() . self::site_font_css() . $this->shared_components_css()
+                . self::rotation_css() . self::carousel_rows_css() . $header_css . $body_css . $footer_css
+        );
+        self::$css_ya_emitido = true;
+    }
+
     public function render_shortcode(array $attributes): string
     {
         $document_id = sanitize_key((string) ($attributes['document_id'] ?? ''));
@@ -317,7 +679,15 @@ final class OCD_Canvas_Page_Publisher
         $theme_css = OCD_Theme_Definitions::css();
         wp_register_style('ocd-canvas-public', false, [], OCD_PUBLISHER_VERSION);
         wp_enqueue_style('ocd-canvas-public');
-        wp_add_inline_style('ocd-canvas-public', $theme_css . $site_font_css . $header_css . $body_css . $footer_css);
+        if (!self::$css_ya_emitido) {
+            wp_add_inline_style(
+                'ocd-canvas-public',
+                $theme_css . $site_font_css . $this->shared_components_css()
+                    . self::rotation_css() . self::carousel_rows_css()
+                    . $header_css . $body_css . $footer_css
+            );
+            self::$css_ya_emitido = true;
+        }
         wp_enqueue_script(
             'ocd-interactions',
             plugins_url('assets/js/ocd-interactions.js', OCD_PUBLISHER_FILE),
@@ -339,12 +709,22 @@ final class OCD_Canvas_Page_Publisher
             OCD_PUBLISHER_VERSION,
             true
         );
+        wp_enqueue_script(
+            'ocd-preload',
+            plugins_url('assets/js/ocd-preload.js', OCD_PUBLISHER_FILE),
+            [],
+            OCD_PUBLISHER_VERSION,
+            true
+        );
+
+        $whatsapp_number = preg_replace('/[^0-9]/', '', (string) get_option('ocd_whatsapp_number', ''));
 
         $markup = '';
         if ($header_html !== '') {
             $markup .= '<header class="ocd-canvas-region ocd-canvas-region-header">' . $header_html . '</header>';
         }
-        $markup .= '<div class="ocd-canvas-published" data-ocd-document-id="' . esc_attr($body_document_id) . '">' .
+        $markup .= '<div class="ocd-canvas-published" data-ocd-document-id="' . esc_attr($body_document_id) . '"'
+            . ' data-ocd-whatsapp-number="' . esc_attr((string) $whatsapp_number) . '">' .
             $body_html . '</div>';
         if ($footer_html !== '') {
             $markup .= '<footer class="ocd-canvas-region ocd-canvas-region-footer">' . $footer_html . '</footer>';
@@ -353,6 +733,12 @@ final class OCD_Canvas_Page_Publisher
         if ($this->token_resolver !== null) {
             $markup = $this->token_resolver->resolve($markup, $post_id);
         }
+
+        // Los shortcodes se ejecutan al final, después de resolver los tokens
+        // dinámicos: así un marcador puede llevar un valor ACF entre sus
+        // atributos. Solo actúa sobre nodos marcados y de una lista permitida
+        // (ver OCD_Canvas_Shortcode_Renderer); nunca sobre el texto del diseño.
+        $markup = (new OCD_Canvas_Shortcode_Renderer())->render($markup);
 
         return $markup;
     }

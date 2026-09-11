@@ -91,7 +91,7 @@ if (-not (Test-Path -LiteralPath $pluginRoot -PathType Container)) {
 
 $files = @(Get-ChildItem -LiteralPath $pluginRoot -Recurse -File | Sort-Object FullName)
 if ($files.Count -eq 0) { throw 'El plugin local no contiene archivos.' }
-$allowedRuntimePath = '^(open-codesign-publisher\.php|includes/[^/]+\.php|templates/[^/]+\.php|assets/(css|js)/[^/]+\.(css|js)|assets/vendor/grapesjs/(grapes\.min\.(css|js)|LICENSE|README\.md))$'
+$allowedRuntimePath = '^(open-codesign-publisher\.php|includes/[^/]+\.php|templates/[^/]+\.php|tools/[^/]+.mjs|blocks/[^/]+/[^/]+\.(php|json|js|css)|assets/(css|js)/[^/]+\.(css|js)|assets/img/[^/]+\.(svg|png|jpg|jpeg|webp)|assets/vendor/grapesjs/(grapes\.min\.(css|js)|LICENSE|README\.md))$'
 $unexpected = @($files | Where-Object {
     $relative = $_.FullName.Substring($pluginRootPrefix.Length).Replace('\', '/')
     $relative -notmatch $allowedRuntimePath

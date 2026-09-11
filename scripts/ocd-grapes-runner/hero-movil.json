@@ -1,0 +1,26 @@
+{
+  "_comentario": "Dos ajustes del banner en móvil. (1) El video de la familia se ve chico: la pieza compuesta conserva su proporción, así que para que crezca hay que darle más ancho — 130vw la deja ~30% más alta y sobresale por los costados, que es lo pedido; el recorte lo hace .hero-inner, que ya tiene overflow hidden, así que no aparece scroll horizontal. Se sube el borde inferior de -60px a 0 para que los pies no queden cortados al crecer. (2) La franja de tarjetas vive DENTRO del banner y su revelado por scroll se dispara al cargar, porque ya está en pantalla: se la mantiene oculta hasta que el banner marca que hubo scroll (is-handoff, que el motor pone pasados 40px).",
+  "mode": "append",
+  "structure": [],
+  "styles": [
+    {
+      "_causa": "Cuerpo COMPLETO de la regla móvil de .hero-family: setRule reemplaza la regla entera.",
+      "selector": ".hero-family",
+      "media": "(max-width: 900px), (max-aspect-ratio: 4 / 5)",
+      "style": {
+        "width": "130vw",
+        "height": "38%",
+        "bottom": "0px"
+      }
+    },
+    {
+      "_causa": "Banner limpio hasta el primer scroll. Selector nuevo, no reemplaza nada.",
+      "selector": ".hero:not(.is-handoff) .features",
+      "media": "(max-width: 900px), (max-aspect-ratio: 4 / 5)",
+      "style": {
+        "opacity": "0",
+        "pointer-events": "none"
+      }
+    }
+  ]
+}

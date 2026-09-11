@@ -3,23 +3,43 @@
   "version": 3,
   "settings": {
     "appearanceTools": true,
-    "layout": { "contentSize": "1120px", "wideSize": "1360px" },
+    "layout": { "contentSize": "1180px", "wideSize": "1360px" },
     "color": {
       "palette": [
-        { "slug": "background", "name": "Fondo", "color": "#F5F0EB" },
-        { "slug": "surface", "name": "Superficie", "color": "#FAF6F2" },
-        { "slug": "text", "name": "Texto", "color": "#1A1A1A" },
-        { "slug": "muted", "name": "Texto secundario", "color": "#5C4F42" },
-        { "slug": "accent", "name": "Acento", "color": "#A7641A" },
-        { "slug": "green", "name": "Verde", "color": "#2D4A22" }
+        { "slug": "background", "name": "Fondo", "color": "#F6F6F3" },
+        { "slug": "surface", "name": "Superficie", "color": "#FFFFFF" },
+        { "slug": "text", "name": "Texto", "color": "#70745E" },
+        { "slug": "muted", "name": "Texto secundario", "color": "#968B8A" },
+        { "slug": "accent", "name": "Dorado", "color": "#CDA23C" },
+        { "slug": "green", "name": "Oliva", "color": "#70745E" },
+        { "slug": "green-soft", "name": "Oliva claro", "color": "#EBF0E3" },
+        { "slug": "earth", "name": "Tierra", "color": "#6E5F5F" }
       ]
     },
     "spacing": { "units": ["px", "rem", "vw", "%"], "blockGap": true },
     "typography": {
       "fluid": true,
       "fontFamilies": [
-        { "slug": "display", "name": "Display", "fontFamily": "'Cormorant Garamond', Georgia, serif" },
-        { "slug": "body", "name": "Cuerpo", "fontFamily": "Inter, system-ui, sans-serif" }
+        {
+          "slug": "display",
+          "name": "Títulos",
+          "fontFamily": "'Montserrat', system-ui, -apple-system, 'Segoe UI', sans-serif"
+        },
+        {
+          "slug": "body",
+          "name": "Cuerpo",
+          "fontFamily": "'Montserrat', system-ui, -apple-system, 'Segoe UI', sans-serif"
+        },
+        {
+          "slug": "script",
+          "name": "Manuscrita",
+          "fontFamily": "'Birthstone', 'Segoe Script', cursive"
+        },
+        {
+          "slug": "quote",
+          "name": "Citas",
+          "fontFamily": "'Lora', Georgia, 'Times New Roman', serif"
+        }
       ],
       "fontSizes": [
         { "slug": "small", "name": "Pequeño", "size": "0.8rem" },
@@ -30,17 +50,37 @@
     }
   },
   "styles": {
-    "color": { "background": "#F5F0EB", "text": "#1A1A1A" },
+    "color": { "background": "#F6F6F3", "text": "#70745E" },
     "spacing": { "blockGap": "1.25rem" },
-    "typography": { "fontFamily": "var(--wp--preset--font-family--body)", "lineHeight": "1.6" },
+    "typography": {
+      "fontFamily": "var(--wp--preset--font-family--body)",
+      "lineHeight": "1.5"
+    },
     "elements": {
-      "heading": { "typography": { "fontFamily": "var(--wp--preset--font-family--display)", "fontWeight": "600", "lineHeight": "1.08" } },
-      "button": { "color": { "background": "#A7641A", "text": "#FFFFFF" }, "border": { "radius": "8px" }, "typography": { "fontSize": "0.8rem", "fontWeight": "600" } },
-      "link": { "color": { "text": "#7B4A13" } }
+      "heading": {
+        "typography": {
+          "fontFamily": "var(--wp--preset--font-family--display)",
+          "fontWeight": "700",
+          "lineHeight": "1.05"
+        }
+      },
+      "button": {
+        "color": { "background": "#CDA23C", "text": "#2B2210" },
+        "border": { "radius": "999px" },
+        "typography": { "fontSize": "0.78rem", "fontWeight": "700" }
+      },
+      "link": { "color": { "text": "#70745E" } }
     },
     "blocks": {
       "core/image": { "border": { "radius": "16px" } },
-      "core/group": { "spacing": { "padding": { "left": "clamp(1.25rem, 4vw, 3rem)", "right": "clamp(1.25rem, 4vw, 3rem)" } } }
+      "core/group": {
+        "spacing": {
+          "padding": {
+            "left": "clamp(1.25rem, 4vw, 3rem)",
+            "right": "clamp(1.25rem, 4vw, 3rem)"
+          }
+        }
+      }
     }
   },
   "templateParts": [
@@ -48,4 +88,3 @@
     { "name": "footer", "title": "Pie", "area": "footer" }
   ]
 }
-

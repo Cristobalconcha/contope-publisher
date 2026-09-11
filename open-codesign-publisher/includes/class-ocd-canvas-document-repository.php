@@ -26,6 +26,21 @@ final class OCD_Canvas_Document_Repository
     public const META_UPDATED_AT = '_ocd_canvas_updated_at';
 
     /**
+     * Última composición MCP aplicada con éxito: `{composition, design}` tal
+     * cual salió normalizada del compilador (OCD_Canvas_MCP_Recipe_Compiler::
+     * compile()['compositionSnapshot'|'designSnapshot']), resubmitible sin
+     * cambios a ocd_preview_canvas_composition/ocd_apply_canvas_composition.
+     * No es una representación cruda (HTML/CSS/JS): es la misma composición
+     * declarativa que ya se validó al aplicarse, guardada para poder editar un
+     * nodo puntual después sin reconstruir el resto a ciegas.
+     *
+     * Vacío ('') para documentos que nunca se escribieron por esta vía (por
+     * ejemplo, contenido armado a mano en el editor Grapes) — ocd_read_canvas_
+     * composition debe distinguir ese caso, no inventar un árbol.
+     */
+    public const META_COMPOSITION = '_ocd_canvas_composition';
+
+    /**
      * Índice JSON de snapshots de sesión por documento: arreglo de
      * `{id, session, label, createdAt (ISO UTC), revision}`. Cada snapshot
      * guarda además su contenido en una meta propia `_ocd_canvas_snap_<id>`.
@@ -52,6 +67,19 @@ final class OCD_Canvas_Document_Repository
     public const REGION_KIND_BODY = 'body';
     public const REGION_KIND_FOOTER = 'footer';
     public const REGION_KINDS = [self::REGION_KIND_HEADER, self::REGION_KIND_BODY, self::REGION_KIND_FOOTER];
+
+    /**
+     * Documento Canvas especial, compartido por TODAS las páginas del sitio
+     * en vez de vivir por separado en cada una. No es una región (no tiene
+     * scope/targets/excludes: no se resuelve "para esta página sí, para
+     * aquella no") — es una sola hoja de clases reutilizables, como .ocd-btn,
+     * que hasta ahora había que duplicar a mano en cada documento y por eso
+     * se desalineaban entre páginas. Se edita con las mismas herramientas que
+     * cualquier documento (revisión, bloqueo, snapshot); ver target() en
+     * class-ocd-canvas-mcp-service.php para cómo se autoriza su escritura con
+     * pageId 0.
+     */
+    public const SHARED_STYLES_DOCUMENT_ID = 'ocd-shared-styles';
 
     /**
      * 'global' applies to every page unless a more specific local region
@@ -116,6 +144,9 @@ final class OCD_Canvas_Document_Repository
     /** Prefix for generated region document IDs. */
     public const REGION_DOCUMENT_ID_PREFIX = 'ocd-template-';
 
+    /** Tiempo máximo del bloqueo breve que serializa las mutaciones Canvas. */
+    private const MUTATION_LOCK_TTL_SECONDS = 30;
+
     public const MATCH_TYPE_ALL_PAGES = 'all_pages';
     public const MATCH_TYPE_HOMEPAGE = 'homepage';
     public const MATCH_TYPE_POST = 'post';
@@ -173,6 +204,7 @@ final class OCD_Canvas_Document_Repository
             self::META_HTML,
             self::META_CSS,
             self::META_UPDATED_AT,
+            self::META_COMPOSITION,
             self::META_SNAPSHOTS,
             self::META_REGION_KIND,
             self::META_REGION_SCOPE,
@@ -245,6 +277,7 @@ final class OCD_Canvas_Document_Repository
                 self::META_PROJECT_DATA => '{}',
                 self::META_HTML => '',
                 self::META_CSS => '',
+                self::META_COMPOSITION => '',
                 self::META_REVISION => 0,
                 self::META_UPDATED_AT => '',
                 self::META_REGION_KIND => '',
@@ -277,6 +310,81 @@ final class OCD_Canvas_Document_Repository
     }
 
     /**
+     * Carga un documento existente sin inicializarlo. A diferencia de load(),
+     * esta variante es para operaciones de dominio que ya conocen una
+     * identidad estable y deben rechazar una referencia ausente.
+     *
+     * @return array<string, mixed>|WP_Error
+     */
+    public function load_existing(string $document_id)
+    {
+        $post_id = $this->find_post_id($document_id);
+        if ($post_id === null) {
+            return new WP_Error('ocd_canvas_document_not_found', 'No existe un documento Canvas con ese ID.');
+        }
+
+        return $this->read($post_id, $document_id);
+    }
+
+    /**
+     * Describe un documento ya existente sin inicializarlo ni devolver sus
+     * representaciones crudas. Esta es la frontera de lectura para clientes
+     * externos: a diferencia de load(), nunca llama ensure_post_id() y por lo
+     * tanto una consulta no puede crear una entidad Canvas vacía.
+     *
+     * @return array<string, mixed>|null
+     */
+    public function describe_existing(string $document_id): ?array
+    {
+        $post_id = $this->find_post_id($document_id);
+        if ($post_id === null) {
+            return null;
+        }
+
+        $document = $this->read($post_id, $document_id);
+
+        return $this->semantic_document($document);
+    }
+
+    /**
+     * Lee la última composición MCP aplicada con éxito sobre este documento
+     * (ver META_COMPOSITION). A diferencia de describe_existing(), esto SÍ es
+     * lectura de contenido — pero de la composición declarativa ya validada,
+     * no de HTML/CSS/JS crudo, así que no cruza la frontera que el resto de
+     * este servicio protege.
+     *
+     * @return array{found: bool, revision: int, composition?: array<string, mixed>, design?: array<string, mixed>}|WP_Error
+     */
+    public function read_composition(string $document_id)
+    {
+        $post_id = $this->find_post_id($document_id);
+        if ($post_id === null) {
+            return new WP_Error('ocd_canvas_document_not_found', 'No existe un documento Canvas con ese ID.');
+        }
+
+        $revision = (int) get_post_meta($post_id, self::META_REVISION, true);
+        $raw = (string) get_post_meta($post_id, self::META_COMPOSITION, true);
+        if ($raw === '') {
+            return ['found' => false, 'revision' => $revision];
+        }
+
+        $decoded = json_decode($raw, true);
+        if (!is_array($decoded) || !isset($decoded['composition'], $decoded['design'])) {
+            // No debería pasar (esta meta sólo la escribe write_document con
+            // JSON propio), pero un valor corrupto se trata como ausente en
+            // vez de romper la llamada.
+            return ['found' => false, 'revision' => $revision];
+        }
+
+        return [
+            'found' => true,
+            'revision' => $revision,
+            'composition' => $decoded['composition'],
+            'design' => $decoded['design'],
+        ];
+    }
+
+    /**
      * Guarda las tres representaciones por separado y avanza la revisión.
      *
      * @return array<string, mixed>|WP_Error
@@ -288,16 +396,137 @@ final class OCD_Canvas_Document_Repository
             return $post_id;
         }
 
-        $revision = (int) get_post_meta($post_id, self::META_REVISION, true);
-        $updated_at = gmdate('c');
+        return $this->with_document_lock($post_id, function () use ($document_id, $post_id, $project_data, $html, $css) {
+            $revision = (int) get_post_meta($post_id, self::META_REVISION, true);
+            $updated_at = gmdate('c');
 
-        update_post_meta($post_id, self::META_PROJECT_DATA, $project_data);
-        update_post_meta($post_id, self::META_HTML, $html);
-        update_post_meta($post_id, self::META_CSS, $css);
-        update_post_meta($post_id, self::META_REVISION, $revision + 1);
-        update_post_meta($post_id, self::META_UPDATED_AT, $updated_at);
+            // wp_slash() es obligatorio acá: update_post_meta() le quita una
+            // capa de backslashes al valor (compatibilidad histórica con
+            // magic_quotes), y project_data trae JSON anidado (por ejemplo
+            // el atributo data-ocd-geo-places, que es un string JSON dentro
+            // del JSON del proyecto). Sin wp_slash(), esa capa de escape se
+            // pierde y el documento queda con JSON inválido — así se rompió
+            // el project_data real de "Inicio" antes de este fix.
+            update_post_meta($post_id, self::META_PROJECT_DATA, wp_slash($project_data));
+            update_post_meta($post_id, self::META_HTML, wp_slash($html));
+            update_post_meta($post_id, self::META_CSS, wp_slash($css));
+            // Este guardado viene del editor Grapes (a mano), no de una
+            // composición MCP: cualquier snapshot de composición previo queda
+            // desincronizado del contenido real que se acaba de escribir, así
+            // que se limpia en vez de dejarlo mentir sobre lo que hay ahora.
+            update_post_meta($post_id, self::META_COMPOSITION, '');
+            update_post_meta($post_id, self::META_REVISION, $revision + 1);
+            update_post_meta($post_id, self::META_UPDATED_AT, $updated_at);
 
-        return $this->read($post_id, $document_id);
+            return $this->read($post_id, $document_id);
+        });
+    }
+
+    /**
+     * Persiste un resultado ya compilado por una receta semántica. Esta es la
+     * única ruta de escritura MCP: exige una revisión exacta, crea el snapshot
+     * del estado previo dentro del mismo bloqueo y jamás crea un documento por
+     * una identidad remota errónea.
+     *
+     * @param array<string, mixed> $compiled
+     * @return array<string, mixed>|WP_Error
+     */
+    public function save_compiled_recipe_if_revision(
+        string $document_id,
+        int $expected_revision,
+        array $compiled,
+        string $snapshot_session,
+        string $snapshot_label
+    ) {
+        $storage = $compiled['storage'] ?? null;
+        if (!is_array($storage)
+            || !isset($storage['project'], $storage['markup'], $storage['styles'])
+            || !is_string($storage['project'])
+            || !is_string($storage['markup'])
+            || !is_string($storage['styles'])) {
+            return new WP_Error('ocd_canvas_recipe_compilation_invalid', 'La receta compilada no contiene un documento Canvas válido.');
+        }
+
+        // compositionSnapshot/designSnapshot los trae siempre el compilador
+        // actual, pero el chequeo queda defensivo: si algún llamador futuro
+        // pasa un $compiled sin esas claves, simplemente no se persiste
+        // composición legible en vez de fallar la escritura completa.
+        $composition_json = '';
+        if (isset($compiled['compositionSnapshot'], $compiled['designSnapshot'])) {
+            $encoded = wp_json_encode([
+                'composition' => $compiled['compositionSnapshot'],
+                'design' => $compiled['designSnapshot'],
+            ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+            $composition_json = is_string($encoded) ? $encoded : '';
+        }
+
+        $post_id = $this->find_post_id($document_id);
+        if ($post_id === null) {
+            return new WP_Error('ocd_canvas_document_not_found', 'No existe un documento Canvas con ese ID.');
+        }
+
+        return $this->with_document_lock(
+            $post_id,
+            function () use ($document_id, $post_id, $expected_revision, $storage, $composition_json, $snapshot_session, $snapshot_label) {
+                $actual_revision = (int) get_post_meta($post_id, self::META_REVISION, true);
+                if ($actual_revision !== $expected_revision) {
+                    return $this->revision_conflict($expected_revision, $actual_revision);
+                }
+
+                $snapshot = $this->create_snapshot_for_post($post_id, $snapshot_session, $snapshot_label);
+                if (is_wp_error($snapshot)) {
+                    return $snapshot;
+                }
+
+                $saved = $this->write_document(
+                    $post_id,
+                    $document_id,
+                    $storage['project'],
+                    $storage['markup'],
+                    $storage['styles'],
+                    $composition_json
+                );
+                if (is_wp_error($saved)) {
+                    return $saved;
+                }
+
+                return [
+                    'snapshot' => $snapshot,
+                    'document' => $this->semantic_document($saved),
+                ];
+            }
+        );
+    }
+
+    /**
+     * Crea un snapshot únicamente si la revisión todavía coincide. Se usa por
+     * acciones que mutan la página WordPress (por ejemplo publicar) sin tocar
+     * las representaciones del documento Canvas.
+     *
+     * @return array<string, mixed>|WP_Error
+     */
+    public function create_snapshot_if_revision(
+        string $document_id,
+        int $expected_revision,
+        string $snapshot_session,
+        string $snapshot_label
+    ) {
+        $post_id = $this->find_post_id($document_id);
+        if ($post_id === null) {
+            return new WP_Error('ocd_canvas_document_not_found', 'No existe un documento Canvas con ese ID.');
+        }
+
+        return $this->with_document_lock(
+            $post_id,
+            function () use ($post_id, $expected_revision, $snapshot_session, $snapshot_label) {
+                $actual_revision = (int) get_post_meta($post_id, self::META_REVISION, true);
+                if ($actual_revision !== $expected_revision) {
+                    return $this->revision_conflict($expected_revision, $actual_revision);
+                }
+
+                return $this->create_snapshot_for_post($post_id, $snapshot_session, $snapshot_label);
+            }
+        );
     }
 
     /**
@@ -317,6 +546,7 @@ final class OCD_Canvas_Document_Repository
             'projectData' => $project_data === '' ? '{}' : $project_data,
             'html' => (string) get_post_meta($post_id, self::META_HTML, true),
             'css' => (string) get_post_meta($post_id, self::META_CSS, true),
+            'composition' => (string) get_post_meta($post_id, self::META_COMPOSITION, true),
             'revision' => (int) get_post_meta($post_id, self::META_REVISION, true),
             'updatedAt' => (string) get_post_meta($post_id, self::META_UPDATED_AT, true),
             'regionKind' => (string) get_post_meta($post_id, self::META_REGION_KIND, true),
@@ -326,6 +556,127 @@ final class OCD_Canvas_Document_Repository
             'regionTemplateId' => (string) get_post_meta($post_id, self::META_REGION_TEMPLATE_ID, true),
             'regionTemplateTitle' => (string) get_post_meta($post_id, self::META_REGION_TEMPLATE_TITLE, true),
         ];
+    }
+
+    /**
+     * @param array<string, mixed> $document
+     * @return array<string, mixed>
+     */
+    private function semantic_document(array $document): array
+    {
+        return [
+            'documentId' => $document['documentId'],
+            'title' => $document['title'],
+            'revision' => $document['revision'],
+            'updatedAt' => $document['updatedAt'],
+            'region' => [
+                'kind' => $document['regionKind'],
+                'scope' => $document['regionScope'],
+                'targets' => $document['regionTargets'],
+                'excludes' => $document['regionExcludes'],
+                'templateId' => $document['regionTemplateId'],
+                'templateTitle' => $document['regionTemplateTitle'],
+            ],
+        ];
+    }
+
+    /**
+     * Escribe las tres representaciones internas y avanza la revisión. Debe
+     * llamarse dentro de with_document_lock() cuando la operación comparte el
+     * documento con una acción MCP protegida por revisión.
+     *
+     * @return array<string, mixed>
+     */
+    private function write_document(int $post_id, string $document_id, string $project_data, string $html, string $css, string $composition_json = ''): array
+    {
+        $revision = (int) get_post_meta($post_id, self::META_REVISION, true);
+        $updated_at = gmdate('c');
+
+        // Ver la nota sobre wp_slash() en save(): sin esto, update_post_meta()
+        // corrompe cualquier JSON anidado dentro de project_data.
+        update_post_meta($post_id, self::META_PROJECT_DATA, wp_slash($project_data));
+        update_post_meta($post_id, self::META_HTML, wp_slash($html));
+        update_post_meta($post_id, self::META_CSS, wp_slash($css));
+        // '' es válido y significa "esta escritura no trae composición legible"
+        // (por ejemplo, render_whatsapp_module aislado) — se guarda igual para
+        // no dejar un snapshot de una revisión anterior colgando de una que ya
+        // no le corresponde.
+        update_post_meta($post_id, self::META_COMPOSITION, wp_slash($composition_json));
+        update_post_meta($post_id, self::META_REVISION, $revision + 1);
+        update_post_meta($post_id, self::META_UPDATED_AT, $updated_at);
+
+        return $this->read($post_id, $document_id);
+    }
+
+    /** @return WP_Error */
+    private function revision_conflict(int $expected_revision, int $actual_revision): WP_Error
+    {
+        $error = new WP_Error(
+            'ocd_canvas_revision_conflict',
+            'La revisión de la página cambió; vuelve a consultar o previsualizar antes de aplicar la operación.'
+        );
+        $error->add_data([
+            'expectedRevision' => $expected_revision,
+            'actualRevision' => $actual_revision,
+        ]);
+
+        return $error;
+    }
+
+    /**
+     * @param callable $operation
+     * @return mixed|WP_Error
+     */
+    private function with_document_lock(int $post_id, callable $operation)
+    {
+        $lock = $this->acquire_document_lock($post_id);
+        if (is_wp_error($lock)) {
+            return $lock;
+        }
+
+        try {
+            return $operation();
+        } finally {
+            $this->release_document_lock($lock);
+        }
+    }
+
+    /**
+     * @return array{option: string, value: string}|WP_Error
+     */
+    private function acquire_document_lock(int $post_id)
+    {
+        $option = 'ocd_canvas_lock_' . substr(hash('sha256', (string) get_current_blog_id() . ':' . $post_id), 0, 32);
+        $value = wp_json_encode([
+            'token' => wp_generate_uuid4(),
+            'expiresAt' => time() + self::MUTATION_LOCK_TTL_SECONDS,
+        ]);
+        if (!is_string($value)) {
+            return new WP_Error('ocd_canvas_lock_failed', 'No fue posible preparar el bloqueo de escritura Canvas.');
+        }
+
+        if (!add_option($option, $value, '', false)) {
+            $existing = json_decode((string) get_option($option, ''), true);
+            $expired = is_array($existing) && isset($existing['expiresAt']) && (int) $existing['expiresAt'] < time();
+            if ($expired) {
+                delete_option($option);
+            }
+            if (!$expired || !add_option($option, $value, '', false)) {
+                $error = new WP_Error('ocd_canvas_document_busy', 'El documento Canvas está siendo modificado por otra operación.');
+                $error->add_data(['retryAfterSeconds' => self::MUTATION_LOCK_TTL_SECONDS]);
+                return $error;
+            }
+        }
+
+        return ['option' => $option, 'value' => $value];
+    }
+
+    /** @param array{option: string, value: string} $lock */
+    private function release_document_lock(array $lock): void
+    {
+        if ((string) get_option($lock['option'], '') === $lock['value']) {
+            delete_option($lock['option']);
+        }
     }
 
     /**
@@ -1225,6 +1576,19 @@ final class OCD_Canvas_Document_Repository
             return new WP_Error('ocd_snapshot_document_not_found', 'No existe un documento Canvas con ese ID.');
         }
 
+        return $this->with_document_lock($post_id, function () use ($post_id, $session_id, $label) {
+            return $this->create_snapshot_for_post($post_id, $session_id, $label);
+        });
+    }
+
+    /**
+     * Persiste el estado actual de un post de documento dentro de un bloqueo
+     * que ya fue adquirido por el llamador.
+     *
+     * @return array<string, mixed>|WP_Error
+     */
+    private function create_snapshot_for_post(int $post_id, string $session_id, string $label)
+    {
         $id = bin2hex(random_bytes(6));
         $created_at = gmdate('c');
         $revision = (int) get_post_meta($post_id, self::META_REVISION, true);

@@ -1,0 +1,187 @@
+{
+  "_comentario": "Restaura lo que se perdió al reparar las variables (esquinas, sombras, grilla, pastilla del botón, menú). El paquete repetido esquina+recorte+sombra deja de estar copiado en dos lugares: pasa a ser la clase .ocd-tarjeta, alimentada por variables. Todo en longhand porque GrapesJS descarta las abreviadas con var().",
+  "mode": "append",
+  "structure": [],
+  "styles": [
+    {
+      "_causa": "Se reescribe :root COMPLETO (setRule reemplaza la regla) sumando los tokens nuevos de esquina y sombra.",
+      "selector": ":root",
+      "style": {
+        "--dorado-50": "#F9F6E8", "--dorado-100": "#F1EACB", "--dorado-300": "#EED495",
+        "--dorado-500": "#DDB441", "--dorado-600": "#CDA23C",
+        "--oliva-50": "#F5F9F6", "--oliva-100": "#EBF0E3", "--oliva-300": "#BABBA4",
+        "--oliva-500": "#8E9075", "--oliva-700": "#70745E",
+        "--tierra-50": "#F6F6F3", "--tierra-100": "#ECEBE8", "--tierra-300": "#CDC8C6",
+        "--tierra-500": "#968B8A", "--tierra-700": "#6E5F5F",
+        "--font-hero": "'Birthstone', cursive",
+        "--font-body": "'Montserrat', sans-serif",
+        "--font-quote": "'Lora', serif",
+        "--max-width": "1180px",
+        "--radio-tarjeta": "20px",
+        "--radio-pastilla": "999px",
+        "--sombra-tarjeta": "0 18px 44px rgba(60,50,20,0.10)",
+        "--sombra-tarjeta-fuerte": "0 18px 44px rgba(60,50,20,0.16)",
+        "--sombra-menu": "0 14px 28px rgba(40,35,20,0.14)"
+      }
+    },
+    {
+      "_causa": "El paquete compartido: esquina redondeada + recorte + sombra. Antes estaba escrito dos veces con los mismos valores.",
+      "selector": ".ocd-tarjeta",
+      "style": {
+        "border-top-left-radius": "var(--radio-tarjeta)",
+        "border-top-right-radius": "var(--radio-tarjeta)",
+        "border-bottom-right-radius": "var(--radio-tarjeta)",
+        "border-bottom-left-radius": "var(--radio-tarjeta)",
+        "overflow-x": "hidden",
+        "overflow-y": "hidden",
+        "box-shadow": "var(--sombra-tarjeta)"
+      }
+    },
+    {
+      "_causa": "Variante con la sombra más marcada (la que tenía el recuadro del agua).",
+      "selector": ".ocd-tarjeta--fuerte",
+      "style": { "box-shadow": "var(--sombra-tarjeta-fuerte)" }
+    },
+    {
+      "_causa": "Grilla de los pilares: recupera grid, columnas y separación. Esquinas y sombra ya vienen de .ocd-tarjeta.",
+      "selector": ".pilares__grid",
+      "style": {
+        "display": "grid",
+        "grid-template-columns": "repeat(4, 1fr)",
+        "row-gap": "1px",
+        "column-gap": "1px",
+        "background-color": "var(--tierra-100)"
+      }
+    },
+    {
+      "_causa": "Recuadro del agua: recupera la grilla de dos columnas y el centrado vertical.",
+      "selector": ".agua__box",
+      "style": {
+        "background-color": "var(--oliva-700)",
+        "display": "grid",
+        "grid-template-columns": "1fr 1.15fr",
+        "align-items": "center"
+      }
+    },
+    {
+      "_causa": "Franja de cierre: recupera el aire vertical y el centrado.",
+      "selector": ".cierre",
+      "style": {
+        "background-color": "var(--oliva-700)",
+        "padding-top": "40px",
+        "padding-right": "0px",
+        "padding-bottom": "40px",
+        "padding-left": "0px",
+        "text-align": "center"
+      }
+    },
+    {
+      "_causa": "Botón pastilla del cierre: había quedado como texto suelto sobre fondo dorado.",
+      "selector": ".cierre a",
+      "style": {
+        "display": "inline-flex",
+        "align-items": "center",
+        "row-gap": "8px",
+        "column-gap": "8px",
+        "background-color": "var(--dorado-600)",
+        "color": "#2b2210",
+        "font-weight": "700",
+        "font-size": "12.5px",
+        "letter-spacing": "0.04em",
+        "text-transform": "uppercase",
+        "padding-top": "13px",
+        "padding-right": "26px",
+        "padding-bottom": "13px",
+        "padding-left": "26px",
+        "border-top-left-radius": "var(--radio-pastilla)",
+        "border-top-right-radius": "var(--radio-pastilla)",
+        "border-bottom-right-radius": "var(--radio-pastilla)",
+        "border-bottom-left-radius": "var(--radio-pastilla)"
+      }
+    },
+    {
+      "_causa": "Bajadas de sección: había quedado solo el margen inferior, sin tamaño ni color ni ancho máximo.",
+      "selector": ".section__body",
+      "style": {
+        "font-size": "15px",
+        "color": "var(--oliva-700)",
+        "max-width": "560px",
+        "margin-top": "0px",
+        "margin-right": "0px",
+        "margin-bottom": "20px",
+        "margin-left": "0px"
+      }
+    },
+    {
+      "_causa": "Menú de escritorio: volvía a ser una lista con viñetas en vertical. Además se saca el fondo beige que yo había dejado mal en la regla base (corresponde solo al desplegable móvil).",
+      "selector": ".site-nav__links",
+      "style": {
+        "display": "flex",
+        "row-gap": "28px",
+        "column-gap": "28px",
+        "list-style-type": "none",
+        "margin-top": "0px", "margin-right": "0px", "margin-bottom": "0px", "margin-left": "0px",
+        "padding-top": "0px", "padding-right": "0px", "padding-bottom": "0px", "padding-left": "0px"
+      }
+    },
+    {
+      "_causa": "Tipografía de los enlaces del menú. También saca el borde inferior que yo había dejado en la base (es solo del desplegable móvil).",
+      "selector": ".site-nav__links a",
+      "style": {
+        "font-size": "12.5px",
+        "font-weight": "600",
+        "letter-spacing": "0.06em",
+        "text-transform": "uppercase",
+        "color": "var(--oliva-700)"
+      }
+    },
+    {
+      "_causa": "Desplegable móvil completo, con su fondo propio.",
+      "selector": ".site-nav__links",
+      "media": "(max-width: 720px)",
+      "style": {
+        "flex-direction": "column",
+        "row-gap": "0px", "column-gap": "0px",
+        "position": "absolute",
+        "top": "100%", "left": "0px", "right": "0px",
+        "background-color": "var(--tierra-50)",
+        "box-shadow": "var(--sombra-menu)",
+        "max-height": "0px",
+        "overflow-x": "hidden", "overflow-y": "hidden",
+        "transition-property": "max-height",
+        "transition-duration": "0.3s",
+        "transition-timing-function": "ease",
+        "transition-delay": "0s"
+      }
+    },
+    {
+      "_causa": "Enlaces del desplegable móvil: bloque, aire y línea separadora.",
+      "selector": ".site-nav__links a",
+      "media": "(max-width: 720px)",
+      "style": {
+        "display": "block",
+        "padding-top": "16px", "padding-right": "24px",
+        "padding-bottom": "16px", "padding-left": "24px",
+        "border-bottom-width": "1px",
+        "border-bottom-style": "solid",
+        "border-bottom-color": "var(--tierra-100)"
+      }
+    },
+    {
+      "_causa": "Las tres barras del botón de menú habían quedado sin forma ni tamaño.",
+      "selector": ".site-nav__burger span",
+      "style": {
+        "display": "block",
+        "width": "100%",
+        "height": "2px",
+        "border-top-left-radius": "2px", "border-top-right-radius": "2px",
+        "border-bottom-right-radius": "2px", "border-bottom-left-radius": "2px",
+        "background-color": "var(--oliva-700)",
+        "transition-property": "transform, opacity",
+        "transition-duration": "0.25s, 0.2s",
+        "transition-timing-function": "ease, ease",
+        "transition-delay": "0s, 0s"
+      }
+    }
+  ]
+}

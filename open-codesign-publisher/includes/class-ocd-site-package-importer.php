@@ -20,7 +20,8 @@ final class OCD_Site_Package_Importer
 {
     public function __construct(
         private OCD_Canvas_Document_Repository $repository,
-        private OCD_Canvas_Document_Sanitizer $sanitizer
+        private OCD_Canvas_Document_Sanitizer $sanitizer,
+        private OCD_Media_Attachment_Sync $media_sync
     ) {
     }
 
@@ -279,6 +280,12 @@ final class OCD_Site_Package_Importer
             stream_copy_to_stream($stream, $out);
             fclose($stream);
             fclose($out);
+
+            $sync_result = $this->media_sync->sync_file($target_path);
+            if (is_wp_error($sync_result)) {
+                return new WP_Error('ocd_package_media_attach', sprintf('No fue posible registrar el adjunto para %s: %s', $relative, $sync_result->get_error_message()));
+            }
+
             $copied++;
         }
 

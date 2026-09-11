@@ -1,13 +1,13 @@
 /*!
- * ocd-interactions.js â€” interacciones tipo Webflow (MVP) para Open CoDesign Publisher.
+ * ocd-interactions.js — interacciones tipo Webflow (MVP) para Open CoDesign Publisher.
  *
- * PRIMERA VERSIÃ“N LIMITADA. No es un motor generalizado de interacciones:
- * sÃ³lo admite dos disparadores y dos estados:
+ * PRIMERA VERSIÓN LIMITADA. No es un motor generalizado de interacciones:
+ * sólo admite dos disparadores y dos estados:
  *
- *   - "load"   â†’ al cargar la pÃ¡gina: se aplica el estado inicial y se transiciona
+ *   - "load"   → al cargar la página: se aplica el estado inicial y se transiciona
  *                al estado final durante `trigger.duration` ms (por defecto 600).
- *   - "scroll" â†’ al hacer scroll: se interpola entre el estado inicial y el final
- *                segÃºn el progreso scrollY / `trigger.threshold` px (umbral).
+ *   - "scroll" → al hacer scroll: se interpola entre el estado inicial y el final
+ *                según el progreso scrollY / `trigger.threshold` px (umbral).
  *
  * Modelo de datos persistido como atributo declarativo `data-ocd-interaction`
  * (JSON). Sobrevive al saneado de WordPress (wp_kses admite `data-*`):
@@ -20,29 +20,29 @@
  *     ]
  *   }
  *
- * Propiedades permitidas (allowlist, sin eval/Function â€” ver README de
+ * Propiedades permitidas (allowlist, sin eval/Function — ver README de
  * ocd-behaviors.js): position, top, left, right, bottom, transform, opacity.
- * El runtime sÃ³lo escribe esas propiedades vÃ­a `style.setProperty`; cualquier
+ * El runtime sólo escribe esas propiedades vía `style.setProperty`; cualquier
  * otra clave del JSON se descarta en `parseInteraction`.
  *
- * InterpolaciÃ³n (documentaciÃ³n de decisiones):
- *   - `transform`  â†’ matrices 2D `matrix(...)` interpoladas numÃ©ricamente
+ * Interpolación (documentación de decisiones):
+ *   - `transform`  → matrices 2D `matrix(...)` interpoladas numéricamente
  *                    (6 componentes). `none` se normaliza a identidad. matrix3d
- *                    no se interpola (escalÃ³n).
- *   - `opacity`    â†’ nÃºmero interpolado.
- *   - top/left/right/bottom â†’ longitud interpolada SOLO si ambas comparten unidad
- *                    (px/px, %/%, etc.). Unidades distintas o `auto` â†’ escalÃ³n.
- *   - `position` y cualquier valor no numÃ©rico â†’ escalÃ³n: se aplica el valor
+ *                    no se interpola (escalón).
+ *   - `opacity`    → número interpolado.
+ *   - top/left/right/bottom → longitud interpolada SOLO si ambas comparten unidad
+ *                    (px/px, %/%, etc.). Unidades distintas o `auto` → escalón.
+ *   - `position` y cualquier valor no numérico → escalón: se aplica el valor
  *     inicial mientras progress < 1 y el final cuando progress === 1.
  *
  * El runtime es singleton POR DOCUMENTO (clave `__ocdInteractionsRuntime`): la
- * instalaciÃ³n mÃ¡s reciente reemplaza a la anterior para no duplicar listeners.
+ * instalación más reciente reemplaza a la anterior para no duplicar listeners.
  * Se usa tanto en el iframe del editor (editor-core / inspector) como en el
- * sitio publicado (ocd-canvas-public.js) â€” un Ãºnico archivo compartido, a
- * diferencia de la duplicaciÃ³n histÃ³rica de ocd-behaviors/ocd-canvas-public.
+ * sitio publicado (ocd-canvas-public.js) — un único archivo compartido, a
+ * diferencia de la duplicación histórica de ocd-behaviors/ocd-canvas-public.
  *
- * Carga sin bundler (mismo patrÃ³n UMD que ocd-behaviors.js):
- *   <script src="ocd-interactions.js"></script> â†’ window.OcdInteractions.
+ * Carga sin bundler (mismo patrón UMD que ocd-behaviors.js):
+ *   <script src="ocd-interactions.js"></script> → window.OcdInteractions.
  */
 (function (root, factory) {
   if (typeof module === 'object' && module.exports) module.exports = factory();
@@ -82,8 +82,8 @@
   }
 
   /**
-   * Filtra un objeto de propiedades crudas y conserva sÃ³lo las claves de la
-   * allowlist PROPERTIES, con valor normalizado a string no vacÃ­o. Cualquier
+   * Filtra un objeto de propiedades crudas y conserva sólo las claves de la
+   * allowlist PROPERTIES, con valor normalizado a string no vacío. Cualquier
    * otra cosa se descarta (nunca llega al DOM).
    */
   function pickProperties(raw) {
@@ -102,7 +102,7 @@
 
   /**
    * Parsea y normaliza el JSON de `data-ocd-interaction`. Devuelve null ante
-   * cualquier forma invÃ¡lida (JSON roto, disparador no allowlisted, menos de
+   * cualquier forma inválida (JSON roto, disparador no allowlisted, menos de
    * dos estados, etc.) para que el runtime lo ignore en silencio.
    */
   function parseModel(raw) {
@@ -144,7 +144,7 @@
   }
 
   /**
-   * Construye un modelo canÃ³nico a partir del disparador y de dos bloques de
+   * Construye un modelo canónico a partir del disparador y de dos bloques de
    * propiedades (`states` = [{properties}, {properties}]).
    */
   function buildInteraction(trigger, states) {
@@ -174,7 +174,7 @@
 
   /**
    * Captura el estado actual de un elemento del lienzo (snapshot) leyendo sus
-   * estilos computados, sÃ³lo para las propiedades allowlisted. Se usa desde el
+   * estilos computados, sólo para las propiedades allowlisted. Se usa desde el
    * inspector para "Fijar estado inicial/final".
    */
   function captureState(element) {
@@ -362,7 +362,7 @@
   }
 
   /**
-   * NÃºcleo sin GrapesJS. `env` = { window, document } del contexto (iframe del
+   * Núcleo sin GrapesJS. `env` = { window, document } del contexto (iframe del
    * editor o documento publicado). Devuelve { destroy }.
    */
   function createRuntime(env, options) {
@@ -372,7 +372,7 @@
     var noopDestroy = function () {};
     if (!win || !doc) return { destroy: noopDestroy };
 
-    // Singleton por documento: reemplaza la instalaciÃ³n anterior.
+    // Singleton por documento: reemplaza la instalación anterior.
     if (doc[RUNTIME_KEY] && typeof doc[RUNTIME_KEY].destroy === 'function') {
       try { doc[RUNTIME_KEY].destroy(); } catch (_error) { /* noop */ }
     }
@@ -425,5 +425,4 @@
     createRuntime: createRuntime
   };
 });
-
 

@@ -1,0 +1,60 @@
+{
+  "_comentario": "Ejemplo de receta de construcción. 'mode': 'append' agrega al final de la página; 'replace' reemplaza todo su contenido. Cada nodo se crea con la API real de componentes de Grapes, y cada regla con su gestor de estilos.",
+
+  "mode": "append",
+
+  "styles": [
+    { "selector": ":root", "style": { "--verde": "#70745E", "--dorado": "#CDA23C" } },
+    { "selector": ".demo-hero", "style": { "padding": "96px 24px", "background-color": "var(--verde)", "color": "#ffffff", "text-align": "center" } },
+    { "selector": ".demo-hero__titulo", "style": { "font-size": "48px", "margin": "0 0 12px", "line-height": "1.1" } },
+    { "selector": ".demo-hero__bajada", "style": { "font-size": "17px", "margin": "0", "opacity": "0.9" } },
+    { "selector": ".demo-destacados", "style": { "display": "grid", "row-gap": "20px", "max-width": "760px", "margin": "48px auto", "padding": "0 24px" } },
+    { "selector": ".demo-destacado", "style": { "padding": "20px 24px", "border-left": "3px solid var(--dorado)", "background-color": "#F6F6F3" } },
+    { "selector": ".demo-destacado h3", "style": { "margin": "0 0 6px", "font-size": "17px" } },
+    { "selector": ".demo-destacado p", "style": { "margin": "0", "font-size": "14px" } },
+
+    { "selector": ".demo-hero", "style": { "padding": "56px 20px" }, "media": "(max-width: 860px)" },
+    { "selector": ".demo-hero__titulo", "style": { "font-size": "32px" }, "media": "(max-width: 860px)" }
+  ],
+
+  "structure": [
+    {
+      "tag": "section",
+      "classes": ["demo-hero"],
+      "children": [
+        { "tag": "h1", "classes": ["demo-hero__titulo"], "text": "Un título creado por el motor real" },
+        { "tag": "p", "classes": ["demo-hero__bajada"], "text": "Esta sección no se pegó como HTML: se construyó componente por componente." }
+      ]
+    },
+    {
+      "tag": "section",
+      "classes": ["demo-destacados"],
+      "children": [
+        {
+          "tag": "div",
+          "classes": ["demo-destacado"],
+          "children": [
+            { "tag": "h3", "text": "Componentes de verdad" },
+            { "tag": "p", "text": "Cada nodo se creó con wrapper.append(), no con texto." }
+          ]
+        },
+        {
+          "tag": "div",
+          "classes": ["demo-destacado"],
+          "children": [
+            { "tag": "h3", "text": "Estilos de verdad" },
+            { "tag": "p", "text": "Cada regla pasó por el gestor de estilos de Grapes." }
+          ]
+        },
+        {
+          "tag": "div",
+          "classes": ["demo-destacado"],
+          "children": [
+            { "tag": "h3", "text": "Editable a mano" },
+            { "tag": "p", "text": "Podés abrir esto en el editor visual y seguir refinándolo." }
+          ]
+        }
+      ]
+    }
+  ]
+}

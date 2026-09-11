@@ -36,6 +36,15 @@
     return classes.length ? `.${classes.join('.')}` : component.get('tagName') || 'grid';
   }
 
+  // ------------------------------------------------------------------
+  // Snap-to-guide para el arrastre de separadores: el arrastre sigue siendo
+  // libre/continuo por defecto (no hay incrementos fijos); sólo cuando el
+  // borde pasa a pocos píxeles de una guía se "engancha" ahí, como el
+  // snapping estándar de un editor de diseño (Figma/Sketch). Guías:
+  //   - el borde de las OTRAS columnas de la misma fila (no se mueven
+  //     durante este arrastre, así que se calculan una sola vez al empezar).
+  //   - fracciones de referencia del ancho total: 1/4, 1/3, 1/2, 2/3, 3/4.
+  // ------------------------------------------------------------------
   const SNAP_THRESHOLD_PX = 6;
   // Doce columnas virtuales cubren tercios, cuartos, mitades y sextos con
   // una sola lógica, además de permitir 1/12…11/12 como en una grilla editorial.
@@ -111,12 +120,8 @@
     };
     for (const [value, label] of [['desktop', 'Escritorio'], ['tablet', 'Tablet'], ['mobile', 'Móvil']]) {
       const button = element(hostDocument, 'button', 'ocd-gc__breakpoint');
-      button.type = 'button';
-      button.title = label;
-      button.setAttribute('aria-label', label);
-      button.innerHTML = breakpointIcons[value];
-      breakpointButtons.set(value, button);
-      breakpointBar.appendChild(button);
+      button.type = 'button'; button.title = label; button.setAttribute('aria-label', label); button.innerHTML = breakpointIcons[value];
+      breakpointButtons.set(value, button); breakpointBar.appendChild(button);
     }
     (mount.querySelector('.ocd-ci__headbar') || mount).appendChild(breakpointBar);
 
@@ -182,6 +187,10 @@
           grip.setPointerCapture?.(event.pointerId);
           draggingBoundary = true;
           let lastX = event.clientX;
+          // Posición actual del borde en píxeles (relativa al borde izquierdo
+          // del grid); se recalcula tras cada resize a partir del resultado
+          // real (ver abajo) para no acumular desvío durante un arrastre
+          // largo, ya que `resizeTrackBoundary` puede clampear el pedido.
           let currentOffset = (rect.width * handle.positionPercent) / 100;
           const guides = snapGuidesPx(handles, handle.boundaryIndex, rect.width);
           const onMove = (moveEvent) => {
@@ -258,10 +267,7 @@
     });
     breakpointButtons.forEach((button, value) => button.addEventListener('click', () => {
       activeBreakpoint = value;
-      if (typeof editor.setDevice === 'function') {
-        const deviceId = value === 'mobile' ? 'mobilePortrait' : value;
-        editor.setDevice(deviceId);
-      }
+      if (typeof editor.setDevice === 'function') editor.setDevice(value === 'mobile' ? 'mobilePortrait' : value);
       refresh(selectedGrid);
     }));
 

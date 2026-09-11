@@ -1,0 +1,571 @@
+{
+  "_comentario": "Mismo badge para la PORTADA, que tiene su propio header (site-nav) y no carga la región compartida, así que necesita también las reglas de estilo.",
+  "mode": "append",
+  "structure": [
+    {
+      "tag": "a",
+      "classes": [
+        "header-wa"
+      ],
+      "parent": ".site-nav__inner",
+      "at": 2,
+      "attributes": {
+        "href": "https://wa.me/56981396967?text=Hola%2C%20quiero%20m%C3%A1s%20informaci%C3%B3n%20sobre%20Santa%20Luisa%20de%20Palpi.",
+        "target": "_blank",
+        "rel": "noopener noreferrer",
+        "aria-label": "Escribir por WhatsApp"
+      },
+      "children": [
+        {
+          "tag": "svg",
+          "attributes": {
+            "viewBox": "0 0 32 32",
+            "width": "18",
+            "height": "18",
+            "aria-hidden": "true",
+            "focusable": "false"
+          },
+          "children": [
+            {
+              "tag": "path",
+              "attributes": {
+                "fill": "currentColor",
+                "d": "M16 3C9 3 3.3 8.6 3.3 15.5c0 2.4.7 4.7 1.9 6.7L3 29l7-2.1c1.9 1 4 1.6 6 1.6 7 0 12.7-5.6 12.7-12.5S23 3 16 3zm0 22.7c-1.9 0-3.7-.5-5.3-1.4l-.4-.2-4.2 1.2 1.2-4-.3-.4a10.2 10.2 0 0 1-1.6-5.4C5.4 9.7 10.1 5 16 5s10.6 4.7 10.6 10.5S21.9 25.7 16 25.7zm5.8-7.9c-.3-.2-1.9-.9-2.2-1s-.5-.2-.7.2-.8 1-1 1.2-.4.2-.7.1a8.7 8.7 0 0 1-2.6-1.6 9.7 9.7 0 0 1-1.8-2.2c-.2-.3 0-.5.1-.7l.5-.6.3-.5a.6.6 0 0 0 0-.5c-.1-.2-.7-1.7-1-2.3s-.5-.5-.7-.5h-.6a1.2 1.2 0 0 0-.8.4 3.6 3.6 0 0 0-1.1 2.7c0 1.6 1.2 3.1 1.3 3.3.2.2 2.3 3.6 5.7 5a19.6 19.6 0 0 0 1.9.7 4.6 4.6 0 0 0 2.1.1c.6-.1 1.9-.8 2.2-1.5s.3-1.4.2-1.5-.3-.2-.6-.4z"
+              }
+            }
+          ]
+        },
+        {
+          "tag": "span",
+          "classes": [
+            "header-wa__texto"
+          ],
+          "text": "WhatsApp"
+        }
+      ]
+    }
+  ],
+  "styles": [
+    {
+      "_causa": "Pastilla verde de WhatsApp. Longhands a propósito: Grapes descarta las abreviadas al expandirlas y ya nos costó una vez.",
+      "selector": ".header-wa",
+      "style": {
+        "display": "inline-flex",
+        "align-items": "center",
+        "row-gap": "8px",
+        "column-gap": "8px",
+        "flex": "0 0 auto",
+        "padding-top": "8px",
+        "padding-right": "14px",
+        "padding-bottom": "8px",
+        "padding-left": "14px",
+        "border-top-left-radius": "999px",
+        "border-top-right-radius": "999px",
+        "border-bottom-right-radius": "999px",
+        "border-bottom-left-radius": "999px",
+        "background-color": "#25D366",
+        "color": "#ffffff",
+        "font-size": "11.5px",
+        "font-weight": "700",
+        "letter-spacing": "0.06em",
+        "text-transform": "uppercase",
+        "text-decoration-line": "none",
+        "line-height": "1",
+        "transition-property": "transform, filter",
+        "transition-duration": "0.2s",
+        "transition-timing-function": "ease"
+      }
+    },
+    {
+      "selector": ".header-wa svg",
+      "style": {
+        "display": "block",
+        "flex": "0 0 auto"
+      }
+    },
+    {
+      "selector": ".header-wa:hover",
+      "style": {
+        "filter": "brightness(0.93)",
+        "transform": "translateY(-1px)"
+      }
+    },
+    {
+      "_causa": "Bajo 720px aparece el botón de menú; el badge se reduce a círculo solo-ícono para que los dos convivan sin apretar el logo.",
+      "selector": ".header-wa",
+      "media": "(max-width: 720px)",
+      "style": {
+        "width": "38px",
+        "height": "38px",
+        "padding-top": "0px",
+        "padding-right": "0px",
+        "padding-bottom": "0px",
+        "padding-left": "0px",
+        "justify-content": "center"
+      }
+    },
+    {
+      "selector": ".header-wa__texto",
+      "media": "(max-width: 720px)",
+      "style": {
+        "display": "none"
+      }
+    },
+    {
+      "_causa": "Resguardo: background con var() — se repone el cuerpo COMPLETO en forma expandida.",
+      "selector": ".site-nav__links",
+      "style": {
+        "position": "absolute",
+        "top": "100%",
+        "left": "0",
+        "right": "0",
+        "flex-direction": "column",
+        "gap": "0",
+        "background-color": "var(--tierra-50)",
+        "box-shadow": "0 14px 28px rgba(40,35,20,0.14)",
+        "max-height": "0",
+        "overflow": "hidden",
+        "transition": "max-height 0.3s ease, opacity 0.5s ease"
+      },
+      "media": "(max-width: 720px)"
+    },
+    {
+      "_causa": "Resguardo: border-bottom con var() — se repone el cuerpo COMPLETO en forma expandida.",
+      "selector": ".site-nav__links a",
+      "style": {
+        "display": "block",
+        "padding": "16px 24px",
+        "border-bottom-width": "1px",
+        "border-bottom-style": "solid",
+        "border-bottom-color": "var(--tierra-100)"
+      },
+      "media": "(max-width: 720px)"
+    },
+    {
+      "_causa": "Resguardo: border-bottom con var() — se repone el cuerpo COMPLETO en forma expandida.",
+      "selector": ".feature-card",
+      "style": {
+        "border-bottom-width": "1px",
+        "border-bottom-style": "solid",
+        "border-bottom-color": "var(--tierra-100)",
+        "padding": "19.5px 16.5px",
+        "gap": "9px"
+      },
+      "media": "(max-width: 900px), (max-aspect-ratio: 4/5)"
+    },
+    {
+      "_causa": "Resguardo: border-bottom con var() — se repone el cuerpo COMPLETO en forma expandida.",
+      "selector": ".mapas-huincha__card .feature-card",
+      "style": {
+        "border-right": "none",
+        "border-bottom-width": "1px",
+        "border-bottom-style": "solid",
+        "border-bottom-color": "var(--tierra-100)"
+      },
+      "media": "(max-width: 900px)"
+    },
+    {
+      "_causa": "Resguardo: background con var() — se repone el cuerpo COMPLETO en forma expandida.",
+      "selector": "body",
+      "style": {
+        "margin": "0",
+        "overflow-x": "hidden",
+        "font-family": "var(--font-body)",
+        "color": "var(--oliva-700)",
+        "background-color": "var(--tierra-50)",
+        "line-height": "1.5",
+        "overflow-anchor": "none"
+      }
+    },
+    {
+      "_causa": "Resguardo: background con var() — se repone el cuerpo COMPLETO en forma expandida.",
+      "selector": ".site-nav__burger span",
+      "style": {
+        "display": "block",
+        "width": "100%",
+        "height": "2px",
+        "border-radius": "2px",
+        "background-color": "var(--oliva-700)",
+        "transition": "transform 0.25s ease, opacity 0.2s ease"
+      }
+    },
+    {
+      "_causa": "Resguardo: border-right con var() — se repone el cuerpo COMPLETO en forma expandida.",
+      "selector": ".feature-card",
+      "style": {
+        "display": "flex",
+        "align-items": "center",
+        "gap": "12px",
+        "padding": "26px 22px",
+        "border-right-width": "1px",
+        "border-right-style": "solid",
+        "border-right-color": "var(--tierra-100)"
+      }
+    },
+    {
+      "_causa": "Resguardo: background con var() — se repone el cuerpo COMPLETO en forma expandida.",
+      "selector": ".feature-card__icon",
+      "style": {
+        "flex": "none",
+        "width": "42px",
+        "height": "42px",
+        "border-radius": "50%",
+        "background-color": "var(--oliva-700)",
+        "display": "flex",
+        "align-items": "center",
+        "justify-content": "center"
+      }
+    },
+    {
+      "_causa": "Resguardo: border-bottom con var() — se repone el cuerpo COMPLETO en forma expandida.",
+      "selector": ".link-arrow",
+      "style": {
+        "display": "inline-flex",
+        "align-items": "center",
+        "gap": "8px",
+        "font-size": "13px",
+        "font-weight": "700",
+        "letter-spacing": "0.03em",
+        "text-transform": "uppercase",
+        "color": "var(--dorado-600)",
+        "border-bottom-width": "2px",
+        "border-bottom-style": "solid",
+        "border-bottom-color": "var(--dorado-600)",
+        "padding-bottom": "3px"
+      }
+    },
+    {
+      "_causa": "Resguardo: border-bottom con var() — se repone el cuerpo COMPLETO en forma expandida.",
+      "selector": ".ubicacion__list li",
+      "style": {
+        "font-size": "13.5px",
+        "font-weight": "600",
+        "padding": "10px 0 10px 26px",
+        "border-bottom-width": "1px",
+        "border-bottom-style": "solid",
+        "border-bottom-color": "var(--oliva-300)",
+        "position": "relative"
+      }
+    },
+    {
+      "_causa": "Resguardo: background con var() — se repone el cuerpo COMPLETO en forma expandida.",
+      "selector": ".ubicacion__list li::before",
+      "style": {
+        "content": "\"\"",
+        "position": "absolute",
+        "left": "0",
+        "top": "16px",
+        "width": "8px",
+        "height": "8px",
+        "border-radius": "50%",
+        "background-color": "var(--dorado-600)"
+      }
+    },
+    {
+      "_causa": "Resguardo: background con var() — se repone el cuerpo COMPLETO en forma expandida.",
+      "selector": ".historia",
+      "style": {
+        "background-color": "var(--tierra-50)",
+        "padding": "48px 0"
+      }
+    },
+    {
+      "_causa": "Resguardo: border-top con var() — se repone el cuerpo COMPLETO en forma expandida.",
+      "selector": ".historia__quote",
+      "style": {
+        "margin": "24px 0 0",
+        "padding-top": "22px",
+        "border-top-width": "1px",
+        "border-top-style": "solid",
+        "border-top-color": "var(--tierra-300)",
+        "font-family": "var(--font-hero)",
+        "font-size": "clamp(38px, 4.8vw, 56px)",
+        "line-height": "1.1",
+        "color": "var(--dorado-600)"
+      }
+    },
+    {
+      "_causa": "Resguardo: border con var() — se repone el cuerpo COMPLETO en forma expandida.",
+      "selector": ".ubicacion__filters select",
+      "style": {
+        "font-family": "var(--font-body)",
+        "font-size": "11px",
+        "font-weight": "600",
+        "color": "var(--oliva-700)",
+        "background": "rgba(255,255,255,0.92)",
+        "border-top-width": "1px",
+        "border-top-style": "solid",
+        "border-top-color": "var(--tierra-300)",
+        "border-right-width": "1px",
+        "border-right-style": "solid",
+        "border-right-color": "var(--tierra-300)",
+        "border-bottom-width": "1px",
+        "border-bottom-style": "solid",
+        "border-bottom-color": "var(--tierra-300)",
+        "border-left-width": "1px",
+        "border-left-style": "solid",
+        "border-left-color": "var(--tierra-300)",
+        "border-radius": "6px",
+        "padding": "4px 8px",
+        "width": "168px",
+        "cursor": "pointer",
+        "box-shadow": "0 2px 8px rgba(60,50,20,0.1)"
+      }
+    },
+    {
+      "_causa": "Resguardo: border-top con var() — se repone el cuerpo COMPLETO en forma expandida.",
+      "selector": ".plano-frame__body",
+      "style": {
+        "border-top-width": "1px",
+        "border-top-style": "solid",
+        "border-top-color": "var(--tierra-300)",
+        "margin-top": "10px",
+        "padding-top": "10px"
+      }
+    },
+    {
+      "_causa": "Resguardo: border-top con var() — se repone el cuerpo COMPLETO en forma expandida.",
+      "selector": ".plano-frame__footer",
+      "style": {
+        "display": "flex",
+        "justify-content": "space-between",
+        "align-items": "center",
+        "gap": "16px",
+        "margin-top": "8px",
+        "padding-top": "8px",
+        "border-top-width": "1px",
+        "border-top-style": "solid",
+        "border-top-color": "var(--tierra-300)"
+      }
+    },
+    {
+      "_causa": "Resguardo: border-top con var() — se repone el cuerpo COMPLETO en forma expandida.",
+      "selector": ".legend-swatch",
+      "style": {
+        "display": "inline-block",
+        "width": "16px",
+        "height": "0",
+        "border-top-width": "2px",
+        "border-top-style": "solid",
+        "border-top-color": "var(--tierra-700)"
+      }
+    },
+    {
+      "_causa": "Resguardo: background con var() — se repone el cuerpo COMPLETO en forma expandida.",
+      "selector": ".legend-swatch--star",
+      "style": {
+        "width": "8px",
+        "height": "8px",
+        "border-radius": "50%",
+        "border": "none",
+        "background-color": "var(--dorado-600)"
+      }
+    },
+    {
+      "_causa": "Resguardo: background con var() — se repone el cuerpo COMPLETO en forma expandida.",
+      "selector": ".modelo-card__media--placeholder",
+      "style": {
+        "display": "flex",
+        "align-items": "center",
+        "justify-content": "center",
+        "background-color": "var(--oliva-100)",
+        "color": "var(--oliva-700)",
+        "font-weight": "600",
+        "letter-spacing": ".05em",
+        "text-transform": "uppercase",
+        "font-size": "13px"
+      }
+    },
+    {
+      "_causa": "Resguardo: background con var() — se repone el cuerpo COMPLETO en forma expandida.",
+      "selector": ".lote-ficha__accent",
+      "style": {
+        "width": "6px",
+        "flex": "0 0 6px",
+        "background-color": "var(--tierra-300)"
+      }
+    },
+    {
+      "_causa": "Resguardo: border-top con var() — se repone el cuerpo COMPLETO en forma expandida.",
+      "selector": ".lote-ficha__row",
+      "style": {
+        "display": "flex",
+        "justify-content": "space-between",
+        "gap": "12px",
+        "font-size": "12.5px",
+        "padding": "6px 0",
+        "border-top-width": "1px",
+        "border-top-style": "solid",
+        "border-top-color": "var(--tierra-300)"
+      }
+    },
+    {
+      "_causa": "Resguardo: background con var() — se repone el cuerpo COMPLETO en forma expandida.",
+      "selector": ".testimonios__card",
+      "style": {
+        "position": "relative",
+        "overflow": "visible",
+        "background-color": "var(--tierra-50)",
+        "border-radius": "20px",
+        "box-shadow": "0 20px 50px rgba(40,35,20,0.12)",
+        "padding": "40px 56px 40px 40px",
+        "width": "calc(100% - 76px)",
+        "display": "flex",
+        "flex-direction": "column",
+        "gap": "30px"
+      }
+    },
+    {
+      "_causa": "Resguardo: background, border con var() — se repone el cuerpo COMPLETO en forma expandida.",
+      "selector": ".testimonio-avatar",
+      "style": {
+        "flex": "0 0 auto",
+        "width": "152px",
+        "height": "152px",
+        "border-radius": "50%",
+        "background-color": "var(--oliva-500)",
+        "border-top-width": "4px",
+        "border-top-style": "solid",
+        "border-top-color": "var(--dorado-500)",
+        "border-right-width": "4px",
+        "border-right-style": "solid",
+        "border-right-color": "var(--dorado-500)",
+        "border-bottom-width": "4px",
+        "border-bottom-style": "solid",
+        "border-bottom-color": "var(--dorado-500)",
+        "border-left-width": "4px",
+        "border-left-style": "solid",
+        "border-left-color": "var(--dorado-500)",
+        "box-shadow": "0 10px 24px rgba(40,35,20,0.18)",
+        "display": "flex",
+        "align-items": "center",
+        "justify-content": "center",
+        "font-family": "var(--font-body)",
+        "font-size": "24px",
+        "font-weight": "700",
+        "color": "#fff",
+        "margin-right": "-132px",
+        "overflow": "hidden"
+      }
+    },
+    {
+      "_causa": "Resguardo: background con var() — se repone el cuerpo COMPLETO en forma expandida.",
+      "selector": ".social-frame",
+      "style": {
+        "background-color": "var(--tierra-50)",
+        "border-radius": "20px",
+        "box-shadow": "0 20px 50px rgba(40,35,20,0.12)",
+        "padding": "40px",
+        "display": "flex",
+        "flex-direction": "column",
+        "align-items": "center",
+        "gap": "26px"
+      }
+    },
+    {
+      "_causa": "Resguardo: background con var() — se repone el cuerpo COMPLETO en forma expandida.",
+      "selector": ".social-frame__icon",
+      "style": {
+        "flex": "0 0 auto",
+        "width": "40px",
+        "height": "40px",
+        "border-radius": "50%",
+        "background-color": "var(--oliva-500)",
+        "display": "flex",
+        "align-items": "center",
+        "justify-content": "center"
+      }
+    },
+    {
+      "_causa": "Resguardo: background con var() — se repone el cuerpo COMPLETO en forma expandida.",
+      "selector": ".social-card",
+      "style": {
+        "border-radius": "12px",
+        "overflow": "hidden",
+        "aspect-ratio": "9/16",
+        "background-color": "var(--tierra-500)",
+        "position": "relative"
+      }
+    },
+    {
+      "_causa": "Resguardo: background con var() — se repone el cuerpo COMPLETO en forma expandida.",
+      "selector": ".social-card--contact",
+      "style": {
+        "display": "flex",
+        "flex-direction": "column",
+        "align-items": "center",
+        "justify-content": "center",
+        "gap": "10px",
+        "background-color": "linear-gradient(160deg, var(--oliva-700), var(--oliva-500))",
+        "color": "#fff",
+        "padding": "18px",
+        "text-align": "center"
+      }
+    },
+    {
+      "_causa": "Resguardo: background con var() — se repone el cuerpo COMPLETO en forma expandida.",
+      "selector": ".social-card--contact .social-card__avatar",
+      "style": {
+        "width": "48px",
+        "height": "48px",
+        "border-radius": "50%",
+        "background-color": "var(--dorado-500)",
+        "color": "#2b2210",
+        "display": "flex",
+        "align-items": "center",
+        "justify-content": "center",
+        "font-family": "var(--font-body)",
+        "font-weight": "700",
+        "font-size": "14px"
+      }
+    },
+    {
+      "_causa": "Resguardo: background con var() — se repone el cuerpo COMPLETO en forma expandida.",
+      "selector": ".exit-card__icon-circle",
+      "style": {
+        "width": "40px",
+        "height": "40px",
+        "border-radius": "50%",
+        "background-color": "var(--oliva-700)",
+        "display": "flex",
+        "align-items": "center",
+        "justify-content": "center"
+      }
+    },
+    {
+      "_causa": "Resguardo: border-bottom con var() — se repone el cuerpo COMPLETO en forma expandida.",
+      "selector": ".faq__item",
+      "style": {
+        "border-bottom-width": "1px",
+        "border-bottom-style": "solid",
+        "border-bottom-color": "var(--tierra-300)",
+        "padding": "18px 0"
+      }
+    },
+    {
+      "_causa": "Resguardo: background con var() — se repone el cuerpo COMPLETO en forma expandida.",
+      "selector": ".contacto",
+      "style": {
+        "background-color": "var(--oliva-700)",
+        "color": "var(--tierra-50)"
+      }
+    },
+    {
+      "_causa": "Resguardo: background con var() — se repone el cuerpo COMPLETO en forma expandida.",
+      "selector": ".contacto__form button",
+      "style": {
+        "justify-self": "start",
+        "background-color": "var(--dorado-600)",
+        "color": "#2b2210",
+        "font-weight": "700",
+        "font-size": "12.5px",
+        "letter-spacing": "0.04em",
+        "text-transform": "uppercase",
+        "padding": "13px 24px",
+        "border": "0",
+        "border-radius": "999px",
+        "cursor": "pointer"
+      }
+    }
+  ]
+}

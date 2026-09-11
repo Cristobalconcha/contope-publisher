@@ -89,6 +89,7 @@
   var ATTR_CAROUSEL_VISIBLE = 'data-ocd-carousel-visible';
   var ATTR_CAROUSEL_VISIBLE_MOBILE = 'data-ocd-carousel-visible-mobile';
   var ATTR_CAROUSEL_MOBILE_BREAKPOINT = 'data-ocd-carousel-mobile-breakpoint';
+  var ATTR_CAROUSEL_ROWS = 'data-ocd-carousel-rows';
   var CAROUSEL_MODE_TRACK = 'track';
   var DEFAULT_CAROUSEL_TRACK_SELECTOR = '.ocd-carousel__track';
   var DEFAULT_CAROUSEL_VISIBLE = 1;
@@ -105,6 +106,14 @@
   var ATTR_REVEAL_THRESHOLD = 'data-ocd-reveal-threshold';
   var DEFAULT_REVEAL_CLASS = 'is-revealed';
   var DEFAULT_REVEAL_THRESHOLD = 0.15;
+
+  // whatsapp: el nodo (render_whatsapp en el compilador MCP) ya trae el href
+  // wa.me resuelto server-side; el runtime solo se encarga de revelarlo desde
+  // la base de su sección cuando esta entra en viewport. Umbral más alto que
+  // reveal-on-scroll a propósito: no debe aparecer hasta que la sección esté
+  // realmente a la vista, no apenas asoma el borde.
+  var BEHAVIOR_ANCHOR = 'anchor';
+  var DEFAULT_ANCHOR_THRESHOLD = 0.3;
 
   // lightbox: el elemento con data-ocd-behavior="lightbox" es el overlay
   // mismo; referencia por selector a la fuente de imágenes y a sus propios
@@ -166,8 +175,14 @@
   var ATTR_GEO_FIELD_NOMBRE = 'data-ocd-geo-field-nombre';
   var ATTR_GEO_FIELD_CATEGORIA = 'data-ocd-geo-field-categoria';
   var ATTR_GEO_FIELD_DISTANCIA = 'data-ocd-geo-field-distancia';
+  var ATTR_GEO_FIELD_DESCRIPCION = 'data-ocd-geo-field-descripcion';
   var ATTR_GEO_FIELD_CONTACTO = 'data-ocd-geo-field-contacto';
   var ATTR_GEO_ACCENT_COLOR = 'data-ocd-geo-accent-color';
+  // categoryIcons: JSON { categoria: "<svg path d>" } opcional. Si una
+  // categoría no tiene ícono propio, el marcador usa la estrella por
+  // defecto (compatibilidad con mapas ya publicados sin este atributo).
+  var ATTR_GEO_CATEGORY_ICONS = 'data-ocd-geo-category-icons';
+  var DEFAULT_MARKER_PATH = 'M0 -18 L8 -6 L14 -6 L10 4 L12 16 L0 10 L-12 16 L-10 4 L-14 -6 L-8 -6 Z';
   var DEFAULT_GEO_ACCENT_COLOR = 'var(--dorado-600)';
 
   // hero-collapse: colapso desktop del banner de entrada. Dos máquinas de
@@ -630,14 +645,23 @@
     var prevBtn = root.querySelector('[' + ATTR_CAROUSEL_PREV + ']');
     var index = 0;
 
+    // filas: 1 por defecto — con 1 el comportamiento es idéntico al de siempre.
+    var rows = parseIndex(root.getAttribute(ATTR_CAROUSEL_ROWS), 1) || 1;
     function visibleCount() { return win.innerWidth <= breakpoint ? visibleMobile : visible; }
-    function maxIndex() { return Math.max(0, slides.length - visibleCount()); }
+    function columnCount() { return Math.ceil(slides.length / rows); }
+    function maxIndex() { return Math.max(0, columnCount() - visibleCount()); }
     function slideStep() {
+      // Con varias filas el paso es el ancho de una COLUMNA: medir contra la
+      // segunda diapositiva daría cero, porque queda justo debajo.
+      if (rows > 1 && slides.length > rows) {
+        return slides[rows].getBoundingClientRect().left - slides[0].getBoundingClientRect().left;
+      }
       if (slides.length < 2) return slides[0].getBoundingClientRect().width;
       return slides[1].getBoundingClientRect().left - slides[0].getBoundingClientRect().left;
     }
     function update() {
       var step = slideStep();
+      track.style.setProperty('--ocd-carousel-columnas', String(visibleCount()));
       track.style.transform = 'translateX(' + (-index * step) + 'px)';
       if (prevBtn) prevBtn.disabled = index <= 0;
       if (nextBtn) nextBtn.disabled = index >= maxIndex();
@@ -826,6 +850,53 @@
     }
   }
 
+  // anchor: regla genérica de posicionamiento+animación (borde/esquina +
+  // offset + entrada), aplicable a cualquier nodo (whatsapp, imagen, botón,
+  // precio, red social...) — no exclusiva de WhatsApp. No hay <style>/clase
+  // CSS involucrada: el sanitizador de HTML de Canvas no admite <style>, así
+  // que el compilador deja el estado inicial en el atributo style inline y
+  // aquí solo escribimos el estado final (transform + opacity) directo sobre
+  // el elemento cuando entra en vista. La transición ya viene declarada en
+  // ese mismo style inline.
+  var ATTR_ANCHOR_REVEAL_TRANSFORM = 'data-ocd-anchor-reveal-transform';
+
+  function revealAnchor(el) {
+    var transform = el.getAttribute(ATTR_ANCHOR_REVEAL_TRANSFORM);
+    if (transform) el.style.transform = transform;
+    el.style.opacity = '1';
+  }
+
+  function installAnchorRuntime(win, doc, opts, cleanups) {
+    var nodes = doc.querySelectorAll('[data-ocd-behavior="anchor"]');
+    if (!nodes.length) return;
+    var hasIO = typeof win.IntersectionObserver === 'function';
+    var observer = null;
+    if (hasIO) {
+      observer = new win.IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          revealAnchor(entry.target);
+          observer.unobserve(entry.target);
+        });
+      }, { threshold: DEFAULT_ANCHOR_THRESHOLD });
+    }
+    for (var i = 0; i < nodes.length; i++) {
+      var declared = nodes[i].getAttribute(ATTR_BEHAVIOR);
+      if (declared !== BEHAVIOR_ANCHOR) continue;
+      if (!hasIO) {
+        revealAnchor(nodes[i]);
+        continue;
+      }
+      observer.observe(nodes[i]);
+    }
+    if (observer) {
+      cleanups.push(function () {
+        observer.disconnect();
+      });
+    }
+  }
+
+
   // lightbox: el nodo con el comportamiento ES el overlay. Todo lo demás
   // (fuente de imágenes, controles) se referencia por selector configurable,
   // así el mismo comportamiento sirve para cualquier galería, no solo una.
@@ -860,10 +931,40 @@
         if (!bigImg) return;
 
         var current = 0;
+        // El lightbox arma su imagen ampliada copiando solo src y alt, así que
+        // un giro puesto como clase en la miniatura no llega hasta acá. Por eso
+        // el giro viaja en data-ocd-rotation sobre la propia <img> y se repone
+        // al ampliar. En 90/270 la imagen ocupa al revés, de modo que sus dos
+        // límites se intercambian; si no, se recorta contra el borde equivocado.
+        function aplicarGiro(destino, origen) {
+          var giro = parseInt(origen.getAttribute('data-ocd-rotation') || '0', 10);
+          if (giro !== 90 && giro !== 180 && giro !== 270) {
+            destino.style.transform = '';
+            destino.style.maxWidth = '';
+            destino.style.maxHeight = '';
+            destino.removeAttribute('data-ocd-rotation');
+            return;
+          }
+          destino.setAttribute('data-ocd-rotation', String(giro));
+          destino.style.transform = 'rotate(' + giro + 'deg)';
+          if (giro === 180) {
+            destino.style.maxWidth = '';
+            destino.style.maxHeight = '';
+            return;
+          }
+          var caja = destino.parentNode && destino.parentNode.getBoundingClientRect
+            ? destino.parentNode.getBoundingClientRect()
+            : null;
+          var ancho = caja && caja.width ? caja.width : window.innerWidth;
+          var alto = caja && caja.height ? caja.height : window.innerHeight;
+          destino.style.maxWidth = Math.round(alto) + 'px';
+          destino.style.maxHeight = Math.round(ancho) + 'px';
+        }
         function open(index) {
           current = ((index % images.length) + images.length) % images.length;
           bigImg.src = images[current].currentSrc || images[current].src;
           bigImg.alt = images[current].alt || '';
+          aplicarGiro(bigImg, images[current]);
           root.classList.add(openClass);
         }
         function close() { root.classList.remove(openClass); }
@@ -1043,9 +1144,23 @@
         var fieldNombre = bySelector(ATTR_GEO_FIELD_NOMBRE);
         var fieldCategoria = bySelector(ATTR_GEO_FIELD_CATEGORIA);
         var fieldDistancia = bySelector(ATTR_GEO_FIELD_DISTANCIA);
+        var fieldDescripcion = bySelector(ATTR_GEO_FIELD_DESCRIPCION);
         var fieldContacto = bySelector(ATTR_GEO_FIELD_CONTACTO);
         var accentColor = parseClass(root.getAttribute(ATTR_GEO_ACCENT_COLOR), DEFAULT_GEO_ACCENT_COLOR);
+        var categoryIcons = parseJsonAttr(root, ATTR_GEO_CATEGORY_ICONS);
+        if (!categoryIcons || typeof categoryIcons !== 'object') categoryIcons = {};
+        var markerIcon = marker ? marker.querySelector('.ocd-geo-map__marker-icon') : null;
         if (!svg) return;
+
+        // cercanía: preferimos minutos si el lugar los trae cargados (la
+        // razón de negocio, no técnica: "a 10 km" suena lejos, "a 10 min"
+        // suena cerca). Medir en línea recta no sirve para nada real, así
+        // que ambos valores se cargan a mano mirando la ruta en Google, tal
+        // como ya se hace con nombre/categoría/contacto.
+        function formatCercania(lugar) {
+          if (lugar.tiempoMin != null && isFinite(Number(lugar.tiempoMin))) return Number(lugar.tiempoMin) + ' min';
+          return lugar.dist + ' km';
+        }
 
         var bounds = parseJsonAttr(root, ATTR_GEO_DATA_BOUNDS) || {};
         var DATA = {
@@ -1058,6 +1173,9 @@
         var proyecto = parsePoint(root.getAttribute(ATTR_GEO_PROYECTO), 300, 270);
         var minZoomRatio = parseFloat(root.getAttribute(ATTR_GEO_MIN_ZOOM_RATIO));
         if (!isFinite(minZoomRatio) || minZoomRatio <= 0 || minZoomRatio >= 1) minZoomRatio = 0.2;
+        var initialZoom = parseFloat(root.getAttribute('data-ocd-geo-initial-zoom'));
+        if (!isFinite(initialZoom) || initialZoom <= 0 || initialZoom > 1) initialZoom = 1;
+        if (initialZoom < minZoomRatio) initialZoom = minZoomRatio;
 
         var FULL_W = DATA.maxX - DATA.minX;
         var FULL_H = DATA.maxY - DATA.minY;
@@ -1075,6 +1193,8 @@
         }
         var MAX_W = view.w;
         var MIN_W = MAX_W * minZoomRatio;
+        view.w = MAX_W * initialZoom;
+        view.h = view.w * containerAspect;
         view.x = initialCenter.x - view.w / 2;
         view.y = initialCenter.y - view.h / 2;
 
@@ -1174,13 +1294,16 @@
             return;
           }
           selLugar.disabled = false;
+          function orderKey(lugar) {
+            return (lugar.tiempoMin != null && isFinite(Number(lugar.tiempoMin))) ? Number(lugar.tiempoMin) : Number(lugar.dist);
+          }
           places
             .filter(function (lugar) { return lugar.categoria === categoria; })
-            .sort(function (a, b) { return a.dist - b.dist; })
+            .sort(function (a, b) { return orderKey(a) - orderKey(b); })
             .forEach(function (lugar) {
               var opt = doc.createElement('option');
               opt.value = lugar.nombre;
-              opt.textContent = lugar.nombre + ' · ' + lugar.dist + ' km';
+              opt.textContent = lugar.nombre + ' · ' + formatCercania(lugar);
               selLugar.appendChild(opt);
             });
         }
@@ -1208,12 +1331,23 @@
             marker.setAttribute('transform', 'translate(' + lugar.x + ',' + lugar.y + ')');
             marker.style.display = '';
           }
+          if (markerIcon) {
+            var iconPath = categoryIcons[lugar.categoria];
+            if (typeof iconPath === 'string' && iconPath) {
+              markerIcon.setAttribute('d', iconPath);
+              markerIcon.setAttribute('transform', 'scale(1.3) translate(-12,-12)');
+            } else {
+              markerIcon.setAttribute('d', DEFAULT_MARKER_PATH);
+              markerIcon.removeAttribute('transform');
+            }
+          }
           panToLugar(lugar.x, lugar.y);
           if (panel) panel.setAttribute('data-empty', 'false');
           if (accent) accent.style.background = accentColor;
           if (fieldNombre) fieldNombre.textContent = lugar.nombre;
           if (fieldCategoria) fieldCategoria.textContent = categoryLabels[lugar.categoria] || lugar.categoria;
-          if (fieldDistancia) fieldDistancia.textContent = lugar.dist + ' km';
+          if (fieldDistancia) fieldDistancia.textContent = formatCercania(lugar);
+          if (fieldDescripcion) fieldDescripcion.textContent = lugar.descripcionLarga || '';
           if (fieldContacto) fieldContacto.textContent = lugar.contacto || '—';
         }
 
@@ -1625,6 +1759,7 @@
     installNavToggleRuntime(win, doc, opts, cleanups);
     installCarouselRuntime(win, doc, opts, cleanups);
     installRevealRuntime(win, doc, opts, cleanups);
+    installAnchorRuntime(win, doc, opts, cleanups);
     installLightboxRuntime(win, doc, opts, cleanups);
     installParcelMapRuntime(win, doc, opts, cleanups);
     installGeoMapRuntime(win, doc, opts, cleanups);
@@ -1699,6 +1834,7 @@
       '  var ATTR_CAROUSEL_VISIBLE = "data-ocd-carousel-visible";',
       '  var ATTR_CAROUSEL_VISIBLE_MOBILE = "data-ocd-carousel-visible-mobile";',
       '  var ATTR_CAROUSEL_MOBILE_BREAKPOINT = "data-ocd-carousel-mobile-breakpoint";',
+      '  var ATTR_CAROUSEL_ROWS = "data-ocd-carousel-rows";',
       '  var DEFAULT_TRACK_SELECTOR = ' + JSON.stringify(DEFAULT_CAROUSEL_TRACK_SELECTOR) + ';',
       '  var BEHAVIOR_CAROUSEL = "carousel-basic";',
       '  var DEFAULT_SLIDE_SELECTOR = ' + JSON.stringify(opts.carouselSlideSelector) + ';',
@@ -1879,14 +2015,18 @@
       '    var nextBtn = root.querySelector("[" + ATTR_CAROUSEL_NEXT + "]");',
       '    var prevBtn = root.querySelector("[" + ATTR_CAROUSEL_PREV + "]");',
       '    var index = 0;',
+      '    var rows = parseIndex(root.getAttribute(ATTR_CAROUSEL_ROWS), 1) || 1;',
       '    function visibleCount() { return w.innerWidth <= breakpoint ? visibleMobile : visible; }',
-      '    function maxIndex() { return Math.max(0, slides.length - visibleCount()); }',
+      '    function columnCount() { return Math.ceil(slides.length / rows); }',
+      '    function maxIndex() { return Math.max(0, columnCount() - visibleCount()); }',
       '    function slideStep() {',
+      '      if (rows > 1 && slides.length > rows) { return slides[rows].getBoundingClientRect().left - slides[0].getBoundingClientRect().left; }',
       '      if (slides.length < 2) return slides[0].getBoundingClientRect().width;',
       '      return slides[1].getBoundingClientRect().left - slides[0].getBoundingClientRect().left;',
       '    }',
       '    function update() {',
       '      var step = slideStep();',
+      '      track.style.setProperty("--ocd-carousel-columnas", String(visibleCount()));',
       '      track.style.transform = "translateX(" + (-index * step) + "px)";',
       '      if (prevBtn) prevBtn.disabled = index <= 0;',
       '      if (nextBtn) nextBtn.disabled = index >= maxIndex();',
@@ -2096,6 +2236,9 @@
       '        var proyecto = parsePoint(root.getAttribute(ATTR_GEO_PROYECTO), 300, 270);',
       '        var minZoomRatio = parseFloat(root.getAttribute(ATTR_GEO_MIN_ZOOM_RATIO));',
       '        if (!isFinite(minZoomRatio) || minZoomRatio <= 0 || minZoomRatio >= 1) minZoomRatio = 0.2;',
+      '        var initialZoom = parseFloat(root.getAttribute("data-ocd-geo-initial-zoom"));',
+      '        if (!isFinite(initialZoom) || initialZoom <= 0 || initialZoom > 1) initialZoom = 1;',
+      '        if (initialZoom < minZoomRatio) initialZoom = minZoomRatio;',
       '        var FULL_W = DATA.maxX - DATA.minX;',
       '        var FULL_H = DATA.maxY - DATA.minY;',
       '        var dataAspect = FULL_H / FULL_W;',
@@ -2106,6 +2249,8 @@
       '        else { view.h = FULL_H; view.w = FULL_H / containerAspect; }',
       '        var MAX_W = view.w;',
       '        var MIN_W = MAX_W * minZoomRatio;',
+      '        view.w = MAX_W * initialZoom;',
+      '        view.h = view.w * containerAspect;',
       '        view.x = initialCenter.x - view.w / 2;',
       '        view.y = initialCenter.y - view.h / 2;',
       '        function applyView() {',

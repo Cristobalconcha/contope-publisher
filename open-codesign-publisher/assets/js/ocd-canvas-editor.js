@@ -33,14 +33,12 @@
         var toolbar = document.querySelector('.ocd-canvas-toolbar');
         if (!toolbar || toolbar.dataset.compact === 'true') return;
         toolbar.dataset.compact = 'true';
-
         function moveWithLabel(id, target) {
             var field = document.getElementById(id);
             var label = document.querySelector('label[for="' + id + '"]');
             if (label) target.appendChild(label);
             if (field) target.appendChild(field);
         }
-
         function menu(labelText, ids) {
             var details = document.createElement('details');
             details.className = 'ocd-toolbar-menu';
@@ -59,7 +57,6 @@
             });
             toolbar.insertBefore(details, document.getElementById('ocd-canvas-publish'));
         }
-
         var publishButton = document.getElementById('ocd-canvas-publish');
         var pagePicker = document.querySelector('.ocd-canvas-page-picker');
         ['ocd-page-target', 'ocd-page-create', 'ocd-snapshots-open', 'ocd-canvas-page-title', 'ocd-canvas-page-status'].forEach(function (id) {
@@ -69,11 +66,7 @@
         });
         if (pagePicker && pagePicker.parentElement) pagePicker.parentElement.remove();
         var historyButton = document.getElementById('ocd-snapshots-open');
-        if (historyButton) {
-            historyButton.textContent = '◷';
-            historyButton.title = 'Historial de versiones';
-            historyButton.setAttribute('aria-label', 'Historial de versiones');
-        }
+        if (historyButton) { historyButton.textContent = '◷'; historyButton.title = 'Historial de versiones'; historyButton.setAttribute('aria-label', 'Historial de versiones'); }
         menu('Vista', ['ocd-canvas-zoom', 'ocd-canvas-width', 'ocd-canvas-height']);
         menu('Archivo', ['ocd-canvas-reload', 'ocd-canvas-export-html', 'ocd-canvas-export-css', 'ocd-canvas-toggle-import']);
     }
@@ -134,6 +127,7 @@
             themeDefinitionsCss: config.themeDefinitionsCss || '',
             siteUrl: config.siteUrl || '',
             oruganttForms: config.oruganttForms || [],
+            oruganttFormTokens: config.oruganttFormTokens || [],
             canvasWidth: initialCanvasWidth,
             inspectorMount: document.getElementById('ocd-canvas-inspector'),
             gridControlsMount: '#ocd-canvas-inspector .ocd-ci__head',
