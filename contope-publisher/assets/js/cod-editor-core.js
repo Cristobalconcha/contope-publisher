@@ -1049,7 +1049,7 @@ editor.Components.addType('cod-columns', {
                 };
             }
 
-            var CSS_OVERRIDES_MARKER = '/* OCD-CANVAS-EDITABLE-OVERRIDES */';
+            var CSS_OVERRIDES_MARKER = '/* COD-CANVAS-EDITABLE-OVERRIDES */';
             var sourceCss = '';
             var siteFontCss = typeof options.siteFontCss === 'string' ? options.siteFontCss : '';
             var themeDefinitionsCss = typeof options.themeDefinitionsCss === 'string' ? options.themeDefinitionsCss : '';

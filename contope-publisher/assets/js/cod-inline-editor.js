@@ -25,7 +25,7 @@
     // el estado del lienzo en documentos por región. No usa OCDEditorCore:
     // sólo necesita una instancia de GrapesJS y la configuración del editor.
     // ---------------------------------------------------------------------
-    var CSS_OVERRIDES_MARKER = '/* OCD-CANVAS-EDITABLE-OVERRIDES */';
+    var CSS_OVERRIDES_MARKER = '/* COD-CANVAS-EDITABLE-OVERRIDES */';
     var REGION_ORDER = ['header', 'body', 'footer'];
 
     function parseJson(value) {

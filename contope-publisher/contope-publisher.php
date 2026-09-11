@@ -46,6 +46,13 @@ require_once COD_PUBLISHER_DIR . 'includes/class-cod-block-heading.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-canvas-mcp-recipe-compiler.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-canvas-mcp-service.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-mcp-server.php';
+require_once COD_PUBLISHER_DIR . 'includes/class-cod-migracion-nombres.php';
+
+// Migración de los nombres viejos (Open CoDesign) a los nuevos. Se registra
+// ANTES que todo lo demás y corre con prioridad 1 en plugins_loaded: si el
+// sitio viene de la versión anterior, sus documentos tienen que estar migrados
+// antes de que cualquier otra pieza intente leerlos. Corre una sola vez.
+(new COD_Migracion_Nombres())->register();
 
 add_action('plugins_loaded', static function (): void {
     $validator = new COD_Package_Validator();
