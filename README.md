@@ -1,25 +1,40 @@
 # ContOpe Publisher
 
-Prototipo de integración entre proyectos de ContOpe Design y WordPress/Gutenberg.
+Constructor visual de páginas para WordPress. Editas el sitio **dentro de la
+herramienta real**, no subiendo archivos hechos por fuera — y puedes hacerlo
+conversando con un asistente de IA, que opera el mismo editor que usa una
+persona.
 
-El primer caso conductor es **Santa Luisa de Palpi**. El objetivo del MVP es reconstruir Inicio, Preguntas frecuentes y Contacto como páginas Gutenberg nativas y editables; no incrustar la aplicación React mediante `iframe`.
+Se desarrolló construyendo un sitio de verdad, [Santa Luisa de
+Palpi](https://santaluisadepalpi.com), que sigue siendo el caso de prueba de
+cada cambio.
 
-## Alcance inicial
+## Instalación
 
-- importar una descripción JSON versionada;
-- validar el documento antes de modificar WordPress;
-- crear páginas como borradores;
-- serializar estructura y contenido a bloques Gutenberg;
-- conservar identificadores estables de proyecto, página y nodo;
-- permitir edición nativa de textos, imágenes y enlaces.
+**→ [Guía de instalación y conexión](docs/INSTALAR.md)**
 
-## Fuera del primer checkpoint
+Tres pasos: instalar el plugin, crear una contraseña de aplicación y pegar la
+configuración del servidor en tu asistente. No requiere programar.
 
-- publicación automática;
-- servidor MCP;
-- sincronización bidireccional;
+Requiere WordPress 6.5+, PHP 8.0+ y una cuenta de administrador.
+
+## Qué hace
+
+- **Editor visual** sobre GrapesJS: secciones, grillas anidadas, galerías con
+  lightbox, mapas, gráficos, videos con transparencia.
+- **Servidor MCP** en `/wp-json/contope/v1/mcp`: un asistente lee y modifica
+  las páginas a través del editor real, con las mismas validaciones que una
+  persona.
+- **Cabecera y pie compartidos** entre páginas, con reglas de dónde aplican.
+- **Comportamientos declarativos** —carruseles, acordeones, visores de
+  contenido externo, ventana de WhatsApp con evento medible— sin escribir
+  JavaScript en el contenido.
+- **Portabilidad**: exportar e importar un sitio completo entre instalaciones.
+
+## Qué NO hace todavía
+
 - importación genérica de cualquier JSX;
-- constructor visual completo;
+- sincronización bidireccional automática;
 - modificaciones remotas del hosting.
 
 ## Editor Canvas (experimental)
