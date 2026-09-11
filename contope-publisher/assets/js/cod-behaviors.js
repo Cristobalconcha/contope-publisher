@@ -222,6 +222,7 @@
   // en data-cod-chart-data y el SVG se genera en runtime con createElementNS,
   // sin librerías externas y sin interpretar el JSON como código.
   var BEHAVIOR_CHART = 'chart';
+  var BEHAVIOR_VISOR_EMBED = 'visor-embed';
   var ATTR_CHART_TYPE = 'data-cod-chart-type';
   var ATTR_CHART_DATA = 'data-cod-chart-data';
   var ATTR_CHART_COLOR = 'data-cod-chart-color';
@@ -291,6 +292,11 @@
     name: BEHAVIOR_CHART,
     defaultType: DEFAULT_CHART_TYPE,
     description: 'Gráfico simple de barras o líneas renderizado como SVG desde datos JSON declarativos.',
+  };
+  BEHAVIORS[BEHAVIOR_VISOR_EMBED] = {
+    name: BEHAVIOR_VISOR_EMBED,
+    defaultOpenClass: 'is-open',
+    description: 'Capa a pantalla completa que muestra una página externa (un recorrido 360, un video) dentro de un iframe. La dirección se carga recién al abrir y se descarga al cerrar; solo acepta http y https. No se ejecuta dentro del editor: en el lienzo la capa se ve como un bloque más.',
   };
 
   function isAllowedBehavior(name) {

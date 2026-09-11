@@ -297,26 +297,135 @@ final class COD_Canvas_Document_Sanitizer
             return 'iframe mal formado';
         }
         foreach ($matches[1] as $attributes) {
-            if (preg_match('/\bsrc\s*=\s*([\'\"])(.*?)\1/i', $attributes, $source) !== 1) {
-                return 'iframe sin src';
+            // Un iframe SIN src no carga nada: muestra about:blank. Es el caso
+            // del visor bajo demanda, que recibe su dirección recién cuando
+            // alguien lo abre. Lo que sí se controla es esa dirección, que
+            // viaja en data-cod-visor-src y se comprueba más abajo con la
+            // misma vara que un src escrito a mano.
+            if (preg_match('/\bsrc\s*=\s*([\'\"])(.*?)\1/i', $attributes, $source) === 1) {
+                $error = $this->embed_origin_error(html_entity_decode(trim($source[2]), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+                if ($error !== null) {
+                    return $error;
+                }
             }
-            $url = html_entity_decode(trim($source[2]), ENT_QUOTES | ENT_HTML5, 'UTF-8');
-            $parts = wp_parse_url($url);
-            if (!is_array($parts) || strtolower((string) ($parts['scheme'] ?? '')) !== 'https') {
-                return substr($url, 0, 100);
+            if (preg_match('/\bdata-cod-visor-src\s*=\s*([\'\"])(.*?)\1/i', $attributes, $diferido) === 1) {
+                $error = $this->embed_origin_error(html_entity_decode(trim($diferido[2]), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+                if ($error !== null) {
+                    return $error;
+                }
             }
-            $host = strtolower((string) ($parts['host'] ?? ''));
-            $path = (string) ($parts['path'] ?? '');
-            $allowed =
-                ($host === 'www.google.com' && str_starts_with($path, '/maps/embed')) ||
-                (($host === 'www.youtube.com' || $host === 'youtube.com' || $host === 'www.youtube-nocookie.com') && str_starts_with($path, '/embed/')) ||
-                ($host === 'player.vimeo.com' && str_starts_with($path, '/video/'));
-            if (!$allowed) {
-                return substr($url, 0, 100);
+        }
+
+        // La dirección diferida puede estar en el contenedor del visor y no en
+        // el iframe: el comportamiento visor-embed la lee del nodo que lleva
+        // data-cod-behavior="visor-embed".
+        if (preg_match_all('/data-cod-visor-src\s*=\s*([\'\"])(.*?)\1/i', $html, $diferidas) !== false) {
+            foreach ($diferidas[2] as $cruda) {
+                $error = $this->embed_origin_error(html_entity_decode(trim($cruda), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+                if ($error !== null) {
+                    return $error;
+                }
             }
         }
 
         return null;
+    }
+
+    /**
+     * Opción del sitio con los orígenes que este WordPress permite incrustar.
+     *
+     * Un nombre de host por línea, sin esquema ni ruta. Ver
+     * COD_Settings_Admin, pestaña Configuración.
+     */
+    public const OPTION_EMBED_ORIGINS = 'cod_embed_origins';
+
+    /**
+     * Comprueba una dirección a incrustar. Devuelve null si es aceptable, o el
+     * texto del error si no.
+     *
+     * Por qué existe una lista y no "cualquier dirección": un iframe muestra
+     * una página ajena DENTRO de la tuya, con tu dominio en la barra. Si
+     * cualquiera que edite un documento pudiera apuntarlo a donde quisiera, un
+     * documento importado de afuera —una plantilla, un paquete de otro sitio—
+     * podría traer un iframe a una página cualquiera y la persona que lo abre
+     * no tendría cómo notarlo.
+     *
+     * Por qué tampoco alcanza la lista fija de YouTube, Vimeo y Google Maps:
+     * deja afuera todo lo demás. Un recorrido 360, un plano interactivo, un
+     * formulario de reservas o un visor de documentos son necesidades
+     * corrientes de un sitio, y no hay razón para que el plugin decida por el
+     * dueño del sitio cuáles valen.
+     *
+     * La salida es que el dueño del sitio lo declare: los tres de siempre
+     * vienen permitidos, y cualquier otro origen se agrega a mano en
+     * Configuración. Declararlo es un acto deliberado de alguien con permiso
+     * de administración, que es exactamente la garantía que hacía falta.
+     */
+    private function embed_origin_error(string $url): ?string
+    {
+        $parts = wp_parse_url($url);
+        if (!is_array($parts) || strtolower((string) ($parts['scheme'] ?? '')) !== 'https') {
+            return substr($url, 0, 100);
+        }
+        $host = strtolower((string) ($parts['host'] ?? ''));
+        $path = (string) ($parts['path'] ?? '');
+
+        $conocidos =
+            ($host === 'www.google.com' && str_starts_with($path, '/maps/embed')) ||
+            (($host === 'www.youtube.com' || $host === 'youtube.com' || $host === 'www.youtube-nocookie.com') && str_starts_with($path, '/embed/')) ||
+            ($host === 'player.vimeo.com' && str_starts_with($path, '/video/'));
+        if ($conocidos) {
+            return null;
+        }
+
+        return in_array($host, self::declared_embed_origins(), true)
+            ? null
+            : substr($url, 0, 100);
+    }
+
+    /**
+     * Los hosts que el sitio declaró como incrustables.
+     *
+     * @return list<string>
+     */
+    public static function declared_embed_origins(): array
+    {
+        $crudo = (string) get_option(self::OPTION_EMBED_ORIGINS, '');
+        if ($crudo === '') {
+            return [];
+        }
+        $hosts = [];
+        foreach (preg_split('/[\r\n,]+/', $crudo) ?: [] as $linea) {
+            $host = self::normalize_embed_origin((string) $linea);
+            if ($host !== '') {
+                $hosts[] = $host;
+            }
+        }
+
+        return array_values(array_unique($hosts));
+    }
+
+    /**
+     * Acepta "ejemplo.com", "https://ejemplo.com/algo" o " EJEMPLO.com " y
+     * devuelve siempre el host en minúsculas, o cadena vacía si no lo es.
+     *
+     * Se tolera que alguien pegue la dirección completa porque es lo que va a
+     * hacer: copiar del navegador y pegar. Rechazarlo por traer "https://"
+     * sería castigar lo obvio.
+     */
+    public static function normalize_embed_origin(string $linea): string
+    {
+        $texto = trim($linea);
+        if ($texto === '') {
+            return '';
+        }
+        if (str_contains($texto, '/') || str_contains($texto, ':')) {
+            $partes = wp_parse_url(str_contains($texto, '//') ? $texto : 'https://' . $texto);
+            $texto = is_array($partes) ? (string) ($partes['host'] ?? '') : '';
+        }
+        $texto = strtolower(trim($texto));
+
+        return preg_match('/^[a-z0-9.-]+\.[a-z]{2,}$/', $texto) === 1 ? $texto : '';
     }
 
     /**

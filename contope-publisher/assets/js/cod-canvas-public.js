@@ -415,6 +415,85 @@
         });
     }
 
+    // visor-embed: el nodo con el comportamiento ES la capa que se abre. Sirve
+    // para mostrar algo que vive en otro sitio —un recorrido 360, un video, un
+    // plano interactivo— sin sacar a la persona de la página.
+    //
+    // Dos decisiones que no son cosméticas:
+    //
+    // 1. La dirección NO se pone en el iframe hasta que alguien abre el visor.
+    //    Un iframe con src puesto se carga con la página aunque esté oculto, y
+    //    un recorrido 360 pesa: la portada entera arrastraría ese peso para
+    //    todos, incluso para quien nunca lo abre. Al cerrar se descarga, para
+    //    que no siga consumiendo memoria ni sonando de fondo.
+    //
+    // 2. Solo se aceptan direcciones http y https. El atributo viaja dentro del
+    //    contenido guardado, así que hay que tratarlo como texto de afuera: una
+    //    dirección "javascript:" en un iframe es ejecución de código ajeno.
+    function installVisorEmbed(nodes) {
+        Array.prototype.forEach.call(nodes, function (root) {
+            var crudo = String(root.getAttribute('data-cod-visor-src') || '').trim();
+            var direccion = '';
+            try {
+                var u = new URL(crudo, window.location.href);
+                if (u.protocol === 'http:' || u.protocol === 'https:') direccion = u.href;
+            } catch (error) { direccion = ''; }
+            if (!direccion) return;
+
+            function porSelector(attr, alternativa) {
+                var selector = String(root.getAttribute(attr) || '').trim() || alternativa || '';
+                if (!selector) return null;
+                try { return root.querySelector(selector); } catch (error) { return null; }
+            }
+            var marco = porSelector('data-cod-visor-frame', 'iframe');
+            if (!marco) return;
+
+            var disparadores = [];
+            var selectorDisparador = String(root.getAttribute('data-cod-visor-trigger') || '').trim();
+            if (selectorDisparador) {
+                try { disparadores = Array.prototype.slice.call(document.querySelectorAll(selectorDisparador)); }
+                catch (error) { disparadores = []; }
+            }
+            if (!disparadores.length) return;
+
+            var claseAbierto = String(root.getAttribute('data-cod-visor-open-class') || '').trim() || 'is-open';
+            var cerrar1 = porSelector('data-cod-visor-close', '');
+            var desplazamientoPrevio = '';
+            var temporizador = null;
+
+            function estaAbierto() { return root.classList.contains(claseAbierto); }
+
+            function abrir(evento) {
+                if (evento && typeof evento.preventDefault === 'function') evento.preventDefault();
+                if (temporizador) { window.clearTimeout(temporizador); temporizador = null; }
+                if (marco.getAttribute('src') !== direccion) marco.setAttribute('src', direccion);
+                root.classList.add(claseAbierto);
+                desplazamientoPrevio = document.body.style.overflow;
+                document.body.style.overflow = 'hidden';
+                if (cerrar1 && typeof cerrar1.focus === 'function') cerrar1.focus();
+            }
+
+            function cerrar() {
+                if (!estaAbierto()) return;
+                root.classList.remove(claseAbierto);
+                document.body.style.overflow = desplazamientoPrevio;
+                // Se espera a que termine la transición antes de descargar, para
+                // que no se vea el marco vaciarse mientras la capa se desvanece.
+                temporizador = window.setTimeout(function () {
+                    marco.setAttribute('src', 'about:blank');
+                    temporizador = null;
+                }, 320);
+            }
+
+            disparadores.forEach(function (boton) { boton.addEventListener('click', abrir); });
+            if (cerrar1) cerrar1.addEventListener('click', cerrar);
+            root.addEventListener('click', function (evento) { if (evento.target === root) cerrar(); });
+            document.addEventListener('keydown', function (evento) {
+                if (estaAbierto() && evento.key === 'Escape') cerrar();
+            });
+        });
+    }
+
     // parseJsonAttr: lee un atributo data-* como JSON sin evaluar código. Nunca
     // se interpreta el contenido como ejecutable: falla a null ante JSON inválido.
     function parseJsonAttr(root, attr) {
@@ -1071,6 +1150,7 @@
         var heroCollapseNodes = [];
         var chartNodes = [];
         var anchorNodes = [];
+        var visorNodes = [];
         Array.prototype.forEach.call(behaviorNodes, function (node) {
             var behavior = node.getAttribute('data-cod-behavior');
             if (behavior === 'scroll-threshold') scrollNodes.push(node);
@@ -1083,6 +1163,7 @@
             else if (behavior === 'hero-collapse') heroCollapseNodes.push(node);
             else if (behavior === 'chart') chartNodes.push(node);
             else if (behavior === 'anchor') anchorNodes.push(node);
+            else if (behavior === 'visor-embed') visorNodes.push(node);
         });
         installHeroCollapse(heroCollapseNodes);
         installScrollThreshold(scrollNodes);
@@ -1094,6 +1175,7 @@
         installGeoMap(geoMapNodes);
         installChart(chartNodes);
         installAnchor(anchorNodes);
+        installVisorEmbed(visorNodes);
 
         // Interacciones tipo Webflow (data-cod-interaction): el mismo motor que
         // corre en el iframe del editor (cod-interactions.js) se instala acá

@@ -25,6 +25,7 @@ final class COD_Settings_Admin
         add_action('admin_enqueue_scripts', [$this, 'enqueue_assets']);
         add_action('wp_ajax_' . COD_Theme_Definitions::AJAX_SAVE, [$this, 'handle_save']);
         add_action('admin_post_cod_save_whatsapp_number', [$this, 'handle_save_whatsapp']);
+        add_action('admin_post_cod_save_embed_origins', [$this, 'handle_save_embed_origins']);
     }
 
     public function handle_save_whatsapp(): void
@@ -37,6 +38,38 @@ final class COD_Settings_Admin
         $number = preg_replace('/[^0-9]/', '', (string) $raw);
         update_option('cod_whatsapp_number', $number, false);
         wp_safe_redirect(add_query_arg('cod_whatsapp_saved', '1', admin_url('admin.php?page=' . self::PAGE_SLUG)));
+        exit;
+    }
+
+    /**
+     * Guarda los orígenes que este sitio permite incrustar en un iframe.
+     *
+     * Se normaliza cada línea a un nombre de host: quien pega la dirección
+     * completa del navegador obtiene lo mismo que quien escribe solo el
+     * dominio. Las líneas que no son un host se descartan en silencio en vez
+     * de rechazar el formulario entero, y lo guardado se muestra de vuelta ya
+     * normalizado, así se ve qué quedó.
+     */
+    public function handle_save_embed_origins(): void
+    {
+        if (!current_user_can(self::CAPABILITY)) {
+            wp_die(esc_html__('No tienes permisos para gestionar la configuración.', 'contope-publisher'));
+        }
+        check_admin_referer('cod_save_embed_origins');
+        $crudo = isset($_POST['cod_embed_origins']) ? (string) wp_unslash($_POST['cod_embed_origins']) : '';
+        $hosts = [];
+        foreach (preg_split('/[\r\n,]+/', $crudo) ?: [] as $linea) {
+            $host = COD_Canvas_Document_Sanitizer::normalize_embed_origin((string) $linea);
+            if ($host !== '') {
+                $hosts[] = $host;
+            }
+        }
+        update_option(
+            COD_Canvas_Document_Sanitizer::OPTION_EMBED_ORIGINS,
+            implode("\n", array_values(array_unique($hosts))),
+            false
+        );
+        wp_safe_redirect(add_query_arg('cod_embed_saved', '1', admin_url('admin.php?page=' . self::PAGE_SLUG)));
         exit;
     }
 
@@ -149,6 +182,32 @@ final class COD_Settings_Admin
                                 placeholder="56981396967" class="regular-text">
                         </p>
                         <p><button type="submit" class="button button-primary">Guardar número</button></p>
+                    </form>
+                </section>
+
+                <section class="cod-settings__section">
+                    <h2>Sitios que puedes incrustar</h2>
+                    <p>
+                        Un iframe muestra una página de otro sitio <em>dentro</em> de la tuya.
+                        YouTube, Vimeo y Google Maps vienen permitidos. Para cualquier otro
+                        —un recorrido 360, un plano interactivo, un visor de documentos—
+                        escribe acá su dominio, uno por línea. Puedes pegar la dirección
+                        completa: se guarda solo el dominio.
+                    </p>
+                    <?php if (isset($_GET['cod_embed_saved'])) : ?>
+                        <div class="notice notice-success"><p>Sitios permitidos guardados.</p></div>
+                    <?php endif; ?>
+                    <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+                        <input type="hidden" name="action" value="cod_save_embed_origins">
+                        <?php wp_nonce_field('cod_save_embed_origins'); ?>
+                        <p>
+                            <label for="cod_embed_origins">Dominios permitidos (uno por línea)</label><br>
+                            <textarea id="cod_embed_origins" name="cod_embed_origins" rows="4" class="large-text code"
+                                placeholder="www.ejemplo.cl"><?php
+                                echo esc_textarea((string) get_option(COD_Canvas_Document_Sanitizer::OPTION_EMBED_ORIGINS, ''));
+                            ?></textarea>
+                        </p>
+                        <p><button type="submit" class="button button-primary">Guardar sitios permitidos</button></p>
                     </form>
                 </section>
             </div>
