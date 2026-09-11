@@ -23,6 +23,18 @@ function Read-DotEnv([string]$path) {
         $parts = $trimmed.Split('=', 2)
         if ($parts.Count -eq 2) { $values[$parts[0].Trim()] = $parts[1] }
     }
+    # El proyecto cambio de nombre y las variables pasaron de OCD_ a COD_. Un
+    # archivo de configuracion escrito antes del cambio sigue sirviendo: se le
+    # agrega el nombre nuevo sin tocar el viejo ni el archivo en disco. Si
+    # alguien ya escribio el nombre nuevo, ese manda.
+
+    foreach ($clave in @($values.Keys)) {
+        if ($clave.StartsWith('OCD_')) {
+            $equivalente = 'COD_' + $clave.Substring(4)
+            if (-not $values.ContainsKey($equivalente)) { $values[$equivalente] = $values[$clave] }
+        }
+    }
+
     return $values
 }
 

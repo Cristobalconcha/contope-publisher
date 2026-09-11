@@ -33,8 +33,13 @@ final class COD_Migracion_Nombres
     /** Deja constancia de la migración para no repetirla en cada carga. */
     public const OPTION_HECHA = 'cod_migracion_nombres_hecha';
 
-    /** Versión del formato migrado. Subirla vuelve a correr la migración. */
-    public const VERSION = 1;
+    /**
+     * Versión del formato migrado. Subirla vuelve a correr la migración.
+     *
+     * 2: agrega el renombre de los identificadores singleton (paso 5). La
+     *    versión 1 dejaba la capa compartida invisible.
+     */
+    public const VERSION = 2;
 
     private const POST_TYPE_VIEJO = 'ocd_canvas_doc';
     private const POST_TYPE_NUEVO = 'cod_canvas_doc';
@@ -71,6 +76,8 @@ final class COD_Migracion_Nombres
             'metadatos' => $this->migrar_claves_meta(),
             'opciones' => $this->migrar_opciones(),
             'contenido' => $this->migrar_contenido_guardado(),
+            'identificadores' => $this->migrar_identificadores_fijos(),
+            'titulos' => $this->migrar_titulos(),
         ];
 
         // Las páginas guardan en caché el tipo de contenido y las claves meta.
@@ -230,5 +237,78 @@ final class COD_Migracion_Nombres
         }
 
         return $cambiados;
+    }
+    /**
+     * Renombra los identificadores de documento que el código busca por nombre
+     * fijo, y solo esos.
+     *
+     * Hay dos clases de identificador conviviendo. La mayoría son opacos y
+     * portables: `ocd-canvas-page-7`, `ocd-template-d5a667af…`. Nadie los
+     * construye; se guardan una vez y después se buscan por el valor guardado,
+     * así que el prefijo viejo les da exactamente igual y renombrarlos solo
+     * traería referencias rotas. Esos no se tocan.
+     *
+     * Los otros dos son singletons que el código arma desde una constante y
+     * busca por igualdad: la capa compartida
+     * (`COD_Canvas_Document_Repository::SHARED_STYLES_DOCUMENT_ID`) y la
+     * plantilla por omisión (`DEFAULT_TEMPLATE_ID`). Si el sitio los tiene
+     * guardados con el nombre viejo, el plugin nuevo simplemente no los
+     * encuentra: las páginas se publican sin la cabecera, el pie ni los
+     * estilos comunes. No hay error en ninguna parte, la página sale muda.
+     *
+     * Esto no lo detectó el primer ensayo porque la base local no tenía capa
+     * compartida. Lo detectó revisar qué identificadores nacen de una
+     * constante antes de migrar el sitio real.
+     */
+    private function migrar_identificadores_fijos(): int
+    {
+        global $wpdb;
+
+        $singletons = [
+            '_cod_canvas_document_id' => ['ocd-shared-styles' => 'cod-shared-styles'],
+            '_cod_region_template_id' => ['ocd-site-default' => 'cod-site-default'],
+        ];
+
+        $cambiados = 0;
+        foreach ($singletons as $clave => $equivalencias) {
+            foreach ($equivalencias as $viejo => $nuevo) {
+                $cambiados += (int) $wpdb->query(
+                    $wpdb->prepare(
+                        "UPDATE {$wpdb->postmeta} SET meta_value = %s
+                         WHERE meta_key = %s AND meta_value = %s",
+                        $nuevo,
+                        $clave,
+                        $viejo
+                    )
+                );
+            }
+        }
+
+        return $cambiados;
+    }
+
+    /**
+     * El nombre viejo en los títulos que generó el propio plugin.
+     *
+     * Puramente cosmético: son los títulos que se ven en el selector de
+     * páginas del editor, del tipo "Open CoDesign Canvas — ocd-canvas-page-7".
+     * Se reemplaza solo la marca; el identificador que va después queda igual,
+     * porque es el mismo identificador portable que el paso anterior decide no
+     * tocar.
+     */
+    private function migrar_titulos(): int
+    {
+        global $wpdb;
+
+        return (int) $wpdb->query(
+            $wpdb->prepare(
+                "UPDATE {$wpdb->posts} SET post_title = REPLACE(post_title, %s, %s)
+                 WHERE post_type = %s AND post_title LIKE %s",
+                'Open CoDesign',
+                'ContOpe',
+                self::POST_TYPE_NUEVO,
+                '%Open CoDesign%'
+            )
+        );
     }
 }
