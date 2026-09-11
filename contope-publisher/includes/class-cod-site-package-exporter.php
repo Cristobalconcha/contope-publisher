@@ -133,7 +133,7 @@ final class COD_Site_Package_Exporter
     private function collect_site_font_paths(): array
     {
         $upload_dir = wp_get_upload_dir();
-        $fonts_dir = trailingslashit((string) $upload_dir['basedir']) . 'contope/fonts';
+        $fonts_dir = COD_Canvas_Asset_Resolver::carpeta_gestionada('fonts')['dir'];
         if (!is_dir($fonts_dir)) {
             return [];
         }

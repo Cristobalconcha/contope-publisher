@@ -104,7 +104,7 @@ final class COD_Site_Package_CLI
             return;
         }
 
-        $root = trailingslashit(wp_normalize_path((string) $upload_dir['basedir'])) . 'contope';
+        $root = wp_normalize_path(COD_Canvas_Asset_Resolver::carpeta_gestionada()['dir']);
         if (!is_dir($root)) {
             WP_CLI::warning('No existe el directorio de medios gestionado: ' . $root);
             return;

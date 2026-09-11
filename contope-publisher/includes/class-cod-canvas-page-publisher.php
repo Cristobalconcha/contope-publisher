@@ -19,6 +19,33 @@ final class COD_Canvas_Page_Publisher
     ) {
     }
 
+    /** Nombre actual del shortcode que inserta un documento en una página. */
+    public const SHORTCODE = 'contope_canvas';
+
+    /**
+     * El nombre que usaba el plugin antes del cambio de nombre del proyecto.
+     *
+     * El contenido de cada página publicada es literalmente
+     * `[open_codesign_canvas document_id="…"]`, guardado en post_content. Un
+     * sitio que viene de la versión anterior tiene ese texto en sus páginas, y
+     * dejar de reconocerlo no deja un error: WordPress imprime el shortcode
+     * como texto plano y la página queda en blanco con un corchete a la vista.
+     *
+     * Se podría reescribir el contenido de las páginas en la migración, pero
+     * aceptar el nombre viejo es mejor: no toca contenido que es de la persona,
+     * funciona también si alguien escribió el shortcode a mano en cualquier
+     * otro lugar del sitio, y no hay nada que rehacer si la migración se corre
+     * a medias.
+     */
+    public const SHORTCODE_HEREDADO = 'open_codesign_canvas';
+
+    /** ¿Este contenido inserta un documento, con el nombre que sea? */
+    private static function tiene_shortcode(string $contenido): bool
+    {
+        return has_shortcode($contenido, self::SHORTCODE)
+            || has_shortcode($contenido, self::SHORTCODE_HEREDADO);
+    }
+
     /** Evita que el CSS se emita dos veces cuando ya salió en la cabecera. */
     private static bool $css_ya_emitido = false;
 
@@ -26,7 +53,8 @@ final class COD_Canvas_Page_Publisher
 
     public function register(): void
     {
-        add_shortcode('contope_canvas', [$this, 'render_shortcode']);
+        add_shortcode(self::SHORTCODE, [$this, 'render_shortcode']);
+        add_shortcode(self::SHORTCODE_HEREDADO, [$this, 'render_shortcode']);
         add_action('wp_enqueue_scripts', [$this, 'estilos_en_cabecera'], 5);
         add_action('wp_head', [self::class, 'precarga_en_cabecera'], 1);
         add_filter('template_include', [$this, 'standalone_template']);
@@ -123,7 +151,7 @@ final class COD_Canvas_Page_Publisher
             return;
         }
         $post = get_post();
-        if (!$post || !has_shortcode((string) $post->post_content, 'contope_canvas')) {
+        if (!$post || !self::tiene_shortcode((string) $post->post_content)) {
             return;
         }
 
@@ -153,9 +181,8 @@ final class COD_Canvas_Page_Publisher
             return self::$site_font_css_cache;
         }
 
-        $uploads = wp_upload_dir();
-        $fonts_dir = trailingslashit((string) $uploads['basedir']) . 'contope/fonts';
-        $file = trailingslashit($fonts_dir) . 'fonts.css';
+        $carpeta = COD_Canvas_Asset_Resolver::carpeta_gestionada('fonts');
+        $file = trailingslashit($carpeta['dir']) . 'fonts.css';
 
         if (!is_file($file)) {
             self::$site_font_css_cache = '';
@@ -163,7 +190,7 @@ final class COD_Canvas_Page_Publisher
         }
 
         $css = (string) file_get_contents($file);
-        $base_url = trailingslashit((string) $uploads['baseurl']) . 'contope/fonts';
+        $base_url = $carpeta['url'];
         self::$site_font_css_cache = str_replace('{FONTS_BASE_URL}', $base_url, $css);
 
         return self::$site_font_css_cache;
@@ -573,7 +600,7 @@ final class COD_Canvas_Page_Publisher
             return;
         }
         $contenido = (string) $post->post_content;
-        if (!has_shortcode($contenido, 'contope_canvas')) {
+        if (!self::tiene_shortcode($contenido)) {
             return;
         }
         if (preg_match('/document_id=[\x22\x27]?([a-z0-9_-]+)/i', $contenido, $coincidencias) !== 1) {

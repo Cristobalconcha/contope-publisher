@@ -14,6 +14,43 @@ final class COD_Canvas_Asset_Resolver
      * @param list<string> $references
      * @return array{mapping: array<string, string>, missing: list<string>}
      */
+    /**
+     * La carpeta de uploads donde el plugin guarda lo suyo.
+     *
+     * El proyecto cambió de nombre y la carpeta pasó de `open-codesign` a
+     * `contope`. En un sitio que venía de la versión anterior los archivos
+     * siguen en la carpeta vieja, y nadie va a moverlos: son las tipografías
+     * del sitio y las imágenes ya publicadas.
+     *
+     * Se prefiere la carpeta nueva. Si no existe pero sí la vieja, se usa la
+     * vieja, sin mover ni copiar nada. Mover archivos por FTP para cambiar un
+     * nombre que nadie ve sería caro y arriesgado a cambio de nada; leer donde
+     * están cuesta una comprobación.
+     *
+     * @return array{dir: string, url: string}
+     */
+    public static function carpeta_gestionada(?string $subcarpeta = null): array
+    {
+        $uploads = wp_upload_dir();
+        $sufijo = $subcarpeta !== null && $subcarpeta !== '' ? '/' . ltrim($subcarpeta, '/') : '';
+
+        foreach (['contope', 'open-codesign'] as $nombre) {
+            $dir = trailingslashit((string) $uploads['basedir']) . $nombre . $sufijo;
+            if (is_dir($dir)) {
+                return [
+                    'dir' => $dir,
+                    'url' => trailingslashit((string) $uploads['baseurl']) . $nombre . $sufijo,
+                ];
+            }
+        }
+
+        // Ninguna existe todavía: se nombra la nueva, que es donde se escribe.
+        return [
+            'dir' => trailingslashit((string) $uploads['basedir']) . 'contope' . $sufijo,
+            'url' => trailingslashit((string) $uploads['baseurl']) . 'contope' . $sufijo,
+        ];
+    }
+
     public function resolve(array $references): array
     {
         $references = array_values(array_unique(array_filter($references, static function ($value): bool {
@@ -21,9 +58,9 @@ final class COD_Canvas_Asset_Resolver
         })));
         $references = array_slice($references, 0, self::MAX_REFERENCES);
 
-        $uploads = wp_upload_dir();
-        $managed_root = trailingslashit((string) $uploads['basedir']) . 'contope';
-        $managed_url = trailingslashit((string) $uploads['baseurl']) . 'contope';
+        $carpeta = self::carpeta_gestionada();
+        $managed_root = $carpeta['dir'];
+        $managed_url = $carpeta['url'];
         $index = $this->build_index($managed_root, $managed_url);
         $mapping = [];
         $missing = [];
