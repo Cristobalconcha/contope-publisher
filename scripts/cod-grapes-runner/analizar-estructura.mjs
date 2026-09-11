@@ -8,7 +8,7 @@
  * cod-column) y dónde el mapeo es dudoso y conviene decidirlo a mano.
  *
  * Uso:
- *   node analizar-estructura.mjs --page 44 --document cod-canvas-page-14
+ *   node analizar-estructura.mjs --page 44 --document ocd-canvas-page-14
  */
 import { readFileSync, existsSync } from 'node:fs';
 import path from 'node:path';

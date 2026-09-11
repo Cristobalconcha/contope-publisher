@@ -1,4 +1,9 @@
-# Runner de Grapes — editar nodos con el motor real, desde tu máquina
+#> El identificador del documento no lleva el prefijo nuevo. Es un nombre opaco
+> que se guardó una vez y viaja con el contenido: en un sitio que viene de la
+> versión anterior sigue siendo `ocd-canvas-page-14`. Pedilo tal cual está
+> guardado — `cod_list_canvas_pages` te lo dice.
+
+ Runner de Grapes — editar nodos con el motor real, desde tu máquina
 
 ## Qué hace
 
@@ -43,15 +48,15 @@ El archivo con las credenciales está en `.gitignore` — no se sube al reposito
 cd scripts/cod-grapes-runner
 
 # Cambiar el texto de un nodo
-node cod-grapes-runner.mjs --page 44 --document cod-canvas-page-14 \
+node cod-grapes-runner.mjs --page 44 --document ocd-canvas-page-14 \
   --selector "#iktkn" --set-content "Escríbenos directo y te respondemos a la brevedad."
 
 # Agregar una clase y un estilo
-node cod-grapes-runner.mjs --page 44 --document cod-canvas-page-14 \
+node cod-grapes-runner.mjs --page 44 --document ocd-canvas-page-14 \
   --selector ".wa-bubble" --add-class "destacado" --style '{"bottom":"40px"}'
 
 # Ver qué pasaría, sin guardar nada
-node cod-grapes-runner.mjs --page 44 --document cod-canvas-page-14 \
+node cod-grapes-runner.mjs --page 44 --document ocd-canvas-page-14 \
   --selector "#iktkn" --set-content "Hola" --dry-run
 ```
 
@@ -92,7 +97,7 @@ tema, los estilos y las secciones, y que eso se construya en la página.
 Para eso está `--build`, que toma una receta en JSON:
 
 ```bash
-node cod-grapes-runner.mjs --page 44 --document cod-canvas-page-14 \
+node cod-grapes-runner.mjs --page 44 --document ocd-canvas-page-14 \
   --build ejemplo-construccion.json --dry-run
 ```
 

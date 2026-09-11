@@ -18,10 +18,10 @@
  * Ese archivo NO debe subirse al repositorio.
  *
  * Uso:
- *   node cod-grapes-runner.mjs --page 44 --document cod-canvas-page-14 \
+ *   node cod-grapes-runner.mjs --page 44 --document ocd-canvas-page-14 \
  *     --selector "#iktkn" --set-content "Escríbenos directo y te respondemos a la brevedad."
  *
- *   node cod-grapes-runner.mjs --page 44 --document cod-canvas-page-14 \
+ *   node cod-grapes-runner.mjs --page 44 --document ocd-canvas-page-14 \
  *     --selector ".wa-bubble" --add-class "destacado" --style '{"bottom":"40px"}'
  *
  *   # Ver qué cambiaría, sin guardar:
@@ -74,7 +74,7 @@ const documentId = typeof args.document === 'string' ? args.document : '';
 const selector = typeof args.selector === 'string' ? args.selector : '';
 
 if (!Number.isInteger(pageId) || pageId < 0) fail('Falta --page <id> (número de página).');
-if (documentId === '') fail('Falta --document <documentId> (ej. cod-canvas-page-14).');
+if (documentId === '') fail('Falta --document <documentId> (ej. ocd-canvas-page-14).');
 const buildSpecPath = typeof args.build === 'string' ? args.build : '';
 const isBuild = buildSpecPath !== '';
 if (!isBuild && selector === '') fail('Falta --selector <selector CSS>, o bien --build <archivo.json> para construir.');
