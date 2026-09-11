@@ -108,6 +108,27 @@ console.log('\n── 6 · ciclo completo abrir→guardar sobre el documento rea
   prueba('la segunda vuelta no cambia nada', tercero.length === nuevo.length, nuevo.length + ' → ' + tercero.length);
 }
 
+console.log('\n── 7 · las reglas base de los módulos no se acumulan ──');
+{
+  // serializedCss() vuelve a pegar collectDynamicGroupCss() en CADA guardado,
+  // encima de un sourceCss que ya trae la copia anterior. Se simulan cinco
+  // ciclos de abrir→guardar con la misma regla base.
+  const MARCA = '/* COD-CANVAS-EDITABLE-OVERRIDES */';
+  const BASE = '.cod-dynamic-group{display:grid;gap:16px}';
+  const deGrapes = '.hero{color:red}';
+  let hoja = '.escrita-a-mano{color:blue}';
+  for (let vuelta = 0; vuelta < 5; vuelta++) {
+    const i = hoja.indexOf(MARCA);
+    const fuente = i === -1 ? hoja : hoja.slice(0, i).trimEnd();
+    // así compone serializedCss(), con el prefijo ya deduplicado
+    hoja = dedupeCssRules(fuente.trimEnd() + '\n' + BASE) + '\n\n' + MARCA + '\n' + dedupeCssRules(deGrapes);
+  }
+  const copias = (sinEspacios(hoja).match(/\.cod-dynamic-group\{/g) || []).length;
+  prueba('una sola copia tras cinco guardados', copias === 1, copias + ' copias');
+  prueba('la regla escrita a mano sobrevive', hoja.includes('.escrita-a-mano'), hoja);
+  prueba('la regla de Grapes sobrevive', hoja.includes('.hero'), hoja);
+}
+
 console.log('\n' + '─'.repeat(52));
 console.log(fallos === 0 ? 'TODAS LAS PRUEBAS PASAN' : fallos + ' PRUEBA(S) FALLARON');
 process.exit(fallos === 0 ? 0 : 1);

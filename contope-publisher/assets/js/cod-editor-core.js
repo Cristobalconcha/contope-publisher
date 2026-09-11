@@ -1225,11 +1225,16 @@ editor.Components.addType('cod-columns', {
 
             function serializedCss() {
                 var dynamicGroupCss = collectDynamicGroupCss().trim();
-                return (
-                    sourceCss.trimEnd() +
-                    (dynamicGroupCss ? '\n\n' + dynamicGroupCss : '') +
-                    '\n\n' + CSS_OVERRIDES_MARKER + '\n' + dedupeCssRules(editor.getCss() || '')
+                // El prefijo también se deduplica, y no por prolijidad.
+                // collectDynamicGroupCss() raspa las reglas base de los módulos
+                // dinámicos de la hoja del admin y las vuelve a pegar en CADA
+                // guardado, encima de un sourceCss que ya trae la copia del
+                // guardado anterior. Así llegó la portada de Santa Luisa a
+                // tener .cod-dynamic-group siete veces: una por ciclo.
+                var prefijo = dedupeCssRules(
+                    sourceCss.trimEnd() + (dynamicGroupCss ? '\n' + dynamicGroupCss : '')
                 );
+                return prefijo + '\n\n' + CSS_OVERRIDES_MARKER + '\n' + dedupeCssRules(editor.getCss() || '');
             }
 
             function serializedHtml() {
