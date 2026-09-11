@@ -165,7 +165,31 @@
     window.OCDCanvasEditor = window.OCDCanvasEditor || {};
     window.OCDCanvasEditor.acfImageSrc = acfImageSrc;
     var snapshot = core.snapshot;
-    var applyDocument = core.applyDocument;
+    /**
+     * Cargar un documento NO es una edición de la persona.
+     *
+     * GrapesJS emite 'update' también al cargar, y ese evento marcaba el
+     * documento como sucio y disparaba el autoguardado. Resultado: abrir una
+     * página en el editor guardaba sola una revisión nueva, sin que nadie
+     * tocara nada — y ese guardado arrastraba los defectos del CSS. Medido en
+     * el sitio real: rev 41 → 42 con solo elegir la página en el desplegable.
+     *
+     * La carga no termina en la llamada: el núcleo sigue acomodando el lienzo
+     * en cuadros de animación posteriores. Por eso la ventana se cierra por
+     * tiempo (1.500 ms, más que el rebote de 1.200 del autoguardado) y no al
+     * volver de applyDocument.
+     */
+    var cargandoHasta = 0;
+    var applyDocumentDelNucleo = core.applyDocument;
+    function estaCargando() {
+        return Date.now() < cargandoHasta;
+    }
+    function applyDocument(doc) {
+        cargandoHasta = Date.now() + 1500;
+        window.clearTimeout(autosaveTimer);
+        autosaveTimer = null;
+        return applyDocumentDelNucleo(doc);
+    }
     var request = core.request;
     var refreshPresentation = core.refreshPresentation;
     var getSourceCss = core.getSourceCss;
@@ -1960,6 +1984,9 @@
     on('cod-canvas-publish', publishPage);
     on('cod-canvas-save-region', saveRegion);
     editor.on('update', function () {
+        if (estaCargando()) {
+            return;
+        }
         dirty = true;
         scheduleAutosave();
     });

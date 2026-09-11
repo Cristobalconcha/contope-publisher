@@ -1111,9 +1111,54 @@ editor.Components.addType('cod-columns', {
                 var css = String(value || '');
                 var marker = css.indexOf(CSS_OVERRIDES_MARKER);
                 return {
+                    tieneMarcador: marker !== -1,
                     source: marker === -1 ? css : css.slice(0, marker).trimEnd(),
                     overrides: marker === -1 ? '' : dedupeCssRules(css.slice(marker + CSS_OVERRIDES_MARKER.length).trim())
                 };
+            }
+
+            /**
+             * Recorre el CSS por bloques de primer nivel contando llaves.
+             *
+             * Partir por "}" —como hacía la versión anterior— funciona hasta
+             * que aparece un @media, que termina en "}}": se perdía la llave
+             * de cierre y TODO lo que venía después quedaba encerrado dentro
+             * de esa consulta de medios. Reglas de escritorio convertidas en
+             * reglas de un solo ancho, sin ningún error a la vista. Medido
+             * sobre los cuatro documentos de Santa Luisa: la portada perdía
+             * 16 llaves, una por cada @media.
+             */
+            function bloquesDeCss(css) {
+                var texto = String(css || '');
+                var salida = [];
+                var i = 0;
+                while (i < texto.length) {
+                    var abre = texto.indexOf('{', i);
+                    if (abre < 0) {
+                        break;
+                    }
+                    var profundidad = 1;
+                    var j = abre + 1;
+                    while (j < texto.length && profundidad > 0) {
+                        if (texto[j] === '{') {
+                            profundidad += 1;
+                        } else if (texto[j] === '}') {
+                            profundidad -= 1;
+                        }
+                        j += 1;
+                    }
+                    var bloque = texto.slice(i, j).trim();
+                    if (bloque !== '' && bloque.indexOf('{') !== -1) {
+                        salida.push(bloque);
+                    }
+                    i = j;
+                }
+                return salida;
+            }
+
+            /** Dos reglas idénticas salvo espacios son la misma regla. */
+            function claveDeRegla(regla) {
+                return String(regla).replace(/\s+/g, '');
             }
 
             /**
@@ -1123,32 +1168,59 @@ editor.Components.addType('cod-columns', {
              * copia mas de las reglas base (reset, body, html, el SVG del
              * logo) dentro de "overrides". Un documento con muchos ciclos
              * llego a tener la misma regla repetida 10-20 veces, superando
-             * el limite de tamano. Esto limpia duplicados EXACTOS (mismo
-             * selector + mismo contenido) conservando solo la primera
-             * aparicion, sin tocar reglas distintas aunque compartan
+             * el limite de tamano. Esto limpia duplicados conservando solo la
+             * primera aparicion, sin tocar reglas distintas aunque compartan
              * selector (esas SI pueden ser cascada intencional).
+             *
+             * Dentro de un @media se deduplica aparte: la misma regla en dos
+             * anchos distintos no es una copia.
              */
             function dedupeCssRules(css) {
                 if (!css) {
                     return css;
                 }
-                var seen = Object.create(null);
-                var parts = css.split('}');
-                var out = [];
-                for (var i = 0; i < parts.length; i++) {
-                    var chunk = parts[i];
-                    var trimmed = chunk.trim();
-                    if (trimmed === '') {
+                var vistas = Object.create(null);
+                var salida = [];
+                var bloques = bloquesDeCss(css);
+                for (var i = 0; i < bloques.length; i++) {
+                    var bloque = bloques[i];
+                    var anidado = bloque.match(/^(@[^{]*\{)([\s\S]*)\}$/);
+                    if (anidado) {
+                        bloque = anidado[1] + dedupeCssRules(anidado[2]) + '}';
+                    }
+                    var clave = claveDeRegla(bloque);
+                    if (vistas[clave]) {
                         continue;
                     }
-                    var rule = trimmed + '}';
-                    if (seen[rule]) {
-                        continue;
-                    }
-                    seen[rule] = true;
-                    out.push(rule);
+                    vistas[clave] = true;
+                    salida.push(bloque);
                 }
-                return out.join('');
+                return salida.join('');
+            }
+
+            /**
+             * Quita de "a" las reglas que "b" ya trae, comparando sin espacios.
+             *
+             * Hace falta cuando la hoja guardada NO lleva el marcador: ahí todo
+             * el contenido se toma como CSS fuente, pero GrapesJS reexporta por
+             * su cuenta las mismas reglas desde projectData, y al guardar la
+             * hoja queda dos veces. Le pasa a cualquier documento cuyo último
+             * guardado vino del runner o del MCP, que escriben la hoja plana.
+             */
+            function restarReglasConocidas(a, b) {
+                var conocidas = Object.create(null);
+                var deB = bloquesDeCss(b);
+                for (var k = 0; k < deB.length; k++) {
+                    conocidas[claveDeRegla(deB[k])] = true;
+                }
+                var salida = [];
+                var deA = bloquesDeCss(a);
+                for (var i = 0; i < deA.length; i++) {
+                    if (!conocidas[claveDeRegla(deA[i])]) {
+                        salida.push(deA[i]);
+                    }
+                }
+                return salida.join('\n');
             }
 
             function serializedCss() {
@@ -1505,6 +1577,14 @@ editor.Components.addType('cod-columns', {
                 if (hasPages) {
                     try {
                         editor.loadProjectData(project);
+                        if (!css.tieneMarcador) {
+                            // Sin marcador no se sabe qué parte de la hoja es
+                            // "fuente" y qué parte la exportó GrapesJS, y se
+                            // tomaba TODA como fuente: al guardar quedaba una
+                            // copia entera de más. Lo que Grapes ya conoce sale
+                            // de acá; lo que queda es fuente de verdad.
+                            sourceCss = restarReglasConocidas(sourceCss, editor.getCss() || '');
+                        }
                     } catch (error) {
                         // Los datos estructurados no son utilizables: el HTML y el CSS
                         // guardados siguen siendo una reconstrucción válida.
