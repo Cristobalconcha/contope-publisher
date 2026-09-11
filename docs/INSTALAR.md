@@ -130,6 +130,56 @@ saltos de línea pegados.
 
 ---
 
+## 4 · Enseñarle a tu asistente cómo trabajar
+
+Con los tres pasos anteriores el asistente ya **puede** entrar a tu sitio. Este
+cuarto le enseña **cómo hacerlo bien**: qué vías de trabajo existen, en qué
+orden, y las reglas duras que evitan romper un sitio en producción —cosas que
+costaron horas y defectos reales antes de quedar escritas.
+
+Sin esto también funciona, pero el asistente improvisa. Con esto, sabe.
+
+En la carpeta `skills/` de este repositorio hay dos:
+
+| Skill | Para qué |
+|---|---|
+| **`operar-canvas`** | Crear y editar páginas dentro del constructor, sin romperlo. **Es el importante.** |
+| **`aplicar-set-de-diseno`** | Llevar un set de diseño aprobado en Contope Design Desktop hasta el sitio. Sólo si usas Desktop. |
+
+### Cómo instalarlos
+
+1. Descarga el repositorio completo: botón verde **Code → Download ZIP**, y
+   descomprímelo. (No necesitas git.)
+2. Copia las carpetas `skills/operar-canvas` y `skills/aplicar-set-de-diseno`
+   dentro de la carpeta de skills de tu asistente:
+
+   - **Windows:** `C:\Users\TU-USUARIO\.claude\skills\`
+   - **Mac o Linux:** `~/.claude/skills/`
+
+   La carpeta `.claude` empieza con punto, así que puede estar oculta. En
+   Windows se llega escribiendo la ruta en la barra del explorador; en Mac, con
+   *Ir → Ir a la carpeta*.
+
+3. Reinicia el asistente.
+
+En Windows, si prefieres, el repositorio trae un script que hace la copia:
+
+```powershell
+.\skills\instalar-skills.ps1
+```
+
+### Comprobar que quedó
+
+Pídele algo que dependa del skill, por ejemplo: *"¿cómo debes editar una página
+de este sitio?"*. Si responde hablando del constructor y del circuito de
+edición, lo cargó. Si contesta en general sobre WordPress, revisa que las
+carpetas quedaron en el lugar correcto y que reiniciaste.
+
+> **Si editas un skill**, hazlo en el repositorio y vuelve a copiarlo. La fuente
+> de verdad es el repo, para que viaje con el proyecto.
+
+---
+
 ## Qué puedes hacer ya
 
 Con eso, el asistente puede leer y editar las páginas de tu sitio **dentro del
