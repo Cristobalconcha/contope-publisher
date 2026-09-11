@@ -105,7 +105,7 @@ window.fetch=async(_url,options)=>{const body=new URLSearchParams(options.body);
 <script src="${asset('js/cod-canvas-editor.js')}"></script>
 <script>
 (async()=>{
-  function done(payload){document.documentElement.dataset.ocdResult=btoa(unescape(encodeURIComponent(JSON.stringify(payload))));}
+  function done(payload){document.documentElement.dataset.codResult=btoa(unescape(encodeURIComponent(JSON.stringify(payload))));}
   try{
     const wait=(predicate,timeout=8000)=>new Promise((resolve,reject)=>{const start=Date.now();const tick=()=>{if(predicate())return resolve();if(Date.now()-start>timeout)return reject(new Error('timeout esperando '+predicate));setTimeout(tick,50)};tick()});
     await wait(()=>window.ocdCanvas?.editor?.Canvas?.getDocument());

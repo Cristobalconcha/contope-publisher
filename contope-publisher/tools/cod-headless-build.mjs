@@ -150,7 +150,7 @@ window.fetch=async(_url,options)=>{const body=new URLSearchParams(options.body);
 <script src="${asset('js/cod-canvas-editor.js')}"></script>
 <script>
 (async()=>{
-  function done(payload){document.documentElement.dataset.ocdResult=btoa(unescape(encodeURIComponent(JSON.stringify(payload))));}
+  function done(payload){document.documentElement.dataset.codResult=btoa(unescape(encodeURIComponent(JSON.stringify(payload))));}
 
   // nodo del pedido -> definición de componente de Grapes.
   // Se pasa como OBJETO, no como HTML: así Grapes crea componentes reales y

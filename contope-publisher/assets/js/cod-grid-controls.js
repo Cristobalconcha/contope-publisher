@@ -160,7 +160,7 @@
       if (!handles.length) return;
 
       overlay = document.createElement('div');
-      overlay.dataset.ocdGridOverlay = 'true';
+      overlay.dataset.codGridOverlay = 'true';
       Object.assign(overlay.style, { position: 'fixed', inset: '0', zIndex: '2147483000', pointerEvents: 'none' });
       for (const handle of handles) {
         const grip = document.createElement('button');

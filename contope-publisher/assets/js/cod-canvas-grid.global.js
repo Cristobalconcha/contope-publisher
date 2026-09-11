@@ -201,7 +201,7 @@ function addGridStyleSector(editor) {
     create({ change }) {
       const root = document.createElement('div');
       const select = document.createElement('select');
-      select.dataset.ocdGridPreset = '';
+      select.dataset.codGridPreset = '';
       for (const [label, value] of Object.entries(GRID_PRESETS)) {
         const option = document.createElement('option');
         option.value = value;
@@ -214,7 +214,7 @@ function addGridStyleSector(editor) {
       select.append(customOption);
 
       const input = document.createElement('input');
-      input.dataset.ocdGridCustom = '';
+      input.dataset.codGridCustom = '';
       input.placeholder = 'Ej.: 1fr 1.5fr 1fr';
       input.hidden = true;
 
