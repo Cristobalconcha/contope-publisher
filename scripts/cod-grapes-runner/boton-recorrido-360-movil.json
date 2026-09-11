@@ -1,0 +1,20 @@
+{
+  "_nota": "En teléfono la columna del plano deja 172 px para el texto y 'Ver recorrido aéreo 360°' a 11 px mide 180: se parte en dos líneas, feo al lado del botón de WhatsApp que va en una. A 10 px con menos espaciado mide 161 y entra entero. Se baja el tamaño en vez de acortar el texto, que es el que se aprobó.",
+  "mode": "append",
+  "styles": [
+    {
+      "selector": ".plano-360",
+      "media": "(max-width: 720px)",
+      "style": {
+        "font-size": "10px",
+        "letter-spacing": "0.3px",
+        "padding-top": "12px",
+        "padding-right": "12px",
+        "padding-bottom": "12px",
+        "padding-left": "12px",
+        "gap": "7px"
+      }
+    }
+  ],
+  "structure": []
+}

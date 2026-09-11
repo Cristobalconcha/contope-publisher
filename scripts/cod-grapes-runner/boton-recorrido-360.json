@@ -1,0 +1,272 @@
+{
+  "_nota": "Botón 'Ver recorrido aéreo 360°' en la columna del plano + la capa del visor. El visor se apoya en el comportamiento visor-embed (plugin 0.3.3): carga el iframe recién al abrir y lo descarga al cerrar.",
+  "mode": "append",
+  "styles": [
+    {
+      "selector": ".plano-360",
+      "style": {
+        "display": "flex",
+        "align-items": "center",
+        "justify-content": "center",
+        "gap": "8px",
+        "width": "100%",
+        "margin-top": "14px",
+        "margin-right": "0px",
+        "margin-bottom": "18px",
+        "margin-left": "0px",
+        "padding-top": "11px",
+        "padding-right": "18px",
+        "padding-bottom": "11px",
+        "padding-left": "18px",
+        "border-style": "solid",
+        "border-width": "1px",
+        "border-color": "rgba(205,162,60,0.55)",
+        "border-radius": "999px",
+        "background-color": "transparent",
+        "color": "#CDA23C",
+        "font-family": "Montserrat, sans-serif",
+        "font-size": "11px",
+        "font-weight": "700",
+        "letter-spacing": "0.44px",
+        "text-transform": "uppercase",
+        "text-decoration": "none",
+        "cursor": "pointer",
+        "transition": "background-color .18s ease, color .18s ease, border-color .18s ease"
+      }
+    },
+    {
+      "selector": ".plano-360:hover",
+      "style": {
+        "background-color": "#CDA23C",
+        "border-color": "#CDA23C",
+        "color": "#2B2210"
+      }
+    },
+    {
+      "selector": ".plano-360:focus-visible",
+      "style": {
+        "background-color": "#CDA23C",
+        "border-color": "#CDA23C",
+        "color": "#2B2210"
+      }
+    },
+    {
+      "selector": ".plano-360__icono",
+      "style": {
+        "width": "15px",
+        "height": "15px",
+        "flex-grow": "0",
+        "flex-shrink": "0",
+        "flex-basis": "auto"
+      }
+    },
+    {
+      "selector": ".visor360",
+      "style": {
+        "position": "fixed",
+        "top": "0px",
+        "right": "0px",
+        "bottom": "0px",
+        "left": "0px",
+        "z-index": "9000",
+        "display": "flex",
+        "flex-direction": "column",
+        "background-color": "rgba(20,17,9,0.94)",
+        "opacity": "0",
+        "pointer-events": "none",
+        "transition": "opacity .25s ease"
+      }
+    },
+    {
+      "selector": ".visor360.is-open",
+      "style": {
+        "opacity": "1",
+        "pointer-events": "auto"
+      }
+    },
+    {
+      "selector": ".visor360__barra",
+      "style": {
+        "display": "flex",
+        "align-items": "center",
+        "justify-content": "space-between",
+        "gap": "16px",
+        "padding-top": "14px",
+        "padding-right": "20px",
+        "padding-bottom": "14px",
+        "padding-left": "20px"
+      }
+    },
+    {
+      "selector": ".visor360__titulo",
+      "style": {
+        "font-family": "Montserrat, sans-serif",
+        "font-size": "12px",
+        "font-weight": "700",
+        "letter-spacing": "1.2px",
+        "text-transform": "uppercase",
+        "color": "#CDA23C",
+        "margin-top": "0px",
+        "margin-right": "0px",
+        "margin-bottom": "0px",
+        "margin-left": "0px"
+      }
+    },
+    {
+      "selector": ".visor360__cerrar",
+      "style": {
+        "border-style": "solid",
+        "border-width": "1px",
+        "border-color": "rgba(246,246,243,0.35)",
+        "background-color": "transparent",
+        "color": "#F6F6F3",
+        "border-radius": "999px",
+        "padding-top": "7px",
+        "padding-right": "16px",
+        "padding-bottom": "7px",
+        "padding-left": "16px",
+        "font-family": "Montserrat, sans-serif",
+        "font-size": "11px",
+        "font-weight": "700",
+        "letter-spacing": "0.5px",
+        "cursor": "pointer",
+        "transition": "background-color .18s ease, color .18s ease"
+      }
+    },
+    {
+      "selector": ".visor360__cerrar:hover",
+      "style": {
+        "background-color": "#F6F6F3",
+        "color": "#2B2210"
+      }
+    },
+    {
+      "selector": ".visor360__marco",
+      "style": {
+        "flex-grow": "1",
+        "flex-shrink": "1",
+        "flex-basis": "0%",
+        "border-style": "none",
+        "border-width": "0px",
+        "width": "100%",
+        "background-color": "#000000"
+      }
+    },
+    {
+      "selector": ".visor360__barra",
+      "media": "(max-width: 720px)",
+      "style": {
+        "padding-top": "10px",
+        "padding-right": "12px",
+        "padding-bottom": "10px",
+        "padding-left": "12px",
+        "gap": "10px"
+      }
+    },
+    {
+      "selector": ".visor360__titulo",
+      "media": "(max-width: 720px)",
+      "style": {
+        "font-size": "10px",
+        "letter-spacing": "0.8px"
+      }
+    }
+  ],
+  "structure": [
+    {
+      "tag": "button",
+      "classes": ["plano-360"],
+      "parent": ".plano-frame__side",
+      "at": 2,
+      "attributes": {
+        "type": "button",
+        "id": "abrir-recorrido-360",
+        "aria-label": "Ver el recorrido aéreo 360 grados del proyecto"
+      },
+      "children": [
+        {
+          "tag": "svg",
+          "classes": ["plano-360__icono"],
+          "attributes": {
+            "viewBox": "0 0 24 24",
+            "width": "15",
+            "height": "15",
+            "fill": "none",
+            "stroke": "currentColor",
+            "stroke-width": "1.8",
+            "stroke-linecap": "round",
+            "aria-hidden": "true",
+            "focusable": "false"
+          },
+          "children": [
+            {
+              "_nota": "El ecuador visto en perspectiva. Va como trazado y no como <ellipse> porque el sanitizador del documento no admite esa etiqueta, y no vale la pena ampliar una lista de seguridad por un ícono.",
+              "tag": "path",
+              "attributes": { "d": "M2 12a10 4.6 0 1 0 20 0 10 4.6 0 1 0-20 0z" }
+            },
+            {
+              "tag": "path",
+              "attributes": { "d": "M12 2.2a9.8 9.8 0 0 1 0 19.6 9.8 9.8 0 0 1 0-19.6z" }
+            },
+            {
+              "tag": "path",
+              "attributes": { "d": "M2.2 12h19.6" }
+            }
+          ]
+        },
+        {
+          "tag": "span",
+          "text": "Ver recorrido aéreo 360°"
+        }
+      ]
+    },
+    {
+      "tag": "div",
+      "classes": ["visor360"],
+      "parent": ".mapa-interactivo",
+      "attributes": {
+        "id": "visor-recorrido-360",
+        "role": "dialog",
+        "aria-modal": "true",
+        "aria-label": "Recorrido aéreo 360 grados",
+        "data-cod-behavior": "visor-embed",
+        "data-cod-visor-trigger": "#abrir-recorrido-360",
+        "data-cod-visor-src": "https://www.diegoelgueta.cl/360/fundosantaluisa/",
+        "data-cod-visor-frame": ".visor360__marco",
+        "data-cod-visor-close": ".visor360__cerrar",
+        "data-cod-visor-open-class": "is-open"
+      },
+      "children": [
+        {
+          "tag": "div",
+          "classes": ["visor360__barra"],
+          "children": [
+            {
+              "tag": "p",
+              "classes": ["visor360__titulo"],
+              "text": "Recorrido aéreo · Santa Luisa de Palpi"
+            },
+            {
+              "tag": "button",
+              "classes": ["visor360__cerrar"],
+              "attributes": {
+                "type": "button",
+                "aria-label": "Cerrar el recorrido"
+              },
+              "text": "Cerrar ✕"
+            }
+          ]
+        },
+        {
+          "tag": "iframe",
+          "classes": ["visor360__marco"],
+          "attributes": {
+            "title": "Recorrido aéreo 360° de Santa Luisa de Palpi",
+            "allowfullscreen": "true",
+            "loading": "lazy"
+          }
+        }
+      ]
+    }
+  ]
+}
