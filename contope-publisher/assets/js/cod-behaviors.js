@@ -223,6 +223,7 @@
   // sin librerías externas y sin interpretar el JSON como código.
   var BEHAVIOR_CHART = 'chart';
   var BEHAVIOR_VISOR_EMBED = 'visor-embed';
+  var BEHAVIOR_WA_MENSAJE = 'wa-mensaje';
   var ATTR_CHART_TYPE = 'data-cod-chart-type';
   var ATTR_CHART_DATA = 'data-cod-chart-data';
   var ATTR_CHART_COLOR = 'data-cod-chart-color';
@@ -297,6 +298,11 @@
     name: BEHAVIOR_VISOR_EMBED,
     defaultOpenClass: 'is-open',
     description: 'Capa a pantalla completa que muestra una página externa (un recorrido 360, un video) dentro de un iframe. La dirección se carga recién al abrir y se descarga al cerrar; solo acepta http y https. No se ejecuta dentro del editor: en el lienzo la capa se ve como un bloque más.',
+  };
+  BEHAVIORS[BEHAVIOR_WA_MENSAJE] = {
+    name: BEHAVIOR_WA_MENSAJE,
+    defaultOpenClass: 'is-open',
+    description: 'Ventana para redactar el mensaje antes de abrir WhatsApp. Intercepta los enlaces de WhatsApp que se le indiquen, ofrece escrito el mensaje propio de cada sección, suma una casilla de consentimiento opcional y emite un evento medible al enviar. No se ejecuta dentro del editor.',
   };
 
   function isAllowedBehavior(name) {

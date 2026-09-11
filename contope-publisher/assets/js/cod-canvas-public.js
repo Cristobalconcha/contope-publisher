@@ -494,6 +494,180 @@
         });
     }
 
+    // wa-mensaje: una ventana para redactar el mensaje antes de abrir WhatsApp.
+    //
+    // El nodo que declara el comportamiento ES la ventana, igual que el
+    // lightbox y el visor. No reemplaza los enlaces de WhatsApp: los
+    // INTERCEPTA. Eso importa por tres razones:
+    //
+    //   1. Cada botón conserva el mensaje propio de su sección, que ya viaja
+    //      en su enlace. La ventana lo lee de ahí y lo ofrece escrito.
+    //   2. El número sale del propio enlace, así que no hay un segundo lugar
+    //      donde configurarlo ni forma de que queden distintos.
+    //   3. Si este archivo no cargara, los enlaces siguen funcionando como
+    //      siempre: abren WhatsApp directo. Se pierde la ventana, no el
+    //      contacto.
+    //
+    // El motivo de que exista: un clic que se va del sitio se mide mal, sobre
+    // todo en teléfono, donde la aplicación toma el control antes de que se
+    // alcance a registrar. Con un botón de envío DENTRO de la página, el
+    // evento se emite antes de salir y sí se puede contar como conversión.
+    function installWaMensaje(nodes) {
+        Array.prototype.forEach.call(nodes, function (root) {
+            var selectorDisparador = String(root.getAttribute('data-cod-wa-trigger') || '').trim();
+            if (!selectorDisparador) return;
+            var enlaces = [];
+            try { enlaces = Array.prototype.slice.call(document.querySelectorAll(selectorDisparador)); }
+            catch (error) { return; }
+            if (!enlaces.length) return;
+
+            function dentro(attr, alternativa) {
+                var s = String(root.getAttribute(attr) || '').trim() || alternativa || '';
+                if (!s) return null;
+                try { return root.querySelector(s); } catch (error) { return null; }
+            }
+            var enviar = dentro('data-cod-wa-send', '');
+            var cerrar1 = dentro('data-cod-wa-close', '');
+            if (!enviar) return;
+
+            // El campo de texto y la casilla los CREA este código, no vienen en
+            // el documento guardado. No es un capricho: el sanitizador bloquea
+            // <textarea> e <input> a propósito, para que un documento traído de
+            // otro sitio no pueda incluir un formulario falso que pida claves o
+            // datos de tarjeta. Ese bloqueo protege de verdad y no corresponde
+            // debilitarlo por una ventana de contacto.
+            //
+            // Lo que sí viaja en el documento son los huecos donde van, así que
+            // quien diseña decide dónde se ubican y cómo se ven; las clases son
+            // las mismas y se estilan en el editor como cualquier otra cosa.
+            function crearEn(attr, fabricar) {
+                var hueco = dentro(attr, '');
+                if (!hueco) return null;
+                var ya = hueco.querySelector('textarea, input');
+                if (ya) return ya;
+                var control = fabricar();
+                hueco.appendChild(control);
+                return control;
+            }
+
+            var campo = crearEn('data-cod-wa-field', function () {
+                var e = document.createElement('textarea');
+                e.className = 'wa-ventana__campo';
+                e.rows = 3;
+                e.setAttribute('aria-label', String(root.getAttribute('data-cod-wa-field-label') || 'Tu mensaje'));
+                var pista = String(root.getAttribute('data-cod-wa-placeholder') || '').trim();
+                if (pista) e.placeholder = pista;
+                return e;
+            });
+            if (!campo) return;
+
+            var consent = crearEn('data-cod-wa-consent', function () {
+                var e = document.createElement('input');
+                e.type = 'checkbox';
+                e.className = 'wa-ventana__casilla';
+                // Desmarcada siempre: un consentimiento premarcado no es
+                // consentimiento, y en varias legislaciones directamente no vale.
+                e.checked = false;
+                return e;
+            });
+
+            var claseAbierto = String(root.getAttribute('data-cod-wa-open-class') || '').trim() || 'is-open';
+            var lineaConsent = String(root.getAttribute('data-cod-wa-consent-text') || '').trim();
+            var nombreEvento = String(root.getAttribute('data-cod-wa-event') || '').trim() || 'whatsapp_enviado';
+
+            var destino = '';   // número, sacado del enlace que abrió la ventana
+            var origen = '';    // qué botón fue, para poder distinguirlo al medir
+            var ultimoDisparador = null;
+
+            function estaAbierto() { return root.classList.contains(claseAbierto); }
+
+            function abrir(enlace, evento) {
+                if (evento && typeof evento.preventDefault === 'function') evento.preventDefault();
+                var href = String(enlace.getAttribute('href') || '');
+                var num = href.match(/wa\.me\/(\d+)/);
+                if (!num) return;   // no se reconoce: se deja pasar el enlace tal cual
+                destino = num[1];
+
+                // El mensaje propio de esta sección viaja en el enlace.
+                var texto = '';
+                var puesto = href.match(/[?&]text=([^&]*)/);
+                if (puesto) {
+                    try { texto = decodeURIComponent(puesto[1].replace(/\+/g, ' ')); } catch (e) { texto = ''; }
+                }
+                campo.value = texto;
+
+                // De dónde salió: sirve para saber qué sección convierte.
+                var seccion = enlace.closest ? enlace.closest('section') : null;
+                origen = String(
+                    enlace.getAttribute('data-cod-wa-origen') ||
+                    (seccion && (seccion.id || seccion.className)) ||
+                    'general'
+                ).split(' ')[0];
+
+                ultimoDisparador = enlace;
+                root.classList.add(claseAbierto);
+                revisar();
+                window.setTimeout(function () {
+                    try { campo.focus(); campo.setSelectionRange(campo.value.length, campo.value.length); }
+                    catch (e) { /* da igual si el navegador no deja */ }
+                }, 180);
+            }
+
+            function cerrar() {
+                if (!estaAbierto()) return;
+                root.classList.remove(claseAbierto);
+                if (ultimoDisparador && typeof ultimoDisparador.focus === 'function') ultimoDisparador.focus();
+            }
+
+            // Un mensaje vacío no se manda.
+            function revisar() {
+                var vacio = String(campo.value || '').trim() === '';
+                if ('disabled' in enviar) enviar.disabled = vacio;
+                enviar.setAttribute('aria-disabled', vacio ? 'true' : 'false');
+            }
+
+            // Se avisa por las tres vías que se usan, y ninguna depende de las
+            // otras. Si el sitio no tiene ninguna herramienta instalada, no
+            // pasa nada. Nunca viaja lo que la persona escribió: solo de qué
+            // botón salió y si aceptó recibir novedades.
+            function avisar(acepto) {
+                var detalle = { origen: origen, consentimiento: !!acepto };
+                try { window.dispatchEvent(new CustomEvent('cod:whatsapp-enviado', { detail: detalle })); } catch (e) {}
+                try {
+                    if (Array.isArray(window.dataLayer)) {
+                        window.dataLayer.push({ event: nombreEvento, origen: detalle.origen, consentimiento: detalle.consentimiento });
+                    }
+                } catch (e) {}
+                try {
+                    if (typeof window.gtag === 'function') window.gtag('event', nombreEvento, detalle);
+                } catch (e) {}
+            }
+
+            function mandar(evento) {
+                if (evento && typeof evento.preventDefault === 'function') evento.preventDefault();
+                var texto = String(campo.value || '').trim();
+                if (!texto || !destino) return;
+                var acepto = !!(consent && consent.checked);
+                if (acepto && lineaConsent) texto += '\n\n' + lineaConsent;
+
+                avisar(acepto);
+                window.open('https://wa.me/' + destino + '?text=' + encodeURIComponent(texto), '_blank', 'noopener');
+                cerrar();
+            }
+
+            enlaces.forEach(function (enlace) {
+                enlace.addEventListener('click', function (evento) { abrir(enlace, evento); });
+            });
+            enviar.addEventListener('click', mandar);
+            campo.addEventListener('input', revisar);
+            if (cerrar1) cerrar1.addEventListener('click', function (e) { if (e && e.preventDefault) e.preventDefault(); cerrar(); });
+            document.addEventListener('keydown', function (evento) {
+                if (estaAbierto() && evento.key === 'Escape') cerrar();
+            });
+            revisar();
+        });
+    }
+
     // parseJsonAttr: lee un atributo data-* como JSON sin evaluar código. Nunca
     // se interpreta el contenido como ejecutable: falla a null ante JSON inválido.
     function parseJsonAttr(root, attr) {
@@ -1151,6 +1325,7 @@
         var chartNodes = [];
         var anchorNodes = [];
         var visorNodes = [];
+        var waNodes = [];
         Array.prototype.forEach.call(behaviorNodes, function (node) {
             var behavior = node.getAttribute('data-cod-behavior');
             if (behavior === 'scroll-threshold') scrollNodes.push(node);
@@ -1164,6 +1339,7 @@
             else if (behavior === 'chart') chartNodes.push(node);
             else if (behavior === 'anchor') anchorNodes.push(node);
             else if (behavior === 'visor-embed') visorNodes.push(node);
+            else if (behavior === 'wa-mensaje') waNodes.push(node);
         });
         installHeroCollapse(heroCollapseNodes);
         installScrollThreshold(scrollNodes);
@@ -1176,6 +1352,7 @@
         installChart(chartNodes);
         installAnchor(anchorNodes);
         installVisorEmbed(visorNodes);
+        installWaMensaje(waNodes);
 
         // Interacciones tipo Webflow (data-cod-interaction): el mismo motor que
         // corre en el iframe del editor (cod-interactions.js) se instala acá
