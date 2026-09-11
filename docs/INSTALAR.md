@@ -4,8 +4,8 @@ Esta guía es para alguien que quiere usar el constructor en **su propio sitio
 WordPress** y editarlo conversando con un asistente de IA, como se hace en el
 proyecto que le dio origen.
 
-Son tres pasos y ninguno necesita programar. El tercero es el único que pide
-pegar un texto en un archivo de configuración.
+Son cuatro pasos y ninguno necesita programar. El tercero es el único que pide
+pegar un texto en un archivo de configuración; el cuarto es copiar dos carpetas.
 
 ---
 

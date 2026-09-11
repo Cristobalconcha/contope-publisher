@@ -13,8 +13,8 @@ cada cambio.
 
 **→ [Guía de instalación y conexión](docs/INSTALAR.md)**
 
-Tres pasos: instalar el plugin, crear una contraseña de aplicación y pegar la
-configuración del servidor en tu asistente. No requiere programar.
+Cuatro pasos: instalar el plugin, crear una contraseña de aplicación, conectar el
+asistente y enseñarle cómo trabajar. No requiere programar.
 
 Requiere WordPress 6.5+, PHP 8.0+ y una cuenta de administrador.
 
