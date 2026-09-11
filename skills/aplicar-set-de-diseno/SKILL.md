@@ -27,7 +27,9 @@ Orden de autoridad, sin excepciones: **confirmado por una persona > guía aproba
 
 ## Lo que Desktop emite
 
-`design/model.json` dentro del paquete portable (`kind: contope/design-model`, esquema 1). Adentro, el contrato:
+`design/model.json` dentro del paquete portable (`kind: open-codesign/design-model`, esquema 1). Adentro, el contrato:
+
+> El `kind` conserva el nombre viejo a propósito: es el que emite hoy ContOpe Design Desktop (`PORTABLE_DESIGN_MODEL_KIND` en `packages/core/src/design-contract-portable.ts`). Cambiarlo acá antes que allá rompería la validación. Se renombra cuando se renombre el emisor, en el mismo cambio.
 
 ```
 design:            { id, revision, createdAt, updatedAt }

@@ -1,6 +1,6 @@
 ---
 name: operar-canvas
-description: Operar el page builder de ContOpe Design / Contope Design en WordPress a través de su servidor MCP — crear y editar páginas dentro de la herramienta real, con las reglas que impiden romper el sitio. Usar en cualquier tarea que toque un sitio Canvas (crear una página o sección, cambiar textos, estilos, imágenes, mapas o formularios), antes de escribir nada.
+description: Operar el page builder de ContOpe Design en WordPress a través de su servidor MCP — crear y editar páginas dentro de la herramienta real, con las reglas que impiden romper el sitio. Usar en cualquier tarea que toque un sitio Canvas (crear una página o sección, cambiar textos, estilos, imágenes, mapas o formularios), antes de escribir nada.
 ---
 
 # Operar el page builder

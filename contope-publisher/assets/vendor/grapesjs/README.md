@@ -1,7 +1,7 @@
 # Vendor — GrapesJS
 
 Copia local y sin CDN de la distribución oficial de GrapesJS. La pantalla
-**Herramientas → Open CoDesign Canvas (Experimental)** la carga con
+**Herramientas → ContOpe Canvas (Experimental)** la carga con
 `plugins_url()`; el sitio no realiza ninguna petición de red para editar.
 
 ## Procedencia
@@ -40,4 +40,4 @@ introduce el módulo experimental; el resto del plugin sigue funcionando sin ell
 
 Al reemplazar estos archivos hay que actualizar en el mismo cambio la versión, los
 bytes y los SHA-256 en este documento, en `scripts/check-canvas-editor.mjs` y en
-`OCD_Canvas_Editor_Admin::GRAPESJS_VERSION`. `npm run check` falla si divergen.
+`COD_Canvas_Editor_Admin::GRAPESJS_VERSION`. `npm run check` falla si divergen.
