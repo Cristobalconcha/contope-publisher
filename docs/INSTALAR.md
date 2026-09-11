@@ -11,14 +11,28 @@ pegar un texto en un archivo de configuración; el cuarto es copiar dos carpetas
 
 ## Antes de empezar
 
-Tu sitio necesita:
+**Tu sitio** necesita:
 
 - **WordPress 6.5** o superior
 - **PHP 8.0** o superior
-- Una cuenta de **administrador** en ese WordPress
+- Estar en **HTTPS** — sin eso WordPress no permite crear contraseñas de
+  aplicación, y no hay forma de conectar el asistente
+- Una cuenta de **administrador**
 
 Si no sabes qué versión tienes, aparece en *Escritorio → Actualizaciones* y en
 *Herramientas → Salud del sitio → Información*.
+
+**Tu computador** necesita:
+
+- **Node.js 20** o superior
+
+Esto último sorprende a mucha gente, así que conviene decirlo claro: el
+asistente no habla con tu sitio directamente, levanta un pequeño puente para
+hacerlo, y ese puente corre sobre Node. Sin Node, la conexión no se establece y
+el mensaje de error no explica por qué.
+
+Si no lo tienes, el instalador del paso 3 lo puede instalar por ti. O lo bajas
+de [nodejs.org](https://nodejs.org) — la versión **LTS**.
 
 ---
 
@@ -62,6 +76,29 @@ entero.
 ---
 
 ## 3 · Conectar el asistente
+
+### La forma rápida (Windows)
+
+El repositorio trae un instalador que hace todo este paso por ti: comprueba
+Node y lo instala si falta, te pide los datos, **prueba la conexión de verdad**
+y sólo escribe la configuración si funcionó. Si algo falla, te dice cuál de las
+tres cosas falló, que es lo que no se puede adivinar cuando se hace a mano.
+
+Descarga el repositorio (**Code → Download ZIP**), descomprímelo, abre
+PowerShell en esa carpeta y ejecuta:
+
+```powershell
+.\instalar-conexion.ps1
+```
+
+Te va a preguntar la dirección de tu sitio, tu usuario y la contraseña de
+aplicación. La contraseña se escribe oculta y no queda en el historial. Antes
+de tocar tu configuración hace un respaldo con fecha.
+
+Si funcionó, salta al paso 4. Si prefieres hacerlo a mano, o no estás en
+Windows, sigue leyendo.
+
+### A mano
 
 El plugin publica una dirección en tu propio sitio por donde el asistente entra.
 Es siempre tu dominio seguido de `/wp-json/contope/v1/mcp`.
@@ -201,10 +238,8 @@ Hay un modo de edición más fino, que hace pasar cada cambio por el mismo motor
 del editor visual en vez de reconstruir el documento. Es lo que usan las recetas
 de `scripts/cod-grapes-runner/`.
 
-Necesita, **en tu computador** (no en el hosting):
-
-- **Node.js 20** o superior
-- **Google Chrome** instalado
+Necesita, además de Node (que ya tienes de la conexión), **Google Chrome**
+instalado en tu computador.
 
 No hace falta para empezar. Si más adelante lo quieres, el README de esa carpeta
 explica cómo.
