@@ -5,6 +5,35 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.7 — 12 de septiembre de 2026
+
+### Corregido
+
+- **Cuatro tipos de regla de diseño se aplicaban y no pintaban nada.** Las
+  reglas de imagen, galería, tabla y movimiento (`media`, `gallery`, `table`,
+  `motion`) alcanzan elementos que están *dentro* del módulo —la `img`, cada
+  ítem de la galería, las celdas de la tabla— y por eso su ayudante ya devuelve
+  la regla completa, con su selector. El compilador la volvía a envolver en el
+  selector del módulo, produciendo `.x{.x img{…}}`: una regla que el navegador
+  entiende como "una `img` dentro de un `.x` que está dentro de otro `.x`", algo
+  que no existe en la página.
+
+  El efecto era el peor posible: la evidencia de la previsualización mostraba la
+  regla aplicada, el CSS quedaba escrito, y en pantalla no cambiaba nada. No
+  había ningún error que seguir.
+
+  Las demás reglas —color, tipografía, espaciado, botón, formulario— nunca
+  estuvieron afectadas: sus ayudantes devuelven declaraciones sueltas y sí
+  necesitan que el compilador las envuelva. Esa diferencia ahora está declarada
+  en el código, con su nombre, en vez de quedar implícita en la firma de cada
+  función.
+
+> Reportado y corregido por quien lo encontró trabajando en otro sitio. Lo
+> incorporamos verificando antes la causa: de los seis ayudantes de CSS, sólo
+> esos cuatro reciben el selector.
+
+---
+
 ## 0.3.6 — 11 de septiembre de 2026
 
 ### Corregido

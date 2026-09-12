@@ -72,6 +72,18 @@ final class COD_Canvas_MCP_Recipe_Compiler
     /** @var array<int, string> */
     private const SOURCE_KINDS = ['reference', 'user', 'ai'];
 
+    /**
+     * Tipos cuyo ayudante recibe el selector y devuelve reglas CSS completas,
+     * porque alcanzan elementos internos del nodo. No deben volver a envolverse.
+     *
+     * Se distinguen de los demás por la firma: media_css, gallery_css,
+     * table_css y motion_css reciben $selector; button_css y form_css no,
+     * porque sólo producen declaraciones sueltas para el nodo mismo.
+     *
+     * @var array<int, string>
+     */
+    private const SELF_SELECTED_RULE_KINDS = ['media', 'gallery', 'table', 'motion'];
+
     private const MAX_RULES = 256;
     private const MAX_NODES = 240;
     private const MAX_DEPTH = 12;
@@ -2769,7 +2781,15 @@ final class COD_Canvas_MCP_Recipe_Compiler
         if ($css === '') {
             return '';
         }
-        $rule_css = $selector . '{' . $css . '}';
+        // media, gallery, table y motion reciben el selector y devuelven reglas
+        // completas — alcanzan elementos internos (img, .cod-mcp-gallery__item,
+        // th/td) que el nodo mismo no es. Envolverlas otra vez producía
+        // .x{.x img{…}}, que el anidamiento CSS resuelve como ".x .x img": un
+        // descendiente de sí mismo, que no existe. La regla figuraba aplicada
+        // en la evidencia y no pintaba nada, que es la peor forma de fallar.
+        $rule_css = in_array($rule['kind'], self::SELF_SELECTED_RULE_KINDS, true)
+            ? $css
+            : $selector . '{' . $css . '}';
         if ($rule['kind'] === 'form' && isset($value['theme']) && is_array($value['theme']) && $value['theme'] !== []) {
             // El runtime del formulario declara sus valores por defecto sobre
             // .ofr-form, que está DENTRO de este contenedor. Heredar no basta:
