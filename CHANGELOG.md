@@ -5,6 +5,39 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.8 — 12 de septiembre de 2026
+
+### Nuevo
+
+- **Etiquetas de medición**, en *ContOpe Design → Configuración*. Un lugar en el
+  sitio para Google Tag Manager, Google Analytics 4, Google Ads, el pixel de
+  Meta y las etiquetas de verificación de propiedad (Search Console, Bing,
+  Meta). El sitio arma solo el fragmento oficial de cada herramienta y lo pone
+  donde corresponde: Tag Manager lo más arriba posible del `head`, y su copia
+  para navegadores sin JavaScript apenas abre el `body`.
+
+  Se pegan **identificadores**, no código. Un cuadro donde se pega código suelto
+  es la vía más común por la que un sitio termina ejecutando JavaScript ajeno, y
+  cuando falla no queda nada que revisar salvo el propio pegado. Cada
+  identificador se valida al guardar y, si está mal copiado, la pantalla lo dice
+  con el ejemplo del formato esperado — porque un identificador equivocado no se
+  nota mirando la página: la herramienta simplemente no recibe nada.
+
+  Las verificaciones de propiedad aceptan las dos formas en que llegan en la
+  vida real: la etiqueta completa copiada del proveedor, o el par
+  `nombre=valor`.
+
+  Incluye **"no medir las visitas de quien administra el sitio"**, porque
+  mientras se trabaja en una página se la recorre decenas de veces y esas
+  visitas ensucian los números de las campañas.
+
+  Tag Manager queda cargado antes que cualquier evento que la página empuje, así
+  que los avisos que el sitio ya emitía por su cuenta —**formulario enviado** y
+  **WhatsApp abierto**— quedan disponibles en el contenedor apenas se conecta,
+  sin tocar nada más.
+
+---
+
 ## 0.3.7 — 12 de septiembre de 2026
 
 ### Corregido

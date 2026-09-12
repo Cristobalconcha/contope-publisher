@@ -210,6 +210,109 @@ final class COD_Settings_Admin
                         <p><button type="submit" class="button button-primary">Guardar sitios permitidos</button></p>
                     </form>
                 </section>
+                <section class="cod-settings__section" id="cod-medicion">
+                    <h2>Etiquetas de medición</h2>
+                    <p>
+                        Acá van los códigos de Google y de Meta. Se pegan los
+                        <strong>identificadores</strong>, no el código completo: el sitio arma
+                        solo el fragmento que corresponde a cada herramienta, en el lugar
+                        correcto de la página. Deja vacío lo que no uses.
+                    </p>
+                    <p>
+                        Con Tag Manager instalado no necesitas volver acá: todo lo demás
+                        —Analytics, campañas, mapas de calor— se agrega desde Tag Manager.
+                        Este sitio además ya avisa por su cuenta cuando alguien
+                        <em>envía el formulario</em> y cuando <em>abre WhatsApp</em>, así que
+                        esas dos conversiones quedan disponibles apenas conectes el contenedor.
+                    </p>
+                    <?php
+                    $cod_medicion = COD_Medicion::ajustes();
+                    $cod_medicion_campos = COD_Medicion::campos_para_pantalla();
+                    $cod_medicion_malos = isset($_GET['cod_medicion_error'])
+                        ? explode(',', sanitize_text_field((string) wp_unslash($_GET['cod_medicion_error'])))
+                        : [];
+                    ?>
+                    <?php if (isset($_GET['cod_medicion_guardada']) && $cod_medicion_malos === []) : ?>
+                        <div class="notice notice-success"><p>Etiquetas de medición guardadas.</p></div>
+                    <?php endif; ?>
+                    <?php if ($cod_medicion_malos !== []) : ?>
+                        <div class="notice notice-error">
+                            <p>
+                                No se guardó
+                                <?php
+                                $cod_nombres = [];
+                                foreach ($cod_medicion_malos as $cod_malo) {
+                                    if (isset($cod_medicion_campos[$cod_malo])) {
+                                        $cod_nombres[] = $cod_medicion_campos[$cod_malo]['etiqueta']
+                                            . ' (se espera algo como ' . $cod_medicion_campos[$cod_malo]['ejemplo'] . ')';
+                                    }
+                                }
+                                echo esc_html(implode('; ', $cod_nombres));
+                                ?>.
+                                Revisa que esté copiado completo y vuelve a guardar.
+                            </p>
+                        </div>
+                    <?php endif; ?>
+                    <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+                        <input type="hidden" name="action" value="cod_save_medicion">
+                        <?php wp_nonce_field('cod_save_medicion'); ?>
+                        <table class="form-table" role="presentation">
+                            <tbody>
+                            <?php foreach ($cod_medicion_campos as $cod_clave => $cod_campo) : ?>
+                                <tr>
+                                    <th scope="row">
+                                        <label for="cod_medicion_<?php echo esc_attr($cod_clave); ?>">
+                                            <?php echo esc_html($cod_campo['etiqueta']); ?>
+                                        </label>
+                                    </th>
+                                    <td>
+                                        <input type="text" class="regular-text code"
+                                            id="cod_medicion_<?php echo esc_attr($cod_clave); ?>"
+                                            name="cod_medicion_<?php echo esc_attr($cod_clave); ?>"
+                                            value="<?php echo esc_attr((string) $cod_medicion[$cod_clave]); ?>"
+                                            placeholder="<?php echo esc_attr($cod_campo['ejemplo']); ?>">
+                                        <p class="description"><?php echo esc_html($cod_campo['ayuda']); ?></p>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                                <tr>
+                                    <th scope="row">
+                                        <label for="cod_medicion_verificaciones">Verificaciones de propiedad</label>
+                                    </th>
+                                    <td>
+                                        <textarea id="cod_medicion_verificaciones" name="cod_medicion_verificaciones"
+                                            rows="3" class="large-text code"
+                                            placeholder="google-site-verification=abc123..."><?php
+                                            echo esc_textarea((string) $cod_medicion['verificaciones']);
+                                        ?></textarea>
+                                        <p class="description">
+                                            Las etiquetas que piden Search Console, Bing o Meta para comprobar
+                                            que el sitio es tuyo. Una por línea. Puedes pegar la etiqueta
+                                            completa tal como te la dan, o sólo el par
+                                            <code>nombre=valor</code>: las dos formas sirven.
+                                        </p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Tus propias visitas</th>
+                                    <td>
+                                        <label for="cod_medicion_excluir_admin">
+                                            <input type="checkbox" id="cod_medicion_excluir_admin"
+                                                name="cod_medicion_excluir_admin" value="1"
+                                                <?php checked($cod_medicion['excluir_admin']); ?>>
+                                            No medir las visitas de quien administra el sitio
+                                        </label>
+                                        <p class="description">
+                                            Recomendado. Mientras trabajas en el sitio lo recorres muchas veces,
+                                            y esas visitas ensucian los números de las campañas.
+                                        </p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p><button type="submit" class="button button-primary">Guardar etiquetas</button></p>
+                    </form>
+                </section>
             </div>
         </div>
         <?php

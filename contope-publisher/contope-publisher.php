@@ -2,7 +2,7 @@
 /**
  * Plugin Name: ContOpe Publisher
  * Description: Importa proyectos ContOpe Design como páginas Gutenberg nativas y editables.
- * Version: 0.3.7
+ * Version: 0.3.8
  * Requires at least: 6.5
  * Requires PHP: 8.0
  * Author: Cristóbal Concha
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('COD_PUBLISHER_VERSION', '0.3.7');
+define('COD_PUBLISHER_VERSION', '0.3.8');
 define('COD_PUBLISHER_FILE', __FILE__);
 define('COD_PUBLISHER_DIR', plugin_dir_path(__FILE__));
 
@@ -46,6 +46,7 @@ require_once COD_PUBLISHER_DIR . 'includes/class-cod-block-heading.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-canvas-mcp-recipe-compiler.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-canvas-mcp-service.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-mcp-server.php';
+require_once COD_PUBLISHER_DIR . 'includes/class-cod-medicion.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-migracion-nombres.php';
 
 // Migración de los nombres viejos (Open CoDesign) a los nuevos. Se registra
@@ -99,6 +100,7 @@ add_action('plugins_loaded', static function (): void {
     (new COD_Theme_Builder_Admin($canvas_repository, $canvas_publisher))->register();
     (new COD_Inline_Editor_Frontend($canvas_repository, $region_resolver))->register();
     (new COD_Settings_Admin())->register();
+    (new COD_Medicion())->register();
 
     // Fase 1 (POC): bloque Gutenberg nativo ocd/heading. Aditivo y aislado,
     // convive con el flujo Canvas legacy sin tocarlo.
