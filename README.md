@@ -18,6 +18,10 @@ asistente y enseñarle cómo trabajar. No requiere programar.
 
 Requiere WordPress 6.5+, PHP 8.0+ y una cuenta de administrador.
 
+## Registro de versiones
+
+Qué cambió en cada versión: **[CHANGELOG.md](CHANGELOG.md)**
+
 ## Qué hace
 
 - **Editor visual** sobre GrapesJS: secciones, grillas anidadas, galerías con
