@@ -102,7 +102,35 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 'reviewStates' => self::REVIEW_STATES,
                 'ruleRecord' => [
                     'required' => ['id', 'kind', 'scope', 'provenance', 'status', 'value'],
-                    'provenanceSources' => self::SOURCE_KINDS,
+                    // provenance es un OBJETO, no una cadena. Antes acá sólo se
+                    // publicaba 'provenanceSources' => ['reference','user','ai'],
+                    // que se leía como "provenance es uno de estos textos" —
+                    // y con esa forma el servidor rechaza el 100% de las
+                    // reglas. Quien seguía la documentación al pie de la letra
+                    // no tenía manera de acertar ni de saber por qué fallaba.
+                    'provenance' => [
+                        'type' => 'object',
+                        'required' => ['sources'],
+                        'sources' => [
+                            'type' => 'array',
+                            'minItems' => 1,
+                            'maxItems' => 16,
+                            'itemRequired' => ['kind'],
+                            'itemKinds' => self::SOURCE_KINDS,
+                            'itemOptional' => [
+                                'label' => 'texto, hasta 200 caracteres',
+                                'reference' => 'texto, hasta 300 caracteres',
+                                'rationale' => 'texto, hasta 1000 caracteres',
+                            ],
+                        ],
+                        'confidence' => 'número opcional entre 0 y 1',
+                        'ejemplo' => [
+                            'sources' => [
+                                ['kind' => 'reference', 'reference' => 'https://ejemplo.cl/guia', 'rationale' => 'Paleta de la marca.'],
+                            ],
+                            'confidence' => 0.9,
+                        ],
+                    ],
                     'ruleStatuses' => self::RULE_STATUSES,
                     'scope' => [
                         'breakpoint' => ['all', 'desktop', 'tablet', 'mobile'],
@@ -619,18 +647,62 @@ final class COD_Canvas_MCP_Recipe_Compiler
      */
     private function normalize_rule(array $rule)
     {
-        if (!$this->has_only_keys($rule, ['id', 'label', 'kind', 'scope', 'provenance', 'status', 'value'])
-            || !isset($rule['id'], $rule['kind'], $rule['scope'], $rule['provenance'], $rule['status'], $rule['value'])
-            || !$this->is_stable_id($rule['id'])
-            || !is_string($rule['kind'])
-            || !in_array($rule['kind'], self::RULE_KINDS, true)
-            || !is_array($rule['scope'])
-            || !is_array($rule['provenance'])
-            || !is_string($rule['status'])
-            || !in_array($rule['status'], self::RULE_STATUSES, true)
-            || !is_array($rule['value'])
-            || (isset($rule['label']) && (!is_string($rule['label']) || mb_strlen($rule['label']) > 160))) {
-            return new WP_Error('cod_mcp_design_rule_invalid', 'Una regla de diseño contiene campos no permitidos o incompletos.');
+        // Cada condición avisa POR SEPARADO qué falló. Antes las once estaban
+        // en un solo if con un mensaje único, así que quien recibía el error
+        // sólo sabía que "algo" estaba mal en la regla: había que ir probando
+        // campo por campo, o leer el código del plugin, para dar con la causa.
+        // Un cliente del MCP no tiene el código a mano.
+        $permitidas = ['id', 'label', 'kind', 'scope', 'provenance', 'status', 'value'];
+        if (!$this->has_only_keys($rule, $permitidas)) {
+            $sobran = array_diff(array_keys($rule), $permitidas);
+            return new WP_Error(
+                'cod_mcp_design_rule_invalid',
+                sprintf(
+                    'La regla trae campos que no existen: %s. Los permitidos son: %s.',
+                    implode(', ', $sobran),
+                    implode(', ', $permitidas)
+                )
+            );
+        }
+        foreach (['id', 'kind', 'scope', 'provenance', 'status', 'value'] as $obligatorio) {
+            if (!isset($rule[$obligatorio])) {
+                return new WP_Error(
+                    'cod_mcp_design_rule_invalid',
+                    sprintf('A la regla le falta el campo obligatorio "%s".', $obligatorio)
+                );
+            }
+        }
+        if (!$this->is_stable_id($rule['id'])) {
+            return new WP_Error('cod_mcp_design_rule_invalid', 'El campo "id" de la regla no es un identificador estable válido.');
+        }
+        if (!is_string($rule['kind']) || !in_array($rule['kind'], self::RULE_KINDS, true)) {
+            return new WP_Error(
+                'cod_mcp_design_rule_invalid',
+                sprintf('El campo "kind" debe ser uno de: %s.', implode(', ', self::RULE_KINDS))
+            );
+        }
+        if (!is_array($rule['scope'])) {
+            return new WP_Error('cod_mcp_design_rule_invalid', 'El campo "scope" debe ser un objeto con breakpoint y state.');
+        }
+        if (!is_array($rule['provenance'])) {
+            return new WP_Error(
+                'cod_mcp_design_rule_invalid',
+                'El campo "provenance" debe ser un OBJETO con "sources" (una lista de al menos una fuente), no un texto. '
+                    . 'Ejemplo: {"sources":[{"kind":"reference","reference":"https://ejemplo.cl/guia"}]}. '
+                    . 'Los valores de "kind" admitidos son: ' . implode(', ', self::SOURCE_KINDS) . '.'
+            );
+        }
+        if (!is_string($rule['status']) || !in_array($rule['status'], self::RULE_STATUSES, true)) {
+            return new WP_Error(
+                'cod_mcp_design_rule_invalid',
+                sprintf('El campo "status" debe ser uno de: %s.', implode(', ', self::RULE_STATUSES))
+            );
+        }
+        if (!is_array($rule['value'])) {
+            return new WP_Error('cod_mcp_design_rule_invalid', 'El campo "value" debe ser un objeto, y su forma depende de "kind".');
+        }
+        if (isset($rule['label']) && (!is_string($rule['label']) || mb_strlen($rule['label']) > 160)) {
+            return new WP_Error('cod_mcp_design_rule_invalid', 'El campo "label" debe ser texto de hasta 160 caracteres.');
         }
 
         $scope = $this->normalize_scope($rule['scope']);
