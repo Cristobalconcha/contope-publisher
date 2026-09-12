@@ -194,6 +194,41 @@ final class COD_Medicion
         return $pares;
     }
 
+    /**
+     * Deja el identificador en su forma canónica antes de validarlo.
+     *
+     * Quita los espacios invisibles que viajan pegados a un copiar-y-pegar desde
+     * una página web —espacio duro (U+00A0), espacio de ancho cero, marca de
+     * orden de bytes—. `trim()` de PHP no toca ninguno de esos: sólo limpia
+     * espacio, tabulador y salto de línea. Con uno de ellos adherido, el
+     * identificador no calzaba con su formato, el campo se guardaba vacío y no
+     * había forma de entender por qué; pasó de verdad la primera vez que se usó
+     * esta pantalla.
+     *
+     * Y si pegaron el fragmento completo en lugar del identificador, lo extrae.
+     * Esa es la forma en que Google entrega estos códigos, así que es la forma
+     * en que van a llegar; rechazarla sólo produce un campo en blanco.
+     */
+    private static function normalizar(string $crudo, string $campo): string
+    {
+        $texto = preg_replace('/[\s\x{00A0}\x{200B}-\x{200D}\x{FEFF}]+/u', ' ', $crudo) ?? $crudo;
+        $texto = trim($texto);
+
+        if ($campo === 'meta_pixel') {
+            return preg_replace('/\D/', '', $texto) ?? '';
+        }
+
+        $texto = strtoupper($texto);
+
+        $prefijos = ['gtm' => 'GTM', 'ga4' => 'G', 'ads' => 'AW'];
+        if (isset($prefijos[$campo])
+            && preg_match('/\b' . $prefijos[$campo] . '-[A-Z0-9]{4,14}\b/', $texto, $coincidencia)) {
+            return $coincidencia[0];
+        }
+
+        return $texto;
+    }
+
     public function guardar(): void
     {
         if (!current_user_can(self::CAPABILITY)) {
@@ -201,25 +236,24 @@ final class COD_Medicion
         }
         check_admin_referer('cod_save_medicion');
 
+        $previos = self::ajustes();
         $errores = [];
         $valores = ['excluir_admin' => !empty($_POST['cod_medicion_excluir_admin'])];
 
         foreach (self::formatos() as $campo => $formato) {
             $crudo = isset($_POST['cod_medicion_' . $campo])
-                ? trim((string) wp_unslash($_POST['cod_medicion_' . $campo]))
+                ? self::normalizar((string) wp_unslash($_POST['cod_medicion_' . $campo]), $campo)
                 : '';
-            if ($campo === 'meta_pixel') {
-                $crudo = preg_replace('/\D/', '', $crudo) ?? '';
-            } else {
-                $crudo = strtoupper($crudo);
-            }
             if ($crudo === '') {
                 $valores[$campo] = '';
                 continue;
             }
             if (!preg_match($formato['patron'], $crudo)) {
+                // No se borra lo que ya estaba guardado y funcionando: un valor
+                // nuevo mal escrito no es motivo para apagar la medición que el
+                // sitio ya tenía. Vaciar el campo sólo se hace a propósito.
                 $errores[] = $campo;
-                $valores[$campo] = '';
+                $valores[$campo] = (string) $previos[$campo];
                 continue;
             }
             $valores[$campo] = $crudo;

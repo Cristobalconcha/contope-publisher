@@ -5,6 +5,43 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.9 — 12 de septiembre de 2026
+
+### Corregido
+
+- **Un identificador de medición podía rechazarse sin decir por qué.** Al copiar
+  desde una página web viajan pegados caracteres invisibles —espacio duro,
+  espacio de ancho cero, marca de orden de bytes— que la limpieza de PHP no
+  quita. Con uno de ellos adherido, el identificador no calzaba con su formato:
+  el campo quedaba en blanco y no había nada que mirar para entenderlo. Pasó en
+  el primer uso real de la pantalla.
+
+  Ahora se limpian antes de validar. Y la pantalla **acepta también el fragmento
+  completo** —el bloque `<script>` tal como lo entrega Google— del que extrae el
+  identificador. Ésa es la forma en que estos códigos llegan a las manos de
+  quien los pega, así que rechazarla sólo producía un campo vacío.
+
+- **Un valor nuevo mal escrito ya no borra el que estaba funcionando.** Antes,
+  un error de tipeo apagaba la medición que el sitio ya tenía. Vaciar un campo
+  ahora sólo ocurre cuando se hace a propósito.
+
+- **Un comentario del plugin tenía los acentos rotos** (`MÃ³dulo` en vez de
+  `Módulo`), resto de una vez en que un archivo se escribió con la codificación
+  equivocada. No afectaba al funcionamiento, pero estaba a la vista de quien lee
+  el código.
+
+  Para que no vuelva a colarse, la revisión que ya se ejecuta antes de cada
+  despliegue ahora **detiene el despliegue** si encuentra acentos rotos en
+  cualquier archivo. Una nota depende de que alguien se acuerde; esto no.
+
+### Interno
+
+- `scripts/probar-medicion.mjs` comprueba la normalización de identificadores.
+  Lee los formatos **desde el propio PHP** en vez de repetirlos, para que no
+  siga pasando en verde si mañana el original cambia.
+
+---
+
 ## 0.3.8 — 12 de septiembre de 2026
 
 ### Nuevo

@@ -87,6 +87,24 @@ function revisar(texto) {
   return problemas;
 }
 
+// Secuencias que sólo existen cuando un texto UTF-8 se leyó como latin1 y se
+// volvió a guardar: la "Ã" seguida del segundo byte del carácter original, la
+// "Â" sobrante delante de un signo, y las comillas tipográficas partidas. Pasó
+// de verdad al escribir PHP con PowerShell, y volvió a aparecer meses después
+// en una línea suelta que sobrevivió a la restauración: por eso se comprueba
+// acá, en el mismo paso que ya corre antes de cada despliegue, y no en una nota.
+const MOJIBAKE = /\u00C3[\u0080-\u00BF]|\u00C2[\u00A0-\u00BF]|\u00E2\u20AC[\u2122\u201C\u201D\u00A6]/;
+
+function acentosRotos(texto) {
+  const malas = [];
+  texto.split(/\r?\n/).forEach((linea, i) => {
+    if (MOJIBAKE.test(linea)) {
+      malas.push('línea ' + (i + 1) + ': ' + linea.trim().slice(0, 70));
+    }
+  });
+  return malas;
+}
+
 function archivosPhp(dir) {
   const salida = [];
   for (const nombre of readdirSync(dir)) {
@@ -105,6 +123,13 @@ for (const archivo of archivos) {
   const texto = readFileSync(archivo, 'utf8');
   if (texto.charCodeAt(0) === 0xFEFF) {
     console.log('✗ ' + path.relative(raiz, archivo) + ': empieza con BOM (deja el sitio en blanco)');
+    conProblemas += 1;
+    continue;
+  }
+  const rotos = acentosRotos(texto);
+  if (rotos.length) {
+    console.log('✗ ' + path.relative(raiz, archivo) + ': acentos rotos (el archivo se escribió con la codificación equivocada)');
+    for (const m of rotos.slice(0, 5)) console.log('    ' + m);
     conProblemas += 1;
     continue;
   }
