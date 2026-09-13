@@ -175,9 +175,9 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 'nodeKinds' => self::NODE_KINDS,
                 'nodeRecord' => [
                     'required' => ['id', 'kind'],
-                    'optional' => ['role', 'referenceId', 'ruleIds', 'cadenceRuleId', 'children', 'content'],
+                    'optional' => ['role', 'marker', 'ruleIds', 'cadenceRuleId', 'children', 'content'],
                     'ruleApplication' => 'Cada nodo refiere reglas por id. No acepta CSS, HTML, JS, selectores ni componentes serializados por el cliente.',
-                    'referenceId' => 'Destino estable al que puede llegar un enlace, un QR o el menú: se emite como id de HTML y por eso debe ser único en la página. Es identidad del nodo, no una regla —una regla se aplica a muchos nodos y repetiría el id. El aire de aterrizaje, en cambio, sí es una regla: spacing.landing.',
+                    'marker' => 'Destino estable al que puede llegar un enlace, un QR o el menú: se emite como id de HTML y por eso debe ser único en la página. Es identidad del nodo, no una regla —una regla se aplica a muchos nodos y repetiría el id. El aire de aterrizaje, en cambio, sí es una regla: spacing.landing.',
                 ],
                 'nodeContentSchemas' => $this->node_content_schemas(),
             ],
@@ -1458,14 +1458,14 @@ final class COD_Canvas_MCP_Recipe_Compiler
         }
 
         $seen_node_ids = [];
-        $seen_reference_ids = [];
+        $seen_markers = [];
         $node_count = 0;
         $nodes = [];
         foreach ($composition['nodes'] as $node) {
             if (!is_array($node)) {
                 return new WP_Error('cod_mcp_composition_node_invalid', 'Cada nodo de la composición debe ser un objeto.');
             }
-            $normalized = $this->normalize_node($node, $rule_index, $seen_node_ids, $seen_reference_ids, $node_count, 0);
+            $normalized = $this->normalize_node($node, $rule_index, $seen_node_ids, $seen_markers, $node_count, 0);
             if (is_wp_error($normalized)) {
                 return $normalized;
             }
@@ -1477,7 +1477,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
             'label' => isset($composition['label']) ? $composition['label'] : '',
             'nodes' => $nodes,
             'nodeIds' => array_keys($seen_node_ids),
-            'referenceIds' => array_keys($seen_reference_ids),
+            'markers' => array_keys($seen_markers),
             'nodeCount' => $node_count,
         ];
     }
@@ -1486,33 +1486,33 @@ final class COD_Canvas_MCP_Recipe_Compiler
      * @param array<string, mixed> $node
      * @param array<string, array<string, mixed>> $rule_index
      * @param array<string, bool> $seen_node_ids
-     * @param array<string, bool> $seen_reference_ids
+     * @param array<string, bool> $seen_markers
      * @return array<string, mixed>|WP_Error
      */
-    private function normalize_node(array $node, array $rule_index, array &$seen_node_ids, array &$seen_reference_ids, int &$node_count, int $depth)
+    private function normalize_node(array $node, array $rule_index, array &$seen_node_ids, array &$seen_markers, int &$node_count, int $depth)
     {
         if ($depth > self::MAX_DEPTH
-            || !$this->has_only_keys($node, ['id', 'kind', 'role', 'referenceId', 'ruleIds', 'cadenceRuleId', 'children', 'content'])
+            || !$this->has_only_keys($node, ['id', 'kind', 'role', 'marker', 'ruleIds', 'cadenceRuleId', 'children', 'content'])
             || !isset($node['id'], $node['kind'])
             || !$this->is_stable_id($node['id'])
             || !is_string($node['kind'])
             || !in_array($node['kind'], self::NODE_KINDS, true)
             || (isset($node['role']) && (!is_string($node['role']) || !$this->is_stable_id($node['role'])))
-            || (isset($node['referenceId']) && (!is_string($node['referenceId']) || !$this->is_stable_id($node['referenceId'])))) {
+            || (isset($node['marker']) && (!is_string($node['marker']) || !$this->is_stable_id($node['marker'])))) {
             return new WP_Error('cod_mcp_composition_node_invalid', 'Un nodo tiene una forma, tipo o profundidad no permitidos.');
         }
         if (isset($seen_node_ids[$node['id']])) {
             return new WP_Error('cod_mcp_composition_node_duplicate', 'Los ids de nodos deben ser únicos.');
         }
         $seen_node_ids[$node['id']] = true;
-        // referenceId se emite como id de HTML: es el destino al que llega un
+        // marker se emite como id de HTML: es el destino al que llega un
         // enlace, un QR o el menú. A diferencia de una regla —que se aplica a
         // muchos nodos y emite una clase— tiene que ser único en la página.
-        if (isset($node['referenceId'])) {
-            if (isset($seen_reference_ids[$node['referenceId']])) {
-                return new WP_Error('cod_mcp_composition_reference_duplicate', 'Dos nodos declaran el mismo referenceId; un destino de enlace debe ser único.');
+        if (isset($node['marker'])) {
+            if (isset($seen_markers[$node['marker']])) {
+                return new WP_Error('cod_mcp_composition_marker_duplicate', 'Dos nodos declaran el mismo marker; un destino de enlace debe ser único.');
             }
-            $seen_reference_ids[$node['referenceId']] = true;
+            $seen_markers[$node['marker']] = true;
         }
         ++$node_count;
         if ($node_count > self::MAX_NODES) {
@@ -1555,7 +1555,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
             if (!is_array($child)) {
                 return new WP_Error('cod_mcp_composition_children_invalid', 'Cada child debe ser un nodo.');
             }
-            $normalized_child = $this->normalize_node($child, $rule_index, $seen_node_ids, $seen_reference_ids, $node_count, $depth + 1);
+            $normalized_child = $this->normalize_node($child, $rule_index, $seen_node_ids, $seen_markers, $node_count, $depth + 1);
             if (is_wp_error($normalized_child)) {
                 return $normalized_child;
             }
@@ -1577,7 +1577,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
             'id' => $node['id'],
             'kind' => $node['kind'],
             'role' => isset($node['role']) ? $node['role'] : '',
-            'referenceId' => isset($node['referenceId']) ? $node['referenceId'] : '',
+            'marker' => isset($node['marker']) ? $node['marker'] : '',
             'ruleIds' => $normalized_rule_ids,
             'cadenceRuleId' => $cadence_rule_id,
             'children' => $normalized_children,
@@ -2114,8 +2114,8 @@ final class COD_Canvas_MCP_Recipe_Compiler
         if ($node['role'] !== '') {
             $attributes['data-cod-role'] = $node['role'];
         }
-        if (($node['referenceId'] ?? '') !== '') {
-            $attributes['id'] = $node['referenceId'];
+        if (($node['marker'] ?? '') !== '') {
+            $attributes['id'] = $node['marker'];
         }
         $attrs = $this->html_attributes($attributes);
         $child_cadence = $node['cadenceRuleId'];

@@ -1,9 +1,9 @@
 <?php
 /**
  * Verifica el referenciado por id y la medida de aterrizaje:
- *  - un nodo con referenceId emite id="..." en el HTML publicado
+ *  - un nodo con marker emite id="..." en el HTML publicado
  *  - spacing.landing emite scroll-margin-block-start en el CSS
- *  - dos nodos con el mismo referenceId son rechazados
+ *  - dos nodos con el mismo marker son rechazados
  *  - el saneador de Canvas no descarta ninguna de las dos cosas
  *
  * Corre contra el WordPress local, que ya tiene el plugin cargado: hay que
@@ -31,11 +31,11 @@ $diseno = [
 
 $composicion = function (string $ref1, string $ref2): array {
     return ['schemaVersion' => 2, 'nodes' => [
-        ['id' => 'seccion-plano', 'kind' => 'section', 'referenceId' => $ref1,
+        ['id' => 'seccion-plano', 'kind' => 'section', 'marker' => $ref1,
          'ruleIds' => ['aterrizaje-bajo-header'], 'children' => [
             ['id' => 'titulo-plano', 'kind' => 'heading', 'content' => ['level' => 2, 'text' => 'Plano de loteo']],
         ]],
-        ['id' => 'seccion-ubicacion', 'kind' => 'section', 'referenceId' => $ref2,
+        ['id' => 'seccion-ubicacion', 'kind' => 'section', 'marker' => $ref2,
          'ruleIds' => ['aterrizaje-bajo-header'], 'children' => [
             ['id' => 'titulo-ubicacion', 'kind' => 'heading', 'content' => ['level' => 2, 'text' => 'Ubicacion']],
         ]],
@@ -60,19 +60,19 @@ if (is_wp_error($r)) {
     $comprobar('el HTML trae id="ubicacion"', strpos($html, 'id="ubicacion"') !== false);
     $comprobar('el CSS trae scroll-margin-block-start:96px', strpos($css, 'scroll-margin-block-start:96px') !== false);
     $comprobar('sigue emitiendo el padding de la misma regla', strpos($css, 'padding-block:48px') !== false);
-    $comprobar('la composicion declara los referenceIds', ($r['compositionSnapshot']['referenceIds'] ?? []) === ['plano', 'ubicacion']);
+    $comprobar('la composicion declara los markers', ($r['compositionSnapshot']['markers'] ?? []) === ['plano', 'ubicacion']);
 }
 
 echo "\n== id repetido: tiene que ser rechazado ==\n";
 $r2 = $compilador->compile($composicion('plano', 'plano'), $diseno);
-$comprobar('dos nodos con el mismo referenceId dan error',
-    is_wp_error($r2) && $r2->get_error_code() === 'cod_mcp_composition_reference_duplicate');
+$comprobar('dos nodos con el mismo marker dan error',
+    is_wp_error($r2) && $r2->get_error_code() === 'cod_mcp_composition_marker_duplicate');
 
 echo "\n== id invalido: tiene que ser rechazado ==\n";
 $r3 = $compilador->compile($composicion('con espacio', 'ubicacion'), $diseno);
-$comprobar('un referenceId con espacios da error', is_wp_error($r3));
+$comprobar('un marker con espacios da error', is_wp_error($r3));
 
-echo "\n== sin referenceId: nada cambia ==\n";
+echo "\n== sin marker: nada cambia ==\n";
 $sin = ['schemaVersion' => 2, 'nodes' => [
     ['id' => 'seccion-suelta', 'kind' => 'section', 'children' => [
         ['id' => 'titulo-suelto', 'kind' => 'heading', 'content' => ['level' => 2, 'text' => 'Hola']],
