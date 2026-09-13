@@ -5,6 +5,32 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.13 — 13 de septiembre de 2026
+
+### Agregado
+
+- **La capa a pantalla completa se puede enlazar.** El visor que muestra algo
+  de afuera —un recorrido 360, un video— tenía una sola manera de abrirse:
+  apretar su botón. Y por lo tanto no tenía dirección: no se podía enlazar
+  desde el menú, un correo ni un código QR.
+
+  Ahora, llegar a la página con el nombre de la capa en la dirección la abre
+  sola. El nombre es el **Marcador** del bloque —el mismo que identifica
+  cualquier destino— así que no hay un segundo sistema de nombres al lado del
+  primero. Se puede declarar otro con `data-cod-visor-hash` si conviene.
+
+  Tres cosas que se cuidaron:
+
+  El iframe **sigue sin cargarse** hasta que alguien abre la capa. Ese era el
+  punto de todo el diseño —un recorrido 360 pesa, y la portada no debe
+  arrastrar ese peso para quien nunca lo abre— y sigue en pie: llegar sin el
+  nombre en la dirección no carga nada.
+
+  **Al cerrar se limpia la dirección**, para que recargar o volver atrás no
+  reabra lo que la persona acaba de cerrar.
+
+  **El botón de siempre sigue funcionando igual.** Esto se suma, no reemplaza.
+
 ## 0.3.12 — 13 de septiembre de 2026
 
 ### Agregado

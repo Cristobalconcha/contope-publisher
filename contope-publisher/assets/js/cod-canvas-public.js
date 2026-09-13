@@ -461,6 +461,11 @@
             var desplazamientoPrevio = '';
             var temporizador = null;
 
+            var nombreEnlace = String(root.getAttribute('data-cod-visor-hash') || '').trim() || String(root.id || '').trim();
+            function pedidaEnLaUrl() {
+                return !!nombreEnlace && String(window.location.hash || '').replace(/^#/, '') === nombreEnlace;
+            }
+
             function estaAbierto() { return root.classList.contains(claseAbierto); }
 
             function abrir(evento) {
@@ -475,6 +480,13 @@
 
             function cerrar() {
                 if (!estaAbierto()) return;
+                // Si se llegó por la dirección, se limpia al cerrar: recargar o
+                // volver atrás no debe reabrir lo que la persona acaba de
+                // cerrar. Va por replaceState y no por location.hash='', que
+                // deja un '#' colgando y hace saltar el desplazamiento.
+                if (pedidaEnLaUrl() && window.history && window.history.replaceState) {
+                    window.history.replaceState(null, '', window.location.pathname + window.location.search);
+                }
                 root.classList.remove(claseAbierto);
                 document.body.style.overflow = desplazamientoPrevio;
                 // Se espera a que termine la transición antes de descargar, para
@@ -491,6 +503,21 @@
             document.addEventListener('keydown', function (evento) {
                 if (estaAbierto() && evento.key === 'Escape') cerrar();
             });
+
+            // Abrirla desde la dirección. Sin esto la capa tiene una sola manera
+            // de abrirse —apretar su botón— y por lo tanto no tiene dirección:
+            // no se puede enlazar desde el menú, un correo ni un código QR.
+            //
+            // El nombre sale de data-cod-visor-hash si está declarado, y si no
+            // del id del propio nodo, que es lo que el editor llama Marcador.
+            // Así el mismo nombre sirve para enlazar y para identificar, en vez
+            // de inventar un segundo sistema de nombres al lado del primero.
+            if (nombreEnlace) {
+                window.addEventListener('hashchange', function () { if (pedidaEnLaUrl()) abrir(); });
+                // Al entrar con la dirección ya puesta. Se espera un cuadro para
+                // no pelear con el desplazamiento inicial del navegador.
+                if (pedidaEnLaUrl()) window.setTimeout(abrir, 0);
+            }
         });
     }
 
