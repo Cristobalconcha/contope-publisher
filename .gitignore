@@ -16,3 +16,6 @@ node_modules/
 scripts/ocd-grapes-runner/
 scripts/cod-grapes-runner/cod-grapes-runner.config.json
 scripts/cod-grapes-runner/backups/
+
+# Respaldos de documentos del sitio: son copias grandes y locales, no fuente.
+scripts/cod-grapes-runner/backups/
