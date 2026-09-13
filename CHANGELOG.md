@@ -5,6 +5,38 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.14 — 13 de septiembre de 2026
+
+### Corregido
+
+- **Publicar una página por MCP nunca funcionó.** La herramienta
+  `cod_publish_canvas_page` respondía siempre *"Guarda contenido en el Canvas
+  antes de publicarlo"*, incluso con páginas que tenían contenido guardado.
+
+  La causa no era el contenido: era el llamado. El servicio invocaba el método
+  equivocado —`publish()`, el del editor, que recibe identificador de documento,
+  título y página— en vez de `publish_existing_if_revision()`, que es el que
+  recibe una página existente y una revisión esperada.
+
+  Los dos métodos existen y se parecen; los argumentos iban en otro orden y eran
+  cinco para un método de tres. **PHP no se queja de eso**: acepta argumentos de
+  más y convierte el número en texto sin avisar. Así, el número de página
+  entraba donde se esperaba el identificador del documento, el documento salía
+  vacío, y el mensaje de error terminaba acusando al contenido.
+
+  Se descubrió al crear la página de Términos y condiciones, que es la primera
+  página nueva publicada íntegramente por MCP.
+
+### Agregado
+
+- **Una prueba que compara cada llamado con la firma del método.**
+  `scripts/probar-firmas.mjs` revisa los 132 llamados internos del plugin y
+  avisa si alguno pasa más o menos argumentos de los que el método declara.
+
+  Existe porque este defecto no se podía ver leyendo: el código se veía
+  razonable y el error apuntaba a otro lado. Una nota en la documentación
+  habría dependido de que alguien la recordara; esto no.
+
 ## 0.3.13 — 13 de septiembre de 2026
 
 ### Agregado

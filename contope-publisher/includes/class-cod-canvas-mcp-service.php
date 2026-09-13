@@ -256,7 +256,18 @@ final class COD_Canvas_MCP_Service
         if (is_wp_error($target)) {
             return $target;
         }
-        return $this->publisher->publish(
+        // publish_existing_if_revision, NO publish. Son dos métodos distintos:
+        // publish(document_id, title, page_id) es el del editor, que crea o
+        // busca la página por su cuenta. El de acá recibe una página que YA
+        // existe y una revisión esperada, que es lo único correcto por MCP.
+        //
+        // Antes se llamaba a publish() con estos cinco argumentos. PHP no se
+        // queja —acepta argumentos de más y convierte el int a string—, así
+        // que el número de página entraba como identificador de documento, el
+        // documento salía vacío y la respuesta era "Guarda contenido en el
+        // Canvas antes de publicarlo". La herramienta nunca funcionó, y el
+        // error acusaba al contenido en vez de al llamado.
+        return $this->publisher->publish_existing_if_revision(
             $page_id,
             $document_id,
             $expected_revision,
