@@ -44,37 +44,37 @@ final class COD_Theme_Definitions
                             '' => 'Sin definir',
                             'light' => 'Claro',
                             'dark' => 'Oscuro',
-                        ],
+                        , 'emite' => ['token' => '--cod-mode', 'also' => 'color-scheme']],
                     ],
                 ],
             ],
             [
                 'title' => 'Paleta',
                 'fields' => [
-                    ['id' => 'color_bg', 'label' => 'Fondo', 'type' => 'color'],
-                    ['id' => 'color_text', 'label' => 'Texto', 'type' => 'color'],
-                    ['id' => 'color_primary', 'label' => 'Primario', 'type' => 'color'],
-                    ['id' => 'color_accent', 'label' => 'Acento', 'type' => 'color'],
+                    ['id' => 'color_bg', 'label' => 'Fondo', 'type' => 'color', 'emite' => ['token' => '--cod-color-bg']],
+                    ['id' => 'color_text', 'label' => 'Texto', 'type' => 'color', 'emite' => ['token' => '--cod-color-text']],
+                    ['id' => 'color_primary', 'label' => 'Primario', 'type' => 'color', 'emite' => ['token' => '--cod-color-primary']],
+                    ['id' => 'color_accent', 'label' => 'Acento', 'type' => 'color', 'emite' => ['token' => '--cod-color-accent']],
                 ],
             ],
             [
                 'title' => 'Tipografías',
                 'fields' => [
-                    ['id' => 'font_heading', 'label' => 'Títulos', 'type' => 'select', 'options' => self::font_options()],
-                    ['id' => 'font_body', 'label' => 'Cuerpo', 'type' => 'select', 'options' => self::font_options()],
-                    ['id' => 'font_accent', 'label' => 'Acento', 'type' => 'select', 'options' => self::font_options()],
+                    ['id' => 'font_heading', 'label' => 'Títulos', 'type' => 'select', 'options' => self::font_options(), 'emite' => ['token' => '--cod-font-heading', 'quote' => true]],
+                    ['id' => 'font_body', 'label' => 'Cuerpo', 'type' => 'select', 'options' => self::font_options(), 'emite' => ['token' => '--cod-font-body', 'quote' => true]],
+                    ['id' => 'font_accent', 'label' => 'Acento', 'type' => 'select', 'options' => self::font_options(), 'emite' => ['token' => '--cod-font-accent', 'quote' => true]],
                 ],
             ],
             [
                 'title' => 'Escala',
                 'fields' => [
-                    ['id' => 'size_base', 'label' => 'Tamaño base', 'type' => 'number', 'min' => 10, 'max' => 32, 'unit' => 'px'],
-                    ['id' => 'h1_size', 'label' => 'H1', 'type' => 'number', 'min' => 12, 'max' => 120, 'unit' => 'px'],
-                    ['id' => 'h2_size', 'label' => 'H2', 'type' => 'number', 'min' => 12, 'max' => 120, 'unit' => 'px'],
-                    ['id' => 'h3_size', 'label' => 'H3', 'type' => 'number', 'min' => 12, 'max' => 120, 'unit' => 'px'],
-                    ['id' => 'h4_size', 'label' => 'H4', 'type' => 'number', 'min' => 12, 'max' => 120, 'unit' => 'px'],
-                    ['id' => 'h5_size', 'label' => 'H5', 'type' => 'number', 'min' => 12, 'max' => 120, 'unit' => 'px'],
-                    ['id' => 'h6_size', 'label' => 'H6', 'type' => 'number', 'min' => 12, 'max' => 120, 'unit' => 'px'],
+                    ['id' => 'size_base', 'label' => 'Tamaño base', 'type' => 'number', 'min' => 10, 'max' => 32, 'unit' => 'px', 'emite' => ['token' => '--cod-size-base', 'unit' => 'px']],
+                    ['id' => 'h1_size', 'label' => 'H1', 'type' => 'number', 'min' => 12, 'max' => 120, 'unit' => 'px', 'emite' => ['token' => '--cod-h1-size', 'unit' => 'px']],
+                    ['id' => 'h2_size', 'label' => 'H2', 'type' => 'number', 'min' => 12, 'max' => 120, 'unit' => 'px', 'emite' => ['token' => '--cod-h2-size', 'unit' => 'px']],
+                    ['id' => 'h3_size', 'label' => 'H3', 'type' => 'number', 'min' => 12, 'max' => 120, 'unit' => 'px', 'emite' => ['token' => '--cod-h3-size', 'unit' => 'px']],
+                    ['id' => 'h4_size', 'label' => 'H4', 'type' => 'number', 'min' => 12, 'max' => 120, 'unit' => 'px', 'emite' => ['token' => '--cod-h4-size', 'unit' => 'px']],
+                    ['id' => 'h5_size', 'label' => 'H5', 'type' => 'number', 'min' => 12, 'max' => 120, 'unit' => 'px', 'emite' => ['token' => '--cod-h5-size', 'unit' => 'px']],
+                    ['id' => 'h6_size', 'label' => 'H6', 'type' => 'number', 'min' => 12, 'max' => 120, 'unit' => 'px', 'emite' => ['token' => '--cod-h6-size', 'unit' => 'px']],
                 ],
             ],
             [
@@ -96,12 +96,12 @@ final class COD_Theme_Definitions
             [
                 'title' => 'Detalles',
                 'fields' => [
-                    ['id' => 'radius', 'label' => 'Radio de bordes', 'type' => 'number', 'min' => 0, 'max' => 64, 'unit' => 'px'],
-                    ['id' => 'spacing', 'label' => 'Espaciado base', 'type' => 'number', 'min' => 0, 'max' => 64, 'unit' => 'px'],
+                    ['id' => 'radius', 'label' => 'Radio de bordes', 'type' => 'number', 'min' => 0, 'max' => 64, 'unit' => 'px', 'emite' => ['token' => '--cod-radius', 'unit' => 'px']],
+                    ['id' => 'spacing', 'label' => 'Espaciado base', 'type' => 'number', 'min' => 0, 'max' => 64, 'unit' => 'px', 'emite' => ['token' => '--cod-spacing', 'unit' => 'px']],
                     // Normalmente el alto del encabezado fijo: es el aire que queda
                     // arriba cuando un enlace o un QR hace saltar la página hasta un
                     // bloque con marcador. Admite negativo para caer más adentro.
-                    ['id' => 'landing', 'label' => 'Aire al llegar por un enlace', 'type' => 'number', 'min' => -400, 'max' => 400, 'unit' => 'px'],
+                    ['id' => 'landing', 'label' => 'Aire al llegar por un enlace', 'type' => 'number', 'min' => -400, 'max' => 400, 'unit' => 'px', 'emite' => ['token' => '--cod-landing', 'unit' => 'px']],
                 ],
             ],
         ];
