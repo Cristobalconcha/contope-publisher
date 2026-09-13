@@ -5,6 +5,30 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.12 — 13 de septiembre de 2026
+
+### Agregado
+
+- **Un bloque se puede reubicar por MCP, no sólo restilar.** El puente a
+  GrapesJS sabía cambiarle a un bloque sus atributos, sus clases, su estilo y
+  su texto, y sabía eliminarlo — pero no sabía **moverlo**. Por eso un bloque
+  mal ubicado quedaba sin arreglo posible desde la IA: había que abrir el
+  editor y arrastrarlo a mano.
+
+  La mutación acepta ahora `move`, con tres formas de decir dónde: `into`
+  (adentro de otro bloque, al final o en la posición que se indique), `before`
+  y `after` (como hermano, antes o después de otro).
+
+  Usa la API real de Grapes, o sea **el mismo movimiento que haría alguien
+  arrastrándolo con el mouse**: el bloque cambia de padre de verdad. La
+  alternativa —simular la posición con `position`, `order` o un margen
+  negativo— deja el árbol mintiendo: el editor lo sigue mostrando donde estaba
+  y quien lo toque después pelea contra reglas que no explican nada.
+
+  Rechaza lo que no puede terminar bien: declarar dos destinos a la vez, un
+  destino que no existe, uno que calza con más de un bloque, y mover un bloque
+  adentro de sí mismo o de un descendiente suyo.
+
 ## 0.3.11 — 13 de septiembre de 2026
 
 ### Agregado

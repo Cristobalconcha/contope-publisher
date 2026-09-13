@@ -419,7 +419,7 @@ final class COD_Canvas_MCP_Service
             [
                 'name' => 'cod_grapes_edit_node',
                 'title' => 'Edita un nodo real dentro del editor Grapes (motor real, headless)',
-                'description' => 'Arranca los bundles reales de GrapesJS (los mismos de wp-admin) en un navegador headless en el servidor, ubica el nodo con `editor.getWrapper().find(selector)` — la API real de Grapes, no una búsqueda de texto — y aplica la mutación con los métodos reales del componente (addAttributes, addClass/removeClass, addStyle, o reemplazo de contenido de texto). El HTML/CSS/projectData resultantes salen de editor.getHtml()/getCss()/getProjectData(): el propio motor de Grapes, no una reconstrucción en PHP. Requiere que el servidor pueda ejecutar Node y un navegador headless (Chrome/Chromium/Edge) — si no puede, el error lo dice explícitamente en vez de fallar en silencio.',
+                'description' => 'Arranca los bundles reales de GrapesJS (los mismos de wp-admin) en un navegador headless en el servidor, ubica el nodo con `editor.getWrapper().find(selector)` — la API real de Grapes, no una búsqueda de texto — y aplica la mutación con los métodos reales del componente (addAttributes, addAttributes, addClass/removeClass, addStyle, move para reubicar, o reemplazo de contenido de texto). El HTML/CSS/projectData resultantes salen de editor.getHtml()/getCss()/getProjectData(): el propio motor de Grapes, no una reconstrucción en PHP. Requiere que el servidor pueda ejecutar Node y un navegador headless (Chrome/Chromium/Edge) — si no puede, el error lo dice explícitamente en vez de fallar en silencio.',
                 'inputSchema' => [
                     'type' => 'object',
                     'properties' => array_merge($target, [
@@ -432,6 +432,17 @@ final class COD_Canvas_MCP_Service
                                 'addClass' => ['type' => 'array', 'items' => ['type' => 'string']],
                                 'removeClass' => ['type' => 'array', 'items' => ['type' => 'string']],
                                 'style' => ['type' => 'object', 'description' => 'Reglas CSS a fusionar sobre este nodo, ej. {"color":"red"}.'],
+                                'move' => [
+                                    'type' => 'object',
+                                    'description' => 'Reubica el nodo cambiándolo de PADRE, con la API real de Grapes — el mismo movimiento que haría alguien arrastrándolo con el mouse. Es lo correcto cuando un bloque está en el lugar equivocado: simularlo con position, order o margen negativo deja el árbol mintiendo, el editor lo sigue mostrando donde estaba y quien lo toque después pelea contra reglas que no explican nada. Se declara exactamente UNO de into, before o after; el destino tiene que resolver a un solo nodo y no puede estar adentro del nodo que se mueve.',
+                                    'properties' => [
+                                        'into' => ['type' => 'string', 'description' => 'Selector del nodo que lo recibe adentro. Sin "at", queda al final de sus hijos.'],
+                                        'before' => ['type' => 'string', 'description' => 'Selector de un nodo; queda como hermano justo antes de él.'],
+                                        'after' => ['type' => 'string', 'description' => 'Selector de un nodo; queda como hermano justo después de él.'],
+                                        'at' => ['type' => 'integer', 'minimum' => 0, 'description' => 'Sólo con "into": posición entre los hijos del destino. Se acota al rango disponible.'],
+                                    ],
+                                    'additionalProperties' => false,
+                                ],
                             ],
                             'additionalProperties' => false,
                         ],

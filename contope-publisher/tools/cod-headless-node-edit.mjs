@@ -13,7 +13,8 @@
  *          "selector":".hero-family","mutation":{"attributes":{"data-foo":"1"}}}' \
  *     | node cod-headless-node-edit.mjs
  *
- * mutation admite: remove (elimina el nodo), attributes (merge), content (texto, solo nodos de texto),
+ * mutation admite: remove (elimina el nodo), move (lo reubica bajo otro padre), attributes (merge),
+ * content (texto, solo nodos de texto),
  * addClass/removeClass (arrays de string), style (merge de reglas CSS).
  * Todo pasa por la API real de componentes de Grapes (component.addAttributes/
  * removeClass/addStyle/etc.), nunca por manipulación directa de HTML.
@@ -225,6 +226,52 @@ window.fetch=async(_url,options)=>{const body=new URLSearchParams(options.body);
     if(Array.isArray(mutation.addClass)) mutation.addClass.forEach(c=>target.addClass(c));
     if(Array.isArray(mutation.removeClass)) mutation.removeClass.forEach(c=>target.removeClass(c));
     if(mutation.style) target.addStyle(mutation.style);
+    // Reubicar: cambiar de PADRE, no simular con CSS.
+    //
+    // Un bloque mal ubicado se puede disimular con position/order/margin
+    // negativo, pero eso deja el árbol mintiendo: el editor lo sigue mostrando
+    // donde estaba, y cualquiera que lo toque después pelea contra reglas que
+    // no explican nada. Acá se usa la API real de Grapes, o sea el mismo
+    // movimiento que haría alguien arrastrándolo con el mouse.
+    //
+    // Se pide un destino de tres formas, y se elige una sola:
+    //   into   : adentro de ese nodo (al final, o en la posicion que diga at)
+    //   before : como hermano, justo antes de ese nodo
+    //   after  : como hermano, justo después de ese nodo
+    if(mutation.move&&typeof mutation.move==='object'){
+      const m=mutation.move;
+      const formas=['into','before','after'].filter(k=>typeof m[k]==='string'&&m[k]!=='');
+      if(formas.length!==1) throw new Error('move necesita exactamente uno de into, before o after (llegaron '+formas.length+')');
+      const refSel=m[formas[0]];
+      const encontrados=editor.getWrapper().find(refSel)||[];
+      if(encontrados.length===0) throw new Error('move: no encontré ningún nodo que calce con "'+refSel+'"');
+      if(encontrados.length>1) throw new Error('move: "'+refSel+'" calza con '+encontrados.length+' nodos; el destino tiene que ser uno solo');
+      const referencia=encontrados[0];
+      if(referencia===target) throw new Error('move: el destino es el mismo nodo que se quiere mover');
+      // Mover un nodo adentro de su propio descendiente rompe el árbol. Grapes
+      // no siempre se defiende de eso, así que se comprueba antes.
+      for(let a=typeof referencia.parent==='function'?referencia.parent():null; a; a=typeof a.parent==='function'?a.parent():null){
+        if(a===target) throw new Error('move: el destino está adentro del nodo que se quiere mover');
+      }
+      let destino, posicion;
+      if(formas[0]==='into'){
+        destino=referencia;
+        const hijos=referencia.components();
+        posicion=Number.isInteger(m.at)?Math.max(0,Math.min(m.at,hijos.length)):hijos.length;
+      }else{
+        destino=typeof referencia.parent==='function'?referencia.parent():null;
+        if(!destino) throw new Error('move: el nodo de referencia no tiene padre; usá into');
+        const indice=destino.components().indexOf(referencia);
+        posicion=formas[0]==='before'?indice:indice+1;
+      }
+      if(typeof target.move==='function'){
+        target.move(destino,{at:posicion});
+      }else{
+        // Respaldo para versiones sin Component.move(): sacar y volver a poner.
+        target.remove();
+        destino.components().add(target,{at:posicion});
+      }
+    }
     // Eliminar de verdad: component.remove() de Grapes, no ocultar con CSS.
     if(mutation.remove===true){ target.remove(); }
     await new Promise(r=>setTimeout(r,50));
