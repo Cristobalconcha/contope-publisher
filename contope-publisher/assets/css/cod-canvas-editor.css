@@ -1,7 +1,14 @@
 /* ContOpe Canvas — pantalla experimental del editor. */
 
 /* Chrome propio del Editor visual: aislado de las demás pantallas de WP. */
-body:has(.cod-canvas-wrap) { background:#15181d; }
+
+/* color-scheme le avisa al navegador que esta pantalla es oscura, y con eso lo
+   que dibuja el SISTEMA —el menú de un select, las barras de desplazamiento,
+   el anillo de foco— sale oscuro también. Sin esta línea, el menú del select
+   tomaba el fondo oscuro que declara el CSS de más abajo y el color de texto
+   del sistema, que es negro: las opciones quedaban negro sobre negro y sólo se
+   leía la resaltada. */
+body:has(.cod-canvas-wrap) { background:#15181d; color-scheme:dark; }
 body:has(.cod-canvas-wrap) #wpcontent { padding-left:0; }
 body:has(.cod-canvas-wrap) #wpbody-content { padding-bottom:0; }
 body:has(.cod-canvas-wrap) #wpfooter { display:none; }
@@ -10,6 +17,10 @@ body:has(.cod-canvas-wrap) #wpfooter { display:none; }
 .cod-canvas-wrap .button:hover,.cod-canvas-wrap .button:focus { border-color:#7296ff; background:#303744; color:#fff; }
 .cod-canvas-wrap .button-primary { border-color:#4964e9; background:#4458dc; color:#fff; }
 .cod-canvas-wrap input,.cod-canvas-wrap select,.cod-canvas-wrap textarea { border-color:#414955; border-radius:6px; background:#20242b; color:#f2f3f5; box-shadow:none; }
+/* Además de color-scheme, el color de las opciones se declara explícitamente:
+   no todos los navegadores lo heredan del select en el menú desplegable. */
+.cod-canvas-wrap select option { background:#20242b; color:#f2f3f5; }
+.cod-canvas-wrap select optgroup { background:#20242b; color:#b9c0cb; }
 
 .cod-canvas-wrap .cod-canvas-intro {
     max-width: 68ch;

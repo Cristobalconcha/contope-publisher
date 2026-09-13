@@ -5,6 +5,46 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.10 — 13 de septiembre de 2026
+
+### Agregado
+
+- **Un bloque puede declarar a dónde llega un enlace.** Hasta ahora los bloques
+  publicados no tenían dirección propia: un código QR, un enlace del menú o un
+  botón no podían apuntar a una sección determinada de la página. Cada bloque
+  puede ahora declarar un **destino** (`referenceId`) y aparece en la página
+  publicada como `id`, que es lo que un enlace sabe buscar. Dos QR distintos
+  pueden llevar así a los dos mapas.
+
+  El destino es **identidad del bloque, no una regla de diseño**. La distinción
+  importa y es la razón de que se haya construido así: una regla se aplica a
+  muchos bloques a la vez, y si el destino fuera una regla, aplicarla dos veces
+  crearía dos bloques con la misma dirección. El enlace llegaría a cualquiera
+  de los dos, sin aviso. Por eso el plugin rechaza ahora dos destinos iguales
+  en la misma página, en vez de publicar algo que falla en silencio.
+
+- **Una medida nueva de espaciado: el aterrizaje.** Cuando un enlace hace saltar
+  la página hasta una sección, el encabezado fijo del sitio queda encima y tapa
+  justamente el título al que se quería llegar. La regla de espaciado acepta
+  ahora `landing`, que es el aire que debe quedar arriba al aterrizar. A
+  diferencia del destino, esto **sí** es una regla: es una decisión de diseño,
+  suele ser la misma en todo el sitio —el alto del encabezado— y por eso
+  corresponde declararla una vez y reutilizarla.
+
+- **El logotipo de ContOpe viaja con el plugin** (`assets/img/`), en su versión
+  corregida: gris frío y bronce en lugar de gris y oro, para que los dos colores
+  se distingan entre sí y del fondo cuando trabajan en una interfaz. Todavía no
+  se muestra en ninguna pantalla; queda disponible para cuando se vista la
+  interfaz completa.
+
+### Corregido
+
+- **El selector de páginas del editor era negro sobre negro.** El editor visual
+  tiene fondo oscuro propio, pero el navegador seguía dibujando las listas
+  desplegables con su apariencia clara por omisión: al abrir una, las opciones
+  salían en texto oscuro sobre fondo oscuro y no se leía ninguna. Se declara
+  ahora el esquema de color de esa pantalla y el color de las opciones.
+
 ## 0.3.9 — 12 de septiembre de 2026
 
 ### Corregido
