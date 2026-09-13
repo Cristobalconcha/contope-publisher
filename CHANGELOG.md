@@ -5,6 +5,58 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.11 — 13 de septiembre de 2026
+
+### Agregado
+
+- **El Marcador se puede poner desde el editor.** La versión anterior trajo la
+  función pero sólo por el canal del MCP: había que pedirla por texto, no se
+  podía hacer abriendo el editor. Ahora el inspector tiene un panel
+  **Marcador** con dos campos.
+
+  El primero es el **nombre del destino**. Al escribirlo te muestra el enlace
+  que queda —`#plano`— que es lo que se pega en un QR o en el menú. Limpia
+  solo los acentos, espacios y mayúsculas, porque un enlace con esos
+  caracteres no funciona igual escrito a mano que copiado.
+
+  Y **avisa si el nombre ya está usado en la página**. Sin ese aviso se
+  publican dos bloques con la misma dirección y el enlace llega a cualquiera
+  de los dos: sin error, sin señal, sin nada que mirar.
+
+- **El aire de aterrizaje, en Configuración y una sola vez.** Cuando un enlace
+  hace saltar la página hasta un bloque, el encabezado fijo queda encima y tapa
+  el título al que se quería llegar. Configuración tiene ahora **Aire al llegar
+  por un enlace**, que se aplica solo a todo bloque con Marcador.
+
+  Va ahí y no en cada bloque porque el alto del encabezado es un dato del
+  sitio, no de cada sección: declarado una vez, el día que cambie el encabezado
+  no hay que acordarse de corregir nada.
+
+- **Y un ajuste por bloque, para la excepción.** El mismo panel tiene un campo
+  de aterrizaje propio, que en blanco usa el valor del sitio. Sirve para los
+  casos en que no se quiere llegar justo arriba del bloque.
+
+  **Admite valores negativos**, que hacen caer el scroll más adentro. Eso
+  reemplaza el truco de mover el marcador a un párrafo vecino por razones
+  ópticas — un truco que funciona hasta que se reordena el contenido, porque
+  ahí el marcador ya no nombra su destino y el enlace apunta a otra cosa.
+
+### Corregido
+
+- **Un campo numérico de Configuración con mínimo negativo guardaba el signo
+  cambiado.** Todos los campos pasaban por la misma limpieza, que descartaba el
+  signo. Ningún campo existente lo notaba porque ninguno admitía negativos; el
+  aire de aterrizaje es el primero. Ahora sólo se descarta el signo en los
+  campos que declaran un mínimo de cero o más.
+
+### Cambiado
+
+- El campo que en 0.3.10 se llamaba `referenceId` se llama ahora **`marker`**.
+  El nombre viajó en esa versión pero la función no se había usado en ningún
+  sitio, así que el cambio no rompe nada. "Marcador" dice lo que es y no se
+  confunde con la regla `anchor`, que es otra cosa: posicionar un bloque contra
+  un borde de su contenedor y animarlo al entrar en vista.
+
 ## 0.3.10 — 13 de septiembre de 2026
 
 ### Agregado

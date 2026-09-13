@@ -933,7 +933,14 @@ final class COD_Canvas_MCP_Recipe_Compiler
             if (!isset($value[$key])) {
                 continue;
             }
-            if (!is_string($value[$key]) || !$this->is_css_length($value[$key], $key === 'bleed')) {
+            // bleed y landing admiten negativo. bleed saca el bloque de su caja;
+            // un aterrizaje negativo hace que el scroll caiga MÁS ADENTRO del
+            // bloque en vez de antes. Sin eso hay que mover el marcador a un
+            // párrafo vecino por razones ópticas, y ahí el marcador deja de
+            // nombrar su propio destino: si después se reordena el contenido,
+            // el enlace apunta a otra cosa.
+            $admite_negativo = in_array($key, ['bleed', 'landing'], true);
+            if (!is_string($value[$key]) || !$this->is_css_length($value[$key], $admite_negativo)) {
                 return new WP_Error('cod_mcp_spacing_rule_invalid', $key . ' debe ser una longitud CSS segura.');
             }
             $normalized[$key] = $value[$key];

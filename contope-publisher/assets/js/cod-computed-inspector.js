@@ -394,6 +394,16 @@
       .cod-ci__interactions-clear:hover { border-color:#e06c6c; color:#ffb4b4; }
       .cod-ci__content { margin:8px 0; padding:10px; border:1px solid #e0b34d80; border-radius:6px; background:#e0b34d14; }
       .cod-ci__content-title { margin-bottom:8px; color:#f0d9a6; font-weight:650; }
+      /* Marcador: el destino de un enlace. Toma el bronce del logotipo de
+         ContOpe, que es el color de identidad del producto. */
+      .cod-ci__marker { margin:8px 0; padding:10px; border:1px solid #a06a3480; border-radius:6px; background:#a06a3414; }
+      .cod-ci__marker-title { margin-bottom:8px; color:#d8a86a; font-weight:650; }
+      .cod-ci__marker label { display:grid; gap:4px; margin-bottom:6px; color:#c7bda9; font-size:10px; }
+      .cod-ci__marker input { border:1px solid #ffffff26; border-radius:5px; padding:6px; background:#20242b; color:#f2f3f5; font:inherit; }
+      .cod-ci__marker input:focus { outline:none; border-color:#a06a34; }
+      .cod-ci__marker-hint { margin:-2px 0 8px; color:#a9a39a; font-size:10px; line-height:1.4; }
+      .cod-ci__marker-hint.is-ok { color:#8fb08f; }
+      .cod-ci__marker-hint.is-error { color:#ffb4b4; }
       .cod-ci__content-field { min-height:64px; resize:vertical; line-height:1.4; }
       .cod-ci__content-hint { margin-top:7px; color:#a9a39a; font-size:10px; line-height:1.35; }
       .cod-ci__presentation { margin:8px 0; padding:10px; border:1px solid #62a8df66; border-radius:6px; background:#397ba114; }
@@ -2192,6 +2202,120 @@
       return el ? el.textContent.trim() : '';
     }
 
+    /**
+     * Marcador: el destino al que llega un enlace, un QR o el menú.
+     *
+     * Se emite como `id`, que es lo que un enlace sabe buscar. Es identidad del
+     * bloque, no una regla de diseño: una regla se aplica a muchos bloques y
+     * repetiría el id, y el enlace llegaría a cualquiera de ellos sin aviso.
+     * Por eso acá se avisa si el nombre ya está tomado en la página.
+     *
+     * El aire de aterrizaje es lo contrario —sí es una decisión de diseño— y
+     * por eso su valor normal vive una sola vez en Configuración. El campo de
+     * acá es la excepción: sirve para caer más adentro o más arriba de lo
+     * normal, sin tener que mover el marcador a otro párrafo por razones
+     * ópticas. Cuando eso se hace, el marcador deja de nombrar su destino y
+     * un reordenamiento del contenido manda el enlace a otra parte.
+     */
+    function renderMarkerPanel(component) {
+      if (!component) return null;
+
+      const panel = createElement(hostDocument, 'section', 'cod-ci__marker');
+      panel.appendChild(createElement(hostDocument, 'div', 'cod-ci__marker-title', 'Marcador'));
+
+      const attributes = componentAttributes(component);
+
+      const nameLabel = createElement(hostDocument, 'label', '', 'Nombre del destino');
+      const nameInput = createElement(hostDocument, 'input');
+      nameInput.value = String(attributes.id || '');
+      nameInput.placeholder = 'plano, ubicacion…';
+      nameLabel.appendChild(nameInput);
+      panel.appendChild(nameLabel);
+
+      const hint = createElement(hostDocument, 'div', 'cod-ci__marker-hint', '');
+      panel.appendChild(hint);
+
+      // Un id de HTML no admite espacios, acentos ni mayúsculas si se quiere
+      // que el enlace funcione igual escrito a mano o pegado desde un QR.
+      function limpiar(raw) {
+        return String(raw || '')
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .toLowerCase()
+          .replace(/[^a-z0-9_-]+/g, '-')
+          .replace(/^[^a-z]+/, '')
+          .replace(/-+/g, '-')
+          .replace(/-$/, '');
+      }
+
+      function yaEstaTomado(nombre) {
+        if (!nombre) return false;
+        const wrapper = editor.getWrapper?.();
+        if (!wrapper || typeof wrapper.find !== 'function') return false;
+        const encontrados = wrapper.find('#' + nombre) || [];
+        return encontrados.some((otro) => otro !== component);
+      }
+
+      function describir(nombre) {
+        if (!nombre) {
+          hint.textContent = 'Sin marcador: ningún enlace puede apuntar a este bloque.';
+          hint.className = 'cod-ci__marker-hint';
+          return;
+        }
+        if (yaEstaTomado(nombre)) {
+          hint.textContent = 'Ese nombre ya está usado en esta página. Un enlace llegaría a cualquiera de los dos.';
+          hint.className = 'cod-ci__marker-hint is-error';
+          return;
+        }
+        hint.textContent = 'El enlace a este bloque es #' + nombre;
+        hint.className = 'cod-ci__marker-hint is-ok';
+      }
+
+      describir(nameInput.value);
+
+      nameInput.addEventListener('change', () => {
+        const limpio = limpiar(nameInput.value);
+        nameInput.value = limpio;
+        if (limpio) {
+          component.addAttributes({ id: limpio });
+        } else {
+          component.removeAttributes?.('id');
+        }
+        describir(limpio);
+      });
+
+      const landingLabel = createElement(hostDocument, 'label', '', 'Aire al llegar (sólo si hace falta)');
+      const landingInput = createElement(hostDocument, 'input');
+      landingInput.type = 'number';
+      const actual = String(component.getStyle?.()['scroll-margin-block-start'] || '');
+      landingInput.value = actual ? String(Number.parseFloat(actual) || '') : '';
+      landingInput.placeholder = 'usa el valor de Configuración';
+      landingInput.addEventListener('change', () => {
+        const crudo = landingInput.value.trim();
+        if (crudo === '') {
+          // Volver al valor del sitio: se borra el propio, no se escribe un 0.
+          component.addStyle({ 'scroll-margin-block-start': '' });
+          return;
+        }
+        const px = Number.parseFloat(crudo);
+        if (!Number.isFinite(px)) return;
+        component.addStyle({ 'scroll-margin-block-start': px + 'px' });
+        landingInput.value = String(px);
+      });
+      landingLabel.appendChild(landingInput);
+      panel.appendChild(landingLabel);
+
+      const landingHint = createElement(
+        hostDocument,
+        'div',
+        'cod-ci__marker-hint',
+        'En blanco usa el valor del sitio. Negativo hace caer el scroll más adentro del bloque.',
+      );
+      panel.appendChild(landingHint);
+
+      return panel;
+    }
+
     function renderContentPanel(component) {
       if (!esTextoSimple(component)) return null;
       const panel = createElement(hostDocument, 'section', 'cod-ci__content');
@@ -2304,6 +2428,8 @@
       }
       const contentPanel = renderContentPanel(snapshot?.component);
       if (contentPanel) body.appendChild(contentPanel);
+      const markerPanel = renderMarkerPanel(snapshot?.component);
+      if (markerPanel) body.appendChild(markerPanel);
       const headerPanel = renderHeaderStatePanel(headerForComponent(snapshot?.component));
       if (headerPanel) body.appendChild(headerPanel);
       const supermoduleTrail = renderSupermoduleBreadcrumb(snapshot?.component);

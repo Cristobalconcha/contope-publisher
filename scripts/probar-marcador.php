@@ -63,6 +63,16 @@ if (is_wp_error($r)) {
     $comprobar('la composicion declara los markers', ($r['compositionSnapshot']['markers'] ?? []) === ['plano', 'ubicacion']);
 }
 
+echo "\n== aterrizaje negativo: cae mas adentro del bloque ==\n";
+$disenoNeg = $diseno;
+$disenoNeg['rules'][0]['value'] = ['landing' => '-40px'];
+$rn = $compilador->compile($composicion('plano', 'ubicacion'), $disenoNeg);
+$comprobar('un aterrizaje negativo se acepta', !is_wp_error($rn));
+if (!is_wp_error($rn)) {
+    $comprobar('y emite scroll-margin-block-start:-40px',
+        strpos(str_replace(' ', '', $rn['storage']['styles']), 'scroll-margin-block-start:-40px') !== false);
+}
+
 echo "\n== id repetido: tiene que ser rechazado ==\n";
 $r2 = $compilador->compile($composicion('plano', 'plano'), $diseno);
 $comprobar('dos nodos con el mismo marker dan error',

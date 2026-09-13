@@ -98,6 +98,10 @@ final class COD_Theme_Definitions
                 'fields' => [
                     ['id' => 'radius', 'label' => 'Radio de bordes', 'type' => 'number', 'min' => 0, 'max' => 64, 'unit' => 'px'],
                     ['id' => 'spacing', 'label' => 'Espaciado base', 'type' => 'number', 'min' => 0, 'max' => 64, 'unit' => 'px'],
+                    // Normalmente el alto del encabezado fijo: es el aire que queda
+                    // arriba cuando un enlace o un QR hace saltar la página hasta un
+                    // bloque con marcador. Admite negativo para caer más adentro.
+                    ['id' => 'landing', 'label' => 'Aire al llegar por un enlace', 'type' => 'number', 'min' => -400, 'max' => 400, 'unit' => 'px'],
                 ],
             ],
         ];
@@ -276,11 +280,28 @@ final class COD_Theme_Definitions
         if ($v['spacing'] !== '') {
             $root[] = '--cod-spacing:' . $v['spacing'] . 'px';
         }
+        if ($v['landing'] !== '') {
+            $root[] = '--cod-landing:' . $v['landing'] . 'px';
+        }
 
         $css = "/* Definiciones del tema — generado desde Configuración */\n";
         $css .= ':root{' . implode(';', $root) . ';}';
 
         $rules = [];
+
+        // Aire al llegar por un enlace. Todo bloque con marcador —o sea, con id—
+        // recibe este valor sin que haya que escribirlo en cada uno: el alto del
+        // encabezado fijo es un dato del sitio, no de cada sección, y si se
+        // repitiera bloque por bloque el día que cambie el encabezado habría que
+        // acordarse de corregir todos.
+        //
+        // Va en :where() a propósito: eso le da peso CERO, así que cualquier
+        // valor puesto a mano en un bloque le gana sin pelear con especificidad.
+        // Es lo que permite la excepción —caer más adentro, o más arriba— sin
+        // tener que desactivar el valor general.
+        if ($v['landing'] !== '') {
+            $rules[] = ':where([id]){scroll-margin-block-start:var(--cod-landing);}';
+        }
 
         $body = [];
         if ($v['color_bg'] !== '') {
@@ -361,10 +382,15 @@ final class COD_Theme_Definitions
             return is_string($hex) ? $hex : '';
         }
 
-        // number: absint + clamp min/max. El 0 es válido cuando min es 0
+        // number: se acota entre min y max. El 0 es válido cuando min es 0
         // (radius/spacing); '' ya se devolvió antes como "sin definir".
-        $num = absint($value);
+        //
+        // El signo sólo se descarta si el campo no admite negativos. Antes esto
+        // era un absint() para todos, y un campo con mínimo negativo —como el
+        // aire de aterrizaje, que puede ir hacia arriba— habría guardado el
+        // valor con el signo cambiado, sin decir nada.
         $min = isset($field['min']) ? (int) $field['min'] : null;
+        $num = ($min !== null && $min < 0) ? (int) $value : absint($value);
         $max = isset($field['max']) ? (int) $field['max'] : null;
         if ($min !== null && $num < $min) {
             $num = $min;
