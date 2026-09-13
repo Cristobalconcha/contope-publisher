@@ -1,0 +1,5 @@
+        // El campo de imagen abre la biblioteca de medios de WordPress. Sin
+        // esto, wp.media no existe y el botón "Elegir…" no hace nada.
+        wp_enqueue_media();
+
+        wp_enqueue_style(

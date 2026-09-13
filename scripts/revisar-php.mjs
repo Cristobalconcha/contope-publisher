@@ -2,7 +2,7 @@
 /**
  * revisar-php.mjs — comprobación de sintaxis para los PHP del plugin.
  *
- * POR QUÉ EXISTE: esta máquina no tiene PHP instalado, así que no hay `php -l`.
+ * POR QUÉ EXISTE: cuando esta máquina no tiene PHP instalado no hay `php -l`.
  * Sin eso, un error de sintaxis viaja en el paquete y tumba el sitio entero al
  * activar el plugin. Pasó de verdad el 2026-09-09: una comilla simple dentro de
  * una cadena de comillas simples (` content: ''; `) cerraba la cadena antes de
@@ -17,6 +17,7 @@
  * Uso:  node scripts/revisar-php.mjs [carpeta]
  */
 import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 
 const BARRA = String.fromCharCode(92);
@@ -117,6 +118,39 @@ function archivosPhp(dir) {
 }
 
 const raiz = process.argv[2] || path.join(process.cwd(), 'contope-publisher');
+
+/**
+ * El intérprete de PHP, si está en esta máquina.
+ *
+ * La cabecera de este archivo decía que no había PHP instalado y que por eso
+ * existía la revisión casera de más arriba. Dejó de ser cierto: hay un PHP en
+ * wp-local. Y la diferencia importa — el 2026-09-13 la revisión casera dio
+ * "ninguno con problemas" sobre un archivo que PHP rechazaba, porque el error
+ * tenía TODAS las comillas y todos los corchetes balanceados. Estaba bien
+ * formado y mal escrito, que es justo lo que un balanceador no puede ver.
+ *
+ * Cuando hay intérprete se usa php -l, que es la verdad. Cuando no lo hay,
+ * queda la revisión casera: atrapa menos, pero es mejor que nada.
+ */
+const PHP_CANDIDATOS = [
+  process.env.COD_PHP,
+  'C:/Users/Cristobal concha/wp-local/php/php.exe',
+  path.join(process.env.USERPROFILE || '', 'wp-local/php/php.exe'),
+  '/usr/bin/php',
+  '/usr/local/bin/php',
+];
+const PHP = PHP_CANDIDATOS.filter(Boolean).find((c) => {
+  try { return statSync(c).isFile(); } catch { return false; }
+}) || (spawnSync('php', ['-v'], { encoding: 'utf8' }).status === 0 ? 'php' : null);
+
+function lint(archivo) {
+  if (!PHP) return null;
+  const r = spawnSync(PHP, ['-l', '-d', 'display_errors=1', archivo], { encoding: 'utf8' });
+  if (r.status === 0) return [];
+  const salida = ((r.stdout || '') + (r.stderr || '')).trim();
+  return salida.split(String.fromCharCode(10)).filter((l) => /rror/.test(l)).slice(0, 3);
+}
+
 const archivos = archivosPhp(raiz);
 let conProblemas = 0;
 for (const archivo of archivos) {
@@ -133,12 +167,15 @@ for (const archivo of archivos) {
     conProblemas += 1;
     continue;
   }
-  const problemas = revisar(texto);
+  // php -l es la verdad; la revisión propia es el respaldo.
+  const delInterprete = lint(archivo);
+  const problemas = delInterprete !== null ? delInterprete : revisar(texto);
   if (!problemas.length) continue;
   conProblemas += 1;
   console.log('✗ ' + path.relative(raiz, archivo));
   for (const p of problemas.slice(0, 5)) console.log('    ' + p);
 }
-console.log('\n' + archivos.length + ' archivos revisados · '
+console.log(String.fromCharCode(10) + archivos.length + ' archivos revisados con '
+  + (PHP ? 'php -l' : 'la revisión propia, sin PHP en esta máquina') + ' · '
   + (conProblemas ? conProblemas + ' CON PROBLEMAS' : 'ninguno con problemas'));
 process.exit(conProblemas ? 1 : 0);

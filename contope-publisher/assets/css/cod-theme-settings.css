@@ -159,3 +159,21 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* Campo de imagen: vista previa sobre un damero, para que un PNG con
+   transparencia se distinga de uno con fondo blanco. */
+.cod-settings-image { display: flex; align-items: center; gap: 12px; }
+.cod-settings-image-preview {
+    display: grid; place-items: center;
+    width: 64px; height: 64px; flex: 0 0 64px;
+    border: 1px solid #c3c4c7; border-radius: 6px; overflow: hidden;
+    background-color: #fff;
+    background-image:
+        linear-gradient(45deg, #e6e6e6 25%, transparent 25%, transparent 75%, #e6e6e6 75%),
+        linear-gradient(45deg, #e6e6e6 25%, transparent 25%, transparent 75%, #e6e6e6 75%);
+    background-size: 12px 12px;
+    background-position: 0 0, 6px 6px;
+}
+.cod-settings-image-preview img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.cod-settings-image-vacio { color: #8c8f94; font-size: 10px; text-align: center; line-height: 1.2; }
+.cod-settings-image-acciones { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }

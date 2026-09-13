@@ -7,13 +7,23 @@
  * porque el principio que hay que preservar es que un campo sin valor NO emite
  * nada y no cae a un valor por omisión.
  */
-import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, copyFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 
 const PHP = 'C:/Users/Cristobal concha/wp-local/php/php.exe';
 const REFERENCIA = 'scripts/css-del-tema.referencia.json';
 const GUARDAR = process.argv.includes('--guardar');
+
+
+// El WordPress local carga SU copia del plugin, no la del repo. Si no se
+// sincroniza, esta prueba mide código viejo y dice que todo está bien sobre un
+// cambio que ni siquiera vio. Pasó el 2026-09-13: dio "idéntico" sobre un
+// archivo que ni compilaba. Se sincroniza acá y no se confía en que alguien
+// se acuerde de hacerlo antes.
+const FUENTE = 'contope-publisher/includes/class-cod-theme-definitions.php';
+const DESTINO = 'C:/Users/Cristobal concha/wp-local/wordpress/wp-content/plugins/contope-publisher/includes/class-cod-theme-definitions.php';
+copyFileSync(FUENTE, DESTINO);
 
 const CASOS = {
   vacio: {},

@@ -34,6 +34,20 @@ final class COD_Theme_Definitions
     {
         return [
             [
+                'title' => 'Marca',
+                'fields' => [
+                    // El ícono del sitio es una definición de MARCA, no un ajuste
+                    // de WordPress: pertenece al tema, igual que la paleta o la
+                    // tipografía. Por eso vive acá y no en Ajustes → Generales.
+                    //
+                    // WordPress trae su propio "Icono del sitio" y eso deja dos
+                    // lugares donde definirlo. La respuesta no es evitar el
+                    // duplicado sino declarar cuál manda: si acá hay un ícono,
+                    // se apaga el de WordPress (ver icono_en_cabecera).
+                    ['id' => 'favicon', 'label' => 'Ícono del sitio', 'type' => 'image'],
+                ],
+            ],
+            [
                 'title' => 'Modo',
                 'fields' => [
                     [
@@ -44,7 +58,8 @@ final class COD_Theme_Definitions
                             '' => 'Sin definir',
                             'light' => 'Claro',
                             'dark' => 'Oscuro',
-                        , 'emite' => ['token' => '--cod-mode', 'also' => 'color-scheme']],
+                        ],
+                        'emite' => ['token' => '--cod-mode', 'also' => 'color-scheme'],
                     ],
                 ],
             ],
@@ -377,6 +392,29 @@ final class COD_Theme_Definitions
             return array_key_exists($value, $options) ? $value : '';
         }
 
+        // image: una dirección de un archivo que YA está en la biblioteca de
+        // medios de este sitio. No se acepta cualquier URL: el valor termina
+        // dentro de un <link> en la cabecera de todas las páginas, así que una
+        // dirección ajena sería un recurso de un tercero cargándose en cada
+        // visita, y una dirección con esquema raro sería peor.
+        if ($type === 'image') {
+            $limpia = esc_url_raw($value);
+            if ($limpia === '') {
+                return '';
+            }
+            $subidas = wp_get_upload_dir();
+            $base = isset($subidas['baseurl']) ? (string) $subidas['baseurl'] : '';
+            // Se comparan sin esquema para que el valor sobreviva a un cambio de
+            // http a https, o de dominio con y sin www.
+            $sin_esquema = static function (string $u): string {
+                return preg_replace('#^https?://#i', '', $u) ?? $u;
+            };
+            if ($base === '' || strpos($sin_esquema($limpia), $sin_esquema($base)) !== 0) {
+                return '';
+            }
+            return $limpia;
+        }
+
         if ($type === 'color') {
             $hex = sanitize_hex_color($value);
             return is_string($hex) ? $hex : '';
@@ -400,5 +438,55 @@ final class COD_Theme_Definitions
         }
 
         return (string) $num;
+    }
+
+    /**
+     * Emite el ícono del sitio declarado por el tema, y apaga el de WordPress.
+     *
+     * Que existan dos lugares donde definir el ícono no es el problema; el
+     * problema sería que ninguno mande. Acá se declara: si el tema tiene uno,
+     * el tema gana y el de WordPress se calla. Si el tema no tiene, WordPress
+     * sigue haciendo lo suyo y nadie se entera de que esto existe.
+     *
+     * Se emiten tres medidas porque cada una la pide alguien distinto: 32 para
+     * la pestaña del navegador, 180 para la pantalla de inicio de iOS y 192
+     * para Android. Es el mismo archivo redimensionado por el navegador; no se
+     * generan copias, que es lo que WordPress sí hace y acá no hace falta.
+     */
+    public static function icono_en_cabecera(): void
+    {
+        $valores = self::get();
+        $icono = isset($valores['favicon']) ? (string) $valores['favicon'] : '';
+        if ($icono === '') {
+            return;
+        }
+        $tipo = wp_check_filetype(basename(wp_parse_url($icono, PHP_URL_PATH) ?? ''));
+        $mime = isset($tipo['type']) && is_string($tipo['type']) && $tipo['type'] !== '' ? $tipo['type'] : 'image/png';
+
+        echo "\n<!-- Ícono del sitio — definido en ContOpe, Configuración → Marca -->\n";
+        printf(
+            '<link rel="icon" href="%1$s" sizes="32x32" type="%2$s">' . "\n"
+            . '<link rel="apple-touch-icon" href="%1$s" sizes="180x180">' . "\n"
+            . '<link rel="icon" href="%1$s" sizes="192x192" type="%2$s">' . "\n",
+            esc_url($icono),
+            esc_attr($mime)
+        );
+    }
+
+    /**
+     * WordPress imprime su propio ícono con wp_site_icon en wp_head. Si el tema
+     * declara uno, ese sobra: se retira el suyo antes de que llegue a imprimir.
+     * Se hace en 'wp_head' con prioridad muy temprana y no al registrar, porque
+     * el valor puede cambiar mientras el sitio corre.
+     */
+    public static function registrar_icono(): void
+    {
+        add_action('wp_head', static function (): void {
+            $valores = self::get();
+            if (!empty($valores['favicon'])) {
+                remove_action('wp_head', 'wp_site_icon', 99);
+            }
+        }, 1);
+        add_action('wp_head', [self::class, 'icono_en_cabecera'], 2);
     }
 }

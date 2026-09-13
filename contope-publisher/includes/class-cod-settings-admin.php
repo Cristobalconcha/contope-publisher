@@ -96,6 +96,13 @@ final class COD_Settings_Admin
             return;
         }
 
+        // El campo de imagen abre la biblioteca de medios de WordPress. Sin
+
+        // esto wp.media no existe y el botón «Elegir…» no hace nada.
+
+        wp_enqueue_media();
+
+
         wp_enqueue_style(
             'cod-theme-settings',
             plugins_url('assets/css/cod-theme-settings.css', COD_PUBLISHER_FILE),
@@ -344,6 +351,23 @@ final class COD_Settings_Admin
                         </option>
                     <?php endforeach; ?>
                 </select>
+            <?php elseif ($type === 'image') : ?>
+                <span class="cod-settings-image" data-cod-image-field="<?php echo esc_attr($field['id']); ?>">
+                    <span class="cod-settings-image-preview">
+                        <?php if ($value !== '') : ?>
+                            <img src="<?php echo esc_url($value); ?>" alt="">
+                        <?php else : ?>
+                            <span class="cod-settings-image-vacio">Sin definir</span>
+                        <?php endif; ?>
+                    </span>
+                    <span class="cod-settings-image-acciones">
+                        <button type="button" class="button cod-settings-image-elegir">Elegir…</button>
+                        <button type="button" class="button-link cod-settings-image-quitar"
+                            <?php disabled($value === ''); ?>>Quitar</button>
+                    </span>
+                    <input type="hidden" id="<?php echo esc_attr($id); ?>" name="<?php echo esc_attr($field['id']); ?>"
+                        data-field-id="<?php echo esc_attr($field['id']); ?>" value="<?php echo esc_attr($value); ?>">
+                </span>
             <?php elseif ($type === 'color') : ?>
                 <span class="cod-settings-color">
                     <input type="color" id="<?php echo esc_attr($id); ?>" name="<?php echo esc_attr($field['id']); ?>"

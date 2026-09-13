@@ -165,3 +165,83 @@
         });
     }
 })(window, document);
+
+/**
+ * Campo de imagen: abre la biblioteca de medios de WordPress y guarda la
+ * dirección del archivo elegido.
+ *
+ * Se usa la biblioteca de WordPress y no un campo de subida propio por dos
+ * razones. La primera es que el archivo queda donde el sitio guarda todo lo
+ * demás, y viaja en el paquete de exportación como cualquier otro medio. La
+ * segunda es que el validador del servidor sólo acepta direcciones que estén
+ * dentro de `uploads` de este sitio: una URL de afuera se descarta, porque el
+ * valor termina en un <link> de la cabecera de todas las páginas.
+ */
+(function (window, document) {
+    'use strict';
+
+    function marcar(campo, url) {
+        var oculto = campo.querySelector('input[type="hidden"]');
+        var vista = campo.querySelector('.cod-settings-image-preview');
+        var quitar = campo.querySelector('.cod-settings-image-quitar');
+        if (!oculto || !vista) {
+            return;
+        }
+        oculto.value = url || '';
+        vista.innerHTML = '';
+        if (url) {
+            var img = document.createElement('img');
+            img.src = url;
+            img.alt = '';
+            vista.appendChild(img);
+        } else {
+            var vacio = document.createElement('span');
+            vacio.className = 'cod-settings-image-vacio';
+            vacio.textContent = 'Sin definir';
+            vista.appendChild(vacio);
+        }
+        if (quitar) {
+            quitar.disabled = !url;
+        }
+        // El formulario se autoguarda escuchando change; un valor puesto por
+        // JavaScript no lo dispara solo.
+        oculto.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+
+    document.addEventListener('click', function (evento) {
+        var elegir = evento.target.closest && evento.target.closest('.cod-settings-image-elegir');
+        var quitar = evento.target.closest && evento.target.closest('.cod-settings-image-quitar');
+        if (!elegir && !quitar) {
+            return;
+        }
+        var campo = evento.target.closest('[data-cod-image-field]');
+        if (!campo) {
+            return;
+        }
+        evento.preventDefault();
+
+        if (quitar) {
+            marcar(campo, '');
+            return;
+        }
+        if (!window.wp || !window.wp.media) {
+            window.alert('La biblioteca de medios no está disponible en esta pantalla.');
+            return;
+        }
+        var marco = window.wp.media({
+            title: 'Elegir el ícono del sitio',
+            button: { text: 'Usar este archivo' },
+            library: { type: 'image' },
+            multiple: false
+        });
+        marco.on('select', function () {
+            var elegido = marco.state().get('selection').first();
+            if (!elegido) {
+                return;
+            }
+            var datos = elegido.toJSON();
+            marcar(campo, datos.url || '');
+        });
+        marco.open();
+    });
+})(window, document);

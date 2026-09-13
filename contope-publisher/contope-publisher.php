@@ -2,7 +2,7 @@
 /**
  * Plugin Name: ContOpe Publisher
  * Description: Importa proyectos ContOpe Design como páginas Gutenberg nativas y editables.
- * Version: 0.3.14
+ * Version: 0.3.15
  * Requires at least: 6.5
  * Requires PHP: 8.0
  * Author: Cristóbal Concha
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('COD_PUBLISHER_VERSION', '0.3.14');
+define('COD_PUBLISHER_VERSION', '0.3.15');
 define('COD_PUBLISHER_FILE', __FILE__);
 define('COD_PUBLISHER_DIR', plugin_dir_path(__FILE__));
 
@@ -101,6 +101,11 @@ add_action('plugins_loaded', static function (): void {
     (new COD_Inline_Editor_Frontend($canvas_repository, $region_resolver))->register();
     (new COD_Settings_Admin())->register();
     (new COD_Medicion())->register();
+
+    // El ícono del sitio es una definición de marca y vive en el tema, no en
+    // los ajustes de WordPress. Si el tema declara uno, gana y el de WordPress
+    // se apaga; si no declara ninguno, WordPress sigue haciendo lo suyo.
+    COD_Theme_Definitions::registrar_icono();
 
     // Fase 1 (POC): bloque Gutenberg nativo ocd/heading. Aditivo y aislado,
     // convive con el flujo Canvas legacy sin tocarlo.

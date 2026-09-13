@@ -5,6 +5,50 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.15 — 13 de septiembre de 2026
+
+### Agregado
+
+- **Un grupo Marca en Configuración, y el ícono del sitio dentro.** El favicon
+  es una definición de **marca**, no un ajuste de WordPress: pertenece al tema,
+  igual que la paleta o la tipografía. Por eso ahora vive en Configuración y no
+  en Ajustes → Generales.
+
+  WordPress trae su propio «Icono del sitio», así que quedan dos lugares donde
+  definirlo. La respuesta no es evitar el duplicado: es **declarar cuál manda**.
+  Si el tema declara un ícono, el tema gana y el de WordPress se apaga. Si el
+  tema no declara ninguno, WordPress sigue haciendo lo suyo y nadie se entera
+  de que esto existe.
+
+- **Un tipo de campo nuevo: imagen.** Abre la biblioteca de medios de WordPress
+  y guarda la dirección del archivo elegido. Sólo acepta archivos **de este
+  sitio**: el valor termina dentro de un `<link>` en la cabecera de todas las
+  páginas, así que una dirección ajena sería un recurso de un tercero cargándose
+  en cada visita.
+
+  Es el primer campo que no es color, número ni lista. Los tipos son la capa que
+  vive en código; lo que se construye encima es lo que puede venir de una
+  definición importada.
+
+### Corregido
+
+- **La revisión de PHP no revisaba sintaxis.** `scripts/revisar-php.mjs` existía
+  porque *«esta máquina no tiene PHP instalado, así que no hay `php -l`»* — y eso
+  dejó de ser cierto: hay un PHP en `wp-local`.
+
+  La diferencia no es teórica. Hoy la revisión casera dio «ninguno con
+  problemas» sobre un archivo que PHP rechazaba, porque el error tenía **todas**
+  las comillas y **todos** los corchetes balanceados: estaba bien formado y mal
+  escrito, que es justo lo que un balanceador no puede ver.
+
+  Ahora usa `php -l` cuando hay intérprete, y la revisión casera sólo como
+  respaldo. Dice al final con cuál de los dos revisó.
+
+- **La prueba del CSS del tema medía la copia equivocada.** El WordPress local
+  carga *su* copia del plugin, no la del repo. Sin sincronizar, la prueba
+  aprobaba código que ni siquiera había visto. Ahora sincroniza ella misma antes
+  de medir, en vez de confiar en que alguien se acuerde.
+
 ## 0.3.14 — 13 de septiembre de 2026
 
 ### Corregido

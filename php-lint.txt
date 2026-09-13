@@ -1,0 +1,32 @@
+
+/**
+ * El intérprete de PHP, si está en esta máquina.
+ *
+ * La cabecera de este archivo decía que no había PHP instalado y que por eso
+ * existía la revisión casera de más arriba. Eso dejó de ser cierto: hay un PHP
+ * en wp-local. Y la diferencia importa — el 2026-09-13 la revisión casera dio
+ * "ninguno con problemas" sobre un archivo que PHP rechazaba, porque el error
+ * (`'dark' => 'Oscuro', , 'emite' => [...]`) tenía TODAS las comillas y todos
+ * los corchetes balanceados. Estaba bien formado y mal escrito, que es
+ * justamente lo que un balanceador no puede ver.
+ *
+ * Cuando hay intérprete se usa `php -l`, que es la verdad. Cuando no lo hay,
+ * queda la revisión casera, que atrapa menos pero es mejor que nada.
+ */
+const PHP_CANDIDATOS = [
+  process.env.COD_PHP,
+  'C:/Users/Cristobal concha/wp-local/php/php.exe',
+  path.join(process.env.USERPROFILE || '', 'wp-local/php/php.exe'),
+  '/usr/bin/php',
+  '/usr/local/bin/php',
+];
+const PHP = PHP_CANDIDATOS.filter(Boolean).find((c) => { try { return statSync(c).isFile(); } catch { return false; } })
+  || (spawnSync('php', ['-v'], { encoding: 'utf8' }).status === 0 ? 'php' : null);
+
+function lint(archivo) {
+  if (!PHP) return null;
+  const r = spawnSync(PHP, ['-l', '-d', 'display_errors=1', archivo], { encoding: 'utf8' });
+  const salida = ((r.stdout || '') + (r.stderr || '')).trim();
+  if (r.status === 0) return null;
+  return salida.split('\n').filter((l) => /error|Error/.test(l)).slice(0, 3);
+}
