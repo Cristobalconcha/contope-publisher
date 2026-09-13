@@ -25,3 +25,5 @@ contope-publisher-*.zip
 
 scripts/.casos.json
 scripts/.css-tema.php
+scripts/.icono.php
+*.txt.tmp
