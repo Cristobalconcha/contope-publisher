@@ -22,3 +22,6 @@ scripts/cod-grapes-runner/backups/
 issue*.md
 rel*.md
 contope-publisher-*.zip
+
+scripts/.casos.json
+scripts/.css-tema.php
