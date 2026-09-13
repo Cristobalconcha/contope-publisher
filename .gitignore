@@ -19,3 +19,6 @@ scripts/cod-grapes-runner/backups/
 
 # Respaldos de documentos del sitio: son copias grandes y locales, no fuente.
 scripts/cod-grapes-runner/backups/
+issue*.md
+rel*.md
+contope-publisher-*.zip
