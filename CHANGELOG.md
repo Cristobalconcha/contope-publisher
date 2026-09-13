@@ -5,6 +5,28 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.17 — 13 de septiembre de 2026
+
+### Corregido
+
+- **Tercera causa del mismo defecto: un campo vacío se trataba como inválido.**
+  La 0.3.16 arregló dos de las tres razones por las que una composición leída
+  del sitio no se podía reenviar. La prueba de ida y vuelta destapó la que
+  faltaba, que era la más extendida de todas.
+
+  La normalización emite `role` y `marker` como cadena vacía cuando el nodo no
+  los declara. El validador, en cambio, exigía que fueran identificadores
+  válidos apenas estuvieran presentes — y `''` no lo es, porque un
+  identificador tiene que empezar con letra.
+
+  Resultado: **fallaba en casi todos los nodos**, porque la mayoría no tiene ni
+  rol ni marcador. Y el mensaje —«un nodo tiene una forma, tipo o profundidad
+  no permitidos»— no daba ninguna pista de cuál nodo ni de cuál campo.
+
+  Ahora un valor vacío se trata como lo que es: la **ausencia** del campo, no un
+  valor mal escrito. Es la misma corrección que la de `content` en 0.3.16, en
+  otros dos campos.
+
 ## 0.3.16 — 13 de septiembre de 2026
 
 ### Corregido

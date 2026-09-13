@@ -1504,8 +1504,12 @@ final class COD_Canvas_MCP_Recipe_Compiler
             || !$this->is_stable_id($node['id'])
             || !is_string($node['kind'])
             || !in_array($node['kind'], self::NODE_KINDS, true)
-            || (isset($node['role']) && (!is_string($node['role']) || !$this->is_stable_id($node['role'])))
-            || (isset($node['marker']) && (!is_string($node['marker']) || !$this->is_stable_id($node['marker'])))) {
+            // Un valor vacío es la AUSENCIA del campo, no un identificador
+            // inválido. La normalización emite role y marker como '' cuando no
+            // están, así que exigir is_stable_id sobre '' hacía que ninguna
+            // composición leída del sitio se pudiera reenviar.
+            || (isset($node['role']) && $node['role'] !== '' && (!is_string($node['role']) || !$this->is_stable_id($node['role'])))
+            || (isset($node['marker']) && $node['marker'] !== '' && (!is_string($node['marker']) || !$this->is_stable_id($node['marker'])))) {
             return new WP_Error('cod_mcp_composition_node_invalid', 'Un nodo tiene una forma, tipo o profundidad no permitidos.');
         }
         if (isset($seen_node_ids[$node['id']])) {
@@ -1515,7 +1519,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
         // marker se emite como id de HTML: es el destino al que llega un
         // enlace, un QR o el menú. A diferencia de una regla —que se aplica a
         // muchos nodos y emite una clase— tiene que ser único en la página.
-        if (isset($node['marker'])) {
+        if (isset($node['marker']) && $node['marker'] !== '') {
             if (isset($seen_markers[$node['marker']])) {
                 return new WP_Error('cod_mcp_composition_marker_duplicate', 'Dos nodos declaran el mismo marker; un destino de enlace debe ser único.');
             }
