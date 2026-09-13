@@ -1553,7 +1553,11 @@ final class COD_Canvas_MCP_Recipe_Compiler
         if (!$allows_children && $children !== []) {
             return new WP_Error('cod_mcp_composition_children_invalid', 'Este tipo de nodo no admite children; usa una estructura o colección declarada.');
         }
-        if ($allows_children && isset($node['content'])) {
+        // Un content VACÍO no es «usar content». La normalización devuelve
+        // 'content' => [] para todo nodo estructural, así que rechazarlo por
+        // estar presente impedía reenviar una composición leída del propio
+        // sitio. Se rechaza sólo si trae algo adentro.
+        if ($allows_children && !empty($node['content'])) {
             return new WP_Error('cod_mcp_composition_content_invalid', 'Un nodo estructural usa children, no content.');
         }
 

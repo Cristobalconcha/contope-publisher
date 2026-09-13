@@ -5,6 +5,45 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.16 — 13 de septiembre de 2026
+
+### Corregido
+
+- **Una composición leída del sitio no se podía reenviar.** El flujo que el
+  propio MCP documenta dice, en su paso 2: leé la composición aplicada,
+  modificá sólo el nodo que corresponda y *«conservá el resto tal cual»*.
+
+  Eso no funcionaba. Al reenviar lo que `cod_read_canvas_composition` devolvía,
+  el sitio respondía *«La composición debe declarar schemaVersion=2 y una lista
+  no vacía de nodos»* — aunque la composición declarara `schemaVersion: 2` y
+  trajera todos sus nodos.
+
+  Dos causas, las dos por campos que el propio servidor agrega al leer:
+
+  La lectura devolvía **campos derivados** dentro de la composición —`nodeIds`,
+  `markers`, `nodeCount`—, y el validador no admite claves de más. Ahora viajan
+  aparte, en `resumen`, y `composition` queda exactamente como hay que
+  reenviarla.
+
+  Y los nodos con hijos volvían con **`content` vacío**, que el validador
+  rechazaba por estar presente. Un `content` vacío no es «usar content»: ahora
+  se rechaza sólo si trae algo adentro.
+
+  El mensaje de error tampoco ayudaba: acusaba a `schemaVersion` y a la lista de
+  nodos, que eran justo las dos cosas que sí estaban bien.
+
+  Reportado en [#8](https://github.com/Cristobalconcha/contope-publisher/issues/8).
+
+### Agregado
+
+- **Una prueba del ciclo completo.** `scripts/probar-ida-y-vuelta.mjs` lee la
+  composición de una página real y la reenvía sin tocar nada. Es la única forma
+  de comprobar que el paso 2 del flujo funciona de verdad; todo lo demás prueba
+  partes sueltas.
+
+  Verificada de las dos maneras: contra el código viejo falla y reproduce el
+  mensaje engañoso; contra el nuevo pasa.
+
 ## 0.3.15 — 13 de septiembre de 2026
 
 ### Agregado

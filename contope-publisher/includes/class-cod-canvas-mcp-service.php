@@ -133,11 +133,30 @@ final class COD_Canvas_MCP_Service
                 'notice' => 'Esta página no tiene una composición MCP registrada (se construyó, o se editó después, fuera de cod_apply_canvas_composition). No hay árbol para leer; una composición nueva reemplaza todo el contenido actual.',
             ];
         }
+        // La composición guardada trae campos DERIVADOS que el compilador calcula
+        // al normalizar: nodeIds, markers y nodeCount. Son útiles para leer y
+        // fatales para reenviar, porque normalize_composition usa has_only_keys y
+        // admite sólo schemaVersion, label y nodes. Devolverlos adentro hacía que
+        // el paso 2 del flujo —"modificá un nodo y conservá el resto tal cual"—
+        // fallara siempre, con un mensaje que además acusaba a schemaVersion, que
+        // era justo lo único que sí estaba bien.
+        //
+        // Se separan: 'composition' queda exactamente como hay que reenviarla, y lo
+        // derivado viaja al lado, en 'resumen'.
+        $composicion = $result['composition'];
+        $resumen = [
+            'nodeIds' => $composicion['nodeIds'] ?? [],
+            'markers' => $composicion['markers'] ?? [],
+            'nodeCount' => $composicion['nodeCount'] ?? 0,
+        ];
+        unset($composicion['nodeIds'], $composicion['markers'], $composicion['nodeCount']);
+
         return [
             'page' => $page,
             'found' => true,
             'revision' => $result['revision'],
-            'composition' => $result['composition'],
+            'composition' => $composicion,
+            'resumen' => $resumen,
             'design' => $result['design'],
             'next' => 'Editá sólo el/los nodo(s) que quieras por su id (o las reglas que referencian) y resubmití composition+design completos, con expectedRevision = revision, a cod_preview_canvas_composition.',
         ];
