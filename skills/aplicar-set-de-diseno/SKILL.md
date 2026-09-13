@@ -14,7 +14,7 @@ Contope Design Desktop  →  contrato portable  →  MCP de WordPress  →  Page
 
 Complementa a dos skills que ya existen y **no los reemplaza**:
 
-- `design-contract-builder` (Desktop) — cómo leer el contrato, la precedencia de autoridad y las tareas de desarrollo. Ese skill habla de un builder genérico; **acá están las operaciones reales de este destino**.
+- `leer-contrato-de-diseno` (Desktop) — qué contiene la cápsula, la precedencia de autoridad y las tareas de desarrollar. Ese skill deliberadamente **no nombra operaciones de ningún constructor**; las de este destino están acá abajo.
 - `operar-canvas` (este repo) — cómo operar el page builder sin romperlo.
 
 ## Quién manda sobre qué
