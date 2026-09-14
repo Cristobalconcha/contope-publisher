@@ -1078,7 +1078,7 @@
           if (fieldN) fieldN.textContent = String(item.getAttribute(idAttr) || '').trim();
           if (fieldEstado) fieldEstado.textContent = esDisponible ? 'Disponible' : 'Vendida';
           if (fieldSup) fieldSup.textContent = superficie;
-          if (fieldVal) fieldVal.textContent = esDisponible && valor ? valor : '—';
+          if (fieldVal) fieldVal.textContent = valor ? valor : '—';
         }
         function reset() {
           if (!panel) return;
@@ -2189,7 +2189,7 @@
       '          if (fieldN) fieldN.textContent = String(item.getAttribute(idAttr) || "").trim();',
       '          if (fieldEstado) fieldEstado.textContent = esDisponible ? "Disponible" : "Vendida";',
       '          if (fieldSup) fieldSup.textContent = superficie;',
-      '          if (fieldVal) fieldVal.textContent = esDisponible && valor ? valor : "—";',
+      '          if (fieldVal) fieldVal.textContent = valor ? valor : "—";',
       '        }',
       '        function reset() {',
       '          if (!panel) return;',

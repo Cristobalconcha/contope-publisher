@@ -5,6 +5,44 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.18 — 14 de septiembre de 2026
+
+### Cambiado
+
+- **El campo de valor del mapa de lotes ya no se oculta en las parcelas
+  vendidas.** El panel del plano mostraba una raya en vez del contenido de
+  `data-cod-parcel-valor` cuando la parcela estaba vendida:
+
+  ```js
+  fieldVal.textContent = esDisponible && valor ? valor : '—';
+  ```
+
+  Tenía sentido mientras ese campo fuera un precio: el precio de una parcela ya
+  vendida no le importa a nadie. Pero el campo no está atado a un precio —
+  guarda lo que el sitio quiera mostrar ahí— y en Santa Luisa pasó a mostrar si
+  la parcela es central o perimetral, que es un dato de ubicación y vale igual
+  para las vendidas.
+
+  Ahora el runtime muestra lo que haya y deja la raya sólo cuando de verdad no
+  hay nada:
+
+  ```js
+  fieldVal.textContent = valor ? valor : '—';
+  ```
+
+  `esDisponible` sigue decidiendo lo que sí depende del estado: el color del
+  acento y el rótulo Disponible/Vendida.
+
+  Cambiado en las **tres** copias del runtime, como exige la regla de la casa:
+  `cod-canvas-public.js` (página publicada), `cod-behaviors.js` (editor) y la
+  copia serializada que ese mismo archivo lleva adentro.
+
+  Quien tenga un mapa de lotes con precios y quiera conservar el
+  comportamiento anterior sólo tiene que no declarar el valor en las parcelas
+  vendidas, que es como ya estaba en Santa Luisa.
+
+---
+
 ## 0.3.17 — 13 de septiembre de 2026
 
 ### Corregido
