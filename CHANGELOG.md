@@ -11,28 +11,34 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 - **El plugin no encontraba Node.js en hosting compartido, y sí estaba.** El
   puente headless a Grapes buscaba el ejecutable en cuatro rutas fijas
-  --, , homebrew y Windows-- más .
-  Ninguna sirve en un cPanel con CloudLinux, que instala Node bajo
-   y no lo deja en el PATH del proceso
-  de PHP.
+  —`/usr/bin/node`, `/usr/local/bin/node`, homebrew y Windows— más
+  `command -v node`. Ninguna sirve en un cPanel con CloudLinux, que instala
+  Node bajo `/opt/alt/alt-nodejs*/root/usr/bin/node` y **no lo deja en el PATH
+  del proceso de PHP**.
 
-  Desde el 4 de septiembre se daba por hecho que el servidor de Santa Luisa no
-  tenía Node. **Lo tenía.** Lo que no teníamos era la ruta.
+  Desde el 4 de septiembre se daba por hecho, y estaba anotado como verificado,
+  que el servidor de Santa Luisa no tenía Node. **Lo tenía.** Lo que no
+  teníamos era la ruta.
 
-  Ahora se buscan también  y
-  , ordenadas de mayor a menor versión para
-  tomar la más nueva.
+  Ahora se buscan también `/opt/alt/alt-nodejs*/root/usr/bin/node` y
+  `/opt/cpanel/ea-nodejs*/bin/node`, ordenadas de mayor a menor versión para
+  tomar la más nueva disponible.
 
-- **El error dice dónde buscó.** Antes decía sólo «no se encontró», que obliga a
-  volver a averiguar lo mismo desde cero cada vez. Ahora lista las rutas
-  probadas y avisa si  está deshabilitado.
+- **El error dice dónde buscó.** Antes decía sólo «no se encontró el
+  ejecutable», que obliga a volver a averiguar lo mismo desde cero cada vez.
+  Ahora lista las rutas probadas y avisa si `shell_exec` está deshabilitado.
+  Esa falta de detalle es la razón de que una conclusión equivocada durara diez
+  días.
 
 ### Lo que sigue faltando
 
-Con Node resuelto, el puente ahora falla un paso más adelante: **no hay un
-navegador headless** en el servidor. Chrome, Chromium o Edge. Eso es lo que
-falta para que  funcione sin depender de la máquina de
-nadie — y es el punto que decide si el sistema es portable o no.
+Con Node resuelto, el puente falla un paso más adelante: **no hay un navegador
+headless** en el servidor —Chrome, Chromium o Edge—. El propio error lo dice
+ahora, con la lista de lo que probó.
+
+Eso es lo único que falta para que `cod_grapes_edit_node` funcione sin depender
+de la máquina de nadie, y es el punto que decide si el sistema es portable o si
+el motor tiene que seguir corriendo en un computador propio.
 
 ---
 
