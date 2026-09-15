@@ -5,6 +5,37 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.20 — 14 de septiembre de 2026
+
+### Corregido
+
+- **El plugin no encontraba Node.js en hosting compartido, y sí estaba.** El
+  puente headless a Grapes buscaba el ejecutable en cuatro rutas fijas
+  --, , homebrew y Windows-- más .
+  Ninguna sirve en un cPanel con CloudLinux, que instala Node bajo
+   y no lo deja en el PATH del proceso
+  de PHP.
+
+  Desde el 4 de septiembre se daba por hecho que el servidor de Santa Luisa no
+  tenía Node. **Lo tenía.** Lo que no teníamos era la ruta.
+
+  Ahora se buscan también  y
+  , ordenadas de mayor a menor versión para
+  tomar la más nueva.
+
+- **El error dice dónde buscó.** Antes decía sólo «no se encontró», que obliga a
+  volver a averiguar lo mismo desde cero cada vez. Ahora lista las rutas
+  probadas y avisa si  está deshabilitado.
+
+### Lo que sigue faltando
+
+Con Node resuelto, el puente ahora falla un paso más adelante: **no hay un
+navegador headless** en el servidor. Chrome, Chromium o Edge. Eso es lo que
+falta para que  funcione sin depender de la máquina de
+nadie — y es el punto que decide si el sistema es portable o no.
+
+---
+
 ## 0.3.19 — 14 de septiembre de 2026
 
 ### Agregado

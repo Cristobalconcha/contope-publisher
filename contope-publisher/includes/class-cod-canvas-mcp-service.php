@@ -1080,7 +1080,10 @@ final class COD_Canvas_MCP_Service
 
         $node_bin = $this->find_node_binary();
         if ($node_bin === null) {
-            return new WP_Error('cod_mcp_grapes_no_node', 'No se encontró el ejecutable de Node.js en este servidor. El puente headless a Grapes (tools/cod-headless-node-edit.mjs) necesita Node instalado en la máquina donde corre el plugin.');
+            // El mensaje dice DÓNDE se buscó: si no, cada vez que falla hay que
+            // volver a averiguar lo mismo desde cero.
+            $miradas = ['command -v node' . (function_exists('shell_exec') ? '' : ' (shell_exec deshabilitado)'), '/usr/bin/node', '/usr/local/bin/node', '/opt/homebrew/bin/node', '/opt/alt/alt-nodejs*/root/usr/bin/node', '/opt/cpanel/ea-nodejs*/bin/node'];
+            return new WP_Error('cod_mcp_grapes_no_node', 'No se encontró el ejecutable de Node.js en este servidor. El puente headless a Grapes (tools/cod-headless-node-edit.mjs) lo necesita instalado en la máquina donde corre el plugin. Se buscó en: ' . implode(', ', $miradas) . '.');
         }
 
         $script_path = COD_PUBLISHER_DIR . 'tools/cod-headless-node-edit.mjs';
@@ -1147,6 +1150,18 @@ final class COD_Canvas_MCP_Service
             '/opt/homebrew/bin/node',
             'C:\\Program Files\\nodejs\\node.exe',
         ]);
+        // Hosting compartido con cPanel: Node existe pero NO está en el PATH
+        // del proceso de PHP, así que ni "command -v node" ni las rutas de
+        // arriba lo encuentran. CloudLinux lo instala bajo /opt/alt y
+        // EasyApache bajo /opt/cpanel. Se ordenan de mayor a menor para
+        // tomar la versión más nueva disponible.
+        foreach (['/opt/alt/alt-nodejs*/root/usr/bin/node', '/opt/cpanel/ea-nodejs*/bin/node'] as $patron) {
+            $encontrados = glob($patron);
+            if (is_array($encontrados) && $encontrados !== []) {
+                rsort($encontrados, SORT_NATURAL);
+                $candidates = array_merge($candidates, $encontrados);
+            }
+        }
         foreach ($candidates as $candidate) {
             if ($candidate !== '' && file_exists($candidate)) {
                 return $candidate;
