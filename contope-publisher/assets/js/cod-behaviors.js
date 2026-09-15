@@ -302,7 +302,7 @@
   BEHAVIORS[BEHAVIOR_WA_MENSAJE] = {
     name: BEHAVIOR_WA_MENSAJE,
     defaultOpenClass: 'is-open',
-    description: 'Ventana para redactar el mensaje antes de abrir WhatsApp. Intercepta los enlaces de WhatsApp que se le indiquen, ofrece escrito el mensaje propio de cada sección, suma una casilla de consentimiento opcional y emite un evento medible al enviar. No se ejecuta dentro del editor.',
+    description: 'Ventana para redactar el mensaje antes de abrir WhatsApp. Intercepta los enlaces de WhatsApp que se le indiquen, ofrece escrito el mensaje propio de cada sección, suma una casilla de consentimiento opcional y emite dos eventos medibles: uno al abrirse (quien pinchó) y otro al enviar (quien escribió), los dos con la zona de la que salió. No se ejecuta dentro del editor.',
   };
 
   function isAllowedBehavior(name) {

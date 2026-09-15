@@ -5,6 +5,57 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.19 — 14 de septiembre de 2026
+
+### Agregado
+
+- **La ventana de WhatsApp ahora avisa también cuando se abre, no sólo cuando
+  se envía.** Antes sólo se medía a quien escribía un mensaje y lo mandaba.
+  Quien pinchaba el ícono, miraba la ventana y la cerraba no quedaba registrado
+  en ninguna parte — y esa persona también mostró interés, en una zona concreta
+  de la página.
+
+  Se emite `whatsapp_abierto` con el mismo campo `origen` que ya llevaba
+  `whatsapp_enviado`: el `id` de la sección de la que salió el botón. Con los
+  dos eventos se puede ver, por zona, cuántos pincharon y cuántos de ésos
+  llegaron a escribir.
+
+  El nombre es configurable con `data-cod-wa-event-open`, igual que el de envío
+  con `data-cod-wa-event`. Va por las tres vías de siempre —evento del
+  navegador, `dataLayer` y `gtag`— y ninguna depende de las otras. **Nunca
+  viaja lo que la persona escribió**: sólo de qué zona salió.
+
+- **`remove` en `cod_grapes_edit_node`.** El puente headless sabía quitar un
+  nodo desde el principio; el esquema del MCP declaraba las otras seis
+  mutaciones y no ésa, así que por MCP no se podía borrar nada y había que
+  bajar al script local.
+
+  El PHP nunca filtró la mutación —la pasa tal cual al puente—, o sea que lo
+  único que faltaba era declararla. Ahora las siete están disponibles por MCP:
+  `attributes`, `content`, `addClass`, `removeClass`, `style`, `move` y
+  `remove`.
+
+  Lo protege lo mismo que a las demás: `expectedRevision` rechaza el cambio si
+  alguien tocó el documento entremedio, y Canvas guarda una instantánea al
+  escribir.
+
+### Cambiado
+
+- **El consentimiento sólo viaja si existe la casilla.** El evento mandaba
+  siempre `consentimiento: true|false`. En un sitio sin casilla eso significaba
+  mandar `false` en cada envío, que al leerlo parece «nadie acepta» cuando en
+  realidad es «no se pregunta». Ahora el campo se omite cuando no hay control
+  de consentimiento en la ventana.
+
+### Nota para quien mantenga esto
+
+La ventana de WhatsApp **no corre dentro del editor**, a propósito:
+`cod-behaviors.js` sólo declara el comportamiento y la implementación vive
+únicamente en `cod-canvas-public.js`. No es un caso de los tres runtimes
+duplicados; acá hay una sola copia.
+
+---
+
 ## 0.3.18 — 14 de septiembre de 2026
 
 ### Cambiado

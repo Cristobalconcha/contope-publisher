@@ -462,6 +462,7 @@ final class COD_Canvas_MCP_Service
                                 'addClass' => ['type' => 'array', 'items' => ['type' => 'string']],
                                 'removeClass' => ['type' => 'array', 'items' => ['type' => 'string']],
                                 'style' => ['type' => 'object', 'description' => 'Reglas CSS a fusionar sobre este nodo, ej. {"color":"red"}.'],
+                                'remove' => ['type' => 'boolean', 'description' => 'Quita el nodo del árbol, con la API real de Grapes (component.remove()), igual que borrarlo en el editor. Es destructivo y no hay deshacer dentro de la llamada: lo que protege es expectedRevision, que rechaza el cambio si alguien tocó el documento entremedio, y la instantánea que Canvas guarda al escribir. Se declara solo: combinarlo con otras mutaciones sobre el mismo nodo no tiene sentido porque el nodo deja de existir.'],
                                 'move' => [
                                     'type' => 'object',
                                     'description' => 'Reubica el nodo cambiándolo de PADRE, con la API real de Grapes — el mismo movimiento que haría alguien arrastrándolo con el mouse. Es lo correcto cuando un bloque está en el lugar equivocado: simularlo con position, order o margen negativo deja el árbol mintiendo, el editor lo sigue mostrando donde estaba y quien lo toque después pelea contra reglas que no explican nada. Se declara exactamente UNO de into, before o after; el destino tiene que resolver a un solo nodo y no puede estar adentro del nodo que se mueve.',

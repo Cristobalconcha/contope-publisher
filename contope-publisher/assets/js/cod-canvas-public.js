@@ -601,6 +601,9 @@
             var claseAbierto = String(root.getAttribute('data-cod-wa-open-class') || '').trim() || 'is-open';
             var lineaConsent = String(root.getAttribute('data-cod-wa-consent-text') || '').trim();
             var nombreEvento = String(root.getAttribute('data-cod-wa-event') || '').trim() || 'whatsapp_enviado';
+            // Quien pincha el ícono y cierra sin escribir también es interés, y
+            // hasta ahora no quedaba en ninguna parte: sólo se avisaba al enviar.
+            var nombreEventoApertura = String(root.getAttribute('data-cod-wa-event-open') || '').trim() || 'whatsapp_abierto';
 
             var destino = '';   // número, sacado del enlace que abrió la ventana
             var origen = '';    // qué botón fue, para poder distinguirlo al medir
@@ -638,6 +641,22 @@
                     try { campo.focus(); campo.setSelectionRange(campo.value.length, campo.value.length); }
                     catch (e) { /* da igual si el navegador no deja */ }
                 }, 180);
+                avisarApertura();
+            }
+
+            // Mismo camino que avisar(), por las mismas tres vías. No viaja
+            // nada de lo que la persona escriba: sólo de qué zona salió.
+            function avisarApertura() {
+                var detalle = { origen: origen };
+                try { window.dispatchEvent(new CustomEvent('cod:whatsapp-abierto', { detail: detalle })); } catch (e) {}
+                try {
+                    if (Array.isArray(window.dataLayer)) {
+                        window.dataLayer.push({ event: nombreEventoApertura, origen: detalle.origen });
+                    }
+                } catch (e) {}
+                try {
+                    if (typeof window.gtag === 'function') window.gtag('event', nombreEventoApertura, detalle);
+                } catch (e) {}
             }
 
             function cerrar() {
@@ -658,7 +677,11 @@
             // pasa nada. Nunca viaja lo que la persona escribió: solo de qué
             // botón salió y si aceptó recibir novedades.
             function avisar(acepto) {
-                var detalle = { origen: origen, consentimiento: !!acepto };
+                var detalle = { origen: origen };
+                // Si no hay casilla, no se manda el campo. Mandar siempre
+                // false se lee como "nadie acepta", que no es lo mismo que
+                // "no se pregunta".
+                if (consent) detalle.consentimiento = !!acepto;
                 try { window.dispatchEvent(new CustomEvent('cod:whatsapp-enviado', { detail: detalle })); } catch (e) {}
                 try {
                     if (Array.isArray(window.dataLayer)) {
