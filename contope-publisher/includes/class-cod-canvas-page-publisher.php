@@ -123,6 +123,48 @@ final class COD_Canvas_Page_Publisher
      * unidades de contenedor sobre el marco marcado como tal. Sin ese
      * intercambio, girar deja franjas vacías a los lados.
      */
+    /**
+     * Reglas base del Grupo Dinámico, emitidas por el plugin.
+     *
+     * Antes vivían sólo en la hoja del editor y `cod-editor-core.js` las
+     * copiaba DENTRO del CSS de cada documento, en cada guardado, para que la
+     * página publicada las tuviera. Esa copia se sumaba a la del guardado
+     * anterior: la portada de Santa Luisa llegó a tener cada una de estas
+     * once reglas siete veces, un 13,6% de su CSS. Ver la issue #12.
+     *
+     * El CSS base de un módulo del plugin es del plugin, no del documento. Al
+     * emitirlo acá se publica una sola vez, no puede acumularse, y además se
+     * corrige solo en todas las páginas cuando cambia.
+     *
+     * Va ANTES del CSS del documento a propósito: lo que el usuario
+     * personalizó tiene que seguir ganando la cascada.
+     */
+    public static function dynamic_group_css(string $html): string
+    {
+        // Ninguna página que no use el módulo tiene por qué cargar sus
+        // reglas. Se comprueba contra el HTML y nunca contra el CSS: el CSS
+        // de los documentos viejos todavía arrastra copias de estas mismas
+        // reglas, así que mirarlo daría siempre verdadero.
+        if (strpos($html, 'cod-dynamic-group') === false) {
+            return '';
+        }
+
+        return '.cod-dynamic-group{display:grid;gap:20px;}'
+            . '.cod-dynamic-group--grid-2{grid-template-columns:repeat(2,minmax(0,1fr));}'
+            . '.cod-dynamic-group--grid-3{grid-template-columns:repeat(3,minmax(0,1fr));}'
+            . '.cod-dynamic-group--grid-4{grid-template-columns:repeat(4,minmax(0,1fr));}'
+            . '.cod-dynamic-group--list{grid-template-columns:minmax(0,1fr);}'
+            . '.cod-dynamic-group--carousel{display:flex;gap:20px;overflow-x:auto;'
+            . 'scroll-snap-type:x mandatory;padding-bottom:4px;}'
+            . '.cod-dynamic-group--carousel > .cod-dynamic-group__card{'
+            . 'flex:0 0 min(78%,320px);scroll-snap-align:start;}'
+            . '.cod-dynamic-group__card{min-width:0;box-sizing:border-box;padding:16px;'
+            . 'border:1px solid #dcdcde;border-radius:8px;background:#fff;}'
+            . '.cod-dynamic-group__image{display:block;width:100%;height:auto;border-radius:6px;}'
+            . '.cod-dynamic-group__title{margin:12px 0 6px;}'
+            . '.cod-dynamic-group__text{margin:0;}';
+    }
+
     public static function rotation_css(): string
     {
         return '.cod-rot-180{transform:rotate(180deg);}'
@@ -613,25 +655,35 @@ final class COD_Canvas_Page_Publisher
 
         $post_id = (int) $post->ID;
         $body_css = (string) $document['css'];
+        $body_html = (string) $document['html'];
         $header_css = '';
         $footer_css = '';
+        $header_html = '';
+        $footer_html = '';
         if ($this->region_resolver !== null && $post_id > 0) {
             $header = $this->region_resolver->resolve(
                 COD_Canvas_Document_Repository::REGION_KIND_HEADER,
                 $post_id
             );
-            if ($header !== null) { $header_css = (string) $header['css']; }
+            if ($header !== null) {
+                $header_css = (string) $header['css'];
+                $header_html = (string) $header['html'];
+            }
             $footer = $this->region_resolver->resolve(
                 COD_Canvas_Document_Repository::REGION_KIND_FOOTER,
                 $post_id
             );
-            if ($footer !== null) { $footer_css = (string) $footer['css']; }
+            if ($footer !== null) {
+                $footer_css = (string) $footer['css'];
+                $footer_html = (string) $footer['html'];
+            }
             $body = $this->region_resolver->resolve(
                 COD_Canvas_Document_Repository::REGION_KIND_BODY,
                 $post_id
             );
             if ($body !== null && trim((string) $body['html']) !== '') {
                 $body_css = (string) $body['css'];
+                $body_html = (string) $body['html'];
             }
         }
 
@@ -640,6 +692,7 @@ final class COD_Canvas_Page_Publisher
         wp_add_inline_style(
             'cod-canvas-public',
             COD_Theme_Definitions::css() . self::site_font_css() . $this->shared_components_css()
+                . self::dynamic_group_css($header_html . $body_html . $footer_html)
                 . self::rotation_css() . self::carousel_rows_css() . $header_css . $body_css . $footer_css
         );
         self::$css_ya_emitido = true;
@@ -710,6 +763,7 @@ final class COD_Canvas_Page_Publisher
             wp_add_inline_style(
                 'cod-canvas-public',
                 $theme_css . $site_font_css . $this->shared_components_css()
+                    . self::dynamic_group_css($header_html . $body_html . $footer_html)
                     . self::rotation_css() . self::carousel_rows_css()
                     . $header_css . $body_css . $footer_css
             );

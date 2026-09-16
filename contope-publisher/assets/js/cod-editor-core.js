@@ -1224,17 +1224,27 @@ editor.Components.addType('cod-columns', {
             }
 
             function serializedCss() {
-                var dynamicGroupCss = collectDynamicGroupCss().trim();
-                // El prefijo también se deduplica, y no por prolijidad.
-                // collectDynamicGroupCss() raspa las reglas base de los módulos
-                // dinámicos de la hoja del admin y las vuelve a pegar en CADA
-                // guardado, encima de un sourceCss que ya trae la copia del
-                // guardado anterior. Así llegó la portada de Santa Luisa a
-                // tener .cod-dynamic-group siete veces: una por ciclo.
-                var prefijo = dedupeCssRules(
-                    sourceCss.trimEnd() + (dynamicGroupCss ? '\n' + dynamicGroupCss : '')
-                );
-                return prefijo + '\n\n' + CSS_OVERRIDES_MARKER + '\n' + dedupeCssRules(editor.getCss() || '');
+                // Las reglas base del Grupo Dinámico NO se escriben acá.
+                //
+                // Hasta la 0.3.22 este método pegaba en el documento, en cada
+                // guardado, las reglas que collectDynamicGroupCss() raspaba de
+                // la hoja del admin — encima de un sourceCss que ya traía la
+                // copia del guardado anterior. Una copia por ciclo: la portada
+                // de Santa Luisa llegó a tener cada una siete veces. Se había
+                // tapado deduplicando al serializar, que limpia el resultado
+                // pero no impide que se siga copiando, y encima no alcanza a
+                // los guardados del runner ni del MCP, que escriben la hoja
+                // plana. Ver la issue #12.
+                //
+                // Ahora las emite el plugin en la página publicada
+                // (COD_Canvas_Page_Publisher::dynamic_group_css), antes del CSS
+                // del documento, así que el documento lleva sólo lo del
+                // usuario. ensureDynamicGroupCss() las sigue inyectando en el
+                // lienzo del editor: eso es para ver, no se guarda.
+                //
+                // La deduplicación queda como red, no como solución: hay
+                // documentos guardados que todavía arrastran las copias viejas.
+                return dedupeCssRules(sourceCss.trimEnd()) + '\n\n' + CSS_OVERRIDES_MARKER + '\n' + dedupeCssRules(editor.getCss() || '');
             }
 
             function serializedHtml() {

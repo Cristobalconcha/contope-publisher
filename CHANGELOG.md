@@ -5,6 +5,45 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.23 — 15 de septiembre de 2026
+
+### Corregido
+
+- **El CSS del documento se duplicaba en cada guardado.** El editor copiaba
+  dentro del documento, cada vez que guardabas, las once reglas base del Grupo
+  Dinámico: las raspaba de la hoja de estilos del panel de administración y las
+  pegaba encima de las que ya había dejado el guardado anterior. Una copia por
+  ciclo. La portada de Santa Luisa tenía cada una **siete veces**, un 13,6% de
+  su CSS en copias exactas, y hay reportes de haber visto hasta 25.
+
+  Esto ya se había tapado deduplicando al serializar. Eso limpia el resultado
+  pero no impide que se siga copiando, y además sólo actúa cuando el guardado
+  sale del editor: los del runner y los del MCP escriben la hoja plana, así que
+  en esos documentos las copias quedaban intactas.
+
+  **El CSS base de un módulo del plugin es del plugin, no del documento.** Ahora
+  lo emite el plugin en la página publicada, antes del CSS del documento para
+  que lo que personalizaste siga ganando la cascada, y el editor dejó de
+  escribirlo. El documento vuelve a llevar sólo lo que es suyo.
+
+  La deduplicación se conserva como red, no como solución: hay documentos
+  guardados que todavía arrastran las copias viejas.
+
+  Issue #12.
+
+### Cambiado
+
+- **Las reglas de un módulo sólo viajan si la página lo usa.** Al medir se vio
+  que **ninguna página de Santa Luisa usa el Grupo Dinámico**: las once reglas
+  llevaban meses cargándose en las cinco sin dibujar nada. Ahora se emiten sólo
+  cuando el HTML de la página realmente contiene el módulo.
+
+  La comprobación mira el HTML y nunca el CSS, a propósito: el CSS de los
+  documentos viejos todavía menciona esas clases, así que mirarlo daría siempre
+  verdadero y no serviría de nada.
+
+---
+
 ## 0.3.22 — 15 de septiembre de 2026
 
 ### Corregido
