@@ -5,6 +5,47 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.24 — 16 de septiembre de 2026
+
+### Cambiado
+
+- **El CSS sale de los datos estructurados y de ninguna otra parte.** Hasta acá
+  el documento guardaba una hoja de CSS plana que el editor volvía a tomar como
+  «CSS fuente» y a escribir en el guardado siguiente. Eso es una segunda fuente,
+  y es la puerta por la que entró la duplicación de la 0.3.23: mientras exista
+  un lugar donde escribir estilos sin pasar por el motor, tarde o temprano
+  alguien escribe ahí.
+
+  Ahora, al abrir un documento, se resta **siempre** del CSS guardado lo que el
+  modelo ya conoce — antes sólo se hacía cuando faltaba el marcador. En un
+  documento completo eso deja la hoja en nada, que es exactamente el fin
+  buscado.
+
+  Los seis documentos de Santa Luisa se migraron primero, y recién después se
+  hizo el cambio: **cortar antes de migrar habría perdido estilos.** Entre lo
+  mudado estaban el menú de celular, el hero en teléfono acostado y la barra del
+  visor 360.
+
+### Agregado
+
+- **`scripts/cod-grapes-runner/migrar-css-al-json.mjs`**, que hace esa mudanza y
+  **se niega a escribir si algo cambiaría en pantalla**.
+
+  Compara los dos resultados —con hoja y sólo con el JSON— por *qué valor
+  termina teniendo cada propiedad*, no por el texto de las reglas. Comparar el
+  texto da falsos positivos apenas se fusionan dos `@media` de la misma
+  condición: el texto cambia y la página se ve igual. Las seis migraciones
+  dieron **cero diferencias**.
+
+### Nota
+
+Si un documento trae CSS que el modelo no conoce, **no se descarta en
+silencio**: se conserva y el editor avisa cuántas reglas son y por qué conviene
+migrarlas. Perder estilos de un sitio publicado por aplicar una regla nueva
+sería peor que la regla vieja.
+
+---
+
 ## 0.3.23 — 15 de septiembre de 2026
 
 ### Corregido

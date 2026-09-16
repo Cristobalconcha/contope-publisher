@@ -1592,13 +1592,29 @@ editor.Components.addType('cod-columns', {
                 if (hasPages) {
                     try {
                         editor.loadProjectData(project);
-                        if (!css.tieneMarcador) {
-                            // Sin marcador no se sabe qué parte de la hoja es
-                            // "fuente" y qué parte la exportó GrapesJS, y se
-                            // tomaba TODA como fuente: al guardar quedaba una
-                            // copia entera de más. Lo que Grapes ya conoce sale
-                            // de acá; lo que queda es fuente de verdad.
-                            sourceCss = restarReglasConocidas(sourceCss, editor.getCss() || '');
+                        // La fuente del CSS es projectData y ninguna otra.
+                        // Decisión de Cristóbal, 2026-09-16. Antes la hoja
+                        // plana guardada se tomaba como «CSS fuente» y se
+                        // volvía a escribir al guardar; eso es una segunda
+                        // fuente y por ahí entró la duplicación de la #12.
+                        //
+                        // Se resta SIEMPRE lo que el modelo ya conoce, no
+                        // sólo cuando falta el marcador. En un documento
+                        // migrado eso deja la hoja en nada, que es el fin
+                        // buscado: el CSS sale del JSON.
+                        sourceCss = restarReglasConocidas(sourceCss, editor.getCss() || '');
+
+                        // Lo que sobra es CSS que el modelo NO tiene. No se
+                        // tira en silencio —sería perder estilos de un sitio
+                        // publicado— pero tampoco se acepta callado: se
+                        // conserva y se avisa, para que se migre al JSON.
+                        if (sourceCss.trim() !== '') {
+                            var sobrantes = bloquesDeCss(sourceCss).length;
+                            status(
+                                'Aviso: ' + sobrantes + ' regla(s) de CSS guardadas no están en los datos ' +
+                                'estructurados. Se conservan, pero deberían migrarse: mientras vivan sólo en ' +
+                                'la hoja, nadie las puede editar desde el lienzo.'
+                            );
                         }
                     } catch (error) {
                         // Los datos estructurados no son utilizables: el HTML y el CSS
