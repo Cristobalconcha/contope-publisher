@@ -1,5 +1,5 @@
 /**
- * Limpia de un documento las reglas de CSS repetidas de forma idéntica.
+ * Limpia de un documento las reglas repetidas, en el JSON y en el CSS.
  *
  * Existe por la issue #12: hasta la 0.3.23 el editor copiaba dentro del
  * documento, en cada guardado, las reglas base de un módulo del plugin. Eso ya
@@ -7,6 +7,10 @@
  *
  * NO ejecutar antes de tener 0.3.23 desplegada: sin cortar el origen, la
  * limpieza se deshace sola en el siguiente guardado.
+ *
+ * La fuente es projectData. Limpiar solo la hoja de CSS no sirve: Grapes la
+ * regenera desde el JSON en el guardado siguiente y las copias vuelven. Por
+ * eso se limpian las dos, y el JSON primero.
  *
  * De cada grupo de reglas idénticas conserva LA ÚLTIMA, nunca la primera. Si
  * entremedio hay una regla que la pisa, quedarse con la primera cambiaría lo
@@ -88,6 +92,26 @@ function limpiar(css) {
   return { css: quedan.join('').trim() + '\n', quitadas, antes: partes.length, después: quedan.length };
 }
 
+/**
+ * Quita de projectData.styles las reglas que son objetos idénticos.
+ *
+ * Conserva la última por la misma razón que en el CSS: si entremedio hay una
+ * regla que la pisa, quedarse con la primera cambiaría lo que se ve.
+ */
+function limpiarJson(projectDataTexto) {
+  const pd = JSON.parse(projectDataTexto);
+  if (!Array.isArray(pd.styles)) return { texto: projectDataTexto, quitadas: 0, antes: 0, después: 0 };
+  const claves = pd.styles.map((r) => JSON.stringify(r));
+  const última = new Map();
+  claves.forEach((k, i) => última.set(k, i));
+  const quedan = pd.styles.filter((_, i) => última.get(claves[i]) === i);
+  const quitadas = pd.styles.length - quedan.length;
+  if (quitadas === 0) return { texto: projectDataTexto, quitadas: 0, antes: pd.styles.length, después: pd.styles.length };
+  const antes = pd.styles.length;
+  pd.styles = quedan;
+  return { texto: JSON.stringify(pd), quitadas, antes, después: quedan.length };
+}
+
 const MARCA = '/* COD-CANVAS-EDITABLE-OVERRIDES */';
 const backupsDir = path.join(aquí, 'backups');
 if (!existsSync(backupsDir)) mkdirSync(backupsDir, { recursive: true });
@@ -102,12 +126,14 @@ for (const pág of pages) {
   const doc = await tool('cod_read_canvas_document', { pageId: pág.pageId, documentId: pág.documentId });
   if (typeof doc?.css !== 'string') { console.log(`  ${pág.title}: sin CSS, se omite`); continue; }
   const r = limpiar(doc.css);
+  const j = limpiarJson(doc.projectData);
   const ahorro = doc.css.length - r.css.length;
   const marcaAntes = doc.css.includes(MARCA);
   const marcaDespués = r.css.includes(MARCA);
 
   console.log(`▸ ${pág.title}  (${pág.documentId}, rev ${doc.revision})`);
   console.log(`    reglas ${r.antes} → ${r.después}   ·   CSS ${doc.css.length.toLocaleString('es-CL')} → ${r.css.length.toLocaleString('es-CL')} bytes  (−${ahorro.toLocaleString('es-CL')})`);
+    console.log(`    JSON   ${j.antes} → ${j.después} reglas   ·   quitadas ${j.quitadas}`);
   if (marcaAntes !== marcaDespués) { console.log('    ✗ DETENIDO: se perdería la marca de overrides'); continue; }
   if (r.quitadas.size > 0) {
     const top = [...r.quitadas.entries()].sort((a, b) => b[1] - a[1]).slice(0, 4);
@@ -116,7 +142,7 @@ for (const pág of pages) {
   }
   totalBytes += ahorro;
 
-  if (r.quitadas.size === 0) {
+  if (r.quitadas.size === 0 && j.quitadas === 0) {
     console.log('    ya esta limpio, no se toca');
     console.log('');
     continue;
@@ -130,7 +156,7 @@ for (const pág of pages) {
     pageId: pág.pageId,
     documentId: pág.documentId,
     expectedRevision: doc.revision,
-    projectData: doc.projectData,
+    projectData: j.texto,
     html: doc.html,
     css: r.css,
   });
