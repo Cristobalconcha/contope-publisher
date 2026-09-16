@@ -3,20 +3,63 @@
   "version": 3,
   "settings": {
     "appearanceTools": true,
-    "layout": { "contentSize": "1180px", "wideSize": "1360px" },
+    "layout": {
+      "contentSize": "1180px",
+      "wideSize": "1360px"
+    },
     "color": {
       "palette": [
-        { "slug": "background", "name": "Fondo", "color": "#F6F6F3" },
-        { "slug": "surface", "name": "Superficie", "color": "#FFFFFF" },
-        { "slug": "text", "name": "Texto", "color": "#70745E" },
-        { "slug": "muted", "name": "Texto secundario", "color": "#968B8A" },
-        { "slug": "accent", "name": "Dorado", "color": "#CDA23C" },
-        { "slug": "green", "name": "Oliva", "color": "#70745E" },
-        { "slug": "green-soft", "name": "Oliva claro", "color": "#EBF0E3" },
-        { "slug": "earth", "name": "Tierra", "color": "#6E5F5F" }
+        {
+          "slug": "background",
+          "name": "Fondo",
+          "color": "#F6F6F3"
+        },
+        {
+          "slug": "surface",
+          "name": "Superficie",
+          "color": "#FFFFFF"
+        },
+        {
+          "slug": "text",
+          "name": "Texto",
+          "color": "#70745E"
+        },
+        {
+          "slug": "muted",
+          "name": "Texto secundario",
+          "color": "#968B8A"
+        },
+        {
+          "slug": "accent",
+          "name": "Dorado",
+          "color": "#CDA23C"
+        },
+        {
+          "slug": "green",
+          "name": "Oliva",
+          "color": "#70745E"
+        },
+        {
+          "slug": "green-soft",
+          "name": "Oliva claro",
+          "color": "#EBF0E3"
+        },
+        {
+          "slug": "earth",
+          "name": "Tierra",
+          "color": "#6E5F5F"
+        }
       ]
     },
-    "spacing": { "units": ["px", "rem", "vw", "%"], "blockGap": true },
+    "spacing": {
+      "units": [
+        "px",
+        "rem",
+        "vw",
+        "%"
+      ],
+      "blockGap": true
+    },
     "typography": {
       "fluid": true,
       "fontFamilies": [
@@ -34,24 +77,40 @@
           "slug": "script",
           "name": "Manuscrita",
           "fontFamily": "'Birthstone', 'Segoe Script', cursive"
-        },
-        {
-          "slug": "quote",
-          "name": "Citas",
-          "fontFamily": "'Lora', Georgia, 'Times New Roman', serif"
         }
       ],
       "fontSizes": [
-        { "slug": "small", "name": "Pequeño", "size": "0.8rem" },
-        { "slug": "medium", "name": "Medio", "size": "1rem" },
-        { "slug": "large", "name": "Grande", "size": "clamp(1.35rem, 2vw, 1.8rem)" },
-        { "slug": "x-large", "name": "Muy grande", "size": "clamp(2.4rem, 6vw, 5rem)" }
+        {
+          "slug": "small",
+          "name": "Pequeño",
+          "size": "0.8rem"
+        },
+        {
+          "slug": "medium",
+          "name": "Medio",
+          "size": "1rem"
+        },
+        {
+          "slug": "large",
+          "name": "Grande",
+          "size": "clamp(1.35rem, 2vw, 1.8rem)"
+        },
+        {
+          "slug": "x-large",
+          "name": "Muy grande",
+          "size": "clamp(2.4rem, 6vw, 5rem)"
+        }
       ]
     }
   },
   "styles": {
-    "color": { "background": "#F6F6F3", "text": "#70745E" },
-    "spacing": { "blockGap": "1.25rem" },
+    "color": {
+      "background": "#F6F6F3",
+      "text": "#70745E"
+    },
+    "spacing": {
+      "blockGap": "1.25rem"
+    },
     "typography": {
       "fontFamily": "var(--wp--preset--font-family--body)",
       "lineHeight": "1.5"
@@ -65,14 +124,30 @@
         }
       },
       "button": {
-        "color": { "background": "#CDA23C", "text": "#2B2210" },
-        "border": { "radius": "999px" },
-        "typography": { "fontSize": "0.78rem", "fontWeight": "700" }
+        "color": {
+          "background": "#CDA23C",
+          "text": "#2B2210"
+        },
+        "border": {
+          "radius": "999px"
+        },
+        "typography": {
+          "fontSize": "0.78rem",
+          "fontWeight": "700"
+        }
       },
-      "link": { "color": { "text": "#70745E" } }
+      "link": {
+        "color": {
+          "text": "#70745E"
+        }
+      }
     },
     "blocks": {
-      "core/image": { "border": { "radius": "16px" } },
+      "core/image": {
+        "border": {
+          "radius": "16px"
+        }
+      },
       "core/group": {
         "spacing": {
           "padding": {
@@ -84,7 +159,15 @@
     }
   },
   "templateParts": [
-    { "name": "header", "title": "Cabecera", "area": "header" },
-    { "name": "footer", "title": "Pie", "area": "footer" }
+    {
+      "name": "header",
+      "title": "Cabecera",
+      "area": "header"
+    },
+    {
+      "name": "footer",
+      "title": "Pie",
+      "area": "footer"
+    }
   ]
 }

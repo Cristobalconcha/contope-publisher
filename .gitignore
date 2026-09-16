@@ -27,3 +27,4 @@ scripts/.casos.json
 scripts/.css-tema.php
 scripts/.icono.php
 *.txt.tmp
+scripts/cod-grapes-runner/cod-grapes-runner.local.json

@@ -36,7 +36,14 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(here, '..', '..');
 const bridgeScript = path.join(repoRoot, 'contope-publisher', 'tools', 'cod-headless-node-edit.mjs');
 const buildScript = path.join(repoRoot, 'contope-publisher', 'tools', 'cod-headless-build.mjs');
-const configPath = path.join(here, 'cod-grapes-runner.config.json');
+// --config elige contra qué instalación se trabaja. Sin él, producción.
+// El espejo local vive en cod-grapes-runner.local.json; tenerlo aparte evita
+// el accidente de escribirle a producción creyendo que era el local.
+const configElegida = (() => {
+  const k = process.argv.indexOf('--config');
+  return k !== -1 && process.argv[k + 1] ? process.argv[k + 1] : 'cod-grapes-runner.config.json';
+})();
+const configPath = path.isAbsolute(configElegida) ? configElegida : path.join(here, configElegida);
 const backupsDir = path.join(here, 'backups');
 
 function fail(message) {
@@ -175,7 +182,11 @@ if (faltantes.length > 0) {
     `  Opción B — entorno: definí COD_SITE_URL, COD_WP_USER y COD_WP_APP_PASSWORD.`
   );
 }
-const endpoint = `${config.siteUrl.replace(/\/+$/, '')}/wp-json/contope/v1/mcp`;
+// Una instalación con enlaces simples no sirve /wp-json/: hay que pedirle la
+// ruta por parámetro. Se puede fijar en la configuración con mcpEndpoint.
+const endpoint = typeof config.mcpEndpoint === 'string' && config.mcpEndpoint.trim() !== ''
+  ? config.mcpEndpoint.trim()
+  : config.siteUrl.replace(new RegExp('[/]+$'), '') + '/wp-json/contope/v1/mcp';
 const authHeader = 'Basic ' + Buffer.from(`${config.username}:${config.applicationPassword.replace(/\s+/g, '')}`).toString('base64');
 
 // ------------------------------------------------------------------ MCP call

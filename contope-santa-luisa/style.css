@@ -16,8 +16,15 @@ Text Domain: cod-santa-luisa
  * la página. Por eso el orden correcto es: el tema declara la identidad, y el
  * lienzo la extiende. Nunca al revés.
  *
- * Las tres familias reales del proyecto (Montserrat, Birthstone y Lora) se
- * sirven como @font-face propias, sin pedirle nada a Google.
+ * Las familias reales del proyecto son dos: Montserrat y Birthstone. Se sirven
+ * como @font-face propias, sin pedirle nada a Google.
+ *
+ * Hubo una tercera, Lora, declarada como «tipografía de citas». Nunca se usó:
+ * era un resabio del primer sitio de prueba de Open CoDesign. Se quitó el
+ * 2026-09-16 porque una regla de la página legal la había tomado por estar
+ * disponible, y el texto de entrada salía con serifas en un sitio que no las
+ * usa. Una tipografía declarada y sin uso no es neutra: es una invitación a
+ * usarla por accidente.
  */
 
 :root {
@@ -59,7 +66,6 @@ Text Domain: cod-santa-luisa
      página suelta herede la identidad aunque no traiga su propio :root. */
   --font-hero: 'Birthstone', 'Segoe Script', cursive;
   --font-body: 'Montserrat', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-quote: 'Lora', Georgia, 'Times New Roman', serif;
   --max-width: 1180px;
 }
 
