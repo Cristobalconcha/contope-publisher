@@ -5,6 +5,35 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.25 — 16 de septiembre de 2026
+
+### Agregado
+
+- **Dos fechas que las páginas pueden mostrar solas: `{{post_date}}` y
+  `{{post_modified}}`.** El resolutor de contenido dinámico sabía traer título,
+  extracto, imagen destacada, enlace permanente y campos de ACF, pero ninguna
+  fecha.
+
+  Salieron de una necesidad concreta: una política de privacidad debe indicar
+  desde cuándo rige. Escribir esa fecha a mano es garantizar que algún día quede
+  vieja. Son dos y no una porque responden preguntas distintas — desde cuándo
+  rige el documento, y cuándo se tocó por última vez — y la de modificación sola
+  no sirve para lo legal: cambiaría al corregir una coma y haría parecer que la
+  política es nueva sin serlo.
+
+  Ambas salen en el formato de fecha del sitio y en su idioma, así que la página
+  no decide por su cuenta cómo escribir una fecha.
+
+### Cambiado
+
+- **Una comprobación exigía «los cuatro built-ins» y contaba.** Al agregar dos
+  tokens legítimos, falló. Ahora comprueba que **cada token esté, por nombre**,
+  en vez de cuántos hay: contar rompe la prueba cada vez que el sistema crece de
+  forma correcta, y una prueba así estorba en lugar de proteger. Es la misma
+  fragilidad de la issue #11.
+
+---
+
 ## 0.3.24 — 16 de septiembre de 2026
 
 ### Cambiado

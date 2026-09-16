@@ -920,7 +920,7 @@ async function checkPublishingAndAssets() {
 }
 
 // ---------------------------------------------------------------------------
-// Resolver de contenido dinámico (Etapa 1: cuatro built-ins).
+// Resolver de contenido dinámico (built-ins de la Etapa 1 y tokens ACF).
 // ---------------------------------------------------------------------------
 
 async function checkDynamicTokenResolver() {
@@ -1008,10 +1008,13 @@ async function checkDynamicTokenResolver() {
     check(calls.includes('esc_url'), 'Los tokens de URL en texto deben escaparse con esc_url().');
   }
 
-  check(
-    source.includes('post_title|post_excerpt|featured_image|permalink'),
-    'La gramática debe mantener los cuatro built-ins de la Etapa 1 junto a los tokens ACF de la Etapa 3.',
-  );
+    // Se comprueba que cada built-in esté, no cuántos hay: contarlos rompe la
+    // prueba cada vez que se agrega uno legítimo, y entonces estorba en vez de
+    // proteger. Ver la issue #11.
+    for (const token of ['post_title', 'post_date', 'post_modified', 'post_excerpt', 'featured_image', 'permalink']) {
+      check(source.includes(token), `La gramática debe admitir el token {{${token}}}.`);
+    }
+    check(source.includes('acf:'), 'La gramática debe mantener los tokens ACF de la Etapa 3.');
   check(
     source.includes('{{acf:'),
     'La Etapa 3 debe resolver tokens {{acf:CAMPO}} y {{acf:CAMPO:html}}.',

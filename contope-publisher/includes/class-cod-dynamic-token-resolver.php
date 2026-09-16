@@ -170,7 +170,7 @@ final class COD_Dynamic_Token_Resolver
             }
 
             $parts[$index] = preg_replace_callback(
-                '/\{\{(post_title|post_excerpt|featured_image|permalink|acf:([a-zA-Z0-9_\-]+)(:html)?)\}\}/',
+                '/\{\{(post_title|post_date|post_modified|post_excerpt|featured_image|permalink|acf:([a-zA-Z0-9_\-]+)(:html)?)\}\}/',
                 function (array $matches) use ($post_id): string {
                     $acf_field = $matches[2] ?? '';
                     if ($acf_field !== '') {
@@ -188,6 +188,24 @@ final class COD_Dynamic_Token_Resolver
                             return esc_html(get_the_excerpt($post_id));
                         case 'featured_image':
                             return esc_url((string) get_the_post_thumbnail_url($post_id, 'full'));
+                        // Fecha de PUBLICACIÓN, no de modificación.
+                        //
+                        // Se agregó para la política de privacidad, que debe
+                        // indicar desde cuándo rige. La de modificación no
+                        // sirve ahí: cambiaría al corregir una coma y haría
+                        // parecer que la política es nueva sin serlo.
+                        //
+                        // Sale en el formato de fecha del sitio y en su
+                        // idioma, para no escribir «September» en un sitio
+                        // en español.
+                        case 'post_date':
+                            return esc_html(get_the_date('', $post_id) ?: '');
+                        // Fecha de la última modificación. Va junto a la de
+                        // publicación porque responden preguntas distintas:
+                        // desde cuándo rige el documento, y cuándo se tocó
+                        // por última vez.
+                        case 'post_modified':
+                            return esc_html(get_the_modified_date('', $post_id) ?: '');
                         case 'permalink':
                             return esc_url((string) get_permalink($post_id));
                     }
