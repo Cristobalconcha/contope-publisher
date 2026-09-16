@@ -466,9 +466,14 @@ async function checkSanitizer() {
   check(sanitizer !== null, 'Falta la clase COD_Canvas_Document_Sanitizer.');
   if (!sanitizer) return;
 
+  // Estos techos no fijan el límite: comprueban que exista uno, que sea
+  // positivo y que no sea absurdo. El de CSS decía 1 MB y el código declara
+  // 2 MB desde el 2026-08-21 (se subió a propósito, para destrabar un
+  // guardado real). La prueba no se enteró y falló durante casi un mes. Ver
+  // la issue #11.
   for (const [name, max] of [
     ['MAX_HTML_BYTES', 4194304],
-    ['MAX_CSS_BYTES', 1048576],
+    ['MAX_CSS_BYTES', 4194304],
     ['MAX_PROJECT_BYTES', 8388608],
   ]) {
     const value = constantOf(sanitizer, name);
@@ -808,7 +813,9 @@ async function checkIsolationAndAssets() {
     'GrapesJS no debe usar su almacenamiento propio: la persistencia es de WordPress.',
   );
   check(
-    coreScript.includes('OCD-CANVAS-EDITABLE-OVERRIDES') && coreScript.includes('data-cod-source-css'),
+    // El prefijo cambió de OCD- a COD- en el renombre y esta prueba se quedó
+    // con el viejo. Ver la issue #11.
+    coreScript.includes('COD-CANVAS-EDITABLE-OVERRIDES') && coreScript.includes('data-cod-source-css'),
     'El editor debe preservar el CSS fuente literalmente y separar sus overrides editables.',
   );
   check(
@@ -1186,7 +1193,16 @@ async function checkDevicePresentation() {
   check(!gridControls.includes('Aplicar proporción'), 'La edición manual no debe depender de un botón redundante.');
   check(!gridControls.includes("'Dispositivo'"), 'Columnas no debe repetir un selector textual de dispositivo.');
   check(canvasGrid.includes('parsed.length < 1'), 'La notación manual debe aceptar una sola columna con valor 1.');
-  check(canvasGrid.includes("normalized.startsWith('mobile')"), 'Los dispositivos Mobile deben resolver el breakpoint mobile real.');
+  // Antes se exigía startsWith('mobile'), que es una FORMA de escribirlo y no
+  // una garantía. El código la reemplazó a propósito por coincidencia de
+  // sub-cadena, porque GrapesJS no tiene ningún dispositivo llamado "Mobile"
+  // a secas —trae "Mobile landscape" y "Mobile portrait"— y con la forma
+  // anterior todo teléfono caía a escritorio. Se comprueba lo que importa:
+  // que exista el repliegue por sub-cadena. Ver la issue #11.
+  check(
+    canvasGrid.includes('id.includes(key) || name.includes(key)'),
+    'Un dispositivo cuyo nombre contenga la clave debe resolver ese breakpoint (Mobile landscape → mobile).',
+  );
   check(canvasCss.includes('body:has(.cod-canvas-wrap)'), 'El look propio debe quedar aislado a la pantalla del Editor visual.');
   check(canvasCss.includes('background:#191d23'), 'La barra superior debe usar el chrome oscuro del editor.');
   check(canvasCss.includes('#cod-snapshots-open') && canvasCss.includes('background:transparent'), 'Historial debe mostrarse como icono sin contorno de botón.');
