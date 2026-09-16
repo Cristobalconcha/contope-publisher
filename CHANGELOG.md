@@ -5,6 +5,32 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.22 — 15 de septiembre de 2026
+
+### Corregido
+
+- **Los mensajes de límite decían un tamaño que no era.** El tope de CSS se
+  subió de 512 KB a 2 MB el 21 de agosto y el mensaje de error siguió diciendo
+  512 KB durante casi un mes. Quien topara el límite recibía un número falso: con
+  512 KB en la cabeza uno parte su CSS en pedazos para bajar de una cifra que el
+  sistema hace rato dejó de aplicar, o concluye que el guardado está roto.
+
+  Ahora los tres mensajes —HTML, CSS y datos estructurados— **arman el número a
+  partir del propio límite**, así que no pueden volver a desincronizarse. Se
+  escribió como un ayudante y no como tres textos corregidos a mano, porque
+  corregir el texto sólo arregla esta vez.
+
+- **El error ahora dice cuánto traía el documento.** Antes decía únicamente cuál
+  era el tope. Saber que el límite son 2 MB no ayuda si no sabes si te pasaste
+  por diez kilobytes o por el doble: en el primer caso se borran cuatro reglas
+  huérfanas, en el segundo hay que mirar por qué se acumuló tanto. Es la misma
+  lección de la 0.3.20: un error que sólo dice «no se pudo» manda a buscar a
+  ciegas.
+
+  Issue #10.
+
+---
+
 ## 0.3.21 — 15 de septiembre de 2026
 
 ### Corregido

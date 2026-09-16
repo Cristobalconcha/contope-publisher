@@ -122,6 +122,28 @@ final class COD_Canvas_Document_Sanitizer
     ];
 
     /**
+     * Escribe un tamaño en bytes como lo leería una persona.
+     *
+     * Existe para que el número del mensaje salga del propio límite y no de
+     * la memoria de quien escribió la línea. Escribirlo a mano ya costó una
+     * vez: el tope de CSS se subió a 2 MB el 2026-08-21 y el mensaje siguió
+     * diciendo 512 KB durante casi un mes, mandando a buscar el problema
+     * donde no estaba. Ver la issue #10.
+     */
+    private static function limite_legible(int $bytes): string
+    {
+        foreach ([1048576 => 'MB', 1024 => 'KB'] as $unidad => $nombre) {
+            if ($bytes >= $unidad) {
+                $valor = number_format($bytes / $unidad, 1, ',', '');
+                $valor = rtrim(rtrim($valor, '0'), ',');
+                return $valor . ' ' . $nombre;
+            }
+        }
+
+        return $bytes . ' bytes';
+    }
+
+    /**
      * @return string|WP_Error HTML saneado o el motivo del rechazo.
      */
     public function sanitize_html(string $html)
@@ -129,7 +151,14 @@ final class COD_Canvas_Document_Sanitizer
         $html = $this->normalize($html);
         $html = $this->strip_document_metadata($html);
         if (strlen($html) > self::MAX_HTML_BYTES) {
-            return new WP_Error('cod_canvas_html_size', 'El HTML supera el límite de 2 MB.');
+            return new WP_Error(
+                'cod_canvas_html_size',
+                sprintf(
+                    'El HTML supera el límite de %s: el documento trae %s.',
+                    self::limite_legible(self::MAX_HTML_BYTES),
+                    self::limite_legible(strlen($html))
+                )
+            );
         }
 
         $allowed = $this->allowed_html();
@@ -177,7 +206,14 @@ final class COD_Canvas_Document_Sanitizer
     {
         $css = $this->normalize($css);
         if (strlen($css) > self::MAX_CSS_BYTES) {
-            return new WP_Error('cod_canvas_css_size', 'El CSS supera el límite de 512 KB.');
+            return new WP_Error(
+                'cod_canvas_css_size',
+                sprintf(
+                    'El CSS supera el límite de %s: el documento trae %s.',
+                    self::limite_legible(self::MAX_CSS_BYTES),
+                    self::limite_legible(strlen($css))
+                )
+            );
         }
 
         if (strpos($css, '<') !== false) {
@@ -223,7 +259,14 @@ final class COD_Canvas_Document_Sanitizer
             return wp_json_encode(new stdClass());
         }
         if (strlen($json) > self::MAX_PROJECT_BYTES) {
-            return new WP_Error('cod_canvas_project_size', 'Los datos estructurados superan el límite de 4 MB.');
+            return new WP_Error(
+                'cod_canvas_project_size',
+                sprintf(
+                    'Los datos estructurados superan el límite de %s: traen %s.',
+                    self::limite_legible(self::MAX_PROJECT_BYTES),
+                    self::limite_legible(strlen($json))
+                )
+            );
         }
 
         $data = json_decode($json, true, self::MAX_PROJECT_DEPTH);
