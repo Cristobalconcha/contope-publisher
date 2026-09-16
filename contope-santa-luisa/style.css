@@ -67,6 +67,27 @@ Text Domain: cod-santa-luisa
   --font-hero: 'Birthstone', 'Segoe Script', cursive;
   --font-body: 'Montserrat', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --max-width: 1180px;
+
+  /* Nombres cortos, para que los documentos del lienzo tomen la paleta de
+     ACÁ y no declaren la suya. Hasta el 2026-09-16 cada documento cargaba su
+     propia copia con los mismos valores y otros nombres: la hoja central
+     existía y no la usaba nadie. Un mismo color definido en seis lugares se
+     desincroniza solo. Las tipografías y el ancho ya estaban acá arriba. */
+  --dorado-50: var(--slp-dorado-50);
+  --dorado-100: var(--slp-dorado-100);
+  --dorado-300: var(--slp-dorado-300);
+  --dorado-500: var(--slp-dorado-500);
+  --dorado-600: var(--slp-dorado-600);
+  --oliva-50: var(--slp-oliva-50);
+  --oliva-100: var(--slp-oliva-100);
+  --oliva-300: var(--slp-oliva-300);
+  --oliva-500: var(--slp-oliva-500);
+  --oliva-700: var(--slp-oliva-700);
+  --tierra-50: var(--slp-tierra-50);
+  --tierra-100: var(--slp-tierra-100);
+  --tierra-300: var(--slp-tierra-300);
+  --tierra-500: var(--slp-tierra-500);
+  --tierra-700: var(--slp-tierra-700);
 }
 
 body {

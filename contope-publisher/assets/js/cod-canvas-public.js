@@ -651,7 +651,7 @@
                 try { window.dispatchEvent(new CustomEvent('cod:whatsapp-abierto', { detail: detalle })); } catch (e) {}
                 try {
                     if (Array.isArray(window.dataLayer)) {
-                        window.dataLayer.push({ event: nombreEventoApertura, origen: detalle.origen });
+                        window.dataLayer.push(Object.assign({ event: nombreEventoApertura }, detalle));
                     }
                 } catch (e) {}
                 try {
@@ -678,14 +678,27 @@
             // botón salió y si aceptó recibir novedades.
             function avisar(acepto) {
                 var detalle = { origen: origen };
-                // Si no hay casilla, no se manda el campo. Mandar siempre
-                // false se lee como "nadie acepta", que no es lo mismo que
-                // "no se pregunta".
+                // Un consentimiento sin titular no es un consentimiento.
+                //
+                // Quien pincha el WhatsApp es anónimo: no hay nombre, ni teléfono, ni
+                // correo. Mientras no escriba, lo único que se sabe es que alguien
+                // pinchó. Pedirle que acepte algo ahí sólo llena una casilla que no se
+                // puede asociar a nadie, y no sirve como prueba de nada. Por eso Santa
+                // Luisa no la tiene. El lugar donde el consentimiento SÍ tiene sentido
+                // es el formulario, donde la persona entrega su nombre y su correo.
+                //
+                // Si aun así un sitio pone la casilla, el campo viaja. Si no la hay, no
+                // viaja: mandar siempre false se lee como «nadie acepta», que no es lo
+                // mismo que «no se pregunta».
                 if (consent) detalle.consentimiento = !!acepto;
                 try { window.dispatchEvent(new CustomEvent('cod:whatsapp-enviado', { detail: detalle })); } catch (e) {}
                 try {
                     if (Array.isArray(window.dataLayer)) {
-                        window.dataLayer.push({ event: nombreEvento, origen: detalle.origen, consentimiento: detalle.consentimiento });
+                        // Se manda el detalle tal cual, sin nombrar los campos uno a uno:
+                        // nombrarlos obliga a que la clave viaje aunque no tenga valor, y
+                        // entonces «consentimiento» aparece vacío en un sitio que no lo
+                        // pregunta. Así el dataLayer dice exactamente lo mismo que gtag.
+                        window.dataLayer.push(Object.assign({ event: nombreEvento }, detalle));
                     }
                 } catch (e) {}
                 try {
