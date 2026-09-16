@@ -363,6 +363,22 @@ final class COD_Canvas_Document_Sanitizer
      */
     private function embed_origin_error(string $url): ?string
     {
+        // Una ruta del propio sitio no es un tercero: es este mismo
+        // WordPress sirviendo algo suyo. No hay origen que declarar, porque
+        // ya es el del dueño del sitio, y exigirle https:// obligaría a
+        // escribir el dominio adentro del documento, que es justo lo que
+        // rompe una mudanza de dominio.
+        //
+        // Se admite solo la ruta absoluta de una barra. «//otro.com/x» es
+        // relativa al esquema y apunta afuera; «/\otro.com» lo mismo en
+        // varios navegadores. Las dos quedan fuera a propósito.
+        $barra_invertida = chr(92); // \ — varios navegadores la leen como /
+        $ruta_propia = $url !== '' && $url[0] === '/'
+            && !str_starts_with($url, '//')
+            && !str_starts_with($url, '/' . $barra_invertida);
+        if ($ruta_propia) {
+            return null;
+        }
         $parts = wp_parse_url($url);
         if (!is_array($parts) || strtolower((string) ($parts['scheme'] ?? '')) !== 'https') {
             return substr($url, 0, 100);

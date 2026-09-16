@@ -5,6 +5,33 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.21 — 15 de septiembre de 2026
+
+### Corregido
+
+- **Un sitio no podía incrustar contenido propio.** La regla que decide qué
+  puede aparecer dentro de un `iframe` exigía una dirección `https://` con el
+  dominio declarado en Configuración. Eso deja afuera un caso que no es el que
+  la regla quería atajar: **una ruta del propio sitio**, como `/360/`.
+
+  La regla existe para que un documento traído de afuera —una plantilla, un
+  paquete de otro sitio— no pueda meter una página ajena dentro de la tuya con
+  tu dominio en la barra. Una ruta que empieza con una barra no es un tercero:
+  es este mismo WordPress sirviendo algo suyo. No hay origen que declarar
+  porque ya es el del dueño del sitio.
+
+  Ahora se admite la ruta absoluta de una sola barra. Quedan fuera a propósito
+  `//otro.com/x`, que es relativa al esquema y apunta afuera, y `/\otro.com`,
+  que varios navegadores leen como lo mismo.
+
+  El caso real: un recorrido 360 alojado en el propio servidor. Antes había que
+  escribir el dominio completo adentro del documento, lo que además ata el
+  contenido a ese dominio — justo lo que hace doloroso mudar un sitio. Con la
+  ruta relativa, el contenido sigue al dominio que lo sirva, igual que las
+  imágenes.
+
+---
+
 ## 0.3.20 — 14 de septiembre de 2026
 
 ### Corregido
