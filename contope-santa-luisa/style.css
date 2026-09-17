@@ -2,7 +2,7 @@
 Theme Name: ContOpe Design — Santa Luisa de Palpi
 Template: contope-canvas
 Description: Tema hijo del motor ContOpe Canvas para el proyecto Santa Luisa de Palpi. Aporta paleta, tipografía e identidad del proyecto sobre las reglas estructurales del padre.
-Version: 0.2.3
+Version: 0.2.5
 Requires at least: 6.5
 Requires PHP: 8.0
 Text Domain: cod-santa-luisa
@@ -216,4 +216,79 @@ h1, h2, h3, h4, h5, h6 {
    ajustes del plugin; esto lo resuelve aunque esa casilla no se marque. */
 .cookieadmin_law_container .cookieadmin-poweredby {
   display: none;
+}
+
+/* El panel de «Configurar», con el mismo criterio que el banner:
+   tipografía y espacios reducidos, y sin el logotipo del proveedor.
+   La regla anterior sólo alcanzaba al banner; el panel es otro contenedor y
+   traía su propio «Powered by». */
+.cookieadmin_cookie_modal {
+  font-family: var(--font-body);
+  max-height: 72vh;
+}
+
+.cookieadmin_cookie_modal .cookieadmin-poweredby {
+  display: none;
+}
+
+#cookieadmin_preference_title {
+  font-size: 15px;
+  line-height: 1.3;
+  letter-spacing: 0.01em;
+}
+
+.cookieadmin_details_wrapper {
+  padding: 0 14px;
+  font-size: 11.5px;
+  line-height: 1.45;
+}
+
+.cookieadmin_details_wrapper p,
+.cookieadmin_details_wrapper li,
+.cookieadmin_details_wrapper div {
+  font-size: 11.5px;
+  line-height: 1.45;
+}
+
+.cookieadmin_modal_footer {
+  padding: 10px 14px;
+}
+
+.cookieadmin_modal_footer .cookieadmin_btn,
+.cookieadmin_modal_footer_links .cookieadmin_btn {
+  font-family: var(--font-body);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 7px 14px;
+  border-radius: 999px;
+}
+
+/* El borde de los botones es lo único de color que el plugin NO expone en sus
+   ajustes: lo trae fijo en gris. Por eso se corrige acá y no allá. El resto de
+   los colores —fondos, textos, enlaces, interruptores— se configuran en la
+   pantalla de CookieAdmin, que es donde corresponde. */
+.cookieadmin_btn {
+  border-color: var(--slp-tierra-300);
+}
+
+.cookieadmin_btn:hover {
+  border-color: var(--slp-dorado-600);
+}
+
+/* El plugin trae tres azules escritos a mano en su hoja, sin ajuste que los
+   gobierne: el «Siempre activas», el texto por defecto de los botones y el
+   interruptor encendido. Son los únicos colores que hay que corregir desde
+   acá; todo lo demás sale de su pantalla de ajustes. */
+.cookieadmin_act {
+  color: var(--slp-dorado-600);
+  font-weight: 600;
+}
+
+button.cookieadmin_btn {
+  color: var(--slp-oliva-700);
+}
+
+input:checked + .cookieadmin_slider {
+  background-color: var(--slp-dorado-600);
 }
