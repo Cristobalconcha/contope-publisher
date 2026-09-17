@@ -415,6 +415,11 @@ final class COD_Settings_Admin
                         value="<?php echo esc_attr($value); ?>">
                     <span class="cod-settings-color-value"><?php echo $value !== '' ? esc_html($value) : 'Sin definir'; ?></span>
                 </span>
+            <?php elseif ($type === 'motion') : ?>
+                <input type="text" id="<?php echo esc_attr($id); ?>" name="<?php echo esc_attr($field['id']); ?>"
+                    data-field-id="<?php echo esc_attr($field['id']); ?>" value="<?php echo esc_attr($value); ?>"
+                    placeholder="<?php echo esc_attr((string) ($field['placeholder'] ?? 'Sin definir')); ?>"
+                    spellcheck="false" autocomplete="off">
             <?php else : ?>
                 <input type="number" id="<?php echo esc_attr($id); ?>" name="<?php echo esc_attr($field['id']); ?>"
                     data-field-id="<?php echo esc_attr($field['id']); ?>" value="<?php echo esc_attr($value); ?>"

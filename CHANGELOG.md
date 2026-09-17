@@ -5,6 +5,48 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.28 — 17 de septiembre de 2026
+
+### Agregado
+
+- **El movimiento entra al núcleo del set de diseño, con dos definiciones.**
+  Hasta ahora el núcleo declaraba seis roles —tres colores, dos tipografías y
+  una medida— y el movimiento no estaba en ninguna parte. Por eso terminó
+  escrito **trece veces a mano** repartido entre los documentos, cinco de ellas
+  atadas a identificadores generados como `#irnrp6`, que no se pueden reusar.
+
+  Ahora son ocho roles. Los dos nuevos son **Aparecer** y **Responder**, y son
+  dos y no uno por una razón medible: los dos gestos que el sitio ya usa
+  agrupan en 420–500 ms y en 160–200 ms, con un factor de 2,5 entre medias.
+
+  No son variantes de lo mismo porque sus tiempos se calibran contra cosas
+  distintas. **Aparecer** se mide contra la vista: el movimiento tiene que
+  durar lo suficiente para que el ojo lo siga. **Responder** se mide contra la
+  mano: pasados unos 150 ms deja de sentirse como respuesta y empieza a
+  sentirse como lentitud. Al ajustar una se rompería la otra.
+
+  Se declaran en ContOpe → Configuración, en un grupo nuevo llamado
+  «Movimiento». El valor es una duración y una curva juntas, para poder
+  escribirse tal cual dentro de un `transition`:
+
+  ```css
+  transition: opacity var(--cod-motion-enter);
+  ```
+
+  El campo acepta sólo lo que compone ese par —números, `ms`/`s`, las curvas
+  por nombre, `cubic-bezier()` y `steps()`— y exige que haya una duración. Un
+  punto y coma o una llave permitirían cerrar la declaración y escribir otra
+  regla, así que se rechazan.
+
+### Cambiado
+
+- **El aviso del núcleo dice dónde se declara cada cosa.** Antes remataba
+  siempre con «en el theme.json del tema activo o en Configuración». Para el
+  movimiento eso es falso: esa dimensión no existe en el esquema de un
+  theme.json, y habría mandado a alguien a buscar donde no está.
+
+---
+
 ## 0.3.27 — 16 de septiembre de 2026
 
 ### Cambiado

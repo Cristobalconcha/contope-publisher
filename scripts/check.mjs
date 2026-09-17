@@ -125,7 +125,7 @@ const nucleoSource = await readFile(
   new URL('../contope-publisher/includes/class-cod-design-core.php', import.meta.url),
   'utf8',
 );
-for (const rol of ['accent', 'ink', 'surface', 'heading', 'body', 'measure']) {
+for (const rol of ['accent', 'ink', 'surface', 'heading', 'body', 'measure', 'enter', 'response']) {
   if (!nucleoSource.includes(`'${rol}' =>`)) {
     throw new Error(`El núcleo del mundo web no declara el rol ${rol}.`);
   }

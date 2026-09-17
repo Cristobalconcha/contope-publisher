@@ -102,6 +102,28 @@ final class COD_Design_Core
                 'titulo' => 'Ancho de la caja de lectura',
                 'gradacion' => 1,
             ],
+            // Dos definiciones de movimiento y no una, decidido por Cristóbal
+            // el 2026-09-17 sobre lo medido en el sitio: los dos gestos que usa
+            // agrupan en 420–500 ms y en 160–200 ms, con un factor de 2,5 entre
+            // medias. No son variantes de lo mismo porque sus tiempos se
+            // calibran contra cosas distintas —aparecer contra la vista,
+            // responder contra la mano— y al ajustar una se rompería la otra.
+            //
+            // Es el rol que hoy vale cero: no estaba declarado en ninguna
+            // parte, y por eso terminó escrito trece veces a mano en los
+            // documentos, cinco de ellas atadas a identificadores generados.
+            'enter' => [
+                'clase' => 'movimiento',
+                'token' => '--cod-motion-enter',
+                'titulo' => 'Movimiento al aparecer',
+                'gradacion' => 1,
+            ],
+            'response' => [
+                'clase' => 'movimiento',
+                'token' => '--cod-motion-response',
+                'titulo' => 'Movimiento al responder',
+                'gradacion' => 1,
+            ],
         ];
     }
 
@@ -183,10 +205,23 @@ final class COD_Design_Core
             $nombres[] = $rol['titulo'] . ' (' . $rol['token'] . ')';
         }
 
+        // Dónde se declara depende de la clase: el movimiento no tiene lugar en
+        // el theme.json —esa dimensión no existe en su esquema— así que decir
+        // «o en el theme.json» mandaría a alguien a buscar donde no está.
+        $solo_movimiento = true;
+        foreach ($faltan as $rol) {
+            if ($rol['clase'] !== 'movimiento') {
+                $solo_movimiento = false;
+                break;
+            }
+        }
+        $donde = $solo_movimiento
+            ? 'Se declaran en ContOpe → Configuración; el movimiento no tiene dónde declararse en un theme.json.'
+            : 'Se declaran en ContOpe → Configuración, y los colores, tipografías y medidas también pueden venir del theme.json del tema activo.';
+
         return 'El set de diseño no declara ' . count($faltan) . ' definición(es) del núcleo: '
             . implode(', ', $nombres) . '. El plugin ya no pone un valor propio en su lugar, '
-            . 'así que esas propiedades quedan sin resolver. Se declaran en el theme.json del '
-            . 'tema activo o en ContOpe → Configuración.';
+            . 'así que esas propiedades quedan sin resolver. ' . $donde;
     }
 
     /**
@@ -250,6 +285,8 @@ final class COD_Design_Core
             'heading' => $leer('font_heading'),
             'body' => $leer('font_body'),
             'measure' => $ancho === '' ? '' : $ancho . 'px',
+            'enter' => $leer('motion_enter'),
+            'response' => $leer('motion_response'),
         ];
     }
 
@@ -340,6 +377,12 @@ final class COD_Design_Core
             'heading' => $titulos,
             'body' => $cuerpo,
             'measure' => is_string($ancho) ? $ancho : '',
+            // theme.json no tiene dónde declarar movimiento: no existe esa
+            // dimensión en su esquema. Por eso estos dos roles sólo pueden
+            // venir de Configuración, y si nadie los escribe se informan como
+            // faltantes. Eso es correcto: son el hueco real del set.
+            'enter' => '',
+            'response' => '',
         ];
     }
 }

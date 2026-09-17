@@ -104,6 +104,7 @@ $cod_cookies_de_partida = static function ($guardado) {
         'cookieadmin_notice' => 'Las necesarias para que el sitio funcione. Las de medición y publicidad, sólo si aceptas.',
         'cookieadmin_preference_title' => 'Preferencias de cookies',
         'cookieadmin_preference' => 'Elige qué permites. Puedes cambiarlo cuando quieras.',
+        'reConsent_title' => 'Cambiar preferencias de cookies',
         'cookieadmin_customize_btn' => 'Configurar',
         'cookieadmin_reject_btn' => 'Rechazar',
         'cookieadmin_accept_btn' => 'Aceptar todas',

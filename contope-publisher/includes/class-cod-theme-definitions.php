@@ -336,6 +336,14 @@ final class COD_Theme_Definitions
         if ($v['landing'] !== '') {
             $root[] = '--cod-landing:' . $v['landing'] . 'px';
         }
+        // Duración y curva juntas, para escribirse tal cual dentro de un
+        // transition: `transition: opacity var(--cod-motion-enter);`
+        if (isset($v['motion_enter']) && $v['motion_enter'] !== '') {
+            $root[] = '--cod-motion-enter:' . $v['motion_enter'];
+        }
+        if (isset($v['motion_response']) && $v['motion_response'] !== '') {
+            $root[] = '--cod-motion-response:' . $v['motion_response'];
+        }
 
         $css = "/* Definiciones del tema — generado desde Configuración */\n";
         $css .= ':root{' . implode(';', $root) . ';}';
