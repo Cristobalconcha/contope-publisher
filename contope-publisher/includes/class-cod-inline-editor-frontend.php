@@ -184,7 +184,8 @@ final class COD_Inline_Editor_Frontend
             'regions' => $regions,
             'templatesUrl' => $templates_url,
             'siteFontCss' => COD_Canvas_Page_Publisher::site_font_css(),
-            'themeDefinitionsCss' => COD_Theme_Definitions::css(),
+            // El núcleo primero, igual que en la página publicada.
+            'themeDefinitionsCss' => COD_Design_Core::css() . COD_Theme_Definitions::css(),
         ];
 
         // JSON_HEX_* evita cualquier salida de `<` o `&` dentro del <script>.

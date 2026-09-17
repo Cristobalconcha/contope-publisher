@@ -222,7 +222,16 @@ final class COD_Theme_Definitions
      *
      * Es el mismo fondo del sitio, así la cortina no se distingue de la
      * página: no se ve una pantalla de carga, se ve el sitio todavía vacío.
-     * Si el tema no lo tiene definido, se usa el blanco cálido de partida.
+     *
+     * Hasta el 2026-09-16 devolvía `#f6f6f3` cuando nadie lo definía. Daba la
+     * casualidad de que en Santa Luisa ese era el fondo real, así que el
+     * invento pasó desapercibido durante meses: el mejor ejemplo de por qué un
+     * respaldo que acierta es más peligroso que uno que falla.
+     *
+     * Ahora, si las definiciones no lo traen, sale del rol «superficie» del
+     * núcleo, que lee el theme.json del tema activo: el mismo color, pero
+     * declarado por alguien. Si nadie lo declara devuelve '' y la cortina se
+     * dibuja sin fondo, en vez de con un color que no eligió nadie.
      */
     public static function preload_background(): string
     {
@@ -231,7 +240,15 @@ final class COD_Theme_Definitions
         if ($fondo !== '' && preg_match('/^#[0-9a-fA-F]{3,8}$/', $fondo) === 1) {
             return $fondo;
         }
-        return '#f6f6f3';
+
+        if (class_exists('COD_Design_Core')) {
+            $estado = COD_Design_Core::estado();
+            if (!empty($estado['surface']['declarado'])) {
+                return (string) $estado['surface']['valor'];
+            }
+        }
+
+        return '';
     }
 
     public static function css(): string

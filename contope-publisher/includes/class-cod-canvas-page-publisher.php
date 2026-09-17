@@ -197,11 +197,15 @@ final class COD_Canvas_Page_Publisher
             return;
         }
 
-        $fondo = esc_attr(COD_Theme_Definitions::preload_background());
+        // Si el set no declara una superficie, la cortina va sin fondo. No se
+        // pone un color de relleno: una cortina transparente se nota y se
+        // arregla; una del color equivocado se queda para siempre.
+        $fondo = COD_Theme_Definitions::preload_background();
+        $pinta = $fondo === '' ? '' : ' background: ' . esc_attr($fondo) . ';';
         $estilo = '.cod-precarga, .cod-precarga body { overflow: hidden !important; }'
             . '.cod-precarga body::after, .cod-precarga-lista body::after {'
             . ' content: ""; position: fixed; inset: 0; z-index: 2147483000;'
-            . ' pointer-events: none; background: ' . $fondo . '; }'
+            . ' pointer-events: none;' . $pinta . ' }'
             . '.cod-precarga-lista body::after { opacity: 0; transition: opacity .45s ease; }'
             . '@media (prefers-reduced-motion: reduce) {'
             . ' .cod-precarga-lista body::after { transition: none; } }';
@@ -691,7 +695,11 @@ final class COD_Canvas_Page_Publisher
         wp_enqueue_style('cod-canvas-public');
         wp_add_inline_style(
             'cod-canvas-public',
-            COD_Theme_Definitions::css() . self::site_font_css() . $this->shared_components_css()
+            // El núcleo va primero: lleva a los tokens del plugin lo que el tema
+            // ya declara en su theme.json. Antes esos tokens no llegaban a
+            // ninguna parte y el compilador tapaba el hueco con los colores del
+            // panel de WordPress. Ver COD_Design_Core.
+            COD_Design_Core::css() . COD_Theme_Definitions::css() . self::site_font_css() . $this->shared_components_css()
                 . self::dynamic_group_css($header_html . $body_html . $footer_html)
                 . self::rotation_css() . self::carousel_rows_css() . $header_css . $body_css . $footer_css
         );
@@ -756,7 +764,7 @@ final class COD_Canvas_Page_Publisher
         }
 
         $site_font_css = self::site_font_css();
-        $theme_css = COD_Theme_Definitions::css();
+        $theme_css = COD_Design_Core::css() . COD_Theme_Definitions::css();
         wp_register_style('cod-canvas-public', false, [], COD_PUBLISHER_VERSION);
         wp_enqueue_style('cod-canvas-public');
         if (!self::$css_ya_emitido) {

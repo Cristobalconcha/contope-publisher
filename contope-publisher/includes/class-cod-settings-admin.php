@@ -150,6 +150,45 @@ final class COD_Settings_Admin
 
             <div class="cod-settings-sections">
                 <section class="cod-settings-section">
+                    <h2>Núcleo del set de diseño</h2>
+                    <p class="cod-settings-intro">
+                        Las definiciones sin las cuales no hay con qué dibujar un sitio. No
+                        importa cuál es el color ni cuál la tipografía: importa que exista la
+                        definición. Si falta alguna, el plugin <strong>no pone una suya</strong>:
+                        lo dice acá. Pueden venir de los campos de más abajo o del
+                        <code>theme.json</code> del tema activo.
+                    </p>
+                    <?php $nucleo = COD_Design_Core::estado(); ?>
+                    <table class="widefat striped" style="max-width:760px">
+                        <thead>
+                            <tr><th>Definición</th><th>Variable</th><th>Valor</th><th>Declarada en</th></tr>
+                        </thead>
+                        <tbody>
+                        <?php foreach ($nucleo as $rol) : ?>
+                            <tr>
+                                <td><?php echo esc_html($rol['titulo']); ?></td>
+                                <td><code><?php echo esc_html($rol['token']); ?></code></td>
+                                <td>
+                                    <?php if ($rol['declarado']) : ?>
+                                        <?php echo esc_html($rol['valor']); ?>
+                                    <?php else : ?>
+                                        <strong>sin declarar</strong>
+                                    <?php endif; ?>
+                                </td>
+                                <td><?php echo $rol['declarado'] ? esc_html($rol['origen']) : '—'; ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                    <?php $aviso_nucleo = COD_Design_Core::aviso(); ?>
+                    <?php if ($aviso_nucleo !== '') : ?>
+                        <div class="notice notice-warning inline" style="margin-top:12px">
+                            <p><?php echo esc_html($aviso_nucleo); ?></p>
+                        </div>
+                    <?php endif; ?>
+                </section>
+
+                <section class="cod-settings-section">
                     <h2>Definiciones de estilo del tema</h2>
                     <p class="cod-settings-intro">
                         Los campos sin definir no emiten CSS. Los valores iniciales provienen del

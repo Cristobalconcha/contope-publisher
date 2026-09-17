@@ -59,6 +59,20 @@ final class COD_Canvas_MCP_Service
                 'reason' => 'COD Web acepta una instantánea explícita de reglas trazables para trabajar directo con IA. Desktop deberá emitir la misma forma cuando su importador esté listo; Canvas no altera design-contract.json.',
                 'catalog' => $catalog['designRuleSet'],
             ],
+            // El núcleo del mundo web: las clases de definición sin las cuales
+            // no hay con qué dibujar. No es una lista de valores sino de roles.
+            //
+            // Está acá para que quien construya sepa, ANTES de componer, qué
+            // declara este sitio y qué no. Hasta el 2026-09-16 el plugin tapaba
+            // los huecos con los colores del panel de WordPress, y el resultado
+            // se veía razonable: un sitio con el azul de WordPress no parece
+            // roto, parece decidido. Ver COD_Design_Core e issue #9.
+            'designCore' => [
+                'mundo' => 'web',
+                'roles' => COD_Design_Core::estado(),
+                'faltantes' => COD_Design_Core::faltantes(),
+                'aviso' => COD_Design_Core::aviso(),
+            ],
             'composition' => $catalog['composition'],
             'realization' => $catalog['realization'],
             'existingButNotCallableYet' => $catalog['existingButNotCallableYet'],
@@ -217,7 +231,34 @@ final class COD_Canvas_MCP_Service
             'summary' => $compiled['summary'],
             'schema' => $compiled['schema'],
             'visualPreviewPersisted' => false,
+            // El aviso viaja con la evidencia, no en un registro aparte que
+            // nadie lee. Si el sitio no declara una definición del núcleo, esto
+            // lo dice por su nombre antes de aplicar nada.
+            'designCore' => self::informe_del_nucleo(),
             'next' => 'Si la evidencia es correcta, usa cod_apply_canvas_composition con este previewId; la operación crea un snapshot antes de escribir.',
+        ];
+    }
+
+    /**
+     * Qué definiciones del núcleo faltan, en la forma en que se adjunta a una
+     * previsualización o a una aplicación.
+     *
+     * Devuelve `['completo' => true]` cuando no falta nada: una respuesta corta
+     * para el caso normal, y larga sólo cuando hay algo que decir.
+     *
+     * @return array<string, mixed>
+     */
+    private static function informe_del_nucleo(): array
+    {
+        $faltantes = COD_Design_Core::faltantes();
+        if ($faltantes === []) {
+            return ['completo' => true];
+        }
+
+        return [
+            'completo' => false,
+            'faltantes' => $faltantes,
+            'aviso' => COD_Design_Core::aviso(),
         ];
     }
 
@@ -264,6 +305,7 @@ final class COD_Canvas_MCP_Service
                 'design' => $compiled['design'],
                 'summary' => $compiled['summary'],
                 'reviewedBaseRevision' => $expected_revision,
+                'designCore' => self::informe_del_nucleo(),
             ],
         ];
     }

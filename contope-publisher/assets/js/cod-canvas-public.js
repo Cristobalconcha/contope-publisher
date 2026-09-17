@@ -1102,6 +1102,20 @@
         });
     }
 
+    // El color de acento declarado por el set de diseño, leído del propio
+    // documento. Si nadie lo declaró devuelve 'currentColor', que hereda la
+    // tinta del texto: el medio resuelve lo que el set no dijo, en vez de que
+    // el plugin invente un color. Antes acá caía el azul del panel de
+    // WordPress. Ver COD_Design_Core en el plugin.
+    function colorDeAcento(el) {
+        try {
+            var v = getComputedStyle(el).getPropertyValue('--cod-color-accent');
+            v = v ? v.trim() : '';
+            if (v) return v;
+        } catch (e) {}
+        return 'currentColor';
+    }
+
     // chart: genera un SVG declarativo de barras o líneas desde
     // data-cod-chart-data. Igual que en el runtime del editor: JSON.parse,
     // createElementNS y textContent, sin librerías externas ni eval/Function.
@@ -1121,7 +1135,7 @@
 
             var chartType = parseClass(root.getAttribute('data-cod-chart-type'), 'bar');
             if (chartType !== 'bar' && chartType !== 'line') chartType = 'bar';
-            var color = parseClass(root.getAttribute('data-cod-chart-color'), '#2271b1');
+            var color = parseClass(root.getAttribute('data-cod-chart-color'), '') || colorDeAcento(root);
             var axisColor = parseClass(root.getAttribute('data-cod-chart-axis-color'), '#5f6b7a');
             var gridColor = parseClass(root.getAttribute('data-cod-chart-grid-color'), 'rgba(0,0,0,.08)');
             var labelColor = parseClass(root.getAttribute('data-cod-chart-label-color'), '#27312c');

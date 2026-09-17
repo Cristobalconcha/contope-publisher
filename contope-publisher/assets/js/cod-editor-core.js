@@ -287,7 +287,11 @@
                 '<div class="cod-chart" data-cod-behavior="chart" ' +
                 'data-cod-chart-type="bar" ' +
                 'data-cod-chart-data="[{&quot;label&quot;:&quot;Ene&quot;,&quot;value&quot;:1200},{&quot;label&quot;:&quot;Feb&quot;,&quot;value&quot;:1800},{&quot;label&quot;:&quot;Mar&quot;,&quot;value&quot;:1400},{&quot;label&quot;:&quot;Abr&quot;,&quot;value&quot;:2200}]" ' +
-                'data-cod-chart-color="#2271b1" data-cod-chart-axis-color="#5f6b7a" ' +
+                // Sin color propio: un gráfico recién insertado toma el acento
+                // del set de diseño. Antes nacía con el azul del panel de
+                // WordPress, y un bloque que nace con un color ajeno lo arrastra
+                // para siempre, salvo que alguien se acuerde de cambiarlo.
+                'data-cod-chart-axis-color="#5f6b7a" ' +
                 'data-cod-chart-grid-color="rgba(0,0,0,.08)" data-cod-chart-label-color="#27312c" ' +
                 'data-cod-chart-width="640" data-cod-chart-height="360" ' +
                 'style="width:100%;background:#fff;border:1px solid #e3e6ea;border-radius:6px;padding:8px">' +

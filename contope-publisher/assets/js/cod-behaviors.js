@@ -233,7 +233,13 @@
   var ATTR_CHART_WIDTH = 'data-cod-chart-width';
   var ATTR_CHART_HEIGHT = 'data-cod-chart-height';
   var DEFAULT_CHART_TYPE = 'bar';
-  var DEFAULT_CHART_COLOR = '#2271b1';
+  // Vacío a propósito: el color del gráfico no se inventa. Si el documento no
+  // lo declara, colorDeAcento() lee el rol de acento del set de diseño y, si
+  // tampoco está declarado, devuelve currentColor, que hereda la tinta del
+  // texto. Hasta el 2026-09-16 acá había '#2271b1', el azul del panel de
+  // WordPress: un gráfico pintado así no parece roto, parece decidido.
+  // Ver COD_Design_Core en el plugin e issue #9.
+  var DEFAULT_CHART_COLOR = '';
   var DEFAULT_CHART_AXIS_COLOR = '#5f6b7a';
   var DEFAULT_CHART_GRID_COLOR = 'rgba(0,0,0,.08)';
   var DEFAULT_CHART_LABEL_COLOR = '#27312c';
@@ -307,6 +313,22 @@
 
   function isAllowedBehavior(name) {
     return Object.prototype.hasOwnProperty.call(BEHAVIORS, name);
+  }
+
+  // El color de acento declarado por el set de diseño, leído del propio
+  // documento. Si nadie lo declaró devuelve 'currentColor', que hereda la tinta
+  // del texto: el medio resuelve lo que el set no dijo, en vez de que el plugin
+  // invente un color. Ver COD_Design_Core en el plugin.
+  //
+  // Va como palabra clave y no como var(--...) porque el gráfico pinta con
+  // atributos de presentación de SVG (fill, stroke), y ahí var() no se admite.
+  function colorDeAcento(el) {
+    try {
+      var v = getComputedStyle(el).getPropertyValue('--cod-color-accent');
+      v = v ? v.trim() : '';
+      if (v) return v;
+    } catch (e) {}
+    return 'currentColor';
   }
 
   function parseThreshold(raw, fallback) {
@@ -1568,7 +1590,7 @@
 
         var chartType = parseClass(root.getAttribute(ATTR_CHART_TYPE), DEFAULT_CHART_TYPE);
         if (chartType !== 'bar' && chartType !== 'line') chartType = DEFAULT_CHART_TYPE;
-        var color = parseClass(root.getAttribute(ATTR_CHART_COLOR), DEFAULT_CHART_COLOR);
+        var color = parseClass(root.getAttribute(ATTR_CHART_COLOR), DEFAULT_CHART_COLOR) || colorDeAcento(root);
         var axisColor = parseClass(root.getAttribute(ATTR_CHART_AXIS_COLOR), DEFAULT_CHART_AXIS_COLOR);
         var gridColor = parseClass(root.getAttribute(ATTR_CHART_GRID_COLOR), DEFAULT_CHART_GRID_COLOR);
         var labelColor = parseClass(root.getAttribute(ATTR_CHART_LABEL_COLOR), DEFAULT_CHART_LABEL_COLOR);
@@ -1936,6 +1958,10 @@
       '  var DEFAULT_CHART_LABEL_COLOR = ' + JSON.stringify(opts.chartLabelColor) + ';',
       '  var DEFAULT_CHART_WIDTH = ' + Number(opts.chartWidth) + ';',
       '  var DEFAULT_CHART_HEIGHT = ' + Number(opts.chartHeight) + ';',
+      '  function colorDeAcento(el) {',
+      '    try { var v = getComputedStyle(el).getPropertyValue("--cod-color-accent"); v = v ? v.trim() : ""; if (v) return v; } catch (e) {}',
+      '    return "currentColor";',
+      '  }',
       '  function parseThreshold(raw, fallback) { var n = parseFloat(raw); return isFinite(n) && n >= 0 ? n : fallback; }',
       '  function parseClass(raw, fallback) { var value = String(raw == null ? "" : raw).trim(); return value === "" ? fallback : value; }',
       '  function parseIndex(raw, fallback) { var n = parseInt(raw, 10); return isFinite(n) && n >= 0 ? n : fallback; }',
@@ -2503,7 +2529,7 @@
       '        if (!items.length) return;',
       '        var chartType = parseClass(root.getAttribute(ATTR_CHART_TYPE), DEFAULT_CHART_TYPE);',
       '        if (chartType !== "bar" && chartType !== "line") chartType = DEFAULT_CHART_TYPE;',
-      '        var color = parseClass(root.getAttribute(ATTR_CHART_COLOR), DEFAULT_CHART_COLOR);',
+      '        var color = parseClass(root.getAttribute(ATTR_CHART_COLOR), DEFAULT_CHART_COLOR) || colorDeAcento(root);',
       '        var axisColor = parseClass(root.getAttribute(ATTR_CHART_AXIS_COLOR), DEFAULT_CHART_AXIS_COLOR);',
       '        var gridColor = parseClass(root.getAttribute(ATTR_CHART_GRID_COLOR), DEFAULT_CHART_GRID_COLOR);',
       '        var labelColor = parseClass(root.getAttribute(ATTR_CHART_LABEL_COLOR), DEFAULT_CHART_LABEL_COLOR);',

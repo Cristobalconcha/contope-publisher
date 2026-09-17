@@ -5,6 +5,70 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.27 — 16 de septiembre de 2026
+
+### Cambiado
+
+- **El plugin dejó de inventar colores cuando el set de diseño no los declara.**
+  Hasta ahora, si el set no definía el acento, la tinta o la superficie, el
+  plugin ponía `#2271b1`, `#1d2327` y `#f0f0f1`: el azul, el casi negro y el
+  gris del **panel de administración de WordPress**. También el color de los
+  gráficos y el fondo de la cortina de precarga salían de valores escritos a
+  mano adentro del código.
+
+  El problema no es que el respaldo estuviera mal elegido. Es que un sitio
+  pintado así **no parece roto: parece decidido**, y por eso nadie iba nunca a
+  ir a arreglarlo. Contradice la premisa del sistema, escrita en varias partes:
+  el set de diseño es cerrado, lo declarado es todo lo que hay, y que algo no
+  esté prohibido no significa que esté disponible.
+
+  Ahora hay **un núcleo declarado** para el mundo «sitio web»: seis clases de
+  definición sin las cuales no hay con qué dibujar — tres colores (acento,
+  tinta, superficie), dos tipografías (títulos, cuerpo) y una medida (el ancho
+  de la caja de lectura). No es una lista de valores: es una lista de roles. No
+  importa cuál es el color; importa que exista la definición.
+
+  El plugin busca cada rol en dos lugares reales: las definiciones guardadas en
+  Configuración y el `theme.json` del tema activo, que es donde WordPress mismo
+  lee la identidad. **Leer la declaración del tema es lo contrario de
+  inventarla**: el origen queda escrito en vez de adivinado. Si ningún lugar la
+  trae, el plugin no pinta nada y **dice cuál falta, por su nombre**.
+
+### Agregado
+
+- **Configuración muestra el núcleo**: qué rol está declarado, con qué valor y
+  desde dónde. Si falta alguno, sale un aviso que dice cuál y dónde declararlo.
+
+- **`cod_get_capabilities` informa el núcleo** antes de componer, y la
+  previsualización y la aplicación lo repiten junto a su evidencia. Quien
+  construye se entera de que falta una definición **antes** de escribir, no
+  después de mirar el resultado y encontrarlo raro.
+
+- **`npm run check` rechaza el defecto**: falla si alguna de las tres variables
+  de color del núcleo vuelve a llevar un valor de respaldo dentro de `var()`, o
+  si el compilador vuelve a escribir un color del panel de WordPress. El defecto
+  vivió meses sin que nadie lo viera; una nota depende de que alguien la
+  recuerde, esto no.
+
+### Detalle
+
+- El fondo de la cortina de precarga sale del rol «superficie». Antes devolvía
+  `#f6f6f3` cuando nadie lo definía, y daba la casualidad de que en Santa Luisa
+  ese era el fondo real: **un respaldo que acierta es más peligroso que uno que
+  falla**, porque no deja rastro. Ahora sale el mismo color, pero declarado por
+  el tema. Si nadie lo declara, la cortina va sin fondo.
+
+- El color de los gráficos toma el rol de acento leído del documento; si no hay
+  acento declarado usa `currentColor`, que hereda la tinta del texto. Tocado en
+  los dos motores —el del editor y el de la página publicada—, que son copias
+  separadas.
+
+- Los dos respaldos del carrusel (`--cod-carousel-columnas`, `--cod-carousel-gap`)
+  **se conservan**: viajan escritos en el punto de uso, a la vista de cualquiera
+  que lea el CSS, y son parámetros del módulo, no definiciones del set.
+
+---
+
 ## 0.3.26 — 16 de septiembre de 2026
 
 ### Corregido

@@ -1881,7 +1881,11 @@ final class COD_Canvas_MCP_Recipe_Compiler
             'type' => $content['type'],
             'labels' => array_values($content['labels']),
             'values' => array_map('floatval', $content['values']),
-            'color' => isset($content['color']) ? $content['color'] : '#2271b1',
+            // Sin color declarado no se inventa uno: queda vacío y el runtime
+            // resuelve el rol de acento del núcleo. Antes caía en el azul del
+            // panel de WordPress, que no es un color de este proyecto ni de
+            // ninguno.
+            'color' => isset($content['color']) ? $content['color'] : '',
         ];
     }
 
@@ -2683,7 +2687,10 @@ final class COD_Canvas_MCP_Recipe_Compiler
     private function base_styles(): string
     {
         return "\n"
-            . ".cod-mcp-page{color:#1d2327;background:#fff;line-height:1.5;}\n"
+            // La tinta y la superficie salen del núcleo del set, no del panel de
+            // WordPress. Si el set no las declara, el navegador resuelve el
+            // texto como siempre lo hizo y COD_Design_Core dice cuál falta.
+            . ".cod-mcp-page{color:var(--cod-color-ink);background:var(--cod-color-surface);line-height:1.5;}\n"
             . ".cod-mcp-page *{box-sizing:border-box;}\n"
             . ".cod-mcp-page img,.cod-mcp-page video,.cod-mcp-page audio{display:block;max-width:100%;}\n"
             . ".cod-section{width:100%;padding:48px 24px;position:relative;}\n"
@@ -3008,9 +3015,18 @@ final class COD_Canvas_MCP_Recipe_Compiler
         ][$value['size'] ?? 'md'];
         $tone = $value['tone'] ?? 'primary';
         $colors = [
-            'primary' => ['background' => 'var(--cod-color-accent,#2271b1)', 'foreground' => '#fff'],
-            'secondary' => ['background' => 'var(--cod-color-surface,#f0f0f1)', 'foreground' => 'var(--cod-color-ink,#1d2327)'],
-            'inverse' => ['background' => '#fff', 'foreground' => '#1d2327'],
+            // Sin valores de respaldo. Hasta el 2026-09-16 estos tres tonos
+            // caían en el azul, el gris y el casi negro del panel de
+            // administración de WordPress. Un botón pintado así no parece roto,
+            // parece decidido, y por eso nadie iba a ir a arreglarlo.
+            //
+            // Ahora los tres tonos son combinaciones de los mismos tres roles
+            // del núcleo. Si el set no declara uno, el botón queda sin ese color
+            // y COD_Design_Core lo informa por su nombre. Un aviso que dice qué
+            // falta vale más que un azul que no eligió nadie.
+            'primary' => ['background' => 'var(--cod-color-accent)', 'foreground' => 'var(--cod-color-surface)'],
+            'secondary' => ['background' => 'var(--cod-color-surface)', 'foreground' => 'var(--cod-color-ink)'],
+            'inverse' => ['background' => 'var(--cod-color-ink)', 'foreground' => 'var(--cod-color-surface)'],
         ][$tone];
         $variant = $value['variant'] ?? 'solid';
         $css = 'display:inline-flex;align-items:center;justify-content:center;padding:' . $size . ';text-decoration:none;transition:transform .2s ease,text-decoration-color .2s ease;';
@@ -3082,9 +3098,10 @@ final class COD_Canvas_MCP_Recipe_Compiler
             $css .= '@media(max-width:767px){' . $selector . ' table,' . $selector . ' thead,' . $selector . ' tbody,' . $selector . ' tr,' . $selector . ' th,' . $selector . ' td{display:block;}}';
         }
         if (($value['header'] ?? '') === 'accent') {
-            $css .= $selector . ' th{background:var(--cod-color-accent,#2271b1);color:#fff;}';
+            // Los mismos tres roles del núcleo, sin respaldo inventado.
+            $css .= $selector . ' th{background:var(--cod-color-accent);color:var(--cod-color-surface);}';
         } elseif (($value['header'] ?? '') === 'inverse') {
-            $css .= $selector . ' th{background:#1d2327;color:#fff;}';
+            $css .= $selector . ' th{background:var(--cod-color-ink);color:var(--cod-color-surface);}';
         }
         $padding = ['compact' => '.4rem', 'comfortable' => '.75rem', 'spacious' => '1.15rem'][$value['density'] ?? 'comfortable'];
         $css .= $selector . ' th,' . $selector . ' td{padding:' . $padding . ';}';
