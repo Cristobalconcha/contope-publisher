@@ -119,6 +119,27 @@ final class COD_Theme_Definitions
                     ['id' => 'landing', 'label' => 'Aire al llegar por un enlace', 'type' => 'number', 'min' => -400, 'max' => 400, 'unit' => 'px', 'emite' => ['token' => '--cod-landing', 'unit' => 'px']],
                 ],
             ],
+            [
+                // Dos definiciones y no una, decidido el 2026-09-17 sobre lo
+                // medido en el sitio: los dos gestos que usa agrupan en 420-500
+                // ms y en 160-200 ms, con un factor de 2,5 entre medias.
+                //
+                // No son variantes de lo mismo porque sus tiempos se calibran
+                // contra cosas distintas. Aparecer se mide contra la vista: el
+                // movimiento tiene que durar lo suficiente para que el ojo lo
+                // siga. Responder se mide contra la mano: pasados unos 150 ms
+                // deja de sentirse como respuesta y empieza a sentirse como
+                // lentitud. Al ajustar una se rompería la otra.
+                //
+                // El valor es una duración y una curva juntas, para poder
+                // escribirse tal cual dentro de un transition:
+                //     transition: opacity var(--cod-motion-enter);
+                'title' => 'Movimiento',
+                'fields' => [
+                    ['id' => 'motion_enter', 'label' => 'Aparecer', 'type' => 'motion', 'placeholder' => '420ms cubic-bezier(.34,1.56,.64,1)', 'emite' => ['token' => '--cod-motion-enter']],
+                    ['id' => 'motion_response', 'label' => 'Responder', 'type' => 'motion', 'placeholder' => '160ms ease', 'emite' => ['token' => '--cod-motion-response']],
+                ],
+            ],
         ];
     }
 
@@ -435,6 +456,33 @@ final class COD_Theme_Definitions
         if ($type === 'color') {
             $hex = sanitize_hex_color($value);
             return is_string($hex) ? $hex : '';
+        }
+
+        // motion: una duración y una curva, tal como se escriben dentro de un
+        // transition. El valor termina dentro de un :root del sitio, así que se
+        // admite sólo lo que puede componer ese par —números, ms/s, las curvas
+        // por nombre, cubic-bezier() y steps()— y nada más. Un punto y coma o
+        // una llave permitirían cerrar la declaración y escribir otra regla.
+        if ($type === 'motion') {
+            $limpio = trim(preg_replace('/\s+/', ' ', $value) ?? '');
+            if ($limpio === '' || strlen($limpio) > 120) {
+                return '';
+            }
+            if (preg_match('/^[0-9a-zA-Z .,()\-]+$/', $limpio) !== 1) {
+                return '';
+            }
+            // Tiene que haber al menos una duración: sin ella no es un gesto.
+            if (preg_match('/\d+(\.\d+)?m?s\b/', $limpio) !== 1) {
+                return '';
+            }
+            $palabras = preg_split('/[^a-zA-Z-]+/', $limpio, -1, PREG_SPLIT_NO_EMPTY) ?: [];
+            $permitidas = ['ease', 'ease-in', 'ease-out', 'ease-in-out', 'linear', 'step-start', 'step-end', 'cubic-bezier', 'steps', 'ms', 's', 'jump-start', 'jump-end', 'jump-none', 'jump-both', 'start', 'end'];
+            foreach ($palabras as $palabra) {
+                if (!in_array(strtolower($palabra), $permitidas, true)) {
+                    return '';
+                }
+            }
+            return $limpio;
         }
 
         // number: se acota entre min y max. El 0 es válido cuando min es 0
