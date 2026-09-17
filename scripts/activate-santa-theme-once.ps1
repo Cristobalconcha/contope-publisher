@@ -200,7 +200,10 @@ try {
     }
 
     $response = Invoke-WebRequest -UseBasicParsing -Uri ($siteUrl + $routePath) -Method Post -Headers @{
-        'X-OCD-One-Time-Token' = $token
+        # El nombre debe calzar con el que lee el helper (x-cod-one-time-token).
+        # Quedo con el prefijo viejo al renombrar el proyecto: la ruta habria
+        # respondido 403 y el mensaje habria acusado al token, no al nombre.
+        'X-COD-One-Time-Token' = $token
     } -ContentType 'application/json' -Body '{}' -TimeoutSec 30
     if ([int]$response.StatusCode -ne 200) {
         throw "WordPress respondio HTTP $([int]$response.StatusCode) al activar el tema."
