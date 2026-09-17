@@ -1102,6 +1102,32 @@
         });
     }
 
+    // preferencias-cookies: reabre el panel de preferencias del banner de
+    // cookies desde cualquier elemento del documento — típicamente un enlace en
+    // el pie, que es donde la ley espera encontrarlo.
+    //
+    // Por qué no se le pone al elemento la clase del propio plugin de cookies:
+    // esa clase no es un gancho, es su ícono flotante. Trae `position:fixed`,
+    // 50×50 y su color, y además su JavaScript le cambia el `display` al primer
+    // elemento que la tenga. Un enlace del pie con esa clase se arrancaría del
+    // pie y aparecería y desaparecería solo.
+    //
+    // Así que el documento declara una conducta nuestra, y acá se le reenvía el
+    // clic al disparador que el plugin de cookies ya tiene. Si ese plugin no
+    // está activo, el elemento no hace nada y tampoco estorba.
+    function installPreferenciasCookies(nodes) {
+        if (!nodes.length) return;
+        Array.prototype.forEach.call(nodes, function (node) {
+            node.addEventListener('click', function (ev) {
+                ev.preventDefault();
+                var disparador = document.querySelector(
+                    '.cookieadmin_re_consent, .cookieadmin_customize_btn'
+                );
+                if (disparador && typeof disparador.click === 'function') disparador.click();
+            });
+        });
+    }
+
     // El color de acento declarado por el set de diseño, leído del propio
     // documento. Si nadie lo declaró devuelve 'currentColor', que hereda la
     // tinta del texto: el medio resuelve lo que el set no dijo, en vez de que
@@ -1403,6 +1429,7 @@
         var anchorNodes = [];
         var visorNodes = [];
         var waNodes = [];
+        var prefCookiesNodes = [];
         Array.prototype.forEach.call(behaviorNodes, function (node) {
             var behavior = node.getAttribute('data-cod-behavior');
             if (behavior === 'scroll-threshold') scrollNodes.push(node);
@@ -1417,6 +1444,7 @@
             else if (behavior === 'anchor') anchorNodes.push(node);
             else if (behavior === 'visor-embed') visorNodes.push(node);
             else if (behavior === 'wa-mensaje') waNodes.push(node);
+            else if (behavior === 'preferencias-cookies') prefCookiesNodes.push(node);
         });
         installHeroCollapse(heroCollapseNodes);
         installScrollThreshold(scrollNodes);
@@ -1430,6 +1458,7 @@
         installAnchor(anchorNodes);
         installVisorEmbed(visorNodes);
         installWaMensaje(waNodes);
+        installPreferenciasCookies(prefCookiesNodes);
 
         // Interacciones tipo Webflow (data-cod-interaction): el mismo motor que
         // corre en el iframe del editor (cod-interactions.js) se instala acá

@@ -224,6 +224,7 @@
   var BEHAVIOR_CHART = 'chart';
   var BEHAVIOR_VISOR_EMBED = 'visor-embed';
   var BEHAVIOR_WA_MENSAJE = 'wa-mensaje';
+  var BEHAVIOR_PREFERENCIAS_COOKIES = 'preferencias-cookies';
   var ATTR_CHART_TYPE = 'data-cod-chart-type';
   var ATTR_CHART_DATA = 'data-cod-chart-data';
   var ATTR_CHART_COLOR = 'data-cod-chart-color';
@@ -309,6 +310,11 @@
     name: BEHAVIOR_WA_MENSAJE,
     defaultOpenClass: 'is-open',
     description: 'Ventana para redactar el mensaje antes de abrir WhatsApp. Intercepta los enlaces de WhatsApp que se le indiquen, ofrece escrito el mensaje propio de cada sección, suma una casilla de consentimiento opcional y emite dos eventos medibles: uno al abrirse (quien pinchó) y otro al enviar (quien escribió), los dos con la zona de la que salió. No se ejecuta dentro del editor.',
+  };
+
+  BEHAVIORS[BEHAVIOR_PREFERENCIAS_COOKIES] = {
+    name: BEHAVIOR_PREFERENCIAS_COOKIES,
+    description: 'Reabre el panel de preferencias del banner de cookies. Va en un enlace del pie, que es donde la ley espera encontrarlo, para que alguien pueda cambiar de opinión después de haber respondido. No se le pone al elemento la clase del propio plugin de cookies porque esa clase no es un gancho sino su ícono flotante: trae position:fixed y su JavaScript le cambia el display al primer elemento que la tenga, así que el enlace se arrancaría del pie y aparecería y desaparecería solo. El reenvío del clic vive en el runtime publicado. No se ejecuta dentro del editor: acá no hay banner de cookies que abrir.',
   };
 
   function isAllowedBehavior(name) {

@@ -5,6 +5,38 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.29 — 17 de septiembre de 2026
+
+### Agregado
+
+- **Una conducta nueva: «preferencias-cookies».** Cualquier elemento del
+  documento puede reabrir el panel de preferencias del banner de cookies. Va
+  en el pie, que es donde la ley espera encontrarlo: sirve para que alguien
+  cambie de opinión después de haber respondido el banner.
+
+  Se declara como se declara cualquier conducta:
+
+  ```html
+  <button type="button" data-cod-behavior="preferencias-cookies">Preferencias de cookies</button>
+  ```
+
+  **Por qué existe en vez de usar la clase del propio plugin de cookies.** Se
+  probó primero ponerle al elemento la clase que CookieAdmin escucha. No
+  sirve: esa clase no es un gancho, es su **ícono flotante**. Trae
+  `position:fixed`, 50×50 y su color, y además su JavaScript le cambia el
+  `display` al primer elemento que la tenga. Un enlace del pie con esa clase
+  se habría arrancado del pie y habría aparecido y desaparecido solo.
+
+  Así que el documento declara una conducta nuestra y el runtime le reenvía el
+  clic al disparador que el plugin de cookies ya tiene. Si ese plugin no está
+  activo, el elemento no hace nada y tampoco estorba.
+
+  Es un `<button>` y no un `<a>` a propósito: no navega a ninguna parte,
+  ejecuta una acción en la misma página. Un `<a href="#">` saltaría al inicio
+  del documento y no se anunciaría bien a quien navegue con teclado.
+
+---
+
 ## 0.3.28 — 17 de septiembre de 2026
 
 ### Agregado
