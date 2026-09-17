@@ -2,7 +2,7 @@
 Theme Name: ContOpe Design — Santa Luisa de Palpi
 Template: contope-canvas
 Description: Tema hijo del motor ContOpe Canvas para el proyecto Santa Luisa de Palpi. Aporta paleta, tipografía e identidad del proyecto sobre las reglas estructurales del padre.
-Version: 0.2.2
+Version: 0.2.3
 Requires at least: 6.5
 Requires PHP: 8.0
 Text Domain: cod-santa-luisa
@@ -134,4 +134,86 @@ h1, h2, h3, h4, h5, h6 {
 .cod-main a:where(:not(.wp-element-button)) {
   color: var(--slp-text);
   text-decoration-color: var(--slp-accent);
+}
+
+/* ---------------------------------------------------------------------------
+   Banner de cookies (CookieAdmin 1.2.3)
+
+   El banner que trae el plugin ocupaba el 42,7% de la pantalla en teléfono
+   —400 px de 844— y 315 px de alto en escritorio. Un aviso que tapa media
+   pantalla no se lee: se cierra. Y ese fue el motivo real por el que el banner
+   se desactivó en septiembre: tapaba el sitio justo cuando alguien llegaba por
+   un QR, que es el único momento en que se tiene la atención de una persona
+   parada frente a un letrero.
+
+   Acá se reduce tipografía y espacios hasta dejarlo bajo el 15% de la pantalla
+   en ambos tamaños, y se oculta el «Powered by CookieAdmin», cuyo logotipo de
+   color no pertenece a la paleta del proyecto.
+
+   Los COLORES no se tocan desde acá a propósito: el plugin los emite como
+   estilos en línea desde su propia pantalla de ajustes, así que se configuran
+   ahí. Pelearles con !important sería esconder dónde se deciden.
+
+   Los tres botones quedan del mismo ancho y peso. Un banner donde «Aceptar»
+   es grande y «Rechazar» es chico no recoge un consentimiento válido.
+   --------------------------------------------------------------------------- */
+
+.cookieadmin_law_container {
+  width: min(400px, calc(100% - 32px));
+  font-family: var(--font-body);
+}
+
+.cookieadmin_consent_inside {
+  padding: 13px 15px 12px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.14);
+}
+
+#cookieadmin_notice_title {
+  font-size: 12.5px;
+  line-height: 1.3;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  padding-left: 0;
+}
+
+.cookieadmin_notice_con {
+  font-size: 11px;
+  line-height: 1.42;
+  padding: 0;
+  margin-top: 5px;
+}
+
+#cookieadmin_notice {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.42;
+}
+
+/* En una sola fila y del mismo ancho: los tres pesan igual. */
+.cookieadmin_consent_btns {
+  gap: 6px;
+  margin-top: 10px;
+  flex-wrap: nowrap;
+  justify-content: stretch;
+}
+
+.cookieadmin_consent_inside .cookieadmin_btn {
+  flex: 1 1 0;
+  min-width: 0;
+  margin: 0;
+  padding: 7px 4px;
+  font-family: var(--font-body);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+/* El logotipo del proveedor no es parte de la identidad del proyecto.
+   La licencia Pro además trae una casilla «Hide Powered by Link» en los
+   ajustes del plugin; esto lo resuelve aunque esa casilla no se marque. */
+.cookieadmin_law_container .cookieadmin-poweredby {
+  display: none;
 }
