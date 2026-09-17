@@ -532,7 +532,12 @@ final class COD_Canvas_Document_Sanitizer
             'video' => ['src' => true, 'poster' => true, 'controls' => true, 'loop' => true, 'muted' => true, 'autoplay' => true, 'playsinline' => true, 'preload' => true, 'width' => true, 'height' => true],
             'canvas' => ['width' => true, 'height' => true],
             'audio' => ['src' => true, 'controls' => true, 'loop' => true, 'muted' => true, 'preload' => true],
-            'iframe' => ['src' => true, 'width' => true, 'height' => true, 'title' => true, 'loading' => true, 'allowfullscreen' => true, 'referrerpolicy' => true, 'sandbox' => true],
+            // `allow` es la lista de permisos que el iframe le concede a lo que muestra:
+            // pantalla completa, sensores, seguimiento espacial. Un recorrido 360 los
+            // pide, y sin el atributo el navegador se los niega. No amplía a qué sitios
+            // se puede apuntar —eso lo sigue decidiendo la lista de orígenes— sino qué
+            // puede hacer el contenido ya admitido.
+            'iframe' => ['src' => true, 'width' => true, 'height' => true, 'title' => true, 'loading' => true, 'allowfullscreen' => true, 'referrerpolicy' => true, 'sandbox' => true, 'allow' => true],
             'button' => ['type' => true, 'disabled' => true],
             'label' => ['for' => true],
             'svg' => ['viewbox' => true, 'xmlns' => true, 'fill' => true, 'stroke' => true, 'width' => true, 'height' => true, 'preserveaspectratio' => true],

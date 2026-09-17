@@ -5,6 +5,31 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.26 — 16 de septiembre de 2026
+
+### Corregido
+
+- **Un recorrido 360° dentro de la página se quedaba cargando para siempre.** El
+  visor abría, el contenido llegaba entero —todos sus archivos respondían bien—
+  y aun así se quedaba en «Loading virtual tour. Please wait…».
+
+  La causa: el limpiador de documentos borraba el atributo `allow` de los
+  iframes. Ese atributo es la lista de permisos que el marco le concede a lo que
+  muestra: pantalla completa, acelerómetro, giroscopio, brújula, seguimiento
+  espacial. Un recorrido 360 los pide al arrancar, y sin el atributo el
+  navegador se los niega en silencio. El recorrido no falla con un mensaje: se
+  queda esperando.
+
+  Se veía bien mientras el marco apuntaba a un dominio ajeno porque entonces el
+  recorrido corría en su propia página completa, no dentro de un marco nuestro.
+  Al traer la copia al sitio, el marco pasó a ser el único camino.
+
+  `allow` ahora se conserva. No amplía a qué sitios se puede apuntar —eso lo
+  sigue decidiendo la lista de orígenes permitidos— sino qué puede hacer el
+  contenido que ya fue admitido.
+
+---
+
 ## 0.3.25 — 16 de septiembre de 2026
 
 ### Agregado
