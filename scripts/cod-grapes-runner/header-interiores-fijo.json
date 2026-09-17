@@ -1,0 +1,32 @@
+{
+  "_nota": "El encabezado de las páginas interiores se iba hacia arriba al bajar. La causa medida: .header-nav era position:sticky dentro de <header class=\"cod-canvas-region-header\">, que mide exactamente lo mismo que él. Un sticky sólo se pega dentro de su contenedor, así que tenía CERO recorrido y se iba con la primera pasada de scroll. En la portada no ocurre porque ahí el encabezado es fixed. La corrección mueve el pegado al CONTENEDOR: ése ya está en el flujo y ocupa su propio alto, así que se pega contra el cuerpo entero —que es alto— y no hay que reservar ningún espacio ni inventar una altura. El nav pasa a relative para que su sombra y su z-index sigan valiendo sin un sticky de recorrido nulo adentro. La regla de .header-nav va COMPLETA porque al aplicarla se reemplaza su cuerpo entero.",
+  "mode": "append",
+  "styles": [
+    {
+      "selector": ".cod-canvas-region-header",
+      "style": {
+        "position": "sticky",
+        "top": "0px",
+        "z-index": "70"
+      }
+    },
+    {
+      "selector": ".header-nav",
+      "style": {
+        "position": "relative",
+        "z-index": "70",
+        "background-image": "initial",
+        "background-position-x": "initial",
+        "background-position-y": "initial",
+        "background-size": "initial",
+        "background-repeat": "initial",
+        "background-attachment": "initial",
+        "background-origin": "initial",
+        "background-clip": "initial",
+        "background-color": "rgb(246, 246, 243)",
+        "box-shadow": "rgba(110, 95, 95, 0.18) 0px 1px 0px"
+      }
+    }
+  ],
+  "structure": []
+}
