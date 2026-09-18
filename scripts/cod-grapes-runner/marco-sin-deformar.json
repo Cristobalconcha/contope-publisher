@@ -1,0 +1,107 @@
+{
+  "_nota": "El marco decorativo se deformaba en móvil. Causa medida: el recuadro .plano-frame tiene proporción fija (1350/1247.74), pero en pantallas de hasta 860px una regla la anula con aspect-ratio:auto !important para que quepa el contenido. El alto pasa entonces a mandarlo el contenido, y el dibujo de fondo —un SVG con preserveAspectRatio=\"none\"— se estira con la caja: a 390px de ancho se comprime a la mitad en horizontal contra un 90% en vertical, casi el doble de diferencia entre un eje y el otro. De ahí las escuadras achatadas. La corrección no ajusta el estirado, lo elimina: el marco deja de ser un dibujo y pasa a ser el borde del propio recuadro. Un borde de CSS mide lo mismo en los cuatro lados sea cual sea la forma de la caja, así que se construye solo para cada tamaño, que es justo lo que pidió Cristóbal. El SVG se queda sólo con el papel; sus filetes ya no pintan. Se pierden a propósito las cuatro escuadras marrones de las esquinas: quedan los dos filetes y los cuatro puntos dorados, aprobado por Cristóbal el 2026-09-17. Los bordes van en propiedades largas, nunca en la abreviada, porque la abreviada se pierde al guardar. Las reglas de .plano-frame y .plano-frame__bg van COMPLETAS porque al aplicarlas se reemplaza su cuerpo entero.",
+  "mode": "append",
+  "styles": [
+    {
+      "selector": ".plano-frame",
+      "style": {
+        "position": "relative",
+        "margin-top": "32px",
+        "margin-right": "auto",
+        "margin-bottom": "0px",
+        "margin-left": "auto",
+        "max-width": "940px",
+        "aspect-ratio": "1350 / 1247.74",
+        "background-color": "rgb(246, 246, 243)"
+      }
+    },
+    {
+      "selector": ".plano-frame__bg",
+      "style": {
+        "position": "absolute",
+        "top": "0px",
+        "right": "0px",
+        "bottom": "0px",
+        "left": "0px",
+        "width": "100%",
+        "height": "100%",
+        "display": "none"
+      }
+    },
+    {
+      "selector": ".plano-frame::before",
+      "style": {
+        "content": "''",
+        "position": "absolute",
+        "top": "12px",
+        "right": "12px",
+        "bottom": "12px",
+        "left": "12px",
+        "border-top-width": "2px",
+        "border-right-width": "2px",
+        "border-bottom-width": "2px",
+        "border-left-width": "2px",
+        "border-top-style": "solid",
+        "border-right-style": "solid",
+        "border-bottom-style": "solid",
+        "border-left-style": "solid",
+        "border-top-color": "rgb(36, 34, 29)",
+        "border-right-color": "rgb(36, 34, 29)",
+        "border-bottom-color": "rgb(36, 34, 29)",
+        "border-left-color": "rgb(36, 34, 29)",
+        "pointer-events": "none"
+      }
+    },
+    {
+      "selector": ".plano-frame::after",
+      "style": {
+        "content": "''",
+        "position": "absolute",
+        "top": "19px",
+        "right": "19px",
+        "bottom": "19px",
+        "left": "19px",
+        "border-top-width": "1px",
+        "border-right-width": "1px",
+        "border-bottom-width": "1px",
+        "border-left-width": "1px",
+        "border-top-style": "solid",
+        "border-right-style": "solid",
+        "border-bottom-style": "solid",
+        "border-left-style": "solid",
+        "border-top-color": "rgb(36, 34, 29)",
+        "border-right-color": "rgb(36, 34, 29)",
+        "border-bottom-color": "rgb(36, 34, 29)",
+        "border-left-color": "rgb(36, 34, 29)",
+        "border-top-left-radius": "7px",
+        "border-top-right-radius": "7px",
+        "border-bottom-right-radius": "7px",
+        "border-bottom-left-radius": "7px",
+        "background-image": "radial-gradient(circle 2.6px at 13px 13px, rgb(205, 162, 60) 99%, transparent 100%), radial-gradient(circle 2.6px at calc(100% - 13px) 13px, rgb(205, 162, 60) 99%, transparent 100%), radial-gradient(circle 2.6px at 13px calc(100% - 13px), rgb(205, 162, 60) 99%, transparent 100%), radial-gradient(circle 2.6px at calc(100% - 13px) calc(100% - 13px), rgb(205, 162, 60) 99%, transparent 100%)",
+        "pointer-events": "none"
+      }
+    },
+    {
+      "_nota": "En escritorio el marco llega a medir 1352 px de ancho, casi exactamente el ancho de diseño del dibujo (1350). Ahí la separación original del dibujo —30 y 48 de sus propias unidades— equivale a 30 y 48 píxeles reales: no hay nada que convertir. Por eso en pantallas grandes se repone esa medida y en teléfono se queda la chica, que es la que hace que el marco no invada el contenido. El corte va en 861 px porque a 860 empieza la regla que suelta la proporción del recuadro.",
+      "selector": ".plano-frame::before",
+      "media": "(min-width: 861px)",
+      "style": {
+        "top": "30px",
+        "right": "30px",
+        "bottom": "30px",
+        "left": "30px"
+      }
+    },
+    {
+      "selector": ".plano-frame::after",
+      "media": "(min-width: 861px)",
+      "style": {
+        "top": "48px",
+        "right": "48px",
+        "bottom": "48px",
+        "left": "48px"
+      }
+    }
+  ],
+  "structure": []
+}
