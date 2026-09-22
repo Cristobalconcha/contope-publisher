@@ -1,0 +1,502 @@
+[
+ {
+  "nombre": "Vinos LOF",
+  "categoria": "vinos",
+  "dist": 5.4,
+  "tiempoMin": 8,
+  "contacto": "vinoslof.cl · @vinos_lof",
+  "descripcionLarga": "",
+  "x": 879.45,
+  "y": 307.18
+ },
+ {
+  "nombre": "Viña Santa Rita",
+  "categoria": "vinos",
+  "dist": 5.2,
+  "tiempoMin": 8,
+  "contacto": "santarita.com",
+  "descripcionLarga": "",
+  "x": 876.69,
+  "y": 309.18
+ },
+ {
+  "nombre": "Viña Portal del Alto",
+  "categoria": "vinos",
+  "dist": 4.8,
+  "tiempoMin": 6,
+  "contacto": "Venta vinos y gourmet",
+  "descripcionLarga": "",
+  "x": 873.01,
+  "y": 316.17
+ },
+ {
+  "nombre": "Viña Santa Catalina",
+  "categoria": "vinos",
+  "dist": 5.1,
+  "tiempoMin": 7,
+  "contacto": "santacatalina.cl",
+  "descripcionLarga": "",
+  "x": 875.77,
+  "y": 318.17
+ },
+ {
+  "nombre": "Restaurante Ruta 45",
+  "categoria": "vinos",
+  "dist": 8,
+  "tiempoMin": 10,
+  "contacto": "+56 9 8623 2225",
+  "descripcionLarga": "",
+  "x": 931,
+  "y": 544.94
+ },
+ {
+  "nombre": "Viña Huelquén",
+  "categoria": "vinos",
+  "dist": 9.2,
+  "tiempoMin": 11,
+  "contacto": "huelquen.com",
+  "descripcionLarga": "",
+  "x": 925.47,
+  "y": 556.92
+ },
+ {
+  "nombre": "Viña Pérez Cruz",
+  "categoria": "vinos",
+  "dist": 9,
+  "tiempoMin": 10,
+  "contacto": "perezcruz.com",
+  "descripcionLarga": "",
+  "x": 955.85,
+  "y": 567.91
+ },
+ {
+  "nombre": "Antiyal",
+  "categoria": "vinos",
+  "dist": 9.7,
+  "tiempoMin": 11,
+  "contacto": "antiyal.com",
+  "descripcionLarga": "",
+  "x": 939.28,
+  "y": 578.9
+ },
+ {
+  "nombre": "La Pascual Restaurante",
+  "categoria": "vinos",
+  "dist": 0.9,
+  "tiempoMin": 1,
+  "contacto": "+56 9 9161 9797",
+  "descripcionLarga": "",
+  "x": 895.1,
+  "y": 378.11
+ },
+ {
+  "nombre": "Museo Andino, V. Sta. Rita",
+  "categoria": "vinos",
+  "dist": 5.2,
+  "tiempoMin": 8,
+  "contacto": "+56 2 2362 2520 · santarita.com",
+  "descripcionLarga": "",
+  "x": 876.69,
+  "y": 310.18
+ },
+ {
+  "nombre": "HOLZER Café (Alto Jahuel)",
+  "categoria": "cafes",
+  "dist": 5.1,
+  "tiempoMin": 7,
+  "contacto": "holzer.cl",
+  "descripcionLarga": "",
+  "x": 873.93,
+  "y": 312.18
+ },
+ {
+  "nombre": "HOLZER Café (casa matriz)",
+  "categoria": "cafes",
+  "dist": 9.2,
+  "tiempoMin": 11,
+  "contacto": "holzer.cl",
+  "descripcionLarga": "",
+  "x": 765.31,
+  "y": 325.16
+ },
+ {
+  "nombre": "Cuore Cafetería",
+  "categoria": "cafes",
+  "dist": 9.4,
+  "tiempoMin": 12,
+  "contacto": "@cuore_cafeteria",
+  "descripcionLarga": "",
+  "x": 763.47,
+  "y": 327.16
+ },
+ {
+  "nombre": "Mitifuu",
+  "categoria": "cafes",
+  "dist": 9,
+  "tiempoMin": 10,
+  "contacto": "Reservas por plataformas",
+  "descripcionLarga": "",
+  "x": 767.15,
+  "y": 329.16
+ },
+ {
+  "nombre": "Delicias del Valle",
+  "categoria": "cafes",
+  "dist": 13.6,
+  "tiempoMin": 18,
+  "contacto": "@delicias_del_valle.paine",
+  "descripcionLarga": "",
+  "x": 785.56,
+  "y": 456.03
+ },
+ {
+  "nombre": "Los Buenos Aires de Paine",
+  "categoria": "cafes",
+  "dist": 12.8,
+  "tiempoMin": 16,
+  "contacto": "losbuenosairesdepaine.cl",
+  "descripcionLarga": "",
+  "x": 777.28,
+  "y": 489.99
+ },
+ {
+  "nombre": "Bar 60 Mi Otra Casa",
+  "categoria": "cafes",
+  "dist": 9.4,
+  "tiempoMin": 11,
+  "contacto": "facebook.com/bar60miotracasa",
+  "descripcionLarga": "",
+  "x": 761.63,
+  "y": 332.16
+ },
+ {
+  "nombre": "Santo Secreto",
+  "categoria": "cafes",
+  "dist": 9.1,
+  "tiempoMin": 11,
+  "contacto": "Facebook Buin",
+  "descripcionLarga": "",
+  "x": 759.79,
+  "y": 334.15
+ },
+ {
+  "nombre": "Botánico Bar",
+  "categoria": "cafes",
+  "dist": 13.3,
+  "tiempoMin": 16,
+  "contacto": "@botanicobar.paine",
+  "descripcionLarga": "",
+  "x": 759.79,
+  "y": 504.98
+ },
+ {
+  "nombre": "Club de Equitación Sta. María",
+  "categoria": "deporte",
+  "dist": 11.2,
+  "tiempoMin": 13,
+  "contacto": "equitacionsantamaria.cl",
+  "descripcionLarga": "",
+  "x": 819.62,
+  "y": 479
+ },
+ {
+  "nombre": "Centro Deportivo Bavaria",
+  "categoria": "deporte",
+  "dist": 13.5,
+  "tiempoMin": 18,
+  "contacto": "AgendaPro / FitFit",
+  "descripcionLarga": "",
+  "x": 782.8,
+  "y": 445.04
+ },
+ {
+  "nombre": "Estadio Municipal de Paine",
+  "categoria": "deporte",
+  "dist": 13.4,
+  "tiempoMin": 17,
+  "contacto": "2 2821 8600 · paine.cl",
+  "descripcionLarga": "",
+  "x": 764.39,
+  "y": 504.98
+ },
+ {
+  "nombre": "Centro de Estética de Rosé",
+  "categoria": "deporte",
+  "dist": 13.4,
+  "tiempoMin": 18,
+  "contacto": "+56 9 7810 6978",
+  "descripcionLarga": "",
+  "x": 780.96,
+  "y": 447.04
+ },
+ {
+  "nombre": "Taller de Yoga (C. Cultural)",
+  "categoria": "deporte",
+  "dist": 13.1,
+  "tiempoMin": 16,
+  "contacto": "centro.cultural@paine.cl",
+  "descripcionLarga": "",
+  "x": 767.15,
+  "y": 507.97
+ },
+ {
+  "nombre": "Mat Pilates",
+  "categoria": "deporte",
+  "dist": 13.1,
+  "tiempoMin": 16,
+  "contacto": "@munidepaine",
+  "descripcionLarga": "",
+  "x": 769,
+  "y": 509.97
+ },
+ {
+  "nombre": "Studio Oasis",
+  "categoria": "deporte",
+  "dist": 13.5,
+  "tiempoMin": 17,
+  "contacto": "+56 9 9007 2194",
+  "descripcionLarga": "",
+  "x": 765.31,
+  "y": 511.97
+ },
+ {
+  "nombre": "Iglesia de Paine (1932)",
+  "categoria": "cultura",
+  "dist": 13.3,
+  "tiempoMin": 16,
+  "contacto": "2 2821 8600 · paine.cl",
+  "descripcionLarga": "",
+  "x": 763.47,
+  "y": 505.98
+ },
+ {
+  "nombre": "Plaza de Armas de Paine",
+  "categoria": "cultura",
+  "dist": 13.2,
+  "tiempoMin": 16,
+  "contacto": "2 2821 8600 · paine.cl",
+  "descripcionLarga": "",
+  "x": 762.55,
+  "y": 504.98
+ },
+ {
+  "nombre": "Expo Paine Rural",
+  "categoria": "cultura",
+  "dist": 13.4,
+  "tiempoMin": 17,
+  "contacto": "2 2821 8600 · contacto@paine.cl",
+  "descripcionLarga": "",
+  "x": 764.39,
+  "y": 504.98
+ },
+ {
+  "nombre": "Ferias Libres de Paine",
+  "categoria": "cultura",
+  "dist": 13.3,
+  "tiempoMin": 17,
+  "contacto": "2 2821 8600 · paine.cl",
+  "descripcionLarga": "",
+  "x": 761.63,
+  "y": 502.98
+ },
+ {
+  "nombre": "Cerro Buin / Trekking A. Jahuel",
+  "categoria": "cultura",
+  "dist": 5.9,
+  "tiempoMin": 11,
+  "contacto": "Wikiloc / AllTrails",
+  "descripcionLarga": "",
+  "x": 896.94,
+  "y": 300.19
+ },
+ {
+  "nombre": "Cerro Nancagua / Sta. Rita",
+  "categoria": "cultura",
+  "dist": 6.4,
+  "tiempoMin": 12,
+  "contacto": "Ruta comunitaria Alto Jahuel",
+  "descripcionLarga": "",
+  "x": 887.74,
+  "y": 289.2
+ },
+ {
+  "nombre": "Buin Zoo",
+  "categoria": "natura",
+  "dist": 9.9,
+  "tiempoMin": 11,
+  "contacto": "buinzoo.cl",
+  "descripcionLarga": "",
+  "x": 791.09,
+  "y": 292.2
+ },
+ {
+  "nombre": "CESFAM Dr. Raúl Moya",
+  "categoria": "acceso",
+  "dist": 14,
+  "tiempoMin": 18,
+  "contacto": "800 380 150",
+  "descripcionLarga": "",
+  "x": 755.19,
+  "y": 513.97
+ },
+ {
+  "nombre": "MuniBus Paine",
+  "categoria": "acceso",
+  "dist": 13.1,
+  "tiempoMin": 16,
+  "contacto": "munibus.cl / 2 2821 8600",
+  "descripcionLarga": "",
+  "x": 763.47,
+  "y": 504.98
+ },
+ {
+  "nombre": "Acceso Sur / Ruta 5 Sur",
+  "categoria": "acceso",
+  "dist": 12,
+  "tiempoMin": 14,
+  "contacto": "600 655 6600 · rutamaipo.cl",
+  "descripcionLarga": "",
+  "x": 785.56,
+  "y": 500.98
+ },
+ {
+  "nombre": "Colegio San Gennaro",
+  "categoria": "educacion",
+  "dist": 12.8,
+  "tiempoMin": 16,
+  "contacto": "Alegre 281, Paine",
+  "descripcionLarga": "Particular subvencionado, laico, mixto. Valoración pública 3,9 de 5 (22 reseñas). A 16 minutos en auto del proyecto.",
+  "x": 785.56,
+  "y": 497.98
+ },
+ {
+  "nombre": "Colegio Pulmahue",
+  "categoria": "educacion",
+  "dist": 11.7,
+  "tiempoMin": 14,
+  "contacto": "Las Mercedes 330, Paine",
+  "descripcionLarga": "Particular subvencionado, laico, mixto. Valoración pública 4,2 de 5 (18 reseñas). A 14 minutos en auto del proyecto.",
+  "x": 791.09,
+  "y": 499.98
+ },
+ {
+  "nombre": "Escuela San Pedro Apóstol",
+  "categoria": "educacion",
+  "dist": 13,
+  "tiempoMin": 16,
+  "contacto": "Av. 18 de Septiembre 329, Paine",
+  "descripcionLarga": "Particular subvencionado, religioso, mixto. Valoración pública 4,2 de 5 (29 reseñas). A 16 minutos en auto del proyecto.",
+  "x": 766.23,
+  "y": 502.98
+ },
+ {
+  "nombre": "Colegio María Ana Mogas",
+  "categoria": "educacion",
+  "dist": 13.4,
+  "tiempoMin": 17,
+  "contacto": "Concepción 399, Paine",
+  "descripcionLarga": "Particular subvencionado, religioso, mixto. Valoración pública 3,9 de 5 (34 reseñas). A 17 minutos en auto del proyecto.",
+  "x": 765.31,
+  "y": 506.98
+ },
+ {
+  "nombre": "Colegio Bicentenario Santa María",
+  "categoria": "educacion",
+  "dist": 13.8,
+  "tiempoMin": 17,
+  "contacto": "Av. General Baquedano 348, Paine",
+  "descripcionLarga": "Particular subvencionado, laico, mixto. Valoración pública 3,4 de 5 (40 reseñas). A 17 minutos en auto del proyecto.",
+  "x": 758.87,
+  "y": 499.98
+ },
+ {
+  "nombre": "Colegio San Sebastián",
+  "categoria": "educacion",
+  "dist": 14.1,
+  "tiempoMin": 18,
+  "contacto": "Av. 18 de Septiembre 695, Paine",
+  "descripcionLarga": "Particular subvencionado, religioso, mixto. Valoración pública 4,6 de 5 (8 reseñas). A 18 minutos en auto del proyecto.",
+  "x": 759.79,
+  "y": 518.96
+ },
+ {
+  "nombre": "Colegio San Francisco de Paine",
+  "categoria": "educacion",
+  "dist": 17.8,
+  "tiempoMin": 18,
+  "contacto": "Gilda Díaz Girón 281, Paine",
+  "descripcionLarga": "Particular pagado, laico, mixto. Valoración pública 4,1 de 5 (55 reseñas). A 18 minutos en auto del proyecto.",
+  "x": 749.67,
+  "y": 537.94
+ },
+ {
+  "nombre": "Colegio Las Américas de Paine",
+  "categoria": "educacion",
+  "dist": 14.8,
+  "tiempoMin": 19,
+  "contacto": "Padre Mateo 400, Paine",
+  "descripcionLarga": "Particular subvencionado, laico, mixto. Valoración pública 3 de 5 (19 reseñas). A 19 minutos en auto del proyecto.",
+  "x": 763.47,
+  "y": 533.95
+ },
+ {
+  "nombre": "Colegio Altazol del Maipo",
+  "categoria": "educacion",
+  "dist": 21,
+  "tiempoMin": 20,
+  "contacto": "Darío Pavez con La Torre, Paine",
+  "descripcionLarga": "Particular subvencionado, laico, mixto. Valoración pública 3,1 de 5 (26 reseñas). A 20 minutos en auto del proyecto.",
+  "x": 728.5,
+  "y": 611.87
+ },
+ {
+  "nombre": "Colegio Ecológico Paine",
+  "categoria": "educacion",
+  "dist": 21.4,
+  "tiempoMin": 20,
+  "contacto": "Los Aromos 107, Paine",
+  "descripcionLarga": "Particular subvencionado, laico, mixto. Valoración pública 4,1 de 5 (49 reseñas). A 20 minutos en auto del proyecto.",
+  "x": 736.78,
+  "y": 623.86
+ },
+ {
+  "nombre": "Casino Monticello",
+  "categoria": "cultura",
+  "dist": 28.3,
+  "tiempoMin": 22,
+  "contacto": "",
+  "descripcionLarga": "Casino y centro de entretenimiento en la Ruta 5 Sur, sector Angostura.",
+  "x": 797.23,
+  "y": 757.12
+ },
+ {
+  "nombre": "Parque Nacional Río Clarillo",
+  "categoria": "natura",
+  "dist": 38.2,
+  "tiempoMin": 53,
+  "contacto": "",
+  "descripcionLarga": "Parque nacional en Pirque, con senderos y bosque esclerófilo nativo.",
+  "x": 1256.21,
+  "y": 328.2
+ },
+ {
+  "nombre": "Spa Paula Irrazábal",
+  "categoria": "deporte",
+  "x": 370.02,
+  "y": 584.78,
+  "dist": 43.4,
+  "tiempoMin": 45,
+  "contacto": "spapaulairrazabal.cl · +56 9 8343 7068",
+  "descripcionLarga": "Centro de relajación en Rangue, junto a la laguna de Aculeo, entre eucaliptos y aromos. Masajes y terapias de bienestar."
+ },
+ {
+  "nombre": "Festival del Zapallo",
+  "categoria": "cultura",
+  "x": 540.07,
+  "y": 506.16,
+  "dist": 25.2,
+  "tiempoMin": 31,
+  "contacto": "Valdivia de Paine · cada año en mayo",
+  "descripcionLarga": "Fiesta costumbrista de Valdivia de Paine que celebra la cosecha del zapallo y a los productores de la zona. Se realiza una vez al año."
+ }
+]
