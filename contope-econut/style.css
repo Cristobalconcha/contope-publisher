@@ -1,0 +1,59 @@
+/*
+Theme Name: ContOpe Design — Econut
+Template: contope-canvas
+Description: Tema hijo del motor ContOpe Canvas para Econut. Aporta paleta, tipografía e identidad sobre las reglas estructurales del padre.
+Version: 0.1.0
+Requires at least: 6.5
+Requires PHP: 8.0
+Text Domain: cod-econut
+*/
+
+/*
+ * Paleta de Econut.
+ *
+ * Los dos colores de marca vienen del logotipo, que usa dos Pantone:
+ *   - #046852  Verde Econut   = PANTONE 3298 C
+ *   - #F15A2A  Naranja Econut = PANTONE Orange 021 C
+ *
+ * Los otros cinco valores son derivados o neutros aprobados por Cristóbal:
+ *   - #FFFFFF  Fondo
+ *   - #F3F6F4  Superficie (neutro con un dejo del verde)
+ *   - #132A24  Texto (verde muy oscuro, no negro puro)
+ *   - #51655E  Texto secundario
+ *   - #E4EFEA  Verde claro (aclarado del verde de marca)
+ *
+ * La identidad se declara en theme.json y acá; el lienzo la extiende, nunca al
+ * revés. Las tres familias (Big Shoulders Display, Open Sans y Bodoni Moda) se
+ * cargan desde Google Fonts en functions.php.
+ */
+
+:root {
+  --eco-background: #ffffff;
+  --eco-surface: #dbd4c0;
+  --eco-text: #333333;
+  --eco-muted: #666666;
+  --eco-accent: #dc4017;
+  --eco-green: #2e594a;
+  --eco-dark: #222222;
+  --eco-notice: #fff6c1;
+
+  --font-hero: 'Big Shoulders Display', 'Arial Narrow', system-ui, sans-serif;
+  --font-body: 'Open Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-serif: 'Bodoni Moda', Georgia, 'Times New Roman', serif;
+}
+
+body {
+  background-color: var(--eco-background);
+  color: var(--eco-text);
+  font-family: var(--font-body);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-hero);
+  line-height: 1.05;
+  /* Hereda el color de su superficie. El tema declara la identidad; QUÉ título
+     va naranja y cuál oscuro es decisión de cada pieza, y se fija desde la
+     composición con una regla de color. Fijarlo acá los pintaba todos igual y
+     dejaba ilegibles los que van sobre fondo oscuro. */
+  color: inherit;
+}
