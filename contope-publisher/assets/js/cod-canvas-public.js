@@ -1409,6 +1409,525 @@
         });
     }
 
+    // cuadrantes: cuatro contenidos (imagen, título y texto). En reposo son una
+    // grilla 2x2 de imágenes cuadradas e iguales. Al activar uno, su imagen crece
+    // hasta ocupar la mitad del bloque, su texto aparece en la otra mitad y las
+    // otras tres imágenes pasan a miniaturas (un 20% del lado de la celda) que
+    // CONSERVAN LA DISPOSICIÓN 2x2 que tenían: forman una mini grilla con un
+    // hueco donde estaba la activa (la que estaba a la derecha sigue a la
+    // derecha, la de abajo sigue abajo), pegada a la esquina de la imagen que
+    // mira hacia el centro del bloque:
+    //
+    //   ítem 1 (arriba-izquierda)  imagen a la izquierda, texto a la derecha, miniaturas abajo-derecha
+    //   ítem 2 (arriba-derecha)    imagen a la derecha, texto a la izquierda, miniaturas abajo-izquierda
+    //   ítem 3 (abajo-izquierda)   imagen a la izquierda, texto a la derecha, miniaturas arriba-derecha
+    //   ítem 4 (abajo-derecha)     imagen a la derecha, texto a la izquierda, miniaturas arriba-izquierda
+    //
+    // Por eso no es un carrusel: la posición de origen de cada ítem decide el
+    // lado, la esquina y el lugar de su miniatura. Es el port del módulo original
+    // del sitio de Econut (ver cuadrantes_css en el plugin).
+    //
+    // NINGÚN ELEMENTO CAMBIA DE LUGAR EN EL DOM. Cada imagen es siempre la misma
+    // celda; lo que cambia, por CSS, es su posición y su tamaño. Acá sólo se
+    // marcan atributos sobre la raíz y las piezas: el estado (reposo o activo),
+    // cuál está activa, el lado, la esquina, y en cada imagen su rol.
+    //
+    // ESTRUCTURA QUE ESPERA. La raíz (data-cod-behavior="cuadrantes") tiene
+    // EXACTAMENTE cuatro hijos, y cada hijo es un contenedor con una imagen
+    // (o video) y el resto de su contenido (título y texto). Si la forma no
+    // calza, no toca nada: el contenido queda apilado y legible.
+    //
+    // QUÉ HACE AL DOM. Envuelve la imagen de cada ítem en un `div` propio (que es
+    // la celda de la grilla), le pone un `button` transparente encima y marca
+    // el texto como panel. Un ítem con varios bloques de texto suelto
+    // se agrupa en un `div`. Todo se puede deshacer con la función que retorna.
+    // El color y la tipografía los ponen las reglas de diseño de cada sitio.
+    //
+    // No se monta dentro del editor: allí el bloque debe verse apilado y
+    // editable, sin botones encima ni textos ocultos que no se puedan
+    // seleccionar (ver installCuadrantesRuntime en cod-behaviors.js).
+    var contadorCuadrantes = 0;
+
+    function montarCuadrantes(root, doc) {
+        if (root.getAttribute('data-cod-cuadrantes-listo') === '1') return null;
+
+        var hijos = Array.prototype.slice.call(root.children);
+        if (hijos.length !== 4) return null;
+
+        // 1) Reconocer la forma de cada ítem antes de tocar nada.
+        var formas = [];
+        for (var i = 0; i < hijos.length; i++) {
+            var caja = null;
+            var resto = [];
+            var nietos = Array.prototype.slice.call(hijos[i].children);
+            for (var j = 0; j < nietos.length; j++) {
+                var esMedio = nietos[j].matches('img,video,picture') || nietos[j].querySelector('img,video,picture');
+                if (!caja && esMedio) caja = nietos[j];
+                else resto.push(nietos[j]);
+            }
+            if (!caja || !resto.length) return null;
+            formas.push({ item: hijos[i], caja: caja, resto: resto });
+        }
+
+        contadorCuadrantes += 1;
+        var numero = contadorCuadrantes;
+        var deshacer = [];
+        var piezas = [];
+        var activo = 0; // 0 = reposo; 1..4 = cuadrante activo
+
+        // 2) Armar las piezas de cada ítem.
+        formas.forEach(function (forma, indice) {
+            var n = indice + 1;
+
+            forma.item.classList.add('cod-cuadrantes__item');
+            forma.item.setAttribute('data-cod-cuadrantes-item', String(n));
+            deshacer.push(function () {
+                forma.item.classList.remove('cod-cuadrantes__item');
+                forma.item.removeAttribute('data-cod-cuadrantes-item');
+            });
+
+            // Envoltorio de la imagen: es la celda que se posiciona y se anima.
+            var medio = doc.createElement('div');
+            medio.className = 'cod-cuadrantes__media';
+            medio.setAttribute('data-cod-cuadrantes-item', String(n));
+            forma.item.insertBefore(medio, forma.caja);
+            medio.appendChild(forma.caja);
+            deshacer.push(function () {
+                medio.parentNode.insertBefore(forma.caja, medio);
+                medio.parentNode.removeChild(medio);
+            });
+
+            // Panel de texto: el propio bloque si es uno solo; si son varios, un
+            // grupo que los junta para poder ubicarlos como una sola caja.
+            var panel;
+            if (forma.resto.length === 1) {
+                panel = forma.resto[0];
+            } else {
+                panel = doc.createElement('div');
+                forma.item.insertBefore(panel, forma.resto[0]);
+                forma.resto.forEach(function (bloque) { panel.appendChild(bloque); });
+                deshacer.push(function () {
+                    forma.resto.forEach(function (bloque) { panel.parentNode.insertBefore(bloque, panel); });
+                    panel.parentNode.removeChild(panel);
+                });
+            }
+            panel.classList.add('cod-cuadrantes__info');
+            panel.setAttribute('data-cod-cuadrantes-item', String(n));
+            var idPropio = panel.getAttribute('id');
+            if (!idPropio) {
+                panel.setAttribute('id', 'cod-cuadrantes-' + numero + '-texto-' + n);
+                deshacer.push(function () { panel.removeAttribute('id'); });
+            }
+            deshacer.push(function () {
+                panel.classList.remove('cod-cuadrantes__info');
+                panel.removeAttribute('data-cod-cuadrantes-item');
+                panel.removeAttribute('data-cod-cuadrantes-visible');
+                panel.removeAttribute('aria-hidden');
+            });
+
+            // El nombre accesible del botón es el título; si no hay, un genérico.
+            var titulo = panel.querySelector('h1,h2,h3,h4,h5,h6');
+            var etiqueta = titulo ? String(titulo.textContent || '').trim() : '';
+            if (!etiqueta) etiqueta = 'Contenido ' + n;
+
+            var boton = doc.createElement('button');
+            boton.type = 'button';
+            boton.className = 'cod-cuadrantes__disparador';
+            boton.setAttribute('aria-label', etiqueta);
+            boton.setAttribute('aria-expanded', 'false');
+            boton.setAttribute('aria-controls', panel.getAttribute('id'));
+            boton.addEventListener('click', function () { activar(n); });
+            medio.appendChild(boton);
+
+            piezas.push({ medio: medio, panel: panel, boton: boton });
+        });
+
+        // 3) Botón «×» para volver a reposo (una sola vez, al final de la raíz).
+        var botonCerrar = doc.createElement('button');
+        botonCerrar.type = 'button';
+        botonCerrar.className = 'cod-cuadrantes__cerrar';
+        botonCerrar.setAttribute('aria-label', 'Volver a los cuatro cuadrantes');
+        botonCerrar.textContent = '×';
+        botonCerrar.hidden = true;
+        botonCerrar.addEventListener('click', cerrar);
+        root.appendChild(botonCerrar);
+        deshacer.push(function () { root.removeChild(botonCerrar); });
+
+        function enfocar(elemento) {
+            if (!elemento || typeof elemento.focus !== 'function') return;
+            try { elemento.focus({ preventScroll: true }); } catch (e) { elemento.focus(); }
+        }
+
+        // 4) Dibujar el estado: todo sale de `activo`, nada se acumula.
+        function dibujar() {
+            var lado = '';
+            var esquina = '';
+            if (activo) {
+                // Los ítems 1 y 3 están a la izquierda; el 2 y el 4, a la derecha.
+                lado = activo % 2 === 1 ? 'izquierda' : 'derecha';
+                // Los ítems 1 y 2 están arriba: sus miniaturas quedan abajo.
+                esquina = activo <= 2 ? 'abajo' : 'arriba';
+                root.setAttribute('data-cod-cuadrantes-estado', 'activo');
+                root.setAttribute('data-cod-cuadrantes-activo', String(activo));
+                root.setAttribute('data-cod-cuadrantes-lado', lado);
+                root.setAttribute('data-cod-cuadrantes-esquina', esquina);
+            } else {
+                root.setAttribute('data-cod-cuadrantes-estado', 'reposo');
+                root.removeAttribute('data-cod-cuadrantes-activo');
+                root.removeAttribute('data-cod-cuadrantes-lado');
+                root.removeAttribute('data-cod-cuadrantes-esquina');
+            }
+
+            var ranura = 0; // orden de las miniaturas (lo usa el móvil, que las pone en fila)
+            piezas.forEach(function (pieza, indice) {
+                var n = indice + 1;
+                var rol = activo === 0 ? 'cuadrante' : (n === activo ? 'activa' : 'miniatura');
+                pieza.medio.setAttribute('data-cod-cuadrantes-rol', rol);
+                if (rol === 'miniatura') {
+                    pieza.medio.setAttribute('data-cod-cuadrantes-slot', String(ranura));
+                    ranura += 1;
+                } else {
+                    pieza.medio.removeAttribute('data-cod-cuadrantes-slot');
+                }
+                var visible = n === activo;
+                pieza.panel.setAttribute('data-cod-cuadrantes-visible', visible ? 'true' : 'false');
+                pieza.panel.setAttribute('aria-hidden', visible ? 'false' : 'true');
+                pieza.boton.setAttribute('aria-expanded', visible ? 'true' : 'false');
+                // La imagen ya expandida no es un destino: se sale por la «×».
+                if (visible) pieza.boton.setAttribute('tabindex', '-1');
+                else pieza.boton.removeAttribute('tabindex');
+            });
+            botonCerrar.hidden = activo === 0;
+        }
+
+        function activar(n) {
+            if (n === activo) return;
+            activo = n;
+            dibujar();
+            // El foco sigue al contenido: va a la «×», que abre el panel nuevo.
+            enfocar(botonCerrar);
+        }
+
+        function cerrar() {
+            if (!activo) return;
+            var anterior = activo;
+            activo = 0;
+            dibujar();
+            // Al volver a reposo el foco regresa al cuadrante que se había abierto.
+            enfocar(piezas[anterior - 1].boton);
+        }
+
+        // Escape cierra, pero sólo si el foco está dentro del bloque o suelto en
+        // la página: no debe robarle la tecla a un campo de otra parte.
+        function alTeclado(evento) {
+            if (!activo) return;
+            if (evento.key !== 'Escape' && evento.key !== 'Esc') return;
+            var foco = doc.activeElement;
+            if (foco && foco !== doc.body && foco !== doc.documentElement && !root.contains(foco)) return;
+            cerrar();
+        }
+        doc.addEventListener('keydown', alTeclado);
+        deshacer.push(function () { doc.removeEventListener('keydown', alTeclado); });
+
+        root.classList.add('cod-cuadrantes');
+        root.setAttribute('data-cod-cuadrantes-listo', '1');
+        deshacer.push(function () {
+            root.classList.remove('cod-cuadrantes');
+            ['data-cod-cuadrantes-listo', 'data-cod-cuadrantes-estado', 'data-cod-cuadrantes-activo',
+                'data-cod-cuadrantes-lado', 'data-cod-cuadrantes-esquina'].forEach(function (nombre) {
+                root.removeAttribute(nombre);
+            });
+        });
+        dibujar();
+
+        return function destruir() {
+            while (deshacer.length) deshacer.pop()();
+        };
+    }
+
+    function installCuadrantes(nodes) {
+        Array.prototype.forEach.call(nodes, function (root) {
+            montarCuadrantes(root, document);
+        });
+    }
+
+    // pestanas: un juego de pestañas sobre un grupo con 2 a 8 hijos. Cada hijo es
+    // una pestaña: su PRIMER hijo es la etiqueta (lo que se pincha: un título, un
+    // número, un texto) y el RESTO es el panel de contenido. Al cargar queda
+    // activa la primera; al pinchar una etiqueta se muestra su panel y se ocultan
+    // los demás.
+    //
+    // MIRADO EN DIVI (módulo Tabs, el que usa econut.cl en sus cifras). Lo que
+    // se tomó y lo que no:
+    //   - Se tomó la separación en dos mitades: una fila de etiquetas arriba y los
+    //     paneles debajo, con exactamente uno visible; las etiquetas de la misma
+    //     fila con el mismo alto; el estado activo marcado en la etiqueta (acá con
+    //     atributos data-cod-pestanas-*) para que la composición pinte activa e
+    //     inactiva como quiera; y abrir una pestaña concreta desde la URL (#id).
+    //   - NO se tomó su marcado: Divi usa `<li><a href="#">` sin role, sin
+    //     aria-selected y sin teclado (un `<a href="#">` que no navega a ninguna
+    //     parte). Acá las etiquetas son `button` reales dentro de un
+    //     `role="tablist"`, con roving tabindex, flechas, Inicio y Fin.
+    //   - NO se tomó su transición: Divi desvanece el panel viejo (500 ms), lo
+    //     oculta, y recién ahí desvanece el nuevo (otros 500 ms), bloquea los
+    //     clics mientras dura y NO anima el alto (el contenedor salta de golpe al
+    //     alto del panel nuevo, medido en econut.cl). Acá el panel nuevo aparece
+    //     de inmediato y el alto del bloque viaja del valor viejo al nuevo.
+    //
+    // NINGÚN PANEL CAMBIA DE LUGAR EN EL DOM. Cada hijo del grupo se convierte en
+    // su panel (role="tabpanel"); la etiqueta se saca de él y se pone, dentro de
+    // un `button`, en una lista (role="tablist") que se inserta al principio del
+    // grupo. El nodo de la etiqueta viaja entero (con su clase y sus reglas), de
+    // modo que la composición le sigue dando su tipografía. Para pintar la
+    // etiqueta ACTIVA de otro color, la composición declara una regla con
+    // scope.state = "current" sobre ese nodo (el compilador la emite atada a
+    // [data-cod-pestanas-estado="activa"]); sin regla propia, el nodo hereda el
+    // color del botón. Todo se deshace con la función que retorna.
+    //
+    // ATRIBUTOS QUE EMITE (el contrato para componer sin tocar el runtime):
+    //   raíz:      data-cod-pestanas-listo="1", data-cod-pestanas-activa="1..N"
+    //   lista:     data-cod-pestanas-rol="lista"
+    //   etiqueta:  data-cod-pestanas-item="n", data-cod-pestanas-rol="etiqueta",
+    //              data-cod-pestanas-estado="activa|inactiva"
+    //   panel:     data-cod-pestanas-item="n", data-cod-pestanas-rol="panel",
+    //              data-cod-pestanas-visible="true|false"
+    //
+    // ESTRUCTURA QUE ESPERA. La raíz (data-cod-behavior="pestanas") tiene de 2 a
+    // 8 hijos y cada uno tiene al menos 2 hijos propios (etiqueta y algo de
+    // contenido). Si la forma no calza, no toca nada: el contenido queda apilado
+    // y legible.
+    //
+    // No se monta dentro del editor: allí el bloque debe verse apilado y
+    // editable, con todos los paneles a la vista (ver installPestanasRuntime).
+    var contadorPestanas = 0;
+
+    function montarPestanas(root, doc) {
+        if (root.getAttribute('data-cod-pestanas-listo') === '1') return null;
+
+        var hijos = Array.prototype.slice.call(root.children);
+        if (hijos.length < 2 || hijos.length > 8) return null;
+
+        // 1) Reconocer la forma de cada pestaña antes de tocar nada.
+        var formas = [];
+        for (var i = 0; i < hijos.length; i++) {
+            var propios = hijos[i].children;
+            if (!propios || propios.length < 2) return null;
+            formas.push({ item: hijos[i], etiqueta: propios[0] });
+        }
+
+        contadorPestanas += 1;
+        var numero = contadorPestanas;
+        var win = doc.defaultView || window;
+        var deshacer = [];
+        var piezas = [];
+        var activa = 1; // 1..N
+
+        // Marca un atributo estático y recuerda cómo estaba para poder deshacerlo.
+        function marcar(elemento, nombre, valor) {
+            var antes = elemento.getAttribute(nombre);
+            elemento.setAttribute(nombre, valor);
+            deshacer.push(function () {
+                if (antes === null) elemento.removeAttribute(nombre);
+                else elemento.setAttribute(nombre, antes);
+            });
+        }
+
+        // 2) La lista de etiquetas, al principio del grupo.
+        var lista = doc.createElement('div');
+        lista.className = 'cod-pestanas__lista';
+        lista.setAttribute('role', 'tablist');
+        lista.setAttribute('data-cod-pestanas-rol', 'lista');
+        root.insertBefore(lista, hijos[0]);
+        deshacer.push(function () {
+            if (lista.parentNode) lista.parentNode.removeChild(lista);
+        });
+
+        // 3) Armar cada pestaña: botón con la etiqueta adentro y panel con role.
+        formas.forEach(function (forma, indice) {
+            var n = indice + 1;
+            var panel = forma.item;
+            var idPanel = panel.getAttribute('id') || ('cod-pestanas-' + numero + '-panel-' + n);
+            var idEtiqueta = 'cod-pestanas-' + numero + '-etiqueta-' + n;
+
+            // El botón recibe el nodo de la etiqueta tal cual, no una copia.
+            var boton = doc.createElement('button');
+            boton.type = 'button';
+            boton.id = idEtiqueta;
+            boton.className = 'cod-pestanas__etiqueta';
+            boton.setAttribute('role', 'tab');
+            boton.setAttribute('aria-controls', idPanel);
+            boton.setAttribute('data-cod-pestanas-item', String(n));
+            boton.setAttribute('data-cod-pestanas-rol', 'etiqueta');
+            boton.appendChild(forma.etiqueta);
+            lista.appendChild(boton);
+            deshacer.push(function () {
+                // La etiqueta vuelve a ser el primer hijo de su pestaña.
+                panel.insertBefore(forma.etiqueta, panel.firstChild);
+                if (boton.parentNode) boton.parentNode.removeChild(boton);
+            });
+            boton.addEventListener('click', function () { activar(n, false); });
+
+            // El propio hijo es el panel: conserva su caja y sus reglas.
+            panel.classList.add('cod-pestanas__panel');
+            marcar(panel, 'id', idPanel);
+            marcar(panel, 'role', 'tabpanel');
+            marcar(panel, 'aria-labelledby', idEtiqueta);
+            marcar(panel, 'data-cod-pestanas-item', String(n));
+            marcar(panel, 'data-cod-pestanas-rol', 'panel');
+            deshacer.push(function () {
+                panel.classList.remove('cod-pestanas__panel');
+                panel.removeAttribute('data-cod-pestanas-visible');
+                panel.removeAttribute('hidden');
+            });
+
+            piezas.push({ boton: boton, panel: panel });
+        });
+
+        // 4) Dibujar el estado: todo sale de `activa`, nada se acumula.
+        function dibujar() {
+            root.setAttribute('data-cod-pestanas-activa', String(activa));
+            piezas.forEach(function (pieza, indice) {
+                var esActiva = indice + 1 === activa;
+                pieza.boton.setAttribute('data-cod-pestanas-estado', esActiva ? 'activa' : 'inactiva');
+                pieza.boton.setAttribute('aria-selected', esActiva ? 'true' : 'false');
+                // Roving tabindex: al conjunto se entra por la etiqueta activa y de
+                // ahí se mueve con las flechas; no son N paradas de tabulación.
+                pieza.boton.setAttribute('tabindex', esActiva ? '0' : '-1');
+                pieza.panel.setAttribute('data-cod-pestanas-visible', esActiva ? 'true' : 'false');
+                if (esActiva) pieza.panel.removeAttribute('hidden');
+                else pieza.panel.setAttribute('hidden', '');
+            });
+        }
+
+        // 5) El alto viaja del valor viejo al nuevo. Sin esto el bloque salta de
+        // golpe cuando un panel es más alto que otro (así lo hace Divi). Se fija
+        // el alto viejo en línea, se fuerza el reflujo y se pone el nuevo; el CSS
+        // del plugin trae la transición (--cod-motion-response) bajo
+        // prefers-reduced-motion: no-preference. Si no hay transición (movimiento
+        // reducido, o el sitio no declaró el token) el alto queda en `auto` de
+        // inmediato: es un estado más, no un error.
+        var animando = false;
+        var altoEnLinea = '';
+        var temporizador = null;
+
+        function terminarAlto() {
+            if (temporizador) { win.clearTimeout(temporizador); temporizador = null; }
+            root.removeEventListener('transitionend', alTerminarAlto);
+            if (!animando) return;
+            animando = false;
+            root.style.height = altoEnLinea;
+            root.removeAttribute('data-cod-pestanas-animando');
+        }
+
+        function alTerminarAlto(evento) {
+            if (evento.target === root && evento.propertyName === 'height') terminarAlto();
+        }
+
+        function animarAlto(antes) {
+            var reducido = win.matchMedia && win.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            if (reducido) return;
+            var despues = root.getBoundingClientRect().height;
+            if (Math.abs(despues - antes) < 1) return;
+            altoEnLinea = root.style.height;
+            animando = true;
+            root.setAttribute('data-cod-pestanas-animando', '');
+            root.style.height = antes + 'px';
+            void root.offsetHeight; // reflujo: fija el punto de partida de la transición
+            var duraciones = String(win.getComputedStyle(root).transitionDuration || '').split(',');
+            var duracion = 0;
+            duraciones.forEach(function (d) { duracion = Math.max(duracion, parseFloat(d) || 0); });
+            if (!(duracion > 0)) { terminarAlto(); return; }
+            root.addEventListener('transitionend', alTerminarAlto);
+            root.style.height = despues + 'px';
+            // Red de seguridad: si el navegador no emite transitionend, se limpia igual.
+            temporizador = win.setTimeout(terminarAlto, Math.round(duracion * 1000) + 150);
+        }
+        deshacer.push(function () {
+            terminarAlto();
+        });
+
+        function activar(n, enfocar) {
+            if (n >= 1 && n <= piezas.length && n !== activa) {
+                // El alto de partida se mide ANTES de tocar nada; si había un viaje a
+                // medias, se parte de donde iba.
+                var antes = root.getBoundingClientRect().height;
+                terminarAlto();
+                activa = n;
+                root.setAttribute('data-cod-pestanas-cambio', '1');
+                dibujar();
+                animarAlto(antes);
+            }
+            if (enfocar && piezas[n - 1]) {
+                try { piezas[n - 1].boton.focus({ preventScroll: true }); } catch (e) { piezas[n - 1].boton.focus(); }
+            }
+        }
+
+        // Teclado (patrón de pestañas con activación automática): flechas mueven
+        // y activan, con vuelta al otro extremo; Inicio y Fin van a los extremos.
+        // En escritura de derecha a izquierda las flechas se invierten.
+        function alTeclado(evento) {
+            if (evento.altKey || evento.ctrlKey || evento.metaKey) return;
+            var actual = -1;
+            for (var k = 0; k < piezas.length; k++) {
+                if (piezas[k].boton === evento.target) { actual = k; break; }
+            }
+            if (actual < 0) return;
+            var rtl = String(win.getComputedStyle(root).direction) === 'rtl';
+            var tecla = evento.key;
+            var destino = -1;
+            if (tecla === 'ArrowRight' || tecla === 'Right') destino = actual + (rtl ? -1 : 1);
+            else if (tecla === 'ArrowLeft' || tecla === 'Left') destino = actual + (rtl ? 1 : -1);
+            else if (tecla === 'Home') destino = 0;
+            else if (tecla === 'End') destino = piezas.length - 1;
+            else return;
+            if (destino < 0) destino = piezas.length - 1;
+            if (destino >= piezas.length) destino = 0;
+            evento.preventDefault();
+            activar(destino + 1, true);
+        }
+        lista.addEventListener('keydown', alTeclado);
+        deshacer.push(function () { lista.removeEventListener('keydown', alTeclado); });
+
+        // Abrir una pestaña desde la URL: #id de su panel (o de su etiqueta). Es lo
+        // que hace Divi con sus enlaces #tab-…; sólo actúa si el id existe.
+        function porHash() {
+            var hash = String((win.location && win.location.hash) || '').replace(/^#/, '');
+            if (!hash) return false;
+            try { hash = decodeURIComponent(hash); } catch (e) { /* se usa tal cual */ }
+            for (var k = 0; k < piezas.length; k++) {
+                if (piezas[k].panel.getAttribute('id') === hash || piezas[k].boton.getAttribute('id') === hash) {
+                    activar(k + 1, false);
+                    return true;
+                }
+            }
+            return false;
+        }
+        function alCambiarHash() { porHash(); }
+        win.addEventListener('hashchange', alCambiarHash);
+        deshacer.push(function () { win.removeEventListener('hashchange', alCambiarHash); });
+
+        root.classList.add('cod-pestanas');
+        dibujar();
+        porHash();
+        marcar(root, 'data-cod-pestanas-listo', '1');
+        deshacer.push(function () {
+            root.classList.remove('cod-pestanas');
+            ['data-cod-pestanas-activa', 'data-cod-pestanas-cambio'].forEach(function (nombre) {
+                root.removeAttribute(nombre);
+            });
+        });
+
+        return function destruir() {
+            while (deshacer.length) deshacer.pop()();
+        };
+    }
+
+    function installPestanas(nodes) {
+        Array.prototype.forEach.call(nodes, function (root) {
+            montarPestanas(root, document);
+        });
+    }
+
     function boot() {
         var roots = document.querySelectorAll('.cod-canvas-published');
         Array.prototype.forEach.call(roots, function (root) {
@@ -1430,6 +1949,8 @@
         var visorNodes = [];
         var waNodes = [];
         var prefCookiesNodes = [];
+        var cuadrantesNodes = [];
+        var pestanasNodes = [];
         Array.prototype.forEach.call(behaviorNodes, function (node) {
             var behavior = node.getAttribute('data-cod-behavior');
             if (behavior === 'scroll-threshold') scrollNodes.push(node);
@@ -1445,6 +1966,8 @@
             else if (behavior === 'visor-embed') visorNodes.push(node);
             else if (behavior === 'wa-mensaje') waNodes.push(node);
             else if (behavior === 'preferencias-cookies') prefCookiesNodes.push(node);
+            else if (behavior === 'cuadrantes') cuadrantesNodes.push(node);
+            else if (behavior === 'pestanas') pestanasNodes.push(node);
         });
         installHeroCollapse(heroCollapseNodes);
         installScrollThreshold(scrollNodes);
@@ -1459,6 +1982,8 @@
         installVisorEmbed(visorNodes);
         installWaMensaje(waNodes);
         installPreferenciasCookies(prefCookiesNodes);
+        installCuadrantes(cuadrantesNodes);
+        installPestanas(pestanasNodes);
 
         // Interacciones tipo Webflow (data-cod-interaction): el mismo motor que
         // corre en el iframe del editor (cod-interactions.js) se instala acá

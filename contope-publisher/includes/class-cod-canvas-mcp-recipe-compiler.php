@@ -34,6 +34,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
         'interaction',
         'cadence',
         'anchor',
+        'properties',
     ];
 
     /** @var array<int, string> */
@@ -68,6 +69,173 @@ final class COD_Canvas_MCP_Recipe_Compiler
 
     /** @var array<int, string> */
     private const RULE_STATUSES = ['proposed', 'reviewed'];
+
+    /**
+     * Contrato de los behaviors que fabrican partes en el navegador.
+     *
+     * UNA sola fuente de verdad. De acá se derivan: la marca de «el elegido»
+     * (scope.state = "current"), el texto del catálogo, el mensaje de error
+     * y las partes a las que un nodo puede dirigir reglas (campo `partes`).
+     * Para sumar un behavior nuevo basta declararlo acá.
+     *
+     * Se llenó leyendo lo que el runtime emite de verdad (cod-behaviors.js,
+     * gemelo cod-canvas-public.js), no lo que se supone:
+     *   pestanas:   data-cod-pestanas-rol = lista | etiqueta | panel. La etiqueta
+     *               es un <button> que fabrica el runtime; lleva
+     *               data-cod-pestanas-estado = activa | inactiva. El panel es el
+     *               hijo del grupo; lleva data-cod-pestanas-visible = true | false.
+     *   cuadrantes: data-cod-cuadrantes-rol vale cuadrante (en reposo), activa o
+     *               miniatura, y va en la celda de imagen; el texto lleva
+     *               data-cod-cuadrantes-visible = true | false. Acá el rol ya
+     *               mezcla parte y estado, por eso la parte «imagen» no fija valor.
+     *
+     * Por parte: `selector` es un fragmento de selector de atributo que se
+     * pega tras un espacio (descendiente del nodo); `elegido` es la marca que
+     * pone el runtime en la parte elegida (o null si esa parte no tiene estado
+     * elegido); `descripcion` es lo que ve quien lee el catálogo.
+     *
+     * Los demás behaviors (carousel-basic, lightbox, nav-toggle, scroll-threshold)
+     * no emiten ningún atributo de rol: sus partes se alcanzan por clase y no
+     * entran acá.
+     *
+     * @var array<string, array{atributoRol: string, partes: array<string, array{selector: string, elegido: string|null, descripcion: string}>}>
+     */
+    private const BEHAVIOR_CONTRACTS = [
+        'pestanas' => [
+            'atributoRol' => 'data-cod-pestanas-rol',
+            'partes' => [
+                'lista' => [
+                    'selector' => '[data-cod-pestanas-rol="lista"]',
+                    'elegido' => null,
+                    'descripcion' => 'la fila que junta las etiquetas (role="tablist")',
+                ],
+                'etiqueta' => [
+                    'selector' => '[data-cod-pestanas-rol="etiqueta"]',
+                    'elegido' => '[data-cod-pestanas-estado="activa"]',
+                    'descripcion' => 'el botón de cada pestaña: lo fabrica el runtime y trae adentro la etiqueta original; su relleno lo pone este botón',
+                ],
+                'panel' => [
+                    'selector' => '[data-cod-pestanas-rol="panel"]',
+                    'elegido' => '[data-cod-pestanas-visible="true"]',
+                    'descripcion' => 'el contenido de cada pestaña (el propio hijo del grupo)',
+                ],
+            ],
+        ],
+        'cuadrantes' => [
+            'atributoRol' => 'data-cod-cuadrantes-rol',
+            'partes' => [
+                'imagen' => [
+                    'selector' => '[data-cod-cuadrantes-rol]',
+                    'elegido' => '[data-cod-cuadrantes-rol="activa"]',
+                    'descripcion' => 'la celda de imagen de cada cuadrante, sea cual sea su estado (cuadrante, activa o miniatura)',
+                ],
+                'miniatura' => [
+                    'selector' => '[data-cod-cuadrantes-rol="miniatura"]',
+                    'elegido' => null,
+                    'descripcion' => 'sólo las celdas de imagen que quedan reducidas mientras hay una activa',
+                ],
+                'texto' => [
+                    'selector' => '[data-cod-cuadrantes-visible]',
+                    'elegido' => '[data-cod-cuadrantes-visible="true"]',
+                    'descripcion' => 'el bloque de texto de cada cuadrante (sólo se ve el del activo)',
+                ],
+            ],
+        ],
+    ];
+
+    /**
+     * Tipos de regla que pueden dirigirse a una parte de un behavior. Quedan
+     * fuera los auto-selectivos (media, gallery, table, motion), que arman sus
+     * propios selectores para elementos internos de un nodo de su tipo; los
+     * que no emiten CSS de clase (interaction, anchor, cadence); y form, que
+     * estila un contenedor de formulario. Una parte fabricada por el runtime
+     * no es nada de eso.
+     *
+     * @var array<int, string>
+     */
+    private const PART_RULE_KINDS = ['color', 'typography', 'spacing', 'layout', 'surface', 'shape', 'button', 'properties'];
+
+    /**
+     * Propiedades que acepta el kind `properties`. Lista blanca cerrada: una
+     * propiedad que no esté acá se rechaza nombrándola, y se puede pedir que se
+     * agregue. Las propiedades personalizadas (--nombre) se validan por forma,
+     * no por lista. Las imágenes no entran por acá: van por el kind media.
+     *
+     * @var array<int, string>
+     */
+    private const PROPERTIES_ALLOWED = [
+        'width', 'height', 'min-width', 'min-height', 'max-width', 'max-height', 'display',
+        'grid-template-columns', 'grid-template-rows', 'grid-column', 'grid-row', 'grid-auto-flow',
+        'place-items', 'place-content', 'align-items', 'align-content', 'align-self',
+        'justify-items', 'justify-content', 'justify-self',
+        'flex-direction', 'flex-wrap', 'flex-basis', 'flex-grow', 'flex-shrink', 'order',
+        'gap', 'row-gap', 'column-gap',
+        'padding-block-start', 'padding-block-end', 'padding-inline-start', 'padding-inline-end',
+        'padding-top', 'padding-right', 'padding-bottom', 'padding-left',
+        'margin-block-start', 'margin-block-end', 'margin-inline-start', 'margin-inline-end',
+        'margin-top', 'margin-right', 'margin-bottom', 'margin-left',
+        'color', 'background-color', 'background-image', 'background-size', 'background-position', 'background-repeat',
+        'border-style', 'border-width', 'border-color',
+        'border-top-width', 'border-right-width', 'border-bottom-width', 'border-left-width',
+        'border-top-style', 'border-right-style', 'border-bottom-style', 'border-left-style',
+        'border-top-color', 'border-right-color', 'border-bottom-color', 'border-left-color',
+        'border-radius', 'border-top-left-radius', 'border-top-right-radius', 'border-bottom-right-radius', 'border-bottom-left-radius',
+        'box-shadow', 'backdrop-filter', 'filter', 'opacity', 'mix-blend-mode',
+        'transform', 'transform-origin', 'translate', 'rotate', 'scale',
+        'position', 'top', 'right', 'bottom', 'left',
+        'inset-block-start', 'inset-block-end', 'inset-inline-start', 'inset-inline-end', 'z-index',
+        'overflow', 'overflow-x', 'overflow-y', 'cursor', 'pointer-events', 'visibility',
+        'aspect-ratio', 'object-fit', 'object-position', 'fill', 'stroke', 'stroke-width',
+        'font-family', 'font-size', 'font-weight', 'font-style', 'line-height', 'letter-spacing',
+        'text-align', 'text-transform', 'text-decoration-line', 'text-wrap', 'white-space', 'word-break', 'writing-mode',
+        'transition-property', 'transition-duration', 'transition-timing-function', 'transition-delay',
+        'animation-name', 'animation-duration', 'animation-timing-function', 'animation-iteration-count', 'animation-delay',
+        'list-style-type', 'list-style-position', 'vertical-align', 'table-layout', 'border-collapse', 'border-spacing',
+        'isolation', 'contain', 'scroll-margin-block-start', 'scroll-behavior', 'inset',
+    ];
+
+    /**
+     * Abreviadas reales de CSS. GrapesJS las expande a sus partes y, si el valor
+     * lleva una variable, no puede resolverla y DESCARTA la declaración entera
+     * en silencio (defecto medido y documentado; ver
+     * scripts/auditar-abreviadas.mjs). Por eso el kind `properties` rechaza
+     * una abreviada cuyo valor contenga var(). Las que no están en
+     * PROPERTIES_ALLOWED se rechazan de todos modos, pero con este motivo,
+     * que es el que orienta a quien escribe la regla. El valor es la pista de
+     * cómo escribirla en forma larga.
+     *
+     * @var array<string, string>
+     */
+    private const SHORTHAND_PROPERTIES = [
+        'background' => 'background-color, background-image, background-size, background-position y background-repeat',
+        'background-position' => 'object-position no aplica; usa un valor literal (sin var())',
+        'border' => 'border-<lado>-width, border-<lado>-style y border-<lado>-color',
+        'border-top' => 'border-top-width, border-top-style y border-top-color',
+        'border-right' => 'border-right-width, border-right-style y border-right-color',
+        'border-bottom' => 'border-bottom-width, border-bottom-style y border-bottom-color',
+        'border-left' => 'border-left-width, border-left-style y border-left-color',
+        'border-width' => 'border-top-width, border-right-width, border-bottom-width y border-left-width',
+        'border-style' => 'border-top-style, border-right-style, border-bottom-style y border-left-style',
+        'border-color' => 'border-top-color, border-right-color, border-bottom-color y border-left-color',
+        'border-radius' => 'border-top-left-radius, border-top-right-radius, border-bottom-right-radius y border-bottom-left-radius',
+        'font' => 'font-family, font-size, font-weight, font-style y line-height',
+        'margin' => 'margin-top, margin-right, margin-bottom y margin-left',
+        'padding' => 'padding-top, padding-right, padding-bottom y padding-left',
+        'transition' => 'transition-property, transition-duration, transition-timing-function y transition-delay',
+        'animation' => 'animation-name, animation-duration, animation-timing-function, animation-iteration-count y animation-delay',
+        'grid' => 'grid-template-columns, grid-template-rows y grid-auto-flow',
+        'grid-area' => 'grid-column y grid-row con valores literales',
+        'grid-column' => 'un valor literal (sin var())',
+        'grid-row' => 'un valor literal (sin var())',
+        'flex' => 'flex-grow, flex-shrink y flex-basis',
+        'gap' => 'row-gap y column-gap',
+        'place-items' => 'align-items y justify-items',
+        'place-content' => 'align-content y justify-content',
+        'place-self' => 'align-self y justify-self',
+        'overflow' => 'overflow-x y overflow-y',
+        'inset' => 'top, right, bottom y left (o inset-block-start, inset-inline-start…)',
+        'text-wrap' => 'un valor literal (sin var())',
+    ];
 
     /** @var array<int, string> */
     private const SOURCE_KINDS = ['reference', 'user', 'ai'];
@@ -146,18 +314,19 @@ final class COD_Canvas_MCP_Recipe_Compiler
                     'ruleStatuses' => self::RULE_STATUSES,
                     'scope' => [
                         'breakpoint' => ['all', 'desktop', 'tablet', 'mobile'],
-                        'state' => ['default', 'hover', 'focus', 'active'],
+                        'state' => ['default', 'hover', 'focus', 'active', 'current'],
+                        'stateCurrent' => $this->state_current_text(),
                         'roles' => 'Lista opcional de roles semánticos afectados.',
                     ],
                 ],
                 'ruleKinds' => [
-                    'color' => 'Roles cromáticos, no sólo una paleta nominal.',
+                    'color' => 'Roles cromáticos, no sólo una paleta nominal. Emite siempre la variable --cod-color-<rol> y además pinta el nodo: apply ("text" o "background"; por omisión "text") elige si el color va a color o a background-color. Los fondos de bloque van por la regla surface.',
                     'typography' => 'Jerarquía editorial: escala, medida, interlineado, tracking, transformación, énfasis y alineación.',
                     'spacing' => 'Ritmo, padding, margen, gap, sangría y sangrado.',
                     'layout' => 'Stack, columnas, grid, metro, masonry, cluster o carrusel; incluye respuesta móvil.',
                     'surface' => 'Fondos, overlays, borde, sombra, densidad y tratamientos de superficie.',
                     'shape' => 'Radio, contorno y máscara geométrica segura.',
-                    'media' => 'Relación, recorte, foco, marco, overlay, caption y tratamiento hover de imagen/video.',
+                    'media' => 'Relación, recorte, foco, marco, overlay, caption, tratamiento hover y filtro (none|grayscale) de imagen/video.',
                     'button' => 'Variantes, tono, tamaño, ancho y respuesta de interacción de enlaces de acción.',
                     'gallery' => 'Regla de presentación para una colección de primitivas: grilla, metro, masonry o carrusel. No define QUÉ se muestra (eso lo dice el kind de cada item), solo CÓMO.',
                     'table' => 'Jerarquía de cabecera, rayado, borde y respuesta horizontal.',
@@ -166,6 +335,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
                     'interaction' => 'Comportamientos declarativos ya presentes en Canvas, sin código remoto.',
                     'cadence' => 'Ciclo de reglas aplicado a hijos para alternancia visual y ritmo de una colección.',
                     'anchor' => 'Ancla CUALQUIER nodo a un borde/esquina de su contenedor position:relative más cercano, con cuánto cuelga afuera y cómo entra en vista al hacer scroll. No es exclusiva de whatsapp: separa "dónde nace y cómo entra" (esta regla) de "cómo se ve" (propiedades propias del nodo).',
+                    'properties' => 'Escribe propiedades CSS directamente, cualquiera de la lista permitida más cualquier propiedad personalizada (--nombre), con scope completo (breakpoint y state, incluido current). Los 15 tipos semánticos anteriores siguen siendo el camino preferido cuando aplican, porque llevan rol y procedencia y son lo que el set de diseño reconoce y reutiliza; este tipo existe para que ninguna propiedad quede inalcanzable. Forma larga obligatoria: una abreviada (background, border-radius, gap…) con var() se rechaza, porque GrapesJS la descartaría en silencio. Las imágenes van por media, no por acá.',
                 ],
                 'ruleValueSchemas' => $this->rule_value_schemas(),
             ],
@@ -175,11 +345,13 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 'nodeKinds' => self::NODE_KINDS,
                 'nodeRecord' => [
                     'required' => ['id', 'kind'],
-                    'optional' => ['role', 'marker', 'ruleIds', 'cadenceRuleId', 'children', 'content'],
+                    'optional' => ['role', 'marker', 'ruleIds', 'cadenceRuleId', 'partes', 'children', 'content'],
                     'ruleApplication' => 'Cada nodo refiere reglas por id. No acepta CSS, HTML, JS, selectores ni componentes serializados por el cliente.',
                     'marker' => 'Destino estable al que puede llegar un enlace, un QR o el menú: se emite como id de HTML y por eso debe ser único en la página. Es identidad del nodo, no una regla —una regla se aplica a muchos nodos y repetiría el id. El aire de aterrizaje, en cambio, sí es una regla: spacing.landing.',
+                    'partes' => 'Opcional, sólo en un nodo que lleve un behavior que fabrica partes en el navegador (ver composition.behaviorContracts: hoy pestanas y cuadrantes). Mapa parte → lista de ids de regla, por ejemplo {"etiqueta":["pestana-normal","pestana-activa"],"lista":["fila"]}. Cada regla se emite con un selector de descendiente anclado al nodo (.cod-node-id-<id> [data-cod-pestanas-rol="etiqueta"]), que es lo único que alcanza un elemento que el runtime fabrica y que no recibe clases de regla. Con scope.state="current" se combina con la marca del elegido de ESA parte. La misma regla puede ir además en ruleIds: las dos formas conviven. Sólo admiten partes las reglas color, typography, spacing, layout, surface, shape, button y properties.',
                 ],
                 'nodeContentSchemas' => $this->node_content_schemas(),
+                'behaviorContracts' => $this->behavior_contracts_catalog(),
             ],
             'realization' => [
                 'canvasPrimitives' => [
@@ -187,7 +359,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
                     'video', 'video con transparencia real (matte)', 'button', 'dynamic value', 'dynamic group', 'table', 'published Orugantt form',
                 ],
                 'safeRuntimeBehaviors' => [
-                    'scroll-threshold', 'nav-toggle', 'carousel-basic', 'reveal-on-scroll', 'lightbox',
+                    'scroll-threshold', 'nav-toggle', 'carousel-basic', 'reveal-on-scroll', 'lightbox', 'cuadrantes', 'pestanas',
                     'load-transition', 'scroll-transition',
                 ],
                 'assetPolicy' => 'cod_resolve_canvas_assets devuelve activos ya gestionados por Canvas. El compilador acepta URLs seguras, no carga archivos ni verifica recursos remotos.',
@@ -228,7 +400,11 @@ final class COD_Canvas_MCP_Recipe_Compiler
         return [
             'color' => [
                 'required' => ['role', 'color'],
-                'fields' => ['role' => 'stable id', 'color' => 'hex, rgb(), hsl(), oklch(), transparent o currentColor'],
+                'fields' => [
+                    'role' => 'stable id',
+                    'color' => 'hex, rgb(), hsl(), oklch(), transparent o currentColor',
+                    'apply' => 'opcional: "text" (color, por omisión) o "background" (background-color); los fondos de bloque van por surface',
+                ],
             ],
             'typography' => [
                 'required' => ['role'],
@@ -267,11 +443,12 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 'fields' => ['radius' => 'longitud|none|pill|circle', 'borderStyle' => ['none', 'solid', 'dashed'], 'mask' => ['none', 'rounded', 'circle', 'arch']],
             ],
             'media' => [
-                'atLeastOneOf' => ['aspectRatio', 'fit', 'position', 'frame', 'overlayColor', 'hover', 'caption'],
+                'atLeastOneOf' => ['aspectRatio', 'fit', 'position', 'frame', 'overlayColor', 'hover', 'caption', 'filter'],
                 'fields' => [
                     'aspectRatio' => 'p. ej. 4/3 o 16/9', 'fit' => ['cover', 'contain', 'fill', 'none', 'scale-down'],
                     'frame' => ['none', 'rounded', 'circle', 'arch'], 'hover' => ['none', 'zoom', 'lift', 'dim'],
                     'caption' => ['none', 'overlay', 'below'], 'overlayOpacity' => '0..1',
+                    'filter' => ['none', 'grayscale'],
                 ],
             ],
             'button' => [
@@ -314,11 +491,24 @@ final class COD_Canvas_MCP_Recipe_Compiler
             'interaction' => [
                 'required' => ['behavior'],
                 'fields' => [
-                    'behavior' => ['scroll-threshold', 'nav-toggle', 'carousel-basic', 'lightbox'],
+                    'behavior' => ['scroll-threshold', 'nav-toggle', 'carousel-basic', 'lightbox', 'cuadrantes', 'pestanas'],
                     'threshold' => '0..4000', 'targetId' => 'requerido por nav-toggle', 'toggleClass' => 'clase segura',
                     'mode' => ['single', 'track'], 'visible' => '1..8', 'visibleMobile' => '1..8',
                 ],
-                'constraints' => ['carousel-basic sólo en gallery', 'lightbox sólo en gallery', 'nav-toggle requiere targetId presente en la composición'],
+                'constraints' => [
+                    'carousel-basic sólo en gallery', 'lightbox sólo en gallery', 'nav-toggle requiere targetId presente en la composición',
+                    'cuadrantes sólo en un nodo group con EXACTAMENTE 4 hijos; cada hijo es un contenedor (group) con una imagen y su texto (título y párrafo). En reposo las cuatro imágenes forman una grilla 2x2; al activar una, su imagen ocupa la mitad del bloque, su texto aparece en la otra mitad y las otras tres pasan a miniaturas que conservan su disposición 2x2 (un hueco donde estaba la activa), pegadas a la esquina de la imagen que mira al centro (ítems 1 y 3: imagen a la izquierda; 2 y 4: a la derecha; 1 y 2: miniaturas abajo; 3 y 4: arriba). El compilador sólo emite data-cod-behavior="cuadrantes"; el runtime arma botones, ×, atributos y clases. Sin colores ni tipografía: eso lo ponen las reglas de diseño del sitio.',
+                    'cuadrantes no admite threshold, targetId, toggleClass, mode, visible ni visibleMobile',
+                    'pestanas sólo en un nodo group con 2 a 8 hijos; cada hijo es una pestaña: su PRIMER hijo es la etiqueta (lo que se pincha: un título, un número, un texto) y el RESTO es el panel de contenido. Al cargar queda activa la primera; al pinchar una etiqueta se muestra su panel y se ocultan los demás, sin que el alto salte de golpe. El runtime pone las etiquetas en una lista de botones reales (role="tablist" / role="tab"; flechas izquierda y derecha, Inicio y Fin) y convierte a cada hijo en su panel (role="tabpanel"). Para estilar el estado, la composición usa los atributos que emite el runtime: [data-cod-pestanas-rol="etiqueta"][data-cod-pestanas-estado="activa"|"inactiva"] y [data-cod-pestanas-rol="panel"][data-cod-pestanas-visible="true"|"false"]. Sin colores ni tipografía: eso lo ponen las reglas de diseño del sitio. Si la forma interna no calza (algún hijo con menos de 2 hijos propios) el runtime no toca nada y el contenido queda apilado.',
+                    'pestanas no admite threshold, targetId, toggleClass, mode, visible ni visibleMobile',
+                ],
+            ],
+            'properties' => [
+                'required' => ['declarations'],
+                'fields' => [
+                    'declarations' => 'objeto propiedad → valor, de 1 a 40 declaraciones. Propiedades: las de la lista permitida (' . implode(', ', self::PROPERTIES_ALLOWED) . ') o una propiedad personalizada --[a-z0-9-]+. Valores: texto de 1 a 300 caracteres, sin { } ; < > \\ @ url( expression( javascript: ni /*.',
+                ],
+                'notes' => 'Los 15 tipos semánticos anteriores siguen siendo el camino preferido cuando aplican, porque llevan rol y procedencia; este tipo existe para que ninguna propiedad quede inalcanzable. Acepta scope completo: breakpoint y state (default, hover, focus, active, current). Nunca una abreviada con var(): background, border, font, margin, padding, transition, animation, grid, flex, gap, overflow, inset, place-*, border-radius y border-width/style/color se escriben en su forma larga cuando llevan variable. Se puede dirigir a una parte que fabrica un behavior con el campo partes del nodo. Una propiedad fuera de la lista se rechaza nombrándola; se puede pedir que se agregue.',
             ],
             'cadence' => [
                 'required' => ['cycleRuleIds'],
@@ -355,12 +545,13 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 'posterUrl' => 'opcional',
                 'caption' => 'opcional',
                 'matte' => 'opcional, boolean, default false. true = video con transparencia real (compositor cod-luma-matte): el archivo fuente debe traer el video RGB arriba y su máscara blanco/negro abajo (mismo ancho, el doble de alto; blanco = visible, negro = transparente). Se renderiza como video oculto + canvas compuesto en vivo; ignora posterUrl.',
+                'ambient' => 'opcional, boolean, default false. true = video ambiental: emite <video autoplay loop muted playsinline> SIN controles y sin botón de sonido (va solo, en bucle y mudo, como fondo o textura viva). false o ausente = el video de siempre, con controles. Si viene junto con matte:true manda matte y ambient se ignora (el compositor de luma matte ya arranca el video por su cuenta).',
             ]],
             'audio' => ['content' => ['sourceUrl' => 'URL de activo', 'label' => 'opcional']],
             'button|link' => ['content' => ['label' => 'texto', 'href' => 'enlace seguro', 'target' => ['self', 'blank']]],
             'list' => ['content' => ['ordered' => 'boolean', 'items' => '1..100 textos planos']],
             'table' => ['content' => ['headers' => '1..20 textos', 'rows' => '0..100 filas con el mismo ancho']],
-            'gallery' => ['content' => ['items' => "1..80 items. Cada item declara su primitiva con 'kind': image (por defecto) {assetUrl, alt, caption?}, video {sourceUrl?, posterUrl?, caption?, matte?, pendingLabel?} o dynamic {token, fallback?}. La galería solo aporta presentación (grilla/metro/masonry/carrusel, leyenda, controles): el dibujo de cada item lo hace su propia primitiva. Galería de fotos, de videos y de artículos son la misma máquina con distinta primitiva adentro."]],
+            'gallery' => ['content' => ['items' => "1..80 items. Cada item declara su primitiva con 'kind': image (por defecto) {assetUrl, alt, caption?}, video {sourceUrl?, posterUrl?, caption?, matte?, ambient?, pendingLabel?} o dynamic {token, fallback?}. La galería solo aporta presentación (grilla/metro/masonry/carrusel, leyenda, controles): el dibujo de cada item lo hace su propia primitiva. Galería de fotos, de videos y de artículos son la misma máquina con distinta primitiva adentro."]],
             'form' => ['content' => ['formSlug' => 'valor devuelto por cod_list_canvas_forms']],
             'shortcode' => ['content' => [
                 'tag' => 'nombre del shortcode, de la lista permitida del sitio (hoy: instagram-feed). No ejecuta cualquiera: fuera de esa lista no se renderiza.',
@@ -610,6 +801,9 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 if (!isset($rule_index[$cycle_rule_id]) || $rule_index[$cycle_rule_id]['kind'] === 'cadence') {
                     return new WP_Error('cod_mcp_cadence_rule_invalid', 'Una regla de cadencia sólo puede referir reglas existentes no-cadencia.');
                 }
+                if ($rule_index[$cycle_rule_id]['scope']['state'] === 'current') {
+                    return new WP_Error('cod_mcp_current_state_target_invalid', 'La regla "' . $cycle_rule_id . '" tiene scope.state="current" y una cadencia no puede repartirla: hay que aplicarla directo al nodo que va dentro de un ' . $this->current_behaviors_text(' o ') . '.');
+                }
             }
         }
 
@@ -620,6 +814,9 @@ final class COD_Canvas_MCP_Recipe_Compiler
         foreach ($root_rule_ids as $rule_id) {
             if (!is_string($rule_id) || !isset($rule_index[$rule_id])) {
                 return new WP_Error('cod_mcp_design_rule_reference_invalid', 'rootRuleIds contiene una regla inexistente.');
+            }
+            if ($rule_index[$rule_id]['scope']['state'] === 'current') {
+                return new WP_Error('cod_mcp_current_state_target_invalid', 'La regla "' . $rule_id . '" tiene scope.state="current" y no puede ir en rootRuleIds: el raíz no está dentro de ningún ' . $this->current_behaviors_text(' ni ') . '.');
             }
         }
 
@@ -755,7 +952,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
         $state = $scope['state'] ?? 'default';
         $roles = $scope['roles'] ?? [];
         if (!is_string($breakpoint) || !in_array($breakpoint, ['all', 'desktop', 'tablet', 'mobile'], true)
-            || !is_string($state) || !in_array($state, ['default', 'hover', 'focus', 'active'], true)
+            || !is_string($state) || !in_array($state, ['default', 'hover', 'focus', 'active', 'current'], true)
             || !is_array($roles) || !$this->is_list($roles) || count($roles) > 32) {
             return new WP_Error('cod_mcp_design_scope_invalid', 'scope debe declarar breakpoint, state y roles válidos.');
         }
@@ -854,6 +1051,8 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 return $this->normalize_cadence_rule($value);
             case 'anchor':
                 return $this->normalize_anchor_rule($value);
+            case 'properties':
+                return $this->normalize_properties_rule($value);
         }
 
         return new WP_Error('cod_mcp_design_rule_invalid', 'El tipo de regla no está disponible.');
@@ -862,13 +1061,21 @@ final class COD_Canvas_MCP_Recipe_Compiler
     /** @param array<string, mixed> $value */
     private function normalize_color_rule(array $value)
     {
-        if (!$this->has_only_keys($value, ['role', 'color'])
+        if (!$this->has_only_keys($value, ['role', 'color', 'apply'])
             || !isset($value['role'], $value['color'])
             || !$this->is_stable_id($value['role'])
             || !is_string($value['color']) || !$this->is_css_color($value['color'])) {
             return new WP_Error('cod_mcp_color_rule_invalid', 'La regla color requiere role y color seguros.');
         }
-        return ['role' => $value['role'], 'color' => $value['color']];
+        $normalizado = ['role' => $value['role'], 'color' => $value['color']];
+        if (array_key_exists('apply', $value)) {
+            // apply elige qué propiedad pinta el color: sólo texto o fondo, nada más.
+            if (!is_string($value['apply']) || !in_array($value['apply'], ['text', 'background'], true)) {
+                return new WP_Error('cod_mcp_color_rule_apply_invalid', 'La regla color admite apply "text" o "background"; se recibió otro valor.');
+            }
+            $normalizado['apply'] = $value['apply'];
+        }
+        return $normalizado;
     }
 
     /** @param array<string, mixed> $value */
@@ -1090,7 +1297,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
     /** @param array<string, mixed> $value */
     private function normalize_media_rule(array $value)
     {
-        $allowed = ['aspectRatio', 'fit', 'position', 'frame', 'overlayColor', 'overlayOpacity', 'hover', 'caption'];
+        $allowed = ['aspectRatio', 'fit', 'position', 'frame', 'overlayColor', 'overlayOpacity', 'hover', 'caption', 'filter'];
         if (!$this->has_only_keys($value, $allowed) || $value === []) {
             return new WP_Error('cod_mcp_media_rule_invalid', 'La regla media debe declarar al menos un tratamiento.');
         }
@@ -1117,10 +1324,11 @@ final class COD_Canvas_MCP_Recipe_Compiler
             'frame' => ['none', 'rounded', 'circle', 'arch'],
             'hover' => ['none', 'zoom', 'lift', 'dim'],
             'caption' => ['none', 'overlay', 'below'],
+            'filter' => ['none', 'grayscale'],
         ] as $key => $allowed_values) {
             if (isset($value[$key])) {
                 if (!is_string($value[$key]) || !in_array($value[$key], $allowed_values, true)) {
-                    return new WP_Error('cod_mcp_media_rule_invalid', $key . ' no es válido.');
+                    return new WP_Error('cod_mcp_media_rule_invalid', $key . ' no es válido; admite: ' . implode(', ', $allowed_values) . '.');
                 }
                 $normalized[$key] = $value[$key];
             }
@@ -1379,7 +1587,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
         $allowed = ['behavior', 'threshold', 'targetId', 'toggleClass', 'mode', 'visible', 'visibleMobile'];
         if (!$this->has_only_keys($value, $allowed) || !isset($value['behavior'])
             || !is_string($value['behavior'])
-            || !in_array($value['behavior'], ['scroll-threshold', 'nav-toggle', 'carousel-basic', 'lightbox'], true)) {
+            || !in_array($value['behavior'], ['scroll-threshold', 'nav-toggle', 'carousel-basic', 'lightbox', 'cuadrantes', 'pestanas'], true)) {
             return new WP_Error('cod_mcp_interaction_rule_invalid', 'interaction.behavior no es un comportamiento Canvas disponible.');
         }
         $normalized = ['behavior' => $value['behavior']];
@@ -1418,6 +1626,12 @@ final class COD_Canvas_MCP_Recipe_Compiler
         if ($normalized['behavior'] === 'nav-toggle' && !isset($normalized['targetId'])) {
             return new WP_Error('cod_mcp_interaction_rule_invalid', 'nav-toggle requiere targetId.');
         }
+        // cuadrantes y pestanas no tienen parámetros: la geometría sale del CSS
+        // del plugin y el estado del propio runtime. Aceptar uno y no usarlo
+        // engañaría.
+        if (in_array($normalized['behavior'], ['cuadrantes', 'pestanas'], true) && count($normalized) > 1) {
+            return new WP_Error('cod_mcp_interaction_rule_invalid', $normalized['behavior'] . ' no admite threshold, targetId, toggleClass, mode, visible ni visibleMobile.');
+        }
         return $normalized;
     }
 
@@ -1444,6 +1658,68 @@ final class COD_Canvas_MCP_Recipe_Compiler
             return new WP_Error('cod_mcp_cadence_rule_invalid', 'offset de cadence debe estar entre 0 y 11.');
         }
         return ['cycleRuleIds' => $cycle_rule_ids, 'offset' => $offset];
+    }
+
+    /**
+     * Regla `properties`: un mapa propiedad → valor. Es el kind que evita que
+     * una propiedad quede inalcanzable; los kinds semánticos siguen siendo el
+     * camino preferido cuando aplican porque llevan rol y procedencia.
+     *
+     * @param array<string, mixed> $value
+     * @return array<string, mixed>|WP_Error
+     */
+    private function normalize_properties_rule(array $value)
+    {
+        $codigo = 'cod_mcp_properties_rule_invalid';
+        if (!$this->has_only_keys($value, ['declarations'])
+            || !isset($value['declarations'])
+            || !is_array($value['declarations'])
+            || $value['declarations'] === []) {
+            return new WP_Error($codigo, 'La regla properties requiere "declarations": un objeto no vacío propiedad → valor, por ejemplo {"background-color":"#2E594A"}.');
+        }
+        if (count($value['declarations']) > 40) {
+            return new WP_Error($codigo, 'Una regla properties admite hasta 40 declaraciones; ésta trae ' . count($value['declarations']) . '. Repártelas en varias reglas.');
+        }
+        $declarations = [];
+        foreach ($value['declarations'] as $propiedad => $valor) {
+            if (!is_string($propiedad)) {
+                return new WP_Error($codigo, 'declarations debe ser un objeto propiedad → valor, no una lista.');
+            }
+            $es_personalizada = preg_match('/^--[a-z0-9-]+$/', $propiedad) === 1 && strlen($propiedad) <= 100;
+            if (!$es_personalizada) {
+                if (preg_match('/^[a-z][a-z0-9-]*$/', $propiedad) !== 1 || strlen($propiedad) > 64) {
+                    return new WP_Error($codigo, 'El nombre de propiedad "' . $propiedad . '" no es válido: va en minúsculas y con guiones (por ejemplo background-color), o es una propiedad personalizada (--nombre).');
+                }
+                $permitida = in_array($propiedad, self::PROPERTIES_ALLOWED, true);
+                $abreviada = isset(self::SHORTHAND_PROPERTIES[$propiedad]);
+                if (!$permitida && $abreviada) {
+                    return new WP_Error($codigo, 'La propiedad "' . $propiedad . '" es una abreviada y no se admite: GrapesJS descarta en silencio las abreviadas que llevan var(). Escribe sus partes por separado: ' . self::SHORTHAND_PROPERTIES[$propiedad] . '.');
+                }
+                if (!$permitida) {
+                    return new WP_Error($codigo, 'La propiedad "' . $propiedad . '" no está en la lista de propiedades permitidas de una regla properties. Se puede pedir que se agregue a la lista.');
+                }
+            }
+            if (!is_string($valor)) {
+                return new WP_Error($codigo, 'El valor de "' . $propiedad . '" debe ser texto (por ejemplo "0.5" y no 0.5).');
+            }
+            $valor = trim($valor);
+            $largo = function_exists('mb_strlen') ? mb_strlen($valor) : strlen($valor);
+            if ($largo < 1 || $largo > 300) {
+                return new WP_Error($codigo, 'El valor de "' . $propiedad . '" debe tener entre 1 y 300 caracteres.');
+            }
+            if (preg_match('/[{};<>\\\\@\\x00-\\x1f\\x7f]/', $valor) === 1
+                || stripos($valor, 'url(') !== false
+                || stripos($valor, 'expression(') !== false
+                || stripos($valor, 'javascript:') !== false
+                || strpos($valor, '/*') !== false) {
+                return new WP_Error($codigo, 'El valor de "' . $propiedad . '" trae un carácter o una función que no se admite ({ } ; < > \\ @ url( expression( javascript: /* ni caracteres de control). Las imágenes entran por el tipo media.');
+            }
+            if (isset(self::SHORTHAND_PROPERTIES[$propiedad]) && stripos($valor, 'var(') !== false) {
+                return new WP_Error($codigo, 'La propiedad "' . $propiedad . '" es una abreviada y su valor usa var(): GrapesJS descarta la declaración entera en silencio. Escribe sus partes por separado: ' . self::SHORTHAND_PROPERTIES[$propiedad] . '.');
+            }
+            $declarations[$propiedad] = $valor;
+        }
+        return ['declarations' => $declarations];
     }
 
     /**
@@ -1499,7 +1775,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
     private function normalize_node(array $node, array $rule_index, array &$seen_node_ids, array &$seen_markers, int &$node_count, int $depth)
     {
         if ($depth > self::MAX_DEPTH
-            || !$this->has_only_keys($node, ['id', 'kind', 'role', 'marker', 'ruleIds', 'cadenceRuleId', 'children', 'content'])
+            || !$this->has_only_keys($node, ['id', 'kind', 'role', 'marker', 'ruleIds', 'cadenceRuleId', 'partes', 'children', 'content'])
             || !isset($node['id'], $node['kind'])
             || !$this->is_stable_id($node['id'])
             || !is_string($node['kind'])
@@ -1540,6 +1816,11 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 return new WP_Error('cod_mcp_composition_rule_reference_invalid', 'ruleIds refiere una regla inexistente, cadencia directa o repetida.');
             }
             $normalized_rule_ids[] = $rule_id;
+        }
+
+        $normalized_partes = $this->normalize_node_partes($node, $normalized_rule_ids, $rule_index);
+        if (is_wp_error($normalized_partes)) {
+            return $normalized_partes;
         }
 
         $cadence_rule_id = $node['cadenceRuleId'] ?? '';
@@ -1588,7 +1869,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
             }
         }
 
-        return [
+        $normalized_node = [
             'id' => $node['id'],
             'kind' => $node['kind'],
             'role' => isset($node['role']) ? $node['role'] : '',
@@ -1598,6 +1879,177 @@ final class COD_Canvas_MCP_Recipe_Compiler
             'children' => $normalized_children,
             'content' => $allows_children ? [] : $content,
         ];
+        // partes sólo viaja cuando el nodo la usa: así una composición sin
+        // partes conserva exactamente la misma forma (y el mismo digest) de siempre.
+        if ($normalized_partes !== []) {
+            $normalized_node['partes'] = $normalized_partes;
+        }
+        return $normalized_node;
+    }
+
+    /**
+     * Valida el campo `partes` de un nodo: mapa parte → ids de regla que se
+     * dirigen a una parte que fabrica el behavior del nodo (ver
+     * BEHAVIOR_CONTRACTS). Devuelve el mapa normalizado, o [] si no hay.
+     *
+     * @param array<string, mixed> $node
+     * @param array<int, string> $rule_ids ids ya validados de este nodo
+     * @param array<string, array<string, mixed>> $rule_index
+     * @return array<string, array<int, string>>|WP_Error
+     */
+    private function normalize_node_partes(array $node, array $rule_ids, array $rule_index)
+    {
+        $partes = $node['partes'] ?? [];
+        if (!is_array($partes)) {
+            return new WP_Error('cod_mcp_composition_partes_invalid', 'partes debe ser un objeto parte → lista de ids de regla, por ejemplo {"etiqueta":["mi-regla"]}.');
+        }
+        if ($partes === []) {
+            return [];
+        }
+        $behavior = $this->contract_behavior_of($rule_ids, $rule_index);
+        if ($behavior === '') {
+            return new WP_Error(
+                'cod_mcp_composition_partes_invalid',
+                'El nodo "' . $node['id'] . '" declara partes pero no lleva un behavior que fabrique partes. Hoy lo hacen: ' . implode(', ', array_keys(self::BEHAVIOR_CONTRACTS)) . '. El nodo tiene que llevar en ruleIds una regla interaction con uno de ellos.'
+            );
+        }
+        $contrato = self::BEHAVIOR_CONTRACTS[$behavior];
+        $validas = implode(', ', array_keys($contrato['partes']));
+        $normalized = [];
+        foreach ($partes as $parte => $ids) {
+            if (!is_string($parte) || !isset($contrato['partes'][$parte])) {
+                return new WP_Error(
+                    'cod_mcp_composition_partes_invalid',
+                    'El behavior ' . $behavior . ' del nodo "' . $node['id'] . '" no tiene la parte "' . (string) $parte . '". Las partes válidas son: ' . $validas . '.'
+                );
+            }
+            if (!is_array($ids) || !$this->is_list($ids) || $ids === [] || count($ids) > 32) {
+                return new WP_Error('cod_mcp_composition_partes_invalid', 'La parte "' . $parte . '" del nodo "' . $node['id'] . '" debe ser una lista de 1 a 32 ids de regla.');
+            }
+            $lista = [];
+            foreach ($ids as $rule_id) {
+                if (!is_string($rule_id) || !isset($rule_index[$rule_id])) {
+                    return new WP_Error('cod_mcp_composition_rule_reference_invalid', 'La parte "' . $parte . '" del nodo "' . $node['id'] . '" refiere una regla inexistente.');
+                }
+                $rule = $rule_index[$rule_id];
+                if ($rule['kind'] === 'cadence') {
+                    return new WP_Error('cod_mcp_composition_rule_reference_invalid', 'La regla "' . $rule_id . '" es una cadencia y no puede dirigirse a una parte: una cadencia reparte reglas entre hermanos, no estila una parte.');
+                }
+                if (!in_array($rule['kind'], self::PART_RULE_KINDS, true)) {
+                    return new WP_Error(
+                        'cod_mcp_composition_partes_invalid',
+                        'La regla "' . $rule_id . '" es de tipo ' . $rule['kind'] . ', que no se puede dirigir a una parte. Los tipos que sí: ' . implode(', ', self::PART_RULE_KINDS) . '.'
+                    );
+                }
+                if ($rule['scope']['state'] === 'current' && $contrato['partes'][$parte]['elegido'] === null) {
+                    return new WP_Error(
+                        'cod_mcp_current_state_target_invalid',
+                        'La regla "' . $rule_id . '" tiene scope.state="current" pero la parte "' . $parte . '" de ' . $behavior . ' no tiene un estado elegido. Las partes con estado elegido son: ' . $this->parts_with_current($behavior) . '.'
+                    );
+                }
+                if (in_array($rule_id, $lista, true)) {
+                    return new WP_Error('cod_mcp_composition_rule_reference_invalid', 'La regla "' . $rule_id . '" está repetida en la parte "' . $parte . '".');
+                }
+                $lista[] = $rule_id;
+            }
+            $normalized[$parte] = $lista;
+        }
+        return $normalized;
+    }
+
+    /**
+     * Behavior del registro (BEHAVIOR_CONTRACTS) que lleva un nodo por sus
+     * reglas interaction directas; '' si no lleva ninguno.
+     *
+     * @param array<int, string> $rule_ids
+     * @param array<string, array<string, mixed>> $rule_index
+     */
+    private function contract_behavior_of(array $rule_ids, array $rule_index): string
+    {
+        foreach ($rule_ids as $rule_id) {
+            $rule = $rule_index[$rule_id] ?? null;
+            if ($rule !== null && $rule['kind'] === 'interaction' && isset(self::BEHAVIOR_CONTRACTS[$rule['value']['behavior']])) {
+                return (string) $rule['value']['behavior'];
+            }
+        }
+        return '';
+    }
+
+    /**
+     * Marcas de «el elegido» por behavior, derivadas de BEHAVIOR_CONTRACTS.
+     * Sólo entran los behaviors que tienen al menos una parte con estado elegido.
+     *
+     * @return array<string, array<int, string>>
+     */
+    private function current_markers(): array
+    {
+        $marcas = [];
+        foreach (self::BEHAVIOR_CONTRACTS as $behavior => $contrato) {
+            foreach ($contrato['partes'] as $parte) {
+                if ($parte['elegido'] !== null) {
+                    $marcas[$behavior][] = $parte['elegido'];
+                }
+            }
+        }
+        return $marcas;
+    }
+
+    /** Nombres de los behaviors con estado elegido, unidos con $union («pestanas o cuadrantes»). */
+    private function current_behaviors_text(string $union): string
+    {
+        return implode($union, array_keys($this->current_markers()));
+    }
+
+    /** Partes de un behavior que tienen estado elegido, como lista legible. */
+    private function parts_with_current(string $behavior): string
+    {
+        $nombres = [];
+        foreach (self::BEHAVIOR_CONTRACTS[$behavior]['partes'] as $nombre => $parte) {
+            if ($parte['elegido'] !== null) {
+                $nombres[] = $nombre;
+            }
+        }
+        return implode(', ', $nombres);
+    }
+
+    /** Texto del catálogo para scope.state = "current", armado desde el registro. */
+    private function state_current_text(): string
+    {
+        $behaviors = [];
+        foreach (self::BEHAVIOR_CONTRACTS as $behavior => $contrato) {
+            $partes = [];
+            foreach ($contrato['partes'] as $nombre => $parte) {
+                if ($parte['elegido'] !== null) {
+                    $partes[] = 'la parte ' . $nombre . ' con ' . $parte['elegido'];
+                }
+            }
+            if ($partes !== []) {
+                $behaviors[] = $behavior . ' (' . implode(' y ', $partes) . ')';
+            }
+        }
+        return '"current" = «el elegido» de un behavior que tiene uno: la regla sólo se aplica cuando el nodo, o un ancestro suyo, está marcado por el runtime como elegido. Hoy: ' . implode('; ', $behaviors) . '. No es "active" (que en CSS es «mientras se aprieta»). Se declara como cualquier otra regla, con scope.state="current", y se aplica al nodo que se quiere pintar distinto cuando es el elegido; por ejemplo, el título de una etiqueta de pestañas. Para pintar la parte que fabrica el runtime (el botón de la pestaña, por ejemplo) se usa el campo partes del nodo; ahí "current" se combina con la marca de esa parte. Un nodo que no está dentro de un ' . $this->current_behaviors_text(' o ') . ' devuelve error cod_mcp_current_state_target_invalid, no se acepta para nada.';
+    }
+
+    /**
+     * Contrato de partes que ve la IA en el catálogo.
+     *
+     * @return array<string, array<string, mixed>>
+     */
+    private function behavior_contracts_catalog(): array
+    {
+        $catalogo = [];
+        foreach (self::BEHAVIOR_CONTRACTS as $behavior => $contrato) {
+            $partes = [];
+            foreach ($contrato['partes'] as $nombre => $parte) {
+                $partes[$nombre] = [
+                    'descripcion' => $parte['descripcion'],
+                    'selector' => $parte['selector'],
+                    'elegido' => $parte['elegido'] ?? 'sin estado elegido',
+                ];
+            }
+            $catalogo[$behavior] = ['atributoRol' => $contrato['atributoRol'], 'partes' => $partes];
+        }
+        return $catalogo;
     }
 
     /**
@@ -1772,19 +2224,23 @@ final class COD_Canvas_MCP_Recipe_Compiler
         // de la primitiva (se dibuja como pendiente, con su leyenda). Eso evita
         // inventar un "item de galería especial" para los por-venir.
         $sin_fuente = !isset($content['sourceUrl']) || $content['sourceUrl'] === '';
-        if (!$this->has_only_keys($content, ['sourceUrl', 'posterUrl', 'caption', 'matte', 'pendingLabel'])
+        if (!$this->has_only_keys($content, ['sourceUrl', 'posterUrl', 'caption', 'matte', 'ambient', 'pendingLabel'])
             || (!$sin_fuente && (!is_string($content['sourceUrl']) || !$this->is_safe_asset_url($content['sourceUrl'])))
             || (isset($content['pendingLabel']) && !$this->is_plain_text($content['pendingLabel'], 120))
             || (isset($content['posterUrl']) && (!is_string($content['posterUrl']) || !$this->is_safe_asset_url($content['posterUrl'])))
             || (isset($content['caption']) && !$this->is_plain_text($content['caption'], 2000))
-            || (isset($content['matte']) && !is_bool($content['matte']))) {
-            return new WP_Error('cod_mcp_video_invalid', 'video acepta sourceUrl de activo Canvas (o ninguno, y queda pendiente); poster, caption, matte y pendingLabel son opcionales.');
+            || (isset($content['matte']) && !is_bool($content['matte']))
+            || (isset($content['ambient']) && !is_bool($content['ambient']))) {
+            return new WP_Error('cod_mcp_video_invalid', 'video acepta sourceUrl de activo Canvas (o ninguno, y queda pendiente); poster, caption, matte, ambient (boolean: true o false) y pendingLabel son opcionales.');
         }
         return [
             'sourceUrl' => $sin_fuente ? '' : $content['sourceUrl'],
             'posterUrl' => isset($content['posterUrl']) ? $content['posterUrl'] : '',
             'caption' => isset($content['caption']) ? $content['caption'] : '',
             'matte' => isset($content['matte']) ? $content['matte'] : false,
+            // ambient se guarda tal cual; la precedencia (matte gana) se resuelve
+            // al dibujar, en render_video.
+            'ambient' => isset($content['ambient']) ? $content['ambient'] : false,
             'pendingLabel' => isset($content['pendingLabel']) ? $content['pendingLabel'] : 'Próximamente',
         ];
     }
@@ -2011,6 +2467,10 @@ final class COD_Canvas_MCP_Recipe_Compiler
      */
     private function render_composition(array $composition, array $design)
     {
+        $current = $this->check_current_state($composition['nodes'], $design['ruleIndex'], false, $this->current_markers());
+        if (is_wp_error($current)) {
+            return $current;
+        }
         $body = $this->render_nodes(
             $composition['nodes'],
             $design['ruleIndex'],
@@ -2035,6 +2495,9 @@ final class COD_Canvas_MCP_Recipe_Compiler
         foreach ($design['rules'] as $rule) {
             $styles .= $this->css_for_rule($rule);
         }
+        // Reglas dirigidas a partes que fabrica un behavior (campo `partes`):
+        // van DESPUÉS de las de clase y con selector de descendiente anclado al nodo.
+        $styles .= $this->parts_css($composition['nodes'], $design['ruleIndex']);
 
         $kind_counts = [];
         $this->count_node_kinds($composition['nodes'], $kind_counts);
@@ -2058,6 +2521,45 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 'previewMeaning' => 'La previsualización MCP valida composición, reglas, URLs seguras, formularios publicados y representación Canvas; no sustituye una revisión visual en el Canvas del navegador.',
             ],
         ];
+    }
+
+    /**
+     * Una regla con scope.state="current" sólo tiene sentido dentro de un
+     * behavior que tenga un «elegido» (ver BEHAVIOR_CONTRACTS). Fuera de uno nunca
+     * se cumpliría el selector y la regla quedaría aceptada e ignorada en
+     * silencio: acá se rechaza con el nodo y el motivo.
+     *
+     * @param array<int, array<string, mixed>> $nodes
+     * @param array<string, array<string, mixed>> $rule_index
+     * @param array<string, array<int, string>> $marcas marcas del elegido por behavior (current_markers())
+     * @return true|WP_Error
+     */
+    private function check_current_state(array $nodes, array $rule_index, bool $dentro, array $marcas)
+    {
+        foreach ($nodes as $node) {
+            $ahora = $dentro;
+            foreach ($node['ruleIds'] as $rule_id) {
+                $rule = $rule_index[$rule_id];
+                if ($rule['kind'] === 'interaction' && isset($marcas[$rule['value']['behavior']])) {
+                    $ahora = true;
+                }
+            }
+            foreach ($node['ruleIds'] as $rule_id) {
+                if (!$ahora && $rule_index[$rule_id]['scope']['state'] === 'current') {
+                    return new WP_Error(
+                        'cod_mcp_current_state_target_invalid',
+                        'La regla "' . $rule_id . '" tiene scope.state="current" pero el nodo "' . $node['id'] . '" no está dentro de un grupo con behavior ' . implode(' o ', array_keys($marcas)) . '; no habría nada que lo marque como elegido.'
+                    );
+                }
+            }
+            if (!empty($node['children']) && is_array($node['children'])) {
+                $hijos = $this->check_current_state($node['children'], $rule_index, $ahora, $marcas);
+                if (is_wp_error($hijos)) {
+                    return $hijos;
+                }
+            }
+        }
+        return true;
     }
 
     /**
@@ -2327,6 +2829,36 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 $attributes['data-cod-carousel-active-class'] = 'is-active';
                 $attributes['data-cod-carousel-visible'] = (string) $carousel['visible'];
                 $attributes['data-cod-carousel-visible-mobile'] = (string) $carousel['visibleMobile'];
+            } elseif ($interaction['behavior'] === 'cuadrantes') {
+                // Un display de CUATRO contenidos: el runtime necesita exactamente
+                // cuatro hijos (uno por cuadrante) para saber de qué lado queda
+                // cada imagen y en qué esquina van las miniaturas. Con otra
+                // cantidad no hay grilla 2x2 posible, y es mejor fallar acá, con
+                // un mensaje claro, que publicar un bloque que no se comporta.
+                // El único atributo que se emite es el data-cod-behavior que ya
+                // se puso arriba: el resto lo arma el runtime.
+                if ($node['kind'] !== 'group') {
+                    return new WP_Error('cod_mcp_cuadrantes_target_invalid', 'cuadrantes sólo puede aplicarse a un nodo group.');
+                }
+                $hijos = is_array($node['children'] ?? null) ? count($node['children']) : 0;
+                if ($hijos !== 4) {
+                    return new WP_Error('cod_mcp_cuadrantes_children_invalid', 'cuadrantes exige un group con exactamente 4 hijos (uno por cuadrante); este tiene ' . $hijos . '.');
+                }
+            } elseif ($interaction['behavior'] === 'pestanas') {
+                // Un juego de pestañas: cada hijo del group es una pestaña (su
+                // primer hijo es la etiqueta, el resto es el panel). Con menos
+                // de 2 no hay nada que alternar, y más de 8 etiquetas no caben
+                // en una fila legible: mejor fallar acá, con un mensaje claro,
+                // que publicar un bloque que no se comporta. El único atributo
+                // que se emite es el data-cod-behavior que ya se puso arriba:
+                // el resto lo arma el runtime.
+                if ($node['kind'] !== 'group') {
+                    return new WP_Error('cod_mcp_pestanas_target_invalid', 'pestanas sólo puede aplicarse a un nodo group.');
+                }
+                $hijos = is_array($node['children'] ?? null) ? count($node['children']) : 0;
+                if ($hijos < 2 || $hijos > 8) {
+                    return new WP_Error('cod_mcp_pestanas_children_invalid', 'pestanas exige un group con 2 a 8 hijos (uno por pestaña: su primer hijo es la etiqueta y el resto el panel); este tiene ' . $hijos . '.');
+                }
             }
         }
 
@@ -2386,7 +2918,13 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 . esc_attr($etiqueta) . '"><span>' . esc_html($etiqueta) . '</span></div>' . $caption . '</figure>';
         }
         $poster = $content['posterUrl'] !== '' ? ' poster="' . esc_url($content['posterUrl']) . '"' : '';
-        return '<figure ' . $attrs . '><video controls' . $poster . '><source src="' . esc_url($content['sourceUrl']) . '"></video>' . $caption . '</figure>';
+        // Video ambiental: solo, en bucle, mudo y sin controles. El runtime
+        // público (activateAutoplayVideos) ya arranca todo video[autoplay];
+        // lo que faltaba era poder pedirlo desde la composición. Aquí no hay
+        // rama para matte porque ese caso ya salió arriba: matte gana sobre
+        // ambient.
+        $reproduccion = !empty($content['ambient']) ? 'autoplay loop muted playsinline' : 'controls';
+        return '<figure ' . $attrs . '><video ' . $reproduccion . $poster . '><source src="' . esc_url($content['sourceUrl']) . '"></video>' . $caption . '</figure>';
     }
 
     /**
@@ -2549,7 +3087,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
         // de un atributo style inline (no es el nombre de la propiedad, es el
         // parser de valores). Cosmético, no crítico para la función del CTA.
         $visual_style = 'width:' . $size . 'px;height:' . $size . 'px;border-radius:' . esc_attr($content['borderRadius'])
-            . ';display:flex;align-items:center;justify-content:center;background:' . esc_attr($content['backgroundColor'])
+            . ';display:flex;align-items:center;justify-content:center;background-color:' . esc_attr($content['backgroundColor'])
             . ';color:' . esc_attr($content['iconColor']) . ';';
         $icon = str_replace(
             'width="28" height="28"',
@@ -2690,7 +3228,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
             // La tinta y la superficie salen del núcleo del set, no del panel de
             // WordPress. Si el set no las declara, el navegador resuelve el
             // texto como siempre lo hizo y COD_Design_Core dice cuál falta.
-            . ".cod-mcp-page{color:var(--cod-color-ink);background:var(--cod-color-surface);line-height:1.5;}\n"
+            . ".cod-mcp-page{color:var(--cod-color-ink);background-color:var(--cod-color-surface);line-height:1.5;}\n"
             . ".cod-mcp-page *{box-sizing:border-box;}\n"
             . ".cod-mcp-page img,.cod-mcp-page video,.cod-mcp-page audio{display:block;max-width:100%;}\n"
             . ".cod-section{width:100%;padding:48px 24px;position:relative;}\n"
@@ -2703,7 +3241,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
             . ".cod-mcp-gallery__item img{width:100%;height:100%;object-fit:cover;}\n"
             . ".cod-mcp-gallery__item video,.cod-mcp-gallery__item figure{width:100%;height:100%;margin:0;}\n"
             . ".cod-mcp-gallery__item video{object-fit:cover;display:block;}\n"
-            . ".cod-video--pendiente{display:flex;align-items:center;justify-content:center;width:100%;aspect-ratio:16/9;background:rgba(0,0,0,0.06);opacity:.75;font-size:.8em;letter-spacing:.06em;text-transform:uppercase;}\n"
+            . ".cod-video--pendiente{display:flex;align-items:center;justify-content:center;width:100%;aspect-ratio:16/9;background-color:rgba(0,0,0,0.06);opacity:.75;font-size:.8em;letter-spacing:.06em;text-transform:uppercase;}\n"
             // Giro de la imagen. 180 no cambia la forma de la caja, así que basta
             // el transform. 90 y 270 sí la cambian: la imagen girada necesita
             // medir el ALTO del marco de ancho y el ANCHO de alto, y eso es lo
@@ -2720,7 +3258,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
             // aplica igual y se reserva el espacio con la proporción invertida.
             . "@supports not (width:100cqh){.cod-marco-girado>.cod-rot-90,.cod-marco-girado>.cod-rot-270{position:static;width:100%;height:auto;transform:rotate(90deg);}}\n"
             . ".cod-mcp-gallery__controls{grid-column:1/-1;display:flex;gap:8px;}\n"
-            . ".cod-mcp-lightbox{display:none;position:fixed;inset:0;z-index:9999;padding:32px;background:rgba(0,0,0,.86);align-items:center;justify-content:center;gap:12px;}\n"
+            . ".cod-mcp-lightbox{display:none;position:fixed;inset:0;z-index:9999;padding:32px;background-color:rgba(0,0,0,.86);align-items:center;justify-content:center;gap:12px;}\n"
             . ".cod-mcp-lightbox.is-open{display:flex;}\n"
             . ".cod-mcp-lightbox img{max-width:min(80vw,1100px);max-height:80vh;}\n"
             . ".cod-node--table{overflow-x:auto;}\n"
@@ -2730,11 +3268,74 @@ final class COD_Canvas_MCP_Recipe_Compiler
             . "@media(max-width:767px){.cod-section{padding:32px 16px;}.cod-node--layout,.cod-node--gallery{grid-template-columns:minmax(0,1fr);}}\n";
     }
 
-    /** @param array<string, mixed> $rule */
-    private function css_for_rule(array $rule): string
+    /**
+     * CSS de las reglas que los nodos dirigen a una parte de su behavior.
+     * El selector es un descendiente anclado al nodo por su clase de id:
+     * `.cod-node-id-<nodo> [data-cod-pestanas-rol="etiqueta"]`. No se puede
+     * usar la clase de la regla porque el elemento lo fabrica el runtime en el
+     * navegador y nunca la recibe.
+     *
+     * @param array<int, array<string, mixed>> $nodes
+     * @param array<string, array<string, mixed>> $rule_index
+     */
+    private function parts_css(array $nodes, array $rule_index): string
+    {
+        $css = '';
+        foreach ($nodes as $node) {
+            $partes = $node['partes'] ?? [];
+            if ($partes !== []) {
+                $behavior = $this->contract_behavior_of($node['ruleIds'], $rule_index);
+                $ancla = '.cod-node-id-' . sanitize_html_class($node['id']);
+                foreach ($partes as $parte => $rule_ids) {
+                    $definicion = self::BEHAVIOR_CONTRACTS[$behavior]['partes'][$parte];
+                    $destino = [
+                        'selector' => $ancla . ' ' . $definicion['selector'],
+                        'elegido' => $definicion['elegido'],
+                    ];
+                    foreach ($rule_ids as $rule_id) {
+                        $css .= $this->css_for_rule($rule_index[$rule_id], $destino);
+                    }
+                }
+            }
+            if (!empty($node['children']) && is_array($node['children'])) {
+                $css .= $this->parts_css($node['children'], $rule_index);
+            }
+        }
+        return $css;
+    }
+
+    /**
+     * @param array<string, mixed> $rule
+     * @param array{selector: string, elegido: string|null}|null $destino Parte de un behavior a la que se
+     *   dirige la regla: el selector completo del descendiente y la marca de su elegido. Null = el nodo
+     *   que lleva la clase de la regla (la forma de siempre).
+     */
+    private function css_for_rule(array $rule, ?array $destino = null): string
     {
         $selector = '.' . $this->rule_class($rule['id']);
-        if ($rule['scope']['state'] !== 'default') {
+        if ($destino !== null) {
+            $selector = $destino['selector'];
+            if ($rule['scope']['state'] === 'current') {
+                // La marca es la de ESTA parte (etiqueta activa, panel visible…),
+                // no la unión de todos los behaviors. Ya se validó que existe.
+                $selector .= (string) $destino['elegido'];
+            } elseif ($rule['scope']['state'] !== 'default') {
+                $selector .= ':' . $rule['scope']['state'];
+            }
+        } elseif ($rule['scope']['state'] === 'current') {
+            // Un solo selector (con :is) y no una lista, para que los sufijos que
+            // más abajo se le agregan a $selector (' img', ':hover img'…) sigan
+            // valiendo. Especificidad: la de su argumento más alto, una clase
+            // más un atributo; le gana a la regla del mismo nodo sin estado.
+            $variantes = [];
+            foreach ($this->current_markers() as $marcas) {
+                foreach ($marcas as $marca) {
+                    $variantes[] = $selector . $marca;
+                    $variantes[] = $marca . ' ' . $selector;
+                }
+            }
+            $selector = ':is(' . implode(',', $variantes) . ')';
+        } elseif ($rule['scope']['state'] !== 'default') {
             $selector .= ':' . $rule['scope']['state'];
         }
         $value = $rule['value'];
@@ -2743,9 +3344,18 @@ final class COD_Canvas_MCP_Recipe_Compiler
         switch ($rule['kind']) {
             case 'color':
                 $css = '--cod-color-' . sanitize_html_class($value['role']) . ':' . $value['color'] . ';';
-                if (in_array($value['role'], ['background', 'surface', 'canvas'], true)) {
+                // La variable siempre se emite; además el color tiene que pintar el nodo.
+                // apply explícito manda. Sin apply, se conservan los atajos por nombre de
+                // rol (para no cambiar lo ya compuesto) y, si el rol no es ninguno de
+                // ellos, se pinta como texto: un color suelto sobre un nodo sólo puede
+                // significar eso (los fondos tienen su propia regla surface).
+                $aplica = $value['apply'] ?? null;
+                if ($aplica === null) {
+                    $aplica = in_array($value['role'], ['background', 'surface', 'canvas'], true) ? 'background' : 'text';
+                }
+                if ($aplica === 'background') {
                     $css .= 'background-color:' . $value['color'] . ';';
-                } elseif (in_array($value['role'], ['text', 'foreground', 'ink', 'muted'], true)) {
+                } else {
                     $css .= 'color:' . $value['color'] . ';';
                 }
                 break;
@@ -2810,6 +3420,11 @@ final class COD_Canvas_MCP_Recipe_Compiler
             case 'motion':
                 $css = $this->motion_css($selector, $value);
                 break;
+            case 'properties':
+                foreach ($value['declarations'] as $propiedad => $valor) {
+                    $css .= $propiedad . ':' . $valor . ';';
+                }
+                break;
             case 'interaction':
             case 'cadence':
             case 'anchor':
@@ -2859,7 +3474,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
             $rule_css .= '@media(max-width:767px){' . $selector . '{' . $this->layout_css($mobile_layout) . '}}';
         }
         if ($rule['kind'] === 'surface' && isset($value['overlayColor'])) {
-            $rule_css .= $selector . '::before{content:"";position:absolute;inset:0;background:' . $value['overlayColor'] . ';opacity:'
+            $rule_css .= $selector . '::before{content:"";position:absolute;inset:0;background-color:' . $value['overlayColor'] . ';opacity:'
                 . ($value['overlayOpacity'] ?? 1) . ';pointer-events:none;}'
                 . $selector . '>*{position:relative;}';
         }
@@ -2976,6 +3591,13 @@ final class COD_Canvas_MCP_Recipe_Compiler
         if (isset($value['position'])) {
             $declarations .= 'object-position:' . $value['position'] . ';';
         }
+        // filter:grayscale(1) sobre imagen, video y canvas (el video con matte
+        // se ve por su canvas). Con hover "dim" se suma brillo al gris en vez
+        // de pisarlo.
+        $gris = isset($value['filter']) && $value['filter'] === 'grayscale';
+        if ($gris) {
+            $declarations .= 'filter:grayscale(1);';
+        }
         if ($declarations !== '') {
             $css .= $target . '{' . $declarations . '}';
         }
@@ -2989,18 +3611,18 @@ final class COD_Canvas_MCP_Recipe_Compiler
             $css .= $selector . ' figcaption{display:none;}';
         } elseif (isset($value['caption']) && $value['caption'] === 'overlay') {
             $css .= $selector . '{position:relative;overflow:hidden;}'
-                . $selector . ' figcaption{position:absolute;inset:auto 0 0;padding:.75rem;background:rgba(0,0,0,.62);color:#fff;}';
+                . $selector . ' figcaption{position:absolute;inset:auto 0 0;padding:.75rem;background-color:rgba(0,0,0,.62);color:#fff;}';
         }
         if (isset($value['overlayColor'])) {
             $overlay_target = $selector . '::after,' . $selector . ' .cod-mcp-gallery__item::after';
             $css .= $selector . ',' . $selector . ' .cod-mcp-gallery__item{position:relative;isolation:isolate;}'
-                . $overlay_target . '{content:"";position:absolute;inset:0;background:' . $value['overlayColor'] . ';opacity:'
+                . $overlay_target . '{content:"";position:absolute;inset:0;background-color:' . $value['overlayColor'] . ';opacity:'
                 . ($value['overlayOpacity'] ?? 1) . ';pointer-events:none;}';
         }
         if (isset($value['hover']) && $value['hover'] !== 'none') {
             $transform = ['zoom' => 'scale(1.04)', 'lift' => 'translateY(-4px)', 'dim' => 'none'][$value['hover']];
             $css .= $target . '{transition:transform .3s ease,filter .3s ease;}'
-                . $selector . ':hover img,' . $selector . ':hover video{' . ($value['hover'] === 'dim' ? 'filter:brightness(.78);' : 'transform:' . $transform . ';') . '}';
+                . $selector . ':hover img,' . $selector . ':hover video{' . ($value['hover'] === 'dim' ? 'filter:' . ($gris ? 'grayscale(1) ' : '') . 'brightness(.78);' : 'transform:' . $transform . ';') . '}';
         }
         return $css;
     }
@@ -3031,16 +3653,21 @@ final class COD_Canvas_MCP_Recipe_Compiler
         $variant = $value['variant'] ?? 'solid';
         $css = 'display:inline-flex;align-items:center;justify-content:center;padding:' . $size . ';text-decoration:none;transition:transform .2s ease,text-decoration-color .2s ease;';
         if ($variant === 'solid') {
-            $css .= 'background:' . $colors['background'] . ';color:' . $colors['foreground'] . ';border:1px solid ' . $colors['background'] . ';';
+            $css .= 'background-color:' . $colors['background'] . ';color:' . $colors['foreground'] . ';border-width:1px;border-style:solid;border-color:' . $colors['background'] . ';';
         } elseif ($variant === 'outline') {
-            $css .= 'background:transparent;color:' . $colors['foreground'] . ';border:1px solid currentColor;';
+            $css .= 'background-color:transparent;color:' . $colors['foreground'] . ';border-width:1px;border-style:solid;border-color:currentColor;';
         } elseif ($variant === 'ghost') {
-            $css .= 'background:transparent;color:' . $colors['foreground'] . ';border:1px solid transparent;';
+            $css .= 'background-color:transparent;color:' . $colors['foreground'] . ';border-width:1px;border-style:solid;border-color:transparent;';
         } else {
-            $css .= 'background:transparent;color:' . $colors['foreground'] . ';border:0;padding-inline:0;';
+            $css .= 'background-color:transparent;color:' . $colors['foreground'] . ';border-width:0;border-style:none;padding-inline:0;';
         }
         if (($value['width'] ?? 'auto') === 'full') {
             $css .= 'display:flex;width:100%;';
+        } else {
+            // width "auto" es ancho de contenido de verdad. Hasta 0.3.32 no emitía nada y el
+            // botón quedaba a merced del padre: dentro de una grilla o un flex que estira
+            // salía de ancho completo igual. justify-self/align-self lo sueltan del estirado.
+            $css .= 'width:auto;justify-self:start;align-self:start;';
         }
         if (($value['interaction'] ?? 'none') === 'lift') {
             $css .= 'transform:translateY(0);';
@@ -3090,7 +3717,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
         if (($value['variant'] ?? '') === 'lined') {
             $css .= $selector . ' th,' . $selector . ' td{border-bottom:1px solid currentColor;}';
         } elseif (($value['variant'] ?? '') === 'striped') {
-            $css .= $selector . ' tbody tr:nth-child(even){background:rgba(0,0,0,.05);}';
+            $css .= $selector . ' tbody tr:nth-child(even){background-color:rgba(0,0,0,.05);}';
         } elseif (($value['variant'] ?? '') === 'cards') {
             $css .= '@media(max-width:767px){' . $selector . ' table,' . $selector . ' thead,' . $selector . ' tbody,' . $selector . ' tr,' . $selector . ' th,' . $selector . ' td{display:block;}}';
         }
@@ -3099,9 +3726,9 @@ final class COD_Canvas_MCP_Recipe_Compiler
         }
         if (($value['header'] ?? '') === 'accent') {
             // Los mismos tres roles del núcleo, sin respaldo inventado.
-            $css .= $selector . ' th{background:var(--cod-color-accent);color:var(--cod-color-surface);}';
+            $css .= $selector . ' th{background-color:var(--cod-color-accent);color:var(--cod-color-surface);}';
         } elseif (($value['header'] ?? '') === 'inverse') {
-            $css .= $selector . ' th{background:var(--cod-color-ink);color:var(--cod-color-surface);}';
+            $css .= $selector . ' th{background-color:var(--cod-color-ink);color:var(--cod-color-surface);}';
         }
         $padding = ['compact' => '.4rem', 'comfortable' => '.75rem', 'spacious' => '1.15rem'][$value['density'] ?? 'comfortable'];
         $css .= $selector . ' th,' . $selector . ' td{padding:' . $padding . ';}';
@@ -3187,9 +3814,9 @@ final class COD_Canvas_MCP_Recipe_Compiler
             $css .= 'max-width:' . $value['maxWidth'] . ';margin-inline:auto;';
         }
         if (($value['surface'] ?? '') === 'card') {
-            $css .= 'padding:1.5rem;background:#fff;box-shadow:0 8px 24px rgba(0,0,0,.12);';
+            $css .= 'padding:1.5rem;background-color:#fff;box-shadow:0 8px 24px rgba(0,0,0,.12);';
         } elseif (($value['surface'] ?? '') === 'outlined') {
-            $css .= 'padding:1.5rem;border:1px solid currentColor;';
+            $css .= 'padding:1.5rem;border-width:1px;border-style:solid;border-color:currentColor;';
         }
         return $css;
     }

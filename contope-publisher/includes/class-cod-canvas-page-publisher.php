@@ -165,6 +165,307 @@ final class COD_Canvas_Page_Publisher
             . '.cod-dynamic-group__text{margin:0;}';
     }
 
+    /**
+     * Geometría del behavior «cuadrantes» (cuatro contenidos: en reposo una
+     * grilla 2x2 de imágenes cuadradas; al activar uno, su imagen crece a la
+     * mitad del bloque, el texto va en la otra mitad y las otras tres pasan a
+     * miniaturas). El runtime vive en cod-canvas-public.js y cod-behaviors.js
+     * (montarCuadrantes) y sólo marca atributos; toda la disposición sale de acá.
+     *
+     * Es el port de la hoja original del módulo (la del sitio de Econut, que
+     * estaba clavada en 900px con celdas de 440px). Lo que se conserva, en
+     * proporción, porque es lo que hace bueno al módulo:
+     *
+     *   - celdas cuadradas con 20px de separación sobre 900px (2,22% del ancho);
+     *   - miniaturas de 88px sobre celdas de 440px (20% del lado de la celda) y
+     *     14px entre ellas (3,18% del lado de la celda), con borde de 1px;
+     *   - INVARIANTE: las tres miniaturas forman una mini 2x2 con un hueco donde
+     *     estaba la activa. La que estaba a la derecha sigue a la derecha, la de
+     *     abajo sigue abajo. Se pegan a la esquina de la imagen expandida que
+     *     mira al centro del bloque y no tienen margen;
+     *   - al activar, el bloque pasa de alto 2 celdas + separación a alto 1 celda
+     *     (la imagen y el texto quedan lado a lado, cada uno del tamaño de una
+     *     celda); el radio de 8px; y la «×» en la esquina superior derecha.
+     *
+     * Lo que cambia respecto de la hoja original, y sólo esto: (1) es fluido, no
+     * clavado en píxeles: todo se mide en cqw, o sea en % del ancho del bloque,
+     * y las celdas son cuadradas por construcción; (2) sin !important, que ahí
+     * sólo peleaba contra Divi; (3) el movimiento usa el token del set en vez de
+     * `all 0.4s ease-in-out`; (4) móvil (hasta 700px): el reposo sigue siendo 2x2
+     * y, al activar, la imagen va arriba, el texto abajo y las miniaturas en fila
+     * dentro de la imagen; ahí sí se rompe la invariante, porque no hay espacio.
+     *
+     * CÓMO SE MIDE. La raíz es un contenedor (container-type: inline-size), así
+     * que sus hijos miden en cqw. Todo sale de un solo número, la separación como
+     * fracción del ancho (--cuad-g); de ahí salen la celda, la miniatura y su
+     * separación. Cada imagen tiene su posición de origen (--cuad-k columna,
+     * --cuad-r fila) y esa posición decide dónde queda como miniatura.
+     *
+     *   ítem 1: imagen a la izquierda, texto a la derecha, miniaturas abajo-derecha
+     *   ítem 2: imagen a la derecha, texto a la izquierda, miniaturas abajo-izquierda
+     *   ítem 3: imagen a la izquierda, texto a la derecha, miniaturas arriba-derecha
+     *   ítem 4: imagen a la derecha, texto a la izquierda, miniaturas arriba-izquierda
+     *
+     * SÓLO geometría y movimiento. Ningún color de marca ni tipografía: eso lo
+     * ponen las reglas de diseño de cada sitio. Los únicos colores son las
+     * palabras clave del sistema (Canvas, CanvasText) en el borde de las
+     * miniaturas, la «×» y el anillo de foco: heredan del navegador y no de una
+     * marca. Sin degradados.
+     *
+     * Movimiento: el cambio de estado (el bloque cambia de alto y las imágenes
+     * viajan) usa --cod-motion-response, y el texto al aparecer usa
+     * --cod-motion-enter. Si el sitio no declara esos tokens la transición
+     * queda inválida y el cambio es instantáneo, que es lo correcto: aquí no se
+     * inventan duraciones. Con prefers-reduced-motion no hay transición ni
+     * animación, y el estado cambia igual.
+     *
+     * Ajustes que un sitio puede sobrescribir (todos opcionales):
+     *   --cod-cuadrantes-separacion (número: fracción del ancho, por omisión .0222222),
+     *   --cod-cuadrantes-radio (por omisión --cod-radius y, si no, 8px),
+     *   --cod-cuadrantes-aire (relleno del texto),
+     *   --cod-cuadrantes-movil-miniatura-ancho / -separacion / -margen (móvil, en % de la imagen).
+     *
+     * Regla del proyecto: nunca una abreviada con variable (background,
+     * border, font, margin, padding). Donde entra una variable, forma larga.
+     *
+     * @param string|null $html HTML de la página: si se entrega y no menciona
+     *                          «cuadrantes», no se emite nada. Null = siempre.
+     */
+    public static function cuadrantes_css(?string $html = null): string
+    {
+        if ($html !== null && strpos($html, 'cuadrantes') === false) {
+            return '';
+        }
+
+        $r = '.cod-cuadrantes[data-cod-behavior="cuadrantes"]';
+        // Las piezas van SIN el prefijo de la raíz: cada regla lo pone donde
+        // corresponde ($r, $activo, $izq...) para no repetirlo dentro del selector.
+        $medio = '.cod-cuadrantes__media';
+        $panel = '.cod-cuadrantes__info';
+        $boton = '.cod-cuadrantes__disparador';
+        $cerrar = '.cod-cuadrantes__cerrar';
+        $activo = $r . '[data-cod-cuadrantes-estado="activo"]';
+        $izq = $r . '[data-cod-cuadrantes-lado="izquierda"]';
+        $der = $r . '[data-cod-cuadrantes-lado="derecha"]';
+        $arriba = $r . '[data-cod-cuadrantes-esquina="arriba"]';
+        $abajo = $r . '[data-cod-cuadrantes-esquina="abajo"]';
+        $rol = static function (string $nombre): string {
+            return '[data-cod-cuadrantes-rol="' . $nombre . '"]';
+        };
+        $item = static function (int $n): string {
+            return '[data-cod-cuadrantes-item="' . $n . '"]';
+        };
+        $ranura = static function (int $n): string {
+            return '[data-cod-cuadrantes-slot="' . $n . '"]';
+        };
+
+        $css = <<<CSS
+/* Raíz: contenedor (sus hijos miden en cqw) y, en reposo, un cuadrado: dos celdas más una separación. Todo sale de --cuad-g. */
+{$r}{position:relative;box-sizing:border-box;overflow:hidden;container-type:inline-size;aspect-ratio:1;
+--cuad-g:var(--cod-cuadrantes-separacion,.0222222);
+--cuad-c:calc((1 - var(--cuad-g)) / 2);
+--cuad-gap:calc(var(--cuad-g) * 100cqw);
+--cuad-cel:calc(var(--cuad-c) * 100cqw);
+--cuad-min:calc(var(--cuad-cel) * .2);
+--cuad-sep:calc(var(--cuad-cel) * .0318182);
+--cuad-caja:calc(2 * var(--cuad-min) + var(--cuad-sep));
+--cuad-radio:var(--cod-cuadrantes-radio,var(--cod-radius,8px));
+--cuad-aire:var(--cod-cuadrantes-aire,1.5rem);
+--cuad-movil-mini-w:var(--cod-cuadrantes-movil-miniatura-ancho,22%);
+--cuad-movil-sep:var(--cod-cuadrantes-movil-miniatura-separacion,2%);
+--cuad-movil-margen:var(--cod-cuadrantes-movil-margen,3%);}
+/* El hijo de la raíz no genera caja: su imagen y su texto se ubican directo en el bloque. */
+{$r} .cod-cuadrantes__item{display:contents;}
+
+/* Cada imagen tiene su celda de origen (columna --cuad-k, fila --cuad-r). En reposo, un cuadrante de la grilla 2x2. */
+{$r} {$medio}{position:absolute;box-sizing:border-box;margin:0;overflow:hidden;z-index:1;border-radius:var(--cuad-radio);
+width:var(--cuad-cel);height:var(--cuad-cel);
+left:calc(var(--cuad-k) * (var(--cuad-cel) + var(--cuad-gap)));top:calc(var(--cuad-r) * (var(--cuad-cel) + var(--cuad-gap)));}
+{$r} {$medio}{$item(1)}{--cuad-k:0;--cuad-r:0;}
+{$r} {$medio}{$item(2)}{--cuad-k:1;--cuad-r:0;}
+{$r} {$medio}{$item(3)}{--cuad-k:0;--cuad-r:1;}
+{$r} {$medio}{$item(4)}{--cuad-k:1;--cuad-r:1;}
+/* La imagen original llena su celda sin aportarle tamaño propio: el tamaño lo manda la regla de la celda. */
+{$r} {$medio} > *:not({$boton}){position:absolute;top:0;left:0;display:block;box-sizing:border-box;width:100%;height:100%;margin:0;}
+{$r} {$medio} img:not([data-cod-rotation]),{$r} {$medio} video{display:block;width:100%;height:100%;object-fit:cover;}
+{$r} {$medio} figcaption{display:none;}
+
+/* Activo: el bloque baja a una celda de alto; la imagen y el texto quedan lado a lado, cada uno del tamaño de una celda. */
+{$activo}{aspect-ratio:1 / var(--cuad-c);}
+{$izq}{--cuad-caja-x:calc(var(--cuad-cel) - var(--cuad-caja));--cuad-texto-x:calc(var(--cuad-cel) + var(--cuad-gap));--cuad-imagen-x:0px;}
+{$der}{--cuad-caja-x:calc(var(--cuad-cel) + var(--cuad-gap));--cuad-texto-x:0px;--cuad-imagen-x:calc(var(--cuad-cel) + var(--cuad-gap));}
+{$abajo}{--cuad-caja-y:calc(var(--cuad-cel) - var(--cuad-caja));}
+{$arriba}{--cuad-caja-y:0px;}
+{$activo} {$medio}{$rol('activa')}{left:var(--cuad-imagen-x);top:0;}
+/* Miniaturas: la mini 2x2 con el hueco de la activa, pegada a la esquina de la imagen que mira al centro. Cada una en su celda de origen. */
+{$activo} {$medio}{$rol('miniatura')}{z-index:3;width:var(--cuad-min);height:var(--cuad-min);
+border-width:1px;border-style:solid;border-color:Canvas;
+left:calc(var(--cuad-caja-x) + var(--cuad-k) * (var(--cuad-min) + var(--cuad-sep)));
+top:calc(var(--cuad-caja-y) + var(--cuad-r) * (var(--cuad-min) + var(--cuad-sep)));}
+
+/* Texto: una celda, en la otra mitad. Oculto (y fuera del orden de tabulación) salvo el del ítem activo. */
+{$r} {$panel}{position:absolute;box-sizing:border-box;margin:0;top:0;left:calc(var(--cuad-cel) + var(--cuad-gap));width:var(--cuad-cel);height:var(--cuad-cel);overflow:auto;z-index:2;align-content:start;
+padding-top:calc(var(--cuad-aire) + 1.25rem);padding-right:var(--cuad-aire);padding-bottom:var(--cuad-aire);padding-left:var(--cuad-aire);
+opacity:0;visibility:hidden;pointer-events:none;}
+{$activo} {$panel}{left:var(--cuad-texto-x);}
+{$r} {$panel}[data-cod-cuadrantes-visible="true"]{opacity:1;visibility:visible;pointer-events:auto;}
+
+/* Botón que cubre la imagen: es el «button de verdad» del cuadrante o la miniatura. */
+{$r} {$boton}{position:absolute;left:0;top:0;width:100%;height:100%;z-index:1;padding:0;margin:0;border:0;background-color:transparent;color:inherit;appearance:none;cursor:pointer;}
+{$r} {$boton}:hover{box-shadow:inset 0 0 0 3px Canvas;}
+{$r} {$boton}:focus-visible{outline:3px solid CanvasText;outline-offset:-3px;box-shadow:inset 0 0 0 6px Canvas;}
+{$r} {$medio}{$rol('activa')} {$boton}{cursor:default;box-shadow:none;}
+
+/* «×»: en la esquina superior derecha del bloque, como en el original, pero con un respiro para que quede dentro del área visible y no pegada al borde. */
+{$r} {$cerrar}{position:absolute;top:.5rem;right:.5rem;z-index:1000;box-sizing:border-box;min-width:1.75rem;min-height:1.75rem;
+padding-top:3px;padding-right:6px;padding-bottom:3px;padding-left:6px;margin:0;border:0;border-radius:5px;
+background-color:Canvas;color:CanvasText;box-shadow:0 0 2px rgba(0,0,0,.3);font-weight:bold;font-size:14px;line-height:1em;cursor:pointer;}
+{$r} {$cerrar}[hidden]{display:none;}
+{$r} {$cerrar}:focus-visible{outline:3px solid CanvasText;outline-offset:2px;}
+
+/* Con movimiento permitido: el bloque cambia de alto y las imágenes viajan (el clic responde); el texto aparece. */
+@media (prefers-reduced-motion:no-preference){
+{$r}{transition:aspect-ratio var(--cod-motion-response);}
+{$r} {$medio}{transition:left var(--cod-motion-response),top var(--cod-motion-response),width var(--cod-motion-response),height var(--cod-motion-response);}
+{$r} {$panel}{transition:opacity var(--cod-motion-enter);}
+{$r} {$boton}{transition:box-shadow var(--cod-motion-response);}
+}
+
+/* Móvil: el reposo sigue siendo 2x2; al activar, la imagen arriba (4:3), el texto abajo y las miniaturas en fila dentro de la imagen. */
+@media (max-width:700px){
+{$activo}{display:grid;grid-template-columns:minmax(0,1fr);aspect-ratio:auto;transition:none;}
+{$activo} {$medio}{$rol('activa')}{position:relative;left:auto;top:auto;width:auto;height:auto;aspect-ratio:4/3;grid-area:1/1;align-self:start;transition:none;}
+{$activo} {$medio}{$rol('miniatura')}{position:relative;left:auto;top:auto;width:var(--cuad-movil-mini-w);height:auto;aspect-ratio:1;grid-area:1/1;transition:none;}
+{$izq} {$medio}{$rol('miniatura')}{justify-self:end;margin-right:calc(var(--cuad-movil-margen) + (2 - var(--cuad-slot)) * (var(--cuad-movil-mini-w) + var(--cuad-movil-sep)));}
+{$der} {$medio}{$rol('miniatura')}{justify-self:start;margin-left:calc(var(--cuad-movil-margen) + var(--cuad-slot) * (var(--cuad-movil-mini-w) + var(--cuad-movil-sep)));}
+{$abajo} {$medio}{$rol('miniatura')}{align-self:end;margin-bottom:var(--cuad-movil-margen);}
+{$arriba} {$medio}{$rol('miniatura')}{align-self:start;margin-top:var(--cuad-movil-margen);}
+{$r} {$medio}{$ranura(0)}{--cuad-slot:0;}
+{$r} {$medio}{$ranura(1)}{--cuad-slot:1;}
+{$r} {$medio}{$ranura(2)}{--cuad-slot:2;}
+{$activo} {$panel}[data-cod-cuadrantes-visible="true"]{position:relative;left:auto;top:auto;width:auto;height:auto;overflow:visible;grid-area:2/1;transition:none;}
+{$activo} {$panel}[data-cod-cuadrantes-visible="false"]{display:none;}
+{$activo} {$cerrar}{position:relative;top:auto;right:auto;grid-area:2/1;justify-self:end;align-self:start;margin-top:.5rem;margin-right:.5rem;}
+}
+@media (max-width:700px) and (prefers-reduced-motion:no-preference){
+@keyframes cod-cuadrantes-aparecer{from{opacity:0;}to{opacity:1;}}
+{$activo} {$panel}[data-cod-cuadrantes-visible="true"]{animation:cod-cuadrantes-aparecer var(--cod-motion-enter);}
+}
+CSS;
+
+        // Fuera comentarios y saltos de línea: se emite en línea en cada página.
+        $css = (string) preg_replace('~/\*.*?\*/~s', '', $css);
+        return (string) preg_replace('~\s*\n\s*~', '', $css);
+    }
+
+    /**
+     * Geometría del behavior «pestanas» (un juego de pestañas: una fila de
+     * etiquetas arriba y, debajo, el panel de la activa). El runtime vive en
+     * cod-canvas-public.js y cod-behaviors.js (montarPestanas) y sólo marca
+     * atributos, arma la lista de botones y mueve el alto; toda la disposición
+     * sale de acá.
+     *
+     * Mirado en el módulo Tabs de Divi (econut.cl):
+     *   - Divi flota las etiquetas a la izquierda (float:left) y les iguala el
+     *     alto por JavaScript. Acá la lista es un flex con align-items:stretch:
+     *     misma fila, mismo alto, sin JavaScript.
+     *   - Divi, bajo 768px, apila las etiquetas una sobre otra (float:none,
+     *     display:block, borde abajo). Acá también se apilan, bajo 700px, y por
+     *     la misma razón: NUNCA se esconde una pestaña. La alternativa
+     *     —deslizar la fila— deja etiquetas fuera de la vista sin ninguna
+     *     señal, y en un teléfono el gesto se confunde con el desplazamiento
+     *     de la página. Apiladas, cada etiqueta es un blanco táctil ancho. Si
+     *     un sitio prefiere dos por fila, --cod-pestanas-movil-base lo permite.
+     *   - Divi esconde los paneles inactivos con display:none y desvanece uno
+     *     detrás del otro (500 ms + 500 ms, en serie). Acá el inactivo se
+     *     esconde igual, pero el nuevo aparece de inmediato con
+     *     --cod-motion-enter y el alto del bloque viaja con
+     *     --cod-motion-response, que es lo que Divi no hace (el alto salta).
+     *
+     * SÓLO geometría y movimiento. Ningún color de marca ni tipografía: los
+     * pone la composición sobre los atributos que emite el runtime:
+     *
+     *   [data-cod-pestanas-rol="etiqueta"]                          la etiqueta (un button)
+     *   [data-cod-pestanas-rol="etiqueta"][data-cod-pestanas-estado="activa"|"inactiva"]
+     *   [data-cod-pestanas-rol="panel"][data-cod-pestanas-visible="true"|"false"]
+     *   [data-cod-pestanas-rol="lista"]                             la fila de etiquetas
+     *
+     * Los valores por omisión van dentro de :where(), o sea con especificidad
+     * cero: cualquier regla de la composición los pisa sin necesidad de
+     * !important. Lo único que NO se puede pisar, porque sostiene el
+     * comportamiento, es que el panel inactivo no se ve (display:none) y que el
+     * grupo sea un bloque con la lista arriba.
+     *
+     * Movimiento: el panel al aparecer usa --cod-motion-enter; el alto del
+     * bloque y el color de las etiquetas usan --cod-motion-response. Todo bajo
+     * prefers-reduced-motion: no-preference; con movimiento reducido el estado
+     * cambia igual, sin animar. Si el sitio no declara esos tokens la
+     * transición queda inválida y el cambio es instantáneo, que es lo
+     * correcto: aquí no se inventan duraciones.
+     *
+     * Ajustes que un sitio puede sobrescribir (todos opcionales):
+     *   --cod-pestanas-alineacion (justify-content de la fila; por omisión flex-start),
+     *   --cod-pestanas-separacion (espacio entre etiquetas; por omisión 0),
+     *   --cod-pestanas-espacio-lista (espacio bajo la fila de etiquetas; por omisión 0),
+     *   --cod-pestanas-etiqueta-aire-y / --cod-pestanas-etiqueta-aire-x (relleno de cada etiqueta),
+     *   --cod-pestanas-movil-base (ancho de cada etiqueta bajo 700px; por omisión 100%: apiladas).
+     *
+     * Regla del proyecto: nunca una abreviada con variable (background,
+     * border, font, margin, padding). Donde entra una variable, forma larga.
+     *
+     * @param string|null $html HTML de la página: si se entrega y no menciona
+     *                          «pestanas», no se emite nada. Null = siempre.
+     */
+    public static function pestanas_css(?string $html = null): string
+    {
+        if ($html !== null && strpos($html, 'pestanas') === false) {
+            return '';
+        }
+
+        $r = '.cod-pestanas[data-cod-behavior="pestanas"]';
+        $lista = '.cod-pestanas__lista';
+        $etiqueta = '.cod-pestanas__etiqueta';
+        $panel = '.cod-pestanas__panel';
+        $animando = $r . '[data-cod-pestanas-animando]';
+        $cambio = $r . '[data-cod-pestanas-cambio]';
+
+        $css = <<<CSS
+/* Estructura (esto no se pisa): el grupo es un bloque, la lista va arriba en una fila, y el panel inactivo no se ve. */
+{$r}{display:block;box-sizing:border-box;}
+{$r} > {$lista}{display:flex;}
+{$r} > {$panel}[data-cod-pestanas-visible="false"]{display:none !important;}
+/* La etiqueta es un button de verdad: sin la apariencia del sistema. */
+{$r} > {$lista} > {$etiqueta}{appearance:none;}
+/* El nodo que viaja adentro toma el color del botón y no aporta margen vertical (el aire de la etiqueta lo pone el relleno del botón). Va con UNA clase de especificidad y no más: le gana al color propio del tema (h3{color}) pero pierde, por orden, contra cualquier regla de la composición (una clase), que se emite después. */
+.cod-pestanas__etiqueta > *{color:inherit;margin-top:0;margin-bottom:0;}
+
+/* Valores por omisión, con especificidad cero: la composición los pisa con cualquier regla. */
+:where({$r} > {$lista}){flex-wrap:wrap;align-items:stretch;justify-content:var(--cod-pestanas-alineacion,flex-start);column-gap:var(--cod-pestanas-separacion,0px);row-gap:var(--cod-pestanas-separacion,0px);margin-top:0;margin-right:0;margin-bottom:var(--cod-pestanas-espacio-lista,0px);margin-left:0;padding-top:0;padding-right:0;padding-bottom:0;padding-left:0;min-width:0;}
+:where({$r} > {$lista} > {$etiqueta}){box-sizing:border-box;flex-grow:0;flex-shrink:1;flex-basis:auto;min-width:0;margin-top:0;margin-right:0;margin-bottom:0;margin-left:0;
+padding-top:var(--cod-pestanas-etiqueta-aire-y,.5rem);padding-right:var(--cod-pestanas-etiqueta-aire-x,1rem);padding-bottom:var(--cod-pestanas-etiqueta-aire-y,.5rem);padding-left:var(--cod-pestanas-etiqueta-aire-x,1rem);
+border-top-width:0;border-right-width:0;border-bottom-width:0;border-left-width:0;background-color:transparent;color:inherit;
+font-family:inherit;font-size:inherit;font-weight:inherit;font-style:inherit;line-height:inherit;letter-spacing:inherit;text-transform:inherit;text-align:inherit;cursor:pointer;}
+:where({$r} > {$lista} > {$etiqueta}:focus-visible){outline-width:2px;outline-style:solid;outline-color:currentColor;outline-offset:2px;}
+
+/* Con movimiento permitido: el panel nuevo aparece; el alto del bloque viaja; el color de la etiqueta responde. */
+@media (prefers-reduced-motion:no-preference){
+{$animando}{overflow:hidden;transition:height var(--cod-motion-response);}
+{$cambio} > {$panel}[data-cod-pestanas-visible="true"]{animation:cod-pestanas-aparecer var(--cod-motion-enter);}
+:where({$r} > {$lista} > {$etiqueta}){transition:color var(--cod-motion-response),background-color var(--cod-motion-response);}
+@keyframes cod-pestanas-aparecer{from{opacity:0;}to{opacity:1;}}
+}
+
+/* Móvil: las etiquetas se apilan, una por fila y a todo el ancho. */
+@media (max-width:700px){
+:where({$r} > {$lista} > {$etiqueta}){flex-grow:1;flex-basis:var(--cod-pestanas-movil-base,100%);}
+}
+CSS;
+
+        // Fuera comentarios y saltos de línea: se emite en línea en cada página.
+        $css = (string) preg_replace('~/\*.*?\*/~s', '', $css);
+        return (string) preg_replace('~\s*\n\s*~', '', $css);
+    }
+
     public static function rotation_css(): string
     {
         return '.cod-rot-180{transform:rotate(180deg);}'
@@ -701,6 +1002,8 @@ final class COD_Canvas_Page_Publisher
             // panel de WordPress. Ver COD_Design_Core.
             COD_Design_Core::css() . COD_Theme_Definitions::css() . self::site_font_css() . $this->shared_components_css()
                 . self::dynamic_group_css($header_html . $body_html . $footer_html)
+                . self::cuadrantes_css($header_html . $body_html . $footer_html)
+                . self::pestanas_css($header_html . $body_html . $footer_html)
                 . self::rotation_css() . self::carousel_rows_css() . $header_css . $body_css . $footer_css
         );
         self::$css_ya_emitido = true;
@@ -772,6 +1075,8 @@ final class COD_Canvas_Page_Publisher
                 'cod-canvas-public',
                 $theme_css . $site_font_css . $this->shared_components_css()
                     . self::dynamic_group_css($header_html . $body_html . $footer_html)
+                . self::cuadrantes_css($header_html . $body_html . $footer_html)
+                . self::pestanas_css($header_html . $body_html . $footer_html)
                     . self::rotation_css() . self::carousel_rows_css()
                     . $header_css . $body_css . $footer_css
             );

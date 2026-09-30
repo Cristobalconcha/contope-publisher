@@ -1462,7 +1462,7 @@ final class COD_Canvas_MCP_Service
             'properties' => [
                 'schemaVersion' => ['const' => 2],
                 'label' => ['type' => 'string', 'maxLength' => 160],
-                'nodes' => ['type' => 'array', 'minItems' => 1, 'maxItems' => 240, 'items' => ['type' => 'object', 'description' => 'Nodo id/kind/ruleIds/cadenceRuleId/children/content. No admite HTML, CSS, JS ni projectData remotos.']],
+                'nodes' => ['type' => 'array', 'minItems' => 1, 'maxItems' => 240, 'items' => ['type' => 'object', 'description' => 'Nodo id/kind/ruleIds/cadenceRuleId/partes/children/content (partes: mapa parte → ids de regla, sólo para behaviors que fabrican partes; ver composition.behaviorContracts del catálogo). No admite HTML, CSS, JS ni projectData remotos.']],
             ],
             'required' => ['schemaVersion', 'nodes'],
             'additionalProperties' => false,

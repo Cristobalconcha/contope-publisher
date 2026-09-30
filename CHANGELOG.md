@@ -5,6 +5,398 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.37 — 30 de septiembre de 2026
+
+### Agregado
+
+- **Ninguna propiedad queda inalcanzable desde una composición.** Hasta acá el
+  canal de composición sólo sabía hablar quince tipos de regla cerrados: no
+  había forma de fijar un ancho, un alto, una sombra o una propiedad
+  personalizada (`--algo`), aunque el editor visual sí puede hacerlo desde
+  siempre. El caso que lo destapó: el módulo de pestañas expone variables para
+  su color y su aire, y la composición no podía escribir ninguna. Ahora existe
+  el tipo de regla `properties`, que declara propiedades directamente:
+
+  ```json
+  { "id": "pestana", "kind": "properties",
+    "value": { "declarations": {
+      "background-color": "#FFFFFF",
+      "--cod-pestanas-etiqueta-aire-x": "30px" } } }
+  ```
+
+  Los quince tipos de antes **no cambian y siguen siendo el camino preferido**
+  cuando aplican, porque llevan rol y procedencia: el catálogo semántico está
+  para dar trazabilidad, no para dar permiso. Se exige forma larga (una
+  abreviada con `var()` se rechaza, porque el editor la descarta en silencio),
+  los nombres se validan contra una lista y los valores no admiten `url(` ni
+  nada que permita colar otra cosa. `scope` funciona igual que siempre,
+  incluido el estado `current`.
+
+- **Se pueden estilar las partes que un módulo fabrica al vuelo.** El botón de
+  una pestaña no existe en el documento: lo crea el runtime en el navegador y
+  no recibía ninguna clase, así que era inalcanzable — y es justo el que pone
+  el relleno de la pestaña. Un nodo ahora puede dirigir reglas a las **partes**
+  de su módulo:
+
+  ```json
+  { "id": "cifras", "kind": "group", "ruleIds": ["caja"],
+    "partes": { "etiqueta": ["normal", "elegida"], "lista": ["franja"],
+                "panel": ["fondo"] } }
+  ```
+
+  Las partes de cada módulo (`lista`, `etiqueta` y `panel` en pestañas;
+  `imagen`, `miniatura` y `texto` en cuadrantes) viven ahora en **un solo**
+  registro dentro del compilador, sacado de lo que el runtime emite de verdad.
+  Una parte que no exista se rechaza nombrando las que sí.
+
+### Corregido
+
+- **La tabla de «el elegido» dejó de estar escrita a mano en tres lugares.**
+  Agregar un módulo con noción de elemento seleccionado obligaba a copiar su
+  atributo en una constante, en el texto del catálogo y en un mensaje de error.
+  Los tres salen ahora del registro de módulos. El selector que se emite es el
+  mismo de antes, comprobado contra el texto exacto.
+
+### Medido
+
+- Las pestañas de una página compuesta pintan en el navegador los colores
+  pedidos en el botón real, la variable del módulo se aplica, y el estado viaja
+  al pinchar.
+- Lo nuevo **sobrevive a un viaje por el editor visual**: la propiedad
+  personalizada, el selector por atributo, el estado elegido, el `@media` y el
+  `:hover` aguantan tanto reexportar como guardar el proyecto y recargarlo.
+
+---
+## 0.3.36 — 30 de septiembre de 2026
+
+### Corregido
+
+- **«pestanas»: la hoja del módulo impedía que la composición pintara la
+  etiqueta.** La regla que hace que el título de adentro de la etiqueta tome el
+  color del botón iba con el prefijo completo de la raíz
+  (`.cod-pestanas[data-cod-behavior="pestanas"] > .cod-pestanas__lista > .cod-pestanas__etiqueta > *`,
+  especificidad 0-3-1) y le ganaba a cualquier regla de la composición: un
+  `h3` con una regla de color `#E09900` (una clase) se pintaba `rgb(51,51,51)`.
+  Ahora va con **una sola clase** (`.cod-pestanas__etiqueta > *`): sigue ganándole
+  al color propio del tema (`h3{color}`) pero pierde, por orden, contra la regla
+  de la composición, que se emite después. Además dos valores por omisión que
+  estaban fuera de `:where()` sin necesidad (`flex-wrap` y `align-items` de la
+  lista) pasaron adentro. Lo que queda fuera de `:where()` es sólo estructura:
+  `display` del grupo y de la lista, `appearance`, el panel inactivo
+  (`display:none !important`), el alto en viaje y la aparición del panel.
+  Medido en la página 20 del espejo de Econut: las cuatro etiquetas pintan
+  `rgb(224,153,0)`.
+
+### Agregado
+
+- **`scope.state = "current"`: pintar «el elegido».** El runtime de `pestanas`
+  ya marcaba la etiqueta activa con `data-cod-pestanas-estado="activa"`, pero el
+  vocabulario de reglas sólo admitía `default`, `hover`, `focus` y `active`, y
+  `active` en CSS significa «mientras se aprieta», no «seleccionada»: no había
+  forma de declarar que la pestaña elegida va de otro color. Ahora una regla
+  puede declarar `scope.state: "current"`. El compilador la emite atada al
+  atributo que pone el runtime del behavior, para el nodo mismo y para sus
+  descendientes (`:is(.regla[atributo], [atributo] .regla)`; una clase más un
+  atributo, o sea que le gana a la regla del mismo nodo sin estado). Hoy sirve
+  para:
+  - `pestanas`: la etiqueta con `data-cod-pestanas-estado="activa"` y el panel
+    con `data-cod-pestanas-visible="true"`.
+  - `cuadrantes`: la celda con `data-cod-cuadrantes-rol="activa"` y el texto con
+    `data-cod-cuadrantes-visible="true"`.
+
+  Otro behavior con noción de «el elegido» se suma agregando su atributo a
+  `CURRENT_MARKERS` en el compilador. Nada se acepta y se ignora: una regla
+  `current` sobre un nodo que no está dentro de un `pestanas` o `cuadrantes`, en
+  `rootRuleIds` o repartida por una cadencia devuelve
+  `cod_mcp_current_state_target_invalid` con el nodo y el motivo. Queda
+  documentado en el catálogo de capacidades (`scope.stateCurrent`).
+  Ejemplo (las cifras de econut.cl): etiqueta inactiva `#E09900` con una regla
+  `color` por omisión y activa `#4D7A76` con la misma regla `color` y
+  `scope.state: "current"`, ambas en los nodos de las etiquetas. Medido en la
+  página 20 del espejo de Econut, a 1280px y a 375px: al pinchar cada una queda
+  `rgb(77,122,118)` sólo la activa y las otras tres `rgb(224,153,0)`.
+- Pruebas: `scripts/probar-pestanas.php` cubre `current` (selector emitido,
+  cuadrantes, nodo fuera del behavior, raíz, state inventado, catálogo) y que lo
+  que queda fuera de `:where()` sea sólo estructura.
+
+---
+
+## 0.3.35 — 30 de septiembre de 2026
+
+### Agregado
+
+- **Una conducta nueva: «pestanas».** Un juego de pestañas: una fila de
+  etiquetas arriba y, debajo, el panel de la activa. Se aplica con una regla
+  `interaction` de `behavior: "pestanas"` sobre un nodo `group` con **2 a 8
+  hijos**. Cada hijo es una pestaña: su **primer hijo es la etiqueta** (lo que se
+  pincha: un título, un número, un texto) y **el resto es el panel**. Al cargar
+  queda activa la primera; al pinchar una etiqueta se muestra su panel y se
+  ocultan los demás, y el alto del bloque **viaja** del valor viejo al nuevo en
+  vez de saltar. Sin parámetros: `threshold`, `targetId`, `toggleClass`,
+  `mode`, `visible` y `visibleMobile` devuelven error, no se ignoran en
+  silencio. Un nodo que no sea `group`, o con menos de 2 o más de 8 hijos,
+  devuelve `cod_mcp_pestanas_target_invalid` / `cod_mcp_pestanas_children_invalid`
+  con el motivo. Queda descrita en el catálogo de capacidades
+  (`cod_get_capabilities`).
+- **Cómo se hizo: se miró el módulo de Tabs de Divi** (el de las cifras de
+  econut.cl) y se tomó lo que resuelve bien, y se dejó lo que no:
+  - Se tomó: la separación en fila de etiquetas y paneles con uno solo visible;
+    las etiquetas de una misma fila con el mismo alto; el estado activo marcado
+    en la etiqueta para que la composición pinte activa e inactiva como quiera;
+    abrir una pestaña desde la URL (`#id` del panel o de la etiqueta); apilar las
+    etiquetas en el teléfono (bajo 700px, una por fila, a todo el ancho) porque
+    así **nunca se esconde una pestaña**.
+  - No se tomó su marcado: Divi usa `<li><a href="#">` sin `role`, sin
+    `aria-selected` y sin teclado. Acá las etiquetas son `button` de verdad
+    dentro de un `role="tablist"`, cada hijo es un `role="tabpanel"` con
+    `aria-labelledby`, y hay tabulación por la activa (roving tabindex), flechas
+    izquierda y derecha (con vuelta al otro extremo; se invierten en escritura de
+    derecha a izquierda), Inicio y Fin. Medido con el árbol de accesibilidad del
+    navegador: cada pestaña sale con su nombre, la activa como seleccionada y sólo
+    el panel visible como `tabpanel`.
+  - No se tomó su transición. Medido en econut.cl: Divi desvanece el panel viejo
+    (500 ms), lo oculta, y recién ahí desvanece el nuevo (otros 500 ms), bloquea
+    los clics mientras tanto y **el alto salta de golpe** a mitad de camino (765px
+    a 652px en un solo cuadro). Acá el panel nuevo aparece de inmediato con
+    `--cod-motion-enter` y el alto viaja con `--cod-motion-response` (medido: de
+    1175px a 201px en ~200 ms, sin saltos). Todo dentro de
+    `prefers-reduced-motion: no-preference`; con movimiento reducido el cambio es
+    instantáneo y el estado es el mismo.
+- **Contrato para componer** (los atributos los pone el runtime; la composición
+  estila sobre ellos y no toca el runtime):
+  - raíz: `data-cod-pestanas-listo="1"`, `data-cod-pestanas-activa="1..N"`
+  - lista de etiquetas: `data-cod-pestanas-rol="lista"`
+  - etiqueta (un `button`): `data-cod-pestanas-item="n"`,
+    `data-cod-pestanas-rol="etiqueta"`, `data-cod-pestanas-estado="activa|inactiva"`
+  - panel (el propio hijo del grupo): `data-cod-pestanas-item="n"`,
+    `data-cod-pestanas-rol="panel"`, `data-cod-pestanas-visible="true|false"`
+  - El color de la etiqueta se pone **sobre el botón**
+    (`[data-cod-pestanas-rol="etiqueta"][data-cod-pestanas-estado="activa"]`); el
+    título que viaja adentro lo hereda. Su tipografía sigue siendo la del propio
+    nodo.
+  - Ajustes opcionales por variable: `--cod-pestanas-alineacion`,
+    `--cod-pestanas-separacion`, `--cod-pestanas-espacio-lista`,
+    `--cod-pestanas-etiqueta-aire-y` / `-x` y `--cod-pestanas-movil-base` (ancho de
+    cada etiqueta en el teléfono; por omisión 100%, o sea apiladas; con 45% quedan
+    dos por fila). Los valores por omisión van dentro de `:where()`, con
+    especificidad cero: cualquier regla de la composición los pisa sin `!important`.
+  - Sólo geometría y movimiento: ningún color de marca, ninguna tipografía,
+    ningún degradado, ninguna abreviada con variable.
+- **Los dos motores.** El runtime está en `cod-canvas-public.js` (el sitio) y en
+  `cod-behaviors.js` (el editor); se escribieron los dos. En la vista previa del
+  editor **no monta** (el bloque se ve apilado y editable, con todos los paneles
+  a la vista), igual que `cuadrantes`. Si la forma interna no calza (algún hijo
+  con menos de 2 hijos propios) no toca nada y el contenido queda apilado. La
+  función que devuelve deja el DOM como estaba.
+- Pruebas nuevas: `scripts/probar-pestanas.php` (compilador, catálogo y hoja) y
+  `scripts/probar-pestanas.mjs` (navegador real: pincha cada pestaña con el
+  ratón, mueve con el teclado, mide el alto durante el cambio y retrata cada
+  estado; con `ORIGINAL=1` mide el módulo de Divi para comparar).
+
+---
+
+## 0.3.34 — 30 de septiembre de 2026
+
+### Agregado
+
+- **Video ambiental: `ambient` en el nodo `video`.** El compilador emitía
+  siempre `<video controls>`, sin forma de pedir otra cosa. Medido el 30-09-2026
+  en la portada de la página 20 del espejo local: un nodo `video` salió con
+  controles y pausado, mientras que en el sitio original ese mismo video va solo,
+  en bucle y sin controles. Lo irónico es que el runtime público ya sabía
+  hacerlo (`activateAutoplayVideos` arranca todo `video[autoplay]`), pero la
+  capacidad no era alcanzable desde una composición. Ahora el contenido del nodo
+  acepta `ambient` (booleano, `false` por omisión): con `true` emite
+  `<video autoplay loop muted playsinline>` sin `controls` y sin botón de sonido;
+  con `false` o ausente queda exactamente como antes. Si viene junto con
+  `matte:true` manda `matte` y `ambient` se ignora (el compositor de luma matte
+  ya arranca el video por su cuenta). Un valor que no sea booleano devuelve error
+  `cod_mcp_video_invalid`. Aplica también a los videos dentro de una galería.
+- **Regla `media`: `filter` para desaturar.** El sitio original muestra los
+  logos de certificación en gris y la regla `media` no tenía cómo pedirlo. Ahora
+  acepta `filter` con `none` (por omisión) o `grayscale`; con `grayscale` emite
+  `filter:grayscale(1)` sobre la imagen, el video y el canvas del video con
+  matte. `filter` cuenta en el `atLeastOneOf` de la regla. Con `hover:"dim"` el
+  gris se conserva y se le suma el brillo, en vez de pisarlo. Un valor fuera de la
+  lista devuelve error `cod_mcp_media_rule_invalid` con las opciones admitidas.
+- Ambas capacidades quedan descritas en el catálogo de capacidades
+  (`cod_get_capabilities`).
+
+---
+
+## 0.3.33 — 30 de septiembre de 2026
+
+### Corregido
+
+- **`width: "auto"` en un botón se aceptaba y no hacía nada.** Sólo `full`
+  emitía CSS; con `auto` el botón no llevaba ninguna regla de ancho y quedaba a
+  merced de su padre: dentro de una grilla o de un flex que estira (lo normal),
+  salía de ancho completo igual. Medido el 30-09-2026 en la página 20 del espejo
+  local: un botón con `width:"auto"` declarado midió 286 px, el ancho entero de
+  su columna. Ahora `auto` emite `width:auto;justify-self:start;align-self:start`
+  y el botón mide lo que mide su contenido. `full` no cambia.
+- **El compilador escribía abreviadas con variable.** GrapesJS expande las
+  abreviadas y, si no puede resolver la variable, descarta la declaración
+  entera; era la misma trampa que ya había costado fondos perdidos. El propio
+  compilador las emitía: el fondo de la página (`.cod-mcp-page`), el encabezado
+  de las tablas (`th`, dos variantes), el fondo y el borde de los botones y la
+  capa de color de las superficies. Todo pasó a propiedades largas
+  (`background-color`, `border-width`, `border-style`, `border-color`). Efecto
+  colateral que también se corrige: el borde del botón `solid` quedaba del color
+  del tono (naranja) aunque una regla posterior le cambiara el fondo, porque la
+  abreviada `border` no se podía sobrescribir sólo en el color. Se convirtieron
+  además las abreviadas sin variable (`background:transparent`, `border:0`,
+  `border:1px solid currentColor`, etc.) para que no quede ninguna en el archivo.
+
+---
+
+## 0.3.32 — 30 de septiembre de 2026
+
+### Corregido
+
+- **Una regla de color con un rol propio no pintaba nada.** La regla «color» de
+  las recetas sólo pintaba si el rol se llamaba con una de ocho palabras en
+  inglés (`background`, `surface`, `canvas`, `text`, `foreground`, `ink`,
+  `muted`); con cualquier otro nombre —`titulo`, `texto`, `acento`— emitía una
+  variable que ningún estilo consumía y el elemento seguía con su color de antes,
+  sin error ni aviso. Medido en vivo: un rol `titulo` con `#DC4017` aplicado a un
+  `h2` emitió solo `--cod-color-titulo` y el título siguió en `rgb(51,51,51)`.
+  Ahora la regla siempre emite la variable y además pinta: por omisión, como
+  texto (`color`).
+- **Nuevo campo opcional `apply` en la regla «color»** (`"text"` o
+  `"background"`, por omisión `"text"`) para elegir si el color va a `color` o a
+  `background-color`. Cualquier otro valor se rechaza con un error claro. Los
+  atajos por nombre de rol se mantienen cuando no se indica `apply`, así que lo
+  ya compuesto no cambia. Los fondos de bloque siguen yendo por la regla
+  «surface». El catálogo de capacidades lo deja dicho.
+
+---
+
+## 0.3.31 — 29 de septiembre de 2026
+
+### Corregido
+
+- **«cuadrantes»: el texto del ítem activo tenía un hueco enorme entre el título
+  y el párrafo.** Causa: el bloque de texto del ítem es un grupo del sitio con
+  `display:grid`, y el módulo le fija la altura de una celda. Una grilla más alta
+  que su contenido reparte el espacio sobrante entre sus filas, y por eso el
+  título quedaba a unos 120 px del primer párrafo (y los párrafos entre sí). Ahora
+  el panel de texto alinea su contenido al inicio (`align-content:start`) y el
+  texto queda junto, como en el original.
+- **«cuadrantes»: la «×» quedaba pegada al borde del bloque y parecía flotar en
+  el margen.** Ahora lleva un respiro de 0,5 rem desde la esquina superior
+  derecha, dentro del área visible del módulo.
+
+### Aclarado
+
+- **Las miniaturas nunca se salen de la imagen activa.** Se calculan contra la
+  caja de la imagen activa (una celda), no contra el envoltorio completo; medido
+  a 1280 px, la mini grilla termina exactamente en el borde de la imagen. Lo que
+  parecía lo contrario era el guion de captura: Chrome sin ventana no avanza las
+  transiciones entre cuadros y, al retratar, dejaba las miniaturas a medio camino
+  (más anchas que altas, montadas sobre el texto). El guion
+  `scripts/piezas/probar-cuadrantes.mjs` ahora pide `prefers-reduced-motion`
+  para retratar la disposición final.
+
+---
+
+## 0.3.30 — 29 de septiembre de 2026
+
+### Agregado
+
+- **Una conducta nueva: «cuadrantes».** Es un display de **cuatro contenidos**,
+  cada uno con imagen, título y texto. Lo diseñó Cristóbal para el sitio de
+  Econut y se porta acá para que cualquier sitio lo pueda reusar.
+
+  **En reposo** son las cuatro imágenes en una grilla 2×2 de cuadrantes
+  cuadrados e iguales. **Al activar uno**, esa imagen crece hasta ocupar la
+  mitad del bloque, su título y su texto aparecen en la otra mitad, y las otras
+  tres imágenes pasan a miniaturas pegadas a la esquina de la imagen que mira
+  hacia el centro del bloque. El bloque baja de alto (de dos celdas a una) y
+  aparece una «×» para volver a reposo.
+
+  Lo que hace bueno al módulo, y por eso no es un carrusel: **las tres
+  miniaturas conservan la disposición 2×2 que tenían**. Forman una mini grilla
+  con un hueco justo donde estaba la activa: la que estaba a la derecha sigue a
+  la derecha, la que estaba abajo sigue abajo. Así no se pierde la referencia
+  espacial. De qué lado queda la imagen y en qué esquina las miniaturas depende
+  de dónde estaba el cuadrante:
+
+  | Ítem (posición en reposo) | Imagen    | Texto     | Miniaturas       |
+  |---------------------------|-----------|-----------|------------------|
+  | 1 arriba-izquierda        | izquierda | derecha   | abajo-derecha    |
+  | 2 arriba-derecha          | derecha   | izquierda | abajo-izquierda  |
+  | 3 abajo-izquierda         | izquierda | derecha   | arriba-derecha   |
+  | 4 abajo-derecha           | derecha   | izquierda | arriba-izquierda |
+
+  Al tocar una miniatura, pasa a ser la activa, con su lado y su esquina según
+  **su** cuadrante de origen.
+
+  **Es el port de la hoja original del sitio de Econut**, que estaba clavada en
+  900 px con celdas de 440 px. Se conserva en proporción: celdas cuadradas con
+  20 px de separación sobre 900 px; miniaturas de 88 px sobre celdas de 440 px
+  (el 20 % del lado) con 14 px entre ellas y borde de 1 px; la «×» arriba a la
+  derecha; el radio de 8 px. Medido a 900 px de ancho, las posiciones de las
+  miniaturas coinciden al píxel con las coordenadas de la hoja original en los
+  cuatro casos. Lo único que cambia: (1) es fluido, todo se mide en % del ancho
+  del bloque; (2) no usa `!important`, que allá sólo peleaba contra Divi; (3) el
+  movimiento usa los tokens del set en vez de `all 0.4s ease-in-out`; (4) en
+  móvil, la grilla 2×2 se mantiene en reposo y al activar la imagen va arriba,
+  el texto abajo y las miniaturas en fila dentro de la imagen (ahí sí se rompe
+  la disposición, porque no hay espacio).
+
+  **Cómo se declara.** En una composición MCP, con una regla `interaction`
+  `behavior: "cuadrantes"` sobre un nodo `group` con **exactamente cuatro
+  hijos**; cada hijo es un contenedor con una imagen y su texto (título y
+  párrafo). Si el nodo no es un `group` o no tiene cuatro hijos, el compilador
+  responde con un error claro en vez de publicar un bloque que no se comporta.
+  El compilador emite un solo atributo, `data-cod-behavior="cuadrantes"`; el
+  resto (botones, «×», estados) lo arma el runtime al cargar la página. En el
+  editor GrapesJS se declara poniendo ese mismo atributo al grupo.
+
+  **Qué hace por dentro.** Ningún elemento cambia de lugar en el DOM: cada
+  imagen es siempre la misma celda y lo que cambia, por CSS, es su posición y su
+  tamaño. Cada imagen queda envuelta en un `div` (`cod-cuadrantes__media`) con
+  un `button` transparente encima (`cod-cuadrantes__disparador`); el texto se
+  marca como panel (`cod-cuadrantes__info`) y se agrega un botón «×»
+  (`cod-cuadrantes__cerrar`). El estado vive en atributos del bloque:
+  `data-cod-cuadrantes-estado` (`reposo` o `activo`), `-activo` (1 a 4),
+  `-lado` (`izquierda` o `derecha`) y `-esquina` (`arriba` o `abajo`); y en cada
+  imagen, `-item` (su origen), `-rol` (`cuadrante`, `activa` o `miniatura`) y
+  `-slot` (el orden de las miniaturas, que usa el móvil).
+
+  **Accesibilidad.** Los cuadrantes y las miniaturas son `button` de verdad,
+  con `aria-label` (el título) y `aria-expanded`. Escape cierra. El foco pasa
+  a la «×» al abrir y vuelve al cuadrante que se había abierto al cerrar.
+  Con `prefers-reduced-motion` no hay transición ni animación, pero el cambio
+  de estado funciona igual.
+
+  **Estilos.** El plugin aporta sólo la geometría y el movimiento
+  (`COD_Canvas_Page_Publisher::cuadrantes_css()`, que se emite únicamente si la
+  página usa la conducta). No trae ningún color de marca ni tipografía: eso lo
+  ponen las reglas de diseño de cada sitio; los únicos colores son las palabras
+  clave del sistema (`Canvas`, `CanvasText`) del borde de las miniaturas, la «×»
+  y el anillo de foco. El cambio de estado (el bloque baja de alto y las
+  imágenes viajan) usa `--cod-motion-response`, y el texto al aparecer usa
+  `--cod-motion-enter`. Si el sitio no declara esos tokens el cambio es
+  instantáneo; no se inventan duraciones. Ajustes opcionales por variables:
+  `--cod-cuadrantes-separacion` (fracción del ancho), `--cod-cuadrantes-radio`
+  (por omisión `--cod-radius` y, si no, 8 px), `--cod-cuadrantes-aire` (relleno
+  del texto) y, para el móvil, `--cod-cuadrantes-movil-miniatura-ancho`,
+  `-separacion` y `-margen`.
+
+  **Dentro del editor no se ejecuta**, igual que otras conductas de página
+  pública: allí el bloque se ve apilado, con el texto visible y cada imagen
+  seleccionable, sin botones encima ni textos ocultos.
+
+  **Por qué existe.** Cristóbal lo resolvió a mano para Econut. Sin una
+  conducta del plugin, cada sitio que lo quisiera tendría que repetir el
+  JavaScript y la geometría a mano, y esa geometría (las cuatro combinaciones
+  de lado y esquina, con la mini grilla y su hueco) es justo lo que se rompe al
+  copiar.
+
+---
+
 ## 0.3.29 — 17 de septiembre de 2026
 
 ### Agregado
