@@ -211,20 +211,10 @@ nodes.push({
   ], ['caja'])],
 });
 
-// 2 · Encabezado. Medido en econut.cl: franja blanca de 100px con el
-//     logotipo horizontal de 164x60 centrado, y NADA más. No hay menú; el que
-//     había acá me lo había inventado.
-R('barra-centrada', 'properties', { declarations: {
-  display: 'flex', 'justify-content': 'center', 'align-items': 'center',
-  width: '100%',
-} });
-R('logo-cabecera', 'properties', { declarations: { width: '164px', 'max-width': '164px' } });
-nodes.push({
-  id: 'encabezado', marker: 'encabezado', kind: 'header', ruleIds: ['aire-barra', 's-blanco'],
-  children: [G([
-    IMG(f.logoHorizontal, 'Econut · procesos, productos, perspectiva', ['logo-cabecera']),
-  ], ['barra-centrada'])],
-});
+// 2 · El encabezado NO va acá: vive en la región global «cod-region-header»
+//     (ver componer-regiones.mjs). Un encabezado dentro del cuerpo se
+//     repite y se edita por página, que es lo que el sistema de plantillas
+//     del publisher existe para evitar.
 
 // 3 · Portada PARTIDA: texto a la izquierda, foto a la derecha.
 nodes.push({
@@ -417,21 +407,7 @@ nodes.push({
   ], ['caja'])],
 });
 
-// 11 · Pie
-nodes.push({
-  id: 'pie', marker: 'pie', kind: 'footer', ruleIds: ['aire-corto', 's-oscuro'],
-  children: [G([
-    IMG(f.logoCalado, 'Econut', ['icono', 'logo-chico']),
-    G([
-      P('Ruta 78 de Septiembre s/n, Parcela 3, Fundo San Rafael', ['t-pie']),
-      P('Rinconada de Doñihue, Región del Libertador', ['t-pie']),
-    ], ['columna']),
-  ], ['barra-sup'])],
-});
-
-// El encabezado va arriba de todo: en el sitio real la franja blanca con el
-// logotipo está primero y la barra amarilla del aviso viene debajo.
-nodes.unshift(...nodes.splice(nodes.findIndex((n) => n.id === 'encabezado'), 1));
+// 11 · El pie tampoco: vive en la región global «cod-region-footer».
 
 writeFileSync('composicion-fiel.json', JSON.stringify({
   pageId: 20,

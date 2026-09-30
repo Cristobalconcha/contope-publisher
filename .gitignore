@@ -28,3 +28,13 @@ scripts/.css-tema.php
 scripts/.icono.php
 *.txt.tmp
 scripts/cod-grapes-runner/cod-grapes-runner.local.json
+
+# Econut: archivos de trabajo del circuito de composición (se regeneran)
+scripts/econut/composicion-fiel.json
+scripts/econut/aplicar-fiel.json
+scripts/econut/preview.json
+scripts/econut/region-*.json
+scripts/econut/pv-*.json
+scripts/econut/ap-*.json
+scripts/econut/estado-args.json
+scripts/econut/hoja.html
