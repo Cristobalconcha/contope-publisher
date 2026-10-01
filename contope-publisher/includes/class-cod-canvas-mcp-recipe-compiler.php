@@ -2545,7 +2545,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
         $markup = '<main class="' . esc_attr(implode(' ', array_unique($root_classes))) . '" data-cod-composition="v2" aria-label="'
             . esc_attr($label) . '">' . $body . '</main>';
 
-        $styles = $this->base_styles();
+        $styles = self::base_styles();
         foreach ($design['rules'] as $rule) {
             $styles .= $this->css_for_rule($rule);
         }
@@ -3289,8 +3289,17 @@ final class COD_Canvas_MCP_Recipe_Compiler
         return ['style' => $style, 'revealedTransform' => $revealed_transform];
     }
 
-    /** @return string */
-    private function base_styles(): string
+    /**
+     * CSS base del canvas: lo que hace que un documento sin reglas de diseño
+     * se vea razonable. NO es una decisión de diseño y nunca debe ganarle a una
+     * regla `.cod-rule--*` (misma especificidad: manda el orden). Cada documento
+     * compilado lo lleva al comienzo de su CSS; quien junta varios documentos en
+     * una página (cabecera, cuerpo, pie) lo emite una sola vez, antes de todas las
+     * reglas — ver COD_Canvas_Page_Publisher::unir_css_de_documentos().
+     *
+     * @return string
+     */
+    public static function base_styles(): string
     {
         return "\n"
             // La tinta y la superficie salen del núcleo del set, no del panel de

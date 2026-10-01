@@ -5,6 +5,40 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.42 — 1 de octubre de 2026
+
+### Corregido
+
+- **Una regla de diseño ahora le gana al CSS base del canvas.** Una regla
+  `layout` con `gap` sobre un grupo no cambiaba la separación: el grupo seguía
+  con 16px aunque la regla pidiera 165. Pasaba con cualquier regla cuya
+  declaración chocara con el CSS base (`.cod-group`, `.cod-columns`,
+  `.cod-section`, `.cod-node--layout`, `.cod-node--gallery`, etc.), en cualquier
+  sitio.
+
+  La causa, medida en la página 20 de econut: cada documento compilado
+  (cabecera, cuerpo y pie) lleva el CSS base al comienzo de su hoja, y la página
+  concatenaba las tres hojas tal cual. Así `.cod-group{display:grid;gap:16px}`
+  salía tres veces (posiciones 66, 99 y 241 de la hoja) y la última copia, la del
+  pie, caía después de `.cod-rule--caja-certificaciones` (posición 206, `gap:165px`).
+  Las dos tienen una clase de especificidad, y con la misma especificidad gana la
+  que va después.
+
+  Ahora el CSS base sale una sola vez y antes de todas las reglas de los
+  documentos. No se usó `!important` ni se subió la especificidad de las reglas:
+  se arregló el orden. El base sólo se quita de un documento cuando éste empieza
+  por las mismas líneas del base vigente; un documento reexportado por el editor,
+  que no las trae, se deja intacto.
+
+  **Atención: esta versión puede cambiar el aspecto de páginas existentes.** Una
+  página que dependía, sin saberlo, de que el CSS base le ganara a su regla de
+  diseño (por ejemplo, una regla con un `gap` que nunca se vio porque el base lo
+  tapaba) ahora mostrará lo que la regla declara. Conviene revisar un sitio en un
+  entorno de prueba antes de desplegar esta versión en producción, en particular
+  Santa Luisa.
+
+---
+
 ## 0.3.41 — 1 de octubre de 2026
 
 ### Agregado

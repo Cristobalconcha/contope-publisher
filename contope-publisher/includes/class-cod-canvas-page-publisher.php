@@ -556,6 +556,51 @@ CSS;
         return (string) preg_replace('~\s*\n\s*~', '', $css);
     }
 
+    /**
+     * Junta el CSS de varios documentos (cabecera, cuerpo, pie) de modo que el
+     * CSS base del canvas salga UNA sola vez y ANTES de todas las reglas.
+     *
+     * Cada documento compilado trae su propio base al comienzo (ver
+     * COD_Canvas_MCP_Recipe_Compiler::base_styles()). Si se concatenan tal cual,
+     * el base del pie queda después de las reglas del cuerpo y, con la misma
+     * especificidad, les gana (`.cod-group{gap:16px}` sobre `.cod-rule--x{gap:165px}`).
+     * Aquí se le quita a cada documento su base inicial —sólo las líneas del
+     * comienzo que son idénticas a las del base vigente— y se antepone una copia.
+     * Un documento que no empieza por el base (por ejemplo, reexportado por el
+     * editor) se deja como está.
+     *
+     * @param list<string> $documentos
+     */
+    public static function unir_css_de_documentos(array $documentos): string
+    {
+        $base = COD_Canvas_MCP_Recipe_Compiler::base_styles();
+        $lineas_base = array_flip(array_filter(explode("\n", $base), static fn(string $l): bool => $l !== ''));
+        $hubo_base = false;
+        $resto = '';
+        foreach ($documentos as $css) {
+            $lineas = explode("\n", $css);
+            $quitadas = 0;
+            foreach ($lineas as $i => $linea) {
+                if ($linea === '' && $quitadas === 0) {
+                    // Línea vacía antes del base (el base empieza con un salto).
+                    continue;
+                }
+                if (isset($lineas_base[$linea])) {
+                    ++$quitadas;
+                    $lineas[$i] = null;
+                    continue;
+                }
+                break;
+            }
+            if ($quitadas > 0) {
+                $hubo_base = true;
+                $lineas = array_filter($lineas, static fn($l): bool => $l !== null);
+            }
+            $resto .= implode("\n", $lineas) . "\n";
+        }
+        return ($hubo_base ? $base : '') . $resto;
+    }
+
     public static function rotation_css(): string
     {
         return '.cod-rot-180{transform:rotate(180deg);}'
@@ -1095,7 +1140,8 @@ CSS;
                 . self::cuadrantes_css($header_html . $body_html . $footer_html)
                 . self::pestanas_css($header_html . $body_html . $footer_html)
                 . self::marquesina_css($header_html . $body_html . $footer_html)
-                . self::rotation_css() . self::carousel_rows_css() . $header_css . $body_css . $footer_css
+                . self::rotation_css() . self::carousel_rows_css()
+                . self::unir_css_de_documentos([$header_css, $body_css, $footer_css])
         );
         self::$css_ya_emitido = true;
     }
@@ -1170,7 +1216,7 @@ CSS;
                 . self::pestanas_css($header_html . $body_html . $footer_html)
                 . self::marquesina_css($header_html . $body_html . $footer_html)
                     . self::rotation_css() . self::carousel_rows_css()
-                    . $header_css . $body_css . $footer_css
+                    . self::unir_css_de_documentos([$header_css, $body_css, $footer_css])
             );
             self::$css_ya_emitido = true;
         }
