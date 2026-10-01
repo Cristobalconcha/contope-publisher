@@ -1,0 +1,343 @@
+{
+  "secciones": [
+    {
+      "titulo": "(sin titulo)",
+      "alto": 100,
+      "padding": "2px / 1px"
+    },
+    {
+      "titulo": "Aviso a la comunidad:",
+      "alto": 208,
+      "padding": "2px / 1px"
+    },
+    {
+      "titulo": "Serviciode verdad",
+      "alto": 773,
+      "padding": "0px / 0px"
+    },
+    {
+      "titulo": "Procesamos con pasión",
+      "alto": 963,
+      "padding": "54px / 54px"
+    },
+    {
+      "titulo": "Nuestra historia",
+      "alto": 646,
+      "padding": "54px / 54px"
+    },
+    {
+      "titulo": "2005 | Fundación de Econut",
+      "alto": 982,
+      "padding": "54px / 54px"
+    },
+    {
+      "titulo": "Instalaciones de Vanguardia",
+      "alto": 943,
+      "padding": "54px / 54px"
+    },
+    {
+      "titulo": "Garantía de calidad",
+      "alto": 1142,
+      "padding": "54px / 3px"
+    },
+    {
+      "titulo": "Certificaciones",
+      "alto": 974,
+      "padding": "54px / 50px"
+    },
+    {
+      "titulo": "(sin titulo)",
+      "alto": 120,
+      "padding": "0px / 0px"
+    }
+  ],
+  "textos": [
+    {
+      "tag": "H2",
+      "size": "26px",
+      "lh": "26px",
+      "mt": "0px",
+      "mb": "0px"
+    },
+    {
+      "tag": "P",
+      "size": "14px",
+      "lh": "18px",
+      "mt": "0px",
+      "mb": "0px"
+    },
+    {
+      "tag": "P",
+      "size": "14px",
+      "lh": "18px",
+      "mt": "0px",
+      "mb": "0px"
+    },
+    {
+      "tag": "P",
+      "size": "14px",
+      "lh": "18px",
+      "mt": "0px",
+      "mb": "0px"
+    },
+    {
+      "tag": "P",
+      "size": "14px",
+      "lh": "18px",
+      "mt": "0px",
+      "mb": "0px"
+    },
+    {
+      "tag": "P",
+      "size": "14px",
+      "lh": "18px",
+      "mt": "0px",
+      "mb": "0px"
+    },
+    {
+      "tag": "H4",
+      "size": "14px",
+      "lh": "20px",
+      "mt": "0px",
+      "mb": "0px"
+    },
+    {
+      "tag": "H1",
+      "size": "88px",
+      "lh": "88px",
+      "mt": "0px",
+      "mb": "0px"
+    },
+    {
+      "tag": "H3",
+      "size": "22px",
+      "lh": "22px",
+      "mt": "0px",
+      "mb": "0px"
+    },
+    {
+      "tag": "P",
+      "size": "20px",
+      "lh": "28px",
+      "mt": "0px",
+      "mb": "0px"
+    },
+    {
+      "tag": "H4",
+      "size": "22px",
+      "lh": "26px",
+      "mt": "0px",
+      "mb": "0px"
+    },
+    {
+      "tag": "H2",
+      "size": "46px",
+      "lh": "46px",
+      "mt": "0px",
+      "mb": "0px"
+    },
+    {
+      "tag": "P",
+      "size": "20px",
+      "lh": "32px",
+      "mt": "0px",
+      "mb": "0px"
+    },
+    {
+      "tag": "H4",
+      "size": "18px",
+      "lh": "25px",
+      "mt": "0px",
+      "mb": "0px"
+    },
+    {
+      "tag": "P",
+      "size": "15px",
+      "lh": "26px",
+      "mt": "0px",
+      "mb": "0px"
+    },
+    {
+      "tag": "LI",
+      "size": "13px",
+      "lh": "17px",
+      "mt": "0px",
+      "mb": "0px"
+    },
+    {
+      "tag": "LI",
+      "size": "13px",
+      "lh": "17px",
+      "mt": "0px",
+      "mb": "0px"
+    },
+    {
+      "tag": "H4",
+      "size": "18px",
+      "lh": "25px",
+      "mt": "0px",
+      "mb": "0px"
+    },
+    {
+      "tag": "P",
+      "size": "15px",
+      "lh": "26px",
+      "mt": "0px",
+      "mb": "0px"
+    },
+    {
+      "tag": "LI",
+      "size": "13px",
+      "lh": "17px",
+      "mt": "0px",
+      "mb": "0px"
+    },
+    {
+      "tag": "LI",
+      "size": "13px",
+      "lh": "17px",
+      "mt": "0px",
+      "mb": "0px"
+    },
+    {
+      "tag": "H4",
+      "size": "18px",
+      "lh": "25px",
+      "mt": "0px",
+      "mb": "0px"
+    },
+    {
+      "tag": "P",
+      "size": "15px",
+      "lh": "26px",
+      "mt": "0px",
+      "mb": "0px"
+    },
+    {
+      "tag": "LI",
+      "size": "13px",
+      "lh": "17px",
+      "mt": "0px",
+      "mb": "0px"
+    },
+    {
+      "tag": "LI",
+      "size": "13px",
+      "lh": "17px",
+      "mt": "0px",
+      "mb": "0px"
+    },
+    {
+      "tag": "H2",
+      "size": "58px",
+      "lh": "70px",
+      "mt": "0px",
+      "mb": "0px"
+    },
+    {
+      "tag": "P",
+      "size": "16px",
+      "lh": "28px",
+      "mt": "0px",
+      "mb": "0px"
+    },
+    {
+      "tag": "LI",
+      "size": "63px",
+      "lh": "107px",
+      "mt": "0px",
+      "mb": "0px"
+    },
+    {
+      "tag": "LI",
+      "size": "63px",
+      "lh": "107px",
+      "mt": "0px",
+      "mb": "0px"
+    },
+    {
+      "tag": "LI",
+      "size": "63px",
+      "lh": "107px",
+      "mt": "0px",
+      "mb": "0px"
+    },
+    {
+      "tag": "LI",
+      "size": "63px",
+      "lh": "107px",
+      "mt": "0px",
+      "mb": "0px"
+    },
+    {
+      "tag": "H2",
+      "size": "26px",
+      "lh": "26px",
+      "mt": "0px",
+      "mb": "0px"
+    },
+    {
+      "tag": "P",
+      "size": "18px",
+      "lh": "29px",
+      "mt": "0px",
+      "mb": "0px"
+    },
+    {
+      "tag": "H4",
+      "size": "14px",
+      "lh": "20px",
+      "mt": "0px",
+      "mb": "0px"
+    },
+    {
+      "tag": "H2",
+      "size": "50px",
+      "lh": "60px",
+      "mt": "0px",
+      "mb": "0px"
+    },
+    {
+      "tag": "H2",
+      "size": "58px",
+      "lh": "70px",
+      "mt": "0px",
+      "mb": "0px"
+    },
+    {
+      "tag": "H2",
+      "size": "46px",
+      "lh": "190px",
+      "mt": "0px",
+      "mb": "0px"
+    },
+    {
+      "tag": "H4",
+      "size": "14px",
+      "lh": "20px",
+      "mt": "0px",
+      "mb": "0px"
+    },
+    {
+      "tag": "H2",
+      "size": "50px",
+      "lh": "60px",
+      "mt": "0px",
+      "mb": "0px"
+    },
+    {
+      "tag": "P",
+      "size": "16px",
+      "lh": "28px",
+      "mt": "0px",
+      "mb": "0px"
+    },
+    {
+      "tag": "P",
+      "size": "14px",
+      "lh": "17px",
+      "mt": "0px",
+      "mb": "0px"
+    }
+  ]
+}

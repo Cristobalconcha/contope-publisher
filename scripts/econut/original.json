@@ -1,0 +1,138 @@
+{
+  "alto": 6906,
+  "ancho": 1900,
+  "secciones": [
+    {
+      "y": 0,
+      "alto": 100,
+      "ancho": 1900,
+      "fondo": "rgb(255, 255, 255)",
+      "tieneFoto": false,
+      "imagenes": 1,
+      "videos": 0,
+      "encabezados": [],
+      "textoInicio": ""
+    },
+    {
+      "y": 100,
+      "alto": 208,
+      "ancho": 1900,
+      "fondo": "rgb(255, 246, 193)",
+      "tieneFoto": true,
+      "imagenes": 0,
+      "videos": 0,
+      "encabezados": [
+        "Aviso a la comunidad:"
+      ],
+      "textoInicio": "Aviso a la comunidad: Le informamos que se ha dete"
+    },
+    {
+      "y": 308,
+      "alto": 773,
+      "ancho": 1900,
+      "fondo": "rgb(255, 255, 255)",
+      "tieneFoto": true,
+      "imagenes": 1,
+      "videos": 1,
+      "encabezados": [
+        "Serviciode verdad",
+        "La clave es el compromiso"
+      ],
+      "textoInicio": " #flotante .et-pb-icon { font-family: 'ETModules'"
+    },
+    {
+      "y": 1081,
+      "alto": 963,
+      "ancho": 1900,
+      "fondo": "rgb(219, 212, 192)",
+      "tieneFoto": false,
+      "imagenes": 3,
+      "videos": 0,
+      "encabezados": [
+        "Procesamos con pasión"
+      ],
+      "textoInicio": "Nuestros Servicios Procesamos con pasión En Econut"
+    },
+    {
+      "y": 2044,
+      "alto": 646,
+      "ancho": 1900,
+      "fondo": "rgb(255, 255, 255)",
+      "tieneFoto": false,
+      "imagenes": 1,
+      "videos": 0,
+      "encabezados": [
+        "Nuestra historia"
+      ],
+      "textoInicio": "Nuestra historia Nacimos como una pequeña empresa "
+    },
+    {
+      "y": 2690,
+      "alto": 982,
+      "ancho": 1900,
+      "fondo": "rgb(219, 212, 192)",
+      "tieneFoto": false,
+      "imagenes": 9,
+      "videos": 0,
+      "encabezados": [
+        "2005 | Fundación de Econut",
+        "Metros cuadrados de instalaciones",
+        "Hectáreas de huertos atendidos"
+      ],
+      "textoInicio": "200512.0002.00010.000 2005 | Fundación de Econut N"
+    },
+    {
+      "y": 3672,
+      "alto": 943,
+      "ancho": 1900,
+      "fondo": "rgb(255, 255, 255)",
+      "tieneFoto": false,
+      "imagenes": 1,
+      "videos": 1,
+      "encabezados": [
+        "Instalaciones de Vanguardia"
+      ],
+      "textoInicio": "Nuestras Plantas de Procesamiento Instalaciones de"
+    },
+    {
+      "y": 4615,
+      "alto": 1142,
+      "ancho": 1900,
+      "fondo": "rgb(219, 212, 192)",
+      "tieneFoto": false,
+      "imagenes": 4,
+      "videos": 0,
+      "encabezados": [
+        "Garantía de calidad",
+        "Control de huertos",
+        "Control de calidad"
+      ],
+      "textoInicio": "Garantía de calidad × Control de huertos Nuestros "
+    },
+    {
+      "y": 5812,
+      "alto": 974,
+      "ancho": 1900,
+      "fondo": "rgb(219, 212, 192)",
+      "tieneFoto": false,
+      "imagenes": 9,
+      "videos": 0,
+      "encabezados": [
+        "Certificaciones",
+        "Compromisocon el Futuro"
+      ],
+      "textoInicio": "Certificaciones var swiper = new Swiper(\".mySwiper"
+    },
+    {
+      "y": 6786,
+      "alto": 120,
+      "ancho": 1900,
+      "fondo": "rgb(46, 89, 74)",
+      "tieneFoto": false,
+      "imagenes": 2,
+      "videos": 0,
+      "encabezados": [],
+      "textoInicio": "Av 18 de Septiembre sn Hijuela 2 Fundo San Rafael "
+    }
+  ]
+}

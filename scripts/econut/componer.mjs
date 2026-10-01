@@ -50,6 +50,9 @@ const f = {
   iInstalaciones: M + 'Instalaciones@2x.png',
   iHectareas: M + 'Hectareas@2x.png',
   iProceso: M + 'Proceso@2x.png',
+  // La foto que el original usa en el bloque de sustentabilidad. Antes se
+  // había puesto la aérea «Aerea-Econut-01-scaled-1.jpg», que es otra.
+  sustentabilidad: M + 'd514ce_32d33a9f611747499c605679f39275f7mv2.avif',
   brc: M + 'Logo-BRC-2019.avif',
   kosher: M + 'Isotipos-Kosher.avif',
   halal: M + 'Halal-Logo.avif',
@@ -60,14 +63,15 @@ const f = {
   sag: M + 'Sag.avif',
   revision: M + 'd514ce_2e9d60bac05b4469aaf35aef477c5f69mv2.avif',
   videoBrazo: M + 'Brazo-robotico2.mp4',
+  videoPlantas: M + 'Video-Econut-2025-ok.mp4',
   videoEconut: M + 'Video-Econut-2025-ok.mp4',
 };
 
 const reglas = [];
-const R = (id, kind, value, { quien = 'reference', estado = 'reviewed' } = {}) => {
+const R = (id, kind, value, { quien = 'reference', estado = 'reviewed', bp = 'all' } = {}) => {
   reglas.push({
     id, kind,
-    scope: { breakpoint: 'all', state: 'default' },
+    scope: { breakpoint: bp, state: 'default' },
     provenance: { sources: [{ kind: quien, reference: 'https://econut.cl/', rationale: 'Medido del sitio real con el navegador.' }] },
     status: estado, value,
   });
@@ -86,6 +90,12 @@ R('t-seccion', 'typography', { role: 'titulo-seccion', fontSize: 'clamp(34px, 4.
 R('t-seccion-centro', 'typography', { role: 'titulo-centrado', fontSize: 'clamp(34px, 4.4vw, 58px)', fontWeight: 600, lineHeight: 1.1, align: 'center' });
 R('t-sub', 'typography', { role: 'subtitulo', family: "'Bodoni Moda', Georgia, serif", fontSize: '26px', fontWeight: 600, lineHeight: 1.25 });
 R('t-rotulo', 'typography', { role: 'rotulo', fontSize: '13px', fontWeight: 600, letterSpacing: '0.14em', transform: 'uppercase' });
+// Instalaciones: en el original el rótulo y el título van centrados, y el
+// título a 50px, no a los 58 del resto. El video mide 1080x609, o sea 16/9.
+R('t-rotulo-centro', 'typography', { role: 'rotulo', fontSize: '13px', fontWeight: 600, letterSpacing: '0.14em', transform: 'uppercase', align: 'center' });
+R('t-instalaciones', 'typography', { role: 'titulo-centrado', fontSize: 'clamp(32px, 2.7vw, 50px)', fontWeight: 600, lineHeight: 1.4, align: 'center' });
+R('video-plantas', 'media', { aspectRatio: '16/9', fit: 'cover' });
+R('aire-plantas', 'spacing', { paddingBlock: '54px', paddingInline: '24px' });
 R('t-cuerpo', 'typography', { role: 'cuerpo', fontSize: '16px', lineHeight: 1.75, measure: '62ch' });
 R('t-lead', 'typography', { role: 'bajada', fontSize: '19px', lineHeight: 1.6, measure: '54ch' });
 R('t-cifra', 'typography', { role: 'cifra', fontSize: 'clamp(38px, 4.6vw, 62px)', fontWeight: 700, lineHeight: 1, align: 'center' });
@@ -94,13 +104,20 @@ R('t-aviso', 'typography', { role: 'aviso', fontSize: '13px', lineHeight: 1.6 })
 R('t-pie', 'typography', { role: 'pie', fontSize: '13px', lineHeight: 1.7 });
 
 // --- Ritmo y caja ----------------------------------------------------------
-R('aire', 'spacing', { paddingBlock: '96px', paddingInline: '24px' });
+// 54px arriba y abajo: es el aire que usa el original en todas sus secciones
+// de contenido. Acá había 96, y esos 42px de más por sección eran buena parte
+// de los 1300px que nuestra página medía de más.
+R('aire', 'spacing', { paddingBlock: '54px', paddingInline: '24px' });
 R('aire-corto', 'spacing', { paddingBlock: '48px', paddingInline: '24px' });
 R('aire-barra', 'spacing', { paddingBlock: '20px', paddingInline: '24px' });
-R('caja', 'layout', { mode: 'stack', maxWidth: '1180px', gap: '26px', align: 'start' });
-R('caja-centro', 'layout', { mode: 'stack', maxWidth: '1180px', gap: '26px', align: 'center' });
+// 1080px es el ancho de contenido del original: sus secciones van de 410 a
+// 1490 sobre una ventana de 1900. Acá había 1180.
+R('caja', 'layout', { mode: 'stack', maxWidth: '1080px', gap: '26px', align: 'start' });
+R('caja-centro', 'layout', { mode: 'stack', maxWidth: '1080px', gap: '26px', align: 'center' });
 R('partida', 'layout', { mode: 'grid', columns: 2, gap: '56px', minColumnWidth: '340px', align: 'center', mobile: { mode: 'stack', columns: 1, gap: '28px' } });
-R('tres', 'layout', { mode: 'grid', columns: 3, gap: '32px', minColumnWidth: '280px', align: 'start', mobile: { mode: 'stack', columns: 1, gap: '24px' } });
+// Tres columnas de 302px separadas por 87, que es lo que suma los 1080 de
+// ancho del original (302x3 + 87x2 = 1080). Acá estaban a 32 de separación.
+R('tres', 'layout', { mode: 'grid', columns: 3, gap: '87px', minColumnWidth: '240px', align: 'start', mobile: { mode: 'stack', columns: 1, gap: '24px' } });
 // OJO: cuando una regla de disposición trae minColumnWidth, el compilador
 // IGNORA columns (ver layout_css). Con 180px de mínimo, los cuatro logotipos
 // no caben en la mitad derecha y caen en 2x2. El original los pone en una
@@ -119,18 +136,82 @@ R('barra-sup', 'layout', { mode: 'cluster', gap: '30px', justify: 'between', ali
 R('s-blanco', 'surface', { backgroundColor: BLANCO, foregroundColor: TEXTO });
 R('s-beige', 'surface', { backgroundColor: BEIGE, foregroundColor: TEXTO });
 R('s-oscuro', 'surface', { backgroundColor: OSCURO, foregroundColor: BLANCO });
-// La portada va sobre una foto a sangre, como en el sitio. Sin velos ni
-// degradados: si hiciera falta legibilidad se resuelve con estructura.
+// La portada va sobre la foto a sangre, CON UN VELO OSCURO ENCIMA, como en el
+// sitio publicado. El velo no es decoración: es lo que manda la foto al fondo.
+// Sin él, la foto —un huerto de pasto parejo con árboles que no son nogales—
+// se convierte en la protagonista del hero, y el video, que es el protagonista
+// de verdad, queda de adorno. Medido en econut.cl: la foto va bajo un velo
+// negro y el video encima, desbordando la sección.
+//
+// El original atenúa con un degradado de 0.6 a 0.9. Acá no se usan degradados,
+// así que el velo es PLANO en 0.75 —el promedio—, que da el mismo efecto de
+// apenas adivinar el follaje. Un velo de opacidad pareja no es un degradado.
 R('aire-portada', 'spacing', { paddingBlock: '44px', paddingInline: '40px' });
 R('s-portada', 'surface', { backgroundColor: BLANCO, foregroundColor: TEXTO,
-  backgroundAssetUrl: f.portadaFondo, backgroundPosition: 'center', backgroundSize: 'cover' });
-R('s-aviso', 'surface', { backgroundColor: AVISO, foregroundColor: TEXTO });
+  backgroundAssetUrl: f.portadaFondo, backgroundPosition: 'center', backgroundSize: 'cover',
+  overlayColor: '#000000', overlayOpacity: 0.75 });
+
+// La portada del sitio NO es una grilla de dos celdas: es una sola celda con
+// dos piezas superpuestas. Medido en econut.cl, en proporción del ancho de la
+// sección: la columna blanca del texto empieza en 10% y mide 37.8%; el video
+// empieza en 19.1% y mide 104% —o sea, se sale de la sección por la derecha y
+// pasa por encima de la columna—. Por eso el video pesa y la foto no.
+//
+// Se arma apilando en la MISMA celda de rejilla (grid-area 1/1) en vez de
+// posicionar en absoluto: así el alto lo sigue dando el contenido y el bloque
+// no depende de una altura fija.
+R('portada-lienzo', 'properties', { declarations: {
+  display: 'grid', 'grid-template-columns': 'minmax(0, 1fr)', 'align-items': 'center', width: '100%',
+  'min-height': '760px',
+} });
+// El panel blanco entra a sangre por la izquierda y llega hasta pasada la
+// mitad; el texto arranca adentro, no pegado al borde.
+R('portada-texto', 'properties', { declarations: {
+  'grid-column': '1', 'grid-row': '1', width: '59%', 'margin-inline-start': '0px',
+  'padding-inline-start': '21%', 'padding-inline-end': '5%', 'z-index': '1',
+} });
+// El video monta sobre el borde entre el blanco y la foto: empieza antes de
+// que el panel termine y se mete en la foto. Es lo que lo vuelve protagonista.
+R('portada-video', 'properties', { declarations: {
+  'grid-column': '1', 'grid-row': '1', width: '27%', 'margin-inline-start': '51%', 'z-index': '2',
+} });
+// OJO: la proporción NO se puede poner con `properties`. Esas declaraciones
+// caen sobre el contenedor del nodo, y el <video> de adentro se queda con el
+// 16/9 de la regla base del canvas —salía 496x280—. El kind `media` es el que
+// sabe estilar la pieza interna. En el original el video mide 515x600, más
+// alto que ancho, y eso es parte de lo que lo hace pesar sobre la foto.
+R('portada-video-forma', 'media', { aspectRatio: '6/7', fit: 'cover' });   // 6/7 = 0,857; el original mide 515x600 = 0,858. El validador sólo admite dos dígitos por lado.
+// En teléfono nada de esto aplica: las dos piezas se apilan a ancho completo.
+R('portada-texto-movil', 'properties', { declarations: {
+  width: '100%', 'margin-inline-start': '0px',
+} }, { bp: 'mobile' });
+R('portada-video-movil', 'properties', { declarations: {
+  width: '100%', 'margin-inline-start': '0px', 'margin-block-start': '18px',
+} }, { bp: 'mobile' });
+// El triángulo de advertencia es el FONDO de la sección, no una imagen dentro
+// de ella: en el original va como background-image al 7% de ancho, pegado al
+// 2% de la izquierda y centrado a lo alto. Puesto como <img> ocupaba una
+// columna y empujaba el texto.
+// El triángulo de advertencia es el FONDO de la sección, no una imagen dentro
+// de ella: en el original va al 7% de ancho, pegado al 2% de la izquierda y
+// centrado a lo alto. Como <img> ocupaba una columna y empujaba el texto.
+// Declararlo así necesitó ampliar el plugin (0.3.41): hasta entonces `surface`
+// sólo admitía palabras clave en la posición y cover/contain en el tamaño.
+R('s-aviso', 'surface', { backgroundColor: AVISO, foregroundColor: TEXTO,
+  backgroundAssetUrl: f.iconoAlerta, backgroundPosition: '2% 50%',
+  backgroundSize: '7% auto', backgroundRepeat: 'no-repeat' });
+// El aviso casi no tiene aire propio en el original: 2px arriba y 1 abajo.
+R('aire-aviso', 'spacing', { paddingBlock: '2px', paddingInline: '24px' });
 // El aviso es UNA fila: icono angosto, el texto principal ancho, y las tres
 // recomendaciones en columnas angostas. Las proporciones salen de medir el
 // original a 1440: icono ~100px, texto ~500px, las tres ~190px cada una.
+// Dos bloques de 510, como el original: el texto del aviso de 410 a 920 y las
+// tres recomendaciones de 980 a 1490. El triángulo ya no ocupa una columna
+// —es el fondo de la sección—, y la columna de 100px que tenía reservada
+// aplastaba el texto y estiraba la barra a 959px.
 R('aviso-fila', 'properties', { declarations: {
-  display: 'grid', 'grid-template-columns': '100px minmax(0, 1.9fr) minmax(0, 2.1fr)',
-  'column-gap': '40px', 'align-items': 'start', width: '100%',
+  display: 'grid', 'grid-template-columns': 'minmax(0, 1fr) minmax(0, 1fr)',
+  'column-gap': '60px', 'align-items': 'start', width: '100%',
 } });
 R('tres-juntas', 'properties', { declarations: {
   display: 'grid', 'grid-template-columns': 'repeat(3, minmax(0, 1fr))', 'column-gap': '28px',
@@ -152,14 +233,50 @@ R('s-barra-cifras', 'surface', { backgroundColor: BLANCO, shadow: 'sm' });
 // --- Forma, medio, movimiento, botón ---------------------------------------
 R('redondo', 'shape', { radius: '10px' });
 R('foto', 'media', { aspectRatio: '4/3', fit: 'cover', frame: 'rounded' });
+// La foto de cada servicio es CHICA en el original: 200x155, no una foto a lo
+// ancho de la columna. Acá salían a 383x287, y ese tamaño de más empujaba
+// hacia abajo el nombre, el texto y el botón de las tres columnas.
+R('foto-servicio', 'media', { aspectRatio: '4/3', fit: 'contain' });
+R('foto-servicio-tam', 'properties', { declarations: { 'max-width': '200px', width: '100%' } });
+// El nombre de cada servicio va en 18px, no en los 26 del subtítulo general.
+R('t-servicio', 'typography', { role: 'subtitulo', family: "'Bodoni Moda', Georgia, serif", fontSize: '18px', fontWeight: 600, lineHeight: 1.5 });
 R('foto-ancha', 'media', { aspectRatio: '16/9', fit: 'cover', frame: 'rounded' });
 R('foto-alta', 'media', { aspectRatio: '3/4', fit: 'cover', frame: 'rounded' });
 R('icono', 'media', { fit: 'contain' });
 R('gris', 'media', { fit: 'contain', filter: 'grayscale' });
 R('logo-chico', 'layout', { mode: 'stack', maxWidth: '124px' });
-R('cert-tam', 'layout', { mode: 'stack', maxWidth: '120px' });
+// Los logos de certificación van todos a 120x120 en el original. Con sólo un
+// ancho máximo, cada uno conservaba su proporción y salían de 66, 91, 104 y
+// 121 de alto: la fila quedaba despareja.
+R('cert-tam', 'media', { aspectRatio: '1/1', fit: 'contain' });
+R('cert-tam-caja', 'properties', { declarations: { width: '120px', height: '120px' } });
 R('filete', 'color', { role: 'filete', color: NARANJA, apply: 'background' });
-R('cert-fila', 'layout', { mode: 'grid', columns: 2, gap: '40px', minColumnWidth: '240px', align: 'center', mobile: { mode: 'stack', columns: 1, gap: '24px' } });
+// --- Certificaciones y sustentabilidad, medidas en el original a 1900px ----
+// Arriba: el título ocupa poco más de un cuarto y la marquesina el resto.
+// En el original el título va de 410 a 680 y la marquesina de 680 a 1490.
+R('cert-fila', 'layout', { mode: 'grid', columns: 2, gap: '0px', align: 'center', mobile: { mode: 'stack', columns: 1, gap: '24px' } });
+R('cert-fila-reparto', 'properties', { declarations: { 'grid-template-columns': '270px minmax(0, 1fr)' } });
+// Abajo: la foto mide 624 de ancho y el texto 366, separados por 60.
+R('cert-abajo', 'layout', { mode: 'grid', columns: 2, gap: '60px', align: 'center', mobile: { mode: 'stack', columns: 1, gap: '28px' } });
+R('cert-abajo-reparto', 'properties', { declarations: { 'grid-template-columns': 'minmax(0, 624fr) minmax(0, 366fr)' } });
+R('foto-sustentabilidad', 'media', { aspectRatio: '3/2', fit: 'cover' });
+// El original pone estos dos títulos en 46px y 50px, no en los 58 del resto.
+R('t-certificaciones', 'typography', { role: 'titulo-seccion', fontSize: 'clamp(30px, 2.5vw, 46px)', fontWeight: 600, lineHeight: 1, align: 'start' });
+R('t-compromiso', 'typography', { role: 'titulo-seccion', fontSize: 'clamp(32px, 2.7vw, 50px)', fontWeight: 600, lineHeight: 1.2, align: 'start' });
+// La marquesina: cuatro logos a la vista, desplazamiento continuo. El original
+// lo hace con Swiper (loop, delay 0, speed 8000) dentro de un módulo de código
+// de Divi; acá es el behavior propio, sin librerías de terceros.
+R('marquesina-certificaciones', 'interaction', { behavior: 'marquesina' });
+R('marquesina-ritmo', 'properties', { declarations: {
+  '--cod-marquesina-visibles': '4',
+  '--cod-marquesina-separacion': '97px',
+  '--cod-marquesina-duracion-pieza': '8s',
+} });
+R('aire-certificaciones', 'spacing', { paddingBlock: '54px', paddingInline: '24px' });
+// Entre la fila de la marquesina y la de sustentabilidad el original deja 165
+// de aire: la marquesina termina en y236 y la foto empieza en y401. La caja
+// normal separa 26, y por eso la sección quedaba 263px más corta.
+R('caja-certificaciones', 'layout', { mode: 'stack', maxWidth: '1080px', gap: '165px', align: 'start' });
 R('panel-blanco', 'surface', { backgroundColor: BLANCO, foregroundColor: TEXTO });
 R('tarjeta-blanca', 'surface', { backgroundColor: BLANCO, foregroundColor: TEXTO, shadow: 'sm' });
 R('entra', 'motion', { trigger: 'scroll', effect: 'rise', duration: 520, easing: 'ease-out', threshold: 0.15, stagger: 110 });
@@ -168,6 +285,18 @@ R('boton-fondo', 'color', { role: 'boton-fondo', color: VERDE, apply: 'backgroun
 R('boton-texto', 'color', { role: 'boton-texto', color: BLANCO, apply: 'text' });
 R('pildora', 'shape', { radius: 'pill', borderStyle: 'none' });
 R('cuadrantes', 'interaction', { behavior: 'cuadrantes' });
+// El módulo va sobre un PANEL BLANCO, no suelto sobre el beige de la sección.
+// Medido en el original a 1900px: el panel ocupa de 480 a 1420 —940 de ancho,
+// centrado— y cada cuadrante mide 440x440 con 20px de separación. Acá medían
+// 577x577 sobre 1180, que es lo que lo hacía ver grande y sin fondo.
+R('cuadrantes-panel', 'properties', { declarations: {
+  'background-color': '#FFFFFF',
+  'max-width': '940px',
+  'margin-inline-start': 'auto',
+  'margin-inline-end': 'auto',
+  'padding-top': '20px', 'padding-right': '20px', 'padding-bottom': '20px', 'padding-left': '20px',
+  width: '100%',
+} });
 
 // --- Nodos -----------------------------------------------------------------
 let n = 0;
@@ -196,7 +325,6 @@ nodes.push({
   id: 'aviso', marker: 'aviso', kind: 'section', ruleIds: ['aire-corto', 's-aviso'],
   children: [G([
     G([
-      IMG(f.iconoAlerta, 'Advertencia', ['icono-alerta']),
       G([
         H('Aviso a la comunidad:', 3, ['t-aviso-titulo', 'sin-margen']),
         P('Le informamos que se ha detectado el uso fraudulento de nuestra marca en redes sociales. Personas inescrupulosas están cometiendo estafas en la venta de productos, utilizando nuestra identidad de forma ilegítima.', ['t-aviso']),
@@ -216,24 +344,32 @@ nodes.push({
 //     repite y se edita por página, que es lo que el sistema de plantillas
 //     del publisher existe para evitar.
 
-// 3 · Portada PARTIDA: texto a la izquierda, foto a la derecha.
+// 3 · Portada SUPERPUESTA, como el sitio publicado: la foto al fondo bajo el
+//     velo, la columna blanca del texto a la izquierda, y el video montado
+//     encima, más ancho que la sección. El video es el protagonista; la foto
+//     es textura.
+//
+//     NO lleva 'caja' (que encajona a 1180px) ni 'aire' (que mete 24px de
+//     costado): en el original la sección va a sangre y los márgenes los
+//     ponen las propias piezas, en porcentaje.
 nodes.push({
-  id: 'portada', marker: 'portada', kind: 'section', ruleIds: ['aire', 's-portada'],
-  children: [G([G([
+  id: 'portada', marker: 'portada', kind: 'section', ruleIds: ['s-portada'],
+  children: [G([
     G([
       H('Innovación y sostenibilidad en cada nuez', 4, ['t-rotulo', 'c-texto']),
       H('Servicio de verdad', 1, ['t-portada', 'c-naranja']),
       H('La clave es el compromiso', 3, ['t-sub']),
       P('No se trata de vender excedentes de capacidad de proceso, sino de brindar soluciones completas para exportadores, con control de calidad, proyección productiva, manejo de inventarios, informes completos de resultados, despacho SAG, trazabilidad y seguridad hasta destino. Y todo a un costo único y claro.', ['t-lead']),
-    ], ['columna', 'panel-blanco', 'aire-portada']),
-    { id: id('v'), kind: 'video', ruleIds: ['foto-ancha', 'redondo'], content: { sourceUrl: f.videoBrazo, caption: '', ambient: true } },
-  ], ['partida', 'entra'])], ['caja'])],
+    ], ['columna', 'panel-blanco', 'aire-portada', 'portada-texto', 'portada-texto-movil']),
+    { id: id('v'), kind: 'video', ruleIds: ['portada-video', 'portada-video-forma', 'portada-video-movil'],
+      content: { sourceUrl: f.videoBrazo, caption: '', ambient: true } },
+  ], ['portada-lienzo', 'entra'])],
 });
 
 // 4 · Servicios
 const servicio = (url, alt, nombre, texto, puntos) => G([
-  IMG(url, alt, ['foto', 'redondo']),
-  H(nombre, 3, ['t-sub', 'c-naranja']),
+  IMG(url, alt, ['foto-servicio', 'foto-servicio-tam']),
+  H(nombre, 3, ['t-servicio', 'c-naranja']),
   P(texto),
   LI(puntos),
   { id: id('b'), kind: 'button', ruleIds: ['boton', 'boton-fondo', 'boton-texto', 'pildora', 'al-fondo'], content: { label: 'Más detalles', href: '#contacto', target: 'self' } },
@@ -284,7 +420,9 @@ R('t-etiqueta-cifra', 'typography', { role: 'etiqueta-cifra', fontSize: 'clamp(3
 // hasta hoy eran inalcanzables desde una composición.
 R('pest-etiqueta', 'properties', { declarations: {
   'background-color': '#FFFFFF', color: '#E09900', 'font-weight': '600',
-  '--cod-pestanas-etiqueta-aire-x': '30px', '--cod-pestanas-etiqueta-aire-y': '4px',
+  // En el original la etiqueta mide 115px de alto con el número en 63px; con
+  // 4px de aire vertical acá quedaba en 71. 26 arriba y abajo la dejan igual.
+  '--cod-pestanas-etiqueta-aire-x': '30px', '--cod-pestanas-etiqueta-aire-y': '26px',
 } });
 reglas.push({ id: 'pest-etiqueta-activa', kind: 'properties', scope: { breakpoint: 'all', state: 'current' },
   provenance: { sources: [{ kind: 'reference', reference: 'https://econut.cl/', rationale: 'La pestaña elegida se funde con el panel: los dos en crema, medido con el navegador.' }] },
@@ -301,21 +439,37 @@ R('pest-panel', 'properties', { declarations: {
 } });
 R('panel-cifra', 'layout', { mode: 'grid', columns: 2, gap: '36px', minColumnWidth: '260px', align: 'start', mobile: { mode: 'stack', columns: 1, gap: '20px' } });
 
+// El panel de cada cifra, medido en el original a 1900px (panel 410→1490,
+// alto 650): una columna angosta de 150px a la izquierda con el logotipo de
+// los veinte años arriba (150x131) y el icono de la cifra abajo (150x150); a
+// la derecha el título con el año —«2005 | Fundación de Econut»—, el texto y
+// una fotografía de 500x333.
+//
+// Acá el panel medía 956px contra los 650 del original: faltaba el logotipo,
+// el título no llevaba el año y la foto iba a todo lo ancho.
 const pestana = (numero, titulo, texto, icono, foto) => G([
   H(numero, 3, ['t-etiqueta-cifra']),
   G([
     G([
-      IMG(icono, titulo, ['icono', 'cert-tam']),
-      G([ H(titulo, 3, ['t-sub', 'c-naranja']), P(texto) ], ['columna']),
-    ], ['partida-cifra']),
-    IMG(foto, titulo, ['foto-ancha', 'redondo']),
-  ], ['columna']),
+      IMG(f.logo, 'Veinte años de Econut', ['icono-cifra']),
+      IMG(icono, titulo, ['icono-cifra']),
+    ], ['columna-iconos']),
+    G([
+      H(`${numero} | ${titulo}`, 3, ['t-titulo-cifra', 'c-naranja']),
+      P(texto, ['t-texto-cifra']),
+      IMG(foto, titulo, ['foto-cifra', 'foto-cifra-tam']),
+    ], ['columna']),
+  ], ['partida-cifra']),
 ]);
-// El panel del original es texto arriba y fotografía abajo, no dos columnas
-// con el icono ocupando media caja.
 R('partida-cifra', 'properties', { declarations: {
-  display: 'grid', 'grid-template-columns': '130px minmax(0, 1fr)', 'column-gap': '28px', 'align-items': 'start',
+  display: 'grid', 'grid-template-columns': '150px minmax(0, 1fr)', 'column-gap': '20px', 'align-items': 'start',
 } });
+R('columna-iconos', 'layout', { mode: 'stack', gap: '116px', align: 'start' });
+R('icono-cifra', 'media', { fit: 'contain' });
+R('t-titulo-cifra', 'typography', { role: 'subtitulo', family: "'Bodoni Moda', Georgia, serif", fontSize: '26px', fontWeight: 600, lineHeight: 1.35 });
+R('t-texto-cifra', 'typography', { role: 'cuerpo', fontSize: '18px', lineHeight: 1.6, measure: '54ch' });
+R('foto-cifra', 'media', { aspectRatio: '3/2', fit: 'cover' });
+R('foto-cifra-tam', 'properties', { declarations: { 'max-width': '500px', width: '100%' } });
 
 nodes.push({
   id: 'cifras', marker: 'cifras', kind: 'section', ruleIds: ['aire', 's-beige'],
@@ -333,12 +487,17 @@ nodes.push({
   ], ['caja'])],
 });
 
-// 7 · Instalaciones
+// 7 · Instalaciones. Acá va un VIDEO, no una foto: el original muestra
+//     «Video-Econut-2025-ok.mp4» a 1080x609, con controles —no ambiental, que
+//     se ve el reproductor con su tiempo— y la vista aérea como póster. La
+//     foto suelta que había es lo que faltaba corregir.
 nodes.push({
-  id: 'plantas', marker: 'plantas', kind: 'section', ruleIds: ['aire', 's-blanco'],
+  id: 'plantas', marker: 'plantas', kind: 'section', ruleIds: ['aire-plantas', 's-blanco'],
   children: [G([
-    ...abre('Nuestras plantas de procesamiento', 'Instalaciones de vanguardia', true),
-    IMG(f.aereaChica, 'Vista aérea de las plantas de procesamiento de Econut', ['foto-ancha', 'redondo']),
+    H('Nuestras Plantas de Procesamiento', 4, ['t-rotulo-centro', 'c-texto']),
+    H('Instalaciones de Vanguardia', 2, ['t-instalaciones', 'c-naranja']),
+    { id: id('v'), kind: 'video', ruleIds: ['video-plantas'],
+      content: { sourceUrl: f.videoPlantas, posterUrl: f.aereaChica, caption: '', ambient: false } },
   ], ['caja-centro'])],
 });
 
@@ -351,7 +510,9 @@ const control = (url, alt, nombre, parrafos) => G([
 nodes.push({
   id: 'calidad', marker: 'calidad', kind: 'section', ruleIds: ['aire', 's-beige'],
   children: [G([
-    ...abre('Cuatro puntos de control', 'Garantía de calidad', true),
+    // El original abre esta sección con el título solo: el rótulo «Cuatro
+    // puntos de control» que había acá no existe allá.
+    H('Garantía de calidad', 2, ['t-seccion-centro', 'c-naranja']),
     G([
       control(f.huertos, 'Huertos de nogales', 'Control de huertos', [
         'Nuestros puntos de control comienzan con la fruta directamente en los huertos. Todas las nueces que recibimos han sido monitoreadas de acuerdo con exigentes estándares fitosanitarios.',
@@ -369,42 +530,45 @@ nodes.push({
         'Verificamos los factores sanitarios y de calidad durante los pasos de selección y empaquetado.',
         'Incluso antes de cada envío revisamos todos estos parámetros, para dar garantías reales a nuestros clientes.',
       ]),
-    ], ['cuadrantes']),
+    ], ['cuadrantes', 'cuadrantes-panel']),
   ], ['caja-centro'])],
 });
 
-// 9 · Certificaciones
+// 9 · Certificaciones y sustentabilidad: UNA SOLA SECCIÓN, como el original.
+//
+//     Estaban partidas en dos, y por eso sumaban 1071px donde el original mide
+//     974. En econut.cl es una sección de fondo beige con cuatro piezas:
+//     el título a la izquierda, la marquesina de logos a la derecha, y abajo
+//     una foto grande con el bloque de sustentabilidad al lado.
+//
+//     Medido en el original a 1900px: título x 410→680 (y 56), marquesina
+//     x 680→1490 (y 76, alto 160), foto x 410→1034 (y 401, alto 430), texto
+//     x 1094→1460. Los logos miden 120x120 y se ven cuatro a la vez.
+//
+//     El botón «Conversemos» que había acá no existe en el original.
 nodes.push({
-  id: 'certificaciones', marker: 'certificaciones', kind: 'section', ruleIds: ['aire-corto', 's-beige'],
+  id: 'certificaciones', marker: 'certificaciones', kind: 'section', ruleIds: ['aire-certificaciones', 's-beige'],
   children: [G([
-    { id: id('sep'), kind: 'separator', ruleIds: ['filete'], content: {} },
+    // Fila de arriba: el título y la marquesina.
     G([
-      H('Certificaciones', 2, ['t-seccion', 'c-naranja']),
+      H('Certificaciones', 2, ['t-certificaciones', 'c-naranja']),
       G([
-        IMG(f.brc, 'BRCGS Food Safety', ['gris', 'cert-tam']),
-        IMG(f.kosher, 'Kosher', ['gris', 'cert-tam']),
-        IMG(f.halal, 'Halal', ['gris', 'cert-tam']),
-        IMG(f.chile, 'Chilean Walnut Authentic', ['gris', 'cert-tam']),
-      ], ['cuatro', 'panel-blanco', 'aire-corto', 'entra']),
-    ], ['cert-fila']),
-    { id: id('sep'), kind: 'separator', ruleIds: ['filete'], content: {} },
-  ], ['caja'])],
-});
-
-// 10 · Compromiso
-nodes.push({
-  id: 'contacto', marker: 'contacto', kind: 'section', ruleIds: ['aire', 's-beige'],
-  children: [G([
-    { id: id('sep'), kind: 'separator', ruleIds: ['filete'], content: {} },
+        IMG(f.brc, 'BRCGS Food Safety', ['cert-tam', 'cert-tam-caja']),
+        IMG(f.kosher, 'Kosher', ['cert-tam', 'cert-tam-caja']),
+        IMG(f.halal, 'Halal', ['cert-tam', 'cert-tam-caja']),
+        IMG(f.chile, 'Chilean Walnut Authentic', ['cert-tam', 'cert-tam-caja']),
+      ], ['marquesina-certificaciones', 'marquesina-ritmo']),
+    ], ['cert-fila', 'cert-fila-reparto']),
+    // Fila de abajo: la foto y el bloque de sustentabilidad.
     G([
-    IMG(f.aereaChica, 'Vista aérea de las instalaciones y los huertos', ['foto', 'redondo']),
-    G([
-      ...abre('Sustentabilidad en acción', 'Compromiso con el futuro'),
-      P('En Econut implementamos prácticas de economía circular para maximizar el uso de recursos. Nuestra eficiencia hídrica y el uso de energía solar son pilares fundamentales para reducir el impacto ambiental y promover un futuro más sostenible.'),
-      { id: id('b'), kind: 'button', ruleIds: ['boton', 'boton-fondo', 'boton-texto', 'pildora'], content: { label: 'Conversemos', href: '#contacto', target: 'self' } },
-    ], ['columna']),
-  ], ['partida', 'tarjeta-blanca', 'aire-corto', 'redondo', 'entra']),
-  ], ['caja'])],
+      IMG(f.sustentabilidad, 'Huertos de nogales de Econut desde el aire', ['foto-sustentabilidad']),
+      G([
+        H('Sustentabilidad en acción', 4, ['t-rotulo', 'c-texto']),
+        H('Compromiso con el futuro', 2, ['t-compromiso', 'c-naranja']),
+        P('En Econut implementamos prácticas de economía circular para maximizar el uso de recursos. Nuestra eficiencia hídrica y el uso de energía solar son pilares fundamentales para reducir el impacto ambiental y promover un futuro más sostenible.'),
+      ], ['columna']),
+    ], ['cert-abajo', 'cert-abajo-reparto', 'entra']),
+  ], ['caja-certificaciones'])],
 });
 
 // 11 · El pie tampoco: vive en la región global «cod-region-footer».
