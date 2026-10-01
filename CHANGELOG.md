@@ -5,6 +5,44 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.38 — 30 de septiembre de 2026
+
+### Corregido
+
+- **Pedir cuatro columnas con un ancho mínimo ahora da cuatro columnas.** Una
+  regla de disposición puede declarar dos cosas a la vez: cuántas columnas
+  quiere (`columns`) y cuánto debe medir una antes de que convenga bajar de
+  número (`minColumnWidth`). Hasta acá, cuando venían juntas la segunda
+  descartaba a la primera **en silencio**: la rejilla ponía las columnas que
+  cupieran y nadie avisaba que el número pedido se había ignorado. Se destapó
+  con los cuatro logos de certificación de la landing de Econut, que pedían
+  cuatro y salían en 2×2.
+
+  Ahora las dos se respetan: el ancho mínimo de cada columna es el mayor entre
+  el que se pidió y el que le toca a una de `columns` columnas. Así nunca se
+  pasa de ese número, y la rejilla igual baja sola cuando el espacio no alcanza
+  para el ancho mínimo.
+
+  Una regla que declara sólo `minColumnWidth` **no cambia**: sigue poniendo las
+  columnas que quepan, sin techo. Esto es a propósito — `columns` tiene un valor
+  por omisión de 2, y aplicarle el techo también a ese caso le habría puesto un
+  máximo de dos columnas a todo lo que hoy funciona, Santa Luisa incluida.
+
+  Nada de esto altera una página ya publicada: el compilador corre al aplicar
+  una composición, no al mostrar el sitio, así que el CSS que ya está escrito en
+  un documento se queda como está.
+
+### Agregado
+
+- `scripts/sincronizar-plugin.mjs`: lleva el plugin del repo a un WordPress
+  local (`--a econut` o `--a santaluisa`) e imprime las dos versiones antes de
+  copiar. Existe porque esa copia se hacía a mano y el local de Econut se había
+  quedado dos versiones atrás sin que nada lo dijera.
+- `scripts/probar-rejilla-columnas.php`: los cuatro casos de la rejilla, con el
+  que protege el comportamiento anterior entre ellos.
+
+---
+
 ## 0.3.37 — 30 de septiembre de 2026
 
 ### Agregado

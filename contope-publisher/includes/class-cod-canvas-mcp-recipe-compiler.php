@@ -3506,10 +3506,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
         } elseif ($mode === 'carousel') {
             $css .= 'display:flex;overflow-x:auto;scroll-snap-type:x mandatory;';
         } else {
-            $template = isset($value['minColumnWidth'])
-                ? 'repeat(auto-fit,minmax(' . $value['minColumnWidth'] . ',1fr))'
-                : 'repeat(' . $columns . ',minmax(0,1fr))';
-            $css .= 'display:grid;grid-template-columns:' . $template . ';';
+            $css .= 'display:grid;grid-template-columns:' . $this->grid_template_columns($value, $columns, $gap) . ';';
             if ($mode === 'metro') {
                 $css .= 'grid-auto-flow:dense;';
             }
@@ -3521,6 +3518,40 @@ final class COD_Canvas_MCP_Recipe_Compiler
             $css .= 'justify-content:' . ['start' => 'flex-start', 'center' => 'center', 'end' => 'flex-end', 'between' => 'space-between', 'around' => 'space-around', 'evenly' => 'space-evenly'][$value['justify']] . ';';
         }
         return $css;
+    }
+
+    /**
+     * Las pistas de una rejilla.
+     *
+     * `columns` y `minColumnWidth` son dos exigencias distintas y compatibles: cuántas
+     * columnas como máximo, y cuánto mide una antes de que convenga bajar de número.
+     * Antes `minColumnWidth` descartaba `columns` en silencio, así que una regla que
+     * pedía cuatro logos con ancho mínimo salía en 2x2 sin que nada lo dijera.
+     *
+     * Con las dos presentes, el mínimo de cada pista es el mayor entre el ancho pedido y
+     * el que le toca a una de `columns` columnas: así nunca se pasa de ese número y aun
+     * así baja sola cuando el contenedor no alcanza para el ancho mínimo.
+     *
+     * El techo se aplica sólo cuando `columns` viene escrito en la regla, porque
+     * $columns trae un valor por omisión y usarlo acá le pondría un máximo de dos
+     * columnas a toda regla que hoy declara nada más el ancho mínimo.
+     *
+     * @param array<string, mixed> $value
+     */
+    private function grid_template_columns(array $value, int $columns, string $gap): string
+    {
+        if (!isset($value['minColumnWidth'])) {
+            return 'repeat(' . $columns . ',minmax(0,1fr))';
+        }
+        $min = $value['minColumnWidth'];
+        if (!array_key_exists('columns', $value)) {
+            return 'repeat(auto-fit,minmax(' . $min . ',1fr))';
+        }
+        if ($columns === 1) {
+            return 'minmax(0,1fr)';
+        }
+        $share = 'calc((100% - ' . ($columns - 1) . ' * ' . $gap . ') / ' . $columns . ')';
+        return 'repeat(auto-fit,minmax(max(' . $min . ',' . $share . '),1fr))';
     }
 
     /** @param array<string, mixed> $value */
