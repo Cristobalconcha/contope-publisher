@@ -60,13 +60,48 @@ lo mismo que si no existiera.
 el puerto 8891) y la credencial del archivo que indique `AUTH_FILE`. Ninguna
 credencial se guarda acá.
 
+## La marquesina de certificaciones, medida
+
+El original la hace con **Swiper** metido en un módulo de código de Divi
+(`mySwiperCertificaciones` dentro de `et_pb_code`), no con un módulo nativo.
+Medido el 30 de septiembre con el viewport en 1440x900:
+
+| qué | valor |
+|---|---|
+| movimiento | `loop: true`, `autoplay.delay: 0`, `speed: 8000` — continuo y lento, no de paso en paso |
+| piezas a la vista | 4 desde 1024px · 2 en 768 y 480 · 1 en 320 |
+| separación | 60px (`spaceBetween`, y 60px medidos en pantalla) |
+| cada logo | 120x120px; son 4, y en el DOM salen 8 porque Swiper duplica el juego para cerrar el bucle |
+| su sección | fondo `#DBD4C0`, padding `54px 0 50px` |
+
+En el plugin esto **no** se rehace con Swiper: el bucle continuo se arma con
+CSS, duplicando el juego de piezas. Un tercero no entra al plugin por esto.
+
+## El encabezado no se encoge
+
+Estuvo anotado como pendiente y es falso: el encabezado de econut.cl es
+`position: static`, mide 100px y se va con la página al bajar. No hay
+`et-fixed-header`, no se fija y no cambia de alto. Comprobado con el scroll a
+2500px, donde el encabezado reporta `top: -2500`.
+
+**Ojo con cómo se mide esto.** La primera medición dio justo lo contrario de lo
+que vale: el panel del navegador estaba oculto, `innerHeight` era 0, y con el
+viewport en cero la página declaraba 73.756px de alto (son 6.906), ningún
+elemento quedaba fijo y la marquesina no aparecía por ninguna parte. Un
+navegador sin tamaño contesta cualquier cosa. Antes de preguntar: fijar el
+viewport, recargar, y confirmar que `innerHeight` no es 0.
+
+Y la marquesina tampoco se encuentra buscando animaciones CSS infinitas:
+Swiper mueve por `transform` desde JS, así que ese barrido devuelve sólo las
+dos animaciones del reproductor de medios de WordPress. Lo que sí la delata es
+el juego de logos duplicado.
+
 ## Lo que falta
 
-- El encabezado y el pie deberían ser **regiones globales** del plugin, no
-  secciones dentro de la página. Hoy no existe ninguna región en esa
-  instalación y el MCP no tiene herramienta para crearlas: se crean en el
-  panel de WordPress y después se escriben con `pageId 0`.
-- La marquesina de certificaciones y el encabezado que se encoge al bajar.
+- La marquesina de certificaciones en la página (la capacidad en el plugin
+  entra en 0.3.39; falta componerla acá).
+- El mapa.
+- Nuestra página mide más alto que el original: sobra aire en varios bloques.
 - El original oscurece la foto de la portada con un degradado; acá no se copió,
   por la regla de no usar degradados. La legibilidad la da la columna blanca,
   que es el mismo mecanismo que usa el original.
