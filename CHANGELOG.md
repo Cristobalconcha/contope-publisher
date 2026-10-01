@@ -5,6 +5,48 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.41 — 1 de octubre de 2026
+
+### Agregado
+
+- **Una imagen de fondo se puede colocar y dimensionar con medidas, no sólo con
+  palabras.** La regla `surface` aceptaba `backgroundPosition` únicamente como
+  palabras (`left`, `center`, `right`, `top`, `bottom`) y `backgroundSize`
+  únicamente como `cover`, `contain` o `auto`. Eso dejaba fuera lo que Divi sí
+  hace. Ahora:
+
+  - `backgroundPosition` acepta una o dos medidas (`2% 50%`, `20px 10px`, `50%`)
+    y la mezcla de palabra y medida (`left 20px`, `center 30%`).
+  - `backgroundSize` acepta una o dos medidas, donde `auto` vale como componente
+    (`7% auto`, `200px`, `50% 100%`).
+  - `backgroundRepeat` es un campo nuevo y opcional: `repeat`, `no-repeat`,
+    `repeat-x`, `repeat-y`, `space` o `round`. Sin él sigue saliendo `no-repeat`,
+    como siempre.
+
+  Lo pidió la barra de aviso de econut.cl, que pinta su triángulo de advertencia
+  como fondo de la sección (`7% auto`, a `2% 50%`, sin repetir). Antes esa regla
+  se rechazaba con «backgroundPosition no es válido».
+
+  ```json
+  { "id": "aviso-fondo", "kind": "surface",
+    "value": { "backgroundAssetUrl": "/wp-content/uploads/triangulo.svg",
+               "backgroundSize": "7% auto", "backgroundPosition": "2% 50%",
+               "backgroundRepeat": "no-repeat" } }
+  ```
+
+  Las unidades que se aceptan son `px em rem vh vw vmin vmax ch ex cm mm in pt pc q`
+  y `%`; cualquier otra cosa (`calc(...)`, `var(...)`, `url(...)`, una unidad
+  inventada, tres componentes) se rechaza diciendo qué campo falló. El tamaño no
+  acepta números negativos.
+
+  **Con velo, la medida es sólo de la foto.** Si la superficie trae también
+  `overlayColor`, el velo sigue ocupando toda la caja (siempre `cover`, centrado)
+  y la medida se aplica únicamente a la capa de la foto, para que el velo no se
+  encoja ni se corra. Lo que ya se declaraba con palabras sale exactamente igual
+  que en 0.3.40.
+
+---
+
 ## 0.3.40 — 30 de septiembre de 2026
 
 ### Agregado

@@ -455,7 +455,9 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 'atLeastOneOf' => ['backgroundColor', 'foregroundColor', 'backgroundAssetUrl', 'overlayColor', 'borderColor', 'borderWidth', 'shadow'],
                 'fields' => [
                     'backgroundAssetUrl' => 'URL HTTP(S) o raíz relativa segura; usa cod_resolve_canvas_assets para material existente',
-                    'backgroundPosition' => 'left|center|right y/o top|center|bottom', 'backgroundSize' => ['cover', 'contain', 'auto'],
+                    'backgroundPosition' => 'una o dos componentes: palabras (left|center|right, top|center|bottom) y/o medidas (número con px em rem vh vw vmin vmax ch ex cm mm in pt pc q o %); ej. center, 2% 50%, left 20px',
+                    'backgroundSize' => 'cover|contain|auto, o una o dos medidas (auto vale como componente); ej. 7% auto, 200px, 50% 100%',
+                    'backgroundRepeat' => ['repeat', 'no-repeat', 'repeat-x', 'repeat-y', 'space', 'round'],
                     'overlayColor' => 'color seguro; con backgroundAssetUrl se emite como velo plano de opacidad pareja sobre la imagen (nunca degradado)',
                     'overlayOpacity' => '0..1 (por omisión 1); necesita overlayColor', 'shadow' => ['none', 'sm', 'md', 'lg'],
                 ],
@@ -1231,7 +1233,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
     /** @param array<string, mixed> $value */
     private function normalize_surface_rule(array $value)
     {
-        $allowed = ['backgroundColor', 'foregroundColor', 'backgroundAssetUrl', 'backgroundPosition', 'backgroundSize', 'overlayColor', 'overlayOpacity', 'borderColor', 'borderWidth', 'shadow'];
+        $allowed = ['backgroundColor', 'foregroundColor', 'backgroundAssetUrl', 'backgroundPosition', 'backgroundSize', 'backgroundRepeat', 'overlayColor', 'overlayOpacity', 'borderColor', 'borderWidth', 'shadow'];
         if (!$this->has_only_keys($value, $allowed) || $value === []) {
             return new WP_Error('cod_mcp_surface_rule_invalid', 'La regla surface debe declarar al menos un tratamiento.');
         }
@@ -1251,16 +1253,22 @@ final class COD_Canvas_MCP_Recipe_Compiler
             $normalized['backgroundAssetUrl'] = $value['backgroundAssetUrl'];
         }
         if (isset($value['backgroundPosition'])) {
-            if (!is_string($value['backgroundPosition']) || !$this->is_object_position($value['backgroundPosition'])) {
-                return new WP_Error('cod_mcp_surface_rule_invalid', 'backgroundPosition no es válido.');
+            if (!is_string($value['backgroundPosition']) || !$this->is_background_position($value['backgroundPosition'])) {
+                return new WP_Error('cod_mcp_surface_rule_invalid', 'backgroundPosition no es válido: use palabras (left, center, right, top, bottom) o medidas (2%, 20px), una o dos componentes.');
             }
             $normalized['backgroundPosition'] = $value['backgroundPosition'];
         }
         if (isset($value['backgroundSize'])) {
-            if (!is_string($value['backgroundSize']) || !in_array($value['backgroundSize'], ['cover', 'contain', 'auto'], true)) {
-                return new WP_Error('cod_mcp_surface_rule_invalid', 'backgroundSize no es válido.');
+            if (!is_string($value['backgroundSize']) || !$this->is_background_size($value['backgroundSize'])) {
+                return new WP_Error('cod_mcp_surface_rule_invalid', 'backgroundSize no es válido: use cover, contain, auto, o una o dos medidas (7% auto, 200px).');
             }
             $normalized['backgroundSize'] = $value['backgroundSize'];
+        }
+        if (isset($value['backgroundRepeat'])) {
+            if (!is_string($value['backgroundRepeat']) || !in_array($value['backgroundRepeat'], ['repeat', 'no-repeat', 'repeat-x', 'repeat-y', 'space', 'round'], true)) {
+                return new WP_Error('cod_mcp_surface_rule_invalid', 'backgroundRepeat no es válido: repeat, no-repeat, repeat-x, repeat-y, space o round.');
+            }
+            $normalized['backgroundRepeat'] = $value['backgroundRepeat'];
         }
         if (isset($value['overlayOpacity'])) {
             if ((!is_int($value['overlayOpacity']) && !is_float($value['overlayOpacity'])) || $value['overlayOpacity'] < 0 || $value['overlayOpacity'] > 1) {
@@ -3644,12 +3652,19 @@ final class COD_Canvas_MCP_Recipe_Compiler
         if (isset($value['backgroundAssetUrl'])) {
             $posicion = $value['backgroundPosition'] ?? 'center';
             $tamano = $value['backgroundSize'] ?? 'cover';
+            $repite = $value['backgroundRepeat'] ?? 'no-repeat';
             if (isset($value['overlayColor'])) {
                 // Velo plano dentro del propio fondo: dos capas de background-image,
                 // el velo arriba y la foto abajo. Cada propiedad lleva dos valores
-                // (uno por capa) o la capa se desalinea. Un gradiente sin tamaño
-                // propio ocupa toda la caja con cover, contain o auto, así que
-                // repetir el valor no cambia nada.
+                // (uno por capa) o la capa se desalinea.
+                //
+                // La capa del velo es un gradiente sin tamaño propio: debe ocupar
+                // TODA la caja. Con las palabras de siempre (cover, contain, auto;
+                // posición por palabras) repetir el valor de la foto ya da eso y se
+                // conserva byte a byte lo emitido desde 0.3.40. Con una medida
+                // (7% auto, 2% 50%) repetirla encogería o correría el velo, así que
+                // la capa del velo va fija en cover y 50% 50%, y la medida es sólo
+                // de la foto. El velo no se repite nunca.
                 //
                 // OJO, es a propósito y no se "arregla": el velo es de OPACIDAD
                 // PAREJA, el mismo color en los dos extremos de linear-gradient(),
@@ -3659,11 +3674,13 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 // el sitio de origen (la portada de econut.cl) use 0.6 -> 0.9, acá
                 // se emite un solo valor. Copiar el original rompería la regla.
                 $velo = $this->overlay_layer_color($value['overlayColor'], (float) ($value['overlayOpacity'] ?? 1.0));
+                $posicionVelo = $this->is_object_position($posicion) ? $posicion : '50% 50%';
+                $tamanoVelo = in_array($tamano, ['cover', 'contain', 'auto'], true) ? $tamano : 'cover';
                 $css .= 'background-image:linear-gradient(' . $velo . ',' . $velo . '),url("' . $value['backgroundAssetUrl'] . '");'
-                    . 'background-repeat:no-repeat,no-repeat;'
-                    . 'background-position:' . $posicion . ',' . $posicion . ';background-size:' . $tamano . ',' . $tamano . ';';
+                    . 'background-repeat:no-repeat,' . $repite . ';'
+                    . 'background-position:' . $posicionVelo . ',' . $posicion . ';background-size:' . $tamanoVelo . ',' . $tamano . ';';
             } else {
-                $css .= 'background-image:url("' . $value['backgroundAssetUrl'] . '");background-repeat:no-repeat;'
+                $css .= 'background-image:url("' . $value['backgroundAssetUrl'] . '");background-repeat:' . $repite . ';'
                     . 'background-position:' . $posicion . ';background-size:' . $tamano . ';';
             }
         }
@@ -4079,6 +4096,58 @@ final class COD_Canvas_MCP_Recipe_Compiler
     private function is_object_position(string $value): bool
     {
         return preg_match('/^(?:(?:left|center|right)(?:\s+(?:top|center|bottom))?|(?:top|center|bottom)(?:\s+(?:left|center|right))?)$/', $value) === 1;
+    }
+
+    /** Una medida de fondo: número (con decimales, y signo si $conSigno) más unidad de longitud o %. El 0 pelado también. */
+    private function is_background_measure(string $value, bool $conSigno): bool
+    {
+        $signo = $conSigno ? '[+-]?' : '\+?';
+        return preg_match('/^' . $signo . '(?:\d+(?:\.\d+)?|\.\d+)(?:(?i:px|em|rem|vh|vw|vmin|vmax|ch|ex|cm|mm|in|pt|pc|q)|%)$/D', $value) === 1
+            || preg_match('/^' . $signo . '0+(?:\.0+)?$/D', $value) === 1;
+    }
+
+    /**
+     * Posición del fondo: palabras y/o medidas, una o dos componentes separadas por
+     * un espacio. Lista blanca por componente; nada de calc(), var(), url(), comillas,
+     * punto y coma, llaves ni paréntesis. Las palabras solas valen igual que con
+     * is_object_position(), que se deja intacta (la usan otras reglas).
+     */
+    private function is_background_position(string $value): bool
+    {
+        if ($value === '' || strlen($value) > 64 || preg_match('/^\S+(?: \S+)?$/D', $value) !== 1) {
+            return false;
+        }
+        $x = ['left', 'center', 'right'];
+        $y = ['top', 'center', 'bottom'];
+        $partes = explode(' ', $value);
+        if (count($partes) === 1) {
+            return in_array($partes[0], array_merge($x, $y), true) || $this->is_background_measure($partes[0], true);
+        }
+        [$a, $b] = $partes;
+        // Horizontal y luego vertical; cada uno palabra o medida.
+        if ((in_array($a, $x, true) || $this->is_background_measure($a, true)) && (in_array($b, $y, true) || $this->is_background_measure($b, true))) {
+            return true;
+        }
+        // Orden invertido sólo entre palabras (top left).
+        return in_array($a, $y, true) && in_array($b, $x, true);
+    }
+
+    /** Tamaño del fondo: cover|contain|auto, o una o dos medidas (auto vale como componente). Sin negativos. */
+    private function is_background_size(string $value): bool
+    {
+        if ($value === '' || strlen($value) > 64 || preg_match('/^\S+(?: \S+)?$/D', $value) !== 1) {
+            return false;
+        }
+        $partes = explode(' ', $value);
+        if (count($partes) === 1 && in_array($partes[0], ['cover', 'contain'], true)) {
+            return true;
+        }
+        foreach ($partes as $parte) {
+            if ($parte !== 'auto' && !$this->is_background_measure($parte, false)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private function is_safe_asset_url(string $value): bool
