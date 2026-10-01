@@ -23,6 +23,7 @@ const TEXTO = '#333333';
 const f = {
   logoHorizontal: M + 'Logo-horizontal-@svg.svg',
   logoCalado: M + 'Logo-calado-20.png',
+  logoAltfx: M + 'Altfx-2-Calado.png',   // el crédito de diseño, en el pie
 };
 
 let n = 0;
@@ -74,16 +75,28 @@ const hacerReglas = () => {
 // ----------------------------------------------------------------------- pie
 {
   const { reglas, R } = hacerReglas();
-  R('p-superficie', 'surface', { backgroundColor: OSCURO, foregroundColor: BLANCO });
-  R('p-aire', 'spacing', { paddingBlock: '30px', paddingInline: '24px' });
+  // El pie del original no es negro: es el verde de la marca, #2E594A. Y mide
+  // 120px de alto con el logotipo a la izquierda, así que el aire es poco.
+  R('p-superficie', 'surface', { backgroundColor: '#2E594A', foregroundColor: BLANCO });
+  R('p-aire', 'spacing', { paddingBlock: '10px', paddingInline: '24px' });
   R('p-barra', 'properties', { declarations: {
-    display: 'grid', 'grid-template-columns': '164px minmax(0, 1fr)', 'column-gap': '40px',
-    'align-items': 'center', 'max-width': '1180px', 'margin-inline-start': 'auto', 'margin-inline-end': 'auto', width: '100%',
+    display: 'grid', 'grid-template-columns': '74px minmax(0, 1fr) 200px', 'column-gap': '40px',
+    'align-items': 'center', 'max-width': '1080px', 'margin-inline-start': 'auto', 'margin-inline-end': 'auto', width: '100%',
   } });
-  R('p-logo', 'properties', { declarations: { width: '140px', 'max-width': '140px' } });
-  R('p-texto', 'typography', { role: 'pie', fontSize: '13px', lineHeight: 1.6, align: 'end' });
+  // En el original el logotipo del pie mide 74x60, no 140 de ancho.
+  R('p-logo', 'properties', { declarations: { width: '74px', 'max-width': '74px' } });
+  // El crédito de quien hizo el sitio, a la derecha del todo, como el original.
+  R('p-credito', 'properties', { declarations: {
+    display: 'grid', 'grid-template-columns': 'minmax(0, 1fr) 71px', 'column-gap': '12px',
+    'align-items': 'center', 'justify-items': 'end',
+  } });
+  R('p-credito-texto', 'typography', { role: 'pie', fontSize: '12px', lineHeight: 1.4, align: 'end' });
+  R('p-credito-logo', 'properties', { declarations: { width: '71px', 'max-width': '71px' } });
+  // 12px con interlínea 1.4: en el original las tres líneas de la dirección
+  // caben en 50px de alto, y con 13/1.6 ocupaban 71.
+  R('p-texto', 'typography', { role: 'pie', fontSize: '12px', lineHeight: 1.4, align: 'end' });
   R('p-columna', 'properties', { declarations: {
-    display: 'grid', 'grid-template-columns': 'minmax(0, 1fr)', 'row-gap': '4px', 'justify-items': 'end',
+    display: 'grid', 'grid-template-columns': 'minmax(0, 1fr)', 'row-gap': '0px', 'justify-items': 'end',
   } });
 
   const nodes = [{
@@ -92,8 +105,16 @@ const hacerReglas = () => {
       id: id('g'), kind: 'group', ruleIds: ['p-barra'], children: [
         { id: id('i'), kind: 'image', ruleIds: ['p-logo'], content: { assetUrl: f.logoCalado, alt: 'Econut' } },
         { id: id('g'), kind: 'group', ruleIds: ['p-columna'], children: [
-          { id: id('p'), kind: 'paragraph', ruleIds: ['p-texto'], content: { text: 'Ruta 78 de Septiembre s/n, Parcela 3, Fundo San Rafael' } },
-          { id: id('p'), kind: 'paragraph', ruleIds: ['p-texto'], content: { text: 'Rinconada de Doñihue, Región del Libertador' } },
+          // La dirección, copiada literal del pie de econut.cl. La que había
+          // acá —«Ruta 78 de Septiembre s/n, Parcela 3 / Rinconada de Doñihue,
+          // Región del Libertador»— era otra calle, otra comuna y otra región.
+          { id: id('p'), kind: 'paragraph', ruleIds: ['p-texto'], content: { text: 'Av 18 de Septiembre sn Hijuela 2' } },
+          { id: id('p'), kind: 'paragraph', ruleIds: ['p-texto'], content: { text: 'Fundo San Rafael - Sector Nuevo Sendero,' } },
+          { id: id('p'), kind: 'paragraph', ruleIds: ['p-texto'], content: { text: 'Paine, Región Metropolitana' } },
+        ] },
+        { id: id('g'), kind: 'group', ruleIds: ['p-credito'], children: [
+          { id: id('p'), kind: 'paragraph', ruleIds: ['p-credito-texto'], content: { text: 'Diseño y desarrollo' } },
+          { id: id('i'), kind: 'image', ruleIds: ['p-credito-logo'], content: { assetUrl: f.logoAltfx, alt: 'Altfx' } },
         ] },
       ],
     }],
