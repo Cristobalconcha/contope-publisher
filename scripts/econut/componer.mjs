@@ -129,7 +129,12 @@ R('cinco', 'layout', { mode: 'grid', columns: 4, gap: '36px', minColumnWidth: '1
 // distinto. En el original los tres botones están alineados.
 R('tarjeta-alta', 'properties', { declarations: { height: '100%', 'align-content': 'start' } });
 R('al-fondo', 'properties', { declarations: { 'margin-block-start': 'auto' } });
-R('columna', 'layout', { mode: 'stack', gap: '14px', align: 'start', justify: 'start' });
+// 26px de aire entre las piezas de una columna. Ahora que los textos no traen
+// margen propio, éste es el único aire que los separa, y con 14 las secciones
+// quedaban más cortas que el original. El sitio real separa su título de su
+// primer párrafo con 67 y los párrafos entre sí con 6; 26 es el punto medio
+// que deja cada sección en su alto sin tratar cada bloque por separado.
+R('columna', 'layout', { mode: 'stack', gap: '26px', align: 'start', justify: 'start' });
 R('barra-sup', 'layout', { mode: 'cluster', gap: '30px', justify: 'between', align: 'center', maxWidth: '1180px' });
 
 // --- Superficies -----------------------------------------------------------
