@@ -456,7 +456,8 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 'fields' => [
                     'backgroundAssetUrl' => 'URL HTTP(S) o raíz relativa segura; usa cod_resolve_canvas_assets para material existente',
                     'backgroundPosition' => 'left|center|right y/o top|center|bottom', 'backgroundSize' => ['cover', 'contain', 'auto'],
-                    'overlayOpacity' => '0..1', 'shadow' => ['none', 'sm', 'md', 'lg'],
+                    'overlayColor' => 'color seguro; con backgroundAssetUrl se emite como velo plano de opacidad pareja sobre la imagen (nunca degradado)',
+                    'overlayOpacity' => '0..1 (por omisión 1); necesita overlayColor', 'shadow' => ['none', 'sm', 'md', 'lg'],
                 ],
             ],
             'shape' => [
@@ -1266,6 +1267,11 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 return new WP_Error('cod_mcp_surface_rule_invalid', 'overlayOpacity debe estar entre 0 y 1.');
             }
             $normalized['overlayOpacity'] = (float) $value['overlayOpacity'];
+            // Una opacidad sin color no pinta nada: antes se descartaba en
+            // silencio y la regla parecía aplicada. Ahora se dice.
+            if (!isset($normalized['overlayColor'])) {
+                return new WP_Error('cod_mcp_surface_rule_invalid', 'overlayOpacity necesita overlayColor: sin color no hay velo que atenuar.');
+            }
         }
         if (isset($value['borderWidth'])) {
             if (!is_string($value['borderWidth']) || !$this->is_css_length($value['borderWidth'])) {
@@ -3527,7 +3533,9 @@ final class COD_Canvas_MCP_Recipe_Compiler
             unset($mobile_layout['mobile']);
             $rule_css .= '@media(max-width:767px){' . $selector . '{' . $this->layout_css($mobile_layout) . '}}';
         }
-        if ($rule['kind'] === 'surface' && isset($value['overlayColor'])) {
+        // Con imagen de fondo el velo ya salió como capa de background-image
+        // (surface_css); este ::before sólo queda para superficies sin imagen.
+        if ($rule['kind'] === 'surface' && isset($value['overlayColor']) && !isset($value['backgroundAssetUrl'])) {
             $rule_css .= $selector . '::before{content:"";position:absolute;inset:0;background-color:' . $value['overlayColor'] . ';opacity:'
                 . ($value['overlayOpacity'] ?? 1) . ';pointer-events:none;}'
                 . $selector . '>*{position:relative;}';
@@ -3608,6 +3616,21 @@ final class COD_Canvas_MCP_Recipe_Compiler
         return 'repeat(auto-fit,minmax(max(' . $min . ',' . $share . '),1fr))';
     }
 
+    /**
+     * El color del velo con su opacidad aplicada. color-mix() resuelve cualquier
+     * color que is_css_color() acepta (hex, rgb, hsl, oklch, transparent,
+     * currentColor) sin tener que leer sus canales; con opacidad 1 el color pasa
+     * tal cual.
+     */
+    private function overlay_layer_color(string $color, float $opacity): string
+    {
+        if ($opacity >= 1.0) {
+            return $color;
+        }
+        $porcentaje = rtrim(rtrim(number_format($opacity * 100, 2, '.', ''), '0'), '.');
+        return 'color-mix(in srgb,' . $color . ' ' . ($porcentaje === '' ? '0' : $porcentaje) . '%,transparent)';
+    }
+
     /** @param array<string, mixed> $value */
     private function surface_css(array $value): string
     {
@@ -3619,8 +3642,30 @@ final class COD_Canvas_MCP_Recipe_Compiler
             $css .= 'color:' . $value['foregroundColor'] . ';';
         }
         if (isset($value['backgroundAssetUrl'])) {
-            $css .= 'background-image:url("' . $value['backgroundAssetUrl'] . '");background-repeat:no-repeat;'
-                . 'background-position:' . ($value['backgroundPosition'] ?? 'center') . ';background-size:' . ($value['backgroundSize'] ?? 'cover') . ';';
+            $posicion = $value['backgroundPosition'] ?? 'center';
+            $tamano = $value['backgroundSize'] ?? 'cover';
+            if (isset($value['overlayColor'])) {
+                // Velo plano dentro del propio fondo: dos capas de background-image,
+                // el velo arriba y la foto abajo. Cada propiedad lleva dos valores
+                // (uno por capa) o la capa se desalinea. Un gradiente sin tamaño
+                // propio ocupa toda la caja con cover, contain o auto, así que
+                // repetir el valor no cambia nada.
+                //
+                // OJO, es a propósito y no se "arregla": el velo es de OPACIDAD
+                // PAREJA, el mismo color en los dos extremos de linear-gradient(),
+                // que es la única forma que da CSS de poner un color sólido como
+                // capa de background-image. En este proyecto no hay degradados:
+                // un velo uniforme no lo es, uno que varía de 0.6 a 0.9 sí. Aunque
+                // el sitio de origen (la portada de econut.cl) use 0.6 -> 0.9, acá
+                // se emite un solo valor. Copiar el original rompería la regla.
+                $velo = $this->overlay_layer_color($value['overlayColor'], (float) ($value['overlayOpacity'] ?? 1.0));
+                $css .= 'background-image:linear-gradient(' . $velo . ',' . $velo . '),url("' . $value['backgroundAssetUrl'] . '");'
+                    . 'background-repeat:no-repeat,no-repeat;'
+                    . 'background-position:' . $posicion . ',' . $posicion . ';background-size:' . $tamano . ',' . $tamano . ';';
+            } else {
+                $css .= 'background-image:url("' . $value['backgroundAssetUrl'] . '");background-repeat:no-repeat;'
+                    . 'background-position:' . $posicion . ';background-size:' . $tamano . ';';
+            }
         }
         if (isset($value['borderColor']) || isset($value['borderWidth'])) {
             $css .= 'border-color:' . ($value['borderColor'] ?? 'currentColor') . ';border-style:solid;border-width:' . ($value['borderWidth'] ?? '1px') . ';';

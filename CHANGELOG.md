@@ -5,6 +5,49 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.40 — 30 de septiembre de 2026
+
+### Agregado
+
+- **Un velo plano sobre la foto de fondo de una superficie.** Una foto de fondo
+  que compite con el texto se vuelve la protagonista de la sección; para que
+  quede atrás hay que oscurecerla o aclararla. La regla `surface` ya aceptaba
+  `overlayColor` y `overlayOpacity`; ahora, cuando la superficie trae también
+  `backgroundAssetUrl`, el velo viaja **dentro del propio fondo**: dos capas de
+  `background-image`, el velo arriba y la foto debajo, sin elementos extra y sin
+  tocar a los hijos de la sección.
+
+  ```json
+  { "id": "portada-fondo", "kind": "surface",
+    "value": { "backgroundAssetUrl": "/wp-content/uploads/portada.jpg",
+               "overlayColor": "#000000", "overlayOpacity": 0.75 } }
+  ```
+
+  **El velo es de opacidad pareja, y no es un degradado.** El mismo color, con
+  la misma opacidad, de un extremo al otro. CSS no tiene una «capa de color
+  sólido» para `background-image`, así que se escribe como un `linear-gradient`
+  con el mismo valor en sus dos puntas: por dentro es un truco de CSS, a la vista
+  es un color liso. Esto es a propósito: en este proyecto no se usan degradados,
+  y un velo que varía (por ejemplo de 0.6 a 0.9, como el del sitio original de
+  econut.cl) sí lo sería. Si se copia esa portada, se elige **un** valor.
+
+  Sin `overlayOpacity` el velo sale a opacidad 1, que tapa la foto por completo:
+  la opacidad conviene declararla siempre.
+
+### Corregido
+
+- **Una opacidad de velo sin color ya no se descarta en silencio.** Una regla
+  `surface` con `overlayOpacity` pero sin `overlayColor` se aceptaba y no
+  pintaba nada, y parecía aplicada. Ahora se rechaza diciendo que la opacidad
+  necesita un color.
+- **Con foto de fondo, el velo ya no obliga a los hijos de la sección a quedar
+  `position: relative`.** Hasta acá el velo se dibujaba con un `::before` y, para
+  que quedara bajo el contenido, la regla forzaba `position: relative` en cada
+  hijo directo, lo que descolocaba a los que ya venían posicionados. Una
+  superficie sin foto sigue usando ese `::before`, sin cambios.
+
+---
+
 ## 0.3.39 — 30 de septiembre de 2026
 
 ### Agregado
