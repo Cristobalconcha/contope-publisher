@@ -112,8 +112,10 @@ R('aire-corto', 'spacing', { paddingBlock: '48px', paddingInline: '24px' });
 R('aire-barra', 'spacing', { paddingBlock: '20px', paddingInline: '24px' });
 // 1080px es el ancho de contenido del original: sus secciones van de 410 a
 // 1490 sobre una ventana de 1900. Acá había 1180.
-R('caja', 'layout', { mode: 'stack', maxWidth: '1080px', gap: '26px', align: 'start' });
-R('caja-centro', 'layout', { mode: 'stack', maxWidth: '1080px', gap: '26px', align: 'center' });
+// 64px entre el bloque del título y el contenido de la sección: es lo que deja
+// el original entre el final de su título y lo que viene abajo.
+R('caja', 'layout', { mode: 'stack', maxWidth: '1080px', gap: '64px', align: 'start' });
+R('caja-centro', 'layout', { mode: 'stack', maxWidth: '1080px', gap: '64px', align: 'center' });
 R('partida', 'layout', { mode: 'grid', columns: 2, gap: '56px', minColumnWidth: '340px', align: 'center', mobile: { mode: 'stack', columns: 1, gap: '28px' } });
 // Tres columnas de 302px separadas por 87, que es lo que suma los 1080 de
 // ancho del original (302x3 + 87x2 = 1080). Acá estaban a 32 de separación.
@@ -286,6 +288,10 @@ R('aire-certificaciones', 'spacing', { paddingBlock: '54px', paddingInline: '24p
 // de aire: la marquesina termina en y236 y la foto empieza en y401. La caja
 // normal separa 26, y por eso la sección quedaba 263px más corta.
 R('caja-certificaciones', 'layout', { mode: 'stack', maxWidth: '1080px', gap: '165px', align: 'start' });
+// Servicios: el original deja 35px entre el título y la bajada, y 49 entre la
+// bajada y las tres columnas. Con los 64 de la caja normal la sección se iba
+// 133px por encima del original.
+R('caja-servicios', 'layout', { mode: 'stack', maxWidth: '1080px', gap: '40px', align: 'start' });
 R('panel-blanco', 'surface', { backgroundColor: BLANCO, foregroundColor: TEXTO });
 R('tarjeta-blanca', 'surface', { backgroundColor: BLANCO, foregroundColor: TEXTO, shadow: 'sm' });
 R('entra', 'motion', { trigger: 'scroll', effect: 'rise', duration: 520, easing: 'ease-out', threshold: 0.15, stagger: 110 });
@@ -329,9 +335,16 @@ const LI = (items) => ({ id: id('l'), kind: 'list', ruleIds: ['t-cuerpo'], conte
 const A = (label, href, reglas_ = ['t-rotulo']) => ({ id: id('a'), kind: 'link', ruleIds: reglas_, content: { label, href, target: 'self' } });
 
 // Rótulo y título: el par que abre cada sección en el sitio real.
+// El rótulo y el título van PEGADOS —4px en el original— y es el bloque
+// entero el que se separa del contenido, con 64. Sueltos en la columna, los
+// dos recibían el mismo aire y la sección no calzaba con el original.
+R('titulo-par', 'layout', { mode: 'stack', gap: '4px', align: 'start' });
+R('titulo-par-centro', 'layout', { mode: 'stack', gap: '4px', align: 'center' });
 const abre = (rotulo, titulo, centrado = false) => [
-  H(rotulo, 4, ['t-rotulo', 'c-texto']),
-  H(titulo, 2, [centrado ? 't-seccion-centro' : 't-seccion', 'c-naranja']),
+  G([
+    H(rotulo, 4, [centrado ? 't-rotulo-centro' : 't-rotulo', 'c-texto']),
+    H(titulo, 2, [centrado ? 't-seccion-centro' : 't-seccion', 'c-naranja']),
+  ], [centrado ? 'titulo-par-centro' : 'titulo-par']),
 ];
 
 const nodes = [];
@@ -409,22 +422,27 @@ nodes.push({
         ['Capacidad diaria aproximada de 40 toneladas de producto en cáscara de ingreso.',
          'Envasado en atmósfera modificada en bolsas de 10 ó 12 kilos y en cajas de hasta 12 kilos.']),
     ], ['tres', 'entra']),
-  ], ['caja'])],
+  ], ['caja-servicios'])],
 });
 
 // 5 · Historia
 nodes.push({
   id: 'historia', marker: 'historia', kind: 'section', ruleIds: ['aire', 's-blanco'],
-  children: [G([G([
+  // El título va a TODO EL ANCHO arriba —en el original ocupa de 410 a 1490—
+  // y debajo las dos columnas. Acá estaba metido dentro de la columna del
+  // texto, y por eso la sección quedaba 138px más corta que el original.
+  // Tampoco lleva rótulo: el original abre con el título solo.
+  children: [G([
+    H('Nuestra historia', 2, ['t-seccion', 'c-naranja']),
     G([
-      // El original abre con el título solo: no lleva rótulo.
-      H('Nuestra historia', 2, ['t-seccion', 'c-naranja']),
+    G([
       P('Nacimos como una pequeña empresa familiar y ahora somos el proveedor líder de servicios de procesamiento de nueces para la exportación en el país.'),
       P('Nuestras plantas de proceso están ubicadas en el corazón de la mayor área productiva de nueces en Chile, lo que nos permite apoyar a los principales productores y exportadores del país.'),
       P('Estamos certificados en los protocolos sanitarios, éticos y de calidad más importantes, con una profunda comprensión de los estándares internacionales.'),
     ], ['columna']),
     IMG(f.linea, 'Línea de selección manual en la planta', ['foto', 'redondo']),
-  ], ['partida', 'entra'])], ['caja'])],
+    ], ['partida', 'entra']),
+  ], ['caja'])],
 });
 
 // 6 · Cifras: pestañas, como en el sitio. El número es la etiqueta;
