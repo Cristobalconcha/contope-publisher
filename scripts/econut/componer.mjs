@@ -282,6 +282,12 @@ R('marquesina-ritmo', 'properties', { declarations: {
   '--cod-marquesina-visibles': '4',
   '--cod-marquesina-separacion': '97px',
   '--cod-marquesina-duracion-pieza': '8s',
+  // La marquesina va sobre un panel BLANCO de 200px de alto, con los logos
+  // centrados: en el original el bloque de la marquesina mide 810x200 y es lo
+  // único blanco de esa fila, sobre el beige de la sección.
+  'background-color': '#FFFFFF',
+  'min-height': '200px',
+  'align-content': 'center',
 } });
 R('aire-certificaciones', 'spacing', { paddingBlock: '54px', paddingInline: '24px' });
 // Entre la fila de la marquesina y la de sustentabilidad el original deja 165
@@ -437,8 +443,10 @@ nodes.push({
     G([
     G([
       P('Nacimos como una pequeña empresa familiar y ahora somos el proveedor líder de servicios de procesamiento de nueces para la exportación en el país.'),
-      P('Nuestras plantas de proceso están ubicadas en el corazón de la mayor área productiva de nueces en Chile, lo que nos permite apoyar a los principales productores y exportadores del país.'),
-      P('Estamos certificados en los protocolos sanitarios, éticos y de calidad más importantes, con una profunda comprensión de los estándares internacionales.'),
+      P('Nuestras plantas de proceso están ubicadas en el corazón de la mayor área productora de nueces en Chile, lo que nos permite apoyar a los principales productores y exportadores del país.'),
+      // El tercer párrafo estaba cortado a la mitad: le faltaba todo lo que
+      // viene después de «internacionales». Copiado literal del original.
+      P('Estamos certificados en los protocolos sanitarios, éticos y de calidad más importantes con una profunda comprensión de los estándares internacionales. Todo lo anterior nos permite garantizar la confiabilidad en las sensibles áreas de manejo de alimentos y nos da la capacidad de entregar productos en todo el mundo.'),
     ], ['columna']),
     IMG(f.linea, 'Línea de selección manual en la planta', ['foto', 'redondo']),
     ], ['partida', 'entra']),
