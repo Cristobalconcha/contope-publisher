@@ -466,6 +466,96 @@ CSS;
         return (string) preg_replace('~\s*\n\s*~', '', $css);
     }
 
+    /**
+     * Geometría y movimiento del behavior «marquesina» (una fila de piezas que
+     * se desplaza sola, en bucle continuo y sin controles). El runtime vive en
+     * cod-canvas-public.js y cod-behaviors.js (montarMarquesina) y sólo arma la
+     * estructura: mete las piezas en una pista y agrega las copias que cierran
+     * el bucle. El movimiento es de acá.
+     *
+     * SIN LIBRERÍAS. El caso que la pide (los logos de certificación de la
+     * landing de Econut) es hoy un Swiper dentro de un módulo de código de Divi,
+     * con loop:true, autoplay.delay:0 y speed:8000: desplazamiento continuo y
+     * lento. Acá no entra Swiper ni ninguna dependencia: la pista lleva el
+     * juego de piezas duplicado y una animación de @keyframes la corre
+     * translateX(-50%), que es la forma estándar de un bucle sin salto y sin
+     * JavaScript por cuadro.
+     *
+     * Por qué el desplazamiento es -50% menos MEDIA separación y no -50% a
+     * secas: la separación va entre piezas (column-gap) y la pista tiene
+     * 2N piezas pero 2N-1 separaciones, así que su mitad exacta queda media
+     * separación corta. Sin esa corrección el bucle da un salto del tamaño de
+     * la separación (60px en Econut) al reiniciar.
+     *
+     * Piezas visibles: cada pieza mide (ancho del contenedor - (n-1) separaciones)
+     * / n, con n = --cod-marquesina-visibles. El contenedor es la propia raíz
+     * (container-type:inline-size), por eso se mide con cqw y no con vw. Cuánto
+     * vale n por ancho NO lo decide este archivo: la composición escribe la
+     * variable con una regla properties que admite scope.breakpoint, o sea con el
+     * mismo sistema de breakpoints que todo lo demás. (En un navegador sin
+     * unidades de contenedor el ancho de la pieza no se calcula y las piezas
+     * toman su tamaño natural: la fila sigue andando.)
+     *
+     * Movimiento reducido: con prefers-reduced-motion: reduce la animación se
+     * detiene y el juego queda quieto y a la vista: sin copias y en filas que
+     * envuelven, de modo que ninguna pieza quede fuera de la vista.
+     *
+     * SÓLO geometría y movimiento. Ningún color de marca ni tipografía. Los
+     * valores por omisión van dentro de :where() (especificidad cero); lo que no
+     * se puede pisar, porque sostiene el comportamiento, es la pista en fila sin
+     * envolver, el recorte de la raíz y la animación.
+     *
+     * Ajustes que un sitio puede escribir (todos opcionales, todos variables):
+     *   --cod-marquesina-visibles (piezas a la vez; por omisión 4),
+     *   --cod-marquesina-separacion (espacio entre piezas; por omisión 0px),
+     *   --cod-marquesina-duracion-pieza (cuánto tarda en pasar una pieza; por
+     *     omisión 8s, que es el speed:8000 medido),
+     *   --cod-marquesina-alineacion (justify-content de cada pieza; por omisión center).
+     * El runtime escribe además --cod-marquesina-piezas (cuántas piezas hay en
+     * media pista): es lo que mantiene constante la velocidad por pieza.
+     *
+     * Regla del proyecto: nunca una abreviada con variable (background,
+     * border, font, margin, padding). Donde entra una variable, forma larga;
+     * por eso la animación va en sus partes y no en `animation:`.
+     *
+     * @param string|null $html HTML de la página: si se entrega y no menciona
+     *                          «marquesina», no se emite nada. Null = siempre.
+     */
+    public static function marquesina_css(?string $html = null): string
+    {
+        if ($html !== null && strpos($html, 'marquesina') === false) {
+            return '';
+        }
+
+        $r = '.cod-marquesina[data-cod-behavior="marquesina"]';
+        $pista = '.cod-marquesina__pista';
+        $pieza = '.cod-marquesina__pieza';
+        $copia = '[data-cod-marquesina-copia]';
+
+        $css = <<<CSS
+/* Estructura (esto no se pisa): la raíz recorta y es el contenedor contra el que se mide la pieza; la pista es una fila sin envolver que se mueve; la pieza no se encoge. */
+{$r}{display:block;box-sizing:border-box;overflow:hidden;container-type:inline-size;}
+{$r} > {$pista}{display:flex;flex-wrap:nowrap;width:max-content;animation-name:cod-marquesina-desplazar;animation-duration:calc(var(--cod-marquesina-piezas,4) * var(--cod-marquesina-duracion-pieza,8s));animation-timing-function:linear;animation-iteration-count:infinite;}
+{$r} > {$pista} > {$pieza}{flex-grow:0;flex-shrink:0;box-sizing:border-box;}
+@keyframes cod-marquesina-desplazar{from{transform:translateX(0);}to{transform:translateX(calc(-50% - var(--cod-marquesina-separacion,0px) / 2));}}
+
+/* Valores por omisión, con especificidad cero: la composición los pisa con cualquier regla. */
+:where({$r}){width:100%;}
+:where({$r} > {$pista}){align-items:center;column-gap:var(--cod-marquesina-separacion,0px);}
+:where({$r} > {$pista} > {$pieza}){flex-basis:calc((100cqw - (var(--cod-marquesina-visibles,4) - 1) * var(--cod-marquesina-separacion,0px)) / var(--cod-marquesina-visibles,4));min-width:0;display:flex;align-items:center;justify-content:var(--cod-marquesina-alineacion,center);}
+
+/* Movimiento reducido: la pista se detiene, las copias desaparecen y el juego queda quieto y a la vista, en filas que envuelven. */
+@media (prefers-reduced-motion:reduce){
+{$r} > {$pista}{animation:none;transform:none;width:auto;flex-wrap:wrap;justify-content:center;row-gap:var(--cod-marquesina-separacion,0px);}
+{$r} > {$pista} > {$copia}{display:none;}
+}
+CSS;
+
+        // Fuera comentarios y saltos de línea: se emite en línea en cada página.
+        $css = (string) preg_replace('~/\*.*?\*/~s', '', $css);
+        return (string) preg_replace('~\s*\n\s*~', '', $css);
+    }
+
     public static function rotation_css(): string
     {
         return '.cod-rot-180{transform:rotate(180deg);}'
@@ -1004,6 +1094,7 @@ CSS;
                 . self::dynamic_group_css($header_html . $body_html . $footer_html)
                 . self::cuadrantes_css($header_html . $body_html . $footer_html)
                 . self::pestanas_css($header_html . $body_html . $footer_html)
+                . self::marquesina_css($header_html . $body_html . $footer_html)
                 . self::rotation_css() . self::carousel_rows_css() . $header_css . $body_css . $footer_css
         );
         self::$css_ya_emitido = true;
@@ -1077,6 +1168,7 @@ CSS;
                     . self::dynamic_group_css($header_html . $body_html . $footer_html)
                 . self::cuadrantes_css($header_html . $body_html . $footer_html)
                 . self::pestanas_css($header_html . $body_html . $footer_html)
+                . self::marquesina_css($header_html . $body_html . $footer_html)
                     . self::rotation_css() . self::carousel_rows_css()
                     . $header_css . $body_css . $footer_css
             );

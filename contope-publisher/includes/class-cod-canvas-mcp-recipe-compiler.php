@@ -88,6 +88,12 @@ final class COD_Canvas_MCP_Recipe_Compiler
      *               miniatura, y va en la celda de imagen; el texto lleva
      *               data-cod-cuadrantes-visible = true | false. Acá el rol ya
      *               mezcla parte y estado, por eso la parte «imagen» no fija valor.
+     *   marquesina: data-cod-marquesina-rol = pista | pieza. La pista es el
+     *               contenedor que fabrica el runtime y que se desplaza; la pieza
+     *               es cada hijo del grupo, y también cada copia que el runtime
+     *               agrega para cerrar el bucle (ésas llevan además
+     *               data-cod-marquesina-copia). Ninguna de las dos partes tiene
+     *               estado elegido: el movimiento es continuo, no hay «la activa».
      *
      * Por parte: `selector` es un fragmento de selector de atributo que se
      * pega tras un espacio (descendiente del nodo); `elegido` es la marca que
@@ -138,6 +144,21 @@ final class COD_Canvas_MCP_Recipe_Compiler
                     'selector' => '[data-cod-cuadrantes-visible]',
                     'elegido' => '[data-cod-cuadrantes-visible="true"]',
                     'descripcion' => 'el bloque de texto de cada cuadrante (sólo se ve el del activo)',
+                ],
+            ],
+        ],
+        'marquesina' => [
+            'atributoRol' => 'data-cod-marquesina-rol',
+            'partes' => [
+                'pista' => [
+                    'selector' => '[data-cod-marquesina-rol="pista"]',
+                    'elegido' => null,
+                    'descripcion' => 'el contenedor que fabrica el runtime y que se desplaza en bucle; la separación entre piezas y la velocidad salen de variables (--cod-marquesina-*), no de la regla de layout',
+                ],
+                'pieza' => [
+                    'selector' => '[data-cod-marquesina-rol="pieza"]',
+                    'elegido' => null,
+                    'descripcion' => 'cada elemento de la fila (el propio hijo del grupo), incluidas las copias que el runtime agrega para cerrar el bucle',
                 ],
             ],
         ],
@@ -348,7 +369,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
                     'optional' => ['role', 'marker', 'ruleIds', 'cadenceRuleId', 'partes', 'children', 'content'],
                     'ruleApplication' => 'Cada nodo refiere reglas por id. No acepta CSS, HTML, JS, selectores ni componentes serializados por el cliente.',
                     'marker' => 'Destino estable al que puede llegar un enlace, un QR o el menú: se emite como id de HTML y por eso debe ser único en la página. Es identidad del nodo, no una regla —una regla se aplica a muchos nodos y repetiría el id. El aire de aterrizaje, en cambio, sí es una regla: spacing.landing.',
-                    'partes' => 'Opcional, sólo en un nodo que lleve un behavior que fabrica partes en el navegador (ver composition.behaviorContracts: hoy pestanas y cuadrantes). Mapa parte → lista de ids de regla, por ejemplo {"etiqueta":["pestana-normal","pestana-activa"],"lista":["fila"]}. Cada regla se emite con un selector de descendiente anclado al nodo (.cod-node-id-<id> [data-cod-pestanas-rol="etiqueta"]), que es lo único que alcanza un elemento que el runtime fabrica y que no recibe clases de regla. Con scope.state="current" se combina con la marca del elegido de ESA parte. La misma regla puede ir además en ruleIds: las dos formas conviven. Sólo admiten partes las reglas color, typography, spacing, layout, surface, shape, button y properties.',
+                    'partes' => 'Opcional, sólo en un nodo que lleve un behavior que fabrica partes en el navegador (ver composition.behaviorContracts: hoy pestanas, cuadrantes y marquesina). Mapa parte → lista de ids de regla, por ejemplo {"etiqueta":["pestana-normal","pestana-activa"],"lista":["fila"]}. Cada regla se emite con un selector de descendiente anclado al nodo (.cod-node-id-<id> [data-cod-pestanas-rol="etiqueta"]), que es lo único que alcanza un elemento que el runtime fabrica y que no recibe clases de regla. Con scope.state="current" se combina con la marca del elegido de ESA parte. La misma regla puede ir además en ruleIds: las dos formas conviven. Sólo admiten partes las reglas color, typography, spacing, layout, surface, shape, button y properties.',
                 ],
                 'nodeContentSchemas' => $this->node_content_schemas(),
                 'behaviorContracts' => $this->behavior_contracts_catalog(),
@@ -359,7 +380,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
                     'video', 'video con transparencia real (matte)', 'button', 'dynamic value', 'dynamic group', 'table', 'published Orugantt form',
                 ],
                 'safeRuntimeBehaviors' => [
-                    'scroll-threshold', 'nav-toggle', 'carousel-basic', 'reveal-on-scroll', 'lightbox', 'cuadrantes', 'pestanas',
+                    'scroll-threshold', 'nav-toggle', 'carousel-basic', 'reveal-on-scroll', 'lightbox', 'cuadrantes', 'pestanas', 'marquesina',
                     'load-transition', 'scroll-transition',
                 ],
                 'assetPolicy' => 'cod_resolve_canvas_assets devuelve activos ya gestionados por Canvas. El compilador acepta URLs seguras, no carga archivos ni verifica recursos remotos.',
@@ -491,7 +512,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
             'interaction' => [
                 'required' => ['behavior'],
                 'fields' => [
-                    'behavior' => ['scroll-threshold', 'nav-toggle', 'carousel-basic', 'lightbox', 'cuadrantes', 'pestanas'],
+                    'behavior' => ['scroll-threshold', 'nav-toggle', 'carousel-basic', 'lightbox', 'cuadrantes', 'pestanas', 'marquesina'],
                     'threshold' => '0..4000', 'targetId' => 'requerido por nav-toggle', 'toggleClass' => 'clase segura',
                     'mode' => ['single', 'track'], 'visible' => '1..8', 'visibleMobile' => '1..8',
                 ],
@@ -501,6 +522,8 @@ final class COD_Canvas_MCP_Recipe_Compiler
                     'cuadrantes no admite threshold, targetId, toggleClass, mode, visible ni visibleMobile',
                     'pestanas sólo en un nodo group con 2 a 8 hijos; cada hijo es una pestaña: su PRIMER hijo es la etiqueta (lo que se pincha: un título, un número, un texto) y el RESTO es el panel de contenido. Al cargar queda activa la primera; al pinchar una etiqueta se muestra su panel y se ocultan los demás, sin que el alto salte de golpe. El runtime pone las etiquetas en una lista de botones reales (role="tablist" / role="tab"; flechas izquierda y derecha, Inicio y Fin) y convierte a cada hijo en su panel (role="tabpanel"). Para estilar el estado, la composición usa los atributos que emite el runtime: [data-cod-pestanas-rol="etiqueta"][data-cod-pestanas-estado="activa"|"inactiva"] y [data-cod-pestanas-rol="panel"][data-cod-pestanas-visible="true"|"false"]. Sin colores ni tipografía: eso lo ponen las reglas de diseño del sitio. Si la forma interna no calza (algún hijo con menos de 2 hijos propios) el runtime no toca nada y el contenido queda apilado.',
                     'pestanas no admite threshold, targetId, toggleClass, mode, visible ni visibleMobile',
+                    'marquesina sólo en un nodo group con 2 a 24 hijos; cada hijo es una pieza de una fila que se desplaza sola, de derecha a izquierda y en bucle continuo, sin controles (logos de certificación, sellos, una frase de cinta). El runtime mete las piezas en una pista y agrega una copia del juego (marcada aria-hidden y sin ids) para que el bucle cierre sin salto; si hay pocas piezas para llenar el ancho, repite el juego las veces que haga falta. La pista se mueve con CSS puro (@keyframes y translateX(-50%)): sin librerías ni JavaScript por cuadro. Con prefers-reduced-motion: reduce el movimiento se detiene y las piezas quedan quietas y a la vista, sin copias. Cuántas piezas se ven a la vez, la separación y la velocidad NO son parámetros de la regla interaction: se escriben con una regla properties sobre el nodo, que admite scope.breakpoint, así que el número cambia por ancho como cualquier otra regla: --cod-marquesina-visibles (piezas a la vez; por omisión 4), --cod-marquesina-separacion (espacio entre piezas; por omisión 0px) y --cod-marquesina-duracion-pieza (cuánto tarda en pasar una pieza; por omisión 8s, un desplazamiento lento y continuo). Para estilar la pista o cada pieza se usan las partes pista y pieza del nodo. Sin colores ni tipografía: eso lo ponen las reglas de diseño del sitio. Si el grupo no calza el runtime no toca nada y las piezas quedan apiladas.',
+                    'marquesina no admite threshold, targetId, toggleClass, mode, visible ni visibleMobile (las piezas visibles se declaran con la variable --cod-marquesina-visibles, no con visible)',
                 ],
             ],
             'properties' => [
@@ -1585,9 +1608,25 @@ final class COD_Canvas_MCP_Recipe_Compiler
     private function normalize_interaction_rule(array $value)
     {
         $allowed = ['behavior', 'threshold', 'targetId', 'toggleClass', 'mode', 'visible', 'visibleMobile'];
-        if (!$this->has_only_keys($value, $allowed) || !isset($value['behavior'])
+        // Un parámetro que ninguna interacción conoce se rechaza NOMBRÁNDOLO:
+        // «interaction.behavior no es un comportamiento disponible» no le dice a
+        // quien lo escribió que el problema era la clave inventada.
+        $desconocidos = [];
+        foreach (array_keys($value) as $clave) {
+            if (!is_string($clave) || !in_array($clave, $allowed, true)) {
+                $desconocidos[] = (string) $clave;
+            }
+        }
+        if ($desconocidos !== []) {
+            return new WP_Error(
+                'cod_mcp_interaction_rule_invalid',
+                'interaction no admite el parámetro ' . implode(', ', array_map(static fn(string $c): string => '"' . $c . '"', $desconocidos))
+                . '. Los parámetros que existen son: ' . implode(', ', $allowed) . '.'
+            );
+        }
+        if (!isset($value['behavior'])
             || !is_string($value['behavior'])
-            || !in_array($value['behavior'], ['scroll-threshold', 'nav-toggle', 'carousel-basic', 'lightbox', 'cuadrantes', 'pestanas'], true)) {
+            || !in_array($value['behavior'], ['scroll-threshold', 'nav-toggle', 'carousel-basic', 'lightbox', 'cuadrantes', 'pestanas', 'marquesina'], true)) {
             return new WP_Error('cod_mcp_interaction_rule_invalid', 'interaction.behavior no es un comportamiento Canvas disponible.');
         }
         $normalized = ['behavior' => $value['behavior']];
@@ -1626,11 +1665,12 @@ final class COD_Canvas_MCP_Recipe_Compiler
         if ($normalized['behavior'] === 'nav-toggle' && !isset($normalized['targetId'])) {
             return new WP_Error('cod_mcp_interaction_rule_invalid', 'nav-toggle requiere targetId.');
         }
-        // cuadrantes y pestanas no tienen parámetros: la geometría sale del CSS
-        // del plugin y el estado del propio runtime. Aceptar uno y no usarlo
-        // engañaría.
-        if (in_array($normalized['behavior'], ['cuadrantes', 'pestanas'], true) && count($normalized) > 1) {
-            return new WP_Error('cod_mcp_interaction_rule_invalid', $normalized['behavior'] . ' no admite threshold, targetId, toggleClass, mode, visible ni visibleMobile.');
+        // cuadrantes, pestanas y marquesina no tienen parámetros: la geometría
+        // sale del CSS del plugin y el estado del propio runtime. Aceptar uno y
+        // no usarlo engañaría. Se nombra el que venía.
+        if (in_array($normalized['behavior'], ['cuadrantes', 'pestanas', 'marquesina'], true) && count($normalized) > 1) {
+            $recibidos = array_values(array_diff(array_keys($normalized), ['behavior']));
+            return new WP_Error('cod_mcp_interaction_rule_invalid', $normalized['behavior'] . ' no admite threshold, targetId, toggleClass, mode, visible ni visibleMobile (se recibió: ' . implode(', ', $recibidos) . ').');
         }
         return $normalized;
     }
@@ -2858,6 +2898,20 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 $hijos = is_array($node['children'] ?? null) ? count($node['children']) : 0;
                 if ($hijos < 2 || $hijos > 8) {
                     return new WP_Error('cod_mcp_pestanas_children_invalid', 'pestanas exige un group con 2 a 8 hijos (uno por pestaña: su primer hijo es la etiqueta y el resto el panel); este tiene ' . $hijos . '.');
+                }
+            } elseif ($interaction['behavior'] === 'marquesina') {
+                // Una fila que se desplaza sola: cada hijo del group es una
+                // pieza. Con una sola no hay fila que desplazar; con más de 24
+                // el navegador duplica un DOM que ya no se lee como una cinta.
+                // El único atributo que se emite es el data-cod-behavior que ya
+                // se puso arriba: la pista, la copia del juego y el resto de los
+                // atributos los arma el runtime.
+                if ($node['kind'] !== 'group') {
+                    return new WP_Error('cod_mcp_marquesina_target_invalid', 'marquesina sólo puede aplicarse a un nodo group.');
+                }
+                $hijos = is_array($node['children'] ?? null) ? count($node['children']) : 0;
+                if ($hijos < 2 || $hijos > 24) {
+                    return new WP_Error('cod_mcp_marquesina_children_invalid', 'marquesina exige un group con 2 a 24 hijos (uno por pieza de la fila); este tiene ' . $hijos . '.');
                 }
             }
         }

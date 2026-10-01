@@ -5,6 +5,69 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.39 — 30 de septiembre de 2026
+
+### Agregado
+
+- **«marquesina»: una fila que se desplaza sola, en bucle y sin controles.**
+  Hasta acá, una franja de logos que corre de lado a lado (los sellos de
+  certificación de una landing, una cinta de marcas) había que armarla con una
+  librería externa o con código pegado a mano. Ahora es una conducta del plugin:
+  se declara una regla `interaction` con `behavior: "marquesina"` sobre un grupo
+  de 2 a 24 hijos, y cada hijo pasa a ser una pieza de la fila.
+
+  ```json
+  { "id": "logos", "kind": "interaction", "value": { "behavior": "marquesina" } }
+  ```
+
+  Cuántas piezas se ven a la vez, el espacio entre ellas y la velocidad **no son
+  parámetros de la regla**: se escriben con una regla `properties` sobre el
+  grupo, que ya admite `scope.breakpoint`, así que el número cambia por ancho
+  como cualquier otra regla y no hay un sistema de breakpoints aparte:
+
+  ```json
+  { "id": "logos-medidas", "kind": "properties",
+    "value": { "declarations": {
+      "--cod-marquesina-visibles": "4",
+      "--cod-marquesina-separacion": "60px",
+      "--cod-marquesina-duracion-pieza": "8s" } } }
+  ```
+
+  Sin ellas, la fila muestra cuatro piezas, sin separación, a ocho segundos por
+  pieza: un desplazamiento lento y continuo, que es lo que hace hoy econut.cl
+  (medido: `speed: 8000`, 4 piezas desde 1024px, 60px entre ellas).
+
+  El nodo puede dirigir reglas a las dos partes de la fila, `pista` (lo que se
+  mueve) y `pieza` (cada elemento), con el campo `partes` de siempre. Si hay
+  menos piezas que las que caben a la vez, el juego se repite solo hasta llenar
+  el ancho. Las copias que cierran el bucle no estorban: no llevan ids, quedan
+  fuera de lo que leen los lectores de pantalla y no reciben el foco del
+  teclado.
+
+  **Por qué sin librerías:** el mecanismo es CSS puro (`@keyframes` y
+  `translateX(-50%)` sobre un juego de piezas duplicado), así el plugin no
+  depende de un tercero para una fila que se mueve y no hay JavaScript
+  trabajando en cada cuadro.
+
+  **Movimiento reducido:** con `prefers-reduced-motion: reduce` la fila se
+  detiene y las piezas quedan quietas y a la vista, en filas que envuelven, sin
+  copias. Nada queda escondido fuera del ancho.
+
+  Dentro del editor no se ejecuta: allí las piezas se ven apiladas y editables,
+  igual que pestañas y cuadrantes.
+
+### Corregido
+
+- **Un parámetro inventado en una regla `interaction` se rechaza diciendo cuál
+  es.** Antes, escribir una clave que ninguna interacción conoce (por ejemplo
+  `velocidad`) devolvía «`interaction.behavior` no es un comportamiento
+  disponible», que mandaba a revisar el nombre del behavior cuando el problema
+  era otra cosa. Ahora el error nombra la clave y lista las que existen. Lo
+  mismo para los behaviors que no admiten parámetros (`cuadrantes`, `pestanas`
+  y `marquesina`): el mensaje dice cuál se recibió.
+
+---
+
 ## 0.3.38 — 30 de septiembre de 2026
 
 ### Corregido

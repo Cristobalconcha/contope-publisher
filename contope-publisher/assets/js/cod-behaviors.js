@@ -227,6 +227,7 @@
   var BEHAVIOR_PREFERENCIAS_COOKIES = 'preferencias-cookies';
   var BEHAVIOR_CUADRANTES = 'cuadrantes';
   var BEHAVIOR_PESTANAS = 'pestanas';
+  var BEHAVIOR_MARQUESINA = 'marquesina';
   var ATTR_CHART_TYPE = 'data-cod-chart-type';
   var ATTR_CHART_DATA = 'data-cod-chart-data';
   var ATTR_CHART_COLOR = 'data-cod-chart-color';
@@ -327,6 +328,11 @@
   BEHAVIORS[BEHAVIOR_PESTANAS] = {
     name: BEHAVIOR_PESTANAS,
     description: 'Juego de pestañas sobre un grupo con 2 a 8 hijos: cada hijo es una pestaña, su primer hijo es la etiqueta y el resto es el panel. Al cargar queda activa la primera; al pinchar una etiqueta se muestra su panel y se ocultan los demás, con el alto del bloque viajando del valor viejo al nuevo. Las etiquetas pasan a ser botones reales (role="tab" dentro de un role="tablist"; flechas izquierda y derecha, Inicio y Fin) y cada hijo pasa a ser un role="tabpanel". Emite data-cod-pestanas-* para que la composición estile activa e inactiva; respeta prefers-reduced-motion. No se ejecuta dentro del editor: allí el bloque se ve apilado y editable, con todos los paneles a la vista.',
+  };
+
+  BEHAVIORS[BEHAVIOR_MARQUESINA] = {
+    name: BEHAVIOR_MARQUESINA,
+    description: 'Fila de piezas que se desplaza sola de derecha a izquierda, en bucle continuo y sin controles, sobre un grupo con 2 a 24 hijos (logos, sellos, una frase de cinta). Sin librerías: el runtime mete las piezas en una pista y agrega una copia del juego (aria-hidden, inerte, sin ids) y el movimiento es CSS puro (@keyframes y translateX(-50%)). Cuántas piezas se ven a la vez, la separación y la velocidad salen de variables (--cod-marquesina-visibles, --cod-marquesina-separacion, --cod-marquesina-duracion-pieza). Con prefers-reduced-motion: reduce se detiene y las piezas quedan quietas y a la vista. No se ejecuta dentro del editor: allí las piezas se ven apiladas y editables, sin copias.',
   };
 
   function isAllowedBehavior(name) {
@@ -567,6 +573,7 @@
     }
     if (behaviorName === BEHAVIOR_CUADRANTES) return { behavior: BEHAVIOR_CUADRANTES };
     if (behaviorName === BEHAVIOR_PESTANAS) return { behavior: BEHAVIOR_PESTANAS };
+    if (behaviorName === BEHAVIOR_MARQUESINA) return { behavior: BEHAVIOR_MARQUESINA };
     return {
       behavior: BEHAVIOR_REVEAL_ON_SCROLL,
       revealClass: parseClass(after[ATTR_REVEAL_CLASS], opts.revealClass),
@@ -1597,6 +1604,174 @@
     }
   }
 
+  // marquesina: una fila de piezas que se desplaza sola, de derecha a izquierda,
+  // en bucle continuo y sin controles. Cada hijo del grupo es una pieza (un
+  // logo, un sello, una frase). El caso que la pide: los logos de certificación
+  // de la landing de Econut.
+  //
+  // MEDIDO EN ECONUT.CL (viewport 1440x900). Es un Swiper dentro de un módulo de
+  // código de Divi, con loop:true, autoplay.delay:0 y speed:8000: un
+  // desplazamiento continuo y lento, no de paso en paso; cuatro piezas a la vez
+  // desde 1024px, dos entre 480 y 1023px, una en 320px; 60px de separación.
+  // De ahí salen los valores por omisión de acá (ocho segundos por pieza).
+  //
+  // SIN LIBRERÍAS. El plugin no depende de Swiper ni de nadie para esto. El
+  // mecanismo es CSS puro (ver marquesina_css en el plugin): la pista lleva el
+  // juego de piezas dos veces y una animación de @keyframes la desplaza
+  // translateX(-50%), que es la forma estándar de un bucle sin salto visible y
+  // sin JavaScript por cuadro. Este runtime sólo arma la estructura:
+  //   1) mete las piezas en una pista (data-cod-marquesina-rol="pista");
+  //   2) agrega las copias que cierran el bucle (data-cod-marquesina-copia,
+  //      aria-hidden, inertes y sin ids, para que nada se duplique ni se repita
+  //      para quien lee la página con un lector de pantalla o con el teclado);
+  //   3) cuenta cuántas piezas hay en media pista y lo deja en
+  //      --cod-marquesina-piezas, de donde el CSS saca la duración (así la
+  //      velocidad por pieza no cambia aunque haya más o menos).
+  //
+  // CUÁNTAS COPIAS. Para que el bucle cierre sin hueco, media pista tiene que
+  // medir al menos lo que el contenedor. Cada pieza mide 1/visibles del ancho,
+  // así que basta con que media pista tenga `visibles` piezas o más. Con pocas
+  // piezas (dos logos y cuatro a la vez) el juego se repite las veces que
+  // haga falta. `visibles` es --cod-marquesina-visibles, que el sitio escribe
+  // con una regla properties (y que cambia por ancho con el scope.breakpoint de
+  // esa regla); al cambiar el tamaño de la ventana se recalcula, y sólo si el
+  // resultado cambió se rehacen las copias.
+  //
+  // ATRIBUTOS QUE EMITE (el contrato para componer sin tocar el runtime):
+  //   raíz:   data-cod-marquesina-listo="1"; style --cod-marquesina-piezas
+  //   pista:  data-cod-marquesina-rol="pista"
+  //   pieza:  data-cod-marquesina-rol="pieza" (los hijos originales y las copias);
+  //           las copias además data-cod-marquesina-copia="1" y aria-hidden="true"
+  //
+  // ESTRUCTURA QUE ESPERA. La raíz (data-cod-behavior="marquesina") tiene de 2 a
+  // 24 hijos. Si no calza, no toca nada y las piezas quedan apiladas.
+  //
+  // No se monta dentro del editor: allí las piezas deben verse apiladas y
+  // editables, sin copias que tocar por error (ver installMarquesinaRuntime).
+  function montarMarquesina(root, doc) {
+    if (root.getAttribute('data-cod-marquesina-listo') === '1') return null;
+
+    var hijos = Array.prototype.slice.call(root.children);
+    if (hijos.length < 2 || hijos.length > 24) return null;
+
+    var win = doc.defaultView || window;
+    var deshacer = [];
+    var VISIBLES_POR_OMISION = 4;
+    var MAXIMO_DE_PIEZAS = 240; // techo de seguridad: nunca se duplica más que esto
+    var copias = [];
+    var juegos = 0; // cuántos juegos completos hay en la pista (el original cuenta)
+
+    // Marca un atributo estático y recuerda cómo estaba para poder deshacerlo.
+    function marcar(elemento, nombre, valor) {
+      var antes = elemento.getAttribute(nombre);
+      elemento.setAttribute(nombre, valor);
+      deshacer.push(function () {
+        if (antes === null) elemento.removeAttribute(nombre);
+        else elemento.setAttribute(nombre, antes);
+      });
+    }
+
+    // 1) La pista, al principio del grupo, con los hijos adentro (en su orden).
+    var pista = doc.createElement('div');
+    pista.className = 'cod-marquesina__pista';
+    pista.setAttribute('data-cod-marquesina-rol', 'pista');
+    root.insertBefore(pista, hijos[0]);
+    hijos.forEach(function (hijo) {
+      pista.appendChild(hijo);
+      hijo.classList.add('cod-marquesina__pieza');
+      marcar(hijo, 'data-cod-marquesina-rol', 'pieza');
+    });
+    deshacer.push(function () {
+      // Las piezas vuelven a ser hijos directos de la raíz, en su orden.
+      hijos.forEach(function (hijo) {
+        hijo.classList.remove('cod-marquesina__pieza');
+        root.insertBefore(hijo, pista);
+      });
+      if (pista.parentNode) pista.parentNode.removeChild(pista);
+    });
+
+    // Una copia no es contenido: sin ids (no se repiten), fuera del árbol de
+    // accesibilidad y fuera del recorrido del teclado.
+    function copiaDe(original) {
+      var copia = original.cloneNode(true);
+      copia.removeAttribute('id');
+      Array.prototype.forEach.call(copia.querySelectorAll('[id]'), function (e) { e.removeAttribute('id'); });
+      copia.setAttribute('aria-hidden', 'true');
+      copia.setAttribute('inert', '');
+      copia.setAttribute('data-cod-marquesina-copia', '1');
+      return copia;
+    }
+
+    function visibles() {
+      var crudo = '';
+      try { crudo = win.getComputedStyle(root).getPropertyValue('--cod-marquesina-visibles'); } catch (e) { /* se usa el valor por omisión */ }
+      var n = parseFloat(crudo);
+      return n > 0 ? n : VISIBLES_POR_OMISION;
+    }
+
+    // 2) Las copias: 2r juegos en total (r en cada mitad), con r lo bastante
+    // grande para que media pista llene el ancho.
+    function armar() {
+      var porMitad = Math.max(1, Math.ceil(visibles() / hijos.length));
+      while (porMitad > 1 && porMitad * 2 * hijos.length > MAXIMO_DE_PIEZAS) porMitad -= 1;
+      var total = porMitad * 2;
+      if (total === juegos) return;
+      copias.forEach(function (c) { if (c.parentNode) c.parentNode.removeChild(c); });
+      copias = [];
+      for (var k = 1; k < total; k++) {
+        hijos.forEach(function (hijo) {
+          var copia = copiaDe(hijo);
+          pista.appendChild(copia);
+          copias.push(copia);
+        });
+      }
+      juegos = total;
+      root.style.setProperty('--cod-marquesina-piezas', String(porMitad * hijos.length));
+    }
+    deshacer.push(function () {
+      copias.forEach(function (c) { if (c.parentNode) c.parentNode.removeChild(c); });
+      copias = [];
+      root.style.removeProperty('--cod-marquesina-piezas');
+      if (root.getAttribute('style') === '') root.removeAttribute('style');
+    });
+
+    // 3) Al cambiar el tamaño pueden cambiar las piezas visibles (una regla
+    // por breakpoint): se recalcula, con un respiro para no rehacer en cada píxel.
+    var temporizador = null;
+    function alCambiarTamano() {
+      if (temporizador) win.clearTimeout(temporizador);
+      temporizador = win.setTimeout(function () { temporizador = null; armar(); }, 150);
+    }
+    win.addEventListener('resize', alCambiarTamano, { passive: true });
+    deshacer.push(function () {
+      win.removeEventListener('resize', alCambiarTamano);
+      if (temporizador) { win.clearTimeout(temporizador); temporizador = null; }
+    });
+
+    root.classList.add('cod-marquesina');
+    armar();
+    marcar(root, 'data-cod-marquesina-listo', '1');
+    deshacer.push(function () { root.classList.remove('cod-marquesina'); });
+
+    return function destruir() {
+      while (deshacer.length) deshacer.pop()();
+    };
+  }
+
+  // marquesina: monta la fila sobre cada nodo declarado. Se salta en la vista
+  // previa del editor (editorPreview): ahí las piezas deben seguir apiladas y
+  // editables, sin copias. Ver montarMarquesina.
+  function installMarquesinaRuntime(win, doc, opts, cleanups) {
+    if (opts.editorPreview) return;
+    var roots = doc.querySelectorAll('[data-cod-behavior="marquesina"]');
+    for (var i = 0; i < roots.length; i++) {
+      var declared = roots[i].getAttribute(ATTR_BEHAVIOR);
+      if (!isAllowedBehavior(declared) || declared !== BEHAVIOR_MARQUESINA) continue;
+      var destruir = montarMarquesina(roots[i], doc);
+      if (destruir) cleanups.push(destruir);
+    }
+  }
+
   // parcel-map: los datos de cada lote son atributos en el propio elemento
   // (data-cod-parcel-estado / data-cod-parcel-valor), no JSON en el root.
   function installParcelMapRuntime(win, doc, opts, cleanups) {
@@ -2355,6 +2530,7 @@
     installChartRuntime(win, doc, opts, cleanups);
     installCuadrantesRuntime(win, doc, opts, cleanups);
     installPestanasRuntime(win, doc, opts, cleanups);
+    installMarquesinaRuntime(win, doc, opts, cleanups);
     return function destroy() { while (cleanups.length) cleanups.pop()(); };
   }
 
