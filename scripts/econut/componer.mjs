@@ -162,7 +162,7 @@ R('s-portada', 'surface', { backgroundColor: BLANCO, foregroundColor: TEXTO,
 // no depende de una altura fija.
 R('portada-lienzo', 'properties', { declarations: {
   display: 'grid', 'grid-template-columns': 'minmax(0, 1fr)', 'align-items': 'center', width: '100%',
-  'min-height': '760px',
+  'min-height': '773px',   // el alto exacto del hero del original
 } });
 // El panel blanco entra a sangre por la izquierda y llega hasta pasada la
 // mitad; el texto arranca adentro, no pegado al borde.
@@ -202,6 +202,10 @@ R('s-aviso', 'surface', { backgroundColor: AVISO, foregroundColor: TEXTO,
   backgroundSize: '7% auto', backgroundRepeat: 'no-repeat' });
 // El aviso casi no tiene aire propio en el original: 2px arriba y 1 abajo.
 R('aire-aviso', 'spacing', { paddingBlock: '2px', paddingInline: '24px' });
+// El hero va a sangre: en el original su sección tiene padding 0 y los
+// márgenes los ponen las piezas. Sin esto arrastra los 48x24 que el canvas da
+// por omisión a toda sección, y el panel blanco no llega al borde izquierdo.
+R('aire-cero', 'spacing', { paddingBlock: '0px', paddingInline: '0px' });
 // El aviso es UNA fila: icono angosto, el texto principal ancho, y las tres
 // recomendaciones en columnas angostas. Las proporciones salen de medir el
 // original a 1440: icono ~100px, texto ~500px, las tres ~190px cada una.
@@ -301,8 +305,15 @@ R('cuadrantes-panel', 'properties', { declarations: {
 // --- Nodos -----------------------------------------------------------------
 let n = 0;
 const id = (p) => p + '-' + (++n);
-const H = (texto, nivel, reglas_) => ({ id: id('h'), kind: 'heading', ruleIds: reglas_, content: { text: texto, level: nivel } });
-const P = (texto, reglas_ = ['t-cuerpo']) => ({ id: id('p'), kind: 'paragraph', ruleIds: reglas_, content: { text: texto } });
+// TODOS los textos van sin margen propio: medido en el original, sus 41 textos
+// —títulos, párrafos y listas— tienen margen inferior 0, y el aire entre ellos
+// lo pone el contenedor. Acá cada texto traía entre 16 y 59px de margen, y esa
+// suma era buena parte de los 1300px que la página medía de más.
+R('texto-sin-margen', 'properties', { declarations: {
+  'margin-block-start': '0px', 'margin-block-end': '0px',
+} });
+const H = (texto, nivel, reglas_) => ({ id: id('h'), kind: 'heading', ruleIds: [...reglas_, 'texto-sin-margen'], content: { text: texto, level: nivel } });
+const P = (texto, reglas_ = ['t-cuerpo']) => ({ id: id('p'), kind: 'paragraph', ruleIds: [...reglas_, 'texto-sin-margen'], content: { text: texto } });
 const IMG = (url, alt, reglas_ = ['foto']) => ({ id: id('i'), kind: 'image', ruleIds: reglas_, content: { assetUrl: url, alt } });
 const G = (hijos, reglas_ = [], partes) => {
   const nodo = { id: id('g'), kind: 'group', ruleIds: reglas_, children: hijos };
@@ -353,7 +364,7 @@ nodes.push({
 //     costado): en el original la sección va a sangre y los márgenes los
 //     ponen las propias piezas, en porcentaje.
 nodes.push({
-  id: 'portada', marker: 'portada', kind: 'section', ruleIds: ['s-portada'],
+  id: 'portada', marker: 'portada', kind: 'section', ruleIds: ['aire-cero', 's-portada'],
   children: [G([
     G([
       H('Innovación y sostenibilidad en cada nuez', 4, ['t-rotulo', 'c-texto']),
@@ -401,7 +412,8 @@ nodes.push({
   id: 'historia', marker: 'historia', kind: 'section', ruleIds: ['aire', 's-blanco'],
   children: [G([G([
     G([
-      ...abre('Veinte años', 'Nuestra historia'),
+      // El original abre con el título solo: no lleva rótulo.
+      H('Nuestra historia', 2, ['t-seccion', 'c-naranja']),
       P('Nacimos como una pequeña empresa familiar y ahora somos el proveedor líder de servicios de procesamiento de nueces para la exportación en el país.'),
       P('Nuestras plantas de proceso están ubicadas en el corazón de la mayor área productiva de nueces en Chile, lo que nos permite apoyar a los principales productores y exportadores del país.'),
       P('Estamos certificados en los protocolos sanitarios, éticos y de calidad más importantes, con una profunda comprensión de los estándares internacionales.'),
