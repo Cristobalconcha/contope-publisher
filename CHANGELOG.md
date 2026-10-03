@@ -5,6 +5,46 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.44 — 3 de octubre de 2026
+
+### Agregado
+
+- **Enlaces a las redes sociales de la empresa, con el nombre de usuario a la
+  vista.** Hay una pieza nueva, `social`, que dibuja el logotipo de una red
+  (Instagram, Facebook, LinkedIn, YouTube, TikTok, X, Threads o Pinterest) como un
+  enlace a la cuenta. Si se le da el nombre de usuario (por ejemplo
+  `@econutchile.oficial`), éste se escribe junto al logotipo; si no, va sólo el
+  logotipo.
+
+  Para qué sirve, con el caso que la pidió: Econut tiene en su portada una franja
+  enorme que avisa que hay estafadores vendiendo nueces a nombre de la empresa, y
+  llegó gente a la planta a buscar productos que había pagado por internet. Pero
+  el sitio no tenía ni un enlace a sus redes: advertía que existen cuentas falsas
+  y no daba forma de saber cuál es la verdadera. Los enlaces oficiales son la
+  herramienta con la que una persona comprueba que está hablando con la empresa de
+  verdad, y por eso esto no es decoración.
+
+- **El nombre de usuario es texto, no una imagen.** Se puede seleccionar, copiar,
+  buscar con la página y lo lee un lector de pantalla. Así quien recibió un
+  mensaje de una cuenta que dice ser la empresa puede comparar el nombre letra por
+  letra con el que muestra el sitio. No admite caracteres invisibles ni marcas de
+  escritura inversa, que es justamente lo que usa una cuenta falsa para parecerse
+  a la verdadera.
+
+- **El enlace tiene que ser de la red que dice ser.** No basta con que sea
+  `https://`: un enlace marcado como Instagram que lleva a otro sitio se rechaza,
+  y el aviso dice a qué dominio apuntaba. Tampoco se aceptan `javascript:`,
+  `data:`, direcciones sin cifrar, con usuario antes de la arroba ni con puerto.
+  Una red que no está en la lista se rechaza nombrándola.
+
+- Los logotipos son las siluetas oficiales, de un solo color y sin alterar,
+  tomadas del bloque «Enlaces a redes sociales» del propio WordPress. Son marcas
+  registradas de sus dueños y están aquí sólo para señalar la cuenta de quien las
+  pone en su sitio. El tamaño, el relleno, los colores y el redondeo se ajustan
+  igual que en el botón de WhatsApp.
+
+---
+
 ## 0.3.43 — 3 de octubre de 2026
 
 ### Agregado
