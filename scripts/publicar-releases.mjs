@@ -74,7 +74,13 @@ const commitDe = (version) => {
  * el asunto del commit, quitándole el número de versión que ya va delante.
  */
 const tituloDe = (cuerpo, commit) => {
-  const m = cuerpo.match(/^- \*\*(.+?)\*\*/m);
+  // El `s` importa: un titular en negrita puede ocupar dos líneas, porque el
+  // registro va envuelto a 79 columnas. Sin él, el punto no cruza el salto de
+  // línea, esta primera entrada no calzaba y el guion se iba en silencio a la
+  // siguiente negrita que cupiera en una línea —que es cualquier otra cosa—.
+  // La 0.3.48 salió así titulada «Sin gestor de consentimiento, el sitio queda
+  // como estaba», que es una nota al pie de la versión, no lo que cambió.
+  const m = cuerpo.match(/^- \*\*([\s\S]+?)\*\*/m);
   if (m) return m[1].replace(/\s+/g, ' ').replace(/[.:]$/, '').slice(0, 70);
   if (!commit) return '';
   const asunto = git('log', '--format=%s', '-1', commit);
