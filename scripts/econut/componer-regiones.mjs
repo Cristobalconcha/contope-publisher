@@ -19,6 +19,7 @@ const M = '/wp-content/uploads/2026/09/';
 const BLANCO = '#FFFFFF';
 const OSCURO = '#222222';
 const TEXTO = '#333333';
+const VERDE = '#2E594A';   // el verde de Econut, medido en el pie de econut.cl
 
 const f = {
   logoHorizontal: M + 'Logo-horizontal-@svg.svg',
@@ -51,13 +52,56 @@ const hacerReglas = () => {
     display: 'flex', 'justify-content': 'center', 'align-items': 'center', width: '100%',
   } });
   R('h-logo', 'properties', { declarations: { width: '164px', 'max-width': '164px' } });
+  // El botón de WhatsApp del encabezado, copiado del de Santa Luisa: una
+  // píldora con el logotipo y la palabra al lado. Medido allá: 34 de alto,
+  // radio 999, relleno 8 y 14, icono de 18, separación 8, texto en 11,5 con
+  // peso 700 y 0,69 de espaciado. Lo único que cambia es el color, que acá es
+  // el verde de Econut y no el oliva de Santa Luisa.
+  //
+  // El logo queda centrado en la barra y la píldora se va al extremo derecho
+  // sin empujarlo: por eso el contenedor reparte en tres y el botón vive en la
+  // tercera parte, alineado al final.
+  R('h-barra', 'properties', { declarations: {
+    display: 'grid', 'grid-template-columns': 'minmax(0, 1fr) auto minmax(0, 1fr)',
+    'align-items': 'center', width: '100%',
+  } });
+  R('h-wa-lado', 'properties', { declarations: {
+    display: 'flex', 'justify-content': 'flex-end', 'align-items': 'center',
+  } });
+  R('h-wa-pildora', 'properties', { declarations: {
+    display: 'inline-flex', 'align-items': 'center', gap: '8px',
+    'background-color': VERDE, 'border-radius': '999px',
+    'padding-top': '5px', 'padding-bottom': '5px',
+    'padding-left': '14px', 'padding-right': '14px',
+  } });
+  // Sin interlínea 1 y sin margen el párrafo inflaba la píldora a 50 de alto.
+  R('h-wa-texto', 'typography', { role: 'rotulo', fontSize: '11.5px', fontWeight: 700, letterSpacing: '0.69px', lineHeight: 1 });
+  R('h-wa-sin-margen', 'properties', { declarations: {
+    'margin-block-start': '0px', 'margin-block-end': '0px',
+  } });
+  R('h-wa-blanco', 'color', { role: 'rotulo', color: BLANCO, apply: 'text' });
 
   const nodes = [{
     id: 'encabezado', marker: 'encabezado', kind: 'header', ruleIds: ['h-aire', 'h-superficie'],
     children: [{
-      id: id('g'), kind: 'group', ruleIds: ['h-centrado'], children: [
-        { id: id('i'), kind: 'image', ruleIds: ['h-logo'],
-          content: { assetUrl: f.logoHorizontal, alt: 'Econut · procesos, productos, perspectiva' } },
+      id: id('g'), kind: 'group', ruleIds: ['h-barra'], children: [
+        { id: id('g'), kind: 'group', ruleIds: [], children: [] },
+        { id: id('g'), kind: 'group', ruleIds: ['h-centrado'], children: [
+          { id: id('i'), kind: 'image', ruleIds: ['h-logo'],
+            content: { assetUrl: f.logoHorizontal, alt: 'Econut · procesos, productos, perspectiva' } },
+        ] },
+        { id: id('g'), kind: 'group', ruleIds: ['h-wa-lado'], children: [
+          { id: id('g'), kind: 'group', ruleIds: ['h-wa-pildora'], children: [
+            { id: id('w'), kind: 'whatsapp', ruleIds: [], content: {
+              message: 'Hola, quiero más información sobre los servicios de Econut.',
+              ariaLabel: 'Escribir a Econut por WhatsApp',
+              // La primitiva no baja de 24, así que el dibujo de 18 que usa
+              // Santa Luisa se consigue con 24 menos 3 de relleno por lado.
+              size: 24, iconPadding: 3, iconColor: BLANCO, backgroundColor: 'transparent', borderRadius: '0px',
+            } },
+            { id: id('p'), kind: 'paragraph', ruleIds: ['h-wa-texto', 'h-wa-blanco', 'h-wa-sin-margen'], content: { text: 'WhatsApp' } },
+          ] },
+        ] },
       ],
     }],
   }];
