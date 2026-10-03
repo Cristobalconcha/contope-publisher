@@ -1151,7 +1151,23 @@ final class COD_Canvas_Editor_Admin
             wp_send_json_error(['message' => $css->get_error_message(), 'code' => $css->get_error_code()], 400);
         }
 
-        $entry = $this->custom_module_library->save($label, $category, $html, $css);
+        // El esquema de propiedades del supermódulo (pasos 3 y 4 de §2 de la
+        // arquitectura). Llega como JSON porque es una lista de objetos y
+        // `$_POST` con claves anidadas es más frágil de leer que un decode.
+        //
+        // No se valida acá más allá de que sea una lista: la biblioteca lo
+        // cruza con el marcado, que es la única comprobación que de verdad
+        // sirve —una propiedad que no está marcada en el HTML no tiene dónde
+        // escribir— y hacerlo en dos sitios sería tener dos criterios.
+        $props = [];
+        if (isset($_POST['props'])) {
+            $decodificado = json_decode((string) wp_unslash($_POST['props']), true);
+            if (is_array($decodificado)) {
+                $props = $decodificado;
+            }
+        }
+
+        $entry = $this->custom_module_library->save($label, $category, $html, $css, $props);
 
         wp_send_json_success($entry);
     }
