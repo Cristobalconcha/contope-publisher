@@ -33,6 +33,7 @@ const AVISO = '#FFF6C1';
 const M = '/wp-content/uploads/2026/09/';
 const f = {
   logo: M + 'Logo-20.png',
+  fichaNCC: M + 'Ficha-T-de-Proceso-NCC-2022.pdf',   // la ficha técnica que enlaza el primer servicio
   logoHorizontal: M + 'Logo-horizontal-@svg.svg',
   iconoAlerta: M + 'Icono-alerta@2x.png',
   portadaFondo: M + 'portada-fondo.jpg',
@@ -426,12 +427,19 @@ nodes.push({
 });
 
 // 4 · Servicios
-const servicio = (url, alt, nombre, texto, puntos) => G([
+// El botón de cada servicio. En el original sólo el primero lleva enlace —a
+// la ficha técnica en PDF, que se abre en otra pestaña—; los otros dos tienen
+// el href vacío, o sea que no hacen nada. Acá los tres apuntaban a #contacto,
+// así que se había perdido la ficha y se había inventado un enlace donde no lo
+// hay. El destino de los otros dos queda pendiente de que lo decida Cristóbal:
+// copiar un botón que no hace nada no ayuda a nadie.
+const servicio = (url, alt, nombre, texto, puntos, enlace = '') => G([
   IMG(url, alt, ['foto-servicio', 'foto-servicio-tam']),
   H(nombre, 3, ['t-servicio', 'c-naranja']),
   P(texto),
   LI(puntos),
-  { id: id('b'), kind: 'button', ruleIds: ['boton', 'boton-fondo', 'boton-texto', 'pildora', 'al-fondo'], content: { label: 'Más Detalles', href: '#contacto', target: 'self' } },
+  { id: id('b'), kind: 'button', ruleIds: ['boton', 'boton-fondo', 'boton-texto', 'pildora', 'al-fondo'],
+    content: { label: 'Más Detalles', href: enlace || '#contacto', target: enlace ? 'blank' : 'self' } },
 ], ['columna', 'tarjeta-alta']);
 
 nodes.push({
@@ -449,7 +457,8 @@ nodes.push({
         // sale de lo que el propio sitio declara en «Control de calidad».
         ['Capacidad diaria aproximada de 70 toneladas de producto de Ingreso.',
          'Embalaje en sacos de 10 y 25 kilos y cajas de hasta 10 kilos.',
-         'Control de calidad acucioso en cada lote: color externo, calibre, condición de la cáscara y humedad.']),
+         'Control de calidad acucioso en cada lote: color externo, calibre, condición de la cáscara y humedad.'],
+        f.fichaNCC),
       servicio(f.manual, 'Partido y selección manual', 'Nuez sin Cáscara Manual',
         'Partido y selección manual de nueces por tamaño, color y calidad según estándares internacionales.',
         ['Capacidad diaria aproximada de 20 toneladas de producto en cáscara de ingreso.',
