@@ -2088,6 +2088,361 @@
         });
     }
 
+    // aviso: una ventana emergente que aparece sola al cargar la página, UNA vez
+    // por visitante, y se cierra con la X, con Escape o pinchando el fondo. El
+    // caso que la pide: estafadores vendiendo a nombre de una empresa; el sitio
+    // tenía una franja de media pantalla que sólo advertía, y hacía falta un aviso
+    // que además deje VERIFICAR (las cuentas oficiales enlazadas, adentro).
+    //
+    // El riesgo de un emergente es volverse más invasivo que lo que reemplaza.
+    // Por eso lo que lo hace aceptable es lo que más cuidado tiene acá:
+    //   - se cierra de tres maneras (la X, Escape, el fondo) y no vuelve (se
+    //     recuerda en el navegador; ver "una vez" abajo);
+    //   - NO bloquea la página: no se fija el scroll de atrás, y si este guion
+    //     no corre el contenido queda legible en el flujo normal (toda la CSS del
+    //     aviso cuelga de la clase .cod-aviso, que sólo pone este guion);
+    //   - es accesible de verdad: role="dialog" aria-modal="true" con nombre
+    //     (el primer título del aviso, o "Aviso"), el foco entra al panel al
+    //     abrir, el teclado no se sale mientras está abierto (Tab y Mayús+Tab dan
+    //     la vuelta) y el foco vuelve a donde estaba al cerrar.
+    //
+    // UNA VEZ POR VISITANTE. Se anota la hora en que se abrió en localStorage
+    // (con sessionStorage de respaldo); si el navegador bloquea el almacenamiento
+    // (navegación privada, cookies rechazadas) cada lectura y cada escritura va
+    // en try/catch y el aviso sigue funcionando: aparece, se puede cerrar, y
+    // vuelve en la visita siguiente porque no hay dónde recordarlo. Se anota al
+    // ABRIR y no al cerrar: «una vez» es una vez mostrado; si no, quien sigue uno
+    // de los enlaces a las cuentas oficiales (que es para lo que está) lo
+    // encontraría de nuevo al volver, sin haberlo cerrado.
+    //
+    // CADA CUÁNTO VUELVE y EL ANCHO MÁXIMO no son parámetros de la regla: vienen
+    // de las variables CSS --cod-aviso-vuelve-dias (por omisión 0: una sola vez y
+    // no vuelve) y --cod-aviso-ancho-maximo, que se escriben con una regla
+    // properties sobre el nodo (así valen por breakpoint como todo lo demás).
+    //
+    // REABRIR. Si el grupo tiene marcador (id), cualquier enlace a #<id> lo
+    // vuelve a abrir aunque ya se haya visto, y entrar con #<id> en la dirección
+    // también. Es lo que permite una línea permanente y discreta («cómo verificar
+    // nuestras cuentas») sin dejar una franja de media pantalla.
+    //
+    // ESTRUCTURA QUE ARMA. El grupo pasa a ser la capa fija; adentro, el runtime
+    // fabrica el velo (el fondo) y el panel (la ventana), mete en el panel un
+    // botón de cierre y le pasa los hijos originales del grupo. Nada se duplica
+    // ni se pierde: todo se deshace con la función que retorna.
+    //
+    // ATRIBUTOS QUE EMITE (el contrato para componer sin tocar el runtime):
+    //   raíz:   data-cod-aviso-listo="1", data-cod-aviso-estado="abierto|cerrado"
+    //   velo:   data-cod-aviso-rol="velo"   (aria-hidden)
+    //   panel:  data-cod-aviso-rol="panel"  (role="dialog" aria-modal="true")
+    //   cerrar: data-cod-aviso-rol="cerrar" (button, aria-label="Cerrar aviso")
+    //
+    // No se monta dentro del editor: allí el grupo debe verse apilado y editable
+    // (ver installAvisoRuntime).
+    var contadorAvisos = 0;
+    var SELECTOR_ENFOCABLES = 'a[href],button,input,select,textarea,summary,iframe,audio[controls],video[controls],[contenteditable=""],[contenteditable="true"],[tabindex]';
+
+    function montarAviso(root, doc) {
+        if (root.getAttribute('data-cod-aviso-listo') === '1') return null;
+
+        var hijos = Array.prototype.slice.call(root.children);
+        if (hijos.length < 1) return null;
+
+        contadorAvisos += 1;
+        var numero = contadorAvisos;
+        var win = doc.defaultView || window;
+        var deshacer = [];
+        var abierto = false;
+        var previo = null;
+        var forzandoFoco = false;
+        var inicioEnFondo = null;
+
+        // Marca un atributo estático y recuerda cómo estaba para poder deshacerlo.
+        function marcar(elemento, nombre, valor) {
+            var antes = elemento.getAttribute(nombre);
+            elemento.setAttribute(nombre, valor);
+            deshacer.push(function () {
+                if (antes === null) elemento.removeAttribute(nombre);
+                else elemento.setAttribute(nombre, antes);
+            });
+        }
+
+        // 1) Las tres partes que fabrica el runtime.
+        var velo = doc.createElement('div');
+        velo.className = 'cod-aviso__velo';
+        velo.setAttribute('data-cod-aviso-rol', 'velo');
+        velo.setAttribute('aria-hidden', 'true');
+
+        var panel = doc.createElement('div');
+        panel.className = 'cod-aviso__panel';
+        panel.setAttribute('data-cod-aviso-rol', 'panel');
+        panel.setAttribute('role', 'dialog');
+        panel.setAttribute('aria-modal', 'true');
+        panel.setAttribute('tabindex', '-1');
+
+        var cerrarBoton = doc.createElement('button');
+        cerrarBoton.type = 'button';
+        cerrarBoton.className = 'cod-aviso__cerrar';
+        cerrarBoton.setAttribute('data-cod-aviso-rol', 'cerrar');
+        cerrarBoton.setAttribute('aria-label', 'Cerrar aviso');
+        // La X es un SVG con trazo currentColor: toma el color del botón y no
+        // trae ningún color propio. Se fabrica con createElementNS, no con
+        // innerHTML, para no interpretar texto como marcado.
+        var ns = 'http://www.w3.org/2000/svg';
+        var equis = doc.createElementNS(ns, 'svg');
+        equis.setAttribute('viewBox', '0 0 24 24');
+        equis.setAttribute('aria-hidden', 'true');
+        equis.setAttribute('focusable', 'false');
+        var trazo = doc.createElementNS(ns, 'path');
+        trazo.setAttribute('d', 'M5 5L19 19M19 5L5 19');
+        trazo.setAttribute('fill', 'none');
+        trazo.setAttribute('stroke', 'currentColor');
+        trazo.setAttribute('stroke-width', '2');
+        trazo.setAttribute('stroke-linecap', 'round');
+        equis.appendChild(trazo);
+        cerrarBoton.appendChild(equis);
+
+        // El nombre de la ventana: su primer título; si no hay, "Aviso".
+        var titulo = null;
+        for (var i = 0; i < hijos.length && !titulo; i++) {
+            var tag = String(hijos[i].tagName || '').toLowerCase();
+            titulo = /^h[1-6]$/.test(tag) ? hijos[i] : (hijos[i].querySelector ? hijos[i].querySelector('h1,h2,h3,h4,h5,h6') : null);
+        }
+        if (titulo) {
+            var idTitulo = titulo.getAttribute('id');
+            if (!idTitulo) {
+                idTitulo = 'cod-aviso-' + numero + '-titulo';
+                marcar(titulo, 'id', idTitulo);
+            }
+            panel.setAttribute('aria-labelledby', idTitulo);
+        } else {
+            panel.setAttribute('aria-label', 'Aviso');
+        }
+
+        // 2) Armar: el botón primero en el panel, después los hijos originales.
+        panel.appendChild(cerrarBoton);
+        hijos.forEach(function (hijo) { panel.appendChild(hijo); });
+        root.appendChild(velo);
+        root.appendChild(panel);
+        deshacer.push(function () {
+            // Los hijos vuelven al grupo, en su orden original.
+            hijos.forEach(function (hijo) { root.appendChild(hijo); });
+            if (velo.parentNode) velo.parentNode.removeChild(velo);
+            if (panel.parentNode) panel.parentNode.removeChild(panel);
+        });
+
+        // 3) Una vez por visitante. Cada acceso al almacenamiento puede lanzar
+        // (SecurityError en navegación privada o con cookies rechazadas, o incluso
+        // sólo al LEER window.localStorage): todo va en try/catch y un fallo se
+        // trata como «no hay memoria», nunca como un error del aviso.
+        var clave = 'cod-aviso:' + (root.getAttribute('data-cod-node') || root.getAttribute('id') || String(numero));
+
+        function leerVisto() {
+            var visto = null;
+            ['localStorage', 'sessionStorage'].forEach(function (nombre) {
+                try {
+                    var n = parseInt(win[nombre].getItem(clave), 10);
+                    if (isFinite(n) && (visto === null || n > visto)) visto = n;
+                } catch (e) { /* sin almacenamiento: es como no haberlo visto */ }
+            });
+            return visto;
+        }
+
+        function recordarVisto() {
+            var ahora = String(Date.now());
+            try {
+                win.localStorage.setItem(clave, ahora);
+            } catch (e) {
+                try { win.sessionStorage.setItem(clave, ahora); } catch (e2) { /* sin dónde recordar */ }
+            }
+        }
+
+        // Cada cuántos días vuelve. 0 (o nada, o algo que no es un número): una
+        // sola vez. Sale de la variable CSS, que puede variar por ancho.
+        function diasParaVolver() {
+            var crudo = '';
+            try { crudo = win.getComputedStyle(root).getPropertyValue('--cod-aviso-vuelve-dias'); } catch (e) { /* se usa el valor por omisión */ }
+            var dias = parseFloat(crudo);
+            if (!isFinite(dias) || dias <= 0) return 0;
+            return Math.min(dias, 3650);
+        }
+
+        function debeAparecer() {
+            var visto = leerVisto();
+            if (visto === null) return true;
+            var dias = diasParaVolver();
+            if (dias <= 0) return false;
+            var ahora = Date.now();
+            // Un reloj corrido hacia atrás no debe silenciarlo para siempre.
+            if (visto > ahora) return false;
+            return ahora - visto >= dias * 86400000;
+        }
+
+        // 4) Foco: adentro mientras está abierto, y de vuelta al cerrar.
+        function enfocables() {
+            var candidatos = panel.querySelectorAll(SELECTOR_ENFOCABLES);
+            var lista = [];
+            for (var k = 0; k < candidatos.length; k++) {
+                var el = candidatos[k];
+                if (el.tabIndex < 0 || el.disabled) continue;
+                if (el.tagName === 'INPUT' && el.type === 'hidden') continue;
+                if (!(el.offsetWidth || el.offsetHeight || el.getClientRects().length)) continue;
+                var visibilidad = '';
+                try { visibilidad = win.getComputedStyle(el).visibility; } catch (e) { /* se da por visible */ }
+                if (visibilidad === 'hidden') continue;
+                lista.push(el);
+            }
+            return lista;
+        }
+
+        function enfocar(elemento) {
+            try { elemento.focus({ preventScroll: true }); } catch (e) { elemento.focus(); }
+        }
+
+        function alTeclado(evento) {
+            if (!abierto) return;
+            var tecla = evento.key;
+            if (tecla === 'Escape' || tecla === 'Esc') {
+                evento.preventDefault();
+                cerrar();
+                return;
+            }
+            if (tecla !== 'Tab' || evento.altKey || evento.ctrlKey || evento.metaKey) return;
+            var lista = enfocables();
+            if (!lista.length) {
+                evento.preventDefault();
+                enfocar(panel);
+                return;
+            }
+            var primero = lista[0];
+            var ultimo = lista[lista.length - 1];
+            var activo = doc.activeElement;
+            var dentro = activo && panel.contains(activo);
+            if (evento.shiftKey) {
+                if (!dentro || activo === panel || activo === primero) {
+                    evento.preventDefault();
+                    enfocar(ultimo);
+                }
+            } else if (!dentro || activo === ultimo) {
+                evento.preventDefault();
+                enfocar(primero);
+            }
+        }
+
+        // Si el foco llega a algún sitio fuera del aviso (un clic en el navegador,
+        // un script ajeno), se trae de vuelta. La bandera evita que dos guiones que
+        // atrapan el foco se pasen la pelota sin fin.
+        function alEnfocar(evento) {
+            if (!abierto || forzandoFoco) return;
+            if (evento.target && root.contains(evento.target)) return;
+            forzandoFoco = true;
+            try { enfocar(panel); } finally { forzandoFoco = false; }
+        }
+
+        function devolverFoco() {
+            var destino = previo;
+            previo = null;
+            if (!destino || destino === doc.body || destino === doc.documentElement) return;
+            if (typeof destino.focus !== 'function' || !doc.documentElement.contains(destino)) return;
+            enfocar(destino);
+        }
+
+        // 5) Abrir y cerrar.
+        function estaPedidoPorLaUrl() {
+            var nombre = root.getAttribute('id');
+            return !!nombre && String((win.location && win.location.hash) || '').replace(/^#/, '') === nombre;
+        }
+
+        function abrir() {
+            if (abierto) return;
+            abierto = true;
+            var activo = doc.activeElement;
+            previo = activo && !root.contains(activo) ? activo : null;
+            root.setAttribute('data-cod-aviso-estado', 'abierto');
+            recordarVisto();
+            doc.addEventListener('keydown', alTeclado, true);
+            doc.addEventListener('focusin', alEnfocar, true);
+            enfocar(panel);
+        }
+
+        function cerrar() {
+            if (!abierto) return;
+            abierto = false;
+            root.setAttribute('data-cod-aviso-estado', 'cerrado');
+            doc.removeEventListener('keydown', alTeclado, true);
+            doc.removeEventListener('focusin', alEnfocar, true);
+            // Si se llegó por la dirección, se limpia al cerrar: recargar no debe
+            // reabrir lo que la persona acaba de cerrar. Por replaceState y no por
+            // location.hash = '', que deja un '#' colgando y hace saltar la página.
+            if (estaPedidoPorLaUrl() && win.history && win.history.replaceState) {
+                try { win.history.replaceState(null, '', win.location.pathname + win.location.search); } catch (e) { /* no se limpia la dirección */ }
+            }
+            devolverFoco();
+        }
+
+        cerrarBoton.addEventListener('click', cerrar);
+
+        // Pinchar el fondo cierra. Se exige que el gesto HAYA EMPEZADO en el fondo:
+        // arrastrar para seleccionar texto del panel y soltar fuera genera un clic
+        // sobre la capa, y eso no es pedir que se cierre.
+        function alPresionar(evento) {
+            inicioEnFondo = evento.target === root || evento.target === velo;
+        }
+        function alPinchar(evento) {
+            var empezoAhi = inicioEnFondo === null ? true : inicioEnFondo;
+            inicioEnFondo = null;
+            if (empezoAhi && (evento.target === root || evento.target === velo)) cerrar();
+        }
+        root.addEventListener('pointerdown', alPresionar);
+        root.addEventListener('click', alPinchar);
+
+        // Reabrir: un enlace a #<id> del grupo, o la dirección con ese #.
+        function alPincharEnlace(evento) {
+            var nombre = root.getAttribute('id');
+            if (!nombre || !evento.target || typeof evento.target.closest !== 'function') return;
+            var enlace = evento.target.closest('a[href]');
+            if (!enlace || root.contains(enlace) || enlace.hash !== '#' + nombre) return;
+            if (enlace.pathname !== win.location.pathname || enlace.host !== win.location.host) return;
+            evento.preventDefault();
+            abrir();
+        }
+        function alCambiarHash() { if (estaPedidoPorLaUrl()) abrir(); }
+        doc.addEventListener('click', alPincharEnlace);
+        win.addEventListener('hashchange', alCambiarHash);
+
+        deshacer.push(function () {
+            cerrarBoton.removeEventListener('click', cerrar);
+            root.removeEventListener('pointerdown', alPresionar);
+            root.removeEventListener('click', alPinchar);
+            doc.removeEventListener('click', alPincharEnlace);
+            win.removeEventListener('hashchange', alCambiarHash);
+            doc.removeEventListener('keydown', alTeclado, true);
+            doc.removeEventListener('focusin', alEnfocar, true);
+            abierto = false;
+        });
+
+        root.classList.add('cod-aviso');
+        root.setAttribute('data-cod-aviso-estado', 'cerrado');
+        marcar(root, 'data-cod-aviso-listo', '1');
+        deshacer.push(function () {
+            root.classList.remove('cod-aviso');
+            root.removeAttribute('data-cod-aviso-estado');
+        });
+
+        if (estaPedidoPorLaUrl() || debeAparecer()) abrir();
+
+        return function destruir() {
+            while (deshacer.length) deshacer.pop()();
+        };
+    }
+
+    // aviso: monta la ventana sobre cada nodo declarado. Ver montarAviso (y
+    // installAvisoRuntime en cod-behaviors.js, que no la monta dentro del editor).
+    function installAviso(nodes) {
+        Array.prototype.forEach.call(nodes, function (root) {
+            montarAviso(root, document);
+        });
+    }
+
     function boot() {
         var roots = document.querySelectorAll('.cod-canvas-published');
         Array.prototype.forEach.call(roots, function (root) {
@@ -2112,6 +2467,7 @@
         var cuadrantesNodes = [];
         var pestanasNodes = [];
         var marquesinaNodes = [];
+        var avisoNodes = [];
         Array.prototype.forEach.call(behaviorNodes, function (node) {
             var behavior = node.getAttribute('data-cod-behavior');
             if (behavior === 'scroll-threshold') scrollNodes.push(node);
@@ -2130,6 +2486,7 @@
             else if (behavior === 'cuadrantes') cuadrantesNodes.push(node);
             else if (behavior === 'pestanas') pestanasNodes.push(node);
             else if (behavior === 'marquesina') marquesinaNodes.push(node);
+            else if (behavior === 'aviso') avisoNodes.push(node);
         });
         installHeroCollapse(heroCollapseNodes);
         installScrollThreshold(scrollNodes);
@@ -2147,6 +2504,7 @@
         installCuadrantes(cuadrantesNodes);
         installPestanas(pestanasNodes);
         installMarquesina(marquesinaNodes);
+        installAviso(avisoNodes);
 
         // Interacciones tipo Webflow (data-cod-interaction): el mismo motor que
         // corre en el iframe del editor (cod-interactions.js) se instala acá

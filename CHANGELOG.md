@@ -5,6 +5,93 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.46 — 3 de octubre de 2026
+
+### Agregado
+
+- **«aviso»: una ventana emergente que aparece una vez por visitante y se puede
+  cerrar.** Hasta acá no había forma de mostrar algo que no puede esperar a que
+  alguien lo busque: un aviso de seguridad, un cierre por vacaciones, un cambio
+  de dirección. Ahora es una conducta del plugin: se declara una regla
+  `interaction` con `behavior: "aviso"` sobre un grupo, y los hijos del grupo
+  pasan a ser el contenido de la ventana.
+
+  ```json
+  { "id": "aviso-estafas", "kind": "interaction", "value": { "behavior": "aviso" } }
+  ```
+
+  **Para qué se hizo:** hay estafadores vendiendo a nombre de una empresa y llegó
+  gente a la planta a buscar productos que había pagado por internet y que nunca
+  existieron. Una franja de advertencia de media pantalla cumplía su función pero
+  era invasiva, y además sólo advertía. El aviso es donde va el detalle que ya no
+  cabe en una línea, y lo importante: **no basta con advertir, tiene que permitir
+  verificar**. Dentro del aviso van las cuentas oficiales enlazadas (por ejemplo
+  con la pieza `social` de 0.3.44), para que la persona pueda comprobar en el
+  momento cuál es la verdadera.
+
+  **Cómo se comporta:**
+
+  - Aparece solo al cargar la página, **una vez por visitante**: el navegador
+    recuerda que ya lo vio. Al recargar o volver otro día no reaparece. Si se
+    quiere que vuelva cada cierto tiempo, se dice con `--cod-aviso-vuelve-dias`
+    (por omisión 0: una vez y no vuelve).
+  - **Se cierra de tres maneras**: con la X, con la tecla Escape y pinchando el
+    fondo. Es la parte que lo hace aceptable: un aviso difícil de cerrar o que
+    vuelve sin parar sería peor que la franja que reemplaza. Arrastrar el ratón
+    para seleccionar texto del aviso y soltar fuera no lo cierra por error.
+  - **No bloquea la página.** El desplazamiento de la página sigue libre. Y si el
+    JavaScript no corre, el contenido **no se esconde**: queda en su lugar, como
+    un bloque más, legible. Por eso el grupo conviene ponerlo al final de la
+    página (donde no estorba si el guion no corre), como nodo de primer nivel o
+    dentro de una sección sin movimiento: un ancestro con animación de entrada lo
+    escondería o lo desplazaría, porque la ventana es de posición fija.
+  - **Accesible de verdad**: `role="dialog"` y `aria-modal="true"`, con el título
+    del aviso como nombre; el foco entra a la ventana al abrir, no se sale de ella
+    con Tab ni con Mayús+Tab mientras está abierta, y al cerrar vuelve a donde
+    estaba. La X es un botón real de al menos 44 píxeles. Con movimiento reducido
+    (`prefers-reduced-motion`) aparece sin animar.
+  - **Si el navegador bloquea el almacenamiento** (navegación privada, cookies
+    rechazadas), no se rompe: el aviso aparece, se puede cerrar, y no hay dónde
+    recordarlo, así que vuelve a aparecer en la visita siguiente.
+  - **Reabrirlo.** Si el grupo lleva un marcador, cualquier enlace a `#marcador`
+    lo vuelve a abrir aunque ya se haya visto, y entrar a la página con
+    `#marcador` en la dirección también. Sirve para dejar una línea permanente y
+    discreta («cómo verificar nuestras cuentas») en lugar de una franja grande.
+  - Dentro del editor no se ejecuta: allí el grupo se ve apilado y editable, y
+    editar no gasta el «una vez» del visitante.
+
+  **Los parámetros no son de la regla**: se escriben con una regla `properties`
+  sobre el grupo, que admite `scope.breakpoint`:
+
+  ```json
+  { "id": "aviso-medidas", "kind": "properties",
+    "value": { "declarations": {
+      "--cod-aviso-vuelve-dias": "7",
+      "--cod-aviso-ancho-maximo": "36rem" } } }
+  ```
+
+  Sin ellas: una sola vez, y el panel mide 32rem como máximo. Un parámetro que no
+  existe en la regla (`dias`, `delay`, `ancho`…) se rechaza diciendo cuál es.
+
+  **Tres partes dirigibles** con el campo `partes` de siempre: `panel` (la
+  ventana), `velo` (el fondo que la separa de la página) y `cerrar` (el botón de
+  la X). Por omisión el panel usa los colores del sistema y no trae ningún color
+  ni tipografía de marca; la marca la ponen las reglas de diseño del sitio sobre
+  esas partes.
+
+  Si el contenido es más alto que la pantalla, la ventana se desplaza por dentro
+  y la X queda a la vista.
+
+### Cómo se actualiza
+
+- No cambia nada en las páginas existentes: el aviso sólo existe donde una
+  composición lo declara.
+- El plugin no pone avisos por su cuenta: para que uno aparezca en una página
+  hay que componerla con el grupo y la regla `interaction`, y volver a aplicar
+  la composición.
+
+---
+
 ## 0.3.45 — 3 de octubre de 2026
 
 ### Agregado

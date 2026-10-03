@@ -166,7 +166,7 @@ $comprobar('scope.state="current" sobre la pista: cod_mcp_current_state_target_i
 echo "\n== catálogo de capacidades ==\n";
 $json = wp_json_encode($compilador->capability_catalog(), JSON_UNESCAPED_UNICODE);
 $comprobar('safeRuntimeBehaviors incluye marquesina', preg_match('/safeRuntimeBehaviors.{0,300}marquesina/s', $json) === 1);
-$comprobar('interaction.behavior incluye marquesina', preg_match('/"behavior":\[[^\]]*"pestanas","marquesina"\]/', $json) === 1);
+$comprobar('interaction.behavior incluye marquesina', preg_match('/"behavior":\[[^\]]*"pestanas","marquesina"[,\]]/', $json) === 1);
 $comprobar('constraints describe marquesina', strpos($json, 'marquesina sólo en un nodo group con 2 a 24 hijos') !== false);
 $comprobar('behaviorContracts lista las partes pista y pieza', preg_match('/"marquesina":\{"atributoRol":"data-cod-marquesina-rol","partes":\{"pista":.*"pieza":/s', $json) === 1);
 

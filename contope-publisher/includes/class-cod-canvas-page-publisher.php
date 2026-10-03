@@ -557,6 +557,107 @@ CSS;
     }
 
     /**
+     * Geometría y movimiento del behavior «aviso» (una ventana emergente que
+     * aparece sola, una vez por visitante, y se cierra con la X, con Escape o
+     * pinchando el fondo). El runtime vive en cod-canvas-public.js y
+     * cod-behaviors.js (montarAviso) y sólo arma la estructura, recuerda en el
+     * navegador que ya se vio y maneja el foco. La disposición es de acá.
+     *
+     * LO QUE ESTA HOJA NO PUEDE HACER: ocultar el contenido por su cuenta. El
+     * aviso lleva información de seguridad y no puede depender de que el
+     * JavaScript funcione. Por eso TODA regla de esta hoja cuelga de la clase
+     * .cod-aviso, que sólo pone el runtime al montarse: si el guion no corre, el
+     * grupo queda como un bloque más, en el flujo normal de la página, con su
+     * contenido legible. La capa fija y el «cerrado» sólo existen cuando hay un
+     * runtime vivo que pueda abrir y cerrar.
+     *
+     * Estructura que arma el runtime dentro del grupo (que pasa a ser la capa):
+     *   [data-cod-aviso-estado="abierto"|"cerrado"]            la raíz
+     *     [data-cod-aviso-rol="velo"]                          el fondo (aria-hidden)
+     *     [data-cod-aviso-rol="panel"]                         la ventana (role="dialog")
+     *       [data-cod-aviso-rol="cerrar"]                      el botón de la X (primero en el panel)
+     *       …los hijos originales del grupo
+     *
+     * Estructura (esto no se pisa): cerrado no se ve; abierto es una capa fija a
+     * pantalla completa; el velo la cubre; el panel hace scroll por dentro si el
+     * contenido es más alto que la pantalla (así la X, que es sticky, sigue a la
+     * vista y el aviso nunca queda más grande que la ventana sin salida).
+     *
+     * Valores por omisión, con especificidad cero (:where): cualquier regla de la
+     * composición los pisa. Sin colores ni tipografías de marca: el panel usa los
+     * colores del sistema (Canvas y CanvasText), que se leen sobre cualquier
+     * página, y el velo es CanvasText al 55% —sólo si el navegador sabe mezclar
+     * colores; si no, no hay velo y el panel se sostiene solo—. NO se rellena con
+     * var(--cod-color-*, respaldo): el set de diseño es cerrado y lo que el sitio
+     * no declaró no se inventa (ver el chequeo de scripts/check.mjs). Los colores
+     * de la marca los ponen las reglas de la composición sobre las partes panel y
+     * velo.
+     *
+     * Movimiento: al abrirse, el velo y el panel aparecen con --cod-motion-enter,
+     * y sólo bajo prefers-reduced-motion: no-preference. Con movimiento reducido
+     * el aviso aparece sin animar. Si el sitio no declara el token, la animación
+     * queda inválida y el aviso aparece de golpe: aquí no se inventan duraciones.
+     *
+     * No se bloquea el scroll de la página de atrás: el aviso es una ventana, no
+     * una pared. (El panel contiene su propio scroll, y eso basta.)
+     *
+     * Ajustes que un sitio puede escribir (todos opcionales, variables):
+     *   --cod-aviso-ancho-maximo  (ancho máximo del panel; por omisión 32rem),
+     *   --cod-aviso-vuelve-dias   (cada cuántos días vuelve a aparecer; por omisión
+     *     0: una sola vez y no vuelve. Lo lee el runtime, no esta hoja).
+     *
+     * Regla del proyecto: nunca una abreviada con variable (background, border,
+     * font, margin, padding). Donde entra una variable, forma larga.
+     *
+     * @param string|null $html HTML de la página: si se entrega y no declara el
+     *                          behavior «aviso», no se emite nada. Null = siempre.
+     */
+    public static function aviso_css(?string $html = null): string
+    {
+        if ($html !== null && preg_match('/data-cod-behavior\s*=\s*["\']?aviso\b/', $html) !== 1) {
+            return '';
+        }
+
+        $r = '.cod-aviso[data-cod-behavior="aviso"]';
+        $abierto = $r . '[data-cod-aviso-estado="abierto"]';
+        $velo = '.cod-aviso__velo';
+        $panel = '.cod-aviso__panel';
+        $cerrar = '.cod-aviso__cerrar';
+
+        $css = <<<CSS
+/* Estructura (esto no se pisa): cerrado no se ve; abierto es una capa fija sobre todo; el velo la cubre; el panel hace scroll por dentro. */
+{$r}[data-cod-aviso-estado="cerrado"]{display:none !important;}
+{$abierto}{position:fixed;top:0;right:0;bottom:0;left:0;display:flex;box-sizing:border-box;}
+{$r} > {$velo}{position:absolute;top:0;right:0;bottom:0;left:0;}
+{$r} > {$panel}{position:relative;box-sizing:border-box;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;}
+/* La X es sticky: si el contenido es más alto que la ventana, el botón para salir sigue a la vista. */
+{$r} > {$panel} > {$cerrar}{position:sticky;top:0;z-index:1;appearance:none;}
+
+/* Valores por omisión, con especificidad cero: la composición los pisa con cualquier regla. */
+:where({$abierto}){z-index:100000;align-items:center;justify-content:center;padding-top:1rem;padding-right:1rem;padding-bottom:1rem;padding-left:1rem;}
+:where({$r} > {$panel}){width:100%;max-width:var(--cod-aviso-ancho-maximo,32rem);max-height:calc(100vh - 2rem);max-height:calc(100dvh - 2rem);padding-top:1.5rem;padding-right:1.5rem;padding-bottom:1.5rem;padding-left:1.5rem;background-color:Canvas;color:CanvasText;outline-style:none;}
+:where({$r} > {$panel} > {$cerrar}){display:flex;align-items:center;justify-content:center;width:2.75rem;height:2.75rem;margin-top:0;margin-right:0;margin-bottom:0;margin-left:auto;padding-top:0;padding-right:0;padding-bottom:0;padding-left:0;border-top-width:0;border-right-width:0;border-bottom-width:0;border-left-width:0;background-color:inherit;color:inherit;cursor:pointer;}
+:where({$r} > {$panel} > {$cerrar}:focus-visible){outline-width:2px;outline-style:solid;outline-color:currentColor;outline-offset:2px;}
+.cod-aviso__cerrar svg{width:1.25rem;height:1.25rem;pointer-events:none;}
+@supports (background-color:color-mix(in srgb,red 50%,transparent)){
+:where({$r} > {$velo}){background-color:color-mix(in srgb,CanvasText 55%,transparent);}
+}
+
+/* Con movimiento permitido: el velo y el panel aparecen al abrirse. */
+@media (prefers-reduced-motion:no-preference){
+{$abierto} > {$velo}{animation:cod-aviso-velo var(--cod-motion-enter);}
+{$abierto} > {$panel}{animation:cod-aviso-aparecer var(--cod-motion-enter);}
+@keyframes cod-aviso-velo{from{opacity:0;}to{opacity:1;}}
+@keyframes cod-aviso-aparecer{from{opacity:0;transform:translateY(.75rem);}to{opacity:1;transform:none;}}
+}
+CSS;
+
+        // Fuera comentarios y saltos de línea: se emite en línea en cada página.
+        $css = (string) preg_replace('~/\*.*?\*/~s', '', $css);
+        return (string) preg_replace('~\s*\n\s*~', '', $css);
+    }
+
+    /**
      * Junta el CSS de varios documentos (cabecera, cuerpo, pie) de modo que el
      * CSS base del canvas salga UNA sola vez y ANTES de todas las reglas.
      *
@@ -1140,6 +1241,7 @@ CSS;
                 . self::cuadrantes_css($header_html . $body_html . $footer_html)
                 . self::pestanas_css($header_html . $body_html . $footer_html)
                 . self::marquesina_css($header_html . $body_html . $footer_html)
+                . self::aviso_css($header_html . $body_html . $footer_html)
                 . self::rotation_css() . self::carousel_rows_css()
                 . self::unir_css_de_documentos([$header_css, $body_css, $footer_css])
         );
@@ -1215,6 +1317,7 @@ CSS;
                 . self::cuadrantes_css($header_html . $body_html . $footer_html)
                 . self::pestanas_css($header_html . $body_html . $footer_html)
                 . self::marquesina_css($header_html . $body_html . $footer_html)
+                . self::aviso_css($header_html . $body_html . $footer_html)
                     . self::rotation_css() . self::carousel_rows_css()
                     . self::unir_css_de_documentos([$header_css, $body_css, $footer_css])
             );
