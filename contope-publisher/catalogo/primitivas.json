@@ -125,14 +125,81 @@
         "columnas. Por eso su control es una paleta visual y no un campo de",
         "texto. La distinción es de Cristóbal, 2026-08-21, y está escrita en el",
         "código del editor: «Proporción» se sacó del panel porque parecía la",
-        "forma de armar el layout cuando la forma real es la paleta.",
-        "",
-        "Las variantes NO se listan acá todavía: hoy viven en el código del",
-        "inspector (13 fijas). Traerlas es el siguiente paso, y con ellas la",
-        "posibilidad de cualquier combinación que no sea absurda, por",
-        "breakpoint, que es lo que Divi no permite: su paleta son ~25 formas",
-        "fijas y punto."
+        "forma de armar el layout cuando la forma real es la paleta."
       ],
+      "columnas": {
+        "_": [
+          "Las disposiciones que ofrece la paleta visual. Vivían dentro del",
+          "código del inspector como una lista fija de 15; están acá para que",
+          "se puedan ampliar sin tocar el editor ni desplegar nada.",
+          "",
+          "Es el mismo patrón que los divisores: lo que en Divi es una lista",
+          "cerrada —~25 disposiciones y punto— acá es un catálogo. Cristóbal,",
+          "2026-10-03: «no aplicaría una cantidad rígida de opciones, ya que",
+          "deberíamos poder hacer cualquier combinación que no sea absurda,",
+          "dependiendo del breakpoint».",
+          "",
+          "Las que están son el punto de partida medido: son las que el editor",
+          "ya ofrecía. `pesos` son proporciones, así que [1,2] es un tercio y",
+          "dos tercios. Para medidas fijas o mezcladas —como el pie de Econut,",
+          "`74px minmax(0,1fr) 220px 200px`— está la opción libre del control",
+          "de proporción, que no pasa por esta lista."
+        ],
+        "techoPorBreakpoint": {
+          "_": [
+            "Cuántas columnas tiene sentido ofrecer en cada tamaño. Criterio de",
+            "diseño responsivo recuperado del selector equivalente de Orugantt:",
+            "en un teléfono una fila de seis columnas no es una opción, es una",
+            "trampa. Divi no hace esto — te deja elegir seis en móvil y",
+            "apañártelas."
+          ],
+          "desktop": 6,
+          "tablet": 4,
+          "mobile": 3
+        },
+        "grupos": [
+          {
+            "columnas": 2,
+            "variantes": [
+              { "rotulo": "50 / 50", "pesos": [1, 1] },
+              { "rotulo": "33 / 67", "pesos": [1, 2] },
+              { "rotulo": "67 / 33", "pesos": [2, 1] },
+              { "rotulo": "25 / 75", "pesos": [1, 3] },
+              { "rotulo": "75 / 25", "pesos": [3, 1] }
+            ]
+          },
+          {
+            "columnas": 3,
+            "variantes": [
+              { "rotulo": "33 / 33 / 33", "pesos": [1, 1, 1] },
+              { "rotulo": "25 / 50 / 25", "pesos": [1, 2, 1] },
+              { "rotulo": "50 / 25 / 25", "pesos": [2, 1, 1] },
+              { "rotulo": "25 / 25 / 50", "pesos": [1, 1, 2] }
+            ]
+          },
+          {
+            "columnas": 4,
+            "variantes": [
+              { "rotulo": "Iguales", "pesos": [1, 1, 1, 1] },
+              { "rotulo": "Primera doble", "pesos": [2, 1, 1, 1] }
+            ]
+          },
+          {
+            "columnas": 5,
+            "variantes": [
+              { "rotulo": "Iguales", "pesos": [1, 1, 1, 1, 1] },
+              { "rotulo": "Primera doble", "pesos": [2, 1, 1, 1, 1] }
+            ]
+          },
+          {
+            "columnas": 6,
+            "variantes": [
+              { "rotulo": "Iguales", "pesos": [1, 1, 1, 1, 1, 1] },
+              { "rotulo": "Primera doble", "pesos": [2, 1, 1, 1, 1, 1] }
+            ]
+          }
+        ]
+      },
       "propiedades": {
         "columnas":   { "rotulo": "Columnas", "control": "formas" },
         "separacion": { "rotulo": "Separación", "control": "peldanos", "heredaDe": { "rol": "measure" } },

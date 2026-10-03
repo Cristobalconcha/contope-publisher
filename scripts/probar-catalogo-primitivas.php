@@ -159,6 +159,60 @@ foreach ($escapadas as $nombre => [$fam, $prop]) {
     $comprobar("«{$nombre}» tiene dónde vivir", isset($familias[$fam]['propiedades'][$prop]), "$fam.$prop");
 }
 
+echo "\n== las disposiciones de columnas ==\n";
+$col = $familias['disposicion']['columnas'] ?? [];
+$comprobar('el catálogo las trae', isset($col['grupos']) && is_array($col['grupos']));
+$total = 0;
+foreach ($col['grupos'] ?? [] as $g) { $total += count($g['variantes'] ?? []); }
+$comprobar('trae las 15 que tenía el editor en el código', $total === 15, (string) $total);
+
+$malPeso = [];
+foreach ($col['grupos'] ?? [] as $g) {
+    foreach ($g['variantes'] ?? [] as $v) {
+        if (count($v['pesos'] ?? []) !== (int) $g['columnas']) {
+            $malPeso[] = ($v['rotulo'] ?? '?') . ': dice ' . $g['columnas'] . ' columnas y trae ' . count($v['pesos'] ?? []);
+        }
+        foreach ($v['pesos'] ?? [] as $peso) {
+            if (!is_int($peso) || $peso < 1) { $malPeso[] = ($v['rotulo'] ?? '?') . ': peso inválido'; }
+        }
+    }
+}
+$comprobar('cada variante tiene tantos pesos como columnas dice', $malPeso === [], implode(' · ', $malPeso));
+
+echo "\n== el techo por breakpoint ==\n";
+// En un teléfono una fila de seis columnas no es una opción, es una trampa.
+$comprobar('en escritorio caben los 5 grupos', count(COD_Catalogo::columnas('desktop')) === 5);
+$comprobar('en tablet se recorta a 3', count(COD_Catalogo::columnas('tablet')) === 3);
+$comprobar('en móvil se recorta a 2', count(COD_Catalogo::columnas('mobile')) === 2);
+$comprobar('un breakpoint desconocido cae en escritorio', count(COD_Catalogo::columnas('reloj')) === 5);
+
+echo "\n== se puede AMPLIAR sin tocar el editor ==\n";
+// Ésta es la razón de ser del catálogo. Si esto falla, haberlo sacado del
+// código no sirvió de nada.
+add_filter('cod_catalogo', static function (array $c): array {
+    $c['familias']['disposicion']['columnas']['techoPorBreakpoint']['desktop'] = 7;
+    $c['familias']['disposicion']['columnas']['grupos'][] = [
+        'columnas' => 7,
+        'variantes' => [['rotulo' => 'Siete iguales', 'pesos' => [1, 1, 1, 1, 1, 1, 1]]],
+    ];
+    return $c;
+});
+COD_Catalogo::olvidar();
+$comprobar('una disposición nueva aparece', count(COD_Catalogo::columnas('desktop')) === 6);
+$alEditor = array_column(COD_Catalogo::para_el_editor()['familias']['disposicion']['columnas']['grupos'], 'columnas');
+$comprobar('  y llega al editor', in_array(7, $alEditor, true));
+remove_all_filters('cod_catalogo');
+COD_Catalogo::olvidar();
+$comprobar('al quitar el filtro vuelve a lo de fábrica', count(COD_Catalogo::columnas('desktop')) === 5);
+
+echo "\n== lo que el editor recibe ==\n";
+$paraEditor = COD_Catalogo::para_el_editor();
+$comprobar('lleva familias, taxonomías y controles', isset($paraEditor['familias'], $paraEditor['taxonomias'], $paraEditor['controles']));
+$deUnTitulo = COD_Catalogo::para('heading');
+$comprobar('pedir por taxonomía devuelve las familias resueltas', isset($deUnTitulo['diseno']['tipografia']['propiedades']));
+$comprobar('  una taxonomía inventada no revienta', COD_Catalogo::para('inventada')['diseno'] === []);
+
+
 echo "\n== el catálogo propone, no prohíbe ==\n";
 // Un texto con puntas redondeadas no está en el catálogo, pero el compilador
 // debe seguir aceptándolo: «el diseño funciona sobre la base de excepciones».

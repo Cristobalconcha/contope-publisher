@@ -50,6 +50,7 @@ require_once COD_PUBLISHER_DIR . 'includes/class-cod-canvas-mcp-recipe-compiler.
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-canvas-mcp-service.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-mcp-server.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-consentimiento.php';
+require_once COD_PUBLISHER_DIR . 'includes/class-cod-catalogo.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-svg.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-block-lienzo.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-block-cuadrantes.php';

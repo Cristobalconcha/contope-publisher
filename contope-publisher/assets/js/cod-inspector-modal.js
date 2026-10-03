@@ -437,11 +437,37 @@
 
       select.addEventListener('change', function () {
         var target = editor.getSelected() || currentComponent;
-        if (!isHeadingComponent(target)) return;
+        if (!target) return;
         applySource(target, select.value);
       });
 
       return select;
+    }
+
+    /**
+     * Cuelga en la pestaña Configuración los behaviors con sus gatilladores.
+     *
+     * Cristóbal, el 3 de octubre de 2026, cuando se quitó la tercera pestaña:
+     * «no sobra para nada, porque en esas configuraciones se incorporan los
+     * behaviors asociados a gatilladores». Quitar la pestaña estuvo bien;
+     * quitar su contenido, no. Esto lo devuelve donde corresponde.
+     *
+     * El panel NO se escribe acá: se pide al inspector lateral, que ya lo
+     * tiene. Copiarlo habría repetido el error que este mismo editor ya tenía
+     * —seis funciones definidas dos veces, con la segunda ganando en silencio—
+     * y el día que alguien cambiara el disparador en un sitio, el otro
+     * seguiría igual.
+     */
+    function agregarInteracciones(pane, component) {
+      var inspector = inspectorApi();
+      if (!inspector || typeof inspector.renderInteractionsPanel !== 'function') return;
+      var panel = null;
+      try {
+        panel = inspector.renderInteractionsPanel(component);
+      } catch (_error) {
+        return;
+      }
+      if (panel) pane.appendChild(panel);
     }
 
     /** Un campo que escribe en un atributo del objeto. */
@@ -516,6 +542,7 @@
         pane.appendChild(createElement(hostDocument, 'div', 'cod-im-note',
           'Este bloque no tiene contenido propio: lo que se edita son las piezas de dentro. '
           + 'Pínchalas para abrir su lápiz. En «Diseño» sí se configura este bloque.'));
+        agregarInteracciones(pane, component);
         return;
       }
 
@@ -528,7 +555,7 @@
       textInput.disabled = isDynamic;
       textInput.addEventListener('change', function () {
         var target = editor.getSelected() || currentComponent;
-        if (!isHeadingComponent(target)) return;
+        if (!target) return;
         setHeadingText(target, textInput.value);
       });
       textField.appendChild(textInput);
@@ -580,7 +607,7 @@
       colorInput.value = rgbToHex(style.color);
       colorInput.addEventListener('change', function () {
         var target = editor.getSelected() || currentComponent;
-        if (!isHeadingComponent(target)) return;
+        if (!target) return;
         applyDesignStyle(target, 'color', colorInput.value);
       });
       colorField.appendChild(colorInput);
@@ -594,7 +621,7 @@
       sizeInput.placeholder = 'ej. 32px';
       sizeInput.addEventListener('change', function () {
         var target = editor.getSelected() || currentComponent;
-        if (!isHeadingComponent(target)) return;
+        if (!target) return;
         applyDesignStyle(target, 'font-size', sizeInput.value);
       });
       sizeField.appendChild(sizeInput);
@@ -617,11 +644,77 @@
       alignSelect.value = normalizeTextAlign(style.textAlign);
       alignSelect.addEventListener('change', function () {
         var target = editor.getSelected() || currentComponent;
-        if (!isHeadingComponent(target)) return;
+        if (!target) return;
         applyDesignStyle(target, 'text-align', alignSelect.value);
       });
       alignField.appendChild(alignSelect);
       pane.appendChild(alignField);
+
+      // POSICIÓN, con «pegado» como un valor más y no como una función aparte.
+      //
+      // Divi mete Sticky en su pestaña «Avanzado», como si fuera una capacidad
+      // del sistema. Cristóbal, el 3 de octubre de 2026: «para mí sticky es una
+      // propiedad visual que se maneja igual que cualquier posición de CSS».
+      // Tiene razón y además ordena el reparto entre las dos pestañas: en
+      // Diseño va lo que es apariencia —y una posición lo es—, y en
+      // Configuración lo que es conducta, o sea los behaviors y sus
+      // gatilladores.
+      var posField = createElement(hostDocument, 'label', 'cod-im-field');
+      posField.appendChild(createElement(hostDocument, 'span', '', 'Posición'));
+      var posSelect = createElement(hostDocument, 'select');
+      var posOptions = [
+        ['static', 'Normal (sigue el flujo)'],
+        ['relative', 'Relativa'],
+        ['sticky', 'Pegada al desplazar'],
+        ['absolute', 'Absoluta'],
+        ['fixed', 'Fija a la pantalla'],
+      ];
+      for (var p = 0; p < posOptions.length; p++) {
+        var posOption = createElement(hostDocument, 'option', '', posOptions[p][1]);
+        posOption.value = posOptions[p][0];
+        posSelect.appendChild(posOption);
+      }
+      posSelect.value = String(style.position || 'static');
+      posField.appendChild(posSelect);
+      pane.appendChild(posField);
+
+      // Una posición pegada sin distancia no se pega a nada: el navegador
+      // necesita saber desde dónde. Por eso el campo aparece con ella.
+      var desdeField = createElement(hostDocument, 'label', 'cod-im-field');
+      desdeField.appendChild(createElement(hostDocument, 'span', '', 'Distancia desde arriba'));
+      var desdeInput = createElement(hostDocument, 'input');
+      desdeInput.type = 'text';
+      desdeInput.placeholder = '0px, 1rem…';
+      var topActual = String(style.top || '');
+      desdeInput.value = topActual === 'auto' ? '' : topActual;
+      desdeField.appendChild(desdeInput);
+      pane.appendChild(desdeField);
+
+      function mostrarDistancia() {
+        var v = posSelect.value;
+        desdeField.hidden = v === 'static' || v === 'relative';
+      }
+      mostrarDistancia();
+
+      posSelect.addEventListener('change', function () {
+        var target = editor.getSelected() || currentComponent;
+        if (!target) return;
+        applyDesignStyle(target, 'position', posSelect.value);
+        // Pegada y sin distancia, se pone 0 para que haga algo: una posición
+        // pegada sin `top` se comporta como si no estuviera, y eso parece un
+        // control roto en vez de uno sin terminar de configurar.
+        if (posSelect.value === 'sticky' && !desdeInput.value.trim()) {
+          desdeInput.value = '0px';
+          applyDesignStyle(target, 'top', '0px');
+        }
+        mostrarDistancia();
+      });
+
+      desdeInput.addEventListener('change', function () {
+        var target = editor.getSelected() || currentComponent;
+        if (!target) return;
+        applyDesignStyle(target, 'top', desdeInput.value.trim());
+      });
 
       pane.appendChild(createElement(hostDocument, 'p', 'cod-im-hint', 'Estos controles aplican estilo local al elemento seleccionado (mismo mecanismo que el panel lateral).'));
     }

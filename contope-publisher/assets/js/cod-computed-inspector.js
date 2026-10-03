@@ -1054,48 +1054,67 @@
      * archivo `cod-grid-controls.js`) y este picker quedan sobre la misma
      * fuente de verdad (`component.get('ocdGridConfig')` + la regla CSS real).
      */
-    const COLUMN_PRESET_GROUPS = [
-      {
-        count: 2,
-        variants: [
-          { label: '50 / 50', weights: [1, 1] },
-          { label: '33 / 67', weights: [1, 2] },
-          { label: '67 / 33', weights: [2, 1] },
-          { label: '25 / 75', weights: [1, 3] },
-          { label: '75 / 25', weights: [3, 1] },
-        ],
-      },
-      {
-        count: 3,
-        variants: [
-          { label: '33 / 33 / 33', weights: [1, 1, 1] },
-          { label: '25 / 50 / 25', weights: [1, 2, 1] },
-          { label: '50 / 25 / 25', weights: [2, 1, 1] },
-          { label: '25 / 25 / 50', weights: [1, 1, 2] },
-        ],
-      },
-      {
-        count: 4,
-        variants: [
-          { label: 'Iguales', weights: [1, 1, 1, 1] },
-          { label: 'Primera doble', weights: [2, 1, 1, 1] },
-        ],
-      },
-      {
-        count: 5,
-        variants: [
-          { label: 'Iguales', weights: [1, 1, 1, 1, 1] },
-          { label: 'Primera doble', weights: [2, 1, 1, 1, 1] },
-        ],
-      },
-      {
-        count: 6,
-        variants: [
-          { label: 'Iguales', weights: [1, 1, 1, 1, 1, 1] },
-          { label: 'Primera doble', weights: [2, 1, 1, 1, 1, 1] },
-        ],
-      },
+    /**
+     * Las disposiciones de columnas salen del CATÁLOGO, no de acá.
+     *
+     * Vivían en este archivo como una lista fija de quince. Ampliarlas exigía
+     * tocar el editor y desplegar, que es justo lo que Cristóbal señaló el
+     * 3 de octubre de 2026: «no aplicaría una cantidad rígida de opciones, ya
+     * que deberíamos poder hacer cualquier combinación que no sea absurda,
+     * dependiendo del breakpoint». Es el mismo patrón que los divisores: lo
+     * que en Divi es una lista cerrada, acá es un catálogo ampliable.
+     *
+     * Si el catálogo no llega —editor abierto fuera de WordPress, archivo
+     * ilegible— se cae a las quince de siempre, para que el panel nunca salga
+     * vacío. Pero eso es la red, no el camino.
+     */
+    const COLUMN_PRESET_GROUPS_RESPALDO = [
+      { count: 2, variants: [
+        { label: '50 / 50', weights: [1, 1] },
+        { label: '33 / 67', weights: [1, 2] },
+        { label: '67 / 33', weights: [2, 1] },
+        { label: '25 / 75', weights: [1, 3] },
+        { label: '75 / 25', weights: [3, 1] } ] },
+      { count: 3, variants: [
+        { label: '33 / 33 / 33', weights: [1, 1, 1] },
+        { label: '25 / 50 / 25', weights: [1, 2, 1] },
+        { label: '50 / 25 / 25', weights: [2, 1, 1] },
+        { label: '25 / 25 / 50', weights: [1, 1, 2] } ] },
+      { count: 4, variants: [
+        { label: 'Iguales', weights: [1, 1, 1, 1] },
+        { label: 'Primera doble', weights: [2, 1, 1, 1] } ] },
+      { count: 5, variants: [
+        { label: 'Iguales', weights: [1, 1, 1, 1, 1] },
+        { label: 'Primera doble', weights: [2, 1, 1, 1, 1] } ] },
+      { count: 6, variants: [
+        { label: 'Iguales', weights: [1, 1, 1, 1, 1, 1] },
+        { label: 'Primera doble', weights: [2, 1, 1, 1, 1, 1] } ] },
     ];
+
+    /** El catálogo que mandó WordPress, si llegó. */
+    function catalogoDeColumnas() {
+      const cat = global.ocdCanvasEditorConfig?.catalogo
+        || global.OCDCanvasEditor?.catalogo
+        || null;
+      const col = cat?.familias?.disposicion?.columnas;
+      if (!col || !Array.isArray(col.grupos) || !col.grupos.length) return null;
+      return col;
+    }
+
+    /** Las disposiciones, en la forma que el panel ya sabe dibujar. */
+    function columnPresetGroups() {
+      const col = catalogoDeColumnas();
+      if (!col) return COLUMN_PRESET_GROUPS_RESPALDO;
+      return col.grupos
+        .filter((g) => Number.isInteger(g?.columnas) && Array.isArray(g?.variantes))
+        .map((g) => ({
+          count: g.columnas,
+          variants: g.variantes
+            .filter((v) => Array.isArray(v?.pesos) && v.pesos.length === g.columnas)
+            .map((v) => ({ label: String(v.rotulo || ''), weights: v.pesos })),
+        }))
+        .filter((g) => g.variants.length);
+    }
 
     function isColumnsContainer(component) {
       return !!component && componentClasses(component).includes('cod-columns');
@@ -1108,20 +1127,32 @@
      * es angosto ahí, así que el techo se baja escalonadamente en vez de
      * mostrar siempre los mismos 5 grupos sin importar el dispositivo activo.
      */
-    const COLUMN_PRESET_MAX_BY_BREAKPOINT = { desktop: 6, tablet: 4, mobile: 3 };
+    const COLUMN_PRESET_MAX_RESPALDO = { desktop: 6, tablet: 4, mobile: 3 };
     const COLUMN_PRESET_BREAKPOINT_LABEL = { desktop: 'Escritorio', tablet: 'Tablet', mobile: 'Móvil' };
+
+    /** Los techos del catálogo, o los de siempre si no llegó. */
+    function techosDeColumnas() {
+      const techos = catalogoDeColumnas()?.techoPorBreakpoint;
+      if (!techos) return COLUMN_PRESET_MAX_RESPALDO;
+      const fuera = { ...COLUMN_PRESET_MAX_RESPALDO };
+      for (const bp of Object.keys(fuera)) {
+        if (Number.isInteger(techos[bp])) fuera[bp] = techos[bp];
+      }
+      return fuera;
+    }
 
     function activeColumnPresetBreakpoint() {
       const gridApi = editor.OcdCanvasGrid;
       const breakpoint = gridApi && typeof gridApi.getActiveBreakpoint === 'function'
         ? gridApi.getActiveBreakpoint()
         : 'desktop';
-      return Object.hasOwn(COLUMN_PRESET_MAX_BY_BREAKPOINT, breakpoint) ? breakpoint : 'desktop';
+      return Object.hasOwn(techosDeColumnas(), breakpoint) ? breakpoint : 'desktop';
     }
 
     function columnPresetGroupsForBreakpoint(breakpoint) {
-      const max = COLUMN_PRESET_MAX_BY_BREAKPOINT[breakpoint] ?? COLUMN_PRESET_MAX_BY_BREAKPOINT.desktop;
-      return COLUMN_PRESET_GROUPS.filter((group) => group.count <= max);
+      const techos = techosDeColumnas();
+      const max = techos[breakpoint] ?? techos.desktop;
+      return columnPresetGroups().filter((group) => group.count <= max);
     }
 
     function svgColumnPresetIcon(weights) {
@@ -2733,6 +2764,14 @@
     const api = {
       inspect,
       refresh,
+      // Los behaviors con sus gatilladores, para que la VENTANA CONTEXTUAL
+      // los muestre en su pestaña Configuración sin volver a escribirlos.
+      //
+      // Se expone en vez de copiarse porque este mismo archivo tenía seis
+      // funciones duplicadas que se descubrieron el 3 de octubre de 2026: la
+      // segunda copia ganaba en silencio y quien editaba la primera perdía la
+      // tarde. Dos copias de un panel acabarían igual.
+      renderInteractionsPanel,
       getSnapshot: () => snapshot,
       applyLocalStyle,
       applyClassStyle,

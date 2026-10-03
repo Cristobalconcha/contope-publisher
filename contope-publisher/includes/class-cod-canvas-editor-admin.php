@@ -451,6 +451,10 @@ final class COD_Canvas_Editor_Admin
             'publishedPage' => $document_id !== '' ? $this->publisher->current($document_id) : null,
             'pageTitle' => $auto_load_page_id > 0 ? get_the_title($auto_load_page_id) : '',
             'regionKinds' => COD_Canvas_Document_Repository::REGION_KINDS,
+            // El catálogo de primitivas, entero. Lo consulta en cada
+            // selección, así que mandarlo de una vez sale más barato que
+            // una ida y vuelta por objeto.
+            'catalogo' => COD_Catalogo::para_el_editor(),
             'regionDocuments' => $this->repository->list_region_documents(),
             'ruleChoices' => [
                 'pages' => $this->rule_page_choices(),
