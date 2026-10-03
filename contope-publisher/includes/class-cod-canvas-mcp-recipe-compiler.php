@@ -1844,7 +1844,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
     private function normalize_divisor_rule(array $value)
     {
         $codigo = 'cod_mcp_divisor_rule_invalid';
-        $permitidas = ['forma', 'donde', 'alto', 'repeticion', 'voltear'];
+        $permitidas = ['forma', 'donde', 'alto', 'repeticion', 'voltear', 'color'];
 
         if (!$this->has_only_keys($value, $permitidas)) {
             return new WP_Error($codigo, 'divisor admite: ' . implode(', ', $permitidas) . '.');
@@ -1888,6 +1888,16 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 return new WP_Error($codigo, 'divisor.repeticion debe ser un entero entre 1 y 12.');
             }
             $normalizado['repeticion'] = $value['repeticion'];
+        }
+        if (isset($value['color'])) {
+            // El color del divisor es, casi siempre, el de la sección que
+            // viene DESPUÉS: un divisor es la banda de abajo invadiendo a la
+            // de arriba, no una pieza de un tercer color. Equivocarse en eso
+            // es el error más común al usarlos.
+            if (!is_string($value['color']) || !$this->is_css_color($value['color'])) {
+                return new WP_Error($codigo, 'divisor.color debe ser un color CSS seguro.');
+            }
+            $normalizado['color'] = $value['color'];
         }
         if (isset($value['voltear'])) {
             if (!is_bool($value['voltear'])) {
@@ -3091,14 +3101,21 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 if (is_wp_error($children)) {
                     return $children;
                 }
-                return '<section ' . $attrs . '><div class="cod-columns cod-columns--single"><div class="cod-column">' . $children . '</div></div></section>';
+                // El divisor va FUERA de la caja de columnas y como hijo directo
+                // de la sección: se posiciona contra el borde de la sección, no
+                // contra el de su contenido, que es lo que lo hace tocar el
+                // filo. Dentro de la columna quedaría metido hacia adentro por
+                // el relleno de la sección.
+                return '<section ' . $attrs . '>' . $this->render_divisor($behavior['divisor'] ?? null)
+                    . '<div class="cod-columns cod-columns--single"><div class="cod-column">' . $children . '</div></div></section>';
             case 'header':
             case 'footer':
                 $children = $this->render_nodes($node['children'], $rule_index, $node_ids, $depth + 1, $child_cadence, false);
                 if (is_wp_error($children)) {
                     return $children;
                 }
-                return '<' . $node['kind'] . ' ' . $attrs . '><div class="cod-columns cod-columns--single"><div class="cod-column">' . $children . '</div></div></' . $node['kind'] . '>';
+                return '<' . $node['kind'] . ' ' . $attrs . '>' . $this->render_divisor($behavior['divisor'] ?? null)
+                    . '<div class="cod-columns cod-columns--single"><div class="cod-column">' . $children . '</div></div></' . $node['kind'] . '>';
             case 'navigation':
                 $children = $this->render_nodes($node['children'], $rule_index, $node_ids, $depth + 1, $child_cadence, false);
                 if (is_wp_error($children)) {
@@ -3662,6 +3679,10 @@ final class COD_Canvas_MCP_Recipe_Compiler
         }
         if (isset($divisor['repeticion'])) {
             $estilo[] = '--cod-divisor-repeticion:' . (int) $divisor['repeticion'];
+        }
+        if (isset($divisor['color'])) {
+            // Va como `color` y no como `fill`: el SVG hereda con currentColor.
+            $estilo[] = 'color:' . $divisor['color'];
         }
         $estilo = $estilo === [] ? '' : ' style="' . esc_attr(implode(';', $estilo)) . '"';
 

@@ -1,0 +1,988 @@
+{
+  "pageId": 96,
+  "documentId": "cod-canvas-page-96",
+  "expectedRevision": 2,
+  "design": {
+    "schemaVersion": 1,
+    "designId": "econut-web",
+    "expectedDesignRevision": 2,
+    "reviewState": "session",
+    "rules": [
+      {
+        "id": "hoja",
+        "kind": "spacing",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de divisores: formas de partida generadas con scripts/generar-formas-divisor.mjs."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "paddingBlock": "0px",
+          "paddingInline": "0px"
+        }
+      },
+      {
+        "id": "titulo",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de divisores: formas de partida generadas con scripts/generar-formas-divisor.mjs."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "titulo",
+          "fontSize": "34px",
+          "lineHeight": 1.15,
+          "fontWeight": 700
+        }
+      },
+      {
+        "id": "titulo-color",
+        "kind": "surface",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de divisores: formas de partida generadas con scripts/generar-formas-divisor.mjs."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "foregroundColor": "#2E594A"
+        }
+      },
+      {
+        "id": "intro",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de divisores: formas de partida generadas con scripts/generar-formas-divisor.mjs."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "cuerpo",
+          "fontSize": "16px",
+          "lineHeight": 1.7
+        }
+      },
+      {
+        "id": "intro-aire",
+        "kind": "spacing",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de divisores: formas de partida generadas con scripts/generar-formas-divisor.mjs."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "paddingBlock": "48px",
+          "paddingInline": "24px"
+        }
+      },
+      {
+        "id": "intro-caja",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de divisores: formas de partida generadas con scripts/generar-formas-divisor.mjs."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "max-width": "760px",
+            "margin-inline-start": "auto",
+            "margin-inline-end": "auto",
+            "width": "100%"
+          }
+        }
+      },
+      {
+        "id": "banda-oscura",
+        "kind": "surface",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de divisores: formas de partida generadas con scripts/generar-formas-divisor.mjs."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "backgroundColor": "#2E594A",
+          "foregroundColor": "#FFFFFF"
+        }
+      },
+      {
+        "id": "banda-clara",
+        "kind": "surface",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de divisores: formas de partida generadas con scripts/generar-formas-divisor.mjs."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "backgroundColor": "#DBD4C0",
+          "foregroundColor": "#2E594A"
+        }
+      },
+      {
+        "id": "banda-blanca",
+        "kind": "surface",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de divisores: formas de partida generadas con scripts/generar-formas-divisor.mjs."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "backgroundColor": "#FFFFFF",
+          "foregroundColor": "#2E594A"
+        }
+      },
+      {
+        "id": "banda-aire",
+        "kind": "spacing",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de divisores: formas de partida generadas con scripts/generar-formas-divisor.mjs."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "paddingBlock": "72px",
+          "paddingInline": "24px"
+        }
+      },
+      {
+        "id": "banda-aire-alta",
+        "kind": "spacing",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de divisores: formas de partida generadas con scripts/generar-formas-divisor.mjs."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "paddingBlock": "160px",
+          "paddingInline": "24px"
+        }
+      },
+      {
+        "id": "rotulo",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de divisores: formas de partida generadas con scripts/generar-formas-divisor.mjs."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "rotulo",
+          "fontSize": "13px",
+          "lineHeight": 1.4,
+          "transform": "uppercase",
+          "letterSpacing": "0.08em"
+        }
+      },
+      {
+        "id": "rotulo-centro",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de divisores: formas de partida generadas con scripts/generar-formas-divisor.mjs."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "text-align": "center"
+          }
+        }
+      },
+      {
+        "id": "div-pendiente-0",
+        "kind": "divisor",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de divisores: formas de partida generadas con scripts/generar-formas-divisor.mjs."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "forma": "/wp-content/uploads/2026/10/divisor-pendiente.svg",
+          "donde": "abajo",
+          "color": "#DBD4C0"
+        }
+      },
+      {
+        "id": "div-pendiente-suave-1",
+        "kind": "divisor",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de divisores: formas de partida generadas con scripts/generar-formas-divisor.mjs."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "forma": "/wp-content/uploads/2026/10/divisor-pendiente-suave.svg",
+          "donde": "abajo",
+          "voltear": true,
+          "color": "#FFFFFF"
+        }
+      },
+      {
+        "id": "div-onda-2",
+        "kind": "divisor",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de divisores: formas de partida generadas con scripts/generar-formas-divisor.mjs."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "forma": "/wp-content/uploads/2026/10/divisor-onda.svg",
+          "donde": "abajo",
+          "color": "#2E594A"
+        }
+      },
+      {
+        "id": "div-onda-suave-3",
+        "kind": "divisor",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de divisores: formas de partida generadas con scripts/generar-formas-divisor.mjs."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "forma": "/wp-content/uploads/2026/10/divisor-onda-suave.svg",
+          "donde": "abajo",
+          "color": "#DBD4C0"
+        }
+      },
+      {
+        "id": "div-ondas-4",
+        "kind": "divisor",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de divisores: formas de partida generadas con scripts/generar-formas-divisor.mjs."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "forma": "/wp-content/uploads/2026/10/divisor-ondas.svg",
+          "donde": "abajo",
+          "repeticion": 2,
+          "color": "#FFFFFF"
+        }
+      },
+      {
+        "id": "div-curva-5",
+        "kind": "divisor",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de divisores: formas de partida generadas con scripts/generar-formas-divisor.mjs."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "forma": "/wp-content/uploads/2026/10/divisor-curva.svg",
+          "donde": "abajo",
+          "color": "#2E594A"
+        }
+      },
+      {
+        "id": "div-cerros-6",
+        "kind": "divisor",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de divisores: formas de partida generadas con scripts/generar-formas-divisor.mjs."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "forma": "/wp-content/uploads/2026/10/divisor-cerros.svg",
+          "donde": "abajo",
+          "color": "#DBD4C0"
+        }
+      },
+      {
+        "id": "div-cordillera-7",
+        "kind": "divisor",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de divisores: formas de partida generadas con scripts/generar-formas-divisor.mjs."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "forma": "/wp-content/uploads/2026/10/divisor-cordillera.svg",
+          "donde": "abajo",
+          "alto": "140px",
+          "color": "#FFFFFF"
+        }
+      },
+      {
+        "id": "div-nubes-8",
+        "kind": "divisor",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de divisores: formas de partida generadas con scripts/generar-formas-divisor.mjs."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "forma": "/wp-content/uploads/2026/10/divisor-nubes.svg",
+          "donde": "abajo",
+          "color": "#2E594A"
+        }
+      },
+      {
+        "id": "div-dientes-9",
+        "kind": "divisor",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de divisores: formas de partida generadas con scripts/generar-formas-divisor.mjs."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "forma": "/wp-content/uploads/2026/10/divisor-dientes.svg",
+          "donde": "abajo",
+          "color": "#DBD4C0"
+        }
+      },
+      {
+        "id": "div-escalones-10",
+        "kind": "divisor",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de divisores: formas de partida generadas con scripts/generar-formas-divisor.mjs."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "forma": "/wp-content/uploads/2026/10/divisor-escalones.svg",
+          "donde": "abajo",
+          "color": "#FFFFFF"
+        }
+      },
+      {
+        "id": "div-triangulo-11",
+        "kind": "divisor",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de divisores: formas de partida generadas con scripts/generar-formas-divisor.mjs."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "forma": "/wp-content/uploads/2026/10/divisor-triangulo.svg",
+          "donde": "abajo",
+          "color": "#2E594A"
+        }
+      },
+      {
+        "id": "div-asimetrica-12",
+        "kind": "divisor",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de divisores: formas de partida generadas con scripts/generar-formas-divisor.mjs."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "forma": "/wp-content/uploads/2026/10/divisor-asimetrica.svg",
+          "donde": "abajo",
+          "color": "#DBD4C0"
+        }
+      },
+      {
+        "id": "div-curva-invertida-13",
+        "kind": "divisor",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de divisores: formas de partida generadas con scripts/generar-formas-divisor.mjs."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "forma": "/wp-content/uploads/2026/10/divisor-curva-invertida.svg",
+          "donde": "ambos",
+          "color": "#FFFFFF"
+        }
+      }
+    ]
+  },
+  "composition": {
+    "schemaVersion": 2,
+    "nodes": [
+      {
+        "id": "intro",
+        "kind": "section",
+        "ruleIds": [
+          "banda-blanca",
+          "intro-aire"
+        ],
+        "children": [
+          {
+            "id": "g-29",
+            "kind": "group",
+            "ruleIds": [
+              "intro-caja"
+            ],
+            "children": [
+              {
+                "id": "h-30",
+                "kind": "heading",
+                "ruleIds": [
+                  "titulo",
+                  "titulo-color"
+                ],
+                "content": {
+                  "text": "Divisores",
+                  "level": 1
+                }
+              },
+              {
+                "id": "p-31",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "intro"
+                ],
+                "content": {
+                  "text": "Catorce formas de partida, generadas con un guion y subidas a Medios. No son el catálogo: cualquier SVG del sitio sirve como divisor. Cada banda de abajo usa una, con su color, su alto y, en algunos casos, repetida o volteada."
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "banda-1",
+        "kind": "section",
+        "ruleIds": [
+          "banda-oscura",
+          "banda-aire",
+          "div-pendiente-0"
+        ],
+        "children": [
+          {
+            "id": "r-2",
+            "kind": "paragraph",
+            "ruleIds": [
+              "rotulo",
+              "rotulo-centro"
+            ],
+            "content": {
+              "text": "Pendiente"
+            }
+          }
+        ]
+      },
+      {
+        "id": "banda-3",
+        "kind": "section",
+        "ruleIds": [
+          "banda-clara",
+          "banda-aire",
+          "div-pendiente-suave-1"
+        ],
+        "children": [
+          {
+            "id": "r-4",
+            "kind": "paragraph",
+            "ruleIds": [
+              "rotulo",
+              "rotulo-centro"
+            ],
+            "content": {
+              "text": "Pendiente suave · volteada"
+            }
+          }
+        ]
+      },
+      {
+        "id": "banda-5",
+        "kind": "section",
+        "ruleIds": [
+          "banda-blanca",
+          "banda-aire",
+          "div-onda-2"
+        ],
+        "children": [
+          {
+            "id": "r-6",
+            "kind": "paragraph",
+            "ruleIds": [
+              "rotulo",
+              "rotulo-centro"
+            ],
+            "content": {
+              "text": "Onda"
+            }
+          }
+        ]
+      },
+      {
+        "id": "banda-7",
+        "kind": "section",
+        "ruleIds": [
+          "banda-oscura",
+          "banda-aire",
+          "div-onda-suave-3"
+        ],
+        "children": [
+          {
+            "id": "r-8",
+            "kind": "paragraph",
+            "ruleIds": [
+              "rotulo",
+              "rotulo-centro"
+            ],
+            "content": {
+              "text": "Onda suave"
+            }
+          }
+        ]
+      },
+      {
+        "id": "banda-9",
+        "kind": "section",
+        "ruleIds": [
+          "banda-clara",
+          "banda-aire",
+          "div-ondas-4"
+        ],
+        "children": [
+          {
+            "id": "r-10",
+            "kind": "paragraph",
+            "ruleIds": [
+              "rotulo",
+              "rotulo-centro"
+            ],
+            "content": {
+              "text": "Ondas · repetida 2 veces"
+            }
+          }
+        ]
+      },
+      {
+        "id": "banda-11",
+        "kind": "section",
+        "ruleIds": [
+          "banda-blanca",
+          "banda-aire",
+          "div-curva-5"
+        ],
+        "children": [
+          {
+            "id": "r-12",
+            "kind": "paragraph",
+            "ruleIds": [
+              "rotulo",
+              "rotulo-centro"
+            ],
+            "content": {
+              "text": "Curva"
+            }
+          }
+        ]
+      },
+      {
+        "id": "banda-13",
+        "kind": "section",
+        "ruleIds": [
+          "banda-oscura",
+          "banda-aire",
+          "div-cerros-6"
+        ],
+        "children": [
+          {
+            "id": "r-14",
+            "kind": "paragraph",
+            "ruleIds": [
+              "rotulo",
+              "rotulo-centro"
+            ],
+            "content": {
+              "text": "Cerros"
+            }
+          }
+        ]
+      },
+      {
+        "id": "banda-15",
+        "kind": "section",
+        "ruleIds": [
+          "banda-clara",
+          "banda-aire-alta",
+          "div-cordillera-7"
+        ],
+        "children": [
+          {
+            "id": "r-16",
+            "kind": "paragraph",
+            "ruleIds": [
+              "rotulo",
+              "rotulo-centro"
+            ],
+            "content": {
+              "text": "Cordillera · alta"
+            }
+          }
+        ]
+      },
+      {
+        "id": "banda-17",
+        "kind": "section",
+        "ruleIds": [
+          "banda-blanca",
+          "banda-aire",
+          "div-nubes-8"
+        ],
+        "children": [
+          {
+            "id": "r-18",
+            "kind": "paragraph",
+            "ruleIds": [
+              "rotulo",
+              "rotulo-centro"
+            ],
+            "content": {
+              "text": "Nubes"
+            }
+          }
+        ]
+      },
+      {
+        "id": "banda-19",
+        "kind": "section",
+        "ruleIds": [
+          "banda-oscura",
+          "banda-aire",
+          "div-dientes-9"
+        ],
+        "children": [
+          {
+            "id": "r-20",
+            "kind": "paragraph",
+            "ruleIds": [
+              "rotulo",
+              "rotulo-centro"
+            ],
+            "content": {
+              "text": "Dientes"
+            }
+          }
+        ]
+      },
+      {
+        "id": "banda-21",
+        "kind": "section",
+        "ruleIds": [
+          "banda-clara",
+          "banda-aire",
+          "div-escalones-10"
+        ],
+        "children": [
+          {
+            "id": "r-22",
+            "kind": "paragraph",
+            "ruleIds": [
+              "rotulo",
+              "rotulo-centro"
+            ],
+            "content": {
+              "text": "Escalones"
+            }
+          }
+        ]
+      },
+      {
+        "id": "banda-23",
+        "kind": "section",
+        "ruleIds": [
+          "banda-blanca",
+          "banda-aire",
+          "div-triangulo-11"
+        ],
+        "children": [
+          {
+            "id": "r-24",
+            "kind": "paragraph",
+            "ruleIds": [
+              "rotulo",
+              "rotulo-centro"
+            ],
+            "content": {
+              "text": "Triángulo"
+            }
+          }
+        ]
+      },
+      {
+        "id": "banda-25",
+        "kind": "section",
+        "ruleIds": [
+          "banda-oscura",
+          "banda-aire",
+          "div-asimetrica-12"
+        ],
+        "children": [
+          {
+            "id": "r-26",
+            "kind": "paragraph",
+            "ruleIds": [
+              "rotulo",
+              "rotulo-centro"
+            ],
+            "content": {
+              "text": "Asimétrica"
+            }
+          }
+        ]
+      },
+      {
+        "id": "banda-27",
+        "kind": "section",
+        "ruleIds": [
+          "banda-clara",
+          "banda-aire",
+          "div-curva-invertida-13"
+        ],
+        "children": [
+          {
+            "id": "r-28",
+            "kind": "paragraph",
+            "ruleIds": [
+              "rotulo",
+              "rotulo-centro"
+            ],
+            "content": {
+              "text": "Curva invertida · arriba y abajo"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

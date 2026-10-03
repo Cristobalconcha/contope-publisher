@@ -186,8 +186,10 @@ height:var(--cod-divisor-alto,80px);}
 {$r}[data-cod-divisor-voltear="1"] > svg{transform:scaleX(-1);}
 {$r}[data-cod-divisor-donde="arriba"] > svg{transform:scaleY(-1);}
 {$r}[data-cod-divisor-donde="arriba"][data-cod-divisor-voltear="1"] > svg{transform:scale(-1,-1);}
-/* Una sección con divisor necesita ser el ancla de su posición. */
-.cod-node:has(> {$r}){position:relative;}
+/* El contenedor del divisor tiene que ser el ancla de su posición. `:has` es
+   lo que permite no exigirle al diseño que lo declare: si hay divisor dentro,
+   el contenedor se vuelve relativo solo. */
+:where(section, header, footer, .cod-node):has(> {$r}){position:relative;}
 CSS;
     }
 }
