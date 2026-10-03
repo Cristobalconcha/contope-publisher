@@ -5,6 +5,109 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.49 — 3 de octubre de 2026
+
+### Agregado
+
+- **Se pueden subir SVG a Medios, y se limpian al subirlos.** WordPress no lo
+  permite, y la razón técnica es real: un SVG es un documento XML y puede
+  traer JavaScript dentro. Pero la consecuencia práctica es que un sitio no
+  puede usar vectores, que es la forma correcta de un logotipo, un icono o un
+  pin de mapa. Un PNG de un pin se ve borroso en cuanto alguien amplía.
+
+  Lo que hacen los plugins habituales para esto es abrir el tipo de archivo y
+  guardar lo que llegue tal cual, y por eso tienen mala fama: eso deja el
+  agujero entero. Acá el SVG **se limpia antes de escribirse en el disco**, así
+  que lo que queda guardado ya no puede ejecutar nada:
+
+  | Se va | Por qué |
+  |---|---|
+  | `<script>` | lo evidente |
+  | `<foreignObject>` | mete HTML dentro del SVG, y con él cualquier cosa |
+  | atributos `on*` (`onload`, `onclick`…) | son guiones escritos en un atributo |
+  | `javascript:` y `vbscript:` | lo mismo, en una dirección |
+  | `<use>`, `<image>` o `<a>` hacia otro servidor | traen un fragmento ajeno y lo dibujan como propio |
+  | `<!ENTITY>` y entidades externas | por ahí entra el ataque de XML que lee archivos del servidor |
+  | `<?xml-stylesheet?>` | trae una hoja de estilos de fuera |
+
+  Y lo que **no** se toca, porque es dibujo legítimo: los `href` internos
+  (`#pieza`), los gradientes `url(#g)`, las rutas relativas del propio sitio y
+  las imágenes incrustadas en base64.
+
+  Sólo puede subirlos quien ya tiene `unfiltered_html` —administradores y
+  editores—, que es la capacidad con la que WordPress ya marca «de esta persona
+  nos fiamos para meter marcado». En un sitio con autores o colaboradores, para
+  ellos el SVG sigue rechazado: limpiar está bien, pero no es razón para
+  ampliarle los permisos a quien no los tenía.
+
+  Un archivo que no se puede leer como XML se rechaza con un mensaje que dice
+  qué hacer, en vez de guardarse a medias. Lo que no se puede analizar tampoco
+  se puede limpiar.
+
+  Esto **no** toca los SVG que genera el propio plugin dentro de una página
+  —el mapa de OpenStreetMap, por ejemplo—: ésos no pasan por la subida de
+  archivos. Son dos caminos distintos.
+
+  Se apaga entero con el filtro `cod_permitir_svg`.
+
+### Corregido
+
+- **El mapa abierto ya no se encierra en la columna donde está el mini.** El
+  mapa grande mide 100% de la raíz de la conducta, y cerrada esa raíz mide lo
+  que mide el mini: 60 píxeles. Puesto como el sitio lo necesita —el mini al
+  lado de la dirección, en una columna del pie— el mapa se abría dentro de esa
+  columna: 347 píxeles de ancho en un pie de 1080, y en una fila flexible salía
+  directamente de ancho cero, descargando Mapbox y levantando su lienzo para no
+  mostrar nada.
+
+  Ahora, al abrirse, la raíz reclama su ancho: `flex-basis:100%` para bajar a su
+  propia línea en una fila flexible, y `grid-column:1 / -1` para abarcar todas
+  las columnas de una grilla. Donde el contenedor no sea ni una cosa ni la otra,
+  ninguna de las dos declaraciones hace nada. El tope lo sigue poniendo el
+  sitio, que es quien sabe cuánto mide su contenido.
+
+  Medido en el pie de Econut: de **347×400 a 961×400**.
+
+### Cambiado
+
+- **El mapa ofrece la salida desde el primer segundo, no sólo cuando falla.**
+  Mapbox GL necesita WebGL. Donde no lo hay, el módulo ya lo detectaba y lo
+  decía en el acto. Pero quedaba un caso peor: WebGL presente y el mapa que no
+  termina de cargar nunca. Ahí se veía un recuadro **en blanco durante 20
+  segundos** antes de que apareciera ningún mensaje.
+
+  Ahora el enlace «Cómo llegar» —a OpenStreetMap, con las coordenadas— aparece
+  junto a «Cargando el mapa…» desde el principio, y la espera baja de 20
+  segundos a 8. Nunca queda un recuadro muerto.
+
+  Esto salió de una pregunta de Cristóbal que vale la pena dejar escrita: «no
+  estamos trabajando para un navegador específico». La escalera completa,
+  comprobada sobre la página servida:
+
+  | Situación | Qué ve |
+  |---|---|
+  | sin JavaScript | el mini es un enlace real a OpenStreetMap con las coordenadas, y su imagen es del propio sitio |
+  | con JavaScript, sin WebGL | el aviso y «Cómo llegar», de inmediato |
+  | con WebGL que no carga | «Cargando el mapa… / Cómo llegar» desde el primer segundo; a los 8 s, el aviso |
+  | todo bien | el mapa |
+
+  Los dos motores —`cod-behaviors.js` y `cod-canvas-public.js`— son copias
+  separadas y llevan el cambio los dos.
+
+### Comprobado
+
+- `scripts/probar-svg.php`: el pin real del sitio sobrevive entero —mismos
+  `<path>`, mismo `viewBox`, mismos colores—, y diez formas de meter código
+  dentro de un SVG salen todas. Están las dos mitades a propósito: comprobar
+  sólo que un SVG limpio pasa es comprobar que la puerta abre, no que haya un
+  guardia en ella.
+
+  La prueba encontró un fallo real en lo recién escrito: con un archivo **vacío**
+  —lo que deja una subida cortada— el limpiador lanzaba un error fatal de PHP 8
+  en vez de rechazarlo.
+
+---
+
 ## 0.3.48 — 3 de octubre de 2026
 
 ### Corregido

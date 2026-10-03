@@ -2196,7 +2196,7 @@
   var MAPBOX_GL_VERSION = '2.14.1';
   var MAPBOX_GL_JS = 'https://api.mapbox.com/mapbox-gl-js/v' + MAPBOX_GL_VERSION + '/mapbox-gl.js';
   var MAPBOX_GL_CSS = 'https://api.mapbox.com/mapbox-gl-js/v' + MAPBOX_GL_VERSION + '/mapbox-gl.css';
-  var MAPBOX_GL_ESPERA_MS = 20000;
+  var MAPBOX_GL_ESPERA_MS = 8000;
   // Estado de la descarga de Mapbox GL, compartido por todos los mapas de la
   // página: se descarga una vez y a quien llegue después se le avisa al terminar.
   var cargaMapbox = null;
@@ -2505,7 +2505,7 @@
       boton.setAttribute('aria-expanded', 'true');
       grande.hidden = false;
       grande.setAttribute('aria-busy', 'true');
-      decir('Cargando el mapa…', false);
+      decir('Cargando el mapa…', true);
       enfocar(cerrarBoton);
       irAlMapa();
       cargarMapbox(win, doc, function (gl) { dibujar(gl, miGeneracion); }, function () {

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: ContOpe Publisher
  * Description: Importa proyectos ContOpe Design como páginas Gutenberg nativas y editables.
- * Version: 0.3.48
+ * Version: 0.3.49
  * Requires at least: 6.5
  * Requires PHP: 8.0
  * Author: Cristóbal Concha
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('COD_PUBLISHER_VERSION', '0.3.48');
+define('COD_PUBLISHER_VERSION', '0.3.49');
 define('COD_PUBLISHER_FILE', __FILE__);
 define('COD_PUBLISHER_DIR', plugin_dir_path(__FILE__));
 
@@ -50,6 +50,7 @@ require_once COD_PUBLISHER_DIR . 'includes/class-cod-canvas-mcp-recipe-compiler.
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-canvas-mcp-service.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-mcp-server.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-consentimiento.php';
+require_once COD_PUBLISHER_DIR . 'includes/class-cod-svg.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-medicion.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-migracion-nombres.php';
 
@@ -105,6 +106,7 @@ add_action('plugins_loaded', static function (): void {
     (new COD_Inline_Editor_Frontend($canvas_repository, $region_resolver))->register();
     (new COD_Settings_Admin())->register();
     (new COD_Medicion())->register();
+    (new COD_SVG())->register();
     (new COD_Redes_Sociales())->register();
     (new COD_Mapa())->register();
 

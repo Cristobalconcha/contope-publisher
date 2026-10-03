@@ -42,6 +42,22 @@ const HAY_WHATSAPP = false;
 // /contactos.
 const LEGAL = '/terminos-y-privacidad/';
 
+// La imagen del mini mapa. Es un archivo del SITIO, no una llamada a Mapbox:
+// se generó una sola vez con `scripts/generar-mini-mapa.mjs` a zoom 2 —el país
+// entero— y se subió a Medios. El encuadre del mini nunca cambia, así que
+// pedírselo a Mapbox en cada visita sería pagar un viaje por algo que ya
+// sabemos cómo se ve. Y además lo deja fuera del consentimiento de cookies:
+// una imagen propia no le cuenta a nadie quién entró al sitio.
+const MINI_MAPA = '/wp-content/uploads/2026/10/mini-mapa-econut.png';
+
+// El pin de Econut, el mismo del sitio publicado. Vive en el TEMA y no en
+// Medios porque WordPress rechaza subir SVG —con razón: un SVG puede traer
+// JavaScript dentro— y no vale la pena abrir esa puerta en todo el sitio por
+// una imagen. Como recurso del tema además viaja con él al desplegar.
+// Comprobado antes de copiarlo: sólo trae <svg>, <defs>, <style>, <g> y
+// <path>, sin <script>, sin manejadores de evento y sin referencias externas.
+const PIN = '/wp-content/uploads/2026/10/pin-econut.svg';
+
 const f = {
   logoHorizontal: M + 'Logo-horizontal-@svg.svg',
   logoCalado: M + 'Logo-calado-20.png',
@@ -202,6 +218,40 @@ const hacerReglas = () => {
     display: 'grid', 'grid-template-columns': 'minmax(0, 1fr)', 'row-gap': '0px', 'justify-items': 'end',
   } });
 
+  // ------------------------------------------------------------- el mapa
+  //
+  // El cuadradito junto a la dirección. Cerrado funciona como un ICONO, no
+  // como un mapa: se ve Chile entero y se entiende de qué va sin tener que
+  // leerlo. Al pincharlo despliega el mapa grande sobre la planta de Paine.
+  //
+  // La imagen del mini es un archivo del sitio, generado UNA vez con
+  // `scripts/generar-mini-mapa.mjs`. Por eso el mini no le pide nada a
+  // Mapbox: se ve sin red hacia afuera, sin consumir cuota y —lo que importa
+  // esta semana— sin entrar en el consentimiento de cookies. El mapa grande
+  // sí usa Mapbox, y sólo se descarga cuando alguien lo abre.
+  //
+  // La CLAVE no va acá: vive en Configuración → Mapa, y el plugin la inyecta
+  // al mostrar la página. Así cambiarla llega a todas sin recomponer, y no
+  // queda escrita en el documento.
+  R('p-mapa', 'interaction', { behavior: 'mapa' });
+  // La dirección va DENTRO del grupo del mapa, no al lado: así la conducta
+  // está pensada, y es lo que permite que al abrirse el mapa grande baje a su
+  // propia línea mientras la dirección se queda donde estaba.
+  //
+  // `flex` con `flex-wrap`, porque el `.cod-group` base es una grilla y en una
+  // grilla el mini y la dirección no se ponen uno al lado del otro. El salto
+  // de línea del mapa grande lo da su propio `flex-basis:100%`.
+  R('p-mapa-grupo', 'properties', { declarations: {
+    display: 'flex', 'flex-wrap': 'wrap', 'align-items': 'center',
+    gap: '12px', 'justify-content': 'flex-end',
+    // El tope del mapa abierto. Lo pone el sitio y no el plugin: es la medida
+    // del contenido del pie, los mismos 1080 que mide la barra de arriba.
+    'max-width': '1080px',
+  } });
+  for (const bp of ['mobile', 'tablet']) {
+    R(`p-mapa-grupo-${bp}`, 'properties', { declarations: { 'justify-content': 'flex-start' } }, { bp });
+  }
+
   // -------------------------------------------------------- la línea legal
   //
   // Esto NO está en econut.cl, y es una de las pocas cosas que se agregan a
@@ -246,14 +296,34 @@ const hacerReglas = () => {
     children: [{
       id: id('g'), kind: 'group', ruleIds: ['p-barra', 'p-barra-mobile', 'p-barra-tablet'], children: [
         { id: id('i'), kind: 'image', ruleIds: ['p-logo'], content: { assetUrl: f.logoCalado, alt: 'Econut' } },
-        { id: id('g'), kind: 'group', ruleIds: ['p-columna'], children: [
-          // La dirección, copiada literal del pie de econut.cl. La que había
-          // acá —«Ruta 78 de Septiembre s/n, Parcela 3 / Rinconada de Doñihue,
-          // Región del Libertador»— era otra calle, otra comuna y otra región.
-          { id: id('p'), kind: 'paragraph', ruleIds: ['p-texto', 'p-texto-mobile', 'p-texto-tablet'], content: { text: 'Av 18 de Septiembre sn Hijuela 2' } },
-          { id: id('p'), kind: 'paragraph', ruleIds: ['p-texto', 'p-texto-mobile', 'p-texto-tablet'], content: { text: 'Fundo San Rafael - Sector Nuevo Sendero,' } },
-          { id: id('p'), kind: 'paragraph', ruleIds: ['p-texto', 'p-texto-mobile', 'p-texto-tablet'], content: { text: 'Paine, Región Metropolitana' } },
-        ] },
+        {
+            id: id('g'), kind: 'group',
+            ruleIds: ['p-mapa', 'p-mapa-grupo', 'p-mapa-grupo-mobile', 'p-mapa-grupo-tablet'],
+            content: {
+              lat: -33.804136, lng: -70.681617, zoom: 17,
+              mini: MINI_MAPA,
+              etiqueta: 'Ver en el mapa dónde está la planta de Econut, en Paine',
+              marcador: PIN,
+              // El texto del globo, como en el código del sitio publicado:
+              // «Planta Econut» y la dirección. Allá va en varias líneas con
+              // <br>; acá el globo es texto plano a propósito —se arma con
+              // textContent y no con setHTML— así que va de corrido.
+              globo: 'Planta Econut · Av 18 de Septiembre sn Hijuela 2, Fundo San Rafael - Sector Nuevo Sendero, Paine, Región Metropolitana',
+              globoEnlaceTexto: 'www.econut.cl',
+              globoEnlaceHref: 'https://www.econut.cl',
+            },
+            children: [
+              { id: id('g'), kind: 'group', ruleIds: ['p-columna'], children: [
+                // La dirección, copiada literal del pie de econut.cl. La que
+                // había acá —«Ruta 78 de Septiembre s/n, Parcela 3 /
+                // Rinconada de Doñihue, Región del Libertador»— era otra
+                // calle, otra comuna y otra región.
+                { id: id('p'), kind: 'paragraph', ruleIds: ['p-texto', 'p-texto-mobile', 'p-texto-tablet'], content: { text: 'Av 18 de Septiembre sn Hijuela 2' } },
+                { id: id('p'), kind: 'paragraph', ruleIds: ['p-texto', 'p-texto-mobile', 'p-texto-tablet'], content: { text: 'Fundo San Rafael - Sector Nuevo Sendero,' } },
+                { id: id('p'), kind: 'paragraph', ruleIds: ['p-texto', 'p-texto-mobile', 'p-texto-tablet'], content: { text: 'Paine, Región Metropolitana' } },
+              ] },
+            ],
+          },
         // Las cuentas oficiales, CON el nombre escrito. Acá el nombre importa
         // más que el icono: es lo que una persona puede comparar letra por
         // letra con la cuenta que le escribió. Hay estafadores vendiendo a

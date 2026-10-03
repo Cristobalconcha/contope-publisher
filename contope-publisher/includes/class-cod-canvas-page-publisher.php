@@ -722,6 +722,21 @@ CSS;
 /* Estructura (esto no se pisa): abierto esconde el mini y muestra el grande; cerrado, al revés. */
 {$cerrado} > {$grande}{display:none !important;}
 {$abierto} > {$mini}{display:none !important;}
+/* Abierto, la raíz reclama su ancho. El mapa grande mide 100% DE ESTA RAÍZ, y
+   cerrada la raíz mide lo que mide el mini: 60px. Donde el sitio la haya puesto
+   como elemento de una fila flexible —el caso normal: el mini al lado de la
+   dirección en el pie— se encogía a su contenido y el mapa grande salía de
+   ancho CERO. Abría, descargaba Mapbox, levantaba su lienzo WebGL y no se veía
+   nada. `flex-basis:100%` con el `flex-wrap` del contenedor lo baja a su propia
+   línea, que es donde cabe. Esto es de la conducta y no de cada sitio: la
+   conducta sabe que tiene dos tamaños, el sitio no tiene por qué saberlo.
+
+   `grid-column:1 / -1` es lo mismo para el otro caso: un pie repartido en
+   columnas, donde el mini vive en una de 220px. Sin esto el mapa grande se
+   abría dentro de esa columna. Donde el contenedor no sea una grilla, la
+   declaración no hace nada. El tope de ancho lo pone el sitio, que es quien
+   sabe cuánto mide su contenido: en econut.cl son 1080. */
+{$abierto}{width:100%;flex-basis:100%;max-width:100%;grid-column:1 / -1;}
 {$r} > {$mini}{appearance:none;cursor:pointer;}
 {$r} > {$mini} img{display:block;width:100%;height:100%;object-fit:contain;}
 {$r} > {$grande}{position:relative;box-sizing:border-box;overflow:hidden;flex-grow:0;flex-shrink:0;flex-basis:100%;width:100%;}
