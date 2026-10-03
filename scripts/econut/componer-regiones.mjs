@@ -34,6 +34,14 @@ const VERDE = '#2E594A';   // el verde de Econut, medido en el pie de econut.cl
 // true y volver a correr este guion.
 const HAY_WHATSAPP = false;
 
+// La página de términos y privacidad, por su DIRECCIÓN y no por su número.
+// El número de una página cambia de una instalación a otra —en el espejo local
+// es la 3, en econut.cl será otra— y un enlace con el número funciona en un
+// lado y lleva a otra parte en el otro. Por eso el espejo local tiene los
+// enlaces permanentes bonitos activos, igual que econut.cl, que tiene
+// /contactos.
+const LEGAL = '/terminos-y-privacidad/';
+
 const f = {
   logoHorizontal: M + 'Logo-horizontal-@svg.svg',
   logoCalado: M + 'Logo-calado-20.png',
@@ -194,6 +202,45 @@ const hacerReglas = () => {
     display: 'grid', 'grid-template-columns': 'minmax(0, 1fr)', 'row-gap': '0px', 'justify-items': 'end',
   } });
 
+  // -------------------------------------------------------- la línea legal
+  //
+  // Esto NO está en econut.cl, y es una de las pocas cosas que se agregan a
+  // propósito en vez de copiarse. El original no tiene página de privacidad ni
+  // enlace legal en ninguna parte —comprobado recorriendo el sitio, no
+  // supuesto—, y eso es justamente una de las cosas que no cumple: la Ley
+  // 21.719 exige una política enlazada desde el sitio, y exige poder CAMBIAR
+  // el consentimiento, no sólo darlo.
+  //
+  // Son dos piezas distintas y por eso no son dos enlaces iguales:
+  //
+  //  - «Términos y privacidad» es un enlace normal: lleva a esa página.
+  //  - «Preferencias de cookies» lleva TAMBIÉN a esa página, y encima declara
+  //    la conducta `preferencias-cookies` del plugin, que le quita el salto al
+  //    clic y reabre el panel del banner. El destino no es relleno: sin
+  //    JavaScript no hay panel que reabrir, y entonces el enlace lleva a la
+  //    página que explica las cookies, que es lo segundo mejor. Primero algo
+  //    que funciona, y encima lo mejor.
+  R('p-legal-barra', 'properties', { declarations: {
+    display: 'flex', 'flex-wrap': 'wrap', 'align-items': 'center', 'justify-content': 'center',
+    gap: '10px', 'max-width': '1080px',
+    'margin-inline-start': 'auto', 'margin-inline-end': 'auto',
+    'margin-block-start': '10px', 'padding-block-start': '10px', width: '100%',
+    // Una línea de un píxel para separarla de la barra de arriba sin meter un
+    // elemento más. El blanco a un 18% sobre el verde da una raya que se
+    // insinúa y no compite con nada.
+    //
+    // En tres partes y no como `border-top`: el plugin rechaza las abreviadas
+    // porque GrapesJS las descarta en silencio al guardar.
+    'border-top-width': '1px',
+    'border-top-style': 'solid',
+    'border-top-color': 'rgba(255, 255, 255, 0.18)',
+  } });
+  R('p-legal-texto', 'typography', { role: 'pie', fontSize: '11px', lineHeight: 1.4 });
+  // El separador va más apagado que los dos rótulos: es puntuación, no texto.
+  R('p-legal-punto', 'typography', { role: 'pie', fontSize: '11px', lineHeight: 1.4 });
+  R('p-legal-punto-color', 'properties', { declarations: { opacity: '0.5' } });
+  R('p-preferencias', 'interaction', { behavior: 'preferencias-cookies' });
+
   const nodes = [{
     id: 'pie', marker: 'pie', kind: 'footer', ruleIds: ['p-aire', 'p-superficie'],
     children: [{
@@ -224,6 +271,16 @@ const hacerReglas = () => {
           { id: id('p'), kind: 'paragraph', ruleIds: ['p-credito-texto'], content: { text: 'Diseño y desarrollo' } },
           { id: id('i'), kind: 'image', ruleIds: ['p-credito-logo'], content: { assetUrl: f.logoAltfx, alt: 'Altfx' } },
         ] },
+      ],
+    }, {
+      id: id('g'), kind: 'group', ruleIds: ['p-legal-barra'], children: [
+        { id: id('l'), kind: 'link', ruleIds: ['p-legal-texto'], content: {
+          label: 'Términos y privacidad', href: LEGAL,
+        } },
+        { id: id('p'), kind: 'paragraph', ruleIds: ['p-legal-punto', 'p-legal-punto-color'], content: { text: '·' } },
+        { id: id('l'), kind: 'link', ruleIds: ['p-legal-texto', 'p-preferencias'], content: {
+          label: 'Preferencias de cookies', href: LEGAL,
+        } },
       ],
     }],
   }];

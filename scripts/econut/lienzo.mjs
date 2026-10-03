@@ -15,7 +15,31 @@ import { readFileSync } from 'node:fs';
 
 const ENDPOINT = process.env.ENDPOINT
   || 'http://localhost:8891/index.php?rest_route=/contope/v1/mcp';
-const AUTH = readFileSync(process.env.AUTH_FILE || '/tmp/econut-local-auth.txt', 'utf8').trim();
+// La credencial del canal, en un lugar que sobrevive a la sesión.
+//
+// Antes el valor por omisión era `/tmp/econut-local-auth.txt`. Eso se perdía
+// al cerrar la sesión de trabajo —el temporal se vacía— y el guion fallaba con
+// un ENOENT que no dice nada de lo que de verdad falta: una credencial. Ahora
+// vive junto al WordPress local al que pertenece, fuera del repositorio.
+//
+// Es una contraseña de aplicación del WordPress de este PC, de un solo sitio
+// local. Se vuelve a generar desde el panel (Usuarios → Perfil → Contraseñas
+// de aplicación) o desde PHP con `WP_Application_Passwords`.
+const RUTA_CREDENCIAL = process.env.AUTH_FILE
+  || 'C:/Users/Cristobal concha/wp-local-econut/.credencial-mcp-local.txt';
+
+let AUTH;
+try {
+  AUTH = readFileSync(RUTA_CREDENCIAL, 'utf8').trim();
+} catch {
+  console.error(
+    `\nNo encontré la credencial del canal MCP en:\n  ${RUTA_CREDENCIAL}\n\n`
+    + 'Es un archivo con una línea «usuario:contraseña-de-aplicación» del WordPress local.\n'
+    + 'Se genera en Usuarios → Perfil → Contraseñas de aplicación.\n'
+    + 'Otra ruta: variable de entorno AUTH_FILE.\n'
+  );
+  process.exit(1);
+}
 
 const [herramienta, archivoArgs] = process.argv.slice(2);
 if (!herramienta) {
