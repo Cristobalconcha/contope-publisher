@@ -483,8 +483,17 @@ const servicio = (url, alt, nombre, texto, puntos, enlace = '') => G([
   // va <p>…</p> <hr /> <ul>. Acá no estaba, y el bloque se leía corrido.
   { id: id('sep'), kind: 'separator', ruleIds: ['filete-tenue'], content: {} },
   LI(puntos, ['t-servicio-vineta']),
+  // El primero abre su ficha técnica en PDF, como en el original. Los otros
+  // dos no tienen ficha —probé los nombres plausibles en el sitio y sólo
+  // existe la de nuez con cáscara— y en el original tienen el destino vacío,
+  // o sea que no hacen nada.
+  //
+  // Acá apuntaban a «#contacto», que tampoco existe como ancla en la página:
+  // el botón se veía pinchable y no pasaba nada. Van al pie, donde está la
+  // dirección y las cuentas, que es lo único útil que podemos ofrecer sin
+  // inventar una ficha que no existe.
   { id: id('b'), kind: 'button', ruleIds: ['boton', 'boton-fondo', 'boton-texto', 'pildora', 'al-fondo'],
-    content: { label: 'Más Detalles', href: enlace || '#contacto', target: enlace ? 'blank' : 'self' } },
+    content: { label: 'Más Detalles', href: enlace || '#pie', target: enlace ? 'blank' : 'self' } },
 ], ['columna', 'tarjeta-alta']);
 
 nodes.push({
