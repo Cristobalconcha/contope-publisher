@@ -89,7 +89,13 @@ R('t-portada', 'typography', { role: 'portada', family: "'Bodoni Moda', Georgia,
 R('t-seccion', 'typography', { role: 'titulo-seccion', fontSize: 'clamp(34px, 4.4vw, 58px)', fontWeight: 600, lineHeight: 1.1, align: 'start' });
 R('t-seccion-centro', 'typography', { role: 'titulo-centrado', fontSize: 'clamp(34px, 4.4vw, 58px)', fontWeight: 600, lineHeight: 1.1, align: 'center' });
 R('t-sub', 'typography', { role: 'subtitulo', family: "'Bodoni Moda', Georgia, serif", fontSize: '26px', fontWeight: 600, lineHeight: 1.25 });
-R('t-rotulo', 'typography', { role: 'rotulo', fontSize: '13px', fontWeight: 600, letterSpacing: '0.14em', transform: 'uppercase' });
+// Medido en el original: 14px, interlínea 19,6, espaciado 1px y peso 500. Y
+// sí lleva mayúsculas automáticas —acá se había puesto en duda—, salvo que el
+// texto se escribe con Mayúscula En Cada Palabra, que es lo que se copia y lo
+// que leen los buscadores.
+R('t-rotulo', 'typography', { role: 'rotulo', fontSize: '14px', fontWeight: 500, letterSpacing: '1px', lineHeight: 1.4, transform: 'uppercase' });
+// El rótulo de servicios es el distinto: 22px en Big Shoulders, sin espaciado.
+R('t-rotulo-servicios', 'typography', { role: 'rotulo', family: "'Big Shoulders Display', 'Oswald', sans-serif", fontSize: '22px', fontWeight: 500, lineHeight: 1.2, transform: 'uppercase' });
 // Instalaciones: en el original el rótulo y el título van centrados, y el
 // título a 50px, no a los 58 del resto. El video mide 1080x609, o sea 16/9.
 R('t-rotulo-centro', 'typography', { role: 'rotulo', fontSize: '13px', fontWeight: 600, letterSpacing: '0.14em', transform: 'uppercase', align: 'center' });
@@ -364,9 +370,9 @@ const A = (label, href, reglas_ = ['t-rotulo']) => ({ id: id('a'), kind: 'link',
 // dos recibían el mismo aire y la sección no calzaba con el original.
 R('titulo-par', 'layout', { mode: 'stack', gap: '4px', align: 'start' });
 R('titulo-par-centro', 'layout', { mode: 'stack', gap: '4px', align: 'center' });
-const abre = (rotulo, titulo, centrado = false) => [
+const abre = (rotulo, titulo, centrado = false, reglaRotulo = '') => [
   G([
-    H(rotulo, 4, [centrado ? 't-rotulo-centro' : 't-rotulo', 'c-texto']),
+    H(rotulo, 4, [reglaRotulo || (centrado ? 't-rotulo-centro' : 't-rotulo'), 'c-texto']),
     H(titulo, 2, [centrado ? 't-seccion-centro' : 't-seccion', 'c-naranja']),
   ], [centrado ? 'titulo-par-centro' : 'titulo-par']),
 ];
@@ -409,7 +415,7 @@ nodes.push({
   id: 'portada', marker: 'portada', kind: 'section', ruleIds: ['aire-cero', 's-portada'],
   children: [G([
     G([
-      H('Innovación y sostenibilidad en cada nuez', 4, ['t-rotulo', 'c-texto']),
+      H('Innovación y Sostenibilidad en Cada Nuez', 4, ['t-rotulo', 'c-texto']),
       H('Servicio de verdad', 1, ['t-portada', 'c-naranja']),
       H('La clave es el compromiso', 3, ['t-sub']),
       P('No se trata de vender excedentes de capacidad de proceso, sino de brindar soluciones completas para exportadores, con control de calidad, proyección productiva, manejo de inventarios, informes completos de resultados, despacho SAG, trazabilidad y seguridad hasta destino. Y todo a un costo único y claro.', ['t-lead']),
@@ -425,29 +431,30 @@ const servicio = (url, alt, nombre, texto, puntos) => G([
   H(nombre, 3, ['t-servicio', 'c-naranja']),
   P(texto),
   LI(puntos),
-  { id: id('b'), kind: 'button', ruleIds: ['boton', 'boton-fondo', 'boton-texto', 'pildora', 'al-fondo'], content: { label: 'Más detalles', href: '#contacto', target: 'self' } },
+  { id: id('b'), kind: 'button', ruleIds: ['boton', 'boton-fondo', 'boton-texto', 'pildora', 'al-fondo'], content: { label: 'Más Detalles', href: '#contacto', target: 'self' } },
 ], ['columna', 'tarjeta-alta']);
 
 nodes.push({
   id: 'servicios', marker: 'servicios', kind: 'section', ruleIds: ['aire', 's-beige'],
   children: [G([
-    ...abre('Nuestros servicios', 'Procesamos con pasión'),
+    ...abre('Nuestros Servicios', 'Procesamos con pasión', false, 't-rotulo-servicios'),
     P('En Econut nos dedicamos al procesamiento de nueces desde su llegada desde el campo hasta el empaque final para exportación. Nuestro trabajo combina precisión técnica, compromiso humano y control de calidad en cada etapa.', ['t-lead']),
     G([
-      servicio(f.saco, 'Nuez con cáscara en saco', 'Nuez con cáscara',
-        'Selección y embalaje de nuez con cáscara por tamaño y calidad externa e interna, de acuerdo a estándares internacionales.',
-        // El segundo punto no está en econut.cl: lo pidió Cristóbal para que
-        // los tres servicios tengan dos viñetas y los botones queden parejos
-        // por contenido y no por un ajuste. Lo que dice sale de lo que el
-        // propio sitio declara en «Control de calidad»: color externo,
-        // distribución de tamaños, condición de la cáscara y humedad.
-        ['Embalaje en sacos de 10 y 25 kilos y cajas de hasta 10 kilos.',
+      servicio(f.saco, 'Nuez con cáscara en saco', 'Nuez con Cáscara',
+        'Selección y embalaje de Nuez con Cáscara por tamaño y calidad externa e interna, de acuerdo a estándares internacionales.',
+        // La primera viñeta ES del original y se había perdido: es la que hace
+        // juego con las de 20 y 40 toneladas de las otras dos tarjetas. Yo di
+        // por hecho que acá había una sola, y por eso agregamos la tercera.
+        // La tercera no está en econut.cl: la pidió Cristóbal. Lo que dice
+        // sale de lo que el propio sitio declara en «Control de calidad».
+        ['Capacidad diaria aproximada de 70 toneladas de producto de Ingreso.',
+         'Embalaje en sacos de 10 y 25 kilos y cajas de hasta 10 kilos.',
          'Control de calidad acucioso en cada lote: color externo, calibre, condición de la cáscara y humedad.']),
-      servicio(f.manual, 'Partido y selección manual', 'Nuez sin cáscara manual',
+      servicio(f.manual, 'Partido y selección manual', 'Nuez sin Cáscara Manual',
         'Partido y selección manual de nueces por tamaño, color y calidad según estándares internacionales.',
         ['Capacidad diaria aproximada de 20 toneladas de producto en cáscara de ingreso.',
          'Envasado en atmósfera modificada en bolsas de 5, 6, 10 ó 12 kilos y en cajas de hasta 12 kilos.']),
-      servicio(f.mecanico, 'Partido y selección mecánica', 'Nuez sin cáscara mecánico',
+      servicio(f.mecanico, 'Partido y selección mecánica', 'Nuez sin Cáscara Mecánico',
         'Partido y selección mecánica con inspección digital y visual de nueces por tamaño, color y calidad, según estándares internacionales.',
         ['Capacidad diaria aproximada de 40 toneladas de producto en cáscara de ingreso.',
          'Envasado en atmósfera modificada en bolsas de 10 ó 12 kilos y en cajas de hasta 12 kilos.']),
@@ -514,7 +521,11 @@ R('panel-cifra', 'layout', { mode: 'grid', columns: 2, gap: '36px', minColumnWid
 //
 // Acá el panel medía 956px contra los 650 del original: faltaba el logotipo,
 // el título no llevaba el año y la foto iba a todo lo ancho.
-const pestana = (numero, titulo, texto, icono, foto) => G([
+// `titulo` va LITERAL del original: sólo la primera pestaña lleva el año
+// delante («2005 | Fundación de Econut»); las otras tres no, y el generador se
+// lo ponía a todas. `subtitulo` es opcional y existe porque la pestaña de las
+// 10.000 toneladas trae un segundo encabezado que acá no estaba.
+const pestana = (numero, titulo, texto, icono, foto, subtitulo = '') => G([
   H(numero, 3, ['t-etiqueta-cifra']),
   G([
     G([
@@ -522,12 +533,14 @@ const pestana = (numero, titulo, texto, icono, foto) => G([
       IMG(icono, titulo, ['icono-cifra']),
     ], ['columna-iconos']),
     G([
-      H(`${numero} | ${titulo}`, 3, ['t-titulo-cifra', 'c-naranja']),
+      H(titulo, 3, ['t-titulo-cifra', 'c-naranja']),
+      ...(subtitulo ? [H(subtitulo, 4, ['t-subtitulo-cifra'])] : []),
       P(texto, ['t-texto-cifra']),
       IMG(foto, titulo, ['foto-cifra', 'foto-cifra-tam']),
     ], ['columna']),
   ], ['partida-cifra']),
 ]);
+R('t-subtitulo-cifra', 'typography', { role: 'subtitulo', fontSize: '18px', fontWeight: 600, lineHeight: 1.4 });
 R('partida-cifra', 'properties', { declarations: {
   display: 'grid', 'grid-template-columns': '150px minmax(0, 1fr)', 'column-gap': '20px', 'align-items': 'start',
 } });
@@ -542,14 +555,19 @@ nodes.push({
   id: 'cifras', marker: 'cifras', kind: 'section', ruleIds: ['aire', 's-beige'],
   children: [G([
     G([
-      pestana('2005', 'Fundación de Econut',
-        'Nacimos hace veinte años como una pequeña empresa familiar, con el proyecto de servir a la industria exportadora de nuez chilena. Una línea, mucho esfuerzo y un magnífico grupo de personas.', f.iFundacion, f.perspectiva),
+      // Los cuatro textos, literales del original. Estaban reescritos y
+      // recortados: faltaban el cierre de 2005, los 17.000 m2 de dependencias
+      // complementarias, el cierre de las 2.000 hectáreas y el segundo
+      // encabezado de las 10.000 toneladas.
+      pestana('2005', '2005 | Fundación de Econut',
+        'Nacimos hace veinte años como una pequeña empresa familiar, con el proyecto de servir a la industria exportadora de nuez chilena. Una línea, mucho esfuerzo y un magnífico grupo de personas. La mayoría de ellas comparten con nosotros el éxito de esta empresa hoy. En 2005 era difícil imaginar hasta dónde podía llegar el desarrollo de la industria de la nuez chilena.', f.iFundacion, f.perspectiva),
       pestana('12.000', 'Metros cuadrados de instalaciones',
-        'Hoy somos líderes en servicio de procesamiento de nueces para exportación en Chile, con tecnología moderna y dos plantas productivas con más de 12.000 metros cuadrados construidos.', f.iInstalaciones, f.aerea),
+        'Hoy estamos orgullosos de ser líderes en servicio de procesamiento de nueces para exportación en Chile, con una moderna tecnología y dos plantas productivas con más de 12,000 metros cuadrados de áreas limpias para proceso y 17,000 m2 de dependencias complementarias.', f.iInstalaciones, f.aerea),
       pestana('2.000', 'Hectáreas de huertos atendidos',
-        'Somos responsables de agregar valor a más de 2.000 hectáreas de nogales, cuyos dueños las han cuidado diligentemente. Por eso nos tomamos nuestra misión muy en serio.', f.iHectareas, f.plantaciones),
-      pestana('10.000', 'Toneladas de capacidad de proceso',
-        'Tres meses de proceso de nuez con cáscara y seis de nuez sin cáscara. Entregamos más de 100.000 kilos diarios de proceso en cáscara y 40.000 kilos diarios de nuez partida.', f.iProceso, f.mano),
+        'Nos tomamos nuestra misión muy en serio: somos responsables de agregar valor a más de 2,000 hectáreas de nogales, cuyos dueños las han cuidado diligentemente. Por lo tanto, tenemos que aplicar toda la experiencia que tenemos para mejorar continuamente cada temporada.', f.iHectareas, f.plantaciones),
+      pestana('10.000', 'Tons. de Capacidad de proceso',
+        'Hoy entregamos más de 100,000 kilos diarios de proceso de Nuez con Cáscara, calibrando, seleccionando, empacando y despachando para importantes clientes. 40,000 kilos diarios de nuez partida manual y mecánicamente pasan por nuestras salas, con los mejores sistemas de partido y selección disponibles. Todo ello con la calidad y servicio personalizado que nos caracteriza.', f.iProceso, f.mano,
+        '3 meses de proceso de Nuez con Cáscara y 6 meses de proceso de Nuez sin Cáscara.'),
     ], ['pestanas'], { etiqueta: ['pest-etiqueta', 'pest-etiqueta-activa'], lista: ['pest-lista'], panel: ['pest-panel'] }),
   ], ['caja'])],
 });
@@ -586,21 +604,29 @@ nodes.push({
     // izquierda, con 40px sueltos abajo y a la derecha. Con el envoltorio, el
     // margen es parejo por los cuatro lados.
     G([G([
+      // Los cuatro textos van LITERALES del original. Estaban recortados a la
+      // mitad: faltaban el muestreo externo de aflatoxinas y metales pesados,
+      // el laboratorio propio, el envío a laboratorio externo ante un conteo
+      // anormal y el control de envasado. Son frases que dicen lo que la
+      // empresa hace, no relleno.
       control(f.huertos, 'Huertos de nogales', 'Control de huertos', [
-        'Nuestros puntos de control comienzan con la fruta directamente en los huertos. Todas las nueces que recibimos han sido monitoreadas de acuerdo con exigentes estándares fitosanitarios.',
-        'Durante la post cosecha también colaboramos con nuestros productores para lograr los mejores resultados del despelonado y secado.',
+        'Nuestros puntos de control comienzan con la fruta directamente en los huertos. Todas las nueces que recibimos han sido monitoreadas de acuerdo con exigentes estándares fitosanitarios. Además, todos los productos que ingresan a la planta son muestreados para un análisis externo, especialmente para detectar aflatoxinas y metales pesados.',
+        'Durante la post cosecha también colaboramos con nuestros productores para lograr los mejores resultados del despelonado y secado. Cuanto menos estrés pongamos a nuestro producto durante la cosecha y post cosecha, mayor será la calidad de la nuez; limpia, sin daños externos e internos, con colores más claros y más porcentaje de mitades.',
       ]),
       control(f.bandeja, 'Nueces en bandeja de selección', 'Control de calidad', [
-        'Se toma una muestra importante de cada lote que ingresa a Econut para proyectar sus posibilidades en todas las áreas.',
-        'Se tiene en cuenta el color externo, la distribución de tamaños, las condiciones de la cáscara, el rendimiento y la humedad.',
+        'Se toma una muestra importante de cada lote que ingresa a Econut para proyectar sus posibilidades en todas las áreas. Con esta proyección podemos decidir de forma inteligente qué destino guiará el proceso: Para Nuez con Cáscara, Partido Mecánico o Manual.',
+        'Se tiene en cuenta el color externo, la distribución de tamaños, las condiciones de la cáscara, el rendimiento, la distribución del color de la semilla, porcentaje de mitades, la humedad y todos los parámetros para comprender el uso potencial de cada lote de nuez.',
+        'Nuestro personal de calidad se capacita constantemente para este muesteo con los métodos de análisis más asertivos.',
       ]),
       control(f.sag, 'Sello del SAG', 'Control de inocuidad', [
-        'Seguimos el proceso de manufactura revisando constantemente las condiciones sanitarias del área y las herramientas de trabajo.',
-        'Comprobamos la humedad y las tasas de coliformes, aerobio mesófilo, hongos y levaduras. El objetivo es evitar cualquier riesgo.',
+        'Una vez que la nuez comienza a ser procesada, seguimos su proceso de manufactura revisando constantemente las condiciones sanitarias en el área y las herramientas de trabajo. Tenemos nuestro propio laboratorio donde muestreamos materiales y manejo de productos.',
+        'Básicamente comprobamos la humedad, las tasas totales de coliformes, aerobio mesófilo, hongos y levaduras. Si se detecta un conteo anormal, expandimos la muestra y la enviamos a un laboratorio externo con larga experiencia en el manejo de la nuez.',
+        'El objetivo es evitar cualquier riesgo.',
       ]),
       control(f.revision, 'Revisión de una nuez partida', 'Control de producto terminado', [
-        'Verificamos los factores sanitarios y de calidad durante los pasos de selección y empaquetado.',
-        'Incluso antes de cada envío revisamos todos estos parámetros, para dar garantías reales a nuestros clientes.',
+        'Después de los profundos análisis de recepción, debemos verificar que todo esté bien con todos los demás factores sanitarios y de calidad tan importantes durante los pasos de selección y empaquetado.',
+        'De esta forma, controlamos las condiciones organolépticas y fisiológicas, junto con los estándares de calidad requeridos para el producto y las buenas condiciones de envasado: sellos de bolsas, oxigeno rersidual, sellos de caja, etiquetado de trazabilidad, etc.',
+        'Incluso antes de cada envío revisamos todos estos parámetros de calidad, para dar garantías reales a nuestros clientes.',
       ]),
     ], ['cuadrantes', 'cuadrantes-medida'])], ['cuadrantes-panel']),
   ], ['caja-centro'])],
@@ -635,9 +661,9 @@ nodes.push({
     G([
       IMG(f.sustentabilidad, 'Huertos de nogales de Econut desde el aire', ['foto-sustentabilidad']),
       G([
-        H('Sustentabilidad en acción', 4, ['t-rotulo', 'c-texto']),
-        H('Compromiso con el futuro', 2, ['t-compromiso', 'c-naranja']),
-        P('En Econut implementamos prácticas de economía circular para maximizar el uso de recursos. Nuestra eficiencia hídrica y el uso de energía solar son pilares fundamentales para reducir el impacto ambiental y promover un futuro más sostenible.'),
+        H('Sustentabilidad en Acción', 4, ['t-rotulo', 'c-texto']),
+        H('Compromiso con el Futuro', 2, ['t-compromiso', 'c-naranja']),
+        P('En Econut, implementamos prácticas de economía circular para maximizar el uso de recursos. Nuestra eficiencia hídrica y el uso de energía solar son pilares fundamentales para reducir el impacto ambiental y promover un futuro más sostenible.'),
       ], ['columna']),
     ], ['cert-abajo', 'cert-abajo-reparto', 'entra']),
   ], ['caja-certificaciones'])],
