@@ -234,6 +234,11 @@ const hacerReglas = () => {
   // al mostrar la página. Así cambiarla llega a todas sin recomponer, y no
   // queda escrita en el documento.
   R('p-mapa', 'interaction', { behavior: 'mapa' });
+  // Las puntas redondeadas del mini, como en el sitio publicado: el código
+  // original le pone `border-radius: 8px` al cuadradito. Va como regla sobre
+  // la PARTE `mini` que expone la conducta, no clavada en el plugin: el radio
+  // es una decisión de este sitio, no del módulo.
+  R('p-mapa-mini-forma', 'shape', { radius: '8px' });
   // La dirección va DENTRO del grupo del mapa, no al lado: así la conducta
   // está pensada, y es lo que permite que al abrirse el mapa grande baje a su
   // propia línea mientras la dirección se queda donde estaba.
@@ -299,6 +304,7 @@ const hacerReglas = () => {
         {
             id: id('g'), kind: 'group',
             ruleIds: ['p-mapa', 'p-mapa-grupo', 'p-mapa-grupo-mobile', 'p-mapa-grupo-tablet'],
+            partes: { mini: ['p-mapa-mini-forma'] },
             content: {
               lat: -33.804136, lng: -70.681617, zoom: 17,
               mini: MINI_MAPA,
