@@ -386,9 +386,12 @@ R('texto-sin-margen', 'properties', { declarations: {
 const H = (texto, nivel, reglas_) => ({ id: id('h'), kind: 'heading', ruleIds: [...reglas_, 'texto-sin-margen'], content: { text: texto, level: nivel } });
 const P = (texto, reglas_ = ['t-cuerpo']) => ({ id: id('p'), kind: 'paragraph', ruleIds: [...reglas_, 'texto-sin-margen'], content: { text: texto } });
 const IMG = (url, alt, reglas_ = ['foto']) => ({ id: id('i'), kind: 'image', ruleIds: reglas_, content: { assetUrl: url, alt } });
-const G = (hijos, reglas_ = [], partes) => {
+const G = (hijos, reglas_ = [], partes, marcador = '') => {
   const nodo = { id: id('g'), kind: 'group', ruleIds: reglas_, children: hijos };
   if (partes && Object.keys(partes).length) nodo.partes = partes;
+  // El marcador da un identificador estable al nodo, para enlazarlo desde
+  // otra parte de la página. El aviso lo usa para poder reabrirse.
+  if (marcador) nodo.marker = marcador;
   return nodo;
 };
 const LI = (items, reglas_ = ['t-cuerpo']) => ({ id: id('l'), kind: 'list', ruleIds: reglas_, content: { ordered: false, items } });
@@ -409,6 +412,66 @@ const abre = (rotulo, titulo, centrado = false, reglaRotulo = '', reglaTitulo = 
 
 const nodes = [];
 
+// 0 · El aviso emergente, donde vive el detalle que ya no cabe en la línea.
+//
+//     Aparece una vez por visitante y se cierra con la X, con Escape o
+//     pinchando fuera. La línea de arriba lo reabre, así que quien lo cierre
+//     sin leer puede volver.
+//
+//     Y lo importante: no sólo advierte, **deja verificar**. Dentro van las
+//     cuentas oficiales enlazadas, para que la persona pueda comprobar en el
+//     momento cuál es la verdadera. Advertir sin dar con qué comparar es lo
+//     que hacía la franja vieja, y por eso no bastaba.
+//
+//     Va al final y como sección propia SIN movimiento: su capa es fija, y
+//     dentro de una sección con animación de entrada quedaría escondida o
+//     corrida. Está advertido en el catálogo del plugin.
+const avisoEmergente = () => ({
+  id: 'seccion-aviso', marker: 'seccion-aviso', kind: 'section', ruleIds: [],
+  children: [G([
+    H('Aviso a la comunidad', 2, ['t-aviso-titulo-emergente', 'c-naranja']),
+    P('Le informamos que se ha detectado el uso fraudulento de nuestra marca en redes sociales. Personas inescrupulosas están cometiendo estafas en la venta de productos, utilizando nuestra identidad de forma ilegítima.', ['t-aviso-cuerpo']),
+    P('Estamos trabajando activamente para denunciar y eliminar estas cuentas falsas. Su seguridad es nuestra prioridad. Les pedimos que tomen las siguientes precauciones para evitar ser víctimas de estos fraudes:', ['t-aviso-cuerpo']),
+    G([
+      H('Verifiquen la autenticidad', 3, ['t-aviso-rotulo-emergente']),
+      P('Antes de realizar cualquier compra, asegúrense de que la cuenta o página web que está viendo sea nuestra cuenta oficial.', ['t-aviso-cuerpo']),
+    ], ['columna-junta']),
+    G([
+      H('Sospeche de ofertas inusuales', 3, ['t-aviso-rotulo-emergente']),
+      P('Las estafas suelen atraer con precios increíbles. Si una oferta parece demasiado buena probablemente no sea real.', ['t-aviso-cuerpo']),
+    ], ['columna-junta']),
+    G([
+      H('Proteja su información personal', 3, ['t-aviso-rotulo-emergente']),
+      P('No comparta datos sensibles como contraseñas, números de tarjeta de crédito o códigos de seguridad.', ['t-aviso-cuerpo']),
+    ], ['columna-junta']),
+    H('Nuestras cuentas oficiales', 3, ['t-aviso-rotulo-emergente']),
+    P('Éstas son las únicas cuentas de Econut. Si le escribieron desde otra, no somos nosotros.', ['t-aviso-cuerpo']),
+    G(Object.entries(REDES).map(([red, d]) => ({
+      id: id('s'), kind: 'social', ruleIds: ['t-aviso-cuenta'], content: {
+        network: red, url: d.url, handle: d.handle,
+        size: 28, iconPadding: 6, iconColor: OSCURO,
+        backgroundColor: 'transparent', borderRadius: '999px',
+      },
+    })), ['aviso-cuentas']),
+  // El marcador va en el GRUPO que lleva la conducta, no en la sección: es el
+  // que el aviso reconoce para reabrirse desde un enlace. Con el marcador en
+  // la sección, el enlace de la línea no lo reabría.
+  ], ['aviso-estafas', 'aviso-caja'], { panel: ['aviso-panel'], velo: ['aviso-velo'], cerrar: ['aviso-cerrar'] },
+     'aviso-estafas')],
+});
+R('aviso-estafas', 'interaction', { behavior: 'aviso' });
+R('aviso-caja', 'layout', { mode: 'stack', gap: '14px', align: 'start' });
+R('aviso-panel', 'surface', { backgroundColor: BLANCO, foregroundColor: TEXTO });
+R('aviso-velo', 'surface', { backgroundColor: OSCURO });
+R('aviso-cerrar', 'surface', { backgroundColor: BLANCO, foregroundColor: TEXTO });
+R('aviso-cuentas', 'properties', { declarations: {
+  display: 'flex', 'flex-direction': 'column', 'align-items': 'flex-start', gap: '8px', 'margin-block-start': '4px',
+} });
+R('t-aviso-titulo-emergente', 'typography', { role: 'titulo-seccion', fontSize: '26px', fontWeight: 600, lineHeight: 1.2, align: 'start' });
+R('t-aviso-rotulo-emergente', 'typography', { role: 'subtitulo', fontSize: '15px', fontWeight: 700, lineHeight: 1.3 });
+R('t-aviso-cuerpo', 'typography', { role: 'cuerpo', fontSize: '14px', lineHeight: 1.5, measure: '54ch' });
+R('t-aviso-cuenta', 'typography', { role: 'cuerpo', fontSize: '13px', lineHeight: 1.4 });
+
 // 1 · El aviso, reducido a una LÍNEA. Ocupaba media pantalla —208px en el original
 // y 273 acá— y era lo primero que veía cualquiera que entrara. Cristóbal pidió
 // achicarlo: la advertencia tiene que estar, pero no puede ser la portada.
@@ -426,7 +489,7 @@ nodes.push({
   children: [G([
     G([
       P('Atención: hay cuentas falsas vendiendo a nombre de Econut. Verifique siempre que esté hablando con nuestras cuentas oficiales.', ['t-aviso-linea']),
-      A('Ver cuentas oficiales', '#pie', ['t-aviso-enlace']),
+      A('Ver cuentas oficiales', '#aviso-estafas', ['t-aviso-enlace']),
     ], ['aviso-linea']),
   ], ['caja'])],
 });
@@ -742,6 +805,10 @@ nodes.push({
 });
 
 // 11 · El pie tampoco: vive en la región global «cod-region-footer».
+
+// 12 · El aviso emergente va al FINAL, y sin movimiento: su capa es fija, y
+//      dentro de una sección con animación de entrada quedaría escondida.
+nodes.push(avisoEmergente());
 
 writeFileSync('composicion-fiel.json', JSON.stringify({
   pageId: 20,
