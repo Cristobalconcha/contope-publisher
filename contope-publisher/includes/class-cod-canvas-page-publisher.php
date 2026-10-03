@@ -39,11 +39,61 @@ final class COD_Canvas_Page_Publisher
      */
     public const SHORTCODE_HEREDADO = 'open_codesign_canvas';
 
-    /** ¿Este contenido inserta un documento, con el nombre que sea? */
+    /** El bloque contenedor: el contenido vive en WordPress, la forma la pone ContOpe. */
+    public const BLOQUE = 'contope/lienzo';
+
+    /**
+     * ¿Este contenido inserta un documento, de la forma que sea?
+     *
+     * Hay DOS formas, y las dos cuentan:
+     *
+     *  - el shortcode, que es como el publisher ha guardado las páginas hasta
+     *    ahora: el post_content es una sola línea y todo el contenido vive
+     *    dentro del documento del lienzo;
+     *  - el bloque contope/lienzo, donde el CONTENIDO son bloques de WordPress
+     *    de verdad —títulos, párrafos, imágenes— y el documento sólo aporta la
+     *    forma.
+     *
+     * La segunda es a donde vamos. Esta función es la que decide si una página
+     * recibe el encabezado, el pie y las hojas de estilo del sitio, y mientras
+     * sólo miró el shortcode, sacar el contenido del lienzo significaba sacar
+     * la página del sitio entero: perdía encabezado, pie y todo el diseño.
+     * Pasó de verdad el 3 de octubre con la página de términos, y por eso hubo
+     * que devolverla al lienzo sin haber conseguido nada.
+     */
     private static function tiene_shortcode(string $contenido): bool
     {
         return has_shortcode($contenido, self::SHORTCODE)
-            || has_shortcode($contenido, self::SHORTCODE_HEREDADO);
+            || has_shortcode($contenido, self::SHORTCODE_HEREDADO)
+            || has_block(self::BLOQUE, $contenido);
+    }
+
+    /**
+     * De qué documento sale la FORMA de esta página, venga como venga escrito.
+     *
+     * El shortcode lo dice como `document_id="…"`; el bloque, como un atributo
+     * JSON `{"documentId":"…"}`. Se leen los dos acá y no en cada sitio donde
+     * hacía falta, porque antes la expresión estaba escrita a mano en dos
+     * lugares y el día que apareció la segunda forma habría habido que
+     * acordarse de los dos.
+     */
+    public static function documento_del_contenido(string $contenido): string
+    {
+        if (preg_match('/document_id=[\x22\x27]?([a-z0-9_-]+)/i', $contenido, $m) === 1) {
+            return sanitize_key($m[1]);
+        }
+        // El atributo del bloque. `parse_blocks` es lo correcto —entiende el
+        // JSON, los espacios y los bloques anidados— y no una expresión
+        // regular sobre el comentario, que se rompe con cualquier formato.
+        if (has_block(self::BLOQUE, $contenido)) {
+            foreach (parse_blocks($contenido) as $bloque) {
+                if (($bloque['blockName'] ?? '') === self::BLOQUE) {
+                    return sanitize_key((string) ($bloque['attrs']['documentId'] ?? ''));
+                }
+            }
+        }
+
+        return '';
     }
 
     /** Evita que el CSS se emita dos veces cuando ya salió en la cabecera. */
@@ -51,8 +101,21 @@ final class COD_Canvas_Page_Publisher
 
     private static ?string $shared_css_cache = null;
 
+    /**
+     * La instancia viva, para que el render de un bloque pueda pedirle que
+     * envuelva su contenido en las regiones del sitio. Un bloque se dibuja
+     * desde un archivo suelto y no tiene forma de alcanzarla si no.
+     */
+    private static ?self $instancia = null;
+
+    public static function instancia(): ?self
+    {
+        return self::$instancia;
+    }
+
     public function register(): void
     {
+        self::$instancia = $this;
         add_shortcode(self::SHORTCODE, [$this, 'render_shortcode']);
         add_shortcode(self::SHORTCODE_HEREDADO, [$this, 'render_shortcode']);
         add_action('wp_enqueue_scripts', [$this, 'estilos_en_cabecera'], 5);
@@ -1292,10 +1355,11 @@ CSS;
         if (!self::tiene_shortcode($contenido)) {
             return;
         }
-        if (preg_match('/document_id=[\x22\x27]?([a-z0-9_-]+)/i', $contenido, $coincidencias) !== 1) {
+        $documento_id = self::documento_del_contenido($contenido);
+        if ($documento_id === '') {
             return;
         }
-        $document = $this->repository->load(sanitize_key($coincidencias[1]));
+        $document = $this->repository->load($documento_id);
         if (is_wp_error($document)) {
             return;
         }
@@ -1371,10 +1435,6 @@ CSS;
         // makes a global (or category-local) region propagate automatically
         // to every page that uses it without republishing each one.
         $post_id = (int) get_the_ID();
-        $header_html = '';
-        $footer_html = '';
-        $header_css = '';
-        $footer_css = '';
         // El cuerpo por defecto es el documento propio de la página. Una región
         // `body` que resuelve Y tiene HTML no vacío lo reemplaza (estilo Divi:
         // cuerpo dinámico ACF/tokens); si resuelve vacía, se conserva el
@@ -1382,33 +1442,79 @@ CSS;
         $body_html = (string) $document['html'];
         $body_css = (string) $document['css'];
         $body_document_id = $document_id;
-        if ($this->region_resolver !== null) {
-            if ($post_id > 0) {
-                $header = $this->region_resolver->resolve(
-                    COD_Canvas_Document_Repository::REGION_KIND_HEADER,
-                    $post_id
-                );
-                if ($header !== null) {
-                    $header_html = (string) $header['html'];
-                    $header_css = (string) $header['css'];
-                }
-                $footer = $this->region_resolver->resolve(
-                    COD_Canvas_Document_Repository::REGION_KIND_FOOTER,
-                    $post_id
-                );
-                if ($footer !== null) {
-                    $footer_html = (string) $footer['html'];
-                    $footer_css = (string) $footer['css'];
-                }
-                $body = $this->region_resolver->resolve(
-                    COD_Canvas_Document_Repository::REGION_KIND_BODY,
-                    $post_id
-                );
-                if ($body !== null && trim((string) $body['html']) !== '') {
-                    $body_html = (string) $body['html'];
-                    $body_css = (string) $body['css'];
-                    $body_document_id = (string) $body['documentId'];
-                }
+        if ($this->region_resolver !== null && $post_id > 0) {
+            $body = $this->region_resolver->resolve(
+                COD_Canvas_Document_Repository::REGION_KIND_BODY,
+                $post_id
+            );
+            if ($body !== null && trim((string) $body['html']) !== '') {
+                $body_html = (string) $body['html'];
+                $body_css = (string) $body['css'];
+                $body_document_id = (string) $body['documentId'];
+            }
+        }
+
+        return $this->salida_con_regiones($body_html, $body_css, $body_document_id);
+    }
+
+    /**
+     * Pone el ENCABEZADO y el PIE del sitio alrededor de un cuerpo, sea cual
+     * sea el origen de ese cuerpo, y deja la página lista para mostrarse.
+     *
+     * POR QUÉ EXISTE. Hasta el 3 de octubre de 2026 esto vivía dentro de
+     * `render_shortcode`, y la consecuencia era que **una página sólo tenía
+     * encabezado si su contenido estaba guardado dentro del publisher**. Una
+     * página con su contenido en bloques de WordPress salía sin encabezado,
+     * sin pie y sin nada: se caía del sitio.
+     *
+     * Dicho por Cristóbal, que fue quien lo diagnosticó: «¿Por qué las páginas
+     * están sin header? Porque no estás trabajando las páginas como
+     * corresponde. Hay un header para todo el sitio. El header debería ser
+     * global. ¿Por qué no está el header en esta página nueva? Si por el hecho
+     * de construirse debería asumirlo y adoptarlo».
+     *
+     * Tiene razón y es la raíz, no un síntoma: un encabezado global que depende
+     * de cómo se guardó el contenido no es global. Ahora lo usan las dos vías
+     * —el shortcode y el bloque `contope/lienzo`— y la región se resuelve al
+     * MOSTRAR, contra la página real, que es lo que hace que cambiar el pie
+     * una vez llegue a todas las páginas sin recomponer ninguna.
+     */
+    /**
+     * El CSS de un documento, para quien tiene su identificador y no el
+     * repositorio: el render de un bloque, por ejemplo.
+     */
+    public function css_del_documento(string $documento_id): string
+    {
+        if ($documento_id === '') {
+            return '';
+        }
+        $documento = $this->repository->load($documento_id);
+        return is_wp_error($documento) ? '' : (string) ($documento['css'] ?? '');
+    }
+
+    public function salida_con_regiones(string $body_html, string $body_css, string $body_document_id): string
+    {
+        $post_id = (int) get_the_ID();
+        $header_html = '';
+        $footer_html = '';
+        $header_css = '';
+        $footer_css = '';
+        if ($this->region_resolver !== null && $post_id > 0) {
+            $header = $this->region_resolver->resolve(
+                COD_Canvas_Document_Repository::REGION_KIND_HEADER,
+                $post_id
+            );
+            if ($header !== null) {
+                $header_html = (string) $header['html'];
+                $header_css = (string) $header['css'];
+            }
+            $footer = $this->region_resolver->resolve(
+                COD_Canvas_Document_Repository::REGION_KIND_FOOTER,
+                $post_id
+            );
+            if ($footer !== null) {
+                $footer_html = (string) $footer['html'];
+                $footer_css = (string) $footer['css'];
             }
         }
 

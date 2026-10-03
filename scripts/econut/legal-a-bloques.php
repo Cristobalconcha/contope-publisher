@@ -160,7 +160,21 @@ $bloques = [
         . 'entra en vigencia el 1 de diciembre de 2026.'),
 ];
 
-$contenido = implode("\n\n", $bloques) . "\n";
+// De qué documento sale la FORMA. El contenido ya no vive ahí: vive en los
+// bloques de arriba.
+$documento = (string) get_post_meta($pagina->ID, '_cod_document_id', true);
+if ($documento === '') {
+    $documento = 'cod-canvas-page-' . $pagina->ID;
+}
+
+// Todo va DENTRO del contenedor de ContOpe. Eso es lo que hace que la página
+// siga siendo parte del sitio —encabezado, pie, hojas de estilo—: el plugin
+// reconoce este bloque igual que reconocía su shortcode. Sin el contenedor, la
+// página se sale del sitio, que es exactamente lo que pasó el 3 de octubre al
+// primer intento.
+$contenido = '<!-- wp:contope/lienzo {"documentId":"' . $documento . '"} -->' . "\n"
+    . implode("\n\n", $bloques) . "\n"
+    . '<!-- /wp:contope/lienzo -->' . "\n";
 
 echo "Página: {$pagina->ID}  ({$pagina->post_name})\n";
 echo "Ahora: " . (strpos($pagina->post_content, '[contope_canvas') !== false

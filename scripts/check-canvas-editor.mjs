@@ -900,9 +900,23 @@ async function checkPublishingAndAssets() {
       callNames(methodOf(publisherClass, 'publish')).includes('wp_insert_post'),
       'La publicación debe crear o actualizar una página WordPress.',
     );
+    // El CSS y las regiones del sitio se aplican en `salida_con_regiones`, que
+    // es la salida común. Antes esto vivía dentro de `render_shortcode`, y esa
+    // era justamente la causa de que una página con su contenido en bloques de
+    // WordPress saliera sin encabezado, sin pie y sin estilos: lo del sitio
+    // dependía de cómo estuviera guardado el contenido. Ahora las dos vías
+    // —el shortcode y el bloque contope/lienzo— pasan por el mismo sitio.
     check(
-      callNames(methodOf(publisherClass, 'render_shortcode')).includes('wp_add_inline_style'),
-      'El render publicado debe aplicar el CSS guardado del documento.',
+      callNames(methodOf(publisherClass, 'salida_con_regiones')).includes('wp_add_inline_style'),
+      'La salida con regiones debe aplicar el CSS guardado del documento.',
+    );
+    check(
+      callNames(methodOf(publisherClass, 'render_shortcode')).includes('salida_con_regiones'),
+      'El shortcode debe salir por la misma salida común, para no duplicar las regiones.',
+    );
+    check(
+      callNames(methodOf(publisherClass, 'salida_con_regiones')).includes('resolve'),
+      'La salida con regiones debe resolver el encabezado y el pie al mostrar, no al publicar.',
     );
     check(
       publisher.source.includes('META_DOCUMENT_ID') && publisher.source.includes('post_status'),
