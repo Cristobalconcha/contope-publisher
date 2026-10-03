@@ -1,0 +1,61 @@
+/*
+ * La disposición de la página: ancho máximo, centrado y aire lateral.
+ *
+ * POR QUÉ ESTÁ ACÁ Y NO EN `supports.layout`. Lo primero que probé fue
+ * declararle al bloque `supports.layout`, que es la forma de WordPress y la
+ * correcta en un bloque normal. No sirve en éste: el render de este bloque
+ * emite TAMBIÉN el encabezado y el pie del sitio, así que la salida empieza
+ * con un `<header>`, y WordPress le pone la clase de disposición al primer
+ * elemento que encuentra. Medido: `is-layout-constrained` terminó en el
+ * `<header>` del sitio en vez de en el contenedor del contenido — o sea, ni
+ * constreñía el texto ni dejaba en paz al encabezado.
+ *
+ * Así que la disposición se aplica acá, a mano, pero SIN inventar las medidas:
+ * se leen de las variables que el propio tema publica desde su theme.json
+ * (`contentSize: 1180px`, `wideSize: 1360px` en Econut). Si mañana el tema
+ * cambia su ancho, esto lo sigue solo. Los valores de reserva son por si el
+ * tema no declarara ninguno.
+ *
+ * Esto es lo que Cristóbal señaló mirando la página de términos ya hecha de
+ * bloques: «el body tiene reglas generales que son de la página: si es líquida
+ * o no, y el ancho máximo. Esto no tiene límites ni márgenes». El texto iba de
+ * borde a borde de la pantalla.
+ */
+.wp-block-contope-lienzo {
+  padding-inline-start: 24px;
+  padding-inline-end: 24px;
+  box-sizing: border-box;
+}
+
+/* Cada pieza del contenido, centrada en el ancho de lectura del tema. */
+.wp-block-contope-lienzo > * {
+  max-width: var(--wp--style--global--content-size, 1180px);
+  margin-inline-start: auto;
+  margin-inline-end: auto;
+}
+
+/* «Ancho» y «completo» son la forma de WordPress de decir que una pieza es
+   líquida. Se respetan: para eso se piden. */
+.wp-block-contope-lienzo > .alignwide {
+  max-width: var(--wp--style--global--wide-size, 1360px);
+}
+
+.wp-block-contope-lienzo > .alignfull {
+  max-width: none;
+  /* Una pieza a ancho completo tiene que poder tocar los bordes, así que se
+     come el aire lateral del contenedor. */
+  margin-inline-start: -24px;
+  margin-inline-end: -24px;
+}
+
+@media (max-width: 600px) {
+  .wp-block-contope-lienzo {
+    padding-inline-start: 20px;
+    padding-inline-end: 20px;
+  }
+
+  .wp-block-contope-lienzo > .alignfull {
+    margin-inline-start: -20px;
+    margin-inline-end: -20px;
+  }
+}

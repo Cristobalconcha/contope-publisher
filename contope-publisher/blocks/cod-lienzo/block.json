@@ -2,20 +2,36 @@
   "$schema": "https://schemas.wp.org/trunk/block.json",
   "apiVersion": 3,
   "name": "contope/lienzo",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "title": "Contenido ContOpe",
   "category": "design",
   "icon": "layout",
   "description": "El contenido de esta página. Se edita acá, y ContOpe le da la forma.",
   "textdomain": "contope-publisher",
   "attributes": {
-    "documentId": { "type": "string", "default": "" }
+    "documentId": {
+      "type": "string",
+      "default": ""
+    }
   },
   "supports": {
     "html": false,
     "multiple": false,
-    "reusable": false
+    "reusable": false,
+    "align": [
+      "wide",
+      "full"
+    ],
+    "spacing": {
+      "padding": true,
+      "blockGap": true,
+      "__experimentalDefaultControls": {
+        "padding": true
+      }
+    }
   },
+  "example": {},
   "editorScript": "file:./index.js",
-  "render": "file:./render.php"
+  "render": "file:./render.php",
+  "style": "file:./style.css"
 }
