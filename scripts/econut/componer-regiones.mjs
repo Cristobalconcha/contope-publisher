@@ -45,10 +45,10 @@ const id = (p) => `${p}-${++n}`;
 
 const hacerReglas = () => {
   const reglas = [];
-  const R = (rid, kind, value) => {
+  const R = (rid, kind, value, { bp = 'all' } = {}) => {
     reglas.push({
       id: rid, kind,
-      scope: { breakpoint: 'all', state: 'default', roles: [] },
+      scope: { breakpoint: bp, state: 'default', roles: [] },
       provenance: { sources: [{ kind: 'reference', reference: 'https://econut.cl/', rationale: 'Medido del sitio real con el navegador.' }] },
       status: 'reviewed', value,
     });
@@ -174,6 +174,18 @@ const hacerReglas = () => {
   R('p-redes', 'properties', { declarations: {
     display: 'flex', 'flex-direction': 'column', 'align-items': 'flex-start', gap: '6px',
   } });
+  // En pantallas angostas el pie NO puede seguir repartido en cuatro columnas:
+  // a la dirección le quedaban 91px y se cortaba a tres palabras por línea.
+  // Se apila, y todo se alinea a la izquierda para que se lea de corrido.
+  // OJO: hacen falta las dos, móvil Y tablet. El escalón móvil del plugin
+  // llega hasta 767, y un iPad vertical mide justo 768: por un píxel se queda
+  // con la disposición de escritorio y la dirección vuelve a 91px de ancho.
+  for (const bp of ['mobile', 'tablet']) {
+    R(`p-barra-${bp}`, 'properties', { declarations: {
+      'grid-template-columns': 'minmax(0, 1fr)', 'row-gap': '18px', 'justify-items': 'start',
+    } }, { bp });
+    R(`p-texto-${bp}`, 'typography', { role: 'pie', fontSize: '12px', lineHeight: 1.4, align: 'start' }, { bp });
+  }
   R('p-red-item', 'typography', { role: 'pie', fontSize: '12px', lineHeight: 1.4 });
   // 12px con interlínea 1.4: en el original las tres líneas de la dirección
   // caben en 50px de alto, y con 13/1.6 ocupaban 71.
@@ -185,15 +197,15 @@ const hacerReglas = () => {
   const nodes = [{
     id: 'pie', marker: 'pie', kind: 'footer', ruleIds: ['p-aire', 'p-superficie'],
     children: [{
-      id: id('g'), kind: 'group', ruleIds: ['p-barra'], children: [
+      id: id('g'), kind: 'group', ruleIds: ['p-barra', 'p-barra-mobile', 'p-barra-tablet'], children: [
         { id: id('i'), kind: 'image', ruleIds: ['p-logo'], content: { assetUrl: f.logoCalado, alt: 'Econut' } },
         { id: id('g'), kind: 'group', ruleIds: ['p-columna'], children: [
           // La dirección, copiada literal del pie de econut.cl. La que había
           // acá —«Ruta 78 de Septiembre s/n, Parcela 3 / Rinconada de Doñihue,
           // Región del Libertador»— era otra calle, otra comuna y otra región.
-          { id: id('p'), kind: 'paragraph', ruleIds: ['p-texto'], content: { text: 'Av 18 de Septiembre sn Hijuela 2' } },
-          { id: id('p'), kind: 'paragraph', ruleIds: ['p-texto'], content: { text: 'Fundo San Rafael - Sector Nuevo Sendero,' } },
-          { id: id('p'), kind: 'paragraph', ruleIds: ['p-texto'], content: { text: 'Paine, Región Metropolitana' } },
+          { id: id('p'), kind: 'paragraph', ruleIds: ['p-texto', 'p-texto-mobile', 'p-texto-tablet'], content: { text: 'Av 18 de Septiembre sn Hijuela 2' } },
+          { id: id('p'), kind: 'paragraph', ruleIds: ['p-texto', 'p-texto-mobile', 'p-texto-tablet'], content: { text: 'Fundo San Rafael - Sector Nuevo Sendero,' } },
+          { id: id('p'), kind: 'paragraph', ruleIds: ['p-texto', 'p-texto-mobile', 'p-texto-tablet'], content: { text: 'Paine, Región Metropolitana' } },
         ] },
         // Las cuentas oficiales, CON el nombre escrito. Acá el nombre importa
         // más que el icono: es lo que una persona puede comparar letra por
