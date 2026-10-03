@@ -20,7 +20,7 @@ const declaraciones = fuente.matchAll(/'(\w+)' => \['patron' => '\/\^([^']+)\$\/
 for (const [, campo, cuerpo] of declaraciones) {
   FORMATOS[campo] = new RegExp('^' + cuerpo + '$');
 }
-const esperados = ['gtm', 'ga4', 'ads', 'meta_pixel'];
+const esperados = ['gtm', 'ga4', 'ads', 'ads_conv_formulario', 'ads_conv_whatsapp', 'meta_pixel'];
 for (const campo of esperados) {
   if (!FORMATOS[campo]) {
     console.log('No pude leer el formato de "' + campo + '" desde el PHP. ¿Cambió formatos()?');
@@ -42,6 +42,11 @@ const INVISIBLES = new RegExp(
 function normalizar(crudo, campo) {
   let texto = crudo.replace(INVISIBLES, ' ').trim();
   if (campo === 'meta_pixel') return texto.replace(/\D/g, '');
+  if (campo === 'ads_conv_formulario' || campo === 'ads_conv_whatsapp') {
+    // La etiqueta distingue mayúsculas: no se sube a mayúsculas. Sólo el prefijo.
+    const par = texto.match(/AW-[0-9]{6,14}\/[A-Za-z0-9_-]+/i);
+    return par ? 'AW-' + par[0].slice(3) : texto;
+  }
   texto = texto.toUpperCase();
   const prefijos = { gtm: 'GTM', ga4: 'G', ads: 'AW' };
   if (prefijos[campo]) {
@@ -71,6 +76,12 @@ const CASOS = [
   ['Analytics limpio', 'ga4', 'G-ABC1234XYZ', 'G-ABC1234XYZ'],
   ['Analytics con espacio duro', 'ga4', ' G-ABC1234XYZ ', 'G-ABC1234XYZ'],
   ['Ads en minúsculas', 'ads', 'aw-123456789', 'AW-123456789'],
+  ['conversión limpia, con sus mayúsculas', 'ads_conv_formulario', 'AW-751289133/dnRYCLmy84odEK2Gn-YC', 'AW-751289133/dnRYCLmy84odEK2Gn-YC'],
+  ['conversión con espacio duro pegado', 'ads_conv_formulario', ' AW-751289133/dnRYCLmy84odEK2Gn-YC ', 'AW-751289133/dnRYCLmy84odEK2Gn-YC'],
+  ['conversión: prefijo en minúsculas', 'ads_conv_whatsapp', 'aw-751289133/dnRYCLmy84odEK2Gn-YC', 'AW-751289133/dnRYCLmy84odEK2Gn-YC'],
+  ['conversión: el fragmento de Google', 'ads_conv_formulario', "gtag('event', 'conversion', {'send_to': 'AW-751289133/dnRYCLmy84odEK2Gn-YC'});", 'AW-751289133/dnRYCLmy84odEK2Gn-YC'],
+  ['conversión sin la etiqueta (sólo el ID)', 'ads_conv_formulario', 'AW-751289133', null],
+  ['conversión con la barra al revés', 'ads_conv_formulario', 'AW-751289133\\dnRYCLmy84odEK2Gn-YC', null],
   ['pixel con texto alrededor', 'meta_pixel', 'ID: 123456789012345', '123456789012345'],
 ];
 

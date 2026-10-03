@@ -5,6 +5,47 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.43 — 3 de octubre de 2026
+
+### Agregado
+
+- **Contar una conversión de Google Ads cuando alguien envía un formulario o
+  escribe por WhatsApp, sin pasar por Tag Manager.** En Configuración →
+  «Etiquetas de medición» hay dos campos nuevos: «Conversión de Ads: envío de
+  formulario» y «Conversión de Ads: envío por WhatsApp». Se pega lo que Google da
+  al crear la conversión, por ejemplo `AW-751289133/dnRYCLmy84odEK2Gn-YC` (también
+  sirve pegar el fragmento completo de Google; el plugin saca el par). Los dos
+  son opcionales.
+
+  Antes el sitio sólo podía medir la visita; la conversión había que armarla a
+  mano en el código del tema o en Tag Manager. Ahora basta con la etiqueta.
+
+- **Sirve para los dos motores de formularios, y para los dos a la vez.** El
+  sitio cuenta el envío tanto si el formulario es el propio de ContOpe
+  (Orugantt Forms) como si es Gravity Forms, que es lo que tenían los sitios que
+  migran desde otro WordPress. Si el sitio tiene los dos, cuenta los dos.
+
+- **No se cuenta dos veces.** Es el riesgo de escuchar varios avisos a la vez, y
+  inflaría los números de la campaña. El sitio cuenta como mucho una conversión
+  por motor dentro de una ventana de 2 segundos (Gravity avisa por dos vías a la
+  vez y a veces se repite), y aunque otro plugin imprima el guion dos veces, sólo
+  se engancha una. Dos envíos reales, separados, sí cuentan los dos.
+
+- **Avisa cuando la configuración no mediría nada.** Una etiqueta de conversión
+  sin el identificador de Google Ads (ni el de Analytics 4) no mide, y no se nota
+  mirando el sitio. La pantalla de Configuración lo dice con un aviso, y también
+  cuando la etiqueta es de una cuenta distinta a la del identificador de Ads
+  configurado. Una etiqueta mal escrita no se guarda y el aviso nombra el campo.
+
+- Qué NO viaja a Google: nada de lo que la persona escribió en el formulario. El
+  evento lleva sólo la etiqueta de la conversión; ni el nombre del formulario ni
+  el nombre, correo o teléfono de quien lo envió.
+
+- Si ya configuraste estas conversiones dentro de Tag Manager, deja estos
+  campos vacíos: en los dos lados se contarían doble.
+
+---
+
 ## 0.3.42 — 1 de octubre de 2026
 
 ### Corregido

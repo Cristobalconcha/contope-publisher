@@ -271,6 +271,11 @@ final class COD_Settings_Admin
                         <em>envía el formulario</em> y cuando <em>abre WhatsApp</em>, así que
                         esas dos conversiones quedan disponibles apenas conectes el contenedor.
                     </p>
+                    <p>
+                        Si en cambio mides con Google Ads directo, sin Tag Manager, pega abajo las
+                        etiquetas de conversión del formulario y de WhatsApp: el sitio las cuenta
+                        solo, con el formulario propio o con Gravity Forms.
+                    </p>
                     <?php
                     $cod_medicion = COD_Medicion::ajustes();
                     $cod_medicion_campos = COD_Medicion::campos_para_pantalla();
@@ -284,21 +289,14 @@ final class COD_Settings_Admin
                     <?php if ($cod_medicion_malos !== []) : ?>
                         <div class="notice notice-error">
                             <p>
-                                No se guardó
-                                <?php
-                                $cod_nombres = [];
-                                foreach ($cod_medicion_malos as $cod_malo) {
-                                    if (isset($cod_medicion_campos[$cod_malo])) {
-                                        $cod_nombres[] = $cod_medicion_campos[$cod_malo]['etiqueta']
-                                            . ' (se espera algo como ' . $cod_medicion_campos[$cod_malo]['ejemplo'] . ')';
-                                    }
-                                }
-                                echo esc_html(implode('; ', $cod_nombres));
-                                ?>.
+                                <?php echo esc_html(COD_Medicion::mensaje_de_errores($cod_medicion_malos)); ?>
                                 Revisa que esté copiado completo y vuelve a guardar.
                             </p>
                         </div>
                     <?php endif; ?>
+                    <?php foreach (COD_Medicion::avisos_de_conversion($cod_medicion) as $cod_aviso) : ?>
+                        <div class="notice notice-warning"><p><?php echo esc_html($cod_aviso); ?></p></div>
+                    <?php endforeach; ?>
                     <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
                         <input type="hidden" name="action" value="cod_save_medicion">
                         <?php wp_nonce_field('cod_save_medicion'); ?>
