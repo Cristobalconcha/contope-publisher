@@ -50,6 +50,23 @@ final class COD_Divisor
     public const DONDE = ['arriba', 'abajo', 'ambos'];
 
     /**
+     * Cuántas capas extra admite un divisor.
+     *
+     * POR QUÉ HAY CAPAS. Una forma sola lee como un recorte: la banda de abajo
+     * mordiendo a la de arriba, y nada más. Dos o tres de la misma forma,
+     * corridas entre sí y con distinta opacidad, leen como PROFUNDIDAD —que es
+     * lo que uno quiere de una onda—. Cristóbal, el 3 de octubre de 2026: «los
+     * divisores quedan como un poco duros; tal vez que se puedan aplicar dos
+     * capas con diferentes niveles de alfa, y con desplazamiento».
+     *
+     * CUATRO Y NO MÁS. Cada capa translúcida encima de otra sube el valor del
+     * conjunto; pasadas tres o cuatro el degradado se empasta y la forma deja
+     * de leerse. No es una limitación técnica sino el punto donde el recurso
+     * se vuelve contra sí mismo.
+     */
+    public const MAX_CAPAS = 4;
+
+    /**
      * Reemplaza cada marcador de divisor por su SVG, ya limpio.
      *
      * Si la forma no se puede leer o no es un SVG válido, el divisor
@@ -177,15 +194,20 @@ final class COD_Divisor
         return <<<CSS
 /* El divisor se apoya en el borde de su sección y no empuja el contenido. */
 {$r}{position:absolute;left:0;right:0;z-index:1;pointer-events:none;line-height:0;overflow:hidden;
-height:var(--cod-divisor-alto,80px);}
-{$r}[data-cod-divisor-donde="arriba"]{top:0;}
+height:var(--cod-divisor-alto,80px);opacity:var(--cod-divisor-alfa,1);}
+{$r}[data-cod-divisor-donde="arriba"]{top:0;--cod-divisor-sy:-1;}
 {$r}[data-cod-divisor-donde="abajo"]{bottom:0;}
-{$r} > svg{display:block;width:calc(100% * var(--cod-divisor-repeticion,1));height:100%;}
+/* El sobreancho es lo que permite desplazar una capa sin despegarla de los
+   bordes: el dibujo se hace más ancho que su caja y se corre hacia atrás la
+   misma medida, así el desplazamiento ocurre DENTRO del recorte y nunca deja
+   una esquina vacía. Sin esto, correr una capa 60px abre un hueco de 60px. */
+{$r} > svg{display:block;height:100%;
+width:calc(100% * var(--cod-divisor-repeticion,1) + 2 * var(--cod-divisor-margen,0px));
+margin-inline-start:calc(-1 * var(--cod-divisor-margen,0px));
+transform:translateX(var(--cod-divisor-dx,0px)) scale(var(--cod-divisor-sx,1),var(--cod-divisor-sy,1));}
 /* Volteado: la misma forma del revés, sin necesitar un archivo distinto —que
    es la mitad de las 27 formas de Divi, que son pares de lo mismo invertido. */
-{$r}[data-cod-divisor-voltear="1"] > svg{transform:scaleX(-1);}
-{$r}[data-cod-divisor-donde="arriba"] > svg{transform:scaleY(-1);}
-{$r}[data-cod-divisor-donde="arriba"][data-cod-divisor-voltear="1"] > svg{transform:scale(-1,-1);}
+{$r}[data-cod-divisor-voltear="1"]{--cod-divisor-sx:-1;}
 /* El contenedor del divisor tiene que ser el ancla de su posición. `:has` es
    lo que permite no exigirle al diseño que lo declare: si hay divisor dentro,
    el contenedor se vuelve relativo solo. */

@@ -5,6 +5,50 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.56 — 3 de octubre de 2026
+
+### Agregado
+
+- **Un divisor puede tener capas.** La misma forma repetida detrás de sí misma,
+  corrida a lo ancho y con menos opacidad. Cristóbal, al ver la muestra: «los
+  divisores quedan como un poco duros; tal vez que se puedan aplicar dos capas
+  con diferentes niveles de alfa, y con desplazamiento».
+
+  Tiene razón y el porqué vale anotarlo: **una forma sola lee como un recorte**
+  —la banda de abajo mordiendo a la de arriba, y nada más—. Dos o tres corridas
+  entre sí leen como profundidad, que es lo que uno quiere de una onda. Divi no
+  tiene esto: sus divisores son de una sola capa.
+
+  Tres decisiones:
+
+  - **Una capa hereda del divisor todo lo que no declara** —forma, color, alto,
+    repetición, volteado—. No son divisores apilados, es un divisor con grosor;
+    por eso cambiar la forma cambia las tres capas de una vez.
+  - **El desplazamiento es horizontal.** Mover una capa hacia arriba dejaría al
+    descubierto la franja de abajo, porque un divisor es una masa que tapa
+    apoyada en el borde. La variación vertical se consigue dándole a la capa
+    otro alto, que además deforma la silueta y queda mejor.
+  - **Cuatro capas como tope.** No es una limitación técnica: pasadas tres o
+    cuatro translúcidas el degradado se empasta y la forma deja de leerse.
+
+  Y un detalle que no se ve pero sin el cual nada de esto funciona: al correr
+  una capa, su dibujo se hace **más ancho que su caja** y se corre hacia atrás
+  la misma medida. Sin eso, desplazar una capa 60 px abre un hueco de 60 px en
+  un borde.
+
+- **El control de capas en el inspector**, con opacidad, desplazamiento y alto
+  por capa. Una capa nueva entra ya tenue y ya corrida: en 1 y sin desplazar
+  sería invisible y parecería que el botón no hizo nada.
+
+### Corregido
+
+- **Los colores de la muestra de divisores salen de un ciclo y no escritos a
+  mano.** Al insertar dos muestras al principio quedaron catorce bandas con el
+  color del divisor equivocado —el de un divisor es el de la banda siguiente—.
+  Ahora insertar una muestra en medio no obliga a recolorear las demás.
+
+---
+
 ## 0.3.55 — 3 de octubre de 2026
 
 ### Agregado

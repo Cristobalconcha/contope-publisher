@@ -74,21 +74,47 @@ R('rotulo-centro', 'properties', { declarations: { 'text-align': 'center' } });
  * un tercer color. Equivocarse en eso es el error más común al usarlos.
  */
 const MUESTRAS = [
-  { forma: 'pendiente', rotulo: 'Pendiente', fondo: 'banda-oscura', sigue: BEIGE },
-  { forma: 'pendiente-suave', rotulo: 'Pendiente suave · volteada', fondo: 'banda-clara', sigue: BLANCO, voltear: true },
-  { forma: 'onda', rotulo: 'Onda', fondo: 'banda-blanca', sigue: VERDE },
-  { forma: 'onda-suave', rotulo: 'Onda suave', fondo: 'banda-oscura', sigue: BEIGE },
-  { forma: 'ondas', rotulo: 'Ondas · repetida 2 veces', fondo: 'banda-clara', sigue: BLANCO, repeticion: 2 },
-  { forma: 'curva', rotulo: 'Curva', fondo: 'banda-blanca', sigue: VERDE },
-  { forma: 'cerros', rotulo: 'Cerros', fondo: 'banda-oscura', sigue: BEIGE },
-  { forma: 'cordillera', rotulo: 'Cordillera · alta', fondo: 'banda-clara', sigue: BLANCO, alto: '140px' },
-  { forma: 'nubes', rotulo: 'Nubes', fondo: 'banda-blanca', sigue: VERDE },
-  { forma: 'dientes', rotulo: 'Dientes', fondo: 'banda-oscura', sigue: BEIGE },
-  { forma: 'escalones', rotulo: 'Escalones', fondo: 'banda-clara', sigue: BLANCO },
-  { forma: 'triangulo', rotulo: 'Triángulo', fondo: 'banda-blanca', sigue: VERDE },
-  { forma: 'asimetrica', rotulo: 'Asimétrica', fondo: 'banda-oscura', sigue: BEIGE },
-  { forma: 'curva-invertida', rotulo: 'Curva invertida · arriba y abajo', fondo: 'banda-clara', sigue: BLANCO, donde: 'ambos' },
+  // Las capas van primero porque son lo que separa un divisor vivo de un
+  // recorte plano, y conviene verlas antes de recorrer el catálogo de formas.
+  {
+    forma: 'onda', rotulo: 'Onda · tres capas', alto: '120px',
+    capas: [
+      { opacidad: 0.25, desplazamiento: '-90px', alto: '170px' },
+      { opacidad: 0.5, desplazamiento: '45px', alto: '145px' },
+    ],
+  },
+  {
+    forma: 'cerros', rotulo: 'Cerros · dos capas', alto: '110px',
+    capas: [{ opacidad: 0.35, desplazamiento: '-70px', alto: '150px', voltear: true }],
+  },
+  { forma: 'pendiente', rotulo: 'Pendiente' },
+  { forma: 'pendiente-suave', rotulo: 'Pendiente suave · volteada', voltear: true },
+  { forma: 'onda', rotulo: 'Onda' },
+  { forma: 'onda-suave', rotulo: 'Onda suave' },
+  { forma: 'ondas', rotulo: 'Ondas · repetida 2 veces', repeticion: 2 },
+  { forma: 'curva', rotulo: 'Curva' },
+  { forma: 'cerros', rotulo: 'Cerros' },
+  { forma: 'cordillera', rotulo: 'Cordillera · alta', alto: '140px' },
+  { forma: 'nubes', rotulo: 'Nubes' },
+  { forma: 'dientes', rotulo: 'Dientes' },
+  { forma: 'escalones', rotulo: 'Escalones' },
+  { forma: 'triangulo', rotulo: 'Triángulo' },
+  { forma: 'asimetrica', rotulo: 'Asimétrica' },
+  { forma: 'curva-invertida', rotulo: 'Curva invertida · arriba y abajo', donde: 'ambos' },
 ];
+
+/**
+ * El fondo de cada banda y, por lo tanto, el color de su divisor, salen del
+ * ciclo y no se escriben a mano: así insertar una muestra en medio no obliga a
+ * recolorear las catorce siguientes, que es exactamente el error que se cometió
+ * al agregar las capas.
+ */
+const CICLO = [['banda-oscura', VERDE], ['banda-clara', BEIGE], ['banda-blanca', BLANCO]];
+MUESTRAS.forEach((m, i) => {
+  m.fondo = CICLO[i % 3][0];
+  // La última banda tiene debajo el fondo blanco de la página, no otra banda.
+  m.sigue = i === MUESTRAS.length - 1 ? BLANCO : CICLO[(i + 1) % 3][1];
+});
 
 const bandas = MUESTRAS.map((m, i) => {
   const reglaDiv = `div-${m.forma}-${i}`;
@@ -96,15 +122,22 @@ const bandas = MUESTRAS.map((m, i) => {
   if (m.alto) valor.alto = m.alto;
   if (m.repeticion) valor.repeticion = m.repeticion;
   if (m.voltear) valor.voltear = true;
+  if (m.capas) valor.capas = m.capas;
   // El color del divisor es el de la banda SIGUIENTE: un divisor es la banda
   // de abajo invadiendo a la de arriba, no una pieza de un tercer color.
   valor.color = m.sigue;
   R(reglaDiv, 'divisor', valor);
 
+  // Un divisor se monta sobre el contenido a propósito; en una muestra, en
+  // cambio, el rótulo tiene que leerse. El aire se decide por la pieza MÁS
+  // alta, que con capas no es la principal.
+  const altos = [m.alto, ...(m.capas || []).map((c) => c.alto)].filter(Boolean).map((a) => parseInt(a, 10));
+  const aire = altos.length && Math.max(...altos) > 100 ? 'banda-aire-alta' : 'banda-aire';
+
   return {
     id: id('banda'),
     kind: 'section',
-    ruleIds: [m.fondo, m.alto ? 'banda-aire-alta' : 'banda-aire', reglaDiv],
+    ruleIds: [m.fondo, aire, reglaDiv],
     children: [
       {
         id: id('r'),
@@ -134,7 +167,9 @@ const nodes = [
           content: {
             text: 'Catorce formas de partida, generadas con un guion y subidas a Medios. '
               + 'No son el catálogo: cualquier SVG del sitio sirve como divisor. '
-              + 'Cada banda de abajo usa una, con su color, su alto y, en algunos casos, repetida o volteada.',
+              + 'Cada banda usa una, con su color, su alto y, en algunos casos, repetida o volteada. '
+              + 'Las dos primeras llevan capas: la misma forma repetida detrás de sí misma, corrida y '
+              + 'con menos opacidad, que es lo que le da profundidad a un borde que solo lee como recorte.',
           },
         },
       ],

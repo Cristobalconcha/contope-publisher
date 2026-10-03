@@ -142,8 +142,68 @@ $css = COD_Divisor::css($html);
 $comprobar('sale sólo si hay divisor en la página', COD_Divisor::css('<div>nada</div>') === '');
 $comprobar('no empuja el contenido', strpos($css, 'position:absolute') !== false);
 $comprobar('no se come los clics', strpos($css, 'pointer-events:none') !== false);
-$comprobar('el de arriba va espejado', strpos($css, 'scaleY(-1)') !== false);
+$comprobar('el de arriba va espejado', strpos($css, '--cod-divisor-sy:-1') !== false);
+$comprobar('una capa puede correrse sin despegarse del borde',
+    strpos($css, '--cod-divisor-margen') !== false && strpos($css, 'translateX(var(--cod-divisor-dx') !== false);
 $comprobar('no fija colores de marca', stripos($css, '#') === false);
+
+/**
+ * Las capas. Lo que importa comprobar no es que el atributo salga, sino que
+ * una capa HEREDE del divisor lo que no declara: si no heredara, cambiar la
+ * forma dejaría las capas dibujando la anterior y el recurso sería inusable.
+ */
+echo "\n== las capas ==\n";
+$r4 = $compilador->compile($componer(), $diseno([$regla([
+    'forma' => $ondaRel, 'color' => '#2E594A', 'alto' => '90px', 'repeticion' => 2,
+    'capas' => [
+        ['opacidad' => 0.3, 'desplazamiento' => '-60px', 'alto' => '130px'],
+        ['opacidad' => 0.6, 'desplazamiento' => '40px'],
+    ],
+])]));
+$comprobar('dos capas compilan', !is_wp_error($r4), $mensaje($r4));
+$h4 = is_wp_error($r4) ? '' : $r4['storage']['markup'];
+$comprobar('  se dibujan tres piezas (dos capas + la principal)', substr_count($h4, 'class="cod-divisor"') === 3);
+$comprobar('  con su opacidad', strpos($h4, '--cod-divisor-alfa:0.3') !== false && strpos($h4, '--cod-divisor-alfa:0.6') !== false);
+$comprobar('  con su desplazamiento', strpos($h4, '--cod-divisor-dx:-60px') !== false && strpos($h4, '--cod-divisor-dx:40px') !== false);
+$comprobar('  y el sobreancho en positivo, para que no se despegue del borde',
+    strpos($h4, '--cod-divisor-margen:60px') !== false && strpos($h4, '--cod-divisor-margen:40px') !== false);
+$comprobar('  la capa hereda la forma del divisor', substr_count($h4, 'divisor-forma="' . $ondaRel . '"') === 3);
+$comprobar('  hereda el color', substr_count($h4, 'color:#2E594A') === 3);
+$comprobar('  hereda la repetición', substr_count($h4, '--cod-divisor-repeticion:2') === 3);
+$comprobar('  pero su propio alto manda sobre el heredado',
+    strpos($h4, '--cod-divisor-alto:130px') !== false && strpos($h4, '--cod-divisor-alto:90px') !== false);
+// Las capas van antes en el documento porque son hermanas absolutas: el orden
+// es lo único que las deja detrás de la principal.
+$comprobar('  las capas van marcadas como tales, para que el inspector no confunda cuál es la principal',
+    substr_count($h4, 'data-cod-divisor-capa="1"') === 2);
+$comprobar('  la principal se dibuja al final, encima de sus capas',
+    strrpos($h4, '--cod-divisor-alfa:') < strrpos($h4, 'class="cod-divisor"'));
+
+$r5 = $compilador->compile($componer(), $diseno([$regla([
+    'forma' => $ondaRel, 'donde' => 'ambos', 'capas' => [['opacidad' => 0.4]],
+])]));
+$comprobar('«ambos» lleva sus capas a los dos bordes',
+    !is_wp_error($r5) && substr_count($r5['storage']['markup'], 'class="cod-divisor"') === 4, $mensaje($r5));
+
+$r6 = $compilador->compile($componer(), $diseno([$regla([
+    'forma' => $ondaRel, 'voltear' => true, 'capas' => [['voltear' => false]],
+])]));
+$comprobar('una capa puede desvoltearse aunque el divisor esté volteado',
+    !is_wp_error($r6) && substr_count($r6['storage']['markup'], 'data-cod-divisor-voltear="1"') === 1, $mensaje($r6));
+
+foreach ([
+    'capas que no son lista'   => ['forma' => $ondaRel, 'capas' => ['opacidad' => 0.5]],
+    'más de cuatro capas'      => ['forma' => $ondaRel, 'capas' => [[], [], [], [], []]],
+    'opacidad fuera de rango'  => ['forma' => $ondaRel, 'capas' => [['opacidad' => 1.5]]],
+    'opacidad como texto'      => ['forma' => $ondaRel, 'capas' => [['opacidad' => '0.5']]],
+    'desplazamiento inseguro'  => ['forma' => $ondaRel, 'capas' => [['desplazamiento' => 'url(x)']]],
+    'forma ajena en una capa'  => ['forma' => $ondaRel, 'capas' => [['forma' => 'https://otro.cl/x.svg']]],
+    'clave inventada en capa'  => ['forma' => $ondaRel, 'capas' => [['sombra' => '2px']]],
+    'capas anidadas'           => ['forma' => $ondaRel, 'capas' => [['capas' => [[]]]]],
+] as $nombre => $malo) {
+    $rr = $compilador->compile($componer(), $diseno([$regla($malo)]));
+    $comprobar("rechaza $nombre", is_wp_error($rr));
+}
 
 echo "\n== el saneador del documento lo deja pasar ==\n";
 $limpio = (new COD_Canvas_Document_Sanitizer())->sanitize_html($html);
@@ -156,6 +216,9 @@ $comprobar('la familia existe', isset($cat['familias']['divisor']));
 $comprobar('con su clase de regla', ($cat['familias']['divisor']['kind'] ?? '') === 'divisor');
 $comprobar('la forma es un recurso, no una lista', ($cat['familias']['divisor']['propiedades']['forma']['control'] ?? '') === 'recurso');
 $comprobar('se le ofrece a una sección', in_array('divisor', $cat['taxonomias']['section']['diseno'] ?? [], true));
+$comprobar('declara las capas', isset($cat['familias']['divisor']['propiedades']['capas']['capa']['opacidad']));
+$comprobar('  con el mismo tope que el código',
+    ($cat['familias']['divisor']['propiedades']['capas']['maximo'] ?? 0) === COD_Divisor::MAX_CAPAS);
 
 echo "\n";
 if ($fallas === 0) { echo "probar-divisor.php   TODO OK\n"; exit(0); }

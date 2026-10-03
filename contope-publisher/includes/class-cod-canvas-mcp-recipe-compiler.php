@@ -1844,7 +1844,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
     private function normalize_divisor_rule(array $value)
     {
         $codigo = 'cod_mcp_divisor_rule_invalid';
-        $permitidas = ['forma', 'donde', 'alto', 'repeticion', 'voltear', 'color'];
+        $permitidas = ['forma', 'donde', 'alto', 'repeticion', 'voltear', 'color', 'capas'];
 
         if (!$this->has_only_keys($value, $permitidas)) {
             return new WP_Error($codigo, 'divisor admite: ' . implode(', ', $permitidas) . '.');
@@ -1906,7 +1906,124 @@ final class COD_Canvas_MCP_Recipe_Compiler
             $normalizado['voltear'] = $value['voltear'];
         }
 
+        if (isset($value['capas'])) {
+            $capas = $this->normalize_divisor_capas($value['capas'], $codigo);
+            if ($capas instanceof WP_Error) {
+                return $capas;
+            }
+            if ($capas !== []) {
+                $normalizado['capas'] = $capas;
+            }
+        }
+
         return $normalizado;
+    }
+
+    /**
+     * Las capas de un divisor: la misma forma repetida detrás de sí misma,
+     * corrida y con menos opacidad, para que el borde tenga profundidad en vez
+     * de leerse como un recorte plano.
+     *
+     * UNA CAPA NO REPITE LO QUE YA DIJO LA PRINCIPAL. Cada capa hereda forma,
+     * color, alto, repetición y volteado del divisor; sólo declara en qué se
+     * aparta. Eso es lo que hace que cambiar la forma del divisor cambie las
+     * tres capas de una vez, que es como se trabaja: no son tres divisores
+     * apilados, es un divisor con grosor.
+     *
+     * EL DESPLAZAMIENTO ES HORIZONTAL. Mover una capa hacia arriba dejaría al
+     * descubierto la franja de abajo, porque un divisor es una masa que tapa
+     * apoyada en el borde; la variación vertical se consigue dándole a la capa
+     * otro `alto`, que además deforma la silueta y queda mejor.
+     *
+     * @param mixed $valor
+     * @return array<int, array<string, mixed>>|WP_Error
+     */
+    private function normalize_divisor_capas($valor, string $codigo)
+    {
+        if (!is_array($valor) || ($valor !== [] && array_keys($valor) !== range(0, count($valor) - 1))) {
+            return new WP_Error($codigo, 'divisor.capas es una lista de capas.');
+        }
+        if (count($valor) > COD_Divisor::MAX_CAPAS) {
+            return new WP_Error(
+                $codigo,
+                'divisor.capas admite hasta ' . COD_Divisor::MAX_CAPAS . ' capas: pasadas tres o cuatro '
+                    . 'translúcidas el degradado se empasta y la forma deja de leerse.'
+            );
+        }
+
+        $permitidas = ['forma', 'color', 'alto', 'repeticion', 'voltear', 'opacidad', 'desplazamiento'];
+        $capas = [];
+
+        foreach ($valor as $i => $capa) {
+            if (!is_array($capa) || !$this->has_only_keys($capa, $permitidas)) {
+                return new WP_Error($codigo, 'divisor.capas[' . $i . '] admite: ' . implode(', ', $permitidas) . '.');
+            }
+
+            $limpia = [];
+
+            if (isset($capa['forma'])) {
+                $forma = is_string($capa['forma']) ? trim($capa['forma']) : '';
+                if ($forma === '' || !$this->is_safe_link($forma) || !COD_Divisor::es_del_sitio($forma)
+                    || substr(strtolower((string) parse_url($forma, PHP_URL_PATH)), -4) !== '.svg') {
+                    return new WP_Error($codigo, 'divisor.capas[' . $i . '].forma tiene que ser un .svg del propio sitio.');
+                }
+                $limpia['forma'] = $forma;
+            }
+            if (isset($capa['color'])) {
+                if (!is_string($capa['color']) || !$this->is_css_color($capa['color'])) {
+                    return new WP_Error($codigo, 'divisor.capas[' . $i . '].color debe ser un color CSS seguro.');
+                }
+                $limpia['color'] = $capa['color'];
+            }
+            if (isset($capa['alto'])) {
+                if (!is_string($capa['alto']) || !$this->is_css_length($capa['alto'])) {
+                    return new WP_Error($codigo, 'divisor.capas[' . $i . '].alto debe ser una longitud CSS segura.');
+                }
+                $limpia['alto'] = $capa['alto'];
+            }
+            if (isset($capa['repeticion'])) {
+                if (!is_int($capa['repeticion']) || $capa['repeticion'] < 1 || $capa['repeticion'] > 12) {
+                    return new WP_Error($codigo, 'divisor.capas[' . $i . '].repeticion debe ser un entero entre 1 y 12.');
+                }
+                $limpia['repeticion'] = $capa['repeticion'];
+            }
+            if (isset($capa['voltear'])) {
+                if (!is_bool($capa['voltear'])) {
+                    return new WP_Error($codigo, 'divisor.capas[' . $i . '].voltear es verdadero o falso.');
+                }
+                $limpia['voltear'] = $capa['voltear'];
+            }
+            if (isset($capa['opacidad'])) {
+                // Se acepta el entero 1 además del flotante porque un JSON
+                // escrito a mano dice `1`, no `1.0`, y rechazarlo sería una
+                // trampa del formato y no una regla de diseño.
+                if (!is_float($capa['opacidad']) && !is_int($capa['opacidad'])) {
+                    return new WP_Error($codigo, 'divisor.capas[' . $i . '].opacidad es un número entre 0 y 1.');
+                }
+                $opacidad = (float) $capa['opacidad'];
+                if ($opacidad < 0 || $opacidad > 1) {
+                    return new WP_Error($codigo, 'divisor.capas[' . $i . '].opacidad es un número entre 0 y 1.');
+                }
+                $limpia['opacidad'] = $opacidad;
+            }
+            if (isset($capa['desplazamiento'])) {
+                // Negativo, a propósito: correr una capa hacia la izquierda es
+                // tan necesario como hacia la derecha, y es el signo lo que
+                // hace que dos capas se separen en vez de amontonarse.
+                if (!is_string($capa['desplazamiento']) || !$this->is_css_length($capa['desplazamiento'], true)) {
+                    return new WP_Error(
+                        $codigo,
+                        'divisor.capas[' . $i . '].desplazamiento debe ser una longitud CSS segura, '
+                            . 'con signo si corre hacia la izquierda: por ejemplo "-60px".'
+                    );
+                }
+                $limpia['desplazamiento'] = $capa['desplazamiento'];
+            }
+
+            $capas[] = $limpia;
+        }
+
+        return $capas;
     }
 
     private function normalize_properties_rule(array $value)
@@ -3673,30 +3790,70 @@ final class COD_Canvas_MCP_Recipe_Compiler
         $donde = (string) ($divisor['donde'] ?? 'abajo');
         $lugares = $donde === 'ambos' ? ['arriba', 'abajo'] : [$donde];
 
-        $estilo = [];
-        if (isset($divisor['alto'])) {
-            $estilo[] = '--cod-divisor-alto:' . $divisor['alto'];
-        }
-        if (isset($divisor['repeticion'])) {
-            $estilo[] = '--cod-divisor-repeticion:' . (int) $divisor['repeticion'];
-        }
-        if (isset($divisor['color'])) {
-            // Va como `color` y no como `fill`: el SVG hereda con currentColor.
-            $estilo[] = 'color:' . $divisor['color'];
-        }
-        $estilo = $estilo === [] ? '' : ' style="' . esc_attr(implode(';', $estilo)) . '"';
-
-        $voltear = !empty($divisor['voltear']) ? ' data-cod-divisor-voltear="1"' : '';
+        // Las capas van PRIMERO para quedar detrás: son hermanas absolutas en
+        // la misma caja, así que lo que manda es el orden del documento. La
+        // principal se dibuja al final porque es la que tiene que apoyarse
+        // limpia contra la sección siguiente.
+        $capas = $divisor['capas'] ?? [];
 
         $salida = '';
         foreach ($lugares as $lugar) {
-            $salida .= '<div class="' . COD_Divisor::CLASE . '"'
-                . ' ' . COD_Divisor::ATRIBUTO_FORMA . '="' . esc_attr((string) $divisor['forma']) . '"'
-                . ' data-cod-divisor-donde="' . esc_attr($lugar) . '"'
-                . $voltear . $estilo . '></div>';
+            foreach ($capas as $capa) {
+                $salida .= $this->render_divisor_capa($divisor, $capa, $lugar, true);
+            }
+            $salida .= $this->render_divisor_capa($divisor, [], $lugar, false);
         }
 
         return $salida;
+    }
+
+    /**
+     * Una pieza de divisor: la principal (con `$capa` vacía) o una de sus
+     * capas, que hereda del divisor todo lo que no declara.
+     *
+     * @param array<string, mixed> $divisor
+     * @param array<string, mixed> $capa
+     */
+    private function render_divisor_capa(array $divisor, array $capa, string $lugar, bool $es_capa): string
+    {
+        $forma = (string) ($capa['forma'] ?? $divisor['forma']);
+        $estilo = [];
+
+        $alto = $capa['alto'] ?? $divisor['alto'] ?? null;
+        if ($alto !== null) {
+            $estilo[] = '--cod-divisor-alto:' . $alto;
+        }
+        $repeticion = $capa['repeticion'] ?? $divisor['repeticion'] ?? null;
+        if ($repeticion !== null) {
+            $estilo[] = '--cod-divisor-repeticion:' . (int) $repeticion;
+        }
+        $color = $capa['color'] ?? $divisor['color'] ?? null;
+        if ($color !== null) {
+            // Va como `color` y no como `fill`: el SVG hereda con currentColor.
+            $estilo[] = 'color:' . $color;
+        }
+        if (isset($capa['opacidad'])) {
+            $estilo[] = '--cod-divisor-alfa:' . rtrim(rtrim(number_format((float) $capa['opacidad'], 3, '.', ''), '0'), '.');
+        }
+        if (isset($capa['desplazamiento'])) {
+            $dx = (string) $capa['desplazamiento'];
+            $estilo[] = '--cod-divisor-dx:' . $dx;
+            // El sobreancho es el valor absoluto del desplazamiento: sin él,
+            // correr la capa 60px dejaría 60px de hueco en un borde.
+            $estilo[] = '--cod-divisor-margen:' . ltrim($dx, '-');
+        }
+
+        $voltear = array_key_exists('voltear', $capa) ? !empty($capa['voltear']) : !empty($divisor['voltear']);
+
+        return '<div class="' . COD_Divisor::CLASE . '"'
+            . ' ' . COD_Divisor::ATRIBUTO_FORMA . '="' . esc_attr($forma) . '"'
+            . ' data-cod-divisor-donde="' . esc_attr($lugar) . '"'
+            // Marcada como capa para que el inspector sepa cuál es la pieza
+            // principal sin tener que adivinarlo por el orden.
+            . ($es_capa ? ' data-cod-divisor-capa="1"' : '')
+            . ($voltear ? ' data-cod-divisor-voltear="1"' : '')
+            . ($estilo === [] ? '' : ' style="' . esc_attr(implode(';', $estilo)) . '"')
+            . '></div>';
     }
 
     /** @param array<string, mixed> $content */

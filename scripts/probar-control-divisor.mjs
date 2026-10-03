@@ -38,6 +38,25 @@ ok('guarda la ruta sin el dominio', insp.includes('function rutaRelativa'));
 ok('trae los controles de Divi', ['Dónde', 'Alto', 'Color', 'Repeticiones', 'Voltear'].every((c) => insp.includes(c)));
 ok('permite quitarlo', insp.includes('Quitar el divisor'));
 
+/**
+ * Las capas. Lo que vale comprobar acá es que el editor y el servidor escriban
+ * el MISMO marcado: si se desincronizaran, el divisor se vería de una forma al
+ * componer y de otra al publicar, que es el defecto más caro de encontrar.
+ */
+console.log('\n== las capas ==');
+ok('el panel las ofrece', insp.includes('Agregar una capa'));
+ok('distingue una capa de la principal', insp.includes('function esCapa') && insp.includes('data-cod-divisor-capa'));
+ok('no toma la primera pieza por principal', insp.includes('existentes.find((d) => !esCapa(d))'));
+ok('escribe opacidad y desplazamiento', insp.includes('--cod-divisor-alfa:') && insp.includes('--cod-divisor-dx:'));
+ok('y el sobreancho que evita el hueco', insp.includes('--cod-divisor-margen:'));
+ok('las dibuja detrás de la principal', insp.includes('piezas.reverse()'));
+ok('respeta el mismo tope que el servidor',
+  insp.includes('DIVISOR_MAX_CAPAS = 4') && cat.familias?.divisor?.propiedades?.capas?.maximo === 4);
+ok('el catálogo declara qué lleva una capa',
+  ['opacidad', 'desplazamiento', 'alto'].every((c) => !!cat.familias?.divisor?.propiedades?.capas?.capa?.[c]));
+ok('la previsualización del editor muestra la opacidad', beh.includes('opacity:var(--cod-divisor-alfa,1);'));
+ok('y el desplazamiento', beh.includes('mask-position:var(--cod-divisor-dx,0px)'));
+
 console.log('\n== la máscara no ensucia el documento ==');
 ok('el inspector no la escribe en el estilo guardado', !insp.includes('estilo.push(`-webkit-mask-image'));
 ok('la pone el runtime del editor', beh.includes('function pintarDivisores'));

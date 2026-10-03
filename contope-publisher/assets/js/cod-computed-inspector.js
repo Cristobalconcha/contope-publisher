@@ -418,6 +418,16 @@
       .cod-ci__divisor button { border:1px solid #ffffff26; border-radius:5px; padding:6px 10px; background:#2a2e36; color:#f2f3f5; cursor:pointer; font:inherit; }
       .cod-ci__divisor button:hover { border-color:#a06a34; }
       .cod-ci__divisor-quitar { margin-top:8px; width:100%; }
+      .cod-ci__divisor-capas { margin-top:10px; padding-top:8px; border-top:1px solid #ffffff1a; }
+      .cod-ci__divisor-capas-title { margin-bottom:6px; color:#c7bda9; font-size:10px; font-weight:650; }
+      /* Opacidad, desplazamiento y alto en una sola línea: son tres números de
+         la misma capa y separarlos en campos con rótulo haría del panel una
+         escalera. El rótulo va en el title de cada campo. */
+      .cod-ci__divisor-capa { display:grid; grid-template-columns:14px 1fr 1fr 1fr 24px; gap:4px; align-items:center; margin-bottom:5px; }
+      .cod-ci__divisor-capa-n { color:#a9a39a; font-size:10px; text-align:center; }
+      .cod-ci__divisor-capa input { min-width:0; padding:5px; font-size:11px; }
+      .cod-ci__divisor-capa-quitar { padding:4px 0 !important; }
+      .cod-ci__divisor-capa-sumar { width:100%; }
       .cod-ci__divisor-hint { margin:-2px 0 4px; color:#a9a39a; font-size:10px; line-height:1.4; }
       .cod-ci__marker-hint.is-ok { color:#8fb08f; }
       .cod-ci__marker-hint.is-error { color:#ffb4b4; }
@@ -1602,6 +1612,9 @@
 
     const DIVISOR_CLASE = 'cod-divisor';
     const DIVISOR_ATTR_FORMA = 'data-cod-divisor-forma';
+    // El mismo tope que COD_Divisor::MAX_CAPAS: pasadas tres o cuatro capas
+    // translúcidas el degradado se empasta y la forma deja de leerse.
+    const DIVISOR_MAX_CAPAS = 4;
 
     /** ¿El catálogo le ofrece divisores a este tipo de objeto? */
     function admiteDivisor(component) {
@@ -1641,11 +1654,46 @@
       }
     }
 
+    /** ¿Esta pieza es una capa y no la principal? */
+    function esCapa(pieza) {
+      return String(componentAttributes(pieza)['data-cod-divisor-capa'] || '') === '1';
+    }
+
+    /**
+     * Las capas declaradas, leídas de las piezas de UN borde.
+     *
+     * Se leen de un solo lugar aunque el divisor esté arriba y abajo, porque
+     * son la misma declaración dibujada dos veces: si se leyeran de los dos se
+     * duplicarían en cada guardado.
+     */
+    function capasDe(component) {
+      const piezas = divisoresDe(component).filter(esCapa);
+      const lugar = piezas.length
+        ? componentAttributes(piezas[0])['data-cod-divisor-donde']
+        : null;
+      return piezas
+        .filter((p) => componentAttributes(p)['data-cod-divisor-donde'] === lugar)
+        .map((p) => {
+          const a = componentAttributes(p);
+          const capa = {};
+          const alfa = leerVariable(p, '--cod-divisor-alfa');
+          const dx = leerVariable(p, '--cod-divisor-dx');
+          const alto = leerVariable(p, '--cod-divisor-alto');
+          if (alfa) capa.opacidad = alfa;
+          if (dx) capa.desplazamiento = dx;
+          if (alto) capa.alto = alto;
+          if (String(a['data-cod-divisor-voltear'] || '') === '1') capa.voltear = true;
+          return capa;
+        });
+    }
+
     function renderDivisorPanel(component) {
       if (!component || !admiteDivisor(component)) return null;
 
       const existentes = divisoresDe(component);
-      const primero = existentes[0] || null;
+      // La principal, no la primera: con capas, la primera del documento es
+      // una capa —van antes justamente para quedar detrás—.
+      const primero = existentes.find((d) => !esCapa(d)) || existentes[0] || null;
       const attrs = primero ? componentAttributes(primero) : {};
       const forma = String(attrs[DIVISOR_ATTR_FORMA] || '');
 
@@ -1732,6 +1780,87 @@
       campoVolt.appendChild(inVolt);
       panel.appendChild(campoVolt);
 
+      // --- capas --------------------------------------------------------
+      // Una forma sola lee como recorte; dos o tres corridas entre sí y con
+      // menos opacidad leen como profundidad. Cada capa hereda del divisor lo
+      // que no declara, así que cambiar la forma las cambia todas.
+      const capas = capasDe(component);
+      const bloqueCapas = createElement(hostDocument, 'div', 'cod-ci__divisor-capas');
+      bloqueCapas.appendChild(createElement(hostDocument, 'div', 'cod-ci__divisor-capas-title', 'Capas'));
+
+      capas.forEach((capa, i) => {
+        const fila = createElement(hostDocument, 'div', 'cod-ci__divisor-capa');
+        fila.appendChild(createElement(hostDocument, 'span', 'cod-ci__divisor-capa-n', String(i + 1)));
+
+        const cambiar = (clave, valor) => {
+          const siguientes = capasDe(component);
+          if (!siguientes[i]) return;
+          if (valor === '' || valor === null) delete siguientes[i][clave];
+          else siguientes[i][clave] = valor;
+          ponerDivisor(component, { capas: siguientes });
+        };
+
+        const inAlfa = createElement(hostDocument, 'input');
+        inAlfa.type = 'number';
+        inAlfa.min = '0';
+        inAlfa.max = '1';
+        inAlfa.step = '0.05';
+        inAlfa.title = 'Opacidad';
+        inAlfa.value = capa.opacidad || '';
+        inAlfa.addEventListener('change', () => cambiar('opacidad', inAlfa.value.trim()));
+
+        const inDx = createElement(hostDocument, 'input');
+        inDx.type = 'text';
+        inDx.placeholder = '-60px';
+        inDx.title = 'Desplazamiento a lo ancho; con signo si corre hacia la izquierda';
+        inDx.value = capa.desplazamiento || '';
+        inDx.addEventListener('change', () => cambiar('desplazamiento', inDx.value.trim()));
+
+        const inAltoCapa = createElement(hostDocument, 'input');
+        inAltoCapa.type = 'text';
+        inAltoCapa.placeholder = 'alto';
+        inAltoCapa.title = 'Alto propio de la capa; es la vía para variarla en vertical';
+        inAltoCapa.value = capa.alto || '';
+        inAltoCapa.addEventListener('change', () => cambiar('alto', inAltoCapa.value.trim()));
+
+        const fuera = createElement(hostDocument, 'button', 'cod-ci__divisor-capa-quitar', '×');
+        fuera.type = 'button';
+        fuera.title = 'Quitar esta capa';
+        fuera.addEventListener('click', () => {
+          const siguientes = capasDe(component);
+          siguientes.splice(i, 1);
+          ponerDivisor(component, { capas: siguientes });
+        });
+
+        fila.append(inAlfa, inDx, inAltoCapa, fuera);
+        bloqueCapas.appendChild(fila);
+      });
+
+      if (capas.length < DIVISOR_MAX_CAPAS) {
+        const sumar = createElement(hostDocument, 'button', 'cod-ci__divisor-capa-sumar', 'Agregar una capa');
+        sumar.type = 'button';
+        sumar.addEventListener('click', () => {
+          // Valores de partida que ya se leen como profundidad: una capa nueva
+          // en 1 y sin correr sería invisible y parecería que el botón no hizo
+          // nada. Cada capa entra más tenue y más corrida que la anterior.
+          const siguientes = capasDe(component);
+          const n = siguientes.length + 1;
+          siguientes.unshift({
+            opacidad: String(Math.max(0.2, 0.6 - (n - 1) * 0.2)),
+            desplazamiento: `${n % 2 ? '-' : ''}${40 * n}px`,
+          });
+          ponerDivisor(component, { capas: siguientes });
+        });
+        bloqueCapas.appendChild(sumar);
+      }
+
+      if (!capas.length) {
+        bloqueCapas.appendChild(createElement(hostDocument, 'p', 'cod-ci__divisor-hint',
+          'Una capa es la misma forma repetida detrás de sí misma, corrida y con menos opacidad. '
+          + 'Es lo que le da profundidad a un borde que solo lee como recorte.'));
+      }
+      panel.appendChild(bloqueCapas);
+
       // --- quitar -------------------------------------------------------
       const quitar = createElement(hostDocument, 'button', 'cod-ci__divisor-quitar', 'Quitar el divisor');
       quitar.type = 'button';
@@ -1803,7 +1932,7 @@
      */
     function ponerDivisor(component, cambios) {
       const existentes = divisoresDe(component);
-      const primero = existentes[0] || null;
+      const primero = existentes.find((d) => !esCapa(d)) || existentes[0] || null;
       const attrs = primero ? componentAttributes(primero) : {};
       const tieneArriba = existentes.some((d) => componentAttributes(d)['data-cod-divisor-donde'] === 'arriba');
       const tieneAbajo = existentes.some((d) => componentAttributes(d)['data-cod-divisor-donde'] === 'abajo');
@@ -1815,37 +1944,62 @@
         repeticion: leerVariable(primero, '--cod-divisor-repeticion'),
         voltear: String(attrs['data-cod-divisor-voltear'] || '') === '1',
         color: leerColor(primero),
+        capas: capasDe(component),
         ...cambios,
       };
       if (!estado.forma) return;
 
       existentes.forEach((d) => d.remove?.());
 
-      const lugares = estado.donde === 'ambos' ? ['arriba', 'abajo'] : [estado.donde];
-      for (const lugar of lugares) {
+      // El estilo compartido: una capa hereda del divisor lo que no declara,
+      // igual que en el compilador. Si esto se desincronizara, el editor y la
+      // página publicada mostrarían divisores distintos.
+      const marcar = (capa, lugar) => {
         const estilo = [];
-        if (estado.alto) estilo.push(`--cod-divisor-alto:${estado.alto}`);
+        const alto = capa?.alto || estado.alto;
+        if (alto) estilo.push(`--cod-divisor-alto:${alto}`);
         if (estado.repeticion && Number(estado.repeticion) > 1) estilo.push(`--cod-divisor-repeticion:${Number(estado.repeticion)}`);
         if (estado.color) estilo.push(`color:${estado.color}`);
+        if (capa?.opacidad) estilo.push(`--cod-divisor-alfa:${capa.opacidad}`);
+        if (capa?.desplazamiento) {
+          estilo.push(`--cod-divisor-dx:${capa.desplazamiento}`);
+          // El sobreancho en positivo: sin él, correr la capa deja un hueco
+          // del mismo tamaño en un borde.
+          estilo.push(`--cod-divisor-margen:${String(capa.desplazamiento).replace(/^-/, '')}`);
+        }
         // La máscara de previsualización NO se escribe acá: la pone el
         // runtime del editor leyendo el atributo. Una máscara es
         // previsualización, no contenido, y guardarla dejaría en la página
         // publicada una regla que allá no hace falta.
 
-        const marcador = [
+        const voltear = capa && 'voltear' in capa ? capa.voltear : estado.voltear;
+        return [
           `<div class="${DIVISOR_CLASE}"`,
-          ` ${DIVISOR_ATTR_FORMA}="${estado.forma}"`,
+          ` ${DIVISOR_ATTR_FORMA}="${capa?.forma || estado.forma}"`,
           ` data-cod-divisor-donde="${lugar}"`,
-          estado.voltear ? ' data-cod-divisor-voltear="1"' : '',
+          capa ? ' data-cod-divisor-capa="1"' : '',
+          voltear ? ' data-cod-divisor-voltear="1"' : '',
           ` style="${estilo.join(';')}"`,
           '></div>',
         ].join('');
+      };
 
-        try {
-          component.append(marcador, { at: 0 });
-        } catch (_error) {
-          // Un bloque que no admite hijos no puede llevar divisor; no es un
-          // error que deba interrumpir nada.
+      const lugares = estado.donde === 'ambos' ? ['arriba', 'abajo'] : [estado.donde];
+      for (const lugar of lugares) {
+        // Las capas primero para quedar detrás: son hermanas absolutas en la
+        // misma caja y lo único que las ordena es el documento.
+        const piezas = (estado.capas || []).slice(0, DIVISOR_MAX_CAPAS)
+          .map((capa) => marcar(capa, lugar))
+          .concat(marcar(null, lugar));
+        // Al revés porque cada una se inserta en la posición 0: la última que
+        // se escribe es la que queda primera en el documento.
+        for (const marcador of piezas.reverse()) {
+          try {
+            component.append(marcador, { at: 0 });
+          } catch (_error) {
+            // Un bloque que no admite hijos no puede llevar divisor; no es un
+            // error que deba interrumpir nada.
+          }
         }
       }
 

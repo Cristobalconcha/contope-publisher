@@ -3365,8 +3365,13 @@
     estilo.textContent = [
       '.cod-divisor{position:absolute;left:0;right:0;z-index:1;pointer-events:none;',
       'height:var(--cod-divisor-alto,80px);background-color:currentColor;',
+      'opacity:var(--cod-divisor-alfa,1);',
       '-webkit-mask-size:calc(100% / var(--cod-divisor-repeticion,1)) 100%;',
       'mask-size:calc(100% / var(--cod-divisor-repeticion,1)) 100%;',
+      // El desplazamiento de una capa se consigue corriendo la máscara. Acá no
+      // hace falta el sobreancho que sí necesita la página publicada: la
+      // máscara se repite, así que correrla nunca abre un hueco.
+      '-webkit-mask-position:var(--cod-divisor-dx,0px) 0;mask-position:var(--cod-divisor-dx,0px) 0;',
       '-webkit-mask-repeat:repeat-x;mask-repeat:repeat-x;}',
       '.cod-divisor[data-cod-divisor-donde="arriba"]{top:0;transform:scaleY(-1);}',
       '.cod-divisor[data-cod-divisor-donde="abajo"]{bottom:0;}',

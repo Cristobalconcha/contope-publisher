@@ -51,7 +51,8 @@
     "peldanos": "una escala con pasos con nombre, no un número libre",
     "interruptor": "sí o no",
     "formas": "una paleta visual de miniaturas",
-    "recurso": "un archivo del sitio (imagen, SVG, vídeo)"
+    "recurso": "un archivo del sitio (imagen, SVG, vídeo)",
+    "capas": "una lista de capas de la misma pieza, cada una con sus propios valores"
   },
   "familias": {
     "_": "El vocabulario de propiedades. Cada una dice con qué clase de regla se expresa.",
@@ -613,9 +614,63 @@
             "abajo",
             "ambos"
           ]
+        },
+        "capas": {
+          "rotulo": "Capas",
+          "control": "capas",
+          "maximo": 4,
+          "_nota": [
+            "Una forma sola lee como recorte; dos o tres corridas entre sí y con",
+            "distinta opacidad leen como profundidad. Cristóbal, 2026-10-03: «los",
+            "divisores quedan como un poco duros; tal vez que se puedan aplicar",
+            "dos capas con diferentes niveles de alfa, y con desplazamiento».",
+            "",
+            "Cada capa hereda forma, color, alto, repetición y volteado del",
+            "divisor: no son divisores apilados, es un divisor con grosor. Por",
+            "eso cambiar la forma cambia las tres capas de una vez.",
+            "",
+            "Divi no tiene esto: sus divisores son de una sola capa."
+          ],
+          "capa": {
+            "opacidad": {
+              "rotulo": "Opacidad",
+              "control": "numero",
+              "min": 0,
+              "max": 1,
+              "paso": 0.05
+            },
+            "desplazamiento": {
+              "rotulo": "Desplazamiento",
+              "control": "medida",
+              "negativo": true
+            },
+            "alto": {
+              "rotulo": "Alto",
+              "control": "medida"
+            },
+            "color": {
+              "rotulo": "Color",
+              "control": "color",
+              "heredaDe": {
+                "rol": "surface"
+              }
+            },
+            "forma": {
+              "rotulo": "Forma",
+              "control": "recurso"
+            },
+            "repeticion": {
+              "rotulo": "Repetición horizontal",
+              "control": "numero"
+            },
+            "voltear": {
+              "rotulo": "Voltear",
+              "control": "interruptor"
+            }
+          }
         }
       },
-      "evidencia": "divi (`dividers`) · propio (que la forma sea abierta)"
+      "evidencia": "divi (`dividers`) · propio (que la forma sea abierta y que tenga capas)"
     },
     "boton": {
       "rotulo": "Botón",
