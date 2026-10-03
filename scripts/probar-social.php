@@ -18,6 +18,10 @@
  *  - el catálogo declara la primitiva
  *  - nunca la abreviada «background:»
  *
+ * Desde 0.3.45 la `url` es opcional (sin ella la cuenta sale de Configuración →
+ * «Redes sociales»): eso se prueba aparte, en probar-social-ajustes.php. Aquí
+ * quedan las reglas de una `url` propia, que siguen valiendo igual.
+ *
  * Corre contra el WordPress local de Econut (puerto 8891): sincronizar antes con
  *   node scripts/sincronizar-plugin.mjs --a econut --aplicar
  * Nunca contra wp-local (ése es Santa Luisa).
@@ -65,8 +69,8 @@ $error = function (string $nombre, array $contenido, string $debe) use ($compila
     $verifica($nombre, is_wp_error($r) && strpos($r->get_error_message(), $debe) !== false, $msg($r));
 };
 
-// Las siluetas tal como las declara el compilador (constante privada).
-$redes = (new ReflectionClass(COD_Canvas_MCP_Recipe_Compiler::class))->getConstant('SOCIAL_NETWORKS');
+// Las siluetas tal como las declara COD_Redes_Sociales (desde 0.3.45 viven ahí, junto con la regla que valida la dirección).
+$redes = COD_Redes_Sociales::REDES;
 $verifica('la lista tiene las ocho redes pedidas', is_array($redes) && array_keys($redes) === ['instagram', 'facebook', 'linkedin', 'youtube', 'tiktok', 'x', 'threads', 'pinterest'], is_array($redes) ? implode(',', array_keys($redes)) : '');
 
 $urls = [
@@ -124,7 +128,8 @@ $error('JaVaScRiPt: con mayúsculas se rechaza', ['network' => 'instagram', 'url
 $error('data: se rechaza', ['network' => 'instagram', 'url' => 'data:text/html;base64,PHNjcmlwdD4='], 'https://');
 $error('http:// (sin cifrar) se rechaza', ['network' => 'instagram', 'url' => 'http://www.instagram.com/econut'], 'https://');
 $error('ruta relativa se rechaza', ['network' => 'instagram', 'url' => '/econut'], 'https://');
-$error('sin url se rechaza', ['network' => 'instagram'], 'https://');
+$error('url vacía se rechaza (declararla y dejarla vacía no cae al panel)', ['network' => 'instagram', 'url' => ''], 'https://');
+$error('url que no es texto se rechaza', ['network' => 'instagram', 'url' => ['https://instagram.com/x']], 'https://');
 $error('mailto: se rechaza', ['network' => 'instagram', 'url' => 'mailto:a@b.cl'], 'https://');
 $error('usuario@ en la dirección se rechaza', ['network' => 'instagram', 'url' => 'https://instagram.com@evil.example/x'], 'https://');
 $error('puerto se rechaza', ['network' => 'instagram', 'url' => 'https://instagram.com:8443/x'], 'https://');

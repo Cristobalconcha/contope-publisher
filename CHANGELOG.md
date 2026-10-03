@@ -5,6 +5,67 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.45 — 3 de octubre de 2026
+
+### Agregado
+
+- **Las cuentas de redes sociales se cambian desde el panel, sin tocar las
+  páginas.** En Configuración hay una sección nueva, «Redes sociales», con un par
+  de campos por cada red (Instagram, Facebook, LinkedIn, YouTube, TikTok, X,
+  Threads y Pinterest): la dirección de la cuenta y, si se quiere, su nombre de
+  usuario. Todos son opcionales. Los enlaces con logotipo que hay en las páginas
+  (desde 0.3.44) toman la cuenta de ahí.
+
+  Para qué sirve: las cuentas las administra otra gente —el equipo de redes de la
+  empresa— y cambian. Una se consolida, otra se verifica, otra se cierra. Antes,
+  la dirección iba escrita dentro de cada página, y cambiarla obligaba a rehacer
+  la página entera. Ahora quien mantiene el sitio entra a Configuración, cambia la
+  dirección y guarda, y el cambio llega a todas las páginas en ese momento. Si una
+  cuenta se cierra, se vacía su dirección y el logotipo desaparece de todo el
+  sitio.
+
+- **Una red que no está configurada no se muestra.** Si una página pide el
+  logotipo de una red y en el panel no hay cuenta para ella, ese logotipo no se
+  dibuja: ni un icono que no lleva a ninguna parte ni un enlace vacío. En un sitio
+  que existe para que la gente verifique cuál es la cuenta verdadera, un icono
+  muerto es peor que no tenerlo. Al componer la página, el resumen avisa qué
+  nodos quedaron sin dibujar y por qué.
+
+- **Una página puede seguir apuntando a otra cuenta.** Si un enlace trae su propia
+  dirección, esa manda sobre el panel: sirve para un caso suelto, como enlazar la
+  cuenta de otra empresa. En ese caso tampoco se muestra el nombre de usuario del
+  panel junto a ella, porque no sería de la misma cuenta.
+
+- **El panel no deja guardar una cuenta falsa por descuido.** Las mismas reglas de
+  0.3.44 valen al guardar: la dirección tiene que empezar con `https://` y ser del
+  dominio de esa red, y el nombre de usuario no puede llevar caracteres
+  invisibles, marcas de escritura inversa ni HTML. Si algo no pasa, el aviso dice
+  de qué red y de qué campo se trata, y esa red conserva lo que tenía: nunca queda
+  una dirección nueva con un nombre de usuario viejo, que mostraría un enlace y un
+  nombre que no son de la misma cuenta.
+
+### Corregido
+
+- **El botón de WhatsApp ya no se dibuja si no hay número guardado.** Antes salía
+  un botón que no llevaba a ninguna parte (apuntaba a `#`). Ahora no aparece, y el
+  resumen de la composición lo anota. Al activarlo en las secciones, si falta el
+  número, avisa en lugar de insertar un hueco. Ojo: el número sigue quedando
+  escrito en la página cuando ésta se compone, así que si se cambia después en
+  Configuración hay que volver a aplicar la composición (lo de las redes sí se
+  actualiza solo; lo de WhatsApp todavía no).
+
+### Cómo se actualiza
+
+- Las páginas que ya traen la dirección de una red escrita dentro siguen
+  funcionando igual: esa dirección manda. Para pasar una cuenta al panel, se
+  configura ahí y se vuelve a aplicar la página sin la dirección en el enlace.
+- Si una página se compuso cuando una red todavía no estaba en el panel, ese
+  logotipo no quedó guardado; hay que configurar la red y volver a aplicar la
+  composición para que aparezca. Lo contrario no pasa: cambiar o vaciar una
+  cuenta que ya estaba se ve de inmediato.
+
+---
+
 ## 0.3.44 — 3 de octubre de 2026
 
 ### Agregado

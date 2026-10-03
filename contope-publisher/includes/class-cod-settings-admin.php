@@ -231,6 +231,74 @@ final class COD_Settings_Admin
                     </form>
                 </section>
 
+                <section class="cod-settings__section" id="cod-redes">
+                    <h2>Redes sociales</h2>
+                    <p>
+                        Las cuentas oficiales de la empresa. Los enlaces con el logotipo de cada
+                        red que hay en las páginas toman la cuenta de aquí, así que si una cuenta
+                        cambia —se consolida, se verifica, se cierra— se cambia en este lugar y
+                        llega a todo el sitio, sin tocar las páginas.
+                    </p>
+                    <p>
+                        Cada red lleva la <strong>dirección</strong> de la cuenta
+                        (<code>https://…</code>, del dominio de esa red) y, si quieres, su
+                        <strong>nombre de usuario</strong>, que se escribe como texto junto al
+                        logotipo para que quien recibió un mensaje de una cuenta que dice ser la
+                        empresa pueda compararlo letra por letra. Deja vacía la dirección de una red
+                        que no uses o que cierres: ese logotipo deja de mostrarse (y su nombre de
+                        usuario también).
+                    </p>
+                    <?php
+                    $cod_redes = COD_Redes_Sociales::cuentas();
+                    $cod_redes_malas = isset($_GET['cod_redes_error'])
+                        ? explode(',', sanitize_text_field((string) wp_unslash($_GET['cod_redes_error'])))
+                        : [];
+                    ?>
+                    <?php if (isset($_GET['cod_redes_guardadas']) && $cod_redes_malas === []) : ?>
+                        <div class="notice notice-success"><p>Redes sociales guardadas.</p></div>
+                    <?php endif; ?>
+                    <?php if ($cod_redes_malas !== []) : ?>
+                        <div class="notice notice-error">
+                            <p>
+                                <?php echo esc_html(COD_Redes_Sociales::mensaje_de_errores($cod_redes_malas)); ?>
+                                Revisa que esté copiado completo y vuelve a guardar.
+                            </p>
+                        </div>
+                    <?php endif; ?>
+                    <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+                        <input type="hidden" name="action" value="cod_save_redes_sociales">
+                        <?php wp_nonce_field('cod_save_redes_sociales'); ?>
+                        <table class="form-table" role="presentation">
+                            <tbody>
+                            <?php foreach (COD_Redes_Sociales::REDES as $cod_red => $cod_spec) : ?>
+                                <tr>
+                                    <th scope="row"><?php echo esc_html($cod_spec['name']); ?></th>
+                                    <td>
+                                        <p>
+                                            <label for="cod_redes_<?php echo esc_attr($cod_red); ?>_url">Dirección</label><br>
+                                            <input type="url" class="large-text code"
+                                                id="cod_redes_<?php echo esc_attr($cod_red); ?>_url"
+                                                name="cod_redes_<?php echo esc_attr($cod_red); ?>_url"
+                                                value="<?php echo esc_attr((string) ($cod_redes[$cod_red]['url'] ?? '')); ?>"
+                                                placeholder="https://www.<?php echo esc_attr($cod_spec['hosts'][0]); ?>/…">
+                                        </p>
+                                        <p>
+                                            <label for="cod_redes_<?php echo esc_attr($cod_red); ?>_handle">Nombre de usuario (opcional)</label><br>
+                                            <input type="text" class="regular-text code"
+                                                id="cod_redes_<?php echo esc_attr($cod_red); ?>_handle"
+                                                name="cod_redes_<?php echo esc_attr($cod_red); ?>_handle"
+                                                value="<?php echo esc_attr((string) ($cod_redes[$cod_red]['handle'] ?? '')); ?>"
+                                                placeholder="@nombredeusuario" maxlength="80" autocomplete="off">
+                                        </p>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                        <p><button type="submit" class="button button-primary">Guardar redes sociales</button></p>
+                    </form>
+                </section>
+
                 <section class="cod-settings__section">
                     <h2>Sitios que puedes incrustar</h2>
                     <p>

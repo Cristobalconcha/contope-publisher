@@ -1266,6 +1266,11 @@ CSS;
             $markup = $this->token_resolver->resolve($markup, $post_id);
         }
 
+        // Las cuentas de redes sociales se resuelven al mostrar, no al publicar: así
+        // cambiar una dirección en Configuración → Redes sociales llega a todas las
+        // páginas sin recomponerlas (y una red sin configurar no deja un enlace muerto).
+        $markup = COD_Redes_Sociales::resolver_en_html($markup);
+
         // Los shortcodes se ejecutan al final, después de resolver los tokens
         // dinámicos: así un marcador puede llevar un valor ACF entre sus
         // atributos. Solo actúa sobre nodos marcados y de una lista permitida
