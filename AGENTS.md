@@ -2,6 +2,36 @@
 
 Read this file before changing the repository.
 
+## Where the architecture lives — read it first
+
+**This repository does not contain the architecture that governs it.** The
+governing document is, outside this repo:
+
+```
+Contope-Design/vault_contope-design/arquitectura-page-builder-compositivo.md
+```
+
+Read it before designing anything. `docs/` here covers formats and plans
+(`package-format-v1.md`, `implementation-plan.md`, …), not the thesis.
+
+Why this pointer exists: on 2026-10-03 a whole morning was lost designing in
+circles, and twice an agent told Cristóbal that something "is not written"
+when it was written there in detail. It was not a bad search — nothing in this
+repo pointed anywhere. These were answered in that document and were
+rediscovered the hard way:
+
+| Question that came up | Section |
+|---|---|
+| Who owns the content, ContOpe or WordPress? | §6 — *"COD's absence may remove presentation and behaviour, but must not take the user's content away"* |
+| How far may a user extend the system? | §9 — use / compose / extend / modify are four different things |
+| Where do reusable modules and sharing go? | §7 and §8 — site, user and community libraries |
+| How is CSS persisted? | §11 — three distinct representations |
+
+Its closing section, **«Estado y próximas definiciones»**, lists eight
+contracts to specify *before* implementing. Check that list before building:
+two of them (the Gutenberg mapping of each primitive, and the CSS module
+contract) were being touched blindly that morning.
+
 ## Product boundary
 
 This repository builds the WordPress side of an open, bidirectional design workflow:
