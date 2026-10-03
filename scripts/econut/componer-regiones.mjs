@@ -22,6 +22,18 @@ const OSCURO = '#222222';
 const TEXTO = '#333333';
 const VERDE = '#2E594A';   // el verde de Econut, medido en el pie de econut.cl
 
+// ¿Hay número de WhatsApp? Hoy no: econut.cl no publica ninguno —lo busqué en
+// la portada, en /contactos y en el botón flotante, que va a /contacto y no a
+// WhatsApp—, y el local tampoco lo tiene configurado.
+//
+// Sin número, el plugin omite el icono (bien: un botón que no lleva a ninguna
+// parte es peor que nada), pero el envoltorio y la palabra «WhatsApp» quedaban
+// sueltos en el encabezado. Por eso la píldora entera es condicional.
+//
+// PARA ACTIVARLA: guardar el número en Configuración → WhatsApp, poner esto en
+// true y volver a correr este guion.
+const HAY_WHATSAPP = false;
+
 const f = {
   logoHorizontal: M + 'Logo-horizontal-@svg.svg',
   logoCalado: M + 'Logo-calado-20.png',
@@ -103,7 +115,15 @@ const hacerReglas = () => {
               backgroundColor: 'transparent', borderRadius: '999px',
             },
           })),
-          { id: id('g'), kind: 'group', ruleIds: ['h-wa-pildora'], children: [
+          // La píldora de WhatsApp sólo se compone si hay número configurado.
+          // Sin él, el plugin omite el icono —bien, un botón que no lleva a
+          // ninguna parte es peor que nada— pero el envoltorio y la palabra
+          // «WhatsApp» quedaban igual, sueltos y sin sentido.
+          //
+          // Para activarla: guardar el número en Configuración y poner acá
+          // HAY_WHATSAPP en true. Está en dos pasos a propósito: el número lo
+          // pone quien administra el sitio, y esto se recompone después.
+          ...(HAY_WHATSAPP ? [{ id: id('g'), kind: 'group', ruleIds: ['h-wa-pildora'], children: [
             { id: id('w'), kind: 'whatsapp', ruleIds: [], content: {
               message: 'Hola, quiero más información sobre los servicios de Econut.',
               ariaLabel: 'Escribir a Econut por WhatsApp',
@@ -112,7 +132,7 @@ const hacerReglas = () => {
               size: 24, iconPadding: 3, iconColor: BLANCO, backgroundColor: 'transparent', borderRadius: '0px',
             } },
             { id: id('p'), kind: 'paragraph', ruleIds: ['h-wa-texto', 'h-wa-blanco', 'h-wa-sin-margen'], content: { text: 'WhatsApp' } },
-          ] },
+          ] }] : []),
         ] },
       ],
     }],

@@ -594,20 +594,29 @@ const pestana = (numero, titulo, texto, icono, foto, subtitulo = '') => G([
     G([
       IMG(f.logo, 'Veinte años de Econut', ['icono-cifra']),
       IMG(icono, titulo, ['icono-cifra']),
-    ], ['columna-iconos']),
+    ], ['columna-iconos', 'columna-iconos-movil']),
     G([
       H(titulo, 2, ['t-titulo-cifra', 'c-naranja']),   // H2 en el original
       ...(subtitulo ? [H(subtitulo, 4, ['t-subtitulo-cifra'])] : []),
       P(texto, ['t-texto-cifra']),
       IMG(foto, titulo, ['foto-cifra', 'foto-cifra-tam']),
     ], ['columna']),
-  ], ['partida-cifra']),
+  ], ['partida-cifra', 'partida-cifra-movil']),
 ]);
 R('t-subtitulo-cifra', 'typography', { role: 'subtitulo', fontSize: '18px', fontWeight: 600, lineHeight: 1.4 });
 R('partida-cifra', 'properties', { declarations: {
   display: 'grid', 'grid-template-columns': '150px minmax(0, 1fr)', 'column-gap': '20px', 'align-items': 'start',
 } });
 R('columna-iconos', 'layout', { mode: 'stack', gap: '116px', align: 'start' });
+// En teléfono el panel de cada cifra NO puede seguir partido en dos: con 150px
+// fijos para los iconos, al texto le quedaban 108 de ancho y era ilegible.
+// Se apila, y los dos iconos pasan a ir uno al lado del otro.
+R('partida-cifra-movil', 'properties', { declarations: {
+  'grid-template-columns': 'minmax(0, 1fr)', 'row-gap': '20px',
+} }, { bp: 'mobile' });
+R('columna-iconos-movil', 'properties', { declarations: {
+  display: 'flex', 'flex-direction': 'row', 'align-items': 'center', gap: '20px',
+} }, { bp: 'mobile' });
 R('icono-cifra', 'media', { fit: 'contain' });
 R('t-titulo-cifra', 'typography', { role: 'subtitulo', family: "'Bodoni Moda', Georgia, serif", fontSize: '26px', fontWeight: 600, lineHeight: 1.35 });
 R('t-texto-cifra', 'typography', { role: 'cuerpo', fontSize: '18px', lineHeight: 1.6, measure: '54ch' });
