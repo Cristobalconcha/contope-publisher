@@ -31,6 +31,23 @@ const OSCURO = '#222222';
 const AVISO = '#FFF6C1';
 
 const M = '/wp-content/uploads/2026/09/';
+
+// Las cuentas oficiales de Econut, confirmadas por Cristóbal el 3 de octubre.
+// No son un adorno: existen porque hay estafadores vendiendo nueces a nombre
+// de la empresa —llegó gente a la planta a buscar lo que había pagado por
+// internet— y el sitio no daba ninguna forma de verificar cuál es la cuenta
+// verdadera. Publicarlas con el nombre de usuario a la vista es lo que permite
+// comparar letra por letra.
+//
+// OJO: los nombres NO coinciden entre plataformas (`econutchile.oficial` en
+// Instagram, `EconutChile` en Facebook), así que uno no se deduce del otro.
+// Por eso tienen que ir las dos escritas, no una sola.
+const REDES = {
+  instagram: { url: 'https://www.instagram.com/econutchile.oficial/', handle: '@econutchile.oficial' },
+  facebook: { url: 'https://www.facebook.com/EconutChile', handle: 'EconutChile' },
+  // Pendiente: WhatsApp Business, en disputa con Meta mientras se recupera la
+  // propiedad de la marca. Cuando se resuelva, apuntar a la cuenta verificada.
+};
 const f = {
   logo: M + 'Logo-20.png',
   fichaNCC: M + 'Ficha-T-de-Proceso-NCC-2022.pdf',   // la ficha técnica que enlaza el primer servicio
