@@ -350,7 +350,11 @@ echo "\n== la conducta llega a la página ==\n";
 $fuente = file_get_contents(__DIR__ . '/../contope-publisher/includes/class-cod-canvas-page-publisher.php');
 $comprobar('mapa_css() se emite en las dos rutas (plantilla y shortcode)', substr_count($fuente, 'self::mapa_css($header_html . $body_html . $footer_html)') === 2);
 $comprobar('la clave se resuelve al mostrar (COD_Mapa::resolver_en_html en el render de la página)', substr_count($fuente, 'COD_Mapa::resolver_en_html($markup)') === 1);
-$comprobar('la versión del plugin es 0.3.47', COD_PUBLISHER_VERSION === '0.3.47');
+// «o posterior», no la versión exacta: una prueba atada a un número falla en
+// cuanto sale la versión siguiente, y entonces hay que tocarla sin que nada de
+// lo que prueba haya cambiado. Lo que importa acá es que la conducta exista
+// desde la versión en que se agregó.
+$comprobar('la versión del plugin es 0.3.47 o posterior', version_compare(COD_PUBLISHER_VERSION, '0.3.47', '>='));
 
 echo $fallas === 0 ? "\nTODO OK\n" : "\n" . $fallas . " FALLA(S)\n";
 exit($fallas === 0 ? 0 : 1);

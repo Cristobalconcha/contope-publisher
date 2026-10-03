@@ -47,6 +47,14 @@ $BASE = [
     'excluir_admin' => false, 'ads_conv_formulario' => '', 'ads_conv_whatsapp' => '',
 ];
 
+// Desde el 0.3.48 nada de medición se imprime hasta que el visitante acepta.
+// Esta prueba es sobre QUÉ se mide y cómo, no sobre la puerta —ésa tiene la
+// suya, `probar-consentimiento.php`—, así que se pone en el caso de alguien
+// que ya aceptó. Sin esto, todo lo de abajo mediría el guion dormido y daría
+// una falla por cada comprobación, escondiendo lo que de verdad prueba.
+$_COOKIE['cookieadmin_consent'] = '{"accept":"true"}';
+COD_Consentimiento::olvidar();
+
 /** Lo que imprime la medición en el head con esos ajustes (sin tocar la base). */
 $cabecera = function (array $ajustes) use ($BASE): string {
     $filtro = static fn () => array_merge($BASE, $ajustes);
@@ -278,6 +286,40 @@ if (isset($r['__error'])) {
     $verifica('guion impreso dos veces: una conversión, un gancho', $r['doble_impresion'] === ['n' => 1, 'ganchos' => 1], json_encode($r['doble_impresion']));
 }
 @unlink($ruta_arnes);
+
+// Y la otra cara: sin consentimiento, esta misma conversión no engancha nada.
+// Va acá y no sólo en `probar-consentimiento.php` porque es el punto donde
+// alguien podría «arreglar» un fallo futuro quitando la puerta sin darse
+// cuenta de lo que quita: que la prueba de la conversión misma falle lo
+// vuelve imposible de hacer en silencio.
+$_COOKIE['cookieadmin_consent'] = '{"reject":"true"}';
+COD_Consentimiento::olvidar();
+$html = $cabecera(['ads_conv_formulario' => $FORM]);
+$verifica('tras rechazar: el guion de conversión no se ejecuta', $guiones($html) === []);
+$verifica(
+    'tras rechazar: queda dormido esperando publicidad',
+    strpos($html, 'type="text/plain"') !== false
+        && strpos($html, 'data-cookieadmin-category="marketing"') !== false
+        && strpos($html, '__codConversiones') !== false
+);
+// Ojo con cómo se comprueba esto: `gtag('config', …)` SÍ aparece en el HTML
+// —dentro de un guion dormido—, así que buscar el texto a secas daría un falso
+// positivo. Lo que hay que comprobar es que no esté en un guion que se
+// ejecuta, y un guion se ejecuta cuando NO lleva `type="text/plain"`.
+$vivos = [];
+if (preg_match_all('#<script([^>]*)>(.*?)</script>#s', $html, $m, PREG_SET_ORDER)) {
+    foreach ($m as $uno) {
+        if (stripos($uno[1], 'text/plain') === false) {
+            $vivos[] = $uno[2];
+        }
+    }
+}
+$verifica(
+    'tras rechazar: la cuenta de Ads no se configura en ningún guion vivo',
+    strpos(implode(' ', $vivos), "gtag('config'") === false
+);
+unset($_COOKIE['cookieadmin_consent']);
+COD_Consentimiento::olvidar();
 
 printf("\n%d de %d.\n", $total - $fallas, $total);
 exit($fallas === 0 ? 0 : 1);

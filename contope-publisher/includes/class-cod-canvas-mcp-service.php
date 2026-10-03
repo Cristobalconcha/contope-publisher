@@ -118,6 +118,49 @@ final class COD_Canvas_MCP_Service
     }
 
     /**
+     * El estado de un documento de REGIÓN global (encabezado, pie, cuerpo).
+     *
+     * Devuelve la misma clave `document` que `canvas_page_state`, para que
+     * quien lea la revisión lo haga igual en los dos casos y no haya que
+     * escribir el circuito dos veces. No devuelve `page` —una región no
+     * pertenece a ninguna— ni `resolvedRegions`, que no tendría sentido.
+     *
+     * Sólo responde por documentos que SON regiones. Si alguien pide con
+     * `pageId: 0` el documento de una página, el error lo dice: es mejor que
+     * devolver una revisión que después el apply va a rechazar por otro
+     * motivo, dejando a quien lo use buscando en el lugar equivocado.
+     *
+     * @return array<string, mixed>|WP_Error
+     */
+    public function canvas_region_state(string $document_id)
+    {
+        $esperados = [];
+        foreach (COD_Canvas_Document_Repository::REGION_KINDS as $kind) {
+            $esperados[] = 'cod-region-' . $kind;
+        }
+        if (!in_array($document_id, $esperados, true)) {
+            return new WP_Error(
+                'cod_mcp_canvas_region_unknown',
+                'Ese documentId no es una región global. Las que hay: ' . implode(', ', $esperados) . '.'
+            );
+        }
+
+        $document = $this->repository->describe_existing($document_id);
+        if ($document === null) {
+            // Una región que nunca se escribió no es un error: es el estado
+            // normal de un sitio nuevo, y quien pregunta necesita saber que
+            // puede escribirla con expectedRevision 0 en vez de recibir un
+            // fallo que parece una avería.
+            return [
+                'document' => ['documentId' => $document_id, 'revision' => 0, 'exists' => false],
+            ];
+        }
+
+        $document['exists'] = true;
+        return ['document' => $document];
+    }
+
+    /**
      * Devuelve la última composición MCP aplicada con éxito sobre esta
      * página, lista para resubmitir tal cual (ajustando sólo lo que se quiera
      * cambiar) a cod_preview_canvas_composition — así se puede editar un nodo
@@ -291,9 +334,23 @@ final class COD_Canvas_MCP_Service
         if (is_wp_error($stored)) {
             return $stored;
         }
-        $page = $this->publisher->describe_canvas_page($page_id);
-        if ($page === null) {
-            return new WP_Error('cod_mcp_canvas_page_unavailable', 'La página Canvas no pudo leerse después de aplicar la composición.');
+        // Una región global no tiene página, así que no se le pregunta por
+        // una. Hasta el 0.3.48 sí se le preguntaba: `describe_canvas_page(0)`
+        // devolvía null y el apply respondía «La página Canvas no pudo leerse
+        // después de aplicar la composición» —DESPUÉS de haber guardado bien—.
+        //
+        // Un fallo así es peor que un fallo de verdad. La escritura quedó
+        // hecha y la revisión subió, pero quien la hizo lee un error y
+        // reintenta; el reintento manda la revisión anterior, choca con un
+        // conflicto, y ahora hay dos mensajes de error distintos para una
+        // operación que salió bien a la primera. El pie de Econut se escribió
+        // ocho veces así antes de que esto se arreglara.
+        $page = null;
+        if ($page_id > 0) {
+            $page = $this->publisher->describe_canvas_page($page_id);
+            if ($page === null) {
+                return new WP_Error('cod_mcp_canvas_page_unavailable', 'La página Canvas no pudo leerse después de aplicar la composición.');
+            }
         }
         return [
             'page' => $page,
@@ -367,10 +424,16 @@ final class COD_Canvas_MCP_Service
             [
                 'name' => 'cod_get_canvas_page_state',
                 'title' => 'Estado de página Canvas',
-                'description' => 'Obtiene identidad, revisión y regiones resueltas de una página Canvas.',
+                'description' => 'Obtiene identidad, revisión y regiones resueltas de una página Canvas. '
+                    . 'Con pageId 0 y documentId devuelve la revisión de una región global '
+                    . '(cod-region-header, cod-region-body, cod-region-footer), que es la que exige el apply '
+                    . 'para escribirla. Una región que nunca se escribió devuelve revisión 0 y exists: false.',
                 'inputSchema' => [
                     'type' => 'object',
-                    'properties' => ['pageId' => ['type' => 'integer', 'minimum' => 1]],
+                    'properties' => [
+                        'pageId' => ['type' => 'integer', 'minimum' => 0, 'description' => '0 = región global; requiere documentId.'],
+                        'documentId' => ['type' => 'string', 'pattern' => '^cod-region-(header|body|footer)$'],
+                    ],
                     'required' => ['pageId'],
                     'additionalProperties' => false,
                 ],
@@ -691,8 +754,31 @@ final class COD_Canvas_MCP_Service
             return $error ?? ['pages' => $this->list_canvas_pages()];
         }
         if ($tool_name === 'cod_get_canvas_page_state') {
+            // `pageId: 0` + `documentId` pregunta por una REGIÓN global, igual
+            // que al escribirla. Hasta el 0.3.48 no se podía: una región se
+            // podía escribir —el apply acepta `pageId: 0`— pero no se podía
+            // preguntar en qué revisión estaba. Y el apply exige la revisión
+            // exacta, así que quien quisiera corregir un pie tenía que
+            // adivinarla, mandar una equivocada a propósito y leer la revisión
+            // real del mensaje de conflicto. Eso no es un circuito: es un
+            // rebote que funciona por accidente, y además deja un intento
+            // fallido en el registro cada vez.
+            $con_documento = array_key_exists('documentId', $arguments);
+            if ($con_documento) {
+                if (!$this->has_only_keys($arguments, ['pageId', 'documentId'])
+                    || !isset($arguments['pageId'], $arguments['documentId'])
+                    || !is_int($arguments['pageId']) || $arguments['pageId'] !== 0
+                    || !is_string($arguments['documentId']) || !$this->is_document_id($arguments['documentId'])) {
+                    return new WP_Error(
+                        'cod_mcp_invalid_arguments',
+                        'Para una región global: pageId 0 y documentId, y nada más. Para una página: pageId '
+                            . 'positivo y nada más.'
+                    );
+                }
+                return $this->canvas_region_state($arguments['documentId']);
+            }
             if (!$this->has_only_keys($arguments, ['pageId']) || !isset($arguments['pageId']) || !is_int($arguments['pageId']) || $arguments['pageId'] < 1) {
-                return new WP_Error('cod_mcp_invalid_arguments', 'pageId debe ser un entero positivo y el único argumento.');
+                return new WP_Error('cod_mcp_invalid_arguments', 'pageId debe ser un entero positivo y el único argumento, o pageId 0 con documentId para una región global.');
             }
             return $this->canvas_page_state($arguments['pageId']);
         }

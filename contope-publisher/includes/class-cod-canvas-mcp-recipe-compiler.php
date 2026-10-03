@@ -1743,7 +1743,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
         }
         if (!isset($value['behavior'])
             || !is_string($value['behavior'])
-            || !in_array($value['behavior'], ['scroll-threshold', 'nav-toggle', 'carousel-basic', 'lightbox', 'cuadrantes', 'pestanas', 'marquesina', 'aviso', 'mapa'], true)) {
+            || !in_array($value['behavior'], ['scroll-threshold', 'nav-toggle', 'carousel-basic', 'lightbox', 'cuadrantes', 'pestanas', 'marquesina', 'aviso', 'mapa', 'preferencias-cookies'], true)) {
             return new WP_Error('cod_mcp_interaction_rule_invalid', 'interaction.behavior no es un comportamiento Canvas disponible.');
         }
         $normalized = ['behavior' => $value['behavior']];
@@ -3260,6 +3260,47 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 $hijos = is_array($node['children'] ?? null) ? count($node['children']) : 0;
                 if ($hijos < 1) {
                     return new WP_Error('cod_mcp_aviso_children_invalid', 'aviso exige un group con al menos 1 hijo (el contenido de la ventana); este tiene ' . $hijos . '.');
+                }
+            } elseif ($interaction['behavior'] === 'preferencias-cookies') {
+                // Reabre el panel del banner de cookies. La ley no pide sólo
+                // poder dar el consentimiento: pide poder CAMBIARLO, y para eso
+                // tiene que haber algo que lo reabra —en el pie, que es donde se
+                // busca—.
+                //
+                // Va en un `button` o en un `link`, que acá son los dos nodos que
+                // se dibujan como un `<a>` de verdad, con su `href`. Y el `href`
+                // importa: no es relleno. Sin JavaScript no hay panel que
+                // reabrir, así que ese enlace tiene que llevar a algún lugar que
+                // sirva —la página de términos y privacidad, que explica las
+                // cookies—. Con JavaScript, el runtime le quita el salto al clic
+                // y abre el panel. Primero algo que funciona, y encima lo mejor.
+                //
+                // Por eso se rechaza `href="#"`: sin JavaScript saltaría al
+                // inicio del documento, que es no hacer nada, y además se
+                // anunciaría como un enlace que no lleva a ninguna parte a quien
+                // navega con lector de pantalla.
+                //
+                // Hasta el 0.3.48 esta conducta existía en el runtime pero NO acá,
+                // así que la única forma de ponerla era parchear el HTML a mano
+                // —que es justo lo que el page builder viene a evitar: un parche
+                // de HTML no queda en el documento, así que nadie lo puede editar
+                // después, y no sobrevive a la siguiente recomposición—. En Santa
+                // Luisa se puso así, con un guion aparte.
+                if (!in_array($node['kind'], ['button', 'link'], true)) {
+                    return new WP_Error(
+                        'cod_mcp_preferencias_cookies_target_invalid',
+                        'preferencias-cookies sólo puede aplicarse a un nodo button o link, que son los que se '
+                            . 'dibujan como un enlace con destino. Se recibió un nodo "' . $node['kind'] . '".'
+                    );
+                }
+                $destino = is_array($node['content'] ?? null) ? (string) ($node['content']['href'] ?? '') : '';
+                if ($destino === '' || $destino === '#' || strpos($destino, '#') === 0) {
+                    return new WP_Error(
+                        'cod_mcp_preferencias_cookies_href_invalid',
+                        'preferencias-cookies necesita un href que lleve a alguna parte —normalmente la página de '
+                            . 'términos y privacidad—, porque sin JavaScript no hay panel de cookies que reabrir y '
+                            . 'el enlace tiene que servir de todas formas. Se recibió "' . $destino . '".'
+                    );
                 }
             } elseif ($interaction['behavior'] === 'mapa') {
                 // Un mini mapa que despliega uno grande. Los datos viajan en

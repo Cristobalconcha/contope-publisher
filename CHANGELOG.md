@@ -5,6 +5,162 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.48 — 3 de octubre de 2026
+
+### Corregido
+
+- **Las etiquetas de medición ya no se cargan antes de que el visitante
+  acepte.** Es el cambio más importante de esta versión y se publica como
+  corrección y no como mejora, porque lo que había era un defecto.
+
+  Lo que pasaba, medido el 3 de octubre en un sitio en pruebas: la portada
+  pedía `googletagmanager.com` y `ad.doubleclick.net`, y dejaba puesta la
+  cookie publicitaria `_gcl_au`, **con el banner de cookies todavía en
+  pantalla y sin que nadie lo hubiera tocado**. Las etiquetas se imprimían en
+  cuanto se cargaba la página, sin preguntarle nada a nadie.
+
+  No era un error de configuración del sitio. Importa la diferencia, porque
+  decide dónde se arregla: un sitio puede configurar mal su banner, pero que la
+  etiqueta se imprima antes del consentimiento no es algo que el sitio pueda
+  configurar. Si el plugin pone la etiqueta, el plugin tiene que poner la
+  puerta.
+
+  **Cómo quedó.** Cada etiqueta declara a qué categoría pertenece —medición o
+  publicidad— y espera a que esa categoría esté concedida:
+
+  | Etiqueta | Espera |
+  |---|---|
+  | Google Analytics 4 | medición |
+  | Google Ads y sus conversiones | publicidad |
+  | Pixel de Meta | publicidad |
+  | Google Tag Manager | cualquiera de las dos |
+  | Verificaciones de propiedad | nada: son `<meta>`, no piden nada a la red |
+
+  Tag Manager espera cualquiera de las dos porque no es una herramienta de
+  medición: es el transporte de las que se cuelguen dentro. Atarlo sólo a
+  medición dejaría sin funcionar una conversión de publicidad en el caso —poco
+  común, pero real— de quien acepta publicidad y rechaza medición.
+
+  **Y empieza a medir en el momento en que se acepta, sin recargar.** La
+  etiqueta no se omite: se imprime dormida, como `type="text/plain"`, que es un
+  guion que el navegador no ejecuta. El gestor de consentimiento la despierta
+  cuando la persona concede la categoría. Con CookieAdmin funciona así; con
+  otro gestor la etiqueta se queda dormida y la medición empieza en la página
+  siguiente, cuando el plugin ya lee la respuesta desde el servidor. Peor, pero
+  el orden sigue siendo el correcto: primero el permiso.
+
+  **Consent Mode v2 de Google**, además de la puerta y no en vez de ella. Se
+  imprime siempre —es inline, no pide nada a la red y no pone ninguna cookie— y
+  declara todo denegado de partida. Hace falta porque la puerta cubre lo que
+  imprime este plugin, y esto cubre lo que el sitio cuelgue desde dentro de Tag
+  Manager, donde el plugin no manda. `security_storage` va concedido: es lo que
+  impide un fraude, y denegarlo no protege a nadie.
+
+### Cambiado
+
+- **Sin gestor de consentimiento, el sitio queda como estaba.** Esto es una
+  decisión y no un olvido. El repositorio es público y hay forks instalados en
+  sitios que no conozco; un plugin que al actualizarse apagara en silencio la
+  medición de un sitio que no tiene banner haría un daño peor que el que viene
+  a arreglar, y silencioso, que es la peor clase. Donde hay banner la puerta
+  funciona; donde no lo hay, la pantalla de Configuración ahora lo dice con
+  todas sus letras, nombrando la Ley 21.719 y su fecha.
+
+  Se reconocen CookieAdmin, CookieYes, Complianz, Cookie Notice, Borlabs e
+  iubenda. Para otro gestor están los filtros `cod_consentimiento_hay_gestor`,
+  `cod_consentimiento_exigir`, `cod_consentimiento_concedidas`,
+  `cod_consentimiento_cookie` y `cod_consentimiento_atributo`.
+
+- **El modo de fallo es «no se mide».** Si la cookie del gestor cambia de
+  formato y el plugin deja de reconocerla, todo queda denegado. Es a propósito:
+  el formato de la cookie de un plugin de terceros no es un contrato, y entre
+  equivocarse hacia «no medí» y equivocarse hacia «medí sin permiso», sólo una
+  de las dos es un problema legal.
+
+### Comprobado
+
+- `scripts/probar-consentimiento.php` —**63 comprobaciones**— arma el HTML que
+  el plugin produce con la cookie puesta a mano en sus seis estados: sin
+  responder, rechazado, aceptado todo, sólo medición, sólo publicidad y sin
+  gestor. Comprueba que un guion dormido no cuenta como cargado, que un
+  `<iframe>` o una `<img>` de un `<noscript>` sí cuentan —se cargan solos—, y
+  que ningún guion vivo nombra a un tercero antes del consentimiento. Esa
+  última no lleva lista de etiquetas: es la que sobrevive a que mañana se
+  agregue otra y nadie se acuerde de añadirla a la prueba.
+
+  Las tres formas de la cookie de CookieAdmin están **medidas** en el
+  navegador, pulsando cada botón y leyendo `document.cookie`, no leídas de su
+  documentación.
+
+### Agregado
+
+- **«Preferencias de cookies» ya se puede componer, sin parchear HTML.** La
+  conducta `preferencias-cookies` existía en el runtime desde hace meses, pero
+  el compilador no la aceptaba: la única forma de ponerla era editar el HTML a
+  mano con un guion aparte, que es justo lo que el page builder viene a evitar
+  —un parche de HTML no queda en el documento, así que después nadie lo puede
+  editar, y no sobrevive a la siguiente recomposición—. En Santa Luisa se puso
+  así. Ahora se declara como cualquier otra conducta, sobre un `link` o un
+  `button`.
+
+  El `href` es obligatorio y no puede ser `#`. No es relleno: sin JavaScript no
+  hay panel de cookies que reabrir, así que el enlace tiene que llevar a algún
+  lugar que sirva —la página de términos y privacidad—. Con JavaScript, el
+  runtime le quita el salto al clic y abre el panel.
+
+- **Se puede preguntar en qué revisión está una región global.**
+  `cod_get_canvas_page_state` acepta ahora `pageId: 0` con `documentId`
+  (`cod-region-header`, `cod-region-body`, `cod-region-footer`).
+
+  Antes una región se podía escribir pero no consultar, y como el apply exige
+  la revisión exacta, quien quisiera corregir un pie tenía que adivinarla:
+  mandar una equivocada a propósito y leer la revisión real del mensaje de
+  conflicto. Eso no es un circuito, es un rebote que funciona por accidente, y
+  deja un intento fallido en el registro cada vez. Una región que nunca se
+  escribió responde revisión 0 y `exists: false`, en vez de un error que parece
+  una avería.
+
+### Corregido
+
+- **Escribir una región ya no responde un error después de haber funcionado.**
+  Al aplicar una composición sobre una región, el servicio intentaba leer «la
+  página» de vuelta. Una región no tiene página, así que respondía «La página
+  Canvas no pudo leerse después de aplicar la composición» —DESPUÉS de haber
+  guardado bien y subido la revisión—.
+
+  Un fallo así es peor que un fallo de verdad: quien lo recibe reintenta, el
+  reintento manda la revisión anterior, choca con un conflicto, y ahora hay dos
+  errores distintos para una operación que salió bien a la primera.
+
+### Comprobado
+
+- `scripts/probar-preferencias-cookies.php`: la conducta sobre `link` y sobre
+  `button`, el rechazo de `#` y de un destino vacío nombrando el porqué, el
+  rechazo sobre un nodo que no es enlace nombrando lo que llegó, que el
+  saneador no se coma el atributo, y las seis respuestas del estado de región.
+
+- `scripts/probar-conversion-formulario.php` gana tres comprobaciones del otro
+  lado de la puerta: tras rechazar, la conversión no engancha, queda dormida
+  bajo publicidad y la cuenta de Ads no se configura en ningún guion vivo.
+
+  La última estuvo mal escrita a propósito y por eso se deja anotado: buscaba
+  el texto `gtag('config'` en el HTML, y ese texto SÍ aparece —dentro del guion
+  dormido—. Lo que hay que mirar es si está en un guion que se ejecuta. Esa
+  comprobación mal hecha fue, de todas formas, la que destapó un defecto real:
+  los dos `gtag('config')` viajaban en UN solo guion dormido, de modo que
+  aceptar nada más que medición lo despertaba entero y configuraba también la
+  cuenta de publicidad. Un consentimiento a medias que en realidad concedía
+  todo, y sin que se notara, porque la página se ve igual. Ahora cada
+  identificador duerme bajo su propia categoría, y hay tres comprobaciones que
+  lo sujetan.
+
+- `scripts/probar-mapa.php` dejó de exigir la versión exacta `0.3.47`: ahora
+  pide «esa o posterior». Una prueba atada a un número falla en cuanto sale la
+  versión siguiente, y hay que tocarla sin que nada de lo que prueba haya
+  cambiado.
+
+---
+
 ## 0.3.47 — 3 de octubre de 2026
 
 ### Agregado
