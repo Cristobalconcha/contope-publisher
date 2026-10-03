@@ -16,7 +16,12 @@
   'use strict';
 
   var HEADING_TAGS = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
-  var GEAR_SVG = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.55-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34h.01a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87v.01a1.7 1.7 0 0 0 1.55 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1z"></path></svg>';
+  // Un LÁPIZ y no un engranaje. Cristóbal, el 3 de octubre de 2026: «prefiero
+  // un lápiz, no un engranaje, porque es más eso: son las características
+  // visuales». Un engranaje promete ajustes de sistema; un lápiz dice «edita
+  // esto», que es lo que la ventana hace. Las categorías —contenido, diseño—
+  // van DENTRO de la ventana, en sus pestañas, no en el icono.
+  var LAPIZ_SVG = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>';
 
   // ------------------------------------------------------------------
   // Capa flotante compartida: cierre con click afuera, Escape y botón.
@@ -112,6 +117,65 @@
       return componentClasses(component).indexOf('cod-heading') !== -1;
     }
 
+    /**
+     * De qué clase es este objeto, para saber qué ofrecerle en «Content».
+     *
+     * Se mira lo que el objeto ES —su etiqueta y sus atributos— y no una lista
+     * de clases nuestras, para que funcione igual con algo compuesto a mano.
+     */
+    function claseDeObjeto(component) {
+      if (!component) return '';
+      if (isHeadingComponent(component)) return 'titulo';
+      var tag = String(component.get ? component.get('tagName') || '' : '').toLowerCase();
+      var attrs = componentAttributes(component);
+      if (tag === 'img' || attrs.src !== undefined) return 'imagen';
+      if (tag === 'a' || attrs.href !== undefined) return 'enlace';
+      if (HEADING_TAGS.indexOf(tag) !== -1) return 'titulo';
+      if (tag === 'p' || tag === 'span' || tag === 'li' || tag === 'figcaption') return 'texto';
+      if (tag === 'video' || tag === 'audio' || tag === 'iframe') return 'medio';
+      return 'contenedor';
+    }
+
+    /**
+     * ¿Este objeto lleva engranaje?
+     *
+     * POR QUÉ CAMBIÓ. Hasta el 3 de octubre de 2026 el engranaje sólo aparecía
+     * sobre los TÍTULOS: `updateGearButton` se cortaba en la primera línea si
+     * el componente no era uno. Para todo lo demás no había forma de abrir la
+     * ventana contextual, aunque la ventana ya estuviera construida y sus
+     * pestañas Design y Advanced fueran genéricas.
+     *
+     * Cristóbal: «cada objeto tenga el icono de un lápiz para editarse en una
+     * ventana contextual, como el engranaje de DIVI». Lo había pedido antes.
+     *
+     * Qué NO lleva engranaje, y por qué: el envoltorio del lienzo y el `body`
+     * no son objetos de nadie, y un icono flotando sobre ellos aparecería en
+     * cualquier sitio vacío. Lo demás sí: un contenedor también es un objeto
+     * que se configura, igual que en Divi lo es una fila o una sección.
+     */
+    /** Cómo se llama este objeto para una persona. */
+    function nombreDeObjeto(component) {
+      var nombres = {
+        titulo: 'el título',
+        texto: 'el texto',
+        imagen: 'la imagen',
+        enlace: 'el enlace',
+        medio: 'el medio',
+        contenedor: 'el bloque'
+      };
+      return nombres[claseDeObjeto(component)] || 'el objeto';
+    }
+
+    function llevaEngranaje(component) {
+      if (!component) return false;
+      if (typeof component.parent === 'function' && !component.parent()) return false;
+      var tag = String(component.get ? component.get('tagName') || '' : '').toLowerCase();
+      if (tag === 'body' || tag === 'html') return false;
+      // Un nodo de texto suelto no es un objeto: lo es su elemento.
+      if (component.get && component.get('type') === 'textnode') return false;
+      return !!getElement(component);
+    }
+
     function getFrameDocument() {
       var canvas = editor && editor.Canvas;
       var frame = canvas && typeof canvas.getFrameEl === 'function' ? canvas.getFrameEl() : null;
@@ -194,12 +258,12 @@
     }
 
     function ensureGearStyles(frameDocument) {
-      if (!frameDocument || !frameDocument.head || frameDocument.getElementById('cod-heading-gear-css')) return;
+      if (!frameDocument || !frameDocument.head || frameDocument.getElementById('cod-objeto-lapiz-css')) return;
       var gearStyle = frameDocument.createElement('style');
-      gearStyle.id = 'cod-heading-gear-css';
+      gearStyle.id = 'cod-objeto-lapiz-css';
       gearStyle.textContent = [
-        '.cod-heading-gear { position:fixed; z-index:2147483000; width:28px; height:28px; padding:0; border:1px solid #ffffff38; border-radius:6px; background:#1f2228; color:#f4f1eb; cursor:pointer; box-shadow:0 4px 12px #0008; display:flex; align-items:center; justify-content:center; }',
-        '.cod-heading-gear:hover { border-color:#70b9e9; color:#fff; }',
+        '.cod-objeto-lapiz { position:fixed; z-index:2147483000; width:28px; height:28px; padding:0; border:1px solid #ffffff38; border-radius:6px; background:#1f2228; color:#f4f1eb; cursor:pointer; box-shadow:0 4px 12px #0008; display:flex; align-items:center; justify-content:center; }',
+        '.cod-objeto-lapiz:hover { border-color:#70b9e9; color:#fff; }',
       ].join('\n');
       frameDocument.head.appendChild(gearStyle);
     }
@@ -276,7 +340,7 @@
 
     function updateGearButton(component) {
       removeGearButton();
-      if (!isHeadingComponent(component)) return;
+      if (!llevaEngranaje(component)) return;
 
       var element = getElement(component);
       var frameDocument = element && element.ownerDocument ? element.ownerDocument : getFrameDocument();
@@ -285,10 +349,11 @@
 
       var button = frameDocument.createElement('button');
       button.type = 'button';
-      button.className = 'cod-heading-gear';
-      button.title = 'Abrir inspector del título';
-      button.setAttribute('aria-label', 'Abrir inspector del título');
-      button.innerHTML = GEAR_SVG;
+      button.className = 'cod-objeto-lapiz';
+      var rotuloLapiz = 'Editar ' + nombreDeObjeto(component);
+      button.title = rotuloLapiz;
+      button.setAttribute('aria-label', rotuloLapiz);
+      button.innerHTML = LAPIZ_SVG;
       button.addEventListener('pointerdown', function (event) {
         event.preventDefault();
         event.stopPropagation();
@@ -379,6 +444,42 @@
       return select;
     }
 
+    /** Un campo que escribe en un atributo del objeto. */
+    function campoDeAtributo(component, atributo, rotulo, pista) {
+      var campo = createElement(hostDocument, 'label', 'cod-im-field');
+      campo.appendChild(createElement(hostDocument, 'span', '', rotulo));
+      var input = createElement(hostDocument, 'input');
+      input.type = 'text';
+      input.value = String(componentAttributes(component)[atributo] || '');
+      if (pista) input.placeholder = pista;
+      input.addEventListener('change', function () {
+        var destino = editor.getSelected() || currentComponent;
+        if (!destino || typeof destino.addAttributes !== 'function') return;
+        var valor = {};
+        valor[atributo] = input.value.trim();
+        destino.addAttributes(valor);
+      });
+      campo.appendChild(input);
+      return campo;
+    }
+
+    /** Un campo que escribe el texto interior del objeto. */
+    function campoDeTexto(component, rotulo) {
+      var campo = createElement(hostDocument, 'label', 'cod-im-field');
+      campo.appendChild(createElement(hostDocument, 'span', '', rotulo));
+      var input = createElement(hostDocument, 'input');
+      input.type = 'text';
+      var el = getElement(component);
+      input.value = el ? String(el.textContent || '').trim() : '';
+      input.addEventListener('change', function () {
+        var destino = editor.getSelected() || currentComponent;
+        if (!destino) return;
+        setHeadingText(destino, input.value);
+      });
+      campo.appendChild(input);
+      return campo;
+    }
+
     function renderContentPane(component) {
       var pane = panes.content;
       pane.replaceChildren();
@@ -386,7 +487,39 @@
       var element = getElement(component);
       var attributes = componentAttributes(component);
       var isDynamic = !!attributes['data-cod-dynamic'];
+      var clase = claseDeObjeto(component);
 
+      // Cada objeto trae lo suyo. Antes esta pestaña era de títulos y sólo de
+      // títulos —un cuadro de Texto y un selector de Nivel—, porque el lápiz
+      // únicamente aparecía sobre ellos. Abierto a todos los objetos, ofrecerle
+      // «Nivel del título» a una fotografía sería peor que no ofrecer nada.
+      if (clase === 'imagen') {
+        pane.appendChild(campoDeAtributo(component, 'src', 'Imagen', '/wp-content/uploads/…'));
+        pane.appendChild(campoDeAtributo(component, 'alt', 'Texto alternativo', 'Lo que oye quien no la ve'));
+        pane.appendChild(createElement(hostDocument, 'p', 'cod-im-hint',
+          'El texto alternativo no es opcional: es lo que se lee en voz alta y lo que aparece si la imagen no carga.'));
+        return;
+      }
+
+      if (clase === 'enlace') {
+        pane.appendChild(campoDeTexto(component, 'Rótulo'));
+        pane.appendChild(campoDeAtributo(component, 'href', 'Destino', '/contacto, https://…'));
+        return;
+      }
+
+      if (clase === 'medio') {
+        pane.appendChild(campoDeAtributo(component, 'src', 'Archivo', '/wp-content/uploads/…'));
+        return;
+      }
+
+      if (clase === 'contenedor') {
+        pane.appendChild(createElement(hostDocument, 'div', 'cod-im-note',
+          'Este bloque no tiene contenido propio: lo que se edita son las piezas de dentro. '
+          + 'Pínchalas para abrir su lápiz. En «Diseño» sí se configura este bloque.'));
+        return;
+      }
+
+      // Título y texto comparten el cuadro de Texto; sólo el título lleva Nivel.
       var textField = createElement(hostDocument, 'label', 'cod-im-field');
       textField.appendChild(createElement(hostDocument, 'span', '', 'Texto'));
       var textInput = createElement(hostDocument, 'input');
@@ -493,17 +626,10 @@
       pane.appendChild(createElement(hostDocument, 'p', 'cod-im-hint', 'Estos controles aplican estilo local al elemento seleccionado (mismo mecanismo que el panel lateral).'));
     }
 
-    function renderAdvancedPane() {
-      var pane = panes.advanced;
-      pane.replaceChildren();
-      pane.appendChild(createElement(hostDocument, 'div', 'cod-im-note', 'Próximamente. Interacciones, Sticky Position, clases/ID y condiciones de visualización se migrarán acá en una pasada posterior.'));
-    }
-
     function renderAllPanes() {
       if (!currentComponent) return;
       renderContentPane(currentComponent);
       renderDesignPane(currentComponent);
-      renderAdvancedPane();
     }
 
     function switchTab(name) {
@@ -549,7 +675,9 @@
       var tabs = createElement(hostDocument, 'div', 'cod-im-tabs');
       tabs.setAttribute('role', 'tablist');
       tabButtons = [];
-      var tabDefs = [['content', 'Content'], ['design', 'Design'], ['advanced', 'Advanced']];
+      // Las categorías van acá dentro, no en el icono: el lápiz dice «edita esto»
+      // y la ventana separa QUÉ dice de CÓMO se ve.
+      var tabDefs = [['content', 'Configuración'], ['design', 'Diseño']];
       for (var i = 0; i < tabDefs.length; i++) {
         var tab = createElement(hostDocument, 'button', 'cod-im-tab', tabDefs[i][1]);
         tab.type = 'button';

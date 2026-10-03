@@ -1371,6 +1371,170 @@
       return trail;
     }
 
+    // ------------------------------------------------------------------
+    // Propiedades del supermódulo (pasos 3 y 4 de §2 de la arquitectura).
+    //
+    // Dos paneles que son las dos caras de lo mismo:
+    //
+    //   · «Usar como propiedad» — al COMPONER. Marca el elemento seleccionado
+    //     con data-cod-prop y le pone un nombre. Es el paso 3: el esquema se
+    //     recoge de lo que aportan los elementos, no se escribe en una lista
+    //     aparte.
+    //
+    //   · «Propiedades del módulo» — al USAR una instancia. Muestra un campo
+    //     por cada marca que haya dentro, para cambiar el texto, la foto o el
+    //     destino sin entrar a editar el módulo por dentro. Es el paso 4, y es
+    //     lo único que distingue un supermódulo de un patrón sincronizado de
+    //     WordPress.
+    //
+    // La marca vive en el marcado y no en un vínculo con la biblioteca porque
+    // insertar un supermódulo es copiar su HTML: así sobrevive a la copia, al
+    // paquete y a una edición a mano.
+    // ------------------------------------------------------------------
+
+    const PROP_ATTR = 'data-cod-prop';
+    const PROP_LABEL_ATTR = 'data-cod-prop-rotulo';
+
+    /** Una clave de propiedad: minúsculas, sin acentos ni espacios. */
+    function limpiarClaveDeProp(raw) {
+      return String(raw || '')
+        .normalize('NFD')
+        .replace(/[̀-ͯ]/g, '')
+        .toLowerCase()
+        .replace(/[^a-z0-9_-]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .slice(0, 40);
+    }
+
+    /** Qué tipo de propiedad es este componente, por lo que ES. */
+    function tipoDeProp(component) {
+      const tag = String(component?.get?.('tagName') || '').toLowerCase();
+      const attrs = componentAttributes(component);
+      if (tag === 'img' || attrs.src !== undefined) return 'imagen';
+      if (tag === 'a' || attrs.href !== undefined) return 'enlace';
+      return 'texto';
+    }
+
+    /** Todos los descendientes marcados, en orden de documento. */
+    function propsDentroDe(component) {
+      if (!component || typeof component.find !== 'function') return [];
+      let encontrados = [];
+      try {
+        encontrados = component.find('[' + PROP_ATTR + ']') || [];
+      } catch (_error) {
+        return [];
+      }
+      // El propio componente también cuenta si está marcado.
+      const propio = componentAttributes(component)[PROP_ATTR];
+      if (propio) encontrados = [component].concat(encontrados);
+      const vistas = {};
+      return encontrados.filter((c) => {
+        const clave = componentAttributes(c)[PROP_ATTR];
+        if (!clave || vistas[clave]) return false;
+        vistas[clave] = true;
+        return true;
+      });
+    }
+
+    function renderMarcarPropPanel(component) {
+      if (!component || typeof component.addAttributes !== 'function') return null;
+      // Un contenedor con hijos se guarda como módulo; lo que se marca como
+      // propiedad son las piezas de contenido de dentro.
+      if (componentHasChildren(component)) return null;
+
+      const attrs = componentAttributes(component);
+      const claveActual = String(attrs[PROP_ATTR] || '');
+
+      const panel = createElement(hostDocument, 'section', 'cod-ci__prop');
+      panel.appendChild(createElement(hostDocument, 'div', 'cod-ci__prop-title', 'Propiedad del módulo'));
+
+      const campo = createElement(hostDocument, 'label', 'cod-ci__field', 'Nombre de la propiedad');
+      const input = createElement(hostDocument, 'input');
+      input.value = claveActual;
+      input.placeholder = 'titular, foto, boton…';
+      campo.appendChild(input);
+      panel.appendChild(campo);
+
+      const pista = createElement(hostDocument, 'div', 'cod-ci__prop-hint', '');
+      panel.appendChild(pista);
+
+      function describir(clave) {
+        if (!clave) {
+          pista.textContent = 'Sin nombre, esta pieza no aparece en el panel de quien use el módulo: '
+            + 'habrá que entrar a editarla por dentro.';
+          return;
+        }
+        const tipo = tipoDeProp(component);
+        const comoSeEdita = { texto: 'un cuadro de texto', imagen: 'un selector de imagen', enlace: 'un destino' };
+        pista.textContent = 'Quien use el módulo verá «' + clave + '» como ' + (comoSeEdita[tipo] || 'un campo') + '.';
+      }
+      describir(claveActual);
+
+      input.addEventListener('change', () => {
+        const clave = limpiarClaveDeProp(input.value);
+        input.value = clave;
+        if (clave) {
+          component.addAttributes({ [PROP_ATTR]: clave });
+        } else if (typeof component.removeAttributes === 'function') {
+          component.removeAttributes([PROP_ATTR, PROP_LABEL_ATTR]);
+        }
+        describir(clave);
+      });
+
+      return panel;
+    }
+
+    function renderPropsDeInstanciaPanel(component) {
+      const marcados = propsDentroDe(component);
+      if (!marcados.length) return null;
+
+      const panel = createElement(hostDocument, 'section', 'cod-ci__props');
+      panel.appendChild(createElement(hostDocument, 'div', 'cod-ci__props-title', 'Propiedades del módulo'));
+
+      marcados.forEach((pieza) => {
+        const attrs = componentAttributes(pieza);
+        const clave = String(attrs[PROP_ATTR] || '');
+        const rotulo = String(attrs[PROP_LABEL_ATTR] || clave);
+        const tipo = tipoDeProp(pieza);
+
+        const campo = createElement(hostDocument, 'label', 'cod-ci__field', rotulo);
+        const input = createElement(hostDocument, 'input');
+
+        if (tipo === 'imagen') {
+          input.value = String(attrs.src || '');
+          input.placeholder = '/wp-content/uploads/…';
+          input.addEventListener('change', () => pieza.addAttributes({ src: input.value.trim() }));
+        } else if (tipo === 'enlace') {
+          input.value = String(attrs.href || '');
+          input.placeholder = '/contacto, https://…';
+          input.addEventListener('change', () => pieza.addAttributes({ href: input.value.trim() }));
+        } else {
+          // El texto se escribe como contenido, no como atributo. `components`
+          // con una cadena reemplaza el contenido interior del componente.
+          const actual = typeof pieza.get === 'function' ? String(pieza.get('content') || '') : '';
+          input.value = actual || (typeof pieza.getEl === 'function' ? String(pieza.getEl()?.textContent || '').trim() : '');
+          input.addEventListener('change', () => {
+            try {
+              pieza.components(input.value);
+            } catch (_error) {
+              // Un componente que no admite contenido se deja como estaba: es
+              // mejor no escribir que escribir en el sitio equivocado.
+            }
+          });
+        }
+
+        campo.appendChild(input);
+        panel.appendChild(campo);
+
+        const ir = createElement(hostDocument, 'button', 'cod-ci__props-goto', 'Editar esta pieza');
+        ir.type = 'button';
+        ir.addEventListener('click', () => { supermoduleContext = component; editor.select(pieza); openInspectorPanel(); });
+        panel.appendChild(ir);
+      });
+
+      return panel;
+    }
+
     function renderSaveModulePanel(component) {
       if (!componentHasChildren(component)) return null;
       const bridge = global.OCDCanvasEditor;
