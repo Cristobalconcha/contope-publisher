@@ -716,6 +716,107 @@
         applyDesignStyle(target, 'top', desdeInput.value.trim());
       });
 
+      // ORDEN DE CAPAS. Va junto a la posición y no en una familia propia: sin
+      // posición casi no hace nada, y la pregunta que resuelve es la misma
+      // —dónde queda esto respecto de lo demás—.
+      var capaField = createElement(hostDocument, 'label', 'cod-im-field');
+      capaField.appendChild(createElement(hostDocument, 'span', '', 'Orden de capas'));
+      var capaInput = createElement(hostDocument, 'input');
+      capaInput.type = 'number';
+      capaInput.min = '-10';
+      capaInput.max = '100';
+      capaInput.placeholder = 'auto';
+      var capaActual = String(style['z-index'] || '');
+      capaInput.value = capaActual === 'auto' ? '' : capaActual;
+      capaInput.addEventListener('change', function () {
+        var target = editor.getSelected() || currentComponent;
+        if (!target) return;
+        applyDesignStyle(target, 'z-index', capaInput.value.trim());
+      });
+      capaField.appendChild(capaInput);
+      pane.appendChild(capaField);
+
+      // DESBORDE. Recortar es la única forma de que una esquina redondeada
+      // afecte al contenido de dentro —y es además lo que rompe una posición
+      // pegada, de ahí el aviso—.
+      var desbField = createElement(hostDocument, 'label', 'cod-im-field');
+      desbField.appendChild(createElement(hostDocument, 'span', '', 'Desborde'));
+      var desbSelect = createElement(hostDocument, 'select');
+      var desbOptions = [
+        ['visible', 'Visible (se sale)'],
+        ['hidden', 'Oculto (recorta)'],
+        ['auto', 'Desplazable si hace falta'],
+        ['scroll', 'Siempre con barra'],
+      ];
+      for (var d = 0; d < desbOptions.length; d++) {
+        var desbOption = createElement(hostDocument, 'option', '', desbOptions[d][1]);
+        desbOption.value = desbOptions[d][0];
+        desbSelect.appendChild(desbOption);
+      }
+      desbSelect.value = String(style.overflow || 'visible');
+      desbSelect.addEventListener('change', function () {
+        var target = editor.getSelected() || currentComponent;
+        if (!target) return;
+        applyDesignStyle(target, 'overflow', desbSelect.value);
+        avisarRecorte();
+      });
+      desbField.appendChild(desbSelect);
+      pane.appendChild(desbField);
+
+      // El aviso existe porque este par es el motivo número uno de «el sticky
+      // no funciona», y la causa nunca está donde se la busca.
+      var avisoRecorte = createElement(hostDocument, 'p', 'cod-im-hint', '');
+      pane.appendChild(avisoRecorte);
+      function avisarRecorte() {
+        var choca = desbSelect.value === 'hidden' && posSelect.value === 'sticky';
+        avisoRecorte.textContent = choca
+          ? 'Ojo: recortar impide que lo de dentro se pegue al desplazar. Si algo tiene que quedarse pegado aquí dentro, deja el desborde visible.'
+          : '';
+      }
+      avisarRecorte();
+
+      // TRANSFORMACIÓN. Girar y escalar sin tocar el espacio que ocupa. Son
+      // dos campos y no siete porque son los dos que se usan; el resto está en
+      // el contrato de la regla para quien componga.
+      var girarField = createElement(hostDocument, 'label', 'cod-im-field');
+      girarField.appendChild(createElement(hostDocument, 'span', '', 'Girar'));
+      var girarInput = createElement(hostDocument, 'input');
+      girarInput.type = 'text';
+      girarInput.placeholder = '-6deg';
+      girarField.appendChild(girarInput);
+      pane.appendChild(girarField);
+
+      var escalarField = createElement(hostDocument, 'label', 'cod-im-field');
+      escalarField.appendChild(createElement(hostDocument, 'span', '', 'Escalar'));
+      var escalarInput = createElement(hostDocument, 'input');
+      escalarInput.type = 'number';
+      escalarInput.min = '0';
+      escalarInput.max = '10';
+      escalarInput.step = '0.01';
+      escalarInput.placeholder = '1';
+      escalarField.appendChild(escalarInput);
+      pane.appendChild(escalarField);
+
+      var transformActual = String(style.transform || '');
+      var mGirar = transformActual.match(/rotate\(([^)]+)\)/);
+      var mEscalar = transformActual.match(/scale\(([^,)]+)\)/);
+      girarInput.value = mGirar ? mGirar[1].trim() : '';
+      escalarInput.value = mEscalar ? mEscalar[1].trim() : '';
+
+      // Se escriben juntos porque `transform` es UNA propiedad: escribir el
+      // giro por su lado borraría la escala, que es el error clásico al tocar
+      // transform desde dos controles distintos.
+      function aplicarTransformacion() {
+        var target = editor.getSelected() || currentComponent;
+        if (!target) return;
+        var partes = [];
+        if (girarInput.value.trim()) partes.push('rotate(' + girarInput.value.trim() + ')');
+        if (escalarInput.value.trim()) partes.push('scale(' + escalarInput.value.trim() + ')');
+        applyDesignStyle(target, 'transform', partes.join(' '));
+      }
+      girarInput.addEventListener('change', aplicarTransformacion);
+      escalarInput.addEventListener('change', aplicarTransformacion);
+
       pane.appendChild(createElement(hostDocument, 'p', 'cod-im-hint', 'Estos controles aplican estilo local al elemento seleccionado (mismo mecanismo que el panel lateral).'));
     }
 

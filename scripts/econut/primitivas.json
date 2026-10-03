@@ -1,0 +1,1007 @@
+{
+  "pageId": 107,
+  "documentId": "cod-canvas-page-107",
+  "expectedRevision": 1,
+  "design": {
+    "schemaVersion": 1,
+    "designId": "econut-web",
+    "expectedDesignRevision": 2,
+    "reviewState": "session",
+    "rules": [
+      {
+        "id": "titulo",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de las familias nuevas del catálogo."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "titulo",
+          "fontSize": "34px",
+          "lineHeight": 1.15,
+          "fontWeight": 700
+        }
+      },
+      {
+        "id": "rotulo",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de las familias nuevas del catálogo."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "rotulo",
+          "fontSize": "13px",
+          "lineHeight": 1.4,
+          "transform": "uppercase",
+          "letterSpacing": "0.08em"
+        }
+      },
+      {
+        "id": "cuerpo",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de las familias nuevas del catálogo."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "cuerpo",
+          "fontSize": "16px",
+          "lineHeight": 1.7
+        }
+      },
+      {
+        "id": "verde",
+        "kind": "surface",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de las familias nuevas del catálogo."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "backgroundColor": "#2E594A",
+          "foregroundColor": "#FFFFFF"
+        }
+      },
+      {
+        "id": "clara",
+        "kind": "surface",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de las familias nuevas del catálogo."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "backgroundColor": "#DBD4C0",
+          "foregroundColor": "#2E594A"
+        }
+      },
+      {
+        "id": "blanca",
+        "kind": "surface",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de las familias nuevas del catálogo."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "backgroundColor": "#FFFFFF",
+          "foregroundColor": "#2E594A"
+        }
+      },
+      {
+        "id": "aire",
+        "kind": "spacing",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de las familias nuevas del catálogo."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "paddingBlock": "56px",
+          "paddingInline": "24px"
+        }
+      },
+      {
+        "id": "aire-largo",
+        "kind": "spacing",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de las familias nuevas del catálogo."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "paddingBlock": "160px",
+          "paddingInline": "24px"
+        }
+      },
+      {
+        "id": "caja",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de las familias nuevas del catálogo."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "max-width": "760px",
+            "margin-inline-start": "auto",
+            "margin-inline-end": "auto",
+            "width": "100%"
+          }
+        }
+      },
+      {
+        "id": "columna",
+        "kind": "layout",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de las familias nuevas del catálogo."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "mode": "stack",
+          "gap": "16px"
+        }
+      },
+      {
+        "id": "pegada",
+        "kind": "posicion",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de las familias nuevas del catálogo."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "modo": "pegada",
+          "arriba": "16px",
+          "capa": 2
+        }
+      },
+      {
+        "id": "pegada-fondo",
+        "kind": "surface",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de las familias nuevas del catálogo."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "backgroundColor": "#2E594A",
+          "foregroundColor": "#FFFFFF"
+        }
+      },
+      {
+        "id": "pegada-aire",
+        "kind": "spacing",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de las familias nuevas del catálogo."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "paddingBlock": "10px",
+          "paddingInline": "12px"
+        }
+      },
+      {
+        "id": "insignia-pos",
+        "kind": "posicion",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de las familias nuevas del catálogo."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "modo": "relativa",
+          "arriba": "-34px",
+          "izquierda": "12px"
+        }
+      },
+      {
+        "id": "torcida",
+        "kind": "transformacion",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de las familias nuevas del catálogo."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "rotar": "-4deg"
+        }
+      },
+      {
+        "id": "crece",
+        "kind": "transformacion",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de las familias nuevas del catálogo."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "escalar": 1
+        }
+      },
+      {
+        "id": "crece-hover",
+        "kind": "transformacion",
+        "scope": {
+          "breakpoint": "all",
+          "state": "hover",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de las familias nuevas del catálogo."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "escalar": 1.06
+        }
+      },
+      {
+        "id": "marco",
+        "kind": "desborde",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de las familias nuevas del catálogo."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "horizontal": "oculto",
+          "vertical": "oculto"
+        }
+      },
+      {
+        "id": "marco-forma",
+        "kind": "shape",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de las familias nuevas del catálogo."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "radius": "18px"
+        }
+      },
+      {
+        "id": "marco-medida",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de las familias nuevas del catálogo."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "width": "260px",
+            "height": "170px"
+          }
+        }
+      },
+      {
+        "id": "foto-grande",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de las familias nuevas del catálogo."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "width": "420px",
+            "max-width": "none"
+          }
+        }
+      },
+      {
+        "id": "ico-flecha",
+        "kind": "icono",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de las familias nuevas del catálogo."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "forma": "/wp-content/uploads/2026/10/icono-flecha.svg",
+          "donde": "despues",
+          "tamano": "1.1em",
+          "separacion": ".5em"
+        }
+      },
+      {
+        "id": "ico-hoja",
+        "kind": "icono",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de las familias nuevas del catálogo."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "forma": "/wp-content/uploads/2026/10/icono-hoja.svg",
+          "tamano": "1.2em"
+        }
+      },
+      {
+        "id": "ico-reloj",
+        "kind": "icono",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de las familias nuevas del catálogo."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "forma": "/wp-content/uploads/2026/10/icono-reloj.svg",
+          "tamano": "1.2em"
+        }
+      },
+      {
+        "id": "ico-ubicacion",
+        "kind": "icono",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de las familias nuevas del catálogo."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "forma": "/wp-content/uploads/2026/10/icono-ubicacion.svg",
+          "tamano": "1.2em"
+        }
+      },
+      {
+        "id": "ico-correo",
+        "kind": "icono",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de las familias nuevas del catálogo."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "forma": "/wp-content/uploads/2026/10/icono-correo.svg",
+          "tamano": "1.2em",
+          "color": "#DC4017"
+        }
+      },
+      {
+        "id": "boton",
+        "kind": "button",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de las familias nuevas del catálogo."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "variant": "solid",
+          "tone": "primary",
+          "size": "md"
+        }
+      },
+      {
+        "id": "lista-aire",
+        "kind": "spacing",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de las familias nuevas del catálogo."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "paddingBlock": "0px",
+          "paddingInline": "0px",
+          "gap": "10px"
+        }
+      }
+    ]
+  },
+  "composition": {
+    "schemaVersion": 2,
+    "nodes": [
+      {
+        "id": "intro",
+        "kind": "section",
+        "ruleIds": [
+          "blanca",
+          "aire"
+        ],
+        "children": [
+          {
+            "id": "g-1",
+            "kind": "group",
+            "ruleIds": [
+              "caja",
+              "columna"
+            ],
+            "children": [
+              {
+                "id": "h-2",
+                "kind": "heading",
+                "ruleIds": [
+                  "titulo"
+                ],
+                "content": {
+                  "text": "Primitivas nuevas",
+                  "level": 1
+                }
+              },
+              {
+                "id": "p-3",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "cuerpo"
+                ],
+                "content": {
+                  "text": "Cuatro familias que antes había que escribir como CSS suelto y que ahora tienen su propia clase de regla y su control: posición —con «pegada» como un modo más—, desborde, transformación e icono."
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "pos",
+        "kind": "section",
+        "ruleIds": [
+          "verde",
+          "aire-largo"
+        ],
+        "children": [
+          {
+            "id": "g-4",
+            "kind": "group",
+            "ruleIds": [
+              "caja",
+              "columna"
+            ],
+            "children": [
+              {
+                "id": "e-5",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "rotulo",
+                  "pegada",
+                  "pegada-fondo",
+                  "pegada-aire"
+                ],
+                "content": {
+                  "text": "Posición · pegada al desplazar"
+                }
+              },
+              {
+                "id": "p-6",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "cuerpo"
+                ],
+                "content": {
+                  "text": "Esta etiqueta se queda arriba mientras la sección pasa por detrás. Para Divi, «sticky» es un subsistema aparte con su propia pestaña; acá es un valor más de la misma familia, que es como lo pidió Cristóbal."
+                }
+              },
+              {
+                "id": "p-7",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "cuerpo"
+                ],
+                "content": {
+                  "text": "Una posición pegada sin distancia no se pega nunca —el navegador la deja quieta y parece un control roto—, así que si no se declara, el compilador la pone en cero."
+                }
+              },
+              {
+                "id": "p-8",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "cuerpo"
+                ],
+                "content": {
+                  "text": "Y si algún contenedor de más arriba recortara su contenido, la pegada tampoco funcionaría. Esa combinación se rechaza al componer nombrando los dos nodos, en vez de dejar una pieza que no se pega y no avisa."
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "tra",
+        "kind": "section",
+        "ruleIds": [
+          "clara",
+          "aire"
+        ],
+        "children": [
+          {
+            "id": "g-9",
+            "kind": "group",
+            "ruleIds": [
+              "caja",
+              "columna"
+            ],
+            "children": [
+              {
+                "id": "r-10",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "rotulo"
+                ],
+                "content": {
+                  "text": "Transformación"
+                }
+              },
+              {
+                "id": "p-11",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "cuerpo"
+                ],
+                "content": {
+                  "text": "Girar, escalar, mover o inclinar sin tocar el espacio que ocupa. Es un estado, no una animación: ésa es la familia «movimiento»."
+                }
+              },
+              {
+                "id": "h-12",
+                "kind": "heading",
+                "ruleIds": [
+                  "titulo",
+                  "torcida"
+                ],
+                "content": {
+                  "text": "Este título está torcido 4 grados",
+                  "level": 2
+                }
+              },
+              {
+                "id": "p-13",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "cuerpo"
+                ],
+                "content": {
+                  "text": "Y el botón de abajo crece al pasar el ratón. No hace falta nada nuevo para eso: es la misma regla con el estado «hover». Divi, en cambio, declara un gemelo de hover por cada campo transformable."
+                }
+              },
+              {
+                "id": "b-14",
+                "kind": "button",
+                "ruleIds": [
+                  "boton",
+                  "crece",
+                  "crece-hover",
+                  "ico-flecha"
+                ],
+                "content": {
+                  "label": "Pasa el ratón por encima",
+                  "href": "#tra"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "des",
+        "kind": "section",
+        "ruleIds": [
+          "blanca",
+          "aire"
+        ],
+        "children": [
+          {
+            "id": "g-15",
+            "kind": "group",
+            "ruleIds": [
+              "caja",
+              "columna"
+            ],
+            "children": [
+              {
+                "id": "r-16",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "rotulo"
+                ],
+                "content": {
+                  "text": "Desborde"
+                }
+              },
+              {
+                "id": "p-17",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "cuerpo"
+                ],
+                "content": {
+                  "text": "La foto de abajo es más ancha que su marco. Recortar es la única forma de que una esquina redondeada afecte de verdad al contenido de dentro."
+                }
+              },
+              {
+                "id": "m-18",
+                "kind": "group",
+                "ruleIds": [
+                  "marco",
+                  "marco-forma",
+                  "marco-medida"
+                ],
+                "children": [
+                  {
+                    "id": "i-19",
+                    "kind": "image",
+                    "ruleIds": [
+                      "foto-grande"
+                    ],
+                    "content": {
+                      "assetUrl": "/wp-content/uploads/2026/09/Aerea-Econut-01-1024x768.jpg",
+                      "alt": "Vista aérea del fundo, más ancha que su marco"
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "p-20",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "cuerpo"
+                ],
+                "content": {
+                  "text": "Es también lo que rompe una posición pegada, y por eso las dos familias se construyeron juntas."
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "ico",
+        "kind": "section",
+        "ruleIds": [
+          "verde",
+          "aire"
+        ],
+        "children": [
+          {
+            "id": "g-21",
+            "kind": "group",
+            "ruleIds": [
+              "caja",
+              "columna"
+            ],
+            "children": [
+              {
+                "id": "r-22",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "rotulo"
+                ],
+                "content": {
+                  "text": "Icono"
+                }
+              },
+              {
+                "id": "p-23",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "cuerpo"
+                ],
+                "content": {
+                  "text": "El dibujo es un SVG de Medios, no una lista cerrada: el mismo principio abierto que el divisor. Y la decisión contraria en lo único que importa —un divisor se estira a lo ancho a propósito; un icono no se deforma nunca—."
+                }
+              },
+              {
+                "id": "l-24",
+                "kind": "group",
+                "ruleIds": [
+                  "columna",
+                  "lista-aire"
+                ],
+                "children": [
+                  {
+                    "id": "p-25",
+                    "kind": "paragraph",
+                    "ruleIds": [
+                      "cuerpo",
+                      "ico-reloj"
+                    ],
+                    "content": {
+                      "text": "Lunes a viernes, de 9 a 18"
+                    }
+                  },
+                  {
+                    "id": "p-26",
+                    "kind": "paragraph",
+                    "ruleIds": [
+                      "cuerpo",
+                      "ico-ubicacion"
+                    ],
+                    "content": {
+                      "text": "Paine, Región Metropolitana"
+                    }
+                  },
+                  {
+                    "id": "p-27",
+                    "kind": "paragraph",
+                    "ruleIds": [
+                      "cuerpo",
+                      "ico-hoja"
+                    ],
+                    "content": {
+                      "text": "Nueces con cáscara y sin cáscara"
+                    }
+                  },
+                  {
+                    "id": "p-28",
+                    "kind": "paragraph",
+                    "ruleIds": [
+                      "cuerpo",
+                      "ico-correo"
+                    ],
+                    "content": {
+                      "text": "Escríbenos: el icono lleva su propio color"
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "p-29",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "cuerpo"
+                ],
+                "content": {
+                  "text": "Los cuatro de arriba heredan el color del texto. El del sobre declara el suyo, que es la excepción y no la norma: si lo hereda, cambiar la tinta del sistema lo arrastra sin tocar la página."
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

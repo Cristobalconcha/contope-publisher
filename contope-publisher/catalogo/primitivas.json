@@ -437,16 +437,25 @@
     },
     "posicion": {
       "rotulo": "Posición",
-      "kind": "properties",
+      "kind": "posicion",
       "_nota": [
         "Va en «diseño» y no en una pestaña aparte: una posición es una",
         "propiedad visual del objeto. Criterio de Cristóbal, 2026-10-03, y es",
         "donde se separa de Divi, que la mete en su cajón de «Avanzado» junto a",
         "los efectos de scroll.",
         "",
-        "`pegada` necesita que el contenedor no recorte su contenido. Cuando no",
-        "se cumple, el control va en gris con el porqué en el tooltip, en vez de",
-        "ofrecer algo que no va a funcionar."
+        "`pegada` es un valor más de `modo` y no un subsistema. Cristóbal:",
+        "«para mí sticky es una propiedad visual que se maneja igual que",
+        "cualquier posición de css». Divi, en cambio, le dedica un sistema",
+        "aparte, con 483 referencias en su código.",
+        "",
+        "LA CAPA VIVE ACÁ y no en su propia familia porque un orden de capas",
+        "sin posición casi no hace nada, y porque la pregunta que resuelve es",
+        "la misma: dónde queda esto respecto de lo demás.",
+        "",
+        "`pegada` necesita además que ningún antepasado recorte su contenido.",
+        "El compilador lo comprueba y rechaza la combinación nombrando los dos",
+        "nodos, en vez de dejar una pieza que no se pega y no avisa."
       ],
       "propiedades": {
         "modo": {
@@ -460,11 +469,52 @@
             "fija"
           ]
         },
-        "desdeArriba": {
+        "arriba": {
           "rotulo": "Distancia desde arriba",
           "control": "medida",
+          "negativo": true,
           "visibleSi": {
             "modo": [
+              "relativa",
+              "pegada",
+              "absoluta",
+              "fija"
+            ]
+          }
+        },
+        "abajo": {
+          "rotulo": "Distancia desde abajo",
+          "control": "medida",
+          "negativo": true,
+          "visibleSi": {
+            "modo": [
+              "relativa",
+              "pegada",
+              "absoluta",
+              "fija"
+            ]
+          }
+        },
+        "izquierda": {
+          "rotulo": "Distancia desde la izquierda",
+          "control": "medida",
+          "negativo": true,
+          "visibleSi": {
+            "modo": [
+              "relativa",
+              "pegada",
+              "absoluta",
+              "fija"
+            ]
+          }
+        },
+        "derecha": {
+          "rotulo": "Distancia desde la derecha",
+          "control": "medida",
+          "negativo": true,
+          "visibleSi": {
+            "modo": [
+              "relativa",
               "pegada",
               "absoluta",
               "fija"
@@ -473,10 +523,111 @@
         },
         "capa": {
           "rotulo": "Orden de capas",
-          "control": "numero"
+          "control": "numero",
+          "min": -10,
+          "max": 100
         }
       },
-      "evidencia": "medido (2 escapadas de z-index) · divi (`position`, `z_index`) · propio (que viva en diseño)"
+      "evidencia": "medido (4 escapadas de z-index) · divi (`position`, `z_index`, `sticky`) · propio (que viva en diseño y que pegada sea un modo más)"
+    },
+    "desborde": {
+      "rotulo": "Desborde",
+      "kind": "desborde",
+      "_nota": [
+        "Qué pasa con lo que se sale de la caja.",
+        "",
+        "Existe por dos razones concretas y no por completitud: recortar es la",
+        "única forma de que una esquina redondeada afecte al contenido de",
+        "dentro, y es además lo que ROMPE una posición pegada. Esa segunda es",
+        "la que obligó a construirla junto a `posicion`.",
+        "",
+        "NO SE OFRECE SOBRE UN TEXTO, a diferencia de Divi, que la da a todos",
+        "sus módulos. Lo que recorta es una caja con contenido dentro que puede",
+        "salirse; un texto que no cabe se resuelve con tipografía —cuerpo,",
+        "interlínea, medida— y no cortándolo."
+      ],
+      "propiedades": {
+        "horizontal": {
+          "rotulo": "A lo ancho",
+          "control": "seleccion",
+          "opciones": [
+            "visible",
+            "oculto",
+            "barra",
+            "auto"
+          ]
+        },
+        "vertical": {
+          "rotulo": "A lo alto",
+          "control": "seleccion",
+          "opciones": [
+            "visible",
+            "oculto",
+            "barra",
+            "auto"
+          ]
+        }
+      },
+      "evidencia": "divi (`overflow`, en todos sus módulos) · propio (no ofrecerla sobre un texto)"
+    },
+    "transformacion": {
+      "rotulo": "Transformación",
+      "kind": "transformacion",
+      "_nota": [
+        "Mover, girar, escalar o inclinar un objeto sin tocar el espacio que",
+        "ocupa.",
+        "",
+        "LA DIFERENCIA CON `movimiento`: aquélla es una animación —algo que",
+        "ocurre en el tiempo—; ésta es un estado. Dos cosas distintas aunque",
+        "ambas acaben en la misma propiedad de CSS.",
+        "",
+        "LO QUE SALE GRATIS: como cualquier regla admite un estado, «crece un",
+        "poco al pasar el ratón» es esta misma familia con state hover. Divi",
+        "necesita para eso un subsistema aparte, porque sus efectos no son",
+        "reglas con alcance.",
+        "",
+        "El origen decide desde dónde gira o crece la pieza, y es lo que separa",
+        "«se abre como un abanico» de «da un volantín»."
+      ],
+      "propiedades": {
+        "moverX": {
+          "rotulo": "Mover a lo ancho",
+          "control": "medida",
+          "negativo": true
+        },
+        "moverY": {
+          "rotulo": "Mover a lo alto",
+          "control": "medida",
+          "negativo": true
+        },
+        "rotar": {
+          "rotulo": "Girar",
+          "control": "numero",
+          "unidad": "deg"
+        },
+        "escalar": {
+          "rotulo": "Escalar",
+          "control": "numero",
+          "min": 0,
+          "max": 10,
+          "paso": 0.01
+        },
+        "inclinarX": {
+          "rotulo": "Inclinar a lo ancho",
+          "control": "numero",
+          "unidad": "deg"
+        },
+        "inclinarY": {
+          "rotulo": "Inclinar a lo alto",
+          "control": "numero",
+          "unidad": "deg"
+        },
+        "origen": {
+          "rotulo": "Desde dónde",
+          "control": "texto"
+        }
+      },
+      "evidencia": "divi (`transform`, en todos sus módulos) · propio (que el hover sea la misma regla con otro estado)"
     },
     "imagen": {
       "rotulo": "Imagen",
@@ -735,6 +886,60 @@
         }
       },
       "evidencia": "divi (`link_options`) · medido (anclas del sitio)"
+    },
+    "icono": {
+      "rotulo": "Icono",
+      "kind": "icono",
+      "_nota": [
+        "Un dibujo pequeño que acompaña a un texto.",
+        "",
+        "De dónde sale: Cristóbal, mirando el icono de WhatsApp del pie, 2026-10-03:",
+        "«eso no debería ser hardcoded; todo elemento de un módulo debería tener su",
+        "propia configuración, y ésta es una foto que debería poder ser estilizada",
+        "con los controles del pagebuilder». Hasta hoy los iconos del plugin vivían",
+        "escritos dentro del código, sin forma de cambiarles tamaño, color ni dibujo.",
+        "",
+        "EL MISMO PRINCIPIO ABIERTO QUE EL DIVISOR: el icono es un SVG de Medios, no",
+        "una lista cerrada. Divi ofrece su propia fuente de iconos y lo que hay es lo",
+        "que hay; acá el repertorio es el que el sitio tenga.",
+        "",
+        "Y LA DECISIÓN CONTRARIA en lo único que importa: un divisor se estira a lo",
+        "ancho y esa deformación es lo que se busca; un icono no se deforma nunca.",
+        "",
+        "El color no se declara por omisión: lo hereda del texto al que acompaña,",
+        "que es lo que uno quiere casi siempre y lo que hace que cambiar la tinta",
+        "del sistema lo arrastre."
+      ],
+      "propiedades": {
+        "forma": {
+          "rotulo": "Forma",
+          "control": "recurso"
+        },
+        "donde": {
+          "rotulo": "Dónde",
+          "control": "seleccion",
+          "opciones": [
+            "antes",
+            "despues"
+          ]
+        },
+        "tamano": {
+          "rotulo": "Tamaño",
+          "control": "medida"
+        },
+        "separacion": {
+          "rotulo": "Separación del texto",
+          "control": "medida"
+        },
+        "color": {
+          "rotulo": "Color",
+          "control": "color",
+          "heredaDe": {
+            "rol": "ink"
+          }
+        }
+      },
+      "evidencia": "propio (Cristóbal, sobre el icono de WhatsApp del pie) · divi (`image_icon`, con repertorio cerrado)"
     }
   },
   "taxonomias": {
@@ -761,7 +966,9 @@
         "espaciado",
         "superficie",
         "posicion",
-        "movimiento"
+        "movimiento",
+        "transformacion",
+        "icono"
       ],
       "_sin": "forma — un texto no lleva puntas redondeadas (ejemplo de Cristóbal). Divi coincide: su módulo de texto no declara `borders`."
     },
@@ -777,7 +984,9 @@
         "espaciado",
         "superficie",
         "posicion",
-        "movimiento"
+        "movimiento",
+        "transformacion",
+        "icono"
       ],
       "_sin": "forma, por lo mismo que el título."
     },
@@ -793,7 +1002,8 @@
         "espaciado",
         "superficie",
         "posicion",
-        "movimiento"
+        "movimiento",
+        "transformacion"
       ]
     },
     "image": {
@@ -809,7 +1019,9 @@
         "superficie",
         "disposicion",
         "posicion",
-        "movimiento"
+        "movimiento",
+        "transformacion",
+        "desborde"
       ],
       "_sin": "tipografia — una imagen no tiene texto (ejemplo de Cristóbal). Divi coincide: su módulo de imagen no declara `fonts`.",
       "_con": "forma SÍ: el radio de una imagen es de lo más usado. Divi también lo declara."
@@ -824,7 +1036,9 @@
         "forma",
         "espaciado",
         "disposicion",
-        "posicion"
+        "posicion",
+        "transformacion",
+        "desborde"
       ]
     },
     "audio": {
@@ -835,7 +1049,8 @@
       "diseno": [
         "espaciado",
         "disposicion",
-        "posicion"
+        "posicion",
+        "transformacion"
       ]
     },
     "button": {
@@ -851,7 +1066,9 @@
         "espaciado",
         "superficie",
         "posicion",
-        "movimiento"
+        "movimiento",
+        "transformacion",
+        "icono"
       ]
     },
     "link": {
@@ -864,7 +1081,9 @@
         "tipografia",
         "color",
         "espaciado",
-        "posicion"
+        "posicion",
+        "transformacion",
+        "icono"
       ]
     },
     "group": {
@@ -880,7 +1099,10 @@
         "forma",
         "posicion",
         "divisor",
-        "movimiento"
+        "movimiento",
+        "transformacion",
+        "desborde",
+        "icono"
       ],
       "_sin": "tipografia — un bloque no tiene texto propio, aunque la herede para lo de dentro.",
       "_con": "disposicion es la familia principal de un bloque: 59 de las escapadas medidas son suyas."
@@ -894,7 +1116,9 @@
         "disposicion",
         "espaciado",
         "superficie",
-        "posicion"
+        "posicion",
+        "transformacion",
+        "desborde"
       ]
     },
     "section": {
@@ -908,7 +1132,9 @@
         "espaciado",
         "superficie",
         "divisor",
-        "posicion"
+        "posicion",
+        "transformacion",
+        "desborde"
       ],
       "_con": "divisor: es donde Divi los pone, y es donde tienen sentido."
     },
@@ -922,7 +1148,9 @@
         "espaciado",
         "superficie",
         "posicion",
-        "forma"
+        "forma",
+        "transformacion",
+        "desborde"
       ]
     },
     "footer": {
@@ -935,7 +1163,9 @@
         "espaciado",
         "superficie",
         "posicion",
-        "forma"
+        "forma",
+        "transformacion",
+        "desborde"
       ]
     },
     "navigation": {
@@ -949,7 +1179,10 @@
         "color",
         "disposicion",
         "espaciado",
-        "posicion"
+        "posicion",
+        "transformacion",
+        "desborde",
+        "icono"
       ]
     },
     "list": {
@@ -961,7 +1194,9 @@
         "tipografia",
         "color",
         "espaciado",
-        "posicion"
+        "posicion",
+        "transformacion",
+        "icono"
       ]
     },
     "table": {
@@ -975,7 +1210,9 @@
         "espaciado",
         "forma",
         "superficie",
-        "posicion"
+        "posicion",
+        "transformacion",
+        "desborde"
       ]
     },
     "gallery": {
@@ -988,7 +1225,9 @@
         "disposicion",
         "espaciado",
         "forma",
-        "posicion"
+        "posicion",
+        "transformacion",
+        "desborde"
       ]
     },
     "social": {
@@ -1000,7 +1239,9 @@
         "color",
         "forma",
         "espaciado",
-        "disposicion"
+        "disposicion",
+        "transformacion",
+        "icono"
       ]
     },
     "separator": {
@@ -1009,7 +1250,8 @@
       "diseno": [
         "divisor",
         "espaciado",
-        "superficie"
+        "superficie",
+        "transformacion"
       ]
     },
     "chart": {
@@ -1021,7 +1263,9 @@
         "color",
         "espaciado",
         "disposicion",
-        "posicion"
+        "posicion",
+        "transformacion",
+        "desborde"
       ]
     },
     "form": {
@@ -1035,7 +1279,9 @@
         "espaciado",
         "forma",
         "superficie",
-        "disposicion"
+        "disposicion",
+        "transformacion",
+        "desborde"
       ]
     }
   }

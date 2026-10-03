@@ -5,6 +5,82 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.57 — 3 de octubre de 2026
+
+### Agregado
+
+Cuatro familias que hasta hoy había que escribir como CSS suelto —por la
+salida de emergencia de `properties`— y que ahora tienen su propia clase de
+regla, su control y su declaración en el catálogo. Son las que Divi reparte
+entre su pestaña «Avanzado» y subsistemas aparte; acá son lo que son:
+propiedades visuales del objeto, en Diseño, con el mismo trato que un color.
+
+- **Posición**, con el orden de capas dentro. `pegada` es **un modo más** y no
+  un subsistema: criterio de Cristóbal —«para mí sticky es una propiedad
+  visual que se maneja igual que cualquier posición de css»— y es donde más
+  nos separamos de Divi, que le dedica 483 referencias de código aparte.
+
+  Dos cosas que resuelve sola, y son las dos formas en que una posición pegada
+  falla **sin avisar**:
+
+  - **Sin distancia no se pega nunca.** El navegador la deja quieta y parece un
+    control roto. Si no se declara, se pone en cero.
+  - **Dentro de algo que recorta, tampoco.** Y la causa está en un
+    ANTEPASADO, no donde uno la busca. Esa combinación ahora se rechaza al
+    componer **nombrando los dos nodos**.
+
+  El orden de capas va acotado a ±100 a propósito. Un z-index de 9999 es
+  siempre el síntoma de una pelea que se ganó a martillazos, y obliga al
+  siguiente a poner 10000.
+
+- **Desborde**, que existe por dos razones concretas y no por completitud:
+  recortar es la única forma de que una esquina redondeada afecte al contenido
+  de dentro, y es además lo que rompe una posición pegada. **No se ofrece sobre
+  un texto**, a diferencia de Divi, que la da a todos sus módulos: lo que
+  recorta es una caja con algo dentro que puede salirse; un texto que no cabe
+  se resuelve con tipografía, no cortándolo.
+
+- **Transformación**: girar, escalar, mover o inclinar sin tocar el espacio que
+  ocupa. No es `movimiento` —aquélla es una animación, algo que pasa en el
+  tiempo; ésta es un estado—. Lo mejor sale gratis: **«crece al pasar el ratón»
+  es la misma regla con estado hover**, porque cualquier regla tiene alcance.
+  Divi necesita para eso declarar un gemelo de hover por cada campo.
+
+  El orden de `transform` no es arbitrario y está escrito: mover y después
+  girar no es lo mismo que girar y después mover.
+
+- **Icono**, de donde salió: Cristóbal, mirando el icono de WhatsApp del pie,
+  «eso no debería ser hardcoded; todo elemento de un módulo debería tener su
+  propia configuración». Mismo principio abierto que el divisor —el dibujo es
+  un SVG de Medios, no una lista cerrada— y **la decisión contraria en lo único
+  que importa**: un divisor se estira a lo ancho y esa deformación es lo que se
+  le pide; un icono no se deforma nunca.
+
+  El color no se declara por omisión: lo hereda del texto al que acompaña, que
+  es lo que hace que cambiar la tinta del sistema lo arrastre sin tocar la
+  página.
+
+- **Cinco iconos de partida** en Medios —flecha, hoja, reloj, ubicación,
+  correo—, igual que las formas de divisor: no son el catálogo, son para que la
+  biblioteca no esté vacía el primer día.
+
+- **La ventana del lápiz** suma orden de capas, desborde y transformación, con
+  un aviso cuando recortar va a impedir que algo se pegue. Girar y escalar se
+  escriben juntos, porque `transform` es UNA propiedad y escribir uno por su
+  lado borra al otro.
+
+- **Una página de muestra: `/primitivas/`.** Tres de las cuatro sólo se ven
+  funcionando —una pegada necesita que la página se desplace, un recorte
+  necesita algo que se salga, un hover necesita un ratón—, así que una hoja de
+  contactos no servía.
+
+### Corregido
+
+- **`.4em` ya no se rechaza.** Es CSS válido y se escribe así a menudo; que no
+  pasara era una trampa de la expresión regular, no una regla de diseño.
+
+---
+
 ## 0.3.56 — 3 de octubre de 2026
 
 ### Agregado

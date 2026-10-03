@@ -153,7 +153,7 @@ window.__scrolls = [];
 window.addEventListener('error', function (e) { window.__errores.push(String(e.message)); });
 (function () { var viejo = console.error; console.error = function () { window.__errores.push([].join.call(arguments, ' ')); viejo.apply(console, arguments); }; })();
 (function () { var original = Element.prototype.scrollIntoView; Element.prototype.scrollIntoView = function (o) { window.__scrolls.push(o); return original.apply(this, arguments); }; })();
-${consulta.get('timer') === 'corto' ? `(function () { var original = window.setTimeout; window.setTimeout = function (fn, ms) { return original.call(window, fn, ms === 20000 ? 400 : ms); }; })();` : ''}
+${consulta.get('timer') === 'corto' ? `(function () { var original = window.setTimeout; window.setTimeout = function (fn, ms) { return original.call(window, fn, ms >= 2000 ? 400 : ms); }; })();` : ''}
 </script>
 ${gl}
 </head><body><div class="relleno"></div><div class="cod-canvas-published">${html}</div><div class="relleno-abajo"></div>${motorScript}</body></html>`;
@@ -385,7 +385,13 @@ async function pruebasDelMotor(motor) {
   // ---- Cargando… y listo ----
   console.log('\n-- «Cargando…» mientras llega el mapa, y se retira cuando está --');
   s = await snap();
-  comprobar(m + 'mientras el mapa no dice «load», se ve «Cargando el mapa…» (role=status) y aria-busy=true', !s.aviso.oculto && s.aviso.rol === 'status' && s.aviso.texto === 'Cargando el mapa…' && s.grande.busy === 'true', JSON.stringify(s.aviso));
+  // El aviso de carga ofrece ADEMÁS la salida a OpenStreetMap, y por eso el
+  // texto no es exactamente «Cargando el mapa…». Es a propósito: si el mapa no
+  // llega, quien esperaba ya tiene por dónde salir sin haber visto un error.
+  comprobar(m + 'mientras el mapa no dice «load», se ve «Cargando el mapa…» (role=status) y aria-busy=true',
+    !s.aviso.oculto && s.aviso.rol === 'status' && s.aviso.texto.indexOf('Cargando el mapa…') === 0 && s.grande.busy === 'true', JSON.stringify(s.aviso));
+  comprobar(m + 'y ya ofrece «Cómo llegar», para no dejar esperando a nadie sin salida',
+    s.aviso.enlaces.length === 1 && s.aviso.enlaces[0].texto === 'Cómo llegar', JSON.stringify(s.aviso.enlaces));
   comprobar(m + 'el aviso de carga cubre el recuadro (no se ve un gris vacío sin explicación)', s.aviso.display !== 'none');
   await evaluar(`window.__mapa.h.load()`);
   s = await snap();

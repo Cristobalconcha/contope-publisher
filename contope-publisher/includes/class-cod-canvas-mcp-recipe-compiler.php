@@ -47,7 +47,39 @@ final class COD_Canvas_MCP_Recipe_Compiler
         'cadence',
         'anchor',
         'divisor',
+        // Las tres que Divi reparte entre su pestaña «Avanzado» y su
+        // subsistema de sticky, y que acá son lo que son: propiedades
+        // visuales del objeto, en diseño, con el mismo trato que un color.
+        'posicion',
+        'desborde',
+        'transformacion',
+        'icono',
         'properties',
+    ];
+
+    /**
+     * Los modos de posición, con su traducción a CSS.
+     *
+     * `pegada` está en la misma lista que las demás a propósito: es una
+     * posición, no un subsistema. Es el criterio de Cristóbal y es donde más
+     * nos separamos de Divi, que la trata como un estado de estilo aparte.
+     *
+     * @var array<string, string>
+     */
+    public const POSICION_MODOS = [
+        'normal' => 'static',
+        'relativa' => 'relative',
+        'pegada' => 'sticky',
+        'absoluta' => 'absolute',
+        'fija' => 'fixed',
+    ];
+
+    /** @var array<string, string> */
+    public const DESBORDE_VALORES = [
+        'visible' => 'visible',
+        'oculto' => 'hidden',
+        'barra' => 'scroll',
+        'auto' => 'auto',
     ];
 
     /** @var array<int, string> */
@@ -1183,6 +1215,14 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 return $this->normalize_anchor_rule($value);
             case 'divisor':
                 return $this->normalize_divisor_rule($value);
+            case 'posicion':
+                return $this->normalize_posicion_rule($value);
+            case 'desborde':
+                return $this->normalize_desborde_rule($value);
+            case 'transformacion':
+                return $this->normalize_transformacion_rule($value);
+            case 'icono':
+                return $this->normalize_icono_rule($value);
             case 'properties':
                 return $this->normalize_properties_rule($value);
         }
@@ -2026,6 +2066,263 @@ final class COD_Canvas_MCP_Recipe_Compiler
         return $capas;
     }
 
+    /**
+     * La regla `posicion`: dónde se para un objeto y en qué capa queda.
+     *
+     * POR QUÉ ES UNA FAMILIA DE DISEÑO Y NO UNA PESTAÑA «AVANZADO». Divi
+     * reparte esto entre `_add_position_fields` —que vive en su tercera
+     * pestaña, llamada «Avanzado» de cara al usuario pero `custom_css` por
+     * dentro— y `_add_sticky_fields`, un subsistema aparte con 483 referencias
+     * en su código. Cristóbal, el 3 de octubre de 2026: «para mí sticky es una
+     * propiedad visual que se maneja igual que cualquier posición de CSS».
+     * Tiene razón, y por eso acá `pegada` es un valor más de `modo` y no otro
+     * sistema.
+     *
+     * POR QUÉ LA CAPA VIVE ACÁ Y NO EN SU PROPIA FAMILIA. Porque un z-index
+     * sin posición no hace nada —salvo en una rejilla o un flex— y porque la
+     * pregunta que resuelve es la misma: dónde queda esto respecto de lo demás.
+     * Separarlos daría dos paneles para una sola decisión.
+     *
+     * @param array<string, mixed> $value
+     * @return array<string, mixed>|WP_Error
+     */
+    private function normalize_posicion_rule(array $value)
+    {
+        $codigo = 'cod_mcp_posicion_rule_invalid';
+        $lados = ['arriba', 'abajo', 'izquierda', 'derecha'];
+        $permitidas = array_merge(['modo', 'capa'], $lados);
+
+        if (!$this->has_only_keys($value, $permitidas) || $value === []) {
+            return new WP_Error($codigo, 'posicion admite: ' . implode(', ', $permitidas) . '.');
+        }
+
+        $normalizado = [];
+
+        if (isset($value['modo'])) {
+            if (!is_string($value['modo']) || !isset(self::POSICION_MODOS[$value['modo']])) {
+                return new WP_Error($codigo, 'posicion.modo admite: ' . implode(', ', array_keys(self::POSICION_MODOS)) . '.');
+            }
+            $normalizado['modo'] = $value['modo'];
+        }
+
+        foreach ($lados as $lado) {
+            if (!isset($value[$lado])) {
+                continue;
+            }
+            // Negativo a propósito: sacar un objeto de su caja —media pieza
+            // asomando por el borde de la sección— es de las cosas que más se
+            // hacen con una posición, y prohibirlo obligaría a escribir CSS.
+            if (!is_string($value[$lado]) || !$this->is_css_length($value[$lado], true)) {
+                return new WP_Error($codigo, 'posicion.' . $lado . ' debe ser una longitud CSS segura, con signo si es negativa.');
+            }
+            $normalizado[$lado] = $value[$lado];
+        }
+
+        if (isset($value['capa'])) {
+            // Acotado a propósito. Un z-index de 9999 es siempre el síntoma de
+            // una pelea que se resolvió a martillazos, y el que viene después
+            // tiene que poner 10000. Con el rango corto hay que entender el
+            // orden en vez de ganarlo.
+            if (!is_int($value['capa']) || $value['capa'] < -10 || $value['capa'] > 100) {
+                return new WP_Error($codigo, 'posicion.capa debe ser un entero entre -10 y 100.');
+            }
+            $normalizado['capa'] = $value['capa'];
+        }
+
+        $modo = $normalizado['modo'] ?? 'normal';
+        $tiene_lado = (bool) array_intersect($lados, array_keys($normalizado));
+
+        if ($modo === 'normal' && $tiene_lado) {
+            return new WP_Error(
+                $codigo,
+                'Una posición «normal» ignora arriba, abajo, izquierda y derecha: el objeto sigue el flujo. '
+                    . 'Para correrlo sin sacarlo del flujo, usa modo "relativa".'
+            );
+        }
+        // Una pegada sin distancia no se pega nunca: el navegador la deja
+        // quieta y parece que la propiedad no funcionara. Es el error más
+        // común al usarla, así que se resuelve en vez de dejarlo pasar.
+        if ($modo === 'pegada' && !$tiene_lado) {
+            $normalizado['arriba'] = '0px';
+        }
+
+        return $normalizado;
+    }
+
+    /**
+     * La regla `desborde`: qué pasa con lo que se sale de la caja.
+     *
+     * Existe por dos razones concretas y no por completitud: recortar es la
+     * única forma de que una esquina redondeada afecte al contenido de dentro,
+     * y es además lo que ROMPE una posición pegada —de ahí la comprobación de
+     * `clip_bloquea_pegada`, que es el verdadero motivo de construir esta
+     * familia junto a la anterior—.
+     *
+     * @param array<string, mixed> $value
+     * @return array<string, mixed>|WP_Error
+     */
+    private function normalize_desborde_rule(array $value)
+    {
+        $codigo = 'cod_mcp_desborde_rule_invalid';
+        if (!$this->has_only_keys($value, ['horizontal', 'vertical']) || $value === []) {
+            return new WP_Error($codigo, 'desborde admite: horizontal, vertical.');
+        }
+
+        $normalizado = [];
+        foreach (['horizontal', 'vertical'] as $eje) {
+            if (!isset($value[$eje])) {
+                continue;
+            }
+            if (!is_string($value[$eje]) || !isset(self::DESBORDE_VALORES[$value[$eje]])) {
+                return new WP_Error($codigo, 'desborde.' . $eje . ' admite: ' . implode(', ', array_keys(self::DESBORDE_VALORES)) . '.');
+            }
+            $normalizado[$eje] = $value[$eje];
+        }
+
+        return $normalizado;
+    }
+
+    /**
+     * La regla `transformacion`: mover, girar, escalar o inclinar un objeto
+     * sin tocar el espacio que ocupa.
+     *
+     * LA DIFERENCIA CON `movimiento`. Aquélla es una animación —algo que
+     * ocurre en el tiempo—; ésta es un estado. Son dos cosas distintas aunque
+     * ambas acaben en la misma propiedad CSS.
+     *
+     * LO QUE SALE GRATIS, Y ES LO MEJOR DE TENERLA. Como cualquier regla
+     * admite `scope.state`, un «crece un poco al pasar el ratón» es esta misma
+     * regla con state "hover". Divi necesita para eso un subsistema aparte
+     * —cada campo transformable declara su gemelo de hover— porque sus efectos
+     * no son reglas con alcance.
+     *
+     * @param array<string, mixed> $value
+     * @return array<string, mixed>|WP_Error
+     */
+    private function normalize_transformacion_rule(array $value)
+    {
+        $codigo = 'cod_mcp_transformacion_rule_invalid';
+        $medidas = ['moverX', 'moverY'];
+        $angulos = ['rotar', 'inclinarX', 'inclinarY'];
+        $factores = ['escalar', 'escalarX', 'escalarY'];
+        $permitidas = array_merge($medidas, $angulos, $factores, ['origen']);
+
+        if (!$this->has_only_keys($value, $permitidas) || $value === []) {
+            return new WP_Error($codigo, 'transformacion admite: ' . implode(', ', $permitidas) . '.');
+        }
+
+        $normalizado = [];
+
+        foreach ($medidas as $clave) {
+            if (!isset($value[$clave])) {
+                continue;
+            }
+            if (!is_string($value[$clave]) || !$this->is_css_length($value[$clave], true)) {
+                return new WP_Error($codigo, 'transformacion.' . $clave . ' debe ser una longitud CSS segura, con signo si es negativa.');
+            }
+            $normalizado[$clave] = $value[$clave];
+        }
+
+        foreach ($angulos as $clave) {
+            if (!isset($value[$clave])) {
+                continue;
+            }
+            if (!is_string($value[$clave]) || preg_match('/^-?(?:[0-9]+(?:\.[0-9]+)?)(?:deg|turn|rad)$/', $value[$clave]) !== 1) {
+                return new WP_Error($codigo, 'transformacion.' . $clave . ' debe ser un ángulo: por ejemplo "-6deg".');
+            }
+            $normalizado[$clave] = $value[$clave];
+        }
+
+        foreach ($factores as $clave) {
+            if (!isset($value[$clave])) {
+                continue;
+            }
+            if ((!is_float($value[$clave]) && !is_int($value[$clave]))
+                || (float) $value[$clave] < 0 || (float) $value[$clave] > 10) {
+                return new WP_Error($codigo, 'transformacion.' . $clave . ' es un número entre 0 y 10, donde 1 es el tamaño original.');
+            }
+            $normalizado[$clave] = (float) $value[$clave];
+        }
+
+        if (isset($normalizado['escalar']) && (isset($normalizado['escalarX']) || isset($normalizado['escalarY']))) {
+            return new WP_Error($codigo, 'transformacion.escalar ya escala los dos ejes: no lo combines con escalarX ni escalarY.');
+        }
+
+        if (isset($value['origen'])) {
+            // El origen decide desde dónde gira o crece la pieza, y es lo que
+            // separa «se abre como un abanico» de «da un volantín».
+            if (!is_string($value['origen']) || preg_match('/^[a-z0-9%.\s-]{1,40}$/i', $value['origen']) !== 1) {
+                return new WP_Error($codigo, 'transformacion.origen debe ser un origen CSS simple, por ejemplo "left center" o "50% 100%".');
+            }
+            $normalizado['origen'] = trim($value['origen']);
+        }
+
+        return $normalizado;
+    }
+
+    /**
+     * La regla `icono`: un dibujo pequeño que acompaña a un texto.
+     *
+     * Mismo principio abierto que el divisor —la forma es un SVG del sitio y
+     * no una lista cerrada— y la decisión contraria en lo único que importa:
+     * un icono NO se deforma. El porqué largo está en `class-cod-icono.php`.
+     *
+     * @param array<string, mixed> $value
+     * @return array<string, mixed>|WP_Error
+     */
+    private function normalize_icono_rule(array $value)
+    {
+        $codigo = 'cod_mcp_icono_rule_invalid';
+        $permitidas = ['forma', 'donde', 'tamano', 'color', 'separacion'];
+
+        if (!$this->has_only_keys($value, $permitidas)) {
+            return new WP_Error($codigo, 'icono admite: ' . implode(', ', $permitidas) . '.');
+        }
+        if (!isset($value['forma']) || !is_string($value['forma']) || trim($value['forma']) === '') {
+            return new WP_Error($codigo, 'icono.forma es obligatoria: la ruta de un SVG del sitio.');
+        }
+
+        $forma = trim($value['forma']);
+        if (!$this->is_safe_link($forma) || !COD_Divisor::es_del_sitio($forma)) {
+            return new WP_Error(
+                $codigo,
+                'icono.forma tiene que ser una ruta del propio sitio. Sube el SVG a Medios y usa su ruta.'
+            );
+        }
+        if (substr(strtolower((string) parse_url($forma, PHP_URL_PATH)), -4) !== '.svg') {
+            return new WP_Error($codigo, 'icono.forma tiene que ser un archivo .svg: es lo que se recolorea y escala sin perder nitidez.');
+        }
+
+        $normalizado = ['forma' => $forma, 'donde' => 'antes'];
+
+        if (isset($value['donde'])) {
+            if (!is_string($value['donde']) || !in_array($value['donde'], COD_Icono::DONDE, true)) {
+                return new WP_Error($codigo, 'icono.donde admite: ' . implode(', ', COD_Icono::DONDE) . '.');
+            }
+            $normalizado['donde'] = $value['donde'];
+        }
+        foreach (['tamano', 'separacion'] as $medida) {
+            if (!isset($value[$medida])) {
+                continue;
+            }
+            if (!is_string($value[$medida]) || !$this->is_css_length($value[$medida])) {
+                return new WP_Error($codigo, 'icono.' . $medida . ' debe ser una longitud CSS segura, por ejemplo "1.25em".');
+            }
+            $normalizado[$medida] = $value[$medida];
+        }
+        if (isset($value['color'])) {
+            // Por omisión no se declara: el icono hereda el color del texto al
+            // que acompaña, que es lo que uno quiere el 90 % de las veces y lo
+            // que hace que cambiar la tinta del sistema lo arrastre.
+            if (!is_string($value['color']) || !$this->is_css_color($value['color'])) {
+                return new WP_Error($codigo, 'icono.color debe ser un color CSS seguro.');
+            }
+            $normalizado['color'] = $value['color'];
+        }
+
+        return $normalizado;
+    }
+
     private function normalize_properties_rule(array $value)
     {
         $codigo = 'cod_mcp_properties_rule_invalid';
@@ -2130,7 +2427,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
      * @param array<string, bool> $seen_markers
      * @return array<string, mixed>|WP_Error
      */
-    private function normalize_node(array $node, array $rule_index, array &$seen_node_ids, array &$seen_markers, int &$node_count, int $depth)
+    private function normalize_node(array $node, array $rule_index, array &$seen_node_ids, array &$seen_markers, int &$node_count, int $depth, string $recorta_desde = '')
     {
         if ($depth > self::MAX_DEPTH
             || !$this->has_only_keys($node, ['id', 'kind', 'role', 'marker', 'ruleIds', 'cadenceRuleId', 'partes', 'children', 'content'])
@@ -2176,6 +2473,40 @@ final class COD_Canvas_MCP_Recipe_Compiler
             $normalized_rule_ids[] = $rule_id;
         }
 
+        /**
+         * Una posición pegada dentro de un contenedor que recorta no se pega:
+         * el navegador la deja quieta, sin aviso. Es el motivo número uno de
+         * «el sticky no funciona» y se pierden horas buscándolo en el elemento
+         * equivocado, porque la causa está en un ANTEPASADO.
+         *
+         * Se rechaza al componer, nombrando los dos nodos. Las dos reglas son
+         * decisiones explícitas de la misma composición: si de verdad se
+         * quieren juntas, `properties` sigue abierto.
+         */
+        $recorta_este = false;
+        foreach ($normalized_rule_ids as $rule_id) {
+            $regla = $rule_index[$rule_id];
+            $valor = is_array($regla['value'] ?? null) ? $regla['value'] : [];
+            if ($regla['kind'] === 'desborde'
+                && (($valor['horizontal'] ?? '') === 'oculto' || ($valor['vertical'] ?? '') === 'oculto')) {
+                $recorta_este = true;
+            }
+            // Se compara contra lo que venía de ARRIBA: que un objeto recorte
+            // su propio contenido no le impide pegarse a él mismo. Lo que lo
+            // impide es que lo recorte un antepasado.
+            if ($regla['kind'] === 'posicion' && ($valor['modo'] ?? '') === 'pegada' && $recorta_desde !== '') {
+                return new WP_Error(
+                    'cod_mcp_pegada_recortada',
+                    'El nodo "' . $node['id'] . '" se declara pegado, pero el nodo "' . $recorta_desde
+                        . '" lo recorta con desborde "oculto" y eso impide que se pegue —el navegador lo deja quieto, sin aviso—. '
+                        . 'Quita el recorte de ese contenedor, o saca la pieza pegada de dentro de él.'
+                );
+            }
+        }
+        if ($recorta_este && $recorta_desde === '') {
+            $recorta_desde = $node['id'];
+        }
+
         $normalized_partes = $this->normalize_node_partes($node, $normalized_rule_ids, $rule_index);
         if (is_wp_error($normalized_partes)) {
             return $normalized_partes;
@@ -2214,7 +2545,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
             if (!is_array($child)) {
                 return new WP_Error('cod_mcp_composition_children_invalid', 'Cada child debe ser un nodo.');
             }
-            $normalized_child = $this->normalize_node($child, $rule_index, $seen_node_ids, $seen_markers, $node_count, $depth + 1);
+            $normalized_child = $this->normalize_node($child, $rule_index, $seen_node_ids, $seen_markers, $node_count, $depth + 1, $recorta_desde);
             if (is_wp_error($normalized_child)) {
                 return $normalized_child;
             }
@@ -3212,6 +3543,68 @@ final class COD_Canvas_MCP_Recipe_Compiler
         $attrs = $this->html_attributes($attributes);
         $child_cadence = $node['cadenceRuleId'];
 
+        $html = $this->render_node_markup($node, $attrs, $rule_index, $node_ids, $depth, $item_index, $behavior, $child_cadence);
+        if (is_wp_error($html) || $html === '') {
+            return $html;
+        }
+
+        return $this->con_icono($html, $behavior['icono'] ?? null);
+    }
+
+    /**
+     * Mete el marcador del icono dentro del nodo ya dibujado.
+     *
+     * Se hace sobre el marcado y no caso por caso porque un icono acompaña a
+     * cosas muy distintas —un botón, un enlace, un título, un ítem— y escribir
+     * la inserción en cada rama repetiría lo mismo doce veces. El marcado es
+     * nuestro y siempre es UNA etiqueta con su cierre, así que la primera `>`
+     * y el último `</` son posiciones fiables.
+     *
+     * @param array<string, mixed>|null $icono
+     */
+    private function con_icono(string $html, ?array $icono): string
+    {
+        if ($icono === null) {
+            return $html;
+        }
+
+        $estilo = [];
+        if (isset($icono['tamano'])) {
+            $estilo[] = '--cod-icono-tamano:' . $icono['tamano'];
+        }
+        if (isset($icono['separacion'])) {
+            $estilo[] = '--cod-icono-separacion:' . $icono['separacion'];
+        }
+        if (isset($icono['color'])) {
+            // Va como `color` y no como `fill`: el SVG hereda con currentColor,
+            // igual que el divisor.
+            $estilo[] = 'color:' . $icono['color'];
+        }
+
+        $donde = (string) ($icono['donde'] ?? 'antes');
+        $marcador = '<span class="' . COD_Icono::CLASE . '"'
+            . ' ' . COD_Icono::ATRIBUTO_FORMA . '="' . esc_attr((string) $icono['forma']) . '"'
+            . ' data-cod-icono-donde="' . esc_attr($donde) . '"'
+            . ($estilo === [] ? '' : ' style="' . esc_attr(implode(';', $estilo)) . '"')
+            . '></span>';
+
+        if ($donde === 'antes') {
+            $corte = strpos($html, '>');
+            return $corte === false ? $html : substr($html, 0, $corte + 1) . $marcador . substr($html, $corte + 1);
+        }
+        $corte = strrpos($html, '</');
+        return $corte === false ? $html : substr($html, 0, $corte) . $marcador . substr($html, $corte);
+    }
+
+    /**
+     * @param array<string, mixed> $node
+     * @param array<string, array<string, mixed>> $rule_index
+     * @param array<int, string> $node_ids
+     * @param array<string, mixed> $behavior
+     * @return string|WP_Error
+     */
+    private function render_node_markup(array $node, string $attrs, array $rule_index, array $node_ids, int $depth, int $item_index, array $behavior, string $child_cadence)
+    {
         switch ($node['kind']) {
             case 'section':
                 $children = $this->render_nodes($node['children'], $rule_index, $node_ids, $depth + 1, $child_cadence, false);
@@ -3328,6 +3721,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
         $carousel = null;
         $gallery = null;
         $divisor = null;
+        $icono = null;
 
         foreach ($rule_ids as $rule_id) {
             $rule = $rule_index[$rule_id];
@@ -3338,6 +3732,15 @@ final class COD_Canvas_MCP_Recipe_Compiler
                     return new WP_Error('cod_mcp_divisor_duplicado', 'Un nodo no puede llevar dos divisores: usa donde="ambos" para ponerlo arriba y abajo.');
                 }
                 $divisor = $rule['value'];
+                continue;
+            }
+            if ($rule['kind'] === 'icono') {
+                // Igual que el divisor: no es un atributo del nodo sino
+                // marcado que se le pone dentro.
+                if ($icono !== null) {
+                    return new WP_Error('cod_mcp_icono_duplicado', 'Un nodo no puede llevar dos iconos.');
+                }
+                $icono = $rule['value'];
                 continue;
             }
             if ($rule['kind'] === 'gallery') {
@@ -3561,7 +3964,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
             return new WP_Error('cod_mcp_gallery_controls_unavailable', 'Los controles de galería requieren una regla interaction.carousel-basic en el mismo nodo gallery.');
         }
 
-        return ['attributes' => $attributes, 'lightbox' => $is_lightbox, 'carousel' => $carousel, 'gallery' => $gallery, 'divisor' => $divisor];
+        return ['attributes' => $attributes, 'lightbox' => $is_lightbox, 'carousel' => $carousel, 'gallery' => $gallery, 'divisor' => $divisor, 'icono' => $icono];
     }
 
     /**
@@ -4296,11 +4699,38 @@ final class COD_Canvas_MCP_Recipe_Compiler
             case 'motion':
                 $css = $this->motion_css($selector, $value);
                 break;
+            case 'posicion':
+                if (isset($value['modo'])) {
+                    $css .= 'position:' . self::POSICION_MODOS[$value['modo']] . ';';
+                }
+                foreach (['arriba' => 'top', 'abajo' => 'bottom', 'izquierda' => 'left', 'derecha' => 'right'] as $lado => $propiedad) {
+                    if (isset($value[$lado])) {
+                        $css .= $propiedad . ':' . $value[$lado] . ';';
+                    }
+                }
+                if (isset($value['capa'])) {
+                    $css .= 'z-index:' . (int) $value['capa'] . ';';
+                }
+                break;
+            case 'desborde':
+                foreach (['horizontal' => 'overflow-x', 'vertical' => 'overflow-y'] as $eje => $propiedad) {
+                    if (isset($value[$eje])) {
+                        $css .= $propiedad . ':' . self::DESBORDE_VALORES[$value[$eje]] . ';';
+                    }
+                }
+                break;
+            case 'transformacion':
+                $css = $this->transformacion_css($value);
+                break;
             case 'properties':
                 foreach ($value['declarations'] as $propiedad => $valor) {
                     $css .= $propiedad . ':' . $valor . ';';
                 }
                 break;
+            case 'icono':
+                // El icono no emite una regla de clase: su estilo va en el
+                // propio marcador, igual que el divisor, porque el tamaño y la
+                // separación son de esa pieza y no del nodo que la lleva.
             case 'interaction':
             case 'cadence':
             case 'anchor':
@@ -4503,6 +4933,51 @@ final class COD_Canvas_MCP_Recipe_Compiler
     }
 
     /** @param array<string, mixed> $value */
+    /**
+     * El valor de `transform`, en el orden en que CSS lo aplica.
+     *
+     * EL ORDEN IMPORTA Y NO ES ARBITRARIO. `transform` se lee de izquierda a
+     * derecha y cada paso arrastra al siguiente: rotar y después mover lleva
+     * la pieza en la dirección girada, mientras que mover y después rotar la
+     * deja donde se pidió. Movemos primero —que es lo que casi siempre se
+     * quiere— y es además el orden que usa Divi.
+     *
+     * @param array<string, mixed> $value
+     */
+    private function transformacion_css(array $value): string
+    {
+        $partes = [];
+
+        if (isset($value['moverX']) || isset($value['moverY'])) {
+            $partes[] = 'translate(' . ($value['moverX'] ?? '0px') . ',' . ($value['moverY'] ?? '0px') . ')';
+        }
+        if (isset($value['rotar'])) {
+            $partes[] = 'rotate(' . $value['rotar'] . ')';
+        }
+        if (isset($value['inclinarX']) || isset($value['inclinarY'])) {
+            $partes[] = 'skew(' . ($value['inclinarX'] ?? '0deg') . ',' . ($value['inclinarY'] ?? '0deg') . ')';
+        }
+        if (isset($value['escalar'])) {
+            $partes[] = 'scale(' . $this->numero_css((float) $value['escalar']) . ')';
+        } elseif (isset($value['escalarX']) || isset($value['escalarY'])) {
+            $partes[] = 'scale(' . $this->numero_css((float) ($value['escalarX'] ?? 1))
+                . ',' . $this->numero_css((float) ($value['escalarY'] ?? 1)) . ')';
+        }
+
+        $css = $partes === [] ? '' : 'transform:' . implode(' ', $partes) . ';';
+        if (isset($value['origen'])) {
+            $css .= 'transform-origin:' . $value['origen'] . ';';
+        }
+
+        return $css;
+    }
+
+    /** Un número sin ceros de relleno: 1.050 se escribe 1.05, y 2.0 se escribe 2. */
+    private function numero_css(float $n): string
+    {
+        return rtrim(rtrim(number_format($n, 4, '.', ''), '0'), '.') ?: '0';
+    }
+
     private function shape_css(array $value): string
     {
         $css = '';
@@ -4888,7 +5363,9 @@ final class COD_Canvas_MCP_Recipe_Compiler
             return true;
         }
         $sign = $allow_negative ? '-?' : '';
-        return preg_match('/^' . $sign . '[0-9]+(?:\.[0-9]+)?(?:px|rem|em|%|vw|vh|vmin|vmax|ch)$/', $value) === 1;
+        // `.4em` es CSS válido y se escribe así a menudo. Rechazarlo era una
+        // trampa de la expresión regular, no una regla de diseño.
+        return preg_match('/^' . $sign . '(?:[0-9]+(?:\.[0-9]+)?|\.[0-9]+)(?:px|rem|em|%|vw|vh|vmin|vmax|ch)$/', $value) === 1;
     }
 
     private function is_css_color(string $value): bool

@@ -1414,6 +1414,7 @@ CSS;
                 . self::aviso_css($header_html . $body_html . $footer_html)
                 . self::mapa_css($header_html . $body_html . $footer_html)
                 . COD_Divisor::css($header_html . $body_html . $footer_html)
+                . COD_Icono::css($header_html . $body_html . $footer_html)
                 . self::rotation_css() . self::carousel_rows_css()
                 . self::unir_css_de_documentos([$header_css, $body_css, $footer_css])
         );
@@ -1534,6 +1535,7 @@ CSS;
                 . self::aviso_css($header_html . $body_html . $footer_html)
                 . self::mapa_css($header_html . $body_html . $footer_html)
                 . COD_Divisor::css($header_html . $body_html . $footer_html)
+                . COD_Icono::css($header_html . $body_html . $footer_html)
                     . self::rotation_css() . self::carousel_rows_css()
                     . self::unir_css_de_documentos([$header_css, $body_css, $footer_css])
             );
@@ -1598,6 +1600,7 @@ CSS;
         // la ruta, el dibujo se pone acá. Reemplazar el SVG llega a todas las
         // páginas sin recomponer ninguna.
         $markup = COD_Divisor::resolver_en_html($markup);
+        $markup = COD_Icono::resolver_en_html($markup);
 
         // Los shortcodes se ejecutan al final, después de resolver los tokens
         // dinámicos: así un marcador puede llevar un valor ACF entre sus
