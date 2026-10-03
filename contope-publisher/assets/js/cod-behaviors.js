@@ -3337,8 +3337,74 @@
     installMarquesinaRuntime(win, doc, opts, cleanups);
     installAvisoRuntime(win, doc, opts, cleanups);
     installMapaRuntime(win, doc, opts, cleanups);
+    installDivisorPreview(win, doc, opts, cleanups);
     return function destroy() { while (cleanups.length) cleanups.pop()(); };
   }
+
+  /**
+   * Divisores, SÓLO para verlos dentro del editor.
+   *
+   * En la página publicada el divisor lleva su SVG en línea y el CSS del
+   * publicador lo coloca. Dentro del editor no hay ninguna de las dos cosas:
+   * el marcador va vacío y el CSS de las conductas no entra al lienzo. Sin
+   * esto, poner un divisor no se vería hasta publicar, que es la peor forma de
+   * editar algo visual.
+   *
+   * La previsualización usa la forma como MÁSCARA sobre un fondo del color
+   * elegido. No es el mismo mecanismo que el publicado —ahí es un SVG en
+   * línea— pero da la misma silueta y el mismo color, que es lo que hace falta
+   * ver al componer. La máscara, además, no ejecuta nada: un SVG usado así no
+   * se interpreta como marcado.
+   */
+  function installDivisorPreview(win, doc, opts, cleanups) {
+    if (!opts.editorPreview) return;
+    if (!doc.head || doc.getElementById('cod-divisor-preview-css')) return;
+
+    var estilo = doc.createElement('style');
+    estilo.id = 'cod-divisor-preview-css';
+    estilo.textContent = [
+      '.cod-divisor{position:absolute;left:0;right:0;z-index:1;pointer-events:none;',
+      'height:var(--cod-divisor-alto,80px);background-color:currentColor;',
+      '-webkit-mask-size:calc(100% / var(--cod-divisor-repeticion,1)) 100%;',
+      'mask-size:calc(100% / var(--cod-divisor-repeticion,1)) 100%;',
+      '-webkit-mask-repeat:repeat-x;mask-repeat:repeat-x;}',
+      '.cod-divisor[data-cod-divisor-donde="arriba"]{top:0;transform:scaleY(-1);}',
+      '.cod-divisor[data-cod-divisor-donde="abajo"]{bottom:0;}',
+      '.cod-divisor[data-cod-divisor-voltear="1"]{transform:scaleX(-1);}',
+      '.cod-divisor[data-cod-divisor-donde="arriba"][data-cod-divisor-voltear="1"]{transform:scale(-1,-1);}',
+      '.cod-node:has(> .cod-divisor){position:relative;}'
+    ].join('');
+    doc.head.appendChild(estilo);
+
+    // La forma de cada divisor se aplica al vuelo, leyendo su atributo. NO se
+    // escribe en el documento: una máscara es previsualización, no contenido,
+    // y guardarla dejaría en la página publicada una regla que allá no hace
+    // falta, porque ahí el dibujo es el SVG en línea.
+    function pintarDivisores() {
+      var nodos = doc.querySelectorAll('.cod-divisor[data-cod-divisor-forma]');
+      for (var i = 0; i < nodos.length; i++) {
+        var forma = nodos[i].getAttribute('data-cod-divisor-forma') || '';
+        if (!forma || nodos[i].getAttribute('data-cod-divisor-pintado') === forma) continue;
+        var url = 'url("' + forma.split('"').join('') + '")';
+        nodos[i].style.setProperty('-webkit-mask-image', url);
+        nodos[i].style.setProperty('mask-image', url);
+        nodos[i].setAttribute('data-cod-divisor-pintado', forma);
+      }
+    }
+    pintarDivisores();
+
+    // El inspector añade y quita divisores mientras se edita, así que hay que
+    // volver a pintar cuando el árbol cambie.
+    var observador = typeof win.MutationObserver === 'function' ? new win.MutationObserver(pintarDivisores) : null;
+    if (observador && doc.body) {
+      observador.observe(doc.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['data-cod-divisor-forma'] });
+      cleanups.push(function () { observador.disconnect(); });
+    }
+    cleanups.push(function () {
+      if (estilo.parentNode) { estilo.parentNode.removeChild(estilo); }
+    });
+  }
+
 
   // --- Export: JS funcional (string). Sólo constantes allowlisted. ----------
   function runtimeScript(options) {

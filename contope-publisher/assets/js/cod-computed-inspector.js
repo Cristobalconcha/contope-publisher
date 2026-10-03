@@ -402,6 +402,23 @@
       .cod-ci__marker input { border:1px solid #ffffff26; border-radius:5px; padding:6px; background:#20242b; color:#f2f3f5; font:inherit; }
       .cod-ci__marker input:focus { outline:none; border-color:#a06a34; }
       .cod-ci__marker-hint { margin:-2px 0 8px; color:#a9a39a; font-size:10px; line-height:1.4; }
+      /* Divisor: mismo lenguaje que el panel de marcador. La muestra enseña la
+         forma elegida como máscara, para que se reconozca de un vistazo —una
+         onda y unos cerros no se distinguen por el nombre del archivo—. */
+      .cod-ci__divisor { margin:8px 0; padding:10px; border:1px solid #a06a3480; border-radius:6px; background:#a06a3414; }
+      .cod-ci__divisor-title { margin-bottom:8px; color:#d8a86a; font-weight:650; }
+      .cod-ci__divisor label { display:grid; gap:4px; margin-bottom:6px; color:#c7bda9; font-size:10px; }
+      .cod-ci__divisor input, .cod-ci__divisor select { border:1px solid #ffffff26; border-radius:5px; padding:6px; background:#20242b; color:#f2f3f5; font:inherit; }
+      .cod-ci__divisor input[type="color"] { padding:2px; min-height:30px; cursor:pointer; }
+      .cod-ci__divisor .cod-ci__field--inline { grid-auto-flow:column; justify-content:start; align-items:center; gap:8px; }
+      .cod-ci__divisor-forma { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+      .cod-ci__divisor-muestra { flex:0 0 56px; height:26px; border:1px solid #ffffff26; border-radius:4px;
+        background-color:#d8a86a; -webkit-mask-size:100% 100%; mask-size:100% 100%;
+        -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat; }
+      .cod-ci__divisor button { border:1px solid #ffffff26; border-radius:5px; padding:6px 10px; background:#2a2e36; color:#f2f3f5; cursor:pointer; font:inherit; }
+      .cod-ci__divisor button:hover { border-color:#a06a34; }
+      .cod-ci__divisor-quitar { margin-top:8px; width:100%; }
+      .cod-ci__divisor-hint { margin:-2px 0 4px; color:#a9a39a; font-size:10px; line-height:1.4; }
       .cod-ci__marker-hint.is-ok { color:#8fb08f; }
       .cod-ci__marker-hint.is-error { color:#ffb4b4; }
       .cod-ci__content-field { min-height:64px; resize:vertical; line-height:1.4; }
@@ -1566,6 +1583,276 @@
       return panel;
     }
 
+    // ------------------------------------------------------------------
+    // Divisores: el borde no recto entre una sección y la siguiente.
+    //
+    // La forma es un RECURSO DEL SITIO, no una lista cerrada. Divi trae 27 y
+    // ahí se acaba; acá se elige cualquier SVG de Medios. Cristóbal, 2026-10-03:
+    // «somos como Divi pero libre, abierto y modificable por el usuario».
+    //
+    // QUÉ ESCRIBE. Un `<div class="cod-divisor" data-cod-divisor-*>` vacío
+    // dentro del bloque. El dibujo NO se guarda: lo pone el servidor al mostrar
+    // la página (COD_Divisor::resolver_en_html), así que reemplazar el archivo
+    // llega a todas las páginas sin recomponer ninguna.
+    //
+    // QUÉ SE VE EN EL EDITOR. Como el marcador va vacío, acá se previsualiza
+    // con `mask-image` sobre la propia ruta: se ve la forma, con su color, sin
+    // meter el SVG en el documento. El publicado usa el SVG en línea.
+    // ------------------------------------------------------------------
+
+    const DIVISOR_CLASE = 'cod-divisor';
+    const DIVISOR_ATTR_FORMA = 'data-cod-divisor-forma';
+
+    /** ¿El catálogo le ofrece divisores a este tipo de objeto? */
+    function admiteDivisor(component) {
+      const cat = global.ocdCanvasEditorConfig?.catalogo || global.OCDCanvasEditor?.catalogo || null;
+      if (!cat) return false;
+      const tipo = tipoDeNodoDe(component);
+      const def = cat.taxonomias?.[tipo];
+      if (!def) return false;
+      return Array.isArray(def.diseno) && def.diseno.includes('divisor');
+    }
+
+    /**
+     * De qué taxonomía es este componente, en el vocabulario del catálogo.
+     *
+     * Se lee de la clase que el compilador ya pone (`cod-node--group`), que es
+     * el dato que sobrevive de la composición al editor.
+     */
+    function tipoDeNodoDe(component) {
+      const clases = componentClasses(component);
+      for (const c of clases) {
+        if (typeof c === 'string' && c.startsWith('cod-node--')) return c.slice('cod-node--'.length);
+        if (c?.getName && String(c.getName()).startsWith('cod-node--')) {
+          return String(c.getName()).slice('cod-node--'.length);
+        }
+      }
+      const tag = String(component?.get?.('tagName') || '').toLowerCase();
+      return tag === 'section' || tag === 'header' || tag === 'footer' ? tag : 'group';
+    }
+
+    /** Los divisores que ya tiene este bloque. */
+    function divisoresDe(component) {
+      if (!component || typeof component.find !== 'function') return [];
+      try {
+        return component.find('.' + DIVISOR_CLASE) || [];
+      } catch (_error) {
+        return [];
+      }
+    }
+
+    function renderDivisorPanel(component) {
+      if (!component || !admiteDivisor(component)) return null;
+
+      const existentes = divisoresDe(component);
+      const primero = existentes[0] || null;
+      const attrs = primero ? componentAttributes(primero) : {};
+      const forma = String(attrs[DIVISOR_ATTR_FORMA] || '');
+
+      const panel = createElement(hostDocument, 'section', 'cod-ci__divisor');
+      panel.appendChild(createElement(hostDocument, 'div', 'cod-ci__divisor-title', 'Divisor'));
+
+      // --- la forma -----------------------------------------------------
+      const fila = createElement(hostDocument, 'div', 'cod-ci__divisor-forma');
+      const muestra = createElement(hostDocument, 'div', 'cod-ci__divisor-muestra');
+      if (forma) {
+        muestra.style.setProperty('-webkit-mask-image', `url("${forma}")`);
+        muestra.style.setProperty('mask-image', `url("${forma}")`);
+      }
+      const elegir = createElement(hostDocument, 'button', '', forma ? 'Cambiar forma' : 'Elegir forma…');
+      elegir.type = 'button';
+      elegir.addEventListener('click', () => elegirForma(component));
+      fila.append(muestra, elegir);
+      panel.appendChild(fila);
+
+      if (!forma) {
+        panel.appendChild(createElement(hostDocument, 'p', 'cod-ci__divisor-hint',
+          'Cualquier SVG de tu biblioteca sirve como forma: una onda, unos cerros, la silueta de un nogal. '
+          + 'No hay una lista de formas permitidas.'));
+        return panel;
+      }
+
+      // --- dónde --------------------------------------------------------
+      const donde = String(attrs['data-cod-divisor-donde'] || 'abajo');
+      const tieneArriba = existentes.some((d) => componentAttributes(d)['data-cod-divisor-donde'] === 'arriba');
+      const tieneAbajo = existentes.some((d) => componentAttributes(d)['data-cod-divisor-donde'] === 'abajo');
+      const dondeActual = tieneArriba && tieneAbajo ? 'ambos' : (tieneArriba ? 'arriba' : 'abajo');
+
+      const campoDonde = createElement(hostDocument, 'label', 'cod-ci__field', 'Dónde');
+      const selDonde = createElement(hostDocument, 'select');
+      for (const [valor, rotulo] of [['arriba', 'Arriba'], ['abajo', 'Abajo'], ['ambos', 'Arriba y abajo']]) {
+        const op = createElement(hostDocument, 'option', '', rotulo);
+        op.value = valor;
+        selDonde.appendChild(op);
+      }
+      selDonde.value = dondeActual;
+      selDonde.addEventListener('change', () => ponerDivisor(component, { donde: selDonde.value }));
+      campoDonde.appendChild(selDonde);
+      panel.appendChild(campoDonde);
+
+      // --- alto ---------------------------------------------------------
+      const campoAlto = createElement(hostDocument, 'label', 'cod-ci__field', 'Alto');
+      const inAlto = createElement(hostDocument, 'input');
+      inAlto.type = 'text';
+      inAlto.placeholder = '80px';
+      inAlto.value = leerVariable(primero, '--cod-divisor-alto');
+      inAlto.addEventListener('change', () => ponerDivisor(component, { alto: inAlto.value.trim() }));
+      campoAlto.appendChild(inAlto);
+      panel.appendChild(campoAlto);
+
+      // --- color --------------------------------------------------------
+      // El divisor hereda `currentColor`, así que su color es el color del
+      // propio marcador. Se escribe ahí y no en el bloque, para no teñir
+      // también su texto.
+      const campoColor = createElement(hostDocument, 'label', 'cod-ci__field', 'Color');
+      const inColor = createElement(hostDocument, 'input');
+      inColor.type = 'color';
+      inColor.value = leerColor(primero) || '#ffffff';
+      inColor.addEventListener('change', () => ponerDivisor(component, { color: inColor.value }));
+      campoColor.appendChild(inColor);
+      panel.appendChild(campoColor);
+
+      // --- repetición ---------------------------------------------------
+      const campoRep = createElement(hostDocument, 'label', 'cod-ci__field', 'Repeticiones a lo ancho');
+      const inRep = createElement(hostDocument, 'input');
+      inRep.type = 'number';
+      inRep.min = '1';
+      inRep.max = '12';
+      inRep.value = leerVariable(primero, '--cod-divisor-repeticion') || '1';
+      inRep.addEventListener('change', () => ponerDivisor(component, { repeticion: inRep.value }));
+      campoRep.appendChild(inRep);
+      panel.appendChild(campoRep);
+
+      // --- voltear ------------------------------------------------------
+      const campoVolt = createElement(hostDocument, 'label', 'cod-ci__field cod-ci__field--inline', 'Voltear');
+      const inVolt = createElement(hostDocument, 'input');
+      inVolt.type = 'checkbox';
+      inVolt.checked = String(attrs['data-cod-divisor-voltear'] || '') === '1';
+      inVolt.addEventListener('change', () => ponerDivisor(component, { voltear: inVolt.checked }));
+      campoVolt.appendChild(inVolt);
+      panel.appendChild(campoVolt);
+
+      // --- quitar -------------------------------------------------------
+      const quitar = createElement(hostDocument, 'button', 'cod-ci__divisor-quitar', 'Quitar el divisor');
+      quitar.type = 'button';
+      quitar.addEventListener('click', () => {
+        divisoresDe(component).forEach((d) => d.remove?.());
+        refresh(component);
+      });
+      panel.appendChild(quitar);
+
+      return panel;
+    }
+
+    function leerVariable(component, nombre) {
+      if (!component) return '';
+      const estilo = String(componentAttributes(component).style || '');
+      const m = estilo.match(new RegExp(nombre.replace('--', '--') + '\\s*:\\s*([^;]+)'));
+      return m ? m[1].trim() : '';
+    }
+
+    function leerColor(component) {
+      if (!component) return '';
+      const estilo = String(componentAttributes(component).style || '');
+      const m = estilo.match(/(?:^|;)\s*color\s*:\s*([^;]+)/);
+      return m ? m[1].trim() : '';
+    }
+
+    /** Abre Medios y pone la forma elegida. */
+    function elegirForma(component) {
+      if (!global.wp || !global.wp.media) {
+        global.alert('La biblioteca de medios no está disponible en esta pantalla.');
+        return;
+      }
+      const marco = global.wp.media({
+        title: 'Elegir la forma del divisor',
+        button: { text: 'Usar esta forma' },
+        // Sólo SVG: es lo único que se puede recolorear y estirar sin perder
+        // nitidez. Un PNG de una onda se vería borroso en cuanto la sección
+        // fuera más ancha que la imagen.
+        library: { type: 'image/svg+xml' },
+        multiple: false,
+      });
+      marco.on('select', () => {
+        const elegido = marco.state().get('selection').first();
+        if (!elegido) return;
+        const url = elegido.toJSON().url || '';
+        if (!url) return;
+        ponerDivisor(component, { forma: rutaRelativa(url) });
+      });
+      marco.open();
+    }
+
+    /** La ruta sin el dominio: un documento no debe clavar el sitio donde nació. */
+    function rutaRelativa(url) {
+      try {
+        const u = new URL(url, global.location.href);
+        return u.pathname + (u.search || '');
+      } catch (_error) {
+        return url;
+      }
+    }
+
+    /**
+     * Pone, cambia o reemplaza los divisores del bloque.
+     *
+     * Siempre se reescriben los dos marcadores a partir del estado completo,
+     * en vez de ir parcheando cada uno: con «arriba y abajo» hay dos piezas que
+     * tienen que decir lo mismo, y editarlas por separado es cómo se llega a
+     * que una diga una cosa y la otra otra.
+     */
+    function ponerDivisor(component, cambios) {
+      const existentes = divisoresDe(component);
+      const primero = existentes[0] || null;
+      const attrs = primero ? componentAttributes(primero) : {};
+      const tieneArriba = existentes.some((d) => componentAttributes(d)['data-cod-divisor-donde'] === 'arriba');
+      const tieneAbajo = existentes.some((d) => componentAttributes(d)['data-cod-divisor-donde'] === 'abajo');
+
+      const estado = {
+        forma: String(attrs[DIVISOR_ATTR_FORMA] || ''),
+        donde: tieneArriba && tieneAbajo ? 'ambos' : (tieneArriba ? 'arriba' : 'abajo'),
+        alto: leerVariable(primero, '--cod-divisor-alto'),
+        repeticion: leerVariable(primero, '--cod-divisor-repeticion'),
+        voltear: String(attrs['data-cod-divisor-voltear'] || '') === '1',
+        color: leerColor(primero),
+        ...cambios,
+      };
+      if (!estado.forma) return;
+
+      existentes.forEach((d) => d.remove?.());
+
+      const lugares = estado.donde === 'ambos' ? ['arriba', 'abajo'] : [estado.donde];
+      for (const lugar of lugares) {
+        const estilo = [];
+        if (estado.alto) estilo.push(`--cod-divisor-alto:${estado.alto}`);
+        if (estado.repeticion && Number(estado.repeticion) > 1) estilo.push(`--cod-divisor-repeticion:${Number(estado.repeticion)}`);
+        if (estado.color) estilo.push(`color:${estado.color}`);
+        // La máscara de previsualización NO se escribe acá: la pone el
+        // runtime del editor leyendo el atributo. Una máscara es
+        // previsualización, no contenido, y guardarla dejaría en la página
+        // publicada una regla que allá no hace falta.
+
+        const marcador = [
+          `<div class="${DIVISOR_CLASE}"`,
+          ` ${DIVISOR_ATTR_FORMA}="${estado.forma}"`,
+          ` data-cod-divisor-donde="${lugar}"`,
+          estado.voltear ? ' data-cod-divisor-voltear="1"' : '',
+          ` style="${estilo.join(';')}"`,
+          '></div>',
+        ].join('');
+
+        try {
+          component.append(marcador, { at: 0 });
+        } catch (_error) {
+          // Un bloque que no admite hijos no puede llevar divisor; no es un
+          // error que deba interrumpir nada.
+        }
+      }
+
+      refresh(component);
+    }
+
+
     function renderSaveModulePanel(component) {
       if (!componentHasChildren(component)) return null;
       const bridge = global.OCDCanvasEditor;
@@ -2576,6 +2863,8 @@
       if (dynamicSourcePanel) body.appendChild(dynamicSourcePanel);
       const columnPresetsPanel = renderColumnPresetsPanel(snapshot?.component);
       // La paleta visual se abre desde el control principal de Columnas.
+      const divisorPanel = renderDivisorPanel(snapshot?.component);
+      if (divisorPanel) body.appendChild(divisorPanel);
       const saveModulePanel = renderSaveModulePanel(snapshot?.component);
       if (saveModulePanel) body.appendChild(saveModulePanel);
       const svgImage = externalSvgImageFor(snapshot?.component) || firstExternalSvgImage();

@@ -329,6 +329,11 @@ final class COD_Canvas_Editor_Admin
             ['cod-grapesjs'],
             COD_PUBLISHER_VERSION
         );
+        // La biblioteca de Medios, para elegir archivos del sitio desde el
+        // editor: hoy la forma de un divisor, y mañana cualquier otra cosa que
+        // sea un recurso. Es la misma `wp.media` que usa la pantalla de
+        // Configuración, así que el usuario ve la ventana de siempre.
+        wp_enqueue_media();
         wp_enqueue_script(
             'cod-grapesjs',
             plugins_url('assets/vendor/grapesjs/grapes.min.js', COD_PUBLISHER_FILE),
