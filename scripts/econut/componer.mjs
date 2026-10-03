@@ -318,13 +318,23 @@ R('cuadrantes', 'interaction', { behavior: 'cuadrantes' });
 // Medido en el original a 1900px: el panel ocupa de 480 a 1420 —940 de ancho,
 // centrado— y cada cuadrante mide 440x440 con 20px de separación. Acá medían
 // 577x577 sobre 1180, que es lo que lo hacía ver grande y sin fondo.
+// El envoltorio: pone el fondo blanco, el margen parejo y las puntas
+// redondeadas. El radio es 28 y no 8 porque la esquina de afuera tiene que
+// seguir a la de adentro: 8 de la foto más los 20 del margen. Si las dos
+// fueran 8, el blanco se vería con una curva más cerrada que las fotos.
 R('cuadrantes-panel', 'properties', { declarations: {
   'background-color': '#FFFFFF',
   'max-width': '940px',
   'margin-inline-start': 'auto',
   'margin-inline-end': 'auto',
   'padding-top': '20px', 'padding-right': '20px', 'padding-bottom': '20px', 'padding-left': '20px',
+  'border-radius': '28px',
   width: '100%',
+} });
+// El módulo, ya dentro del envoltorio: ocupa los 900 que quedan y conserva su
+// forma cuadrada, que es lo que mantiene la rejilla de 2x2 pareja.
+R('cuadrantes-medida', 'properties', { declarations: {
+  width: '100%', 'aspect-ratio': '1 / 1',
 } });
 
 // --- Nodos -----------------------------------------------------------------
@@ -570,7 +580,12 @@ nodes.push({
     // El original abre esta sección con el título solo: el rótulo «Cuatro
     // puntos de control» que había acá no existe allá.
     H('Garantía de calidad', 2, ['t-seccion-centro', 'c-naranja']),
-    G([
+    // El fondo blanco va en un ENVOLTORIO, no en el mismo nodo del módulo.
+    // El módulo coloca sus cuatro celdas en posición absoluta, así que un
+    // relleno puesto sobre él no las mueve: quedaban pegadas arriba y a la
+    // izquierda, con 40px sueltos abajo y a la derecha. Con el envoltorio, el
+    // margen es parejo por los cuatro lados.
+    G([G([
       control(f.huertos, 'Huertos de nogales', 'Control de huertos', [
         'Nuestros puntos de control comienzan con la fruta directamente en los huertos. Todas las nueces que recibimos han sido monitoreadas de acuerdo con exigentes estándares fitosanitarios.',
         'Durante la post cosecha también colaboramos con nuestros productores para lograr los mejores resultados del despelonado y secado.',
@@ -587,7 +602,7 @@ nodes.push({
         'Verificamos los factores sanitarios y de calidad durante los pasos de selección y empaquetado.',
         'Incluso antes de cada envío revisamos todos estos parámetros, para dar garantías reales a nuestros clientes.',
       ]),
-    ], ['cuadrantes', 'cuadrantes-panel']),
+    ], ['cuadrantes', 'cuadrantes-medida'])], ['cuadrantes-panel']),
   ], ['caja-centro'])],
 });
 
