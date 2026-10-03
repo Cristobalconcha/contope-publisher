@@ -1,0 +1,348 @@
+{
+  "version": 1,
+  "_lee_esto_primero": [
+    "El catálogo de primitivas: qué puede configurarse en cada tipo de objeto.",
+    "",
+    "QUÉ ES. Para cada taxonomía —un título, una imagen, un contenedor— declara",
+    "qué familias de propiedades se le ofrecen, con qué control se editan y de",
+    "dónde sale su valor de partida. Es el equivalente de los `advanced_fields`",
+    "de Divi, donde cada módulo declara qué familias de diseño soporta y el",
+    "constructor arma el panel a partir de esa declaración, en vez de escribir",
+    "la interfaz objeto por objeto.",
+    "",
+    "POR QUÉ UN ARCHIVO Y NO CÓDIGO. Porque añadir una primitiva no debería",
+    "exigir tocar la interfaz. Y porque lo que hoy vive como lista fija dentro",
+    "del código —las 13 disposiciones de columnas, los peldaños de separación—",
+    "tiene que poder crecer sin un despliegue.",
+    "",
+    "EL CRITERIO, EN DOS FRASES. Lo que es apariencia va en «diseño»; lo que no",
+    "lo es va en «configuracion». Es el reparto que decidió Cristóbal el 3 de",
+    "octubre de 2026, y es más ordenado que el de Divi, cuya tercera pestaña",
+    "—llamada «Avanzado» de cara al usuario pero `custom_css` por dentro— nació",
+    "como el cajón del CSS a mano y terminó mezclando la posición de un objeto",
+    "con la posición del scroll.",
+    "",
+    "ESTO PROPONE, NO PROHÍBE. Si una familia no está declarada para una",
+    "taxonomía, el panel no la ofrece; el compilador NO la rechaza. La razón la",
+    "dio él mismo: «el diseño funciona sobre la base de excepciones; la música",
+    "clásica está llena de quintas paralelas y eso no significa que esté mal",
+    "hecha». Un diseñador tiene que poder romper la regla a propósito.",
+    "",
+    "LOS VALORES POR DEFECTO NO SE ESCRIBEN ACÁ. Se declara DE DÓNDE salen, con",
+    "`heredaDe`, apuntando a un rol del set de diseño (ver COD_Design_Core).",
+    "Así, si cambia la tinta del sistema, todos los textos la siguen sin tocar",
+    "este archivo. Es lo mismo que hace Divi con `et_get_option('body_font_size')`",
+    "y lo contrario de clavar un número.",
+    "",
+    "EVIDENCIA. Las familias salen de tres sitios, y cada entrada dice de cuál:",
+    "  medido  — lo usan las páginas reales de Econut (se contó cuántas veces)",
+    "  divi    — lo declara Divi 4.2.1 para ese mismo tipo de objeto",
+    "  propio  — decisión nuestra, con su porqué escrito"
+  ],
+
+  "controles": {
+    "_": "Los controles que el inspector sabe dibujar. Lista corta a propósito.",
+    "texto": "una línea de texto",
+    "textoLargo": "varias líneas",
+    "numero": "un número con unidad",
+    "medida": "una medida CSS (px, rem, %, fr)",
+    "medidas4": "cuatro medidas: arriba, derecha, abajo, izquierda",
+    "color": "un color del set, o uno propio",
+    "seleccion": "una lista de opciones",
+    "peldanos": "una escala con pasos con nombre, no un número libre",
+    "interruptor": "sí o no",
+    "formas": "una paleta visual de miniaturas",
+    "recurso": "un archivo del sitio (imagen, SVG, vídeo)"
+  },
+
+  "familias": {
+    "_": "El vocabulario de propiedades. Cada una dice con qué clase de regla se expresa.",
+
+    "tipografia": {
+      "rotulo": "Tipografía",
+      "kind": "typography",
+      "propiedades": {
+        "familia":     { "rotulo": "Tipografía", "control": "seleccion", "heredaDe": { "rol": "heading" } },
+        "tamano":      { "rotulo": "Tamaño", "control": "medida" },
+        "interlinea":  { "rotulo": "Interlínea", "control": "numero" },
+        "interletra":  { "rotulo": "Interletra", "control": "medida" },
+        "peso":        { "rotulo": "Grosor", "control": "seleccion" },
+        "alineacion":  { "rotulo": "Alineación del texto", "control": "seleccion",
+                         "opciones": ["izquierda", "centro", "derecha", "justificada"] },
+        "transformar": { "rotulo": "Mayúsculas", "control": "seleccion",
+                         "opciones": ["ninguna", "mayusculas", "minusculas", "capital"] }
+      },
+      "evidencia": "medido (45 usos) · divi (familia `font`, 16 campos)"
+    },
+
+    "color": {
+      "rotulo": "Color",
+      "kind": "color",
+      "propiedades": {
+        "tinta": { "rotulo": "Color del texto", "control": "color", "heredaDe": { "rol": "ink" } }
+      },
+      "evidencia": "medido (7 usos) · divi"
+    },
+
+    "superficie": {
+      "rotulo": "Fondo",
+      "kind": "surface",
+      "propiedades": {
+        "fondo":   { "rotulo": "Color de fondo", "control": "color", "heredaDe": { "rol": "surface" } },
+        "velo":    { "rotulo": "Velo sobre la imagen", "control": "color" },
+        "opacidadVelo": { "rotulo": "Intensidad del velo", "control": "numero" },
+        "sombra":  { "rotulo": "Sombra", "control": "peldanos", "opciones": ["ninguna", "sm", "md", "lg"] }
+      },
+      "evidencia": "medido (20 usos, 6 de ellos `background-color` por la salida de emergencia) · divi (`background`, `box_shadow`)"
+    },
+
+    "forma": {
+      "rotulo": "Forma",
+      "kind": "shape",
+      "propiedades": {
+        "radio":        { "rotulo": "Puntas redondeadas", "control": "medida" },
+        "filete":       { "rotulo": "Filete", "control": "seleccion", "opciones": ["ninguno", "solido", "guiones"] },
+        "grosorFilete": { "rotulo": "Grosor del filete", "control": "medida" }
+      },
+      "evidencia": "medido (3 usos como regla + 5 escapadas `border-*`) · divi (`borders`)"
+    },
+
+    "espaciado": {
+      "rotulo": "Espaciado",
+      "kind": "spacing",
+      "propiedades": {
+        "relleno": { "rotulo": "Relleno", "control": "medidas4" },
+        "margen":  { "rotulo": "Margen", "control": "medidas4" }
+      },
+      "evidencia": "medido (17 usos como regla + 39 escapadas `margin-*`/`padding-*`) · divi (`margin_padding`, 12 campos)"
+    },
+
+    "disposicion": {
+      "rotulo": "Disposición",
+      "kind": "layout",
+      "_nota": [
+        "Elegir una disposición NO es cambiar una propiedad: crea o quita",
+        "columnas. Por eso su control es una paleta visual y no un campo de",
+        "texto. La distinción es de Cristóbal, 2026-08-21, y está escrita en el",
+        "código del editor: «Proporción» se sacó del panel porque parecía la",
+        "forma de armar el layout cuando la forma real es la paleta.",
+        "",
+        "Las variantes NO se listan acá todavía: hoy viven en el código del",
+        "inspector (13 fijas). Traerlas es el siguiente paso, y con ellas la",
+        "posibilidad de cualquier combinación que no sea absurda, por",
+        "breakpoint, que es lo que Divi no permite: su paleta son ~25 formas",
+        "fijas y punto."
+      ],
+      "propiedades": {
+        "columnas":   { "rotulo": "Columnas", "control": "formas" },
+        "separacion": { "rotulo": "Separación", "control": "peldanos", "heredaDe": { "rol": "measure" } },
+        "alineacion": { "rotulo": "Alineación del contenido", "control": "seleccion",
+                        "opciones": ["inicio", "centro", "final", "estirar", "espaciado"] },
+        "direccion":  { "rotulo": "Dirección", "control": "seleccion", "opciones": ["fila", "columna"] },
+        "ancho":      { "rotulo": "Ancho", "control": "medida" },
+        "anchoMaximo":{ "rotulo": "Ancho máximo", "control": "medida", "heredaDe": { "rol": "measure" } },
+        "alto":       { "rotulo": "Alto", "control": "medida" }
+      },
+      "evidencia": "medido (18 usos como regla + 59 escapadas: 26 de alineación, 18 de rejilla, 15 de separación) · divi NO tiene rejilla de CSS (cero menciones de grid-template, align-items, justify-content o gap)"
+    },
+
+    "posicion": {
+      "rotulo": "Posición",
+      "kind": "properties",
+      "_nota": [
+        "Va en «diseño» y no en una pestaña aparte: una posición es una",
+        "propiedad visual del objeto. Criterio de Cristóbal, 2026-10-03, y es",
+        "donde se separa de Divi, que la mete en su cajón de «Avanzado» junto a",
+        "los efectos de scroll.",
+        "",
+        "`pegada` necesita que el contenedor no recorte su contenido. Cuando no",
+        "se cumple, el control va en gris con el porqué en el tooltip, en vez de",
+        "ofrecer algo que no va a funcionar."
+      ],
+      "propiedades": {
+        "modo":     { "rotulo": "Posición", "control": "seleccion",
+                      "opciones": ["normal", "relativa", "pegada", "absoluta", "fija"] },
+        "desdeArriba": { "rotulo": "Distancia desde arriba", "control": "medida",
+                         "visibleSi": { "modo": ["pegada", "absoluta", "fija"] } },
+        "capa":     { "rotulo": "Orden de capas", "control": "numero" }
+      },
+      "evidencia": "medido (2 escapadas de z-index) · divi (`position`, `z_index`) · propio (que viva en diseño)"
+    },
+
+    "imagen": {
+      "rotulo": "Imagen",
+      "kind": "media",
+      "propiedades": {
+        "archivo":    { "rotulo": "Imagen", "control": "recurso" },
+        "alternativo":{ "rotulo": "Texto alternativo", "control": "texto" },
+        "proporcion": { "rotulo": "Proporción", "control": "texto" },
+        "ajuste":     { "rotulo": "Ajuste", "control": "seleccion", "opciones": ["cubrir", "contener", "rellenar"] },
+        "foco":       { "rotulo": "Punto de interés", "control": "texto" },
+        "filtro":     { "rotulo": "Filtro", "control": "seleccion", "opciones": ["ninguno", "grises"] }
+      },
+      "evidencia": "medido (12 usos) · divi (`filters`, 9 campos)"
+    },
+
+    "movimiento": {
+      "rotulo": "Movimiento",
+      "kind": "motion",
+      "propiedades": {
+        "efecto":   { "rotulo": "Efecto", "control": "seleccion" },
+        "duracion": { "rotulo": "Duración", "control": "numero", "heredaDe": { "rol": "enter" } },
+        "retardo":  { "rotulo": "Retardo", "control": "numero" }
+      },
+      "evidencia": "medido (1 uso) · divi (`animation`, 12 campos)"
+    },
+
+    "conducta": {
+      "rotulo": "Conducta",
+      "kind": "interaction",
+      "_nota": "Va en «configuracion» y no en «diseño»: no es aspecto. Acá viven los behaviors con sus gatilladores.",
+      "propiedades": {
+        "behavior":  { "rotulo": "Conducta", "control": "seleccion" },
+        "disparador":{ "rotulo": "Disparador", "control": "seleccion",
+                       "opciones": ["ninguno", "al-cargar", "al-desplazar", "al-pinchar"] },
+        "umbral":    { "rotulo": "Umbral", "control": "numero" }
+      },
+      "evidencia": "medido (6 usos) · divi (`scroll_effects`, `sticky`)"
+    },
+
+    "divisor": {
+      "rotulo": "Divisor",
+      "kind": "properties",
+      "_nota": [
+        "La forma es un RECURSO DEL SITIO, no una lista cerrada. Divi trae 27",
+        "formas fijas —Slant, Arrow, Ramp, Curve, Mountains, Wave, Asymmetric,",
+        "Graph, Triangle, Clouds y variantes— y ésas son todas las que hay.",
+        "",
+        "Cristóbal, 2026-10-03: «a diferencia de lo que ofrece Divi, nosotros",
+        "tenemos que construir un sistema totalmente abierto donde el usuario",
+        "pueda reemplazar las texturas, las imágenes, todos los insumos. Somos",
+        "como Divi pero libre, abierto y modificable por el usuario».",
+        "",
+        "Esto depende de poder subir SVG, que se construyó el mismo día",
+        "(COD_SVG, con limpieza al subir). Sin eso sería una promesa."
+      ],
+      "propiedades": {
+        "forma":     { "rotulo": "Forma", "control": "recurso" },
+        "color":     { "rotulo": "Color", "control": "color", "heredaDe": { "rol": "surface" } },
+        "alto":      { "rotulo": "Alto", "control": "medida" },
+        "repeticion":{ "rotulo": "Repetición horizontal", "control": "numero" },
+        "voltear":   { "rotulo": "Voltear", "control": "interruptor" },
+        "donde":     { "rotulo": "Dónde", "control": "seleccion", "opciones": ["arriba", "abajo", "ambos"] }
+      },
+      "evidencia": "divi (`dividers`) · propio (que la forma sea abierta)"
+    },
+
+    "boton": {
+      "rotulo": "Botón",
+      "kind": "button",
+      "propiedades": {
+        "variante":    { "rotulo": "Variante", "control": "seleccion", "opciones": ["solido", "contorno", "texto"] },
+        "tono":        { "rotulo": "Tono", "control": "seleccion", "heredaDe": { "rol": "accent" } },
+        "tamano":      { "rotulo": "Tamaño", "control": "seleccion", "opciones": ["sm", "md", "lg"] },
+        "ancho":       { "rotulo": "Ancho", "control": "seleccion", "opciones": ["auto", "completo"] },
+        "interaccion": { "rotulo": "Respuesta al pasar", "control": "seleccion" }
+      },
+      "evidencia": "medido (1 uso) · divi (`button`, 15 campos)"
+    },
+
+    "enlace": {
+      "rotulo": "Enlace",
+      "kind": "anchor",
+      "_nota": "En «configuracion»: a dónde lleva algo no es su aspecto.",
+      "propiedades": {
+        "destino":  { "rotulo": "Destino", "control": "texto" },
+        "ventana":  { "rotulo": "Abrir en otra ventana", "control": "interruptor" },
+        "marcador": { "rotulo": "Nombre del marcador", "control": "texto" }
+      },
+      "evidencia": "divi (`link_options`) · medido (anclas del sitio)"
+    }
+  },
+
+  "taxonomias": {
+    "_": [
+      "Qué familias se le ofrecen a cada tipo de objeto. Los nombres de",
+      "taxonomía son los NODE_KINDS que el compilador ya acepta.",
+      "",
+      "El criterio para incluir o no una familia es el de Cristóbal: «a un texto",
+      "no le aplican las puntas redondeadas y a un contenedor no le aplican los",
+      "tamaños de texto». Y la corrección que él mismo hizo después: un",
+      "contenedor SÍ tiene tamaño y alineación — lo que cambia es a qué se",
+      "traducen. Por eso el vocabulario es compartido y es la taxonomía la que",
+      "resuelve qué significa cada palabra."
+    ],
+
+    "heading": {
+      "rotulo": "Título",
+      "configuracion": ["enlace", "conducta"],
+      "diseno": ["tipografia", "color", "espaciado", "superficie", "posicion", "movimiento"],
+      "_sin": "forma — un texto no lleva puntas redondeadas (ejemplo de Cristóbal). Divi coincide: su módulo de texto no declara `borders`."
+    },
+
+    "paragraph": {
+      "rotulo": "Texto",
+      "configuracion": ["enlace", "conducta"],
+      "diseno": ["tipografia", "color", "espaciado", "superficie", "posicion", "movimiento"],
+      "_sin": "forma, por lo mismo que el título."
+    },
+
+    "richText": {
+      "rotulo": "Texto con formato",
+      "configuracion": ["enlace", "conducta"],
+      "diseno": ["tipografia", "color", "espaciado", "superficie", "posicion", "movimiento"]
+    },
+
+    "image": {
+      "rotulo": "Imagen",
+      "configuracion": ["enlace", "conducta"],
+      "diseno": ["imagen", "forma", "espaciado", "superficie", "disposicion", "posicion", "movimiento"],
+      "_sin": "tipografia — una imagen no tiene texto (ejemplo de Cristóbal). Divi coincide: su módulo de imagen no declara `fonts`.",
+      "_con": "forma SÍ: el radio de una imagen es de lo más usado. Divi también lo declara."
+    },
+
+    "video":  { "rotulo": "Vídeo",  "configuracion": ["conducta"], "diseno": ["imagen", "forma", "espaciado", "disposicion", "posicion"] },
+    "audio":  { "rotulo": "Audio",  "configuracion": ["conducta"], "diseno": ["espaciado", "disposicion", "posicion"] },
+
+    "button": {
+      "rotulo": "Botón",
+      "configuracion": ["enlace", "conducta"],
+      "diseno": ["boton", "tipografia", "forma", "espaciado", "superficie", "posicion", "movimiento"]
+    },
+
+    "link": {
+      "rotulo": "Enlace",
+      "configuracion": ["enlace", "conducta"],
+      "diseno": ["tipografia", "color", "espaciado", "posicion"]
+    },
+
+    "group": {
+      "rotulo": "Bloque",
+      "configuracion": ["conducta", "enlace"],
+      "diseno": ["disposicion", "espaciado", "superficie", "forma", "posicion", "divisor", "movimiento"],
+      "_sin": "tipografia — un bloque no tiene texto propio, aunque la herede para lo de dentro.",
+      "_con": "disposicion es la familia principal de un bloque: 59 de las escapadas medidas son suyas."
+    },
+
+    "layout":  { "rotulo": "Disposición", "configuracion": ["conducta"], "diseno": ["disposicion", "espaciado", "superficie", "posicion"] },
+
+    "section": {
+      "rotulo": "Sección",
+      "configuracion": ["conducta", "enlace"],
+      "diseno": ["disposicion", "espaciado", "superficie", "divisor", "posicion"],
+      "_con": "divisor: es donde Divi los pone, y es donde tienen sentido."
+    },
+
+    "header":  { "rotulo": "Encabezado", "configuracion": ["conducta"], "diseno": ["disposicion", "espaciado", "superficie", "posicion", "forma"] },
+    "footer":  { "rotulo": "Pie",        "configuracion": ["conducta"], "diseno": ["disposicion", "espaciado", "superficie", "posicion", "forma"] },
+    "navigation": { "rotulo": "Navegación", "configuracion": ["conducta", "enlace"], "diseno": ["tipografia", "color", "disposicion", "espaciado", "posicion"] },
+
+    "list":    { "rotulo": "Lista",  "configuracion": ["conducta"], "diseno": ["tipografia", "color", "espaciado", "posicion"] },
+    "table":   { "rotulo": "Tabla",  "configuracion": ["conducta"], "diseno": ["tipografia", "color", "espaciado", "forma", "superficie", "posicion"] },
+    "gallery": { "rotulo": "Galería","configuracion": ["conducta"], "diseno": ["imagen", "disposicion", "espaciado", "forma", "posicion"] },
+    "social":  { "rotulo": "Redes sociales", "configuracion": ["enlace"], "diseno": ["color", "forma", "espaciado", "disposicion"] },
+    "separator": { "rotulo": "Separador", "configuracion": [], "diseno": ["divisor", "espaciado", "superficie"] },
+    "chart":   { "rotulo": "Gráfico", "configuracion": ["conducta"], "diseno": ["color", "espaciado", "disposicion", "posicion"] },
+    "form":    { "rotulo": "Formulario", "configuracion": ["conducta"], "diseno": ["tipografia", "color", "espaciado", "forma", "superficie", "disposicion"] }
+  }
+}
