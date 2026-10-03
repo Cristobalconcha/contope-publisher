@@ -42,9 +42,16 @@ const M = '/wp-content/uploads/2026/09/';
 // OJO: los nombres NO coinciden entre plataformas (`econutchile.oficial` en
 // Instagram, `EconutChile` en Facebook), así que uno no se deduce del otro.
 // Por eso tienen que ir las dos escritas, no una sola.
+// Las direcciones van LIMPIAS: las que figuran en la biografía de Instagram
+// traen parámetros de seguimiento pegados (`?si=…` en YouTube, `?mibextid=…`
+// en Facebook) que no deben publicarse. Y el enlace corto
+// `facebook.com/share/1CuGPZ7cF3/` resuelve a la misma página EconutChile: no
+// son dos páginas distintas, es la misma compartida de dos formas.
 const REDES = {
   instagram: { url: 'https://www.instagram.com/econutchile.oficial/', handle: '@econutchile.oficial' },
   facebook: { url: 'https://www.facebook.com/EconutChile', handle: 'EconutChile' },
+  youtube: { url: 'https://www.youtube.com/@econutchile', handle: '@econutchile' },
+  linkedin: { url: 'https://www.linkedin.com/company/comercializadora-econut-ltda', handle: 'Comercializadora Econut Ltda' },
   // Pendiente: WhatsApp Business, en disputa con Meta mientras se recupera la
   // propiedad de la marca. Cuando se resuelva, apuntar a la cuenta verificada.
 };
