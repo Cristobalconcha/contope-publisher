@@ -25,7 +25,7 @@ Qué cambió en cada versión: **[CHANGELOG.md](CHANGELOG.md)**
 ## Qué hace
 
 - **Editor visual** sobre GrapesJS: secciones, grillas anidadas, galerías con
-  lightbox, display de cuatro cuadrantes, pestañas, marquesina (fila que se desplaza sola), aviso (ventana emergente de una vez por visitante), mapas, gráficos, videos con transparencia.
+  lightbox, display de cuatro cuadrantes, pestañas, marquesina (fila que se desplaza sola), aviso (ventana emergente de una vez por visitante), mapa (mini mapa que despliega uno grande), mapas, gráficos, videos con transparencia.
 - **Servidor MCP** en `/wp-json/contope/v1/mcp`: un asistente lee y modifica
   las páginas a través del editor real, con las mismas validaciones que una
   persona.

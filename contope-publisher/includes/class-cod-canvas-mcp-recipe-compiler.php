@@ -22,7 +22,10 @@ final class COD_Canvas_MCP_Recipe_Compiler
      * reinicia en compile() y sale en summary.omittedNodes: un nodo omitido en
      * silencio, sin que nada lo cuente, sería indistinguible de un nodo perdido.
      *
-     * @var array<int, array{nodeId: string, kind: string, network?: string, reason: string}>
+     * También se anota aquí lo que se dibujó INCOMPLETO a propósito (un mapa sin la
+     * clave de Mapbox: el mini sí, abrirlo no), con behavior en vez de network.
+     *
+     * @var array<int, array{nodeId: string, kind: string, network?: string, behavior?: string, reason: string}>
      */
     private array $omitted_nodes = [];
 
@@ -111,6 +114,12 @@ final class COD_Canvas_MCP_Recipe_Compiler
      *               pasan los hijos originales del grupo, y cerrar es el botón de
      *               la X. Ninguna tiene estado elegido: el aviso está abierto o
      *               cerrado (data-cod-aviso-estado en la raíz), no hay «el activo».
+     *   mapa:       data-cod-mapa-rol = mini | grande | cerrar. El mini es un enlace
+     *               con la imagen del sitio que SALE DEL COMPILADOR (sin JavaScript es un
+     *               enlace a «cómo llegar»; con él, el runtime lo cambia por un botón). El
+     *               grande y la X los fabrica el runtime al pincharlo, dentro del grupo.
+     *               Ninguna tiene estado elegido: el mapa grande está abierto o cerrado
+     *               (data-cod-mapa-estado en la raíz).
      *
      * Por parte: `selector` es un fragmento de selector de atributo que se
      * pega tras un espacio (descendiente del nodo); `elegido` es la marca que
@@ -196,6 +205,26 @@ final class COD_Canvas_MCP_Recipe_Compiler
                     'selector' => '[data-cod-aviso-rol="cerrar"]',
                     'elegido' => null,
                     'descripcion' => 'el botón de la X que cierra el aviso (lo fabrica el runtime; lleva un SVG que toma el color del texto del botón)',
+                ],
+            ],
+        ],
+        'mapa' => [
+            'atributoRol' => 'data-cod-mapa-rol',
+            'partes' => [
+                'mini' => [
+                    'selector' => '[data-cod-mapa-rol="mini"]',
+                    'elegido' => null,
+                    'descripcion' => 'el mini mapa: la imagen del sitio (content.mini). Es un enlace a «cómo llegar» sin JavaScript y un botón con él; mide 60x60 por omisión y su forma (radio, borde) la ponen las reglas de diseño',
+                ],
+                'grande' => [
+                    'selector' => '[data-cod-mapa-rol="grande"]',
+                    'elegido' => null,
+                    'descripcion' => 'el recuadro del mapa grande que se despliega al pincharlo (lo fabrica el runtime): su alto sale de --cod-mapa-alto y su ancho máximo de --cod-mapa-ancho-maximo; el radio, la sombra y el borde los ponen las reglas de diseño',
+                ],
+                'cerrar' => [
+                    'selector' => '[data-cod-mapa-rol="cerrar"]',
+                    'elegido' => null,
+                    'descripcion' => 'el botón de la X, arriba a la derecha del mapa grande (lo fabrica el runtime; lleva un SVG que toma el color del texto del botón)',
                 ],
             ],
         ],
@@ -406,7 +435,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
                     'optional' => ['role', 'marker', 'ruleIds', 'cadenceRuleId', 'partes', 'children', 'content'],
                     'ruleApplication' => 'Cada nodo refiere reglas por id. No acepta CSS, HTML, JS, selectores ni componentes serializados por el cliente.',
                     'marker' => 'Destino estable al que puede llegar un enlace, un QR o el menú: se emite como id de HTML y por eso debe ser único en la página. Es identidad del nodo, no una regla —una regla se aplica a muchos nodos y repetiría el id. El aire de aterrizaje, en cambio, sí es una regla: spacing.landing.',
-                    'partes' => 'Opcional, sólo en un nodo que lleve un behavior que fabrica partes en el navegador (ver composition.behaviorContracts: hoy pestanas, cuadrantes, marquesina y aviso). Mapa parte → lista de ids de regla, por ejemplo {"etiqueta":["pestana-normal","pestana-activa"],"lista":["fila"]}. Cada regla se emite con un selector de descendiente anclado al nodo (.cod-node-id-<id> [data-cod-pestanas-rol="etiqueta"]), que es lo único que alcanza un elemento que el runtime fabrica y que no recibe clases de regla. Con scope.state="current" se combina con la marca del elegido de ESA parte. La misma regla puede ir además en ruleIds: las dos formas conviven. Sólo admiten partes las reglas color, typography, spacing, layout, surface, shape, button y properties.',
+                    'partes' => 'Opcional, sólo en un nodo que lleve un behavior que fabrica partes en el navegador (ver composition.behaviorContracts: hoy pestanas, cuadrantes, marquesina, aviso y mapa). Mapa parte → lista de ids de regla, por ejemplo {"etiqueta":["pestana-normal","pestana-activa"],"lista":["fila"]}. Cada regla se emite con un selector de descendiente anclado al nodo (.cod-node-id-<id> [data-cod-pestanas-rol="etiqueta"]), que es lo único que alcanza un elemento que el runtime fabrica y que no recibe clases de regla. Con scope.state="current" se combina con la marca del elegido de ESA parte. La misma regla puede ir además en ruleIds: las dos formas conviven. Sólo admiten partes las reglas color, typography, spacing, layout, surface, shape, button y properties.',
                 ],
                 'nodeContentSchemas' => $this->node_content_schemas(),
                 'behaviorContracts' => $this->behavior_contracts_catalog(),
@@ -417,7 +446,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
                     'video', 'video con transparencia real (matte)', 'button', 'dynamic value', 'dynamic group', 'table', 'published Orugantt form',
                 ],
                 'safeRuntimeBehaviors' => [
-                    'scroll-threshold', 'nav-toggle', 'carousel-basic', 'reveal-on-scroll', 'lightbox', 'cuadrantes', 'pestanas', 'marquesina', 'aviso',
+                    'scroll-threshold', 'nav-toggle', 'carousel-basic', 'reveal-on-scroll', 'lightbox', 'cuadrantes', 'pestanas', 'marquesina', 'aviso', 'mapa',
                     'load-transition', 'scroll-transition',
                 ],
                 'assetPolicy' => 'cod_resolve_canvas_assets devuelve activos ya gestionados por Canvas. El compilador acepta URLs seguras, no carga archivos ni verifica recursos remotos.',
@@ -552,7 +581,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
             'interaction' => [
                 'required' => ['behavior'],
                 'fields' => [
-                    'behavior' => ['scroll-threshold', 'nav-toggle', 'carousel-basic', 'lightbox', 'cuadrantes', 'pestanas', 'marquesina', 'aviso'],
+                    'behavior' => ['scroll-threshold', 'nav-toggle', 'carousel-basic', 'lightbox', 'cuadrantes', 'pestanas', 'marquesina', 'aviso', 'mapa'],
                     'threshold' => '0..4000', 'targetId' => 'requerido por nav-toggle', 'toggleClass' => 'clase segura',
                     'mode' => ['single', 'track'], 'visible' => '1..8', 'visibleMobile' => '1..8',
                 ],
@@ -566,6 +595,8 @@ final class COD_Canvas_MCP_Recipe_Compiler
                     'marquesina no admite threshold, targetId, toggleClass, mode, visible ni visibleMobile (las piezas visibles se declaran con la variable --cod-marquesina-visibles, no con visible)',
                     'aviso sólo en un nodo group con al menos 1 hijo; es una ventana emergente que aparece sola al cargar la página, UNA vez por visitante (el navegador recuerda que ya la vio), y se cierra con la X, con Escape o pinchando el fondo. Pensado para lo que no puede esperar a que alguien lo busque: un aviso de seguridad, de cierre, de cambio. El runtime convierte al grupo en la capa que contiene todo y fabrica tres partes dentro: el velo (el fondo), el panel (la ventana, role="dialog" aria-modal="true", donde pasan los hijos originales) y cerrar (el botón de la X). Al abrir el foco entra al panel y mientras está abierto no se sale de él con el teclado; al cerrar el foco vuelve a donde estaba. Si el almacenamiento del navegador está bloqueado (navegación privada, cookies rechazadas) no se rompe: el aviso aparece, se cierra, y vuelve a aparecer en la visita siguiente. Si el JavaScript no corre, el contenido NO se oculta: queda en el flujo normal de la página, legible (por eso el grupo conviene ponerlo al final de la página, donde no estorba). Dentro del editor no se ejecuta: allí el grupo se ve apilado y editable. Los hijos del grupo son el contenido del aviso: para que sirva a quien quiere comprobar y no sólo leer, van ahí mismo los enlaces a las cuentas oficiales (por ejemplo con la primitiva social). Para reabrirlo después de cerrado, el grupo puede llevar un marcador (composition.nodeRecord.marker): cualquier enlace a #<marcador> lo vuelve a abrir, y entrar a la página con #<marcador> en la dirección también. Los parámetros NO son de la regla interaction: se escriben con una regla properties sobre el grupo, que admite scope.breakpoint: --cod-aviso-vuelve-dias (cada cuántos días vuelve a aparecer; por omisión 0 = una sola vez y no vuelve) y --cod-aviso-ancho-maximo (ancho máximo del panel; por omisión 32rem). Para estilar la ventana, el fondo o la X se usan las partes panel, velo y cerrar del nodo. Sin colores ni tipografía de marca escritos en el plugin: el panel usa los colores del sistema (Canvas y CanvasText) hasta que una regla de diseño sobre su parte panel (y velo) ponga los de la marca. Colócalo al final de la página, como nodo de primer nivel o dentro de una sección SIN movimiento: un ancestro con motion (opacity 0 o transform hasta revelarse) lo escondería o lo desplazaría, porque la capa es position:fixed.',
                     'aviso no admite threshold, targetId, toggleClass, mode, visible ni visibleMobile (cada cuánto vuelve y el ancho se declaran con las variables --cod-aviso-vuelve-dias y --cod-aviso-ancho-maximo, no con parámetros de la regla)',
+                    'mapa sólo en un nodo group, que lleva además content con los datos del mapa (ver nodeContentSchemas, group+mapa: lat, lng, zoom, mini, etiqueta, globo, globoEnlaceTexto, globoEnlaceHref, marcador). Es un mini mapa que al pincharlo despliega uno grande con un marcador y un globo. El mini es una IMAGEN del propio sitio (content.mini, un archivo que se genera una sola vez con scripts/generar-mini-mapa.mjs): se ve sin JavaScript, sin clave y sin pedirle nada a un tercero; sin JavaScript es un enlace a «cómo llegar» (OpenStreetMap). Los hijos del grupo —la dirección escrita— quedan SIEMPRE a la vista, al lado del mini. El mapa grande usa Mapbox GL, que se descarga de un tercero SÓLO cuando alguien lo abre (nunca al cargar la página), y necesita la clave pública de Mapbox, que NO va en la composición: se guarda una sola vez en Configuración → «Mapa (Mapbox)» y sirve para todas las páginas; si cambia, no hay que recomponer nada. Sin clave el mini sí se dibuja pero no se ofrece abrirlo (queda como enlace a «cómo llegar») y el aviso queda anotado en summary.omittedNodes. Si Mapbox no llega al pincharlo, se dice y se ofrece el enlace a «cómo llegar». El grupo pasa a ser el contenedor de todo: si es una fila flex, conviene flex-wrap:wrap para que el mapa grande se despliegue debajo (ocupa todo el ancho). El mapa grande no atrapa el foco (Escape y la X lo cierran; el foco vuelve al mini) y el desplazamiento hacia él respeta prefers-reduced-motion. Parámetros por regla properties sobre el grupo: --cod-mapa-alto (alto del mapa grande; por omisión 25rem) y --cod-mapa-ancho-maximo (por omisión 80rem). Partes: mini, grande y cerrar. Dentro del editor no se ejecuta.',
+                    'mapa no admite threshold, targetId, toggleClass, mode, visible ni visibleMobile (el alto y el ancho del mapa grande se declaran con las variables --cod-mapa-alto y --cod-mapa-ancho-maximo, no con parámetros de la regla)',
                 ],
             ],
             'properties' => [
@@ -595,7 +626,19 @@ final class COD_Canvas_MCP_Recipe_Compiler
     private function node_content_schemas(): array
     {
         return [
-            'section|header|footer|navigation|group|layout' => ['content' => 'No usar; declara children: node[].'],
+            'section|header|footer|navigation|layout' => ['content' => 'No usar; declara children: node[].'],
+            'group' => ['content' => 'No usar; declara children: node[]. ÚNICA excepción: un group con una regla interaction.mapa lleva content con los datos del mapa (ver group+mapa).'],
+            'group+mapa' => ['content' => [
+                'lat' => 'requerido, número -90..90 (latitud del lugar)',
+                'lng' => 'requerido, número -180..180 (longitud del lugar)',
+                'zoom' => 'opcional, número 0..22, por defecto 17: el acercamiento del mapa GRANDE (el mini es una imagen y no tiene zoom)',
+                'mini' => 'requerido, URL de activo: la imagen del mini mapa, un archivo del propio sitio. Se genera UNA vez con scripts/generar-mini-mapa.mjs y se sube como cualquier imagen; por eso el mini se ve sin clave, sin JavaScript y sin pedirle nada a un tercero',
+                'etiqueta' => 'opcional, texto plano ≤150, por defecto «Abrir el mapa de ubicación»: el texto alternativo del mini, que es también el nombre del botón',
+                'globo' => 'requerido, texto plano ≤300: lo que dice el globo del marcador (por ejemplo la dirección). Es TEXTO, no HTML: nada se interpreta',
+                'globoEnlaceTexto' => 'opcional, texto plano ≤150: el texto de un enlace dentro del globo. Va junto con globoEnlaceHref (los dos o ninguno)',
+                'globoEnlaceHref' => 'opcional, enlace seguro: se dibuja como un enlace de verdad (<a>), nunca como texto con corchetes',
+                'marcador' => 'opcional, URL de activo: la imagen del marcador (50px de ancho). Sin ella, el marcador por omisión de Mapbox',
+            ]],
             'heading' => ['content' => ['text' => 'texto plano <=500', 'level' => '1..6']],
             'paragraph' => ['content' => ['text' => 'texto plano <=5000']],
             'richText' => ['content' => ['paragraphs' => '1..24 textos planos']],
@@ -1700,7 +1743,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
         }
         if (!isset($value['behavior'])
             || !is_string($value['behavior'])
-            || !in_array($value['behavior'], ['scroll-threshold', 'nav-toggle', 'carousel-basic', 'lightbox', 'cuadrantes', 'pestanas', 'marquesina', 'aviso'], true)) {
+            || !in_array($value['behavior'], ['scroll-threshold', 'nav-toggle', 'carousel-basic', 'lightbox', 'cuadrantes', 'pestanas', 'marquesina', 'aviso', 'mapa'], true)) {
             return new WP_Error('cod_mcp_interaction_rule_invalid', 'interaction.behavior no es un comportamiento Canvas disponible.');
         }
         $normalized = ['behavior' => $value['behavior']];
@@ -1739,10 +1782,10 @@ final class COD_Canvas_MCP_Recipe_Compiler
         if ($normalized['behavior'] === 'nav-toggle' && !isset($normalized['targetId'])) {
             return new WP_Error('cod_mcp_interaction_rule_invalid', 'nav-toggle requiere targetId.');
         }
-        // cuadrantes, pestanas, marquesina y aviso no tienen parámetros: la geometría
+        // cuadrantes, pestanas, marquesina, aviso y mapa no tienen parámetros: la geometría
         // sale del CSS del plugin y el estado del propio runtime. Aceptar uno y
         // no usarlo engañaría. Se nombra el que venía.
-        if (in_array($normalized['behavior'], ['cuadrantes', 'pestanas', 'marquesina', 'aviso'], true) && count($normalized) > 1) {
+        if (in_array($normalized['behavior'], ['cuadrantes', 'pestanas', 'marquesina', 'aviso', 'mapa'], true) && count($normalized) > 1) {
             $recibidos = array_values(array_diff(array_keys($normalized), ['behavior']));
             return new WP_Error('cod_mcp_interaction_rule_invalid', $normalized['behavior'] . ' no admite threshold, targetId, toggleClass, mode, visible ni visibleMobile (se recibió: ' . implode(', ', $recibidos) . ').');
         }
@@ -1956,7 +1999,12 @@ final class COD_Canvas_MCP_Recipe_Compiler
         // 'content' => [] para todo nodo estructural, así que rechazarlo por
         // estar presente impedía reenviar una composición leída del propio
         // sitio. Se rechaza sólo si trae algo adentro.
-        if ($allows_children && !empty($node['content'])) {
+        // EXCEPCIÓN: un group con interaction.mapa lleva sus datos (lat, lng, mini…) en
+        // content. Es el único estructural que lo hace: la ubicación no es una regla
+        // (una regla se aplica a muchos nodos; la ubicación es de ESTE) y los hijos
+        // son la dirección escrita, no los datos.
+        $es_mapa = $node['kind'] === 'group' && $this->node_has_behavior($normalized_rule_ids, $rule_index, 'mapa');
+        if ($allows_children && !$es_mapa && !empty($node['content'])) {
             return new WP_Error('cod_mcp_composition_content_invalid', 'Un nodo estructural usa children, no content.');
         }
 
@@ -1981,6 +2029,11 @@ final class COD_Canvas_MCP_Recipe_Compiler
             if (is_wp_error($content)) {
                 return $content;
             }
+        } elseif ($es_mapa) {
+            $content = $this->normalize_mapa_content($content);
+            if (is_wp_error($content)) {
+                return $content;
+            }
         }
 
         $normalized_node = [
@@ -1991,7 +2044,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
             'ruleIds' => $normalized_rule_ids,
             'cadenceRuleId' => $cadence_rule_id,
             'children' => $normalized_children,
-            'content' => $allows_children ? [] : $content,
+            'content' => ($allows_children && !$es_mapa) ? [] : $content,
         ];
         // partes sólo viaja cuando el nodo la usa: así una composición sin
         // partes conserva exactamente la misma forma (y el mismo digest) de siempre.
@@ -2069,6 +2122,98 @@ final class COD_Canvas_MCP_Recipe_Compiler
             $normalized[$parte] = $lista;
         }
         return $normalized;
+    }
+
+    /**
+     * ¿Lleva el nodo una regla interaction con ese behavior?
+     *
+     * @param array<int, string> $rule_ids
+     * @param array<string, array<string, mixed>> $rule_index
+     */
+    private function node_has_behavior(array $rule_ids, array $rule_index, string $behavior): bool
+    {
+        foreach ($rule_ids as $rule_id) {
+            $rule = $rule_index[$rule_id] ?? null;
+            if ($rule !== null && $rule['kind'] === 'interaction' && ($rule['value']['behavior'] ?? '') === $behavior) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Los datos de un mapa (content de un group con interaction.mapa). Cada error
+     * NOMBRA el campo: «lat debe ser un número entre -90 y 90» sirve; «contenido
+     * inválido» no.
+     *
+     * @param mixed $content
+     * @return array<string, mixed>|WP_Error
+     */
+    private function normalize_mapa_content($content)
+    {
+        $invalido = static function (string $mensaje): WP_Error {
+            return new WP_Error('cod_mcp_mapa_content_invalid', $mensaje);
+        };
+        if (!is_array($content) || $content === []) {
+            return $invalido('mapa requiere content con lat, lng, mini y globo (y opcionalmente zoom, etiqueta, globoEnlaceTexto, globoEnlaceHref, marcador).');
+        }
+        $permitidos = ['lat', 'lng', 'zoom', 'mini', 'etiqueta', 'globo', 'globoEnlaceTexto', 'globoEnlaceHref', 'marcador'];
+        foreach (array_keys($content) as $clave) {
+            if (!in_array($clave, $permitidos, true)) {
+                return $invalido('mapa no admite el campo «' . COD_Redes_Sociales::mostrable((string) $clave) . '». Admite: ' . implode(', ', $permitidos) . '.');
+            }
+        }
+        $numero = static function ($valor, float $minimo, float $maximo): bool {
+            return (is_int($valor) || is_float($valor)) && is_finite((float) $valor) && $valor >= $minimo && $valor <= $maximo;
+        };
+        if (!isset($content['lat']) || !$numero($content['lat'], -90, 90)) {
+            return $invalido('lat debe ser un número entre -90 y 90 (la latitud del lugar).');
+        }
+        if (!isset($content['lng']) || !$numero($content['lng'], -180, 180)) {
+            return $invalido('lng debe ser un número entre -180 y 180 (la longitud del lugar).');
+        }
+        if (isset($content['zoom']) && !$numero($content['zoom'], 0, 22)) {
+            return $invalido('zoom debe ser un número entre 0 y 22 (el acercamiento del mapa grande).');
+        }
+        if (!isset($content['mini']) || !is_string($content['mini']) || !$this->is_safe_asset_url($content['mini'])) {
+            return $invalido('mini debe ser la URL de una imagen del sitio (la del mini mapa, generada con scripts/generar-mini-mapa.mjs).');
+        }
+        if (isset($content['marcador']) && (!is_string($content['marcador']) || !$this->is_safe_asset_url($content['marcador']))) {
+            return $invalido('marcador debe ser la URL de una imagen del sitio.');
+        }
+        if (isset($content['etiqueta']) && !$this->is_plain_text($content['etiqueta'], 150)) {
+            return $invalido('etiqueta debe ser texto plano de hasta 150 caracteres.');
+        }
+        if (!isset($content['globo']) || !$this->is_plain_text($content['globo'], 300) || trim($content['globo']) === '') {
+            return $invalido('globo debe ser texto plano de hasta 300 caracteres (lo que dice el globo del marcador; no se interpreta como HTML).');
+        }
+        $tiene_texto = isset($content['globoEnlaceTexto']);
+        $tiene_href = isset($content['globoEnlaceHref']);
+        if ($tiene_texto !== $tiene_href) {
+            return $invalido('globoEnlaceTexto y globoEnlaceHref van juntos: un enlace sin texto no se ve y un texto sin dirección no lleva a ninguna parte.');
+        }
+        if ($tiene_texto && !$this->is_plain_text($content['globoEnlaceTexto'], 150)) {
+            return $invalido('globoEnlaceTexto debe ser texto plano de hasta 150 caracteres.');
+        }
+        if ($tiene_href && (!is_string($content['globoEnlaceHref']) || !$this->is_safe_link($content['globoEnlaceHref']))) {
+            return $invalido('globoEnlaceHref debe ser un enlace seguro (https:// o una ruta del sitio).');
+        }
+        $normalizado = [
+            'lat' => (float) $content['lat'],
+            'lng' => (float) $content['lng'],
+            'zoom' => isset($content['zoom']) ? (float) $content['zoom'] : 17.0,
+            'mini' => $content['mini'],
+            'etiqueta' => isset($content['etiqueta']) && $content['etiqueta'] !== '' ? $content['etiqueta'] : 'Abrir el mapa de ubicación',
+            'globo' => $content['globo'],
+        ];
+        if ($tiene_texto) {
+            $normalizado['globoEnlaceTexto'] = $content['globoEnlaceTexto'];
+            $normalizado['globoEnlaceHref'] = $content['globoEnlaceHref'];
+        }
+        if (isset($content['marcador'])) {
+            $normalizado['marcador'] = $content['marcador'];
+        }
+        return $normalizado;
     }
 
     /**
@@ -2891,6 +3036,9 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 if (is_wp_error($children)) {
                     return $children;
                 }
+                if (($behavior['attributes']['data-cod-behavior'] ?? '') === 'mapa') {
+                    $children = $this->render_mapa_mini($node['content']) . $children;
+                }
                 return '<div ' . $attrs . '>' . $children . '</div>';
             case 'layout':
                 $children = $this->render_nodes($node['children'], $rule_index, $node_ids, $depth + 1, $child_cadence, true);
@@ -3113,6 +3261,39 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 if ($hijos < 1) {
                     return new WP_Error('cod_mcp_aviso_children_invalid', 'aviso exige un group con al menos 1 hijo (el contenido de la ventana); este tiene ' . $hijos . '.');
                 }
+            } elseif ($interaction['behavior'] === 'mapa') {
+                // Un mini mapa que despliega uno grande. Los datos viajan en
+                // atributos data-cod-mapa-*; la CLAVE de Mapbox NO: se pone al
+                // MOSTRAR la página (COD_Mapa::resolver_en_html), para que cambiarla
+                // en Configuración llegue a todas las páginas sin recomponerlas. El
+                // mini (el <a><img> del sitio) lo dibuja render_node; el mapa grande
+                // y la X los arma el runtime al pincharlo.
+                if ($node['kind'] !== 'group') {
+                    return new WP_Error('cod_mcp_mapa_target_invalid', 'mapa sólo puede aplicarse a un nodo group.');
+                }
+                $datos = is_array($node['content'] ?? null) ? $node['content'] : [];
+                if (!isset($datos['lat'], $datos['lng'], $datos['mini'], $datos['globo'])) {
+                    return new WP_Error('cod_mcp_mapa_content_invalid', 'mapa requiere en el content del group: lat, lng, mini y globo.');
+                }
+                $attributes['data-cod-mapa-lat'] = COD_Mapa::numero((float) $datos['lat']);
+                $attributes['data-cod-mapa-lng'] = COD_Mapa::numero((float) $datos['lng']);
+                $attributes['data-cod-mapa-zoom'] = COD_Mapa::numero((float) $datos['zoom']);
+                $attributes['data-cod-mapa-globo'] = (string) $datos['globo'];
+                if (isset($datos['globoEnlaceHref'])) {
+                    $attributes['data-cod-mapa-globo-enlace-texto'] = (string) $datos['globoEnlaceTexto'];
+                    $attributes['data-cod-mapa-globo-enlace-href'] = (string) $datos['globoEnlaceHref'];
+                }
+                if (isset($datos['marcador'])) {
+                    $attributes['data-cod-mapa-marcador'] = (string) $datos['marcador'];
+                }
+                if (COD_Mapa::clave() === null) {
+                    $this->omitted_nodes[] = [
+                        'nodeId' => (string) $node['id'],
+                        'kind' => 'group',
+                        'behavior' => 'mapa',
+                        'reason' => 'La clave de Mapbox no está configurada (Configuración → Mapa (Mapbox)): el mini mapa se dibuja, pero no se ofrece abrir el mapa grande (queda como enlace a «cómo llegar»). Guárdala ahí; no hace falta recomponer.',
+                    ];
+                }
             }
         }
 
@@ -3316,6 +3497,22 @@ final class COD_Canvas_MCP_Recipe_Compiler
             return '<a ' . $attrs . ' data-cod-dynamic="permalink" href="#">' . esc_html($fallback) . '</a>';
         }
         return '<span ' . $attrs . ' data-cod-dynamic="' . esc_attr($token) . '">' . esc_html($fallback) . '</span>';
+    }
+
+    /**
+     * El mini mapa: un enlace con la imagen del sitio. Sin JavaScript es un enlace a
+     * «cómo llegar» (OpenStreetMap, que no pide clave); con él, el runtime cambia el
+     * enlace por un botón que abre el mapa grande (ver montarMapa). La imagen es un
+     * archivo del propio sitio —no se le pide nada a Mapbox para verla— y lleva
+     * ancho y alto para que la página no salte al cargarla.
+     *
+     * @param array<string, mixed> $content
+     */
+    private function render_mapa_mini(array $content): string
+    {
+        return '<a class="cod-mapa__mini" data-cod-mapa-rol="mini" href="' . esc_url(COD_Mapa::url_como_llegar((float) $content['lat'], (float) $content['lng'], (float) $content['zoom']))
+            . '" target="_blank" rel="noopener noreferrer"><img src="' . esc_url($content['mini']) . '" alt="' . esc_attr($content['etiqueta'])
+            . '" width="60" height="60" decoding="async"></a>';
     }
 
     /** @param array<string, mixed> $content */

@@ -71,8 +71,13 @@ export async function abrirChrome(opciones = {}) {
 
   let id = 0;
   const pendientes = new Map();
+  // Quien quiera oír los EVENTOS del protocolo (los mensajes sin id, como
+  // Fetch.requestPaused) se suscribe con alEvento(fn); devuelve cómo darse de baja.
+  const oyentes = new Set();
+  const alEvento = (fn) => { oyentes.add(fn); return () => oyentes.delete(fn); };
   ws.onmessage = (ev) => {
     const m = JSON.parse(ev.data);
+    if (m.method) oyentes.forEach((fn) => fn(m.method, m.params));
     if (m.id && pendientes.has(m.id)) {
       const { res, rej } = pendientes.get(m.id);
       pendientes.delete(m.id);
@@ -102,7 +107,7 @@ export async function abrirChrome(opciones = {}) {
   });
 
   const cerrar = async () => { ws.close(); chrome.kill(); };
-  return { cdp, evaluar, dormir, cerrar, ancho, alto, escala };
+  return { cdp, evaluar, dormir, cerrar, alEvento, ancho, alto, escala };
 }
 
 /**

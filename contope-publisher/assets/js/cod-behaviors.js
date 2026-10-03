@@ -229,6 +229,7 @@
   var BEHAVIOR_PESTANAS = 'pestanas';
   var BEHAVIOR_MARQUESINA = 'marquesina';
   var BEHAVIOR_AVISO = 'aviso';
+  var BEHAVIOR_MAPA = 'mapa';
   var ATTR_CHART_TYPE = 'data-cod-chart-type';
   var ATTR_CHART_DATA = 'data-cod-chart-data';
   var ATTR_CHART_COLOR = 'data-cod-chart-color';
@@ -339,6 +340,11 @@
   BEHAVIORS[BEHAVIOR_AVISO] = {
     name: BEHAVIOR_AVISO,
     description: 'Ventana emergente que aparece sola al cargar la página, una vez por visitante (se recuerda en el navegador), y se cierra con la X, con Escape o pinchando el fondo; sobre un grupo cuyos hijos son su contenido (por ejemplo un aviso de seguridad con los enlaces a las cuentas oficiales para poder verificar). Accesible: role="dialog" aria-modal="true", el foco entra al panel, el teclado no se sale mientras está abierta y el foco vuelve a donde estaba al cerrar. Si el almacenamiento está bloqueado no se rompe; si el JavaScript no corre el contenido queda legible en el flujo normal. Cada cuánto vuelve y el ancho salen de variables (--cod-aviso-vuelve-dias, --cod-aviso-ancho-maximo). No se ejecuta dentro del editor: allí el grupo se ve apilado y editable.',
+  };
+
+  BEHAVIORS[BEHAVIOR_MAPA] = {
+    name: BEHAVIOR_MAPA,
+    description: 'Mini mapa que, al pincharlo, despliega uno grande con un marcador y un globo, sobre un grupo cuyos hijos (la dirección escrita) quedan siempre a la vista. El mini es una imagen del propio sitio puesta por el compilador (sin JavaScript es un enlace a «cómo llegar»); el mapa grande es Mapbox GL, que se descarga SÓLO al abrirlo, con la clave pública guardada en Configuración (no en la página). Accesible: el mini es un botón (Enter y Espacio), la X y Escape cierran, el mapa no atrapa el foco y el desplazamiento respeta prefers-reduced-motion. Si Mapbox no llega se dice y se ofrece el enlace a «cómo llegar». No se ejecuta dentro del editor: allí el grupo se ve apilado y editable.',
   };
 
   function isAllowedBehavior(name) {
@@ -581,6 +587,7 @@
     if (behaviorName === BEHAVIOR_PESTANAS) return { behavior: BEHAVIOR_PESTANAS };
     if (behaviorName === BEHAVIOR_MARQUESINA) return { behavior: BEHAVIOR_MARQUESINA };
     if (behaviorName === BEHAVIOR_AVISO) return { behavior: BEHAVIOR_AVISO };
+    if (behaviorName === BEHAVIOR_MAPA) return { behavior: BEHAVIOR_MAPA };
     return {
       behavior: BEHAVIOR_REVEAL_ON_SCROLL,
       revealClass: parseClass(after[ATTR_REVEAL_CLASS], opts.revealClass),
@@ -2140,6 +2147,435 @@
     }
   }
 
+  // mapa: un mini mapa que, al pincharlo, despliega uno grande con un marcador. El
+  // caso que lo pide: el pie del sitio de Econut, que lo resolvía con JavaScript
+  // pegado a mano en el tema (con un recuadro «×» y Mapbox cargado en CADA visita
+  // para pintar un cuadrado de 60x60). Acá el guion vive en el plugin, con
+  // pruebas, y la página sólo declara los datos.
+  //
+  // QUÉ ES CADA COSA, y por qué está repartido así:
+  //   - El MINI es una imagen del propio sitio (un archivo generado una vez con
+  //     scripts/generar-mini-mapa.mjs). La pone el COMPILADOR, no este guion: un
+  //     <a><img> que sin JavaScript lleva a «cómo llegar» (OpenStreetMap). Por eso
+  //     se ve sin clave, sin red hacia afuera y sin guion, y no consume cuota ni
+  //     entra al consentimiento de cookies: no hay petición a un tercero mientras
+  //     nadie abra el mapa. Este guion sólo cambia ese enlace por un botón.
+  //   - El MAPA GRANDE sí es Mapbox GL, que se descarga de un tercero (unos 700 KB
+  //     más su hoja) SÓLO la primera vez que alguien lo abre; las siguientes ya
+  //     está. Nunca al cargar la página. Mientras llega se dice «Cargando el
+  //     mapa…»; si no llega (sin red, bloqueado, clave rechazada, sin WebGL) se
+  //     dice, y se ofrece el enlace a «cómo llegar» como salida: nunca un recuadro
+  //     gris para siempre.
+  //   - La CLAVE no está en la página guardada: el servidor la pone al mostrarla
+  //     (data-cod-mapa-token) desde Configuración → Mapa (Mapbox). Sin ese
+  //     atributo (no hay clave) este guion no monta nada y el mini queda como
+  //     enlace: no se ofrece abrir lo que no se puede abrir.
+  //
+  // ATRIBUTOS QUE LEE (los pone el compilador y el servidor):
+  //   raíz: data-cod-mapa-lat, -lng, -zoom, -globo, -globo-enlace-texto,
+  //         -globo-enlace-href, -marcador, -token
+  //   mini: [data-cod-mapa-rol="mini"] (el <a> con la <img>; sin él no se monta)
+  // ATRIBUTOS QUE EMITE:
+  //   raíz:   data-cod-mapa-listo="1", data-cod-mapa-estado="abierto|cerrado"
+  //   mini:   botón con data-cod-mapa-rol="mini", aria-expanded, aria-controls
+  //   grande: data-cod-mapa-rol="grande" (role="region"), aria-busy mientras carga
+  //   cerrar: data-cod-mapa-rol="cerrar" (botón, aria-label="Cerrar el mapa")
+  //
+  // ACCESIBLE. El mini es un botón de verdad (Enter y Espacio, alcanzable con Tab,
+  // aria-expanded). El mapa grande NO atrapa el foco: al abrir el foco pasa a la X
+  // (el mini desaparece y el foco no puede quedarse en el aire), y Escape o la X lo
+  // cierran y devuelven el foco al mini. El desplazamiento hacia el mapa respeta
+  // prefers-reduced-motion: con movimiento reducido salta sin animar.
+  //
+  // MAPBOX GL se carga con las versiones fijas de abajo. No lleva integridad
+  // (SRI): el sitio de Mapbox no la publica para cada versión y un hash equivocado
+  // dejaría el mapa roto; se anota como pendiente en el CHANGELOG.
+  //
+  // No se monta dentro del editor: allí el grupo debe verse apilado y editable.
+  var contadorMapas = 0;
+  var MAPBOX_GL_VERSION = '2.14.1';
+  var MAPBOX_GL_JS = 'https://api.mapbox.com/mapbox-gl-js/v' + MAPBOX_GL_VERSION + '/mapbox-gl.js';
+  var MAPBOX_GL_CSS = 'https://api.mapbox.com/mapbox-gl-js/v' + MAPBOX_GL_VERSION + '/mapbox-gl.css';
+  var MAPBOX_GL_ESPERA_MS = 20000;
+  // Estado de la descarga de Mapbox GL, compartido por todos los mapas de la
+  // página: se descarga una vez y a quien llegue después se le avisa al terminar.
+  var cargaMapbox = null;
+
+  // La misma dirección que arma el servidor para el enlace del mini (COD_Mapa::url_como_llegar).
+  function urlComoLlegarMapa(lat, lng, zoom) {
+    var la = String(Number(lat.toFixed(6)));
+    var lo = String(Number(lng.toFixed(6)));
+    return 'https://www.openstreetmap.org/?mlat=' + la + '&mlon=' + lo + '#map=' + Math.round(zoom) + '/' + la + '/' + lo;
+  }
+
+  // Pide Mapbox GL (la hoja y el guion) y llama a alListo(gl) o a alFallar(). Si ya
+  // está en la página (porque otro mapa lo trajo, o porque la página lo tiene),
+  // responde sin descargar nada. Si falla, se olvida la descarga para que un
+  // segundo intento (pinchar otra vez) vuelva a pedirlo.
+  function cargarMapbox(win, doc, alListo, alFallar) {
+    if (win.mapboxgl) { alListo(win.mapboxgl); return; }
+    if (cargaMapbox && cargaMapbox.win === win) {
+      cargaMapbox.esperando.push({ listo: alListo, falla: alFallar });
+      return;
+    }
+    var carga = { win: win, esperando: [{ listo: alListo, falla: alFallar }] };
+    cargaMapbox = carga;
+    var pendientes = 2;
+    var terminada = false;
+    var fallo = false;
+    var hoja = doc.createElement('link');
+    var guion = doc.createElement('script');
+
+    function terminar(ok) {
+      if (terminada) return;
+      terminada = true;
+      try { win.clearTimeout(temporizador); } catch (e) { /* sin temporizador */ }
+      if (cargaMapbox === carga) cargaMapbox = null;
+      if (!ok) {
+        fallo = true;
+        [hoja, guion].forEach(function (nodo) { if (nodo.parentNode) nodo.parentNode.removeChild(nodo); });
+        // Si el guion llegó pero la hoja no (o al revés), la librería quedó puesta a
+        // medias: se retira también, o un reintento la encontraría ya ahí y dibujaría
+        // un mapa sin su hoja. Es segura de borrar: si estaba antes, no se descargó.
+        try { delete win.mapboxgl; } catch (e) { win.mapboxgl = undefined; }
+      }
+      var gl = win.mapboxgl;
+      carga.esperando.forEach(function (espera) {
+        try { if (ok && gl) espera.listo(gl); else espera.falla(); } catch (e) { /* un oyente roto no debe tumbar a los demás */ }
+      });
+    }
+    function uno() {
+      pendientes -= 1;
+      if (pendientes === 0) terminar(!!win.mapboxgl);
+    }
+    var temporizador = win.setTimeout(function () { terminar(false); }, MAPBOX_GL_ESPERA_MS);
+
+    hoja.rel = 'stylesheet';
+    hoja.href = MAPBOX_GL_CSS;
+    hoja.setAttribute('data-cod-mapa-gl', 'hoja');
+    hoja.onload = uno;
+    hoja.onerror = function () { terminar(false); };
+    guion.async = true;
+    guion.src = MAPBOX_GL_JS;
+    guion.setAttribute('data-cod-mapa-gl', 'guion');
+    // Un guion que llega DESPUÉS de haberse dado la descarga por fallida (la hoja falló primero,
+    // o se agotó la espera) no debe dejar la librería puesta: se retira apenas aparece.
+    guion.onload = function () {
+      if (fallo) { try { delete win.mapboxgl; } catch (e) { win.mapboxgl = undefined; } return; }
+      uno();
+    };
+    guion.onerror = function () { terminar(false); };
+    (doc.head || doc.documentElement).appendChild(hoja);
+    (doc.head || doc.documentElement).appendChild(guion);
+  }
+
+  function montarMapa(root, doc) {
+    if (root.getAttribute('data-cod-mapa-listo') === '1') return null;
+
+    // Sin clave, sin datos o sin el mini del compilador no hay nada que montar: el
+    // mini sigue siendo un enlace a «cómo llegar» y la dirección escrita sigue a la vista.
+    var token = root.getAttribute('data-cod-mapa-token');
+    var lat = parseFloat(root.getAttribute('data-cod-mapa-lat'));
+    var lng = parseFloat(root.getAttribute('data-cod-mapa-lng'));
+    var zoomCrudo = parseFloat(root.getAttribute('data-cod-mapa-zoom'));
+    var zoom = isFinite(zoomCrudo) && zoomCrudo >= 0 && zoomCrudo <= 22 ? zoomCrudo : 17;
+    if (!token || !isFinite(lat) || !isFinite(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) return null;
+    var enlaceMini = null;
+    for (var c = 0; c < root.children.length && !enlaceMini; c++) {
+      if (root.children[c].getAttribute('data-cod-mapa-rol') === 'mini') enlaceMini = root.children[c];
+    }
+    if (!enlaceMini) return null;
+
+    contadorMapas += 1;
+    var numero = contadorMapas;
+    var win = doc.defaultView || window;
+    var deshacer = [];
+    var abierto = false;
+    var generacion = 0; // cada apertura es una; una respuesta tardía de una anterior no hace nada
+    var mapa = null;
+    var temporizadorMapa = null;
+    var comoLlegar = urlComoLlegarMapa(lat, lng, zoom);
+
+    // 1) El mini: el enlace del compilador se cambia por un botón con la MISMA imagen.
+    var imagen = enlaceMini.querySelector('img');
+    var nombre = (imagen && imagen.getAttribute('alt')) || 'Abrir el mapa de ubicación';
+    var idGrande = 'cod-mapa-' + numero + '-grande';
+    var boton = doc.createElement('button');
+    boton.type = 'button';
+    boton.className = 'cod-mapa__mini';
+    boton.setAttribute('data-cod-mapa-rol', 'mini');
+    boton.setAttribute('aria-expanded', 'false');
+    boton.setAttribute('aria-controls', idGrande);
+    boton.setAttribute('aria-label', nombre);
+    if (imagen) boton.appendChild(imagen);
+    root.insertBefore(boton, enlaceMini);
+    root.removeChild(enlaceMini);
+    deshacer.push(function () {
+      if (imagen) enlaceMini.appendChild(imagen);
+      root.insertBefore(enlaceMini, boton);
+      if (boton.parentNode) boton.parentNode.removeChild(boton);
+    });
+
+    // 2) El recuadro del mapa grande, cerrado, al final del grupo.
+    var grande = doc.createElement('div');
+    grande.id = idGrande;
+    grande.className = 'cod-mapa__grande';
+    grande.setAttribute('data-cod-mapa-rol', 'grande');
+    grande.setAttribute('role', 'region');
+    grande.setAttribute('aria-label', 'Mapa de ubicación');
+    grande.hidden = true;
+
+    var lienzo = doc.createElement('div');
+    lienzo.className = 'cod-mapa__lienzo';
+
+    var aviso = doc.createElement('div');
+    aviso.className = 'cod-mapa__estado';
+    aviso.setAttribute('role', 'status');
+    aviso.hidden = true;
+
+    var cerrarBoton = doc.createElement('button');
+    cerrarBoton.type = 'button';
+    cerrarBoton.className = 'cod-mapa__cerrar';
+    cerrarBoton.setAttribute('data-cod-mapa-rol', 'cerrar');
+    cerrarBoton.setAttribute('aria-label', 'Cerrar el mapa');
+    // La X es un SVG con trazo currentColor: toma el color del botón y no trae ningún
+    // color propio. Se fabrica con createElementNS, no con innerHTML.
+    var ns = 'http://www.w3.org/2000/svg';
+    var equis = doc.createElementNS(ns, 'svg');
+    equis.setAttribute('viewBox', '0 0 24 24');
+    equis.setAttribute('aria-hidden', 'true');
+    equis.setAttribute('focusable', 'false');
+    var trazo = doc.createElementNS(ns, 'path');
+    trazo.setAttribute('d', 'M5 5L19 19M19 5L5 19');
+    trazo.setAttribute('fill', 'none');
+    trazo.setAttribute('stroke', 'currentColor');
+    trazo.setAttribute('stroke-width', '2');
+    trazo.setAttribute('stroke-linecap', 'round');
+    equis.appendChild(trazo);
+    cerrarBoton.appendChild(equis);
+
+    grande.appendChild(lienzo);
+    grande.appendChild(aviso);
+    grande.appendChild(cerrarBoton);
+    root.appendChild(grande);
+    deshacer.push(function () { if (grande.parentNode) grande.parentNode.removeChild(grande); });
+
+    function enfocar(elemento) {
+      try { elemento.focus({ preventScroll: true }); } catch (e) { elemento.focus(); }
+    }
+
+    // 3) Los mensajes del recuadro. Todo es texto (textContent); nada se interpreta como HTML.
+    function decir(texto, conSalida) {
+      while (aviso.firstChild) aviso.removeChild(aviso.firstChild);
+      var linea = doc.createElement('p');
+      linea.textContent = texto;
+      aviso.appendChild(linea);
+      if (conSalida) {
+        var salida = doc.createElement('a');
+        salida.href = comoLlegar;
+        salida.target = '_blank';
+        salida.rel = 'noopener noreferrer';
+        salida.textContent = 'Cómo llegar';
+        aviso.appendChild(salida);
+      }
+      aviso.hidden = false;
+    }
+
+    function fallar(motivo) {
+      grande.setAttribute('aria-busy', 'false');
+      decir(motivo || 'No se pudo cargar el mapa.', true);
+    }
+
+    // 4) El mapa de Mapbox, con el marcador y el globo.
+    function contenidoDelGlobo() {
+      var caja = doc.createElement('div');
+      var texto = doc.createElement('p');
+      texto.textContent = root.getAttribute('data-cod-mapa-globo') || '';
+      caja.appendChild(texto);
+      var textoEnlace = root.getAttribute('data-cod-mapa-globo-enlace-texto');
+      var hrefEnlace = root.getAttribute('data-cod-mapa-globo-enlace-href');
+      if (textoEnlace && hrefEnlace) {
+        var enlace = doc.createElement('a');
+        enlace.href = hrefEnlace;
+        // Un enlace de verdad, pero sólo a destinos que no ejecutan nada: nunca javascript: ni data:.
+        if (/^(https?:|mailto:|tel:)$/i.test(enlace.protocol)) {
+          enlace.textContent = textoEnlace;
+          if (enlace.host && enlace.host !== (win.location && win.location.host)) {
+            enlace.target = '_blank';
+            enlace.rel = 'noopener noreferrer';
+          }
+          var parrafo = doc.createElement('p');
+          parrafo.appendChild(enlace);
+          caja.appendChild(parrafo);
+        }
+      }
+      return caja;
+    }
+
+    function dibujar(gl, miGeneracion) {
+      if (!abierto || miGeneracion !== generacion) return;
+      var listo = false;
+      try {
+        if (typeof gl.supported === 'function' && !gl.supported()) {
+          fallar('Este navegador no puede dibujar el mapa.');
+          return;
+        }
+        gl.accessToken = token;
+        mapa = new gl.Map({
+          container: lienzo,
+          style: 'mapbox://styles/mapbox/streets-v11',
+          center: [lng, lat],
+          zoom: zoom,
+        });
+        // La atribución de Mapbox y de OpenStreetMap queda en su sitio: acá es donde se
+        // usa el mapa de verdad y hay espacio. Los términos de Mapbox la exigen.
+        mapa.addControl(new gl.NavigationControl(), 'top-left');
+
+        var imagenMarcador = root.getAttribute('data-cod-mapa-marcador');
+        var marcador;
+        if (imagenMarcador) {
+          var pin = doc.createElement('img');
+          pin.src = imagenMarcador;
+          pin.alt = '';
+          pin.style.setProperty('width', '50px');
+          pin.style.setProperty('height', 'auto');
+          marcador = new gl.Marker({ element: pin, anchor: 'bottom' });
+        } else {
+          marcador = new gl.Marker();
+        }
+        marcador.setLngLat([lng, lat]);
+        // El globo es texto: setDOMContent con nodos fabricados arriba, nunca setHTML.
+        var globo = new gl.Popup({ offset: 25 });
+        globo.setDOMContent(contenidoDelGlobo());
+        marcador.setPopup(globo);
+        marcador.addTo(mapa);
+        marcador.togglePopup();
+
+        mapa.on('load', function () {
+          if (miGeneracion !== generacion) return;
+          listo = true;
+          win.clearTimeout(temporizadorMapa);
+          aviso.hidden = true;
+          grande.setAttribute('aria-busy', 'false');
+        });
+        // Una clave rechazada o un estilo que no llega aparecen como error ANTES de
+        // cargar: se dice en vez de dejar el recuadro en blanco.
+        mapa.on('error', function (evento) {
+          if (miGeneracion !== generacion || listo) return;
+          var estado = evento && evento.error && evento.error.status;
+          win.clearTimeout(temporizadorMapa);
+          fallar(estado === 401 || estado === 403
+            ? 'Mapbox rechazó la clave del sitio.'
+            : 'No se pudo cargar el mapa.');
+        });
+        temporizadorMapa = win.setTimeout(function () {
+          if (miGeneracion === generacion && !listo) fallar('El mapa tarda demasiado en cargar.');
+        }, MAPBOX_GL_ESPERA_MS);
+      } catch (e) {
+        fallar('No se pudo cargar el mapa.');
+      }
+    }
+
+    function destruirMapa() {
+      win.clearTimeout(temporizadorMapa);
+      if (mapa) {
+        try { mapa.remove(); } catch (e) { /* ya no estaba */ }
+        mapa = null;
+      }
+      while (lienzo.firstChild) lienzo.removeChild(lienzo.firstChild);
+    }
+
+    // 5) Abrir y cerrar.
+    function irAlMapa() {
+      var reducido = false;
+      try { reducido = !!(win.matchMedia && win.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch (e) { /* se anima */ }
+      try {
+        grande.scrollIntoView({ behavior: reducido ? 'auto' : 'smooth', block: 'nearest' });
+      } catch (e) {
+        grande.scrollIntoView(false);
+      }
+    }
+
+    function abrir() {
+      if (abierto) return;
+      abierto = true;
+      generacion += 1;
+      var miGeneracion = generacion;
+      root.setAttribute('data-cod-mapa-estado', 'abierto');
+      boton.setAttribute('aria-expanded', 'true');
+      grande.hidden = false;
+      grande.setAttribute('aria-busy', 'true');
+      decir('Cargando el mapa…', false);
+      enfocar(cerrarBoton);
+      irAlMapa();
+      cargarMapbox(win, doc, function (gl) { dibujar(gl, miGeneracion); }, function () {
+        if (abierto && miGeneracion === generacion) fallar('No se pudo cargar el mapa.');
+      });
+    }
+
+    function cerrar() {
+      if (!abierto) return;
+      abierto = false;
+      generacion += 1;
+      destruirMapa();
+      root.setAttribute('data-cod-mapa-estado', 'cerrado');
+      boton.setAttribute('aria-expanded', 'false');
+      grande.hidden = true;
+      aviso.hidden = true;
+      // El mini volvió a mostrarse: el foco vuelve a él, que es de donde se abrió.
+      enfocar(boton);
+    }
+
+    function alPinchar() { if (abierto) cerrar(); else abrir(); }
+    // Escape cierra desde dentro del mapa. No hay trampa de foco: el mapa grande es un
+    // contenido más de la página, no una ventana.
+    function alTeclado(evento) {
+      if (!abierto) return;
+      if (evento.key === 'Escape' || evento.key === 'Esc') {
+        evento.preventDefault();
+        cerrar();
+      }
+    }
+    boton.addEventListener('click', alPinchar);
+    cerrarBoton.addEventListener('click', cerrar);
+    grande.addEventListener('keydown', alTeclado);
+    deshacer.push(function () {
+      boton.removeEventListener('click', alPinchar);
+      cerrarBoton.removeEventListener('click', cerrar);
+      grande.removeEventListener('keydown', alTeclado);
+      generacion += 1;
+      abierto = false;
+      destruirMapa();
+    });
+
+    root.classList.add('cod-mapa');
+    root.setAttribute('data-cod-mapa-estado', 'cerrado');
+    root.setAttribute('data-cod-mapa-listo', '1');
+    deshacer.push(function () {
+      root.classList.remove('cod-mapa');
+      root.removeAttribute('data-cod-mapa-estado');
+      root.removeAttribute('data-cod-mapa-listo');
+    });
+
+    return function destruir() {
+      while (deshacer.length) deshacer.pop()();
+    };
+  }
+
+  // mapa: monta el mini y el mapa grande sobre cada nodo declarado. Se salta en la
+  // vista previa del editor (editorPreview): ahí el grupo debe seguir apilado y
+  // editable. Ver montarMapa.
+  function installMapaRuntime(win, doc, opts, cleanups) {
+    if (opts.editorPreview) return;
+    var roots = doc.querySelectorAll('[data-cod-behavior="mapa"]');
+    for (var i = 0; i < roots.length; i++) {
+      var declared = roots[i].getAttribute(ATTR_BEHAVIOR);
+      if (!isAllowedBehavior(declared) || declared !== BEHAVIOR_MAPA) continue;
+      var destruir = montarMapa(roots[i], doc);
+      if (destruir) cleanups.push(destruir);
+    }
+  }
+
   // parcel-map: los datos de cada lote son atributos en el propio elemento
   // (data-cod-parcel-estado / data-cod-parcel-valor), no JSON en el root.
   function installParcelMapRuntime(win, doc, opts, cleanups) {
@@ -2900,6 +3336,7 @@
     installPestanasRuntime(win, doc, opts, cleanups);
     installMarquesinaRuntime(win, doc, opts, cleanups);
     installAvisoRuntime(win, doc, opts, cleanups);
+    installMapaRuntime(win, doc, opts, cleanups);
     return function destroy() { while (cleanups.length) cleanups.pop()(); };
   }
 

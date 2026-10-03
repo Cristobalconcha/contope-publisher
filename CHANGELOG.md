@@ -5,6 +5,94 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.47 — 3 de octubre de 2026
+
+### Agregado
+
+- **«mapa»: un mini mapa que, al pincharlo, despliega uno grande con un
+  marcador.** Es el cuadradito con esquinas redondeadas que hay junto a la
+  dirección en el pie de muchos sitios. Hasta acá, para tenerlo había que pegar
+  JavaScript a mano en la configuración del tema; el plugin no deja hacer eso, y
+  con razón. Ahora es una conducta del plugin: se declara una regla
+  `interaction` con `behavior: "mapa"` sobre un grupo, y los datos del lugar
+  van en el propio grupo.
+
+  ```json
+  { "id": "mapa-pie", "kind": "group", "ruleIds": ["r-mapa"],
+    "content": { "lat": -33.804136, "lng": -70.681617, "zoom": 17,
+                 "mini": "/wp-content/uploads/mini-mapa.png",
+                 "globo": "Av 18 de Septiembre sn Hijuela 2, Paine",
+                 "globoEnlaceTexto": "www.econut.cl", "globoEnlaceHref": "https://www.econut.cl" },
+    "children": [ { "id": "direccion", "kind": "paragraph", "content": { "text": "Av 18 de Septiembre sn Hijuela 2…" } } ] }
+  ```
+
+  **Qué se ve y qué no se carga:**
+
+  - **El mini mapa es una imagen de tu propio sitio**, no un mapa. Se genera una
+    sola vez (ver más abajo), se sube como cualquier otra imagen y se declara en
+    `mini`. Por eso el mini se ve **aunque no haya clave, aunque no haya
+    JavaScript y aunque no haya internet hacia afuera**, no gasta nada de la
+    cuenta de Mapbox y **no le pide nada a ningún tercero**: mientras nadie abra
+    el mapa, la página no habla con nadie más. Eso también importa para el
+    consentimiento de cookies.
+  - **El mapa grande sí es de Mapbox**, y se descarga **sólo cuando alguien lo
+    abre**, nunca al cargar la página: son unos 700 KB que una visita que sólo
+    mira la dirección nunca paga. Se descarga una vez; las siguientes aperturas
+    no vuelven a pedir nada. Mientras llega dice «Cargando el mapa…».
+  - **La dirección escrita queda siempre a la vista**, al lado del mini: es lo
+    que de verdad importa y no depende de que nada cargue.
+  - Si Mapbox **no llega** (sin conexión, bloqueado, sin WebGL, clave rechazada o
+    demasiada espera), **se dice** —ya no queda un recuadro gris para siempre— y
+    se ofrece un enlace **«Cómo llegar»** a OpenStreetMap. Pinchar otra vez
+    vuelve a intentarlo.
+
+  **La clave de Mapbox se guarda una sola vez y sirve para todas las páginas.**
+  Va en *ContOpe Design → Configuración → Mapa (Mapbox)*, **no** dentro de la
+  página: si mañana cambia, se cambia ahí y llega a todos los mapas sin recomponer
+  ninguna página. Acepta sólo la clave pública (la que empieza con `pk.`); una
+  secreta (`sk.`) se rechaza, porque la clave queda a la vista en el código de la
+  página. La pantalla recuerda que conviene **restringirla al dominio del sitio**
+  desde el panel de Mapbox: sin eso cualquiera que la vea puede gastar la cuota.
+  Sin clave, el mini se ve igual pero no se ofrece abrir el mapa grande (queda como
+  enlace a «cómo llegar»), y el aviso aparece en `summary.omittedNodes` al compilar.
+
+  **Para que el mini no tenga que armarse a mano**, hay un guion que lo genera con
+  la API de imágenes estáticas de Mapbox y deja el archivo:
+
+  ```
+  MAPBOX_TOKEN=pk.… node scripts/generar-mini-mapa.mjs --lng -70.6816 --lat -33.8041 --zoom 2 --salida mini-mapa.png
+  ```
+
+  **Se corre una sola vez** por mapa: la vista del mini nunca cambia. Sale a 60×60
+  al doble de resolución. El mini va con zoom bajo a propósito (muestra el país):
+  ahí funciona como un icono, no como un mapa.
+
+  **Cómo se comporta el mapa grande:**
+
+  - El mini es un **botón de verdad**: se alcanza con Tab y se abre con Enter o
+    Espacio, no sólo con el ratón. La X también.
+  - **No atrapa el foco.** Al abrir, el foco pasa a la X; Escape o la X lo cierran
+    y el foco vuelve al mini. El mini desaparece mientras está abierto.
+  - El desplazamiento hacia el mapa **respeta `prefers-reduced-motion`**: con
+    movimiento reducido salta sin animar.
+  - El **texto del globo es texto**, nunca HTML. Su enlace, si lo hay, es un enlace
+    de verdad (en el sitio original se veía literalmente
+    `[www.econut.cl](https://www.econut.cl)`, con corchetes). La **atribución** de
+    Mapbox y de OpenStreetMap queda activada en el mapa grande, como piden sus
+    términos, y en el mini viene dentro de la propia imagen (no se recorta).
+  - Partes dirigibles con reglas de diseño: `mini`, `grande` y `cerrar`. El
+    alto y el ancho máximo del mapa grande salen de `--cod-mapa-alto` (25rem por
+    omisión) y `--cod-mapa-ancho-maximo` (80rem), con una regla `properties`.
+    Radio, sombra y colores son del diseño del sitio. Si el grupo es una fila, el
+    mapa grande se despliega debajo con `flex-wrap: wrap`.
+  - Dentro del editor no se ejecuta: el grupo se ve apilado y editable.
+
+  **Pendiente que conviene saber:** Mapbox GL se descarga con su versión fija
+  (2.14.1) pero sin comprobación de integridad (SRI); no se pudo calcular el hash
+  sin conectarse. Y las condiciones de Mapbox sobre guardar sus imágenes estáticas
+  son suyas y pueden cambiar: antes de dejar el mini en producción conviene leer
+  sus términos.
+
 ## 0.3.46 — 3 de octubre de 2026
 
 ### Agregado

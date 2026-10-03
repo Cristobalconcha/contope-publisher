@@ -169,11 +169,11 @@ $comprobar('scope.state="current" sobre el panel: cod_mcp_current_state_target_i
 echo "\n== catálogo de capacidades ==\n";
 $json = wp_json_encode($compilador->capability_catalog(), JSON_UNESCAPED_UNICODE);
 $comprobar('safeRuntimeBehaviors incluye aviso', preg_match('/safeRuntimeBehaviors.{0,300}"aviso"/s', $json) === 1);
-$comprobar('interaction.behavior incluye aviso', preg_match('/"behavior":\[[^\]]*"marquesina","aviso"\]/', $json) === 1);
+$comprobar('interaction.behavior incluye aviso', preg_match('/"behavior":\[[^\]]*"marquesina","aviso"[,\]]/', $json) === 1);
 $comprobar('constraints describe aviso', strpos($json, 'aviso sólo en un nodo group con al menos 1 hijo') !== false);
 $comprobar('constraints dice que no admite parámetros de la regla', strpos($json, 'aviso no admite threshold, targetId, toggleClass, mode, visible ni visibleMobile') !== false);
 $comprobar('behaviorContracts lista las partes velo, panel y cerrar', preg_match('/"aviso":\{"atributoRol":"data-cod-aviso-rol","partes":\{"velo":.*"panel":.*"cerrar":/s', $json) === 1);
-$comprobar('la descripción de «partes» menciona aviso', strpos($json, 'hoy pestanas, cuadrantes, marquesina y aviso') !== false);
+$comprobar('la descripción de «partes» menciona aviso', strpos($json, 'hoy pestanas, cuadrantes, marquesina, aviso') !== false);
 
 echo "\n== aviso_css() ==\n";
 $css = COD_Canvas_Page_Publisher::aviso_css();
@@ -222,7 +222,7 @@ echo '           tamaño de la hoja: ' . strlen($css) . " bytes\n";
 echo "\n== la hoja llega a la página ==\n";
 $fuente = file_get_contents(__DIR__ . '/../contope-publisher/includes/class-cod-canvas-page-publisher.php');
 $comprobar('aviso_css() se emite en las dos rutas (plantilla y shortcode)', substr_count($fuente, 'self::aviso_css($header_html . $body_html . $footer_html)') === 2);
-$comprobar('la versión del plugin es 0.3.46', COD_PUBLISHER_VERSION === '0.3.46');
+$comprobar('la versión del plugin es 0.3.46 o posterior', version_compare(COD_PUBLISHER_VERSION, '0.3.46', '>='));
 
 echo $fallas === 0 ? "\nTODO OK\n" : "\n" . $fallas . " FALLA(S)\n";
 exit($fallas === 0 ? 0 : 1);

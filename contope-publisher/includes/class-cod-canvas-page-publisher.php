@@ -658,6 +658,97 @@ CSS;
     }
 
     /**
+     * Geometría del behavior «mapa» (un mini mapa que, al pincharlo, despliega uno
+     * grande con un marcador). El runtime vive en cod-canvas-public.js y
+     * cod-behaviors.js (montarMapa): cambia el enlace del mini por un botón, fabrica
+     * el recuadro del mapa grande y su X, y carga Mapbox GL SÓLO al abrirlo. La
+     * disposición es de acá.
+     *
+     * Lo que NO está acá a propósito:
+     *   - El mini mapa no necesita esta hoja para verse: es un <a><img> del sitio
+     *     con ancho y alto en la propia imagen. Por eso toda regla de esta hoja
+     *     cuelga de la clase .cod-mapa (que sólo pone el runtime) y, si el guion no
+     *     corre, el grupo queda como un bloque más: el mini es un enlace a «cómo
+     *     llegar» y la dirección escrita sigue a la vista. La ÚNICA regla suelta es
+     *     que la imagen del mini hereda el radio de su contenedor, que no oculta ni
+     *     mueve nada.
+     *   - No hay colores de marca ni valores de respaldo de color: el recuadro del
+     *     mapa usa los colores del sistema (Canvas y CanvasText) hasta que una regla
+     *     de diseño sobre las partes grande y cerrar ponga los de la marca. Radio,
+     *     sombra y borde tampoco se inventan: son del diseño del sitio.
+     *   - No hay animación. El desplazamiento hacia el mapa lo hace el runtime y
+     *     respeta prefers-reduced-motion.
+     *
+     * Estructura que arma el runtime dentro del grupo (raíz):
+     *   [data-cod-mapa-estado="abierto"|"cerrado"]            la raíz
+     *     [data-cod-mapa-rol="mini"]                          el botón con la imagen (se oculta al abrir)
+     *     …los hijos originales del grupo (la dirección escrita: siempre a la vista)
+     *     [data-cod-mapa-rol="grande"]                        el recuadro del mapa (oculto mientras está cerrado)
+     *       .cod-mapa__lienzo                                 donde Mapbox dibuja
+     *       .cod-mapa__estado                                 «Cargando…» o el aviso de que no llegó (con el enlace a «cómo llegar»)
+     *       [data-cod-mapa-rol="cerrar"]                      el botón de la X
+     *
+     * Ajustes que un sitio puede escribir (opcionales, variables, por regla
+     * properties sobre el grupo, con scope.breakpoint como todo lo demás):
+     *   --cod-mapa-alto           (alto del mapa grande; por omisión 25rem = 400px),
+     *   --cod-mapa-ancho-maximo   (ancho máximo; por omisión 80rem = 1280px).
+     *
+     * Si el grupo es una fila flex, el mapa grande ocupa todo el ancho (flex-basis
+     * 100%); para que se despliegue DEBAJO de la fila hace falta flex-wrap:wrap en el
+     * grupo, que es una decisión de diseño del sitio.
+     *
+     * Regla del proyecto: nunca una abreviada con variable (background, border,
+     * font, margin, padding). Donde entra una variable, forma larga.
+     *
+     * @param string|null $html HTML de la página: si se entrega y no declara el
+     *                          behavior «mapa», no se emite nada. Null = siempre.
+     */
+    public static function mapa_css(?string $html = null): string
+    {
+        if ($html !== null && preg_match('/data-cod-behavior\s*=\s*["\']?mapa\b/', $html) !== 1) {
+            return '';
+        }
+
+        $r = '.cod-mapa[data-cod-behavior="mapa"]';
+        $abierto = $r . '[data-cod-mapa-estado="abierto"]';
+        $cerrado = $r . '[data-cod-mapa-estado="cerrado"]';
+        $mini = '.cod-mapa__mini';
+        $grande = '.cod-mapa__grande';
+        $lienzo = '.cod-mapa__lienzo';
+        $estado = '.cod-mapa__estado';
+        $cerrar = '.cod-mapa__cerrar';
+
+        $css = <<<CSS
+/* Estructura (esto no se pisa): abierto esconde el mini y muestra el grande; cerrado, al revés. */
+{$cerrado} > {$grande}{display:none !important;}
+{$abierto} > {$mini}{display:none !important;}
+{$r} > {$mini}{appearance:none;cursor:pointer;}
+{$r} > {$mini} img{display:block;width:100%;height:100%;object-fit:contain;}
+{$r} > {$grande}{position:relative;box-sizing:border-box;overflow:hidden;flex-grow:0;flex-shrink:0;flex-basis:100%;width:100%;}
+{$r} > {$grande} > {$lienzo}{width:100%;height:100%;}
+{$r} > {$grande} > {$estado}{position:absolute;top:0;right:0;bottom:0;left:0;z-index:1;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
+{$r} > {$grande} > {$estado}[hidden]{display:none !important;}
+{$r} > {$grande} > {$cerrar}{position:absolute;top:.5rem;right:.5rem;z-index:2;appearance:none;}
+/* Sin guion el mini es un enlace con una imagen: la imagen respeta el radio que le ponga el diseño al mini. */
+[data-cod-behavior="mapa"] > [data-cod-mapa-rol="mini"] > img{border-radius:inherit;}
+
+/* Valores por omisión, con especificidad cero: la composición los pisa con cualquier regla. */
+:where({$r} > {$mini}){display:block;flex-shrink:0;width:60px;height:60px;padding-top:0;padding-right:0;padding-bottom:0;padding-left:0;border-top-width:0;border-right-width:0;border-bottom-width:0;border-left-width:0;background-color:transparent;}
+:where({$r} > {$mini}:focus-visible){outline-width:2px;outline-style:solid;outline-color:currentColor;outline-offset:2px;}
+:where({$r} > {$grande}){height:var(--cod-mapa-alto,25rem);max-width:var(--cod-mapa-ancho-maximo,80rem);margin-top:1.25rem;margin-right:auto;margin-bottom:1.25rem;margin-left:auto;}
+:where({$r} > {$grande}){background-color:Canvas;color:CanvasText;}
+:where({$r} > {$grande} > {$estado}){gap:.75rem;padding-top:1rem;padding-right:1rem;padding-bottom:1rem;padding-left:1rem;background-color:inherit;color:inherit;}
+:where({$r} > {$grande} > {$cerrar}){display:flex;align-items:center;justify-content:center;width:2.75rem;height:2.75rem;padding-top:0;padding-right:0;padding-bottom:0;padding-left:0;border-top-width:0;border-right-width:0;border-bottom-width:0;border-left-width:0;background-color:Canvas;color:CanvasText;cursor:pointer;}
+:where({$r} > {$grande} > {$cerrar}:focus-visible){outline-width:2px;outline-style:solid;outline-color:currentColor;outline-offset:-4px;}
+.cod-mapa__cerrar svg{width:1.25rem;height:1.25rem;pointer-events:none;}
+CSS;
+
+        // Fuera comentarios y saltos de línea: se emite en línea en cada página.
+        $css = (string) preg_replace('~/\*.*?\*/~s', '', $css);
+        return (string) preg_replace('~\s*\n\s*~', '', $css);
+    }
+
+    /**
      * Junta el CSS de varios documentos (cabecera, cuerpo, pie) de modo que el
      * CSS base del canvas salga UNA sola vez y ANTES de todas las reglas.
      *
@@ -1242,6 +1333,7 @@ CSS;
                 . self::pestanas_css($header_html . $body_html . $footer_html)
                 . self::marquesina_css($header_html . $body_html . $footer_html)
                 . self::aviso_css($header_html . $body_html . $footer_html)
+                . self::mapa_css($header_html . $body_html . $footer_html)
                 . self::rotation_css() . self::carousel_rows_css()
                 . self::unir_css_de_documentos([$header_css, $body_css, $footer_css])
         );
@@ -1318,6 +1410,7 @@ CSS;
                 . self::pestanas_css($header_html . $body_html . $footer_html)
                 . self::marquesina_css($header_html . $body_html . $footer_html)
                 . self::aviso_css($header_html . $body_html . $footer_html)
+                . self::mapa_css($header_html . $body_html . $footer_html)
                     . self::rotation_css() . self::carousel_rows_css()
                     . self::unir_css_de_documentos([$header_css, $body_css, $footer_css])
             );
@@ -1373,6 +1466,10 @@ CSS;
         // cambiar una dirección en Configuración → Redes sociales llega a todas las
         // páginas sin recomponerlas (y una red sin configurar no deja un enlace muerto).
         $markup = COD_Redes_Sociales::resolver_en_html($markup);
+
+        // Lo mismo con la clave de Mapbox del mapa grande: la página guardada no la
+        // lleva; aquí se pone la de ahora (o, si no hay, el mapa queda como enlace).
+        $markup = COD_Mapa::resolver_en_html($markup);
 
         // Los shortcodes se ejecutan al final, después de resolver los tokens
         // dinámicos: así un marcador puede llevar un valor ACF entre sus

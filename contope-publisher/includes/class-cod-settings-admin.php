@@ -299,6 +299,47 @@ final class COD_Settings_Admin
                     </form>
                 </section>
 
+                <section class="cod-settings__section" id="cod-mapa">
+                    <h2>Mapa (Mapbox)</h2>
+                    <p>
+                        La clave pública de Mapbox que usa el <strong>mapa grande</strong> de las
+                        páginas que tienen un mini mapa. Se guarda una sola vez y sirve para todas
+                        las páginas: si la cambias, llega a todas sin tocarlas. El mini mapa no la
+                        necesita (es una imagen del propio sitio); sin clave el mini se ve igual,
+                        pero no se puede abrir el mapa grande y queda como un enlace a «cómo llegar».
+                    </p>
+                    <?php
+                    $cod_mapbox_error = isset($_GET['cod_mapbox_error'])
+                        ? sanitize_text_field(rawurldecode((string) wp_unslash($_GET['cod_mapbox_error'])))
+                        : '';
+                    ?>
+                    <?php if (isset($_GET['cod_mapbox_guardada']) && $cod_mapbox_error === '') : ?>
+                        <div class="notice notice-success"><p>Clave de Mapbox guardada.</p></div>
+                    <?php endif; ?>
+                    <?php if ($cod_mapbox_error !== '') : ?>
+                        <div class="notice notice-error">
+                            <p>No se guardó la clave. <?php echo esc_html($cod_mapbox_error); ?> Se conservó la que había.</p>
+                        </div>
+                    <?php endif; ?>
+                    <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+                        <input type="hidden" name="action" value="cod_save_mapbox">
+                        <?php wp_nonce_field('cod_save_mapbox'); ?>
+                        <p>
+                            <label for="cod_mapbox_token">Clave pública de Mapbox (empieza con <code>pk.</code>)</label><br>
+                            <input type="text" class="large-text code" id="cod_mapbox_token" name="cod_mapbox_token"
+                                value="<?php echo esc_attr((string) COD_Mapa::clave()); ?>"
+                                placeholder="pk.eyJ1Ijoi…" autocomplete="off" spellcheck="false">
+                        </p>
+                        <p class="description">
+                            Conviene restringir la clave al dominio de este sitio desde el panel de
+                            Mapbox (Access tokens → URL restrictions): la clave queda a la vista en el
+                            código de la página y, sin esa restricción, cualquiera puede gastar tu cuota.
+                            Deja el campo vacío para quitar la clave.
+                        </p>
+                        <p><button type="submit" class="button button-primary">Guardar clave de Mapbox</button></p>
+                    </form>
+                </section>
+
                 <section class="cod-settings__section">
                     <h2>Sitios que puedes incrustar</h2>
                     <p>
