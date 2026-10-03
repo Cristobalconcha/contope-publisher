@@ -5,6 +5,145 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.55 — 3 de octubre de 2026
+
+### Agregado
+
+- **Catorce formas de divisor, de partida.** Pendiente, pendiente suave, onda,
+  onda suave, ondas, curva, curva invertida, cerros, cordillera, triángulo,
+  dientes, escalones, nubes y asimétrica. Están en Medios y se ven en
+  `/divisores/`.
+
+  **No son el catálogo.** Son para que la biblioteca no esté vacía el primer
+  día: cualquier SVG del sitio sirve como divisor. Divi trae 27 y ahí se acaba.
+
+  Se generan con `scripts/generar-formas-divisor.mjs` y no están dibujadas a
+  mano, porque una onda tiene amplitud y número de crestas y unos cerros tienen
+  cumbres y valles: escritas como geometría se ajustan cambiando un número.
+
+  Van **sin `fill` propio** —el color lo pone el diseño— y con el área cerrada
+  contra el borde inferior, porque un divisor no es una línea sino una masa que
+  tapa.
+
+- **El color entra al contrato de la regla `divisor`.** El color de un divisor
+  es casi siempre el de la sección **siguiente**: es la banda de abajo
+  invadiendo a la de arriba, no una pieza de un tercer color. Equivocarse en
+  eso es el error más común al usarlos.
+
+### Corregido
+
+- **Una `section` no dibujaba su divisor.** El marcador se inyectaba sólo en
+  los `group`, y una sección —que es donde un divisor tiene sentido y donde el
+  catálogo lo ofrece— se quedaba sin él. Ahora va en `section`, `header` y
+  `footer`.
+
+  Y va **fuera** de la caja de columnas: tiene que apoyarse en el borde de la
+  sección y no en el de su contenido, o queda metido hacia adentro por el
+  relleno.
+
+- El ancla de posición pasa a `:where(section, header, footer, .cod-node):has(> .cod-divisor)`,
+  para que el contenedor se vuelva relativo solo en vez de exigírselo al diseño.
+
+### Comprobado
+
+- Sobre la página servida `/divisores/`: 15 divisores —las 14 formas más la
+  segunda pieza de «arriba y abajo»—, todos con su SVG, posicionados, y con el
+  color de la banda siguiente.
+
+---
+
+## 0.3.54 — 3 de octubre de 2026
+
+### Agregado
+
+- **Divisores: el borde no recto entre una sección y la siguiente**, con la
+  forma abierta. Controles: forma, color, alto, repetición, voltear y dónde
+  (arriba, abajo o ambos).
+
+  Tres decisiones, con su porqué:
+
+  - **El SVG va en línea y no en una `<img>`**, porque el color tiene que poder
+    cambiarse y una imagen externa no se recolorea desde CSS.
+  - **Se inyecta al mostrar la página y no al componer.** El documento guarda
+    sólo la ruta, así que reemplazar el archivo llega a todas las páginas sin
+    recomponer ninguna. Mismo patrón que la clave de Mapbox y las cuentas de
+    redes.
+  - **Se limpia otra vez al inyectarlo**, aunque ya se hubiera limpiado al
+    subirlo: un archivo puede haber llegado a `uploads` por FTP o por una
+    migración sin pasar nunca por nuestra subida.
+
+  El volteado es CSS y no un archivo distinto —que es la mitad de las 27 formas
+  de Divi: son pares de lo mismo invertido—.
+
+- **El control del divisor en el inspector.** La forma se elige de la
+  biblioteca de Medios, pidiendo sólo SVG. El panel aparece únicamente donde el
+  catálogo declara la familia; no hay condiciones escritas en la interfaz.
+
+  La previsualización **no se guarda**: dentro del editor el runtime le pone la
+  forma como máscara leyendo su atributo, y la quita al salir.
+
+---
+
+## 0.3.53 — 3 de octubre de 2026
+
+### Corregido
+
+- **El contenido en bloques respeta el ancho de la página.** El texto iba de
+  borde a borde: 1837 px en una ventana de 1900. La medida no se inventó —el
+  tema ya declara `contentSize: 1180px` en su `theme.json` y WordPress la
+  publica como variable CSS—; lo que faltaba era usarla.
+
+  `supports.layout` **no sirve en este bloque** y conviene saberlo: su render
+  emite también el encabezado del sitio, así que la salida empieza con un
+  `<header>` y WordPress le pone la clase de disposición al primer elemento que
+  encuentra. Medido: `is-layout-constrained` terminó en el `<header>`.
+
+---
+
+## 0.3.52 — 3 de octubre de 2026
+
+### Corregido
+
+- **El cuadrante es una unidad con identidad, y su contenido es libre.** La
+  0.3.51 lo dejaba clavado a imagen + título + párrafo. El patrón bueno estaba
+  en el propio WordPress: `core/tab-panel` tiene identidad y acepta cualquier
+  cosa dentro. Lo que se bloquea es la **cantidad** —cuatro, porque es una
+  cuadrícula de 2×2— y no lo que va dentro de cada uno.
+
+---
+
+## 0.3.51 — 3 de octubre de 2026
+
+### Agregado
+
+- **El módulo de cuadrantes toma bloques de WordPress.** Las cuatro fotos, los
+  cuatro títulos y los cuatro textos son `core/image`, `core/heading` y
+  `core/paragraph`, editables en el editor de WordPress. El módulo sólo los
+  redistribuye.
+
+  No hubo que tocar el runtime, y eso es lo que hace barato seguir con los
+  demás módulos: de sus hijos sólo exige que sean cuatro y que cada uno tenga
+  una imagen más algo de texto.
+
+---
+
+## 0.3.50 — 3 de octubre de 2026
+
+### Corregido
+
+- **El encabezado del sitio es global de verdad.** Se resolvía dentro de
+  `render_shortcode`, así que una página tenía encabezado sólo si su contenido
+  estaba guardado dentro del publisher. Una página con su contenido en bloques
+  salía sin encabezado, sin pie y sin estilos.
+
+### Agregado
+
+- **El bloque `contope/lienzo`**: un contenedor cuyo contenido son bloques de
+  WordPress de verdad, editables en su editor. ContOpe pone la forma alrededor.
+  Es aditivo: las páginas con shortcode siguen funcionando igual.
+
+---
+
 ## 0.3.49 — 3 de octubre de 2026
 
 ### Agregado
