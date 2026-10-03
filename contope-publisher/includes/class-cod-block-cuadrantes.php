@@ -30,6 +30,10 @@ final class COD_Block_Cuadrantes
 
     public function register_block(): void
     {
+        // El módulo y su unidad. Son dos bloques y no uno a propósito: la
+        // unidad tiene identidad propia y su contenido es libre, igual que
+        // `core/tab-panel` en WordPress.
         register_block_type(COD_PUBLISHER_DIR . 'blocks/cod-cuadrantes');
+        register_block_type(COD_PUBLISHER_DIR . 'blocks/cod-cuadrante');
     }
 }

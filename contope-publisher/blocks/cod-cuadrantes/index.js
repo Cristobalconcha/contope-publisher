@@ -1,12 +1,24 @@
 /**
  * Bloque contope/cuadrantes, lado editor.
  *
- * En el editor de WordPress se ve APILADO y editable: cuatro grupos, cada uno
- * con su foto, su título y su texto, como cualquier otro contenido. Eso es a
- * propósito. La cuadrícula, el botón encima de cada foto y el panel que se
- * abre los arma el runtime al mostrar la página, y montarlos acá dejaría
- * textos ocultos que no se pueden seleccionar y botones encima de las fotos
- * que impedirían editarlas.
+ * Tres niveles, como los hace WordPress con las pestañas:
+ *
+ *   contope/cuadrantes    el módulo (la conducta: la cuadrícula que se abre)
+ *     contope/cuadrante   la unidad, con identidad propia
+ *       cualquier bloque  el contenido, libre
+ *
+ * Esto es una corrección. La primera versión tenía dos niveles y metía los
+ * contenidos directo como `core/group` con un contenido clavado a imagen,
+ * título y párrafo. Cristóbal lo paró: «hay que tener cuidado que no llevemos
+ * todo a textos, títulos y fotos». El patrón bueno estaba a la vista en el
+ * propio WordPress —`core/tab-panel` tiene identidad y acepta cualquier cosa
+ * dentro— y es el que se sigue acá.
+ *
+ * En el editor de WordPress el módulo se ve APILADO y editable: cuatro
+ * cuadrantes uno debajo del otro. La cuadrícula, el botón sobre cada foto y el
+ * panel que se abre los arma el runtime al mostrar la página. Montarlos acá
+ * dejaría textos ocultos que no se pueden seleccionar y botones encima de las
+ * fotos que impedirían editarlas.
  *
  * Sin compilación: JavaScript plano con wp.element.
  */
@@ -19,31 +31,22 @@
 	var useInnerBlocksProps = wp.blockEditor.useInnerBlocksProps;
 	var InnerBlocks = wp.blockEditor.InnerBlocks;
 
-	// Un cuadrante: la foto primero —el runtime busca el medio para saber cuál
-	// es la celda— y después el título y el texto.
-	function cuadrante(titulo) {
-		return ['core/group', { className: 'cod-cuadrante' }, [
-			['core/image', {}],
-			['core/heading', { level: 3, placeholder: titulo }],
-			['core/paragraph', { placeholder: 'El texto que se abre al pinchar la foto…' }]
-		]];
-	}
-
 	registerBlockType('contope/cuadrantes', {
 		edit: function () {
 			var blockProps = useBlockProps({ className: 'cod-cuadrantes-editor' });
 			var innerProps = useInnerBlocksProps(blockProps, {
-				// Exactamente cuatro, y no se pueden quitar ni agregar: el
-				// módulo es una cuadrícula de 2x2 y con otro número el runtime
-				// no monta nada. Más vale que el editor no deje llegar ahí.
+				// Cuatro, ni más ni menos: es una cuadrícula de 2x2 y con otro
+				// número el runtime no monta nada. Lo que se bloquea es la
+				// CANTIDAD, no el contenido de cada uno: dentro de cada
+				// cuadrante se puede poner lo que sea.
 				template: [
-					cuadrante('Primer cuadrante'),
-					cuadrante('Segundo cuadrante'),
-					cuadrante('Tercer cuadrante'),
-					cuadrante('Cuarto cuadrante')
+					['contope/cuadrante'],
+					['contope/cuadrante'],
+					['contope/cuadrante'],
+					['contope/cuadrante']
 				],
 				templateLock: 'all',
-				allowedBlocks: ['core/group']
+				allowedBlocks: ['contope/cuadrante']
 			});
 
 			return el('div', innerProps);

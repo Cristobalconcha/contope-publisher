@@ -1,0 +1,18 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "contope/cuadrante",
+  "version": "0.1.0",
+  "title": "Cuadrante",
+  "category": "design",
+  "icon": "format-image",
+  "description": "Uno de los cuatro cuadrantes: su imagen, y el contenido que se abre al pincharla.",
+  "textdomain": "contope-publisher",
+  "parent": [ "contope/cuadrantes" ],
+  "supports": {
+    "html": false,
+    "reusable": false
+  },
+  "editorScript": "file:./index.js",
+  "render": "file:./render.php"
+}
