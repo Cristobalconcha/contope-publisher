@@ -13,6 +13,7 @@
  * Deja dos archivos, `region-header.json` y `region-footer.json`, listos para
  * `cod_preview_canvas_composition` y `cod_apply_canvas_composition`.
  */
+import { REDES } from './redes.mjs';
 import { writeFileSync } from 'node:fs';
 
 const M = '/wp-content/uploads/2026/09/';
@@ -66,7 +67,7 @@ const hacerReglas = () => {
     'align-items': 'center', width: '100%',
   } });
   R('h-wa-lado', 'properties', { declarations: {
-    display: 'flex', 'justify-content': 'flex-end', 'align-items': 'center',
+    display: 'flex', 'justify-content': 'flex-end', 'align-items': 'center', gap: '10px',
   } });
   R('h-wa-pildora', 'properties', { declarations: {
     display: 'inline-flex', 'align-items': 'center', gap: '8px',
@@ -91,6 +92,17 @@ const hacerReglas = () => {
             content: { assetUrl: f.logoHorizontal, alt: 'Econut · procesos, productos, perspectiva' } },
         ] },
         { id: id('g'), kind: 'group', ruleIds: ['h-wa-lado'], children: [
+          // Las cuentas oficiales, siempre a la vista. Acá van sin el nombre
+          // —el encabezado no da para tanto— y el nombre completo está en el
+          // pie. Lo que importa de este par es que existan y se vean: desde
+          // cualquier página se llega a la cuenta verdadera en un clic.
+          ...Object.entries(REDES).map(([red, d]) => ({
+            id: id('s'), kind: 'social', ruleIds: [], content: {
+              network: red, url: d.url,
+              size: 30, iconPadding: 7, iconColor: VERDE,
+              backgroundColor: 'transparent', borderRadius: '999px',
+            },
+          })),
           { id: id('g'), kind: 'group', ruleIds: ['h-wa-pildora'], children: [
             { id: id('w'), kind: 'whatsapp', ruleIds: [], content: {
               message: 'Hola, quiero más información sobre los servicios de Econut.',
@@ -124,7 +136,7 @@ const hacerReglas = () => {
   R('p-superficie', 'surface', { backgroundColor: '#2E594A', foregroundColor: BLANCO });
   R('p-aire', 'spacing', { paddingBlock: '10px', paddingInline: '24px' });
   R('p-barra', 'properties', { declarations: {
-    display: 'grid', 'grid-template-columns': '74px minmax(0, 1fr) 200px', 'column-gap': '40px',
+    display: 'grid', 'grid-template-columns': '74px minmax(0, 1fr) 220px 200px', 'column-gap': '40px',
     'align-items': 'center', 'max-width': '1080px', 'margin-inline-start': 'auto', 'margin-inline-end': 'auto', width: '100%',
   } });
   // En el original el logotipo del pie mide 74x60, no 140 de ancho.
@@ -136,6 +148,13 @@ const hacerReglas = () => {
   } });
   R('p-credito-texto', 'typography', { role: 'pie', fontSize: '12px', lineHeight: 1.4, align: 'end' });
   R('p-credito-logo', 'properties', { declarations: { width: '71px', 'max-width': '71px' } });
+  // Las cuentas, en columna y con el nombre a la vista. En vertical y no en
+  // fila porque lo que hay que poder leer es el nombre completo, no el icono:
+  // el icono dice «hay Instagram», el nombre dice CUÁL.
+  R('p-redes', 'properties', { declarations: {
+    display: 'flex', 'flex-direction': 'column', 'align-items': 'flex-start', gap: '6px',
+  } });
+  R('p-red-item', 'typography', { role: 'pie', fontSize: '12px', lineHeight: 1.4 });
   // 12px con interlínea 1.4: en el original las tres líneas de la dirección
   // caben en 50px de alto, y con 13/1.6 ocupaban 71.
   R('p-texto', 'typography', { role: 'pie', fontSize: '12px', lineHeight: 1.4, align: 'end' });
@@ -155,6 +174,19 @@ const hacerReglas = () => {
           { id: id('p'), kind: 'paragraph', ruleIds: ['p-texto'], content: { text: 'Av 18 de Septiembre sn Hijuela 2' } },
           { id: id('p'), kind: 'paragraph', ruleIds: ['p-texto'], content: { text: 'Fundo San Rafael - Sector Nuevo Sendero,' } },
           { id: id('p'), kind: 'paragraph', ruleIds: ['p-texto'], content: { text: 'Paine, Región Metropolitana' } },
+        ] },
+        // Las cuentas oficiales, CON el nombre escrito. Acá el nombre importa
+        // más que el icono: es lo que una persona puede comparar letra por
+        // letra con la cuenta que le escribió. Hay estafadores vendiendo a
+        // nombre de Econut, y hasta ahora el sitio no daba con qué comprobar.
+        { id: id('g'), kind: 'group', ruleIds: ['p-redes'], children: [
+          ...Object.entries(REDES).map(([red, d]) => ({
+            id: id('s'), kind: 'social', ruleIds: ['p-red-item'], content: {
+              network: red, url: d.url, handle: d.handle,
+              size: 28, iconPadding: 6, iconColor: BLANCO,
+              backgroundColor: 'transparent', borderRadius: '999px',
+            },
+          })),
         ] },
         { id: id('g'), kind: 'group', ruleIds: ['p-credito'], children: [
           { id: id('p'), kind: 'paragraph', ruleIds: ['p-credito-texto'], content: { text: 'Diseño y desarrollo' } },

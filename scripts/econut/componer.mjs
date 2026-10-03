@@ -19,6 +19,7 @@
  *   - las cifras son una barra blanca sobre el beige, no números sueltos.
  *   - cada sección entra con movimiento. Antes había reveal en 4 nodos de 113.
  */
+import { REDES } from './redes.mjs';
 import { writeFileSync } from 'node:fs';
 
 const NARANJA = '#DC4017';
@@ -32,29 +33,6 @@ const AVISO = '#FFF6C1';
 
 const M = '/wp-content/uploads/2026/09/';
 
-// Las cuentas oficiales de Econut, confirmadas por Cristóbal el 3 de octubre.
-// No son un adorno: existen porque hay estafadores vendiendo nueces a nombre
-// de la empresa —llegó gente a la planta a buscar lo que había pagado por
-// internet— y el sitio no daba ninguna forma de verificar cuál es la cuenta
-// verdadera. Publicarlas con el nombre de usuario a la vista es lo que permite
-// comparar letra por letra.
-//
-// OJO: los nombres NO coinciden entre plataformas (`econutchile.oficial` en
-// Instagram, `EconutChile` en Facebook), así que uno no se deduce del otro.
-// Por eso tienen que ir las dos escritas, no una sola.
-// Las direcciones van LIMPIAS: las que figuran en la biografía de Instagram
-// traen parámetros de seguimiento pegados (`?si=…` en YouTube, `?mibextid=…`
-// en Facebook) que no deben publicarse. Y el enlace corto
-// `facebook.com/share/1CuGPZ7cF3/` resuelve a la misma página EconutChile: no
-// son dos páginas distintas, es la misma compartida de dos formas.
-const REDES = {
-  instagram: { url: 'https://www.instagram.com/econutchile.oficial/', handle: '@econutchile.oficial' },
-  facebook: { url: 'https://www.facebook.com/EconutChile', handle: 'EconutChile' },
-  youtube: { url: 'https://www.youtube.com/@econutchile', handle: '@econutchile' },
-  linkedin: { url: 'https://www.linkedin.com/company/comercializadora-econut-ltda', handle: 'Comercializadora Econut Ltda' },
-  // Pendiente: WhatsApp Business, en disputa con Meta mientras se recupera la
-  // propiedad de la marca. Cuando se resuelva, apuntar a la cuenta verificada.
-};
 const f = {
   logo: M + 'Logo-20.png',
   fichaNCC: M + 'Ficha-T-de-Proceso-NCC-2022.pdf',   // la ficha técnica que enlaza el primer servicio
@@ -404,24 +382,34 @@ const abre = (rotulo, titulo, centrado = false, reglaRotulo = '') => [
 
 const nodes = [];
 
-// 1 · Barra de aviso, arriba de todo, como en el sitio.
+// 1 · El aviso, reducido a una LÍNEA. Ocupaba media pantalla —208px en el original
+// y 273 acá— y era lo primero que veía cualquiera que entrara. Cristóbal pidió
+// achicarlo: la advertencia tiene que estar, pero no puede ser la portada.
+//
+// Existe porque hay estafadores vendiendo a nombre de Econut y llegó gente a la
+// planta a buscar lo que había pagado por internet. Por eso no se borra: se
+// comprime a lo esencial y se enlaza a lo que de verdad protege, que son las
+// cuentas oficiales del pie. Advertir sin dar con qué comparar no sirve de
+// mucho; el nombre de usuario escrito sí se puede cotejar letra por letra.
+//
+// El detalle completo —las tres recomendaciones— entra en el aviso emergente
+// cuando exista. Está anotado como pendiente en el repositorio del plugin.
 nodes.push({
-  id: 'aviso', marker: 'aviso', kind: 'section', ruleIds: ['aire-corto', 's-aviso'],
+  id: 'aviso', marker: 'aviso', kind: 'section', ruleIds: ['aire-linea', 's-aviso'],
   children: [G([
     G([
-      G([
-        H('Aviso a la comunidad:', 3, ['t-aviso-titulo', 'sin-margen']),
-        P('Le informamos que se ha detectado el uso fraudulento de nuestra marca en redes sociales. Personas inescrupulosas están cometiendo estafas en la venta de productos, utilizando nuestra identidad de forma ilegítima.', ['t-aviso']),
-        P('Estamos trabajando activamente para denunciar y eliminar estas cuentas falsas. Su seguridad es nuestra prioridad. Les pedimos que tomen las siguientes precauciones para evitar ser víctimas de estos fraudes:', ['t-aviso']),
-      ], ['columna-junta']),
-      G([
-        G([H('Verifiquen la autenticidad:', 4, ['t-aviso-rotulo', 'sin-margen']), P('Antes de realizar cualquier compra, asegúrense de que la cuenta o página web que está viendo sea nuestra cuenta oficial.', ['t-aviso'])], ['columna-junta']),
-        G([H('Sospeche de ofertas inusuales:', 4, ['t-aviso-rotulo', 'sin-margen']), P('Las estafas suelen atraer con precios increíbles. Si una oferta parece demasiado buena probablemente no sea real.', ['t-aviso'])], ['columna-junta']),
-        G([H('Proteja su información personal:', 4, ['t-aviso-rotulo', 'sin-margen']), P('No comparta datos sensibles como contraseñas, números de tarjeta de crédito o códigos de seguridad.', ['t-aviso'])], ['columna-junta']),
-      ], ['tres-juntas']),
-    ], ['aviso-fila', 'entra']),
+      P('Atención: hay cuentas falsas vendiendo a nombre de Econut. Verifique siempre que esté hablando con nuestras cuentas oficiales.', ['t-aviso-linea']),
+      A('Ver cuentas oficiales', '#pie', ['t-aviso-enlace']),
+    ], ['aviso-linea']),
   ], ['caja'])],
 });
+R('aire-linea', 'spacing', { paddingBlock: '10px', paddingInline: '24px' });
+R('aviso-linea', 'properties', { declarations: {
+  display: 'flex', 'flex-wrap': 'wrap', 'align-items': 'center',
+  'justify-content': 'center', gap: '12px', width: '100%',
+} });
+R('t-aviso-linea', 'typography', { role: 'cuerpo', fontSize: '13px', lineHeight: 1.4, align: 'center' });
+R('t-aviso-enlace', 'typography', { role: 'rotulo', fontSize: '13px', fontWeight: 700, lineHeight: 1.4 });
 
 // 2 · El encabezado NO va acá: vive en la región global «cod-region-header»
 //     (ver componer-regiones.mjs). Un encabezado dentro del cuerpo se
