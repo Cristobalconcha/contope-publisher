@@ -129,7 +129,15 @@ R('cinco', 'layout', { mode: 'grid', columns: 4, gap: '36px', minColumnWidth: '1
 // La tarjeta ocupa todo el alto de su celda y el botón se empuja al fondo,
 // para que los tres queden a la misma altura aunque las listas midan
 // distinto. En el original los tres botones están alineados.
-R('tarjeta-alta', 'properties', { declarations: { height: '100%', 'align-content': 'start' } });
+// La tarjeta se estira a lo alto de su columna y apila en vertical. Va en
+// FLEX y no en rejilla: con `align-content: start` las filas se empaquetaban
+// arriba y el `margin-block-start: auto` del botón no empujaba nada, así que
+// los tres botones quedaban a distinta altura según cuánto texto tuviera cada
+// uno. En flex-column ese automático sí ancla el botón abajo, aunque mañana
+// un texto crezca o se acorte.
+R('tarjeta-alta', 'properties', { declarations: {
+  height: '100%', display: 'flex', 'flex-direction': 'column', 'align-items': 'flex-start',
+} });
 R('al-fondo', 'properties', { declarations: { 'margin-block-start': 'auto' } });
 // 26px de aire entre las piezas de una columna. Ahora que los textos no traen
 // margen propio, éste es el único aire que los separa, y con 14 las secciones
@@ -418,7 +426,13 @@ nodes.push({
     G([
       servicio(f.saco, 'Nuez con cáscara en saco', 'Nuez con cáscara',
         'Selección y embalaje de nuez con cáscara por tamaño y calidad externa e interna, de acuerdo a estándares internacionales.',
-        ['Embalaje en sacos de 10 y 25 kilos y cajas de hasta 10 kilos.']),
+        // El segundo punto no está en econut.cl: lo pidió Cristóbal para que
+        // los tres servicios tengan dos viñetas y los botones queden parejos
+        // por contenido y no por un ajuste. Lo que dice sale de lo que el
+        // propio sitio declara en «Control de calidad»: color externo,
+        // distribución de tamaños, condición de la cáscara y humedad.
+        ['Embalaje en sacos de 10 y 25 kilos y cajas de hasta 10 kilos.',
+         'Control de calidad acucioso en cada lote: color externo, calibre, condición de la cáscara y humedad.']),
       servicio(f.manual, 'Partido y selección manual', 'Nuez sin cáscara manual',
         'Partido y selección manual de nueces por tamaño, color y calidad según estándares internacionales.',
         ['Capacidad diaria aproximada de 20 toneladas de producto en cáscara de ingreso.',
