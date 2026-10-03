@@ -1,0 +1,18 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "contope/cuadrantes",
+  "version": "0.1.0",
+  "title": "Cuadrantes",
+  "category": "design",
+  "icon": "grid-view",
+  "description": "Cuatro fotos en cuadrícula. Al pinchar una, se abre con su título y su texto. El contenido son bloques de WordPress.",
+  "keywords": [ "cuadrantes", "grilla", "cuadricula", "contope" ],
+  "textdomain": "contope-publisher",
+  "supports": {
+    "html": false,
+    "anchor": true
+  },
+  "editorScript": "file:./index.js",
+  "render": "file:./render.php"
+}
