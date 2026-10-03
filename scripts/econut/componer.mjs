@@ -60,7 +60,6 @@ const f = {
   kosher: M + 'Isotipos-Kosher.avif',
   halal: M + 'Halal-Logo.avif',
   chile: M + 'Made-in-Chile-log.avif',
-  cert5: M + 'd514ce_32d33a9f611747499c605679f39275f7mv2.avif',
   huertos: M + 'Control-de-huertos.avif',
   bandeja: M + 'd514ce_bd4f58c2fb644112944735865054300fmv2.avif',
   sag: M + 'Sag.avif',
@@ -89,7 +88,12 @@ R('c-claro', 'color', { role: 'claro', color: BLANCO });
 // --- Tipografía. La portada en Bodoni; las secciones en Big Shoulders. ------
 // Medido en el original: Bodoni Moda 88px con interlínea 88px, peso 600.
 R('t-portada', 'typography', { role: 'portada', family: "'Bodoni Moda', Georgia, serif", fontSize: 'clamp(46px, 6vw, 88px)', fontWeight: 600, lineHeight: 1.05, align: 'start' });
-R('t-seccion', 'typography', { role: 'titulo-seccion', fontSize: 'clamp(34px, 4.4vw, 58px)', fontWeight: 600, lineHeight: 1.1, align: 'start' });
+// El original NO usa un solo tamaño de título de sección: «Nuestra historia» y
+// «Garantía de calidad» van en 58 con interlínea 70 (1,2), «Procesamos con
+// pasión» en 46, e «Instalaciones de Vanguardia» y «Compromiso con el Futuro»
+// en 50. Por eso hay tres reglas y no una.
+R('t-seccion', 'typography', { role: 'titulo-seccion', fontSize: 'clamp(34px, 4.4vw, 58px)', fontWeight: 600, lineHeight: 1.2, align: 'start' });
+R('t-seccion-46', 'typography', { role: 'titulo-seccion', fontSize: 'clamp(30px, 2.5vw, 46px)', fontWeight: 600, lineHeight: 1, align: 'start' });
 R('t-seccion-centro', 'typography', { role: 'titulo-centrado', fontSize: 'clamp(34px, 4.4vw, 58px)', fontWeight: 600, lineHeight: 1.1, align: 'center' });
 R('t-sub', 'typography', { role: 'subtitulo', family: "'Bodoni Moda', Georgia, serif", fontSize: '26px', fontWeight: 600, lineHeight: 1.25 });
 // Medido en el original: 14px, interlínea 19,6, espaciado 1px y peso 500. Y
@@ -279,6 +283,18 @@ R('logo-chico', 'layout', { mode: 'stack', maxWidth: '124px' });
 R('cert-tam', 'media', { aspectRatio: '1/1', fit: 'contain' });
 R('cert-tam-caja', 'properties', { declarations: { width: '120px', height: '120px' } });
 R('filete', 'color', { role: 'filete', color: NARANJA, apply: 'background' });
+// El separador dentro de una tarjeta de servicio: una línea tenue, no el
+// filete naranja de las secciones, que ahí pesaría demasiado.
+R('filete-tenue', 'properties', { declarations: {
+  'border-top-width': '1px', 'border-top-style': 'solid', 'border-top-color': 'rgba(0,0,0,0.12)',
+  width: '100%', height: '0px',
+} });
+// --- Tipografía de la tarjeta de servicio, medida en el original ----------
+// La descripción va en 15/26 y las viñetas en 13/17: bastante más apretadas
+// que el cuerpo general (16/28), que es lo que tenían acá. En tres columnas
+// angostas esa diferencia es la que hace que el bloque quepa sin estirarse.
+R('t-servicio-texto', 'typography', { role: 'cuerpo', fontSize: '15px', lineHeight: 1.73, measure: '40ch' });
+R('t-servicio-vineta', 'typography', { role: 'cuerpo', fontSize: '13px', lineHeight: 1.31, measure: '40ch' });
 // --- Certificaciones y sustentabilidad, medidas en el original a 1900px ----
 // Arriba: el título ocupa poco más de un cuarto y la marquesina el resto.
 // En el original el título va de 410 a 680 y la marquesina de 680 a 1490.
@@ -287,7 +303,9 @@ R('cert-fila-reparto', 'properties', { declarations: { 'grid-template-columns': 
 // Abajo: la foto mide 624 de ancho y el texto 366, separados por 60.
 R('cert-abajo', 'layout', { mode: 'grid', columns: 2, gap: '60px', align: 'center', mobile: { mode: 'stack', columns: 1, gap: '28px' } });
 R('cert-abajo-reparto', 'properties', { declarations: { 'grid-template-columns': 'minmax(0, 624fr) minmax(0, 366fr)' } });
-R('foto-sustentabilidad', 'media', { aspectRatio: '3/2', fit: 'cover' });
+// 624x430 en el original, o sea 1,45 y no 1,5. Con 3/2 la foto recortaba 10px
+// más de alto de lo que muestra el sitio.
+R('foto-sustentabilidad', 'media', { aspectRatio: '32/22', fit: 'cover' });
 // El original pone estos dos títulos en 46px y 50px, no en los 58 del resto.
 R('t-certificaciones', 'typography', { role: 'titulo-seccion', fontSize: 'clamp(30px, 2.5vw, 46px)', fontWeight: 600, lineHeight: 1, align: 'start' });
 R('t-compromiso', 'typography', { role: 'titulo-seccion', fontSize: 'clamp(32px, 2.7vw, 50px)', fontWeight: 600, lineHeight: 1.2, align: 'start' });
@@ -306,7 +324,16 @@ R('marquesina-ritmo', 'properties', { declarations: {
   'min-height': '200px',
   'align-content': 'center',
 } });
-R('aire-certificaciones', 'spacing', { paddingBlock: '54px', paddingInline: '24px' });
+// 54 arriba y 50 abajo: es lo que mide el original en esta sección, la única
+// que no usa el mismo aire en los dos lados.
+// OJO: la regla `spacing` sólo admite un mismo valor arriba y abajo
+// (paddingBlock), así que un aire asimétrico hay que escribirlo con
+// `properties`. Es la única sección del original con aire distinto arriba (54)
+// y abajo (50). Queda anotado como limitación del plugin.
+R('aire-certificaciones', 'properties', { declarations: {
+  'padding-top': '54px', 'padding-bottom': '50px',
+  'padding-left': '24px', 'padding-right': '24px',
+} });
 // Entre la fila de la marquesina y la de sustentabilidad el original deja 165
 // de aire: la marquesina termina en y236 y la foto empieza en y401. La caja
 // normal separa 26, y por eso la sección quedaba 263px más corta.
@@ -364,7 +391,7 @@ const G = (hijos, reglas_ = [], partes) => {
   if (partes && Object.keys(partes).length) nodo.partes = partes;
   return nodo;
 };
-const LI = (items) => ({ id: id('l'), kind: 'list', ruleIds: ['t-cuerpo'], content: { ordered: false, items } });
+const LI = (items, reglas_ = ['t-cuerpo']) => ({ id: id('l'), kind: 'list', ruleIds: reglas_, content: { ordered: false, items } });
 const A = (label, href, reglas_ = ['t-rotulo']) => ({ id: id('a'), kind: 'link', ruleIds: reglas_, content: { label, href, target: 'self' } });
 
 // Rótulo y título: el par que abre cada sección en el sitio real.
@@ -373,10 +400,10 @@ const A = (label, href, reglas_ = ['t-rotulo']) => ({ id: id('a'), kind: 'link',
 // dos recibían el mismo aire y la sección no calzaba con el original.
 R('titulo-par', 'layout', { mode: 'stack', gap: '4px', align: 'start' });
 R('titulo-par-centro', 'layout', { mode: 'stack', gap: '4px', align: 'center' });
-const abre = (rotulo, titulo, centrado = false, reglaRotulo = '') => [
+const abre = (rotulo, titulo, centrado = false, reglaRotulo = '', reglaTitulo = '') => [
   G([
     H(rotulo, 4, [reglaRotulo || (centrado ? 't-rotulo-centro' : 't-rotulo'), 'c-texto']),
-    H(titulo, 2, [centrado ? 't-seccion-centro' : 't-seccion', 'c-naranja']),
+    H(titulo, 2, [reglaTitulo || (centrado ? 't-seccion-centro' : 't-seccion'), 'c-naranja']),
   ], [centrado ? 'titulo-par-centro' : 'titulo-par']),
 ];
 
@@ -447,9 +474,15 @@ nodes.push({
 // copiar un botón que no hace nada no ayuda a nadie.
 const servicio = (url, alt, nombre, texto, puntos, enlace = '') => G([
   IMG(url, alt, ['foto-servicio', 'foto-servicio-tam']),
-  H(nombre, 3, ['t-servicio', 'c-naranja']),
-  P(texto),
-  LI(puntos),
+  // H4 y no H3: es el nivel que usa el original para el título de cada
+  // tarjeta. El nivel no es decoración, ordena el documento para los
+  // buscadores y para quien navega con lector de pantalla.
+  H(nombre, 4, ['t-servicio', 'c-naranja']),
+  P(texto, ['t-servicio-texto']),
+  // El original separa la descripción de las viñetas con una línea: su marcado
+  // va <p>…</p> <hr /> <ul>. Acá no estaba, y el bloque se leía corrido.
+  { id: id('sep'), kind: 'separator', ruleIds: ['filete-tenue'], content: {} },
+  LI(puntos, ['t-servicio-vineta']),
   { id: id('b'), kind: 'button', ruleIds: ['boton', 'boton-fondo', 'boton-texto', 'pildora', 'al-fondo'],
     content: { label: 'Más Detalles', href: enlace || '#contacto', target: enlace ? 'blank' : 'self' } },
 ], ['columna', 'tarjeta-alta']);
@@ -457,7 +490,7 @@ const servicio = (url, alt, nombre, texto, puntos, enlace = '') => G([
 nodes.push({
   id: 'servicios', marker: 'servicios', kind: 'section', ruleIds: ['aire', 's-beige'],
   children: [G([
-    ...abre('Nuestros Servicios', 'Procesamos con pasión', false, 't-rotulo-servicios'),
+    ...abre('Nuestros Servicios', 'Procesamos con pasión', false, 't-rotulo-servicios', 't-seccion-46'),
     P('En Econut nos dedicamos al procesamiento de nueces desde su llegada desde el campo hasta el empaque final para exportación. Nuestro trabajo combina precisión técnica, compromiso humano y control de calidad en cada etapa.', ['t-lead']),
     G([
       servicio(f.saco, 'Nuez con cáscara en saco', 'Nuez con Cáscara',
@@ -467,7 +500,7 @@ nodes.push({
         // por hecho que acá había una sola, y por eso agregamos la tercera.
         // La tercera no está en econut.cl: la pidió Cristóbal. Lo que dice
         // sale de lo que el propio sitio declara en «Control de calidad».
-        ['Capacidad diaria aproximada de 70 toneladas de producto de Ingreso.',
+        ['Capacidad diaria aproximada de 70 toneladas de producto de ingreso.',
          'Embalaje en sacos de 10 y 25 kilos y cajas de hasta 10 kilos.',
          'Control de calidad acucioso en cada lote: color externo, calibre, condición de la cáscara y humedad.'],
         f.fichaNCC),
@@ -554,7 +587,7 @@ const pestana = (numero, titulo, texto, icono, foto, subtitulo = '') => G([
       IMG(icono, titulo, ['icono-cifra']),
     ], ['columna-iconos']),
     G([
-      H(titulo, 3, ['t-titulo-cifra', 'c-naranja']),
+      H(titulo, 2, ['t-titulo-cifra', 'c-naranja']),   // H2 en el original
       ...(subtitulo ? [H(subtitulo, 4, ['t-subtitulo-cifra'])] : []),
       P(texto, ['t-texto-cifra']),
       IMG(foto, titulo, ['foto-cifra', 'foto-cifra-tam']),
@@ -583,11 +616,11 @@ nodes.push({
       pestana('2005', '2005 | Fundación de Econut',
         'Nacimos hace veinte años como una pequeña empresa familiar, con el proyecto de servir a la industria exportadora de nuez chilena. Una línea, mucho esfuerzo y un magnífico grupo de personas. La mayoría de ellas comparten con nosotros el éxito de esta empresa hoy. En 2005 era difícil imaginar hasta dónde podía llegar el desarrollo de la industria de la nuez chilena.', f.iFundacion, f.perspectiva),
       pestana('12.000', 'Metros cuadrados de instalaciones',
-        'Hoy estamos orgullosos de ser líderes en servicio de procesamiento de nueces para exportación en Chile, con una moderna tecnología y dos plantas productivas con más de 12,000 metros cuadrados de áreas limpias para proceso y 17,000 m2 de dependencias complementarias.', f.iInstalaciones, f.aerea),
+        'Hoy estamos orgullosos de ser líderes en servicio de procesamiento de nueces para exportación en Chile, con una moderna tecnología y dos plantas productivas con más de 12.000 metros cuadrados de áreas limpias para proceso y 17.000 m² de dependencias complementarias.', f.iInstalaciones, f.aerea),
       pestana('2.000', 'Hectáreas de huertos atendidos',
-        'Nos tomamos nuestra misión muy en serio: somos responsables de agregar valor a más de 2,000 hectáreas de nogales, cuyos dueños las han cuidado diligentemente. Por lo tanto, tenemos que aplicar toda la experiencia que tenemos para mejorar continuamente cada temporada.', f.iHectareas, f.plantaciones),
+        'Nos tomamos nuestra misión muy en serio: somos responsables de agregar valor a más de 2.000 hectáreas de nogales, cuyos dueños las han cuidado diligentemente. Por lo tanto, tenemos que aplicar toda la experiencia que tenemos para mejorar continuamente cada temporada.', f.iHectareas, f.plantaciones),
       pestana('10.000', 'Tons. de Capacidad de proceso',
-        'Hoy entregamos más de 100,000 kilos diarios de proceso de Nuez con Cáscara, calibrando, seleccionando, empacando y despachando para importantes clientes. 40,000 kilos diarios de nuez partida manual y mecánicamente pasan por nuestras salas, con los mejores sistemas de partido y selección disponibles. Todo ello con la calidad y servicio personalizado que nos caracteriza.', f.iProceso, f.mano,
+        'Hoy entregamos más de 100.000 kilos diarios de proceso de Nuez con Cáscara, calibrando, seleccionando, empacando y despachando para importantes clientes. 40.000 kilos diarios de nuez partida manual y mecánicamente pasan por nuestras salas, con los mejores sistemas de partido y selección disponibles. Todo ello con la calidad y servicio personalizado que nos caracteriza.', f.iProceso, f.mano,
         '3 meses de proceso de Nuez con Cáscara y 6 meses de proceso de Nuez sin Cáscara.'),
     ], ['pestanas'], { etiqueta: ['pest-etiqueta', 'pest-etiqueta-activa'], lista: ['pest-lista'], panel: ['pest-panel'] }),
   ], ['caja'])],
@@ -637,7 +670,7 @@ nodes.push({
       control(f.bandeja, 'Nueces en bandeja de selección', 'Control de calidad', [
         'Se toma una muestra importante de cada lote que ingresa a Econut para proyectar sus posibilidades en todas las áreas. Con esta proyección podemos decidir de forma inteligente qué destino guiará el proceso: Para Nuez con Cáscara, Partido Mecánico o Manual.',
         'Se tiene en cuenta el color externo, la distribución de tamaños, las condiciones de la cáscara, el rendimiento, la distribución del color de la semilla, porcentaje de mitades, la humedad y todos los parámetros para comprender el uso potencial de cada lote de nuez.',
-        'Nuestro personal de calidad se capacita constantemente para este muesteo con los métodos de análisis más asertivos.',
+        'Nuestro personal de calidad se capacita constantemente para este muestreo con los métodos de análisis más asertivos.',
       ]),
       control(f.sag, 'Sello del SAG', 'Control de inocuidad', [
         'Una vez que la nuez comienza a ser procesada, seguimos su proceso de manufactura revisando constantemente las condiciones sanitarias en el área y las herramientas de trabajo. Tenemos nuestro propio laboratorio donde muestreamos materiales y manejo de productos.',
@@ -646,7 +679,7 @@ nodes.push({
       ]),
       control(f.revision, 'Revisión de una nuez partida', 'Control de producto terminado', [
         'Después de los profundos análisis de recepción, debemos verificar que todo esté bien con todos los demás factores sanitarios y de calidad tan importantes durante los pasos de selección y empaquetado.',
-        'De esta forma, controlamos las condiciones organolépticas y fisiológicas, junto con los estándares de calidad requeridos para el producto y las buenas condiciones de envasado: sellos de bolsas, oxigeno rersidual, sellos de caja, etiquetado de trazabilidad, etc.',
+        'De esta forma, controlamos las condiciones organolépticas y fisiológicas, junto con los estándares de calidad requeridos para el producto y las buenas condiciones de envasado: sellos de bolsas, oxígeno residual, sellos de caja, etiquetado de trazabilidad, etc.',
         'Incluso antes de cada envío revisamos todos estos parámetros de calidad, para dar garantías reales a nuestros clientes.',
       ]),
     ], ['cuadrantes', 'cuadrantes-medida'])], ['cuadrantes-panel']),

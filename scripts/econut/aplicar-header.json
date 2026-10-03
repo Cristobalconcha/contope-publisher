@@ -1,0 +1,424 @@
+{
+  "pageId": 0,
+  "documentId": "cod-region-header",
+  "expectedRevision": 3,
+  "design": {
+    "schemaVersion": 1,
+    "designId": "econut-web",
+    "expectedDesignRevision": 2,
+    "reviewState": "session",
+    "rules": [
+      {
+        "id": "h-superficie",
+        "kind": "surface",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://econut.cl/",
+              "rationale": "Medido del sitio real con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "backgroundColor": "#FFFFFF",
+          "foregroundColor": "#333333"
+        }
+      },
+      {
+        "id": "h-aire",
+        "kind": "spacing",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://econut.cl/",
+              "rationale": "Medido del sitio real con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "paddingBlock": "20px",
+          "paddingInline": "24px"
+        }
+      },
+      {
+        "id": "h-centrado",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://econut.cl/",
+              "rationale": "Medido del sitio real con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "display": "flex",
+            "justify-content": "center",
+            "align-items": "center",
+            "width": "100%"
+          }
+        }
+      },
+      {
+        "id": "h-logo",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://econut.cl/",
+              "rationale": "Medido del sitio real con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "width": "164px",
+            "max-width": "164px"
+          }
+        }
+      },
+      {
+        "id": "h-barra",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://econut.cl/",
+              "rationale": "Medido del sitio real con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "display": "grid",
+            "grid-template-columns": "minmax(0, 1fr) auto minmax(0, 1fr)",
+            "align-items": "center",
+            "width": "100%"
+          }
+        }
+      },
+      {
+        "id": "h-wa-lado",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://econut.cl/",
+              "rationale": "Medido del sitio real con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "display": "flex",
+            "justify-content": "flex-end",
+            "align-items": "center",
+            "gap": "10px"
+          }
+        }
+      },
+      {
+        "id": "h-wa-pildora",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://econut.cl/",
+              "rationale": "Medido del sitio real con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "display": "inline-flex",
+            "align-items": "center",
+            "gap": "8px",
+            "background-color": "#2E594A",
+            "border-radius": "999px",
+            "padding-top": "5px",
+            "padding-bottom": "5px",
+            "padding-left": "14px",
+            "padding-right": "14px"
+          }
+        }
+      },
+      {
+        "id": "h-wa-texto",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://econut.cl/",
+              "rationale": "Medido del sitio real con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "rotulo",
+          "fontSize": "11.5px",
+          "fontWeight": 700,
+          "letterSpacing": "0.69px",
+          "lineHeight": 1
+        }
+      },
+      {
+        "id": "h-wa-sin-margen",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://econut.cl/",
+              "rationale": "Medido del sitio real con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "margin-block-start": "0px",
+            "margin-block-end": "0px"
+          }
+        }
+      },
+      {
+        "id": "h-wa-blanco",
+        "kind": "color",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://econut.cl/",
+              "rationale": "Medido del sitio real con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "rotulo",
+          "color": "#FFFFFF",
+          "apply": "text"
+        }
+      }
+    ]
+  },
+  "composition": {
+    "schemaVersion": 2,
+    "nodes": [
+      {
+        "id": "encabezado",
+        "marker": "encabezado",
+        "kind": "header",
+        "ruleIds": [
+          "h-aire",
+          "h-superficie"
+        ],
+        "children": [
+          {
+            "id": "g-1",
+            "kind": "group",
+            "ruleIds": [
+              "h-barra"
+            ],
+            "children": [
+              {
+                "id": "g-2",
+                "kind": "group",
+                "ruleIds": [],
+                "children": []
+              },
+              {
+                "id": "g-3",
+                "kind": "group",
+                "ruleIds": [
+                  "h-centrado"
+                ],
+                "children": [
+                  {
+                    "id": "i-4",
+                    "kind": "image",
+                    "ruleIds": [
+                      "h-logo"
+                    ],
+                    "content": {
+                      "assetUrl": "/wp-content/uploads/2026/09/Logo-horizontal-@svg.svg",
+                      "alt": "Econut · procesos, productos, perspectiva"
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "g-5",
+                "kind": "group",
+                "ruleIds": [
+                  "h-wa-lado"
+                ],
+                "children": [
+                  {
+                    "id": "s-6",
+                    "kind": "social",
+                    "ruleIds": [],
+                    "content": {
+                      "network": "instagram",
+                      "url": "https://www.instagram.com/econutchile.oficial/",
+                      "size": 30,
+                      "iconPadding": 7,
+                      "iconColor": "#2E594A",
+                      "backgroundColor": "transparent",
+                      "borderRadius": "999px"
+                    }
+                  },
+                  {
+                    "id": "s-7",
+                    "kind": "social",
+                    "ruleIds": [],
+                    "content": {
+                      "network": "facebook",
+                      "url": "https://www.facebook.com/EconutChile",
+                      "size": 30,
+                      "iconPadding": 7,
+                      "iconColor": "#2E594A",
+                      "backgroundColor": "transparent",
+                      "borderRadius": "999px"
+                    }
+                  },
+                  {
+                    "id": "s-8",
+                    "kind": "social",
+                    "ruleIds": [],
+                    "content": {
+                      "network": "youtube",
+                      "url": "https://www.youtube.com/@econutchile",
+                      "size": 30,
+                      "iconPadding": 7,
+                      "iconColor": "#2E594A",
+                      "backgroundColor": "transparent",
+                      "borderRadius": "999px"
+                    }
+                  },
+                  {
+                    "id": "s-9",
+                    "kind": "social",
+                    "ruleIds": [],
+                    "content": {
+                      "network": "linkedin",
+                      "url": "https://www.linkedin.com/company/comercializadora-econut-ltda",
+                      "size": 30,
+                      "iconPadding": 7,
+                      "iconColor": "#2E594A",
+                      "backgroundColor": "transparent",
+                      "borderRadius": "999px"
+                    }
+                  },
+                  {
+                    "id": "g-10",
+                    "kind": "group",
+                    "ruleIds": [
+                      "h-wa-pildora"
+                    ],
+                    "children": [
+                      {
+                        "id": "w-11",
+                        "kind": "whatsapp",
+                        "ruleIds": [],
+                        "content": {
+                          "message": "Hola, quiero más información sobre los servicios de Econut.",
+                          "ariaLabel": "Escribir a Econut por WhatsApp",
+                          "size": 24,
+                          "iconPadding": 3,
+                          "iconColor": "#FFFFFF",
+                          "backgroundColor": "transparent",
+                          "borderRadius": "0px"
+                        }
+                      },
+                      {
+                        "id": "p-12",
+                        "kind": "paragraph",
+                        "ruleIds": [
+                          "h-wa-texto",
+                          "h-wa-blanco",
+                          "h-wa-sin-margen"
+                        ],
+                        "content": {
+                          "text": "WhatsApp"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "previewId": "86c2d9c938fb696e90524aab318ccdd58edeed262b914821cae697fc806e50af"
+}

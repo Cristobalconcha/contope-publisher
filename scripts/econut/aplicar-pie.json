@@ -1,0 +1,351 @@
+{
+  "pageId": 0,
+  "documentId": "cod-region-footer",
+  "expectedRevision": 3,
+  "design": {
+    "schemaVersion": 1,
+    "designId": "econut-web",
+    "expectedDesignRevision": 2,
+    "reviewState": "session",
+    "rules": [
+      {
+        "id": "p-superficie",
+        "kind": "surface",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://econut.cl/",
+              "rationale": "Medido del sitio real con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "backgroundColor": "#2E594A",
+          "foregroundColor": "#FFFFFF"
+        }
+      },
+      {
+        "id": "p-aire",
+        "kind": "spacing",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://econut.cl/",
+              "rationale": "Medido del sitio real con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "paddingBlock": "10px",
+          "paddingInline": "24px"
+        }
+      },
+      {
+        "id": "p-barra",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://econut.cl/",
+              "rationale": "Medido del sitio real con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "display": "grid",
+            "grid-template-columns": "74px minmax(0, 1fr) 200px",
+            "column-gap": "40px",
+            "align-items": "center",
+            "max-width": "1080px",
+            "margin-inline-start": "auto",
+            "margin-inline-end": "auto",
+            "width": "100%"
+          }
+        }
+      },
+      {
+        "id": "p-logo",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://econut.cl/",
+              "rationale": "Medido del sitio real con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "width": "74px",
+            "max-width": "74px"
+          }
+        }
+      },
+      {
+        "id": "p-credito",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://econut.cl/",
+              "rationale": "Medido del sitio real con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "display": "grid",
+            "grid-template-columns": "minmax(0, 1fr) 71px",
+            "column-gap": "12px",
+            "align-items": "center",
+            "justify-items": "end"
+          }
+        }
+      },
+      {
+        "id": "p-credito-texto",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://econut.cl/",
+              "rationale": "Medido del sitio real con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "pie",
+          "fontSize": "12px",
+          "lineHeight": 1.4,
+          "align": "end"
+        }
+      },
+      {
+        "id": "p-credito-logo",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://econut.cl/",
+              "rationale": "Medido del sitio real con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "width": "71px",
+            "max-width": "71px"
+          }
+        }
+      },
+      {
+        "id": "p-texto",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://econut.cl/",
+              "rationale": "Medido del sitio real con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "pie",
+          "fontSize": "12px",
+          "lineHeight": 1.4,
+          "align": "end"
+        }
+      },
+      {
+        "id": "p-columna",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://econut.cl/",
+              "rationale": "Medido del sitio real con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "display": "grid",
+            "grid-template-columns": "minmax(0, 1fr)",
+            "row-gap": "0px",
+            "justify-items": "end"
+          }
+        }
+      }
+    ]
+  },
+  "composition": {
+    "schemaVersion": 2,
+    "nodes": [
+      {
+        "id": "pie",
+        "marker": "pie",
+        "kind": "footer",
+        "ruleIds": [
+          "p-aire",
+          "p-superficie"
+        ],
+        "children": [
+          {
+            "id": "g-3",
+            "kind": "group",
+            "ruleIds": [
+              "p-barra"
+            ],
+            "children": [
+              {
+                "id": "i-4",
+                "kind": "image",
+                "ruleIds": [
+                  "p-logo"
+                ],
+                "content": {
+                  "assetUrl": "/wp-content/uploads/2026/09/Logo-calado-20.png",
+                  "alt": "Econut"
+                }
+              },
+              {
+                "id": "g-5",
+                "kind": "group",
+                "ruleIds": [
+                  "p-columna"
+                ],
+                "children": [
+                  {
+                    "id": "p-6",
+                    "kind": "paragraph",
+                    "ruleIds": [
+                      "p-texto"
+                    ],
+                    "content": {
+                      "text": "Av 18 de Septiembre sn Hijuela 2"
+                    }
+                  },
+                  {
+                    "id": "p-7",
+                    "kind": "paragraph",
+                    "ruleIds": [
+                      "p-texto"
+                    ],
+                    "content": {
+                      "text": "Fundo San Rafael - Sector Nuevo Sendero,"
+                    }
+                  },
+                  {
+                    "id": "p-8",
+                    "kind": "paragraph",
+                    "ruleIds": [
+                      "p-texto"
+                    ],
+                    "content": {
+                      "text": "Paine, Región Metropolitana"
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "g-9",
+                "kind": "group",
+                "ruleIds": [
+                  "p-credito"
+                ],
+                "children": [
+                  {
+                    "id": "p-10",
+                    "kind": "paragraph",
+                    "ruleIds": [
+                      "p-credito-texto"
+                    ],
+                    "content": {
+                      "text": "Diseño y desarrollo"
+                    }
+                  },
+                  {
+                    "id": "i-11",
+                    "kind": "image",
+                    "ruleIds": [
+                      "p-credito-logo"
+                    ],
+                    "content": {
+                      "assetUrl": "/wp-content/uploads/2026/09/Altfx-2-Calado.png",
+                      "alt": "Altfx"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "previewId": "aa47204dca571e1b326c31e0bb3cd73dbe8fbef851d5bbf41f3ae7848c135928"
+}
