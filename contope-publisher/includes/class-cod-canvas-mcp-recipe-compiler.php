@@ -46,6 +46,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
         'interaction',
         'cadence',
         'anchor',
+        'divisor',
         'properties',
     ];
 
@@ -1180,6 +1181,8 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 return $this->normalize_cadence_rule($value);
             case 'anchor':
                 return $this->normalize_anchor_rule($value);
+            case 'divisor':
+                return $this->normalize_divisor_rule($value);
             case 'properties':
                 return $this->normalize_properties_rule($value);
         }
@@ -1825,6 +1828,77 @@ final class COD_Canvas_MCP_Recipe_Compiler
      * @param array<string, mixed> $value
      * @return array<string, mixed>|WP_Error
      */
+    /**
+     * La regla `divisor`: el borde no recto entre una sección y la siguiente.
+     *
+     * `forma` es una ruta del PROPIO SITIO a un SVG. No es una lista cerrada de
+     * formas, y ésa es la diferencia con Divi, que trae 27 y ahí se acaba. El
+     * porqué largo está en `class-cod-divisor.php`.
+     *
+     * El contenido del SVG no entra acá: el documento guarda sólo la ruta y el
+     * dibujo se pone al mostrar la página (`COD_Divisor::resolver_en_html`).
+     *
+     * @param array<string, mixed> $value
+     * @return array<string, mixed>|WP_Error
+     */
+    private function normalize_divisor_rule(array $value)
+    {
+        $codigo = 'cod_mcp_divisor_rule_invalid';
+        $permitidas = ['forma', 'donde', 'alto', 'repeticion', 'voltear'];
+
+        if (!$this->has_only_keys($value, $permitidas)) {
+            return new WP_Error($codigo, 'divisor admite: ' . implode(', ', $permitidas) . '.');
+        }
+        if (!isset($value['forma']) || !is_string($value['forma']) || trim($value['forma']) === '') {
+            return new WP_Error($codigo, 'divisor.forma es obligatoria: la ruta de un SVG del sitio.');
+        }
+
+        $forma = trim($value['forma']);
+        if (!$this->is_safe_link($forma) || !COD_Divisor::es_del_sitio($forma)) {
+            return new WP_Error(
+                $codigo,
+                'divisor.forma tiene que ser una ruta del propio sitio. Una forma traída de otro servidor '
+                    . 'sería un recurso ajeno dibujándose como propio, y dejaría al sitio dependiendo de que '
+                    . 'ese servidor siga ahí. Sube el SVG a Medios y usa su ruta.'
+            );
+        }
+        if (substr(strtolower((string) parse_url($forma, PHP_URL_PATH)), -4) !== '.svg') {
+            return new WP_Error($codigo, 'divisor.forma tiene que ser un archivo .svg: es lo que se puede recolorear y estirar sin perder nitidez.');
+        }
+
+        $normalizado = ['forma' => $forma, 'donde' => 'abajo'];
+
+        if (isset($value['donde'])) {
+            if (!is_string($value['donde']) || !in_array($value['donde'], COD_Divisor::DONDE, true)) {
+                return new WP_Error($codigo, 'divisor.donde admite: ' . implode(', ', COD_Divisor::DONDE) . '.');
+            }
+            $normalizado['donde'] = $value['donde'];
+        }
+        if (isset($value['alto'])) {
+            if (!is_string($value['alto']) || !$this->is_css_length($value['alto'])) {
+                return new WP_Error($codigo, 'divisor.alto debe ser una longitud CSS segura, por ejemplo "80px".');
+            }
+            $normalizado['alto'] = $value['alto'];
+        }
+        if (isset($value['repeticion'])) {
+            // Cuántas veces se repite la forma a lo ancho. Más de 12 deja de
+            // ser un divisor y pasa a ser una textura; no se prohíbe por gusto
+            // sino porque a esa escala el SVG se vuelve ilegible y pesado.
+            if (!is_int($value['repeticion']) || $value['repeticion'] < 1 || $value['repeticion'] > 12) {
+                return new WP_Error($codigo, 'divisor.repeticion debe ser un entero entre 1 y 12.');
+            }
+            $normalizado['repeticion'] = $value['repeticion'];
+        }
+        if (isset($value['voltear'])) {
+            if (!is_bool($value['voltear'])) {
+                return new WP_Error($codigo, 'divisor.voltear es verdadero o falso.');
+            }
+            $normalizado['voltear'] = $value['voltear'];
+        }
+
+        return $normalizado;
+    }
+
     private function normalize_properties_rule(array $value)
     {
         $codigo = 'cod_mcp_properties_rule_invalid';
@@ -3039,6 +3113,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 if (($behavior['attributes']['data-cod-behavior'] ?? '') === 'mapa') {
                     $children = $this->render_mapa_mini($node['content']) . $children;
                 }
+                $children = $this->render_divisor($behavior['divisor'] ?? null) . $children;
                 return '<div ' . $attrs . '>' . $children . '</div>';
             case 'layout':
                 $children = $this->render_nodes($node['children'], $rule_index, $node_ids, $depth + 1, $child_cadence, true);
@@ -3118,9 +3193,19 @@ final class COD_Canvas_MCP_Recipe_Compiler
         $is_lightbox = false;
         $carousel = null;
         $gallery = null;
+        $divisor = null;
 
         foreach ($rule_ids as $rule_id) {
             $rule = $rule_index[$rule_id];
+            if ($rule['kind'] === 'divisor') {
+                // El divisor no es un atributo del nodo sino marcado que se
+                // le pone dentro, así que viaja aparte hasta render_node.
+                if ($divisor !== null) {
+                    return new WP_Error('cod_mcp_divisor_duplicado', 'Un nodo no puede llevar dos divisores: usa donde="ambos" para ponerlo arriba y abajo.');
+                }
+                $divisor = $rule['value'];
+                continue;
+            }
             if ($rule['kind'] === 'gallery') {
                 if ($gallery !== null) {
                     return new WP_Error('cod_mcp_gallery_rule_conflict', 'Un nodo gallery sólo puede aplicar una regla de galería a la vez.');
@@ -3342,7 +3427,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
             return new WP_Error('cod_mcp_gallery_controls_unavailable', 'Los controles de galería requieren una regla interaction.carousel-basic en el mismo nodo gallery.');
         }
 
-        return ['attributes' => $attributes, 'lightbox' => $is_lightbox, 'carousel' => $carousel, 'gallery' => $gallery];
+        return ['attributes' => $attributes, 'lightbox' => $is_lightbox, 'carousel' => $carousel, 'gallery' => $gallery, 'divisor' => $divisor];
     }
 
     /**
@@ -3549,6 +3634,51 @@ final class COD_Canvas_MCP_Recipe_Compiler
      *
      * @param array<string, mixed> $content
      */
+    /**
+     * El marcador de un divisor. El SVG NO va acá.
+     *
+     * Lo que queda guardado en el documento es la ruta de la forma; el dibujo
+     * se pone al mostrar la página (`COD_Divisor::resolver_en_html`). Así,
+     * reemplazar el archivo llega a todas las páginas sin recomponer ninguna.
+     *
+     * `donde: "ambos"` emite dos marcadores, uno arriba y otro abajo. Es un
+     * solo divisor declarado y dos piezas dibujadas, que es como se lee en el
+     * diseño: «esta sección tiene esta forma en sus dos bordes».
+     *
+     * @param array<string, mixed>|null $divisor
+     */
+    private function render_divisor(?array $divisor): string
+    {
+        if ($divisor === null) {
+            return '';
+        }
+
+        $donde = (string) ($divisor['donde'] ?? 'abajo');
+        $lugares = $donde === 'ambos' ? ['arriba', 'abajo'] : [$donde];
+
+        $estilo = [];
+        if (isset($divisor['alto'])) {
+            $estilo[] = '--cod-divisor-alto:' . $divisor['alto'];
+        }
+        if (isset($divisor['repeticion'])) {
+            $estilo[] = '--cod-divisor-repeticion:' . (int) $divisor['repeticion'];
+        }
+        $estilo = $estilo === [] ? '' : ' style="' . esc_attr(implode(';', $estilo)) . '"';
+
+        $voltear = !empty($divisor['voltear']) ? ' data-cod-divisor-voltear="1"' : '';
+
+        $salida = '';
+        foreach ($lugares as $lugar) {
+            $salida .= '<div class="' . COD_Divisor::CLASE . '"'
+                . ' ' . COD_Divisor::ATRIBUTO_FORMA . '="' . esc_attr((string) $divisor['forma']) . '"'
+                . ' data-cod-divisor-donde="' . esc_attr($lugar) . '"'
+                . $voltear . $estilo . '></div>';
+        }
+
+        return $salida;
+    }
+
+    /** @param array<string, mixed> $content */
     private function render_mapa_mini(array $content): string
     {
         return '<a class="cod-mapa__mini" data-cod-mapa-rol="mini" href="' . esc_url(COD_Mapa::url_como_llegar((float) $content['lat'], (float) $content['lng'], (float) $content['zoom']))

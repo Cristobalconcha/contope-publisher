@@ -39,7 +39,6 @@
     "  divi    — lo declara Divi 4.2.1 para ese mismo tipo de objeto",
     "  propio  — decisión nuestra, con su porqué escrito"
   ],
-
   "controles": {
     "_": "Los controles que el inspector sabe dibujar. Lista corta a propósito.",
     "texto": "una línea de texto",
@@ -54,69 +53,143 @@
     "formas": "una paleta visual de miniaturas",
     "recurso": "un archivo del sitio (imagen, SVG, vídeo)"
   },
-
   "familias": {
     "_": "El vocabulario de propiedades. Cada una dice con qué clase de regla se expresa.",
-
     "tipografia": {
       "rotulo": "Tipografía",
       "kind": "typography",
       "propiedades": {
-        "familia":     { "rotulo": "Tipografía", "control": "seleccion", "heredaDe": { "rol": "heading" } },
-        "tamano":      { "rotulo": "Tamaño", "control": "medida" },
-        "interlinea":  { "rotulo": "Interlínea", "control": "numero" },
-        "interletra":  { "rotulo": "Interletra", "control": "medida" },
-        "peso":        { "rotulo": "Grosor", "control": "seleccion" },
-        "alineacion":  { "rotulo": "Alineación del texto", "control": "seleccion",
-                         "opciones": ["izquierda", "centro", "derecha", "justificada"] },
-        "transformar": { "rotulo": "Mayúsculas", "control": "seleccion",
-                         "opciones": ["ninguna", "mayusculas", "minusculas", "capital"] }
+        "familia": {
+          "rotulo": "Tipografía",
+          "control": "seleccion",
+          "heredaDe": {
+            "rol": "heading"
+          }
+        },
+        "tamano": {
+          "rotulo": "Tamaño",
+          "control": "medida"
+        },
+        "interlinea": {
+          "rotulo": "Interlínea",
+          "control": "numero"
+        },
+        "interletra": {
+          "rotulo": "Interletra",
+          "control": "medida"
+        },
+        "peso": {
+          "rotulo": "Grosor",
+          "control": "seleccion"
+        },
+        "alineacion": {
+          "rotulo": "Alineación del texto",
+          "control": "seleccion",
+          "opciones": [
+            "izquierda",
+            "centro",
+            "derecha",
+            "justificada"
+          ]
+        },
+        "transformar": {
+          "rotulo": "Mayúsculas",
+          "control": "seleccion",
+          "opciones": [
+            "ninguna",
+            "mayusculas",
+            "minusculas",
+            "capital"
+          ]
+        }
       },
       "evidencia": "medido (45 usos) · divi (familia `font`, 16 campos)"
     },
-
     "color": {
       "rotulo": "Color",
       "kind": "color",
       "propiedades": {
-        "tinta": { "rotulo": "Color del texto", "control": "color", "heredaDe": { "rol": "ink" } }
+        "tinta": {
+          "rotulo": "Color del texto",
+          "control": "color",
+          "heredaDe": {
+            "rol": "ink"
+          }
+        }
       },
       "evidencia": "medido (7 usos) · divi"
     },
-
     "superficie": {
       "rotulo": "Fondo",
       "kind": "surface",
       "propiedades": {
-        "fondo":   { "rotulo": "Color de fondo", "control": "color", "heredaDe": { "rol": "surface" } },
-        "velo":    { "rotulo": "Velo sobre la imagen", "control": "color" },
-        "opacidadVelo": { "rotulo": "Intensidad del velo", "control": "numero" },
-        "sombra":  { "rotulo": "Sombra", "control": "peldanos", "opciones": ["ninguna", "sm", "md", "lg"] }
+        "fondo": {
+          "rotulo": "Color de fondo",
+          "control": "color",
+          "heredaDe": {
+            "rol": "surface"
+          }
+        },
+        "velo": {
+          "rotulo": "Velo sobre la imagen",
+          "control": "color"
+        },
+        "opacidadVelo": {
+          "rotulo": "Intensidad del velo",
+          "control": "numero"
+        },
+        "sombra": {
+          "rotulo": "Sombra",
+          "control": "peldanos",
+          "opciones": [
+            "ninguna",
+            "sm",
+            "md",
+            "lg"
+          ]
+        }
       },
       "evidencia": "medido (20 usos, 6 de ellos `background-color` por la salida de emergencia) · divi (`background`, `box_shadow`)"
     },
-
     "forma": {
       "rotulo": "Forma",
       "kind": "shape",
       "propiedades": {
-        "radio":        { "rotulo": "Puntas redondeadas", "control": "medida" },
-        "filete":       { "rotulo": "Filete", "control": "seleccion", "opciones": ["ninguno", "solido", "guiones"] },
-        "grosorFilete": { "rotulo": "Grosor del filete", "control": "medida" }
+        "radio": {
+          "rotulo": "Puntas redondeadas",
+          "control": "medida"
+        },
+        "filete": {
+          "rotulo": "Filete",
+          "control": "seleccion",
+          "opciones": [
+            "ninguno",
+            "solido",
+            "guiones"
+          ]
+        },
+        "grosorFilete": {
+          "rotulo": "Grosor del filete",
+          "control": "medida"
+        }
       },
       "evidencia": "medido (3 usos como regla + 5 escapadas `border-*`) · divi (`borders`)"
     },
-
     "espaciado": {
       "rotulo": "Espaciado",
       "kind": "spacing",
       "propiedades": {
-        "relleno": { "rotulo": "Relleno", "control": "medidas4" },
-        "margen":  { "rotulo": "Margen", "control": "medidas4" }
+        "relleno": {
+          "rotulo": "Relleno",
+          "control": "medidas4"
+        },
+        "margen": {
+          "rotulo": "Margen",
+          "control": "medidas4"
+        }
       },
       "evidencia": "medido (17 usos como regla + 39 escapadas `margin-*`/`padding-*`) · divi (`margin_padding`, 12 campos)"
     },
-
     "disposicion": {
       "rotulo": "Disposición",
       "kind": "layout",
@@ -161,58 +234,206 @@
           {
             "columnas": 2,
             "variantes": [
-              { "rotulo": "50 / 50", "pesos": [1, 1] },
-              { "rotulo": "33 / 67", "pesos": [1, 2] },
-              { "rotulo": "67 / 33", "pesos": [2, 1] },
-              { "rotulo": "25 / 75", "pesos": [1, 3] },
-              { "rotulo": "75 / 25", "pesos": [3, 1] }
+              {
+                "rotulo": "50 / 50",
+                "pesos": [
+                  1,
+                  1
+                ]
+              },
+              {
+                "rotulo": "33 / 67",
+                "pesos": [
+                  1,
+                  2
+                ]
+              },
+              {
+                "rotulo": "67 / 33",
+                "pesos": [
+                  2,
+                  1
+                ]
+              },
+              {
+                "rotulo": "25 / 75",
+                "pesos": [
+                  1,
+                  3
+                ]
+              },
+              {
+                "rotulo": "75 / 25",
+                "pesos": [
+                  3,
+                  1
+                ]
+              }
             ]
           },
           {
             "columnas": 3,
             "variantes": [
-              { "rotulo": "33 / 33 / 33", "pesos": [1, 1, 1] },
-              { "rotulo": "25 / 50 / 25", "pesos": [1, 2, 1] },
-              { "rotulo": "50 / 25 / 25", "pesos": [2, 1, 1] },
-              { "rotulo": "25 / 25 / 50", "pesos": [1, 1, 2] }
+              {
+                "rotulo": "33 / 33 / 33",
+                "pesos": [
+                  1,
+                  1,
+                  1
+                ]
+              },
+              {
+                "rotulo": "25 / 50 / 25",
+                "pesos": [
+                  1,
+                  2,
+                  1
+                ]
+              },
+              {
+                "rotulo": "50 / 25 / 25",
+                "pesos": [
+                  2,
+                  1,
+                  1
+                ]
+              },
+              {
+                "rotulo": "25 / 25 / 50",
+                "pesos": [
+                  1,
+                  1,
+                  2
+                ]
+              }
             ]
           },
           {
             "columnas": 4,
             "variantes": [
-              { "rotulo": "Iguales", "pesos": [1, 1, 1, 1] },
-              { "rotulo": "Primera doble", "pesos": [2, 1, 1, 1] }
+              {
+                "rotulo": "Iguales",
+                "pesos": [
+                  1,
+                  1,
+                  1,
+                  1
+                ]
+              },
+              {
+                "rotulo": "Primera doble",
+                "pesos": [
+                  2,
+                  1,
+                  1,
+                  1
+                ]
+              }
             ]
           },
           {
             "columnas": 5,
             "variantes": [
-              { "rotulo": "Iguales", "pesos": [1, 1, 1, 1, 1] },
-              { "rotulo": "Primera doble", "pesos": [2, 1, 1, 1, 1] }
+              {
+                "rotulo": "Iguales",
+                "pesos": [
+                  1,
+                  1,
+                  1,
+                  1,
+                  1
+                ]
+              },
+              {
+                "rotulo": "Primera doble",
+                "pesos": [
+                  2,
+                  1,
+                  1,
+                  1,
+                  1
+                ]
+              }
             ]
           },
           {
             "columnas": 6,
             "variantes": [
-              { "rotulo": "Iguales", "pesos": [1, 1, 1, 1, 1, 1] },
-              { "rotulo": "Primera doble", "pesos": [2, 1, 1, 1, 1, 1] }
+              {
+                "rotulo": "Iguales",
+                "pesos": [
+                  1,
+                  1,
+                  1,
+                  1,
+                  1,
+                  1
+                ]
+              },
+              {
+                "rotulo": "Primera doble",
+                "pesos": [
+                  2,
+                  1,
+                  1,
+                  1,
+                  1,
+                  1
+                ]
+              }
             ]
           }
         ]
       },
       "propiedades": {
-        "columnas":   { "rotulo": "Columnas", "control": "formas" },
-        "separacion": { "rotulo": "Separación", "control": "peldanos", "heredaDe": { "rol": "measure" } },
-        "alineacion": { "rotulo": "Alineación del contenido", "control": "seleccion",
-                        "opciones": ["inicio", "centro", "final", "estirar", "espaciado"] },
-        "direccion":  { "rotulo": "Dirección", "control": "seleccion", "opciones": ["fila", "columna"] },
-        "ancho":      { "rotulo": "Ancho", "control": "medida" },
-        "anchoMaximo":{ "rotulo": "Ancho máximo", "control": "medida", "heredaDe": { "rol": "measure" } },
-        "alto":       { "rotulo": "Alto", "control": "medida" }
+        "columnas": {
+          "rotulo": "Columnas",
+          "control": "formas"
+        },
+        "separacion": {
+          "rotulo": "Separación",
+          "control": "peldanos",
+          "heredaDe": {
+            "rol": "measure"
+          }
+        },
+        "alineacion": {
+          "rotulo": "Alineación del contenido",
+          "control": "seleccion",
+          "opciones": [
+            "inicio",
+            "centro",
+            "final",
+            "estirar",
+            "espaciado"
+          ]
+        },
+        "direccion": {
+          "rotulo": "Dirección",
+          "control": "seleccion",
+          "opciones": [
+            "fila",
+            "columna"
+          ]
+        },
+        "ancho": {
+          "rotulo": "Ancho",
+          "control": "medida"
+        },
+        "anchoMaximo": {
+          "rotulo": "Ancho máximo",
+          "control": "medida",
+          "heredaDe": {
+            "rol": "measure"
+          }
+        },
+        "alto": {
+          "rotulo": "Alto",
+          "control": "medida"
+        }
       },
       "evidencia": "medido (18 usos como regla + 59 escapadas: 26 de alineación, 18 de rejilla, 15 de separación) · divi NO tiene rejilla de CSS (cero menciones de grid-template, align-items, justify-content o gap)"
     },
-
     "posicion": {
       "rotulo": "Posición",
       "kind": "properties",
@@ -227,56 +448,126 @@
         "ofrecer algo que no va a funcionar."
       ],
       "propiedades": {
-        "modo":     { "rotulo": "Posición", "control": "seleccion",
-                      "opciones": ["normal", "relativa", "pegada", "absoluta", "fija"] },
-        "desdeArriba": { "rotulo": "Distancia desde arriba", "control": "medida",
-                         "visibleSi": { "modo": ["pegada", "absoluta", "fija"] } },
-        "capa":     { "rotulo": "Orden de capas", "control": "numero" }
+        "modo": {
+          "rotulo": "Posición",
+          "control": "seleccion",
+          "opciones": [
+            "normal",
+            "relativa",
+            "pegada",
+            "absoluta",
+            "fija"
+          ]
+        },
+        "desdeArriba": {
+          "rotulo": "Distancia desde arriba",
+          "control": "medida",
+          "visibleSi": {
+            "modo": [
+              "pegada",
+              "absoluta",
+              "fija"
+            ]
+          }
+        },
+        "capa": {
+          "rotulo": "Orden de capas",
+          "control": "numero"
+        }
       },
       "evidencia": "medido (2 escapadas de z-index) · divi (`position`, `z_index`) · propio (que viva en diseño)"
     },
-
     "imagen": {
       "rotulo": "Imagen",
       "kind": "media",
       "propiedades": {
-        "archivo":    { "rotulo": "Imagen", "control": "recurso" },
-        "alternativo":{ "rotulo": "Texto alternativo", "control": "texto" },
-        "proporcion": { "rotulo": "Proporción", "control": "texto" },
-        "ajuste":     { "rotulo": "Ajuste", "control": "seleccion", "opciones": ["cubrir", "contener", "rellenar"] },
-        "foco":       { "rotulo": "Punto de interés", "control": "texto" },
-        "filtro":     { "rotulo": "Filtro", "control": "seleccion", "opciones": ["ninguno", "grises"] }
+        "archivo": {
+          "rotulo": "Imagen",
+          "control": "recurso"
+        },
+        "alternativo": {
+          "rotulo": "Texto alternativo",
+          "control": "texto"
+        },
+        "proporcion": {
+          "rotulo": "Proporción",
+          "control": "texto"
+        },
+        "ajuste": {
+          "rotulo": "Ajuste",
+          "control": "seleccion",
+          "opciones": [
+            "cubrir",
+            "contener",
+            "rellenar"
+          ]
+        },
+        "foco": {
+          "rotulo": "Punto de interés",
+          "control": "texto"
+        },
+        "filtro": {
+          "rotulo": "Filtro",
+          "control": "seleccion",
+          "opciones": [
+            "ninguno",
+            "grises"
+          ]
+        }
       },
       "evidencia": "medido (12 usos) · divi (`filters`, 9 campos)"
     },
-
     "movimiento": {
       "rotulo": "Movimiento",
       "kind": "motion",
       "propiedades": {
-        "efecto":   { "rotulo": "Efecto", "control": "seleccion" },
-        "duracion": { "rotulo": "Duración", "control": "numero", "heredaDe": { "rol": "enter" } },
-        "retardo":  { "rotulo": "Retardo", "control": "numero" }
+        "efecto": {
+          "rotulo": "Efecto",
+          "control": "seleccion"
+        },
+        "duracion": {
+          "rotulo": "Duración",
+          "control": "numero",
+          "heredaDe": {
+            "rol": "enter"
+          }
+        },
+        "retardo": {
+          "rotulo": "Retardo",
+          "control": "numero"
+        }
       },
       "evidencia": "medido (1 uso) · divi (`animation`, 12 campos)"
     },
-
     "conducta": {
       "rotulo": "Conducta",
       "kind": "interaction",
       "_nota": "Va en «configuracion» y no en «diseño»: no es aspecto. Acá viven los behaviors con sus gatilladores.",
       "propiedades": {
-        "behavior":  { "rotulo": "Conducta", "control": "seleccion" },
-        "disparador":{ "rotulo": "Disparador", "control": "seleccion",
-                       "opciones": ["ninguno", "al-cargar", "al-desplazar", "al-pinchar"] },
-        "umbral":    { "rotulo": "Umbral", "control": "numero" }
+        "behavior": {
+          "rotulo": "Conducta",
+          "control": "seleccion"
+        },
+        "disparador": {
+          "rotulo": "Disparador",
+          "control": "seleccion",
+          "opciones": [
+            "ninguno",
+            "al-cargar",
+            "al-desplazar",
+            "al-pinchar"
+          ]
+        },
+        "umbral": {
+          "rotulo": "Umbral",
+          "control": "numero"
+        }
       },
       "evidencia": "medido (6 usos) · divi (`scroll_effects`, `sticky`)"
     },
-
     "divisor": {
       "rotulo": "Divisor",
-      "kind": "properties",
+      "kind": "divisor",
       "_nota": [
         "La forma es un RECURSO DEL SITIO, no una lista cerrada. Divi trae 27",
         "formas fijas —Slant, Arrow, Ramp, Curve, Mountains, Wave, Asymmetric,",
@@ -291,42 +582,106 @@
         "(COD_SVG, con limpieza al subir). Sin eso sería una promesa."
       ],
       "propiedades": {
-        "forma":     { "rotulo": "Forma", "control": "recurso" },
-        "color":     { "rotulo": "Color", "control": "color", "heredaDe": { "rol": "surface" } },
-        "alto":      { "rotulo": "Alto", "control": "medida" },
-        "repeticion":{ "rotulo": "Repetición horizontal", "control": "numero" },
-        "voltear":   { "rotulo": "Voltear", "control": "interruptor" },
-        "donde":     { "rotulo": "Dónde", "control": "seleccion", "opciones": ["arriba", "abajo", "ambos"] }
+        "forma": {
+          "rotulo": "Forma",
+          "control": "recurso"
+        },
+        "color": {
+          "rotulo": "Color",
+          "control": "color",
+          "heredaDe": {
+            "rol": "surface"
+          }
+        },
+        "alto": {
+          "rotulo": "Alto",
+          "control": "medida"
+        },
+        "repeticion": {
+          "rotulo": "Repetición horizontal",
+          "control": "numero"
+        },
+        "voltear": {
+          "rotulo": "Voltear",
+          "control": "interruptor"
+        },
+        "donde": {
+          "rotulo": "Dónde",
+          "control": "seleccion",
+          "opciones": [
+            "arriba",
+            "abajo",
+            "ambos"
+          ]
+        }
       },
       "evidencia": "divi (`dividers`) · propio (que la forma sea abierta)"
     },
-
     "boton": {
       "rotulo": "Botón",
       "kind": "button",
       "propiedades": {
-        "variante":    { "rotulo": "Variante", "control": "seleccion", "opciones": ["solido", "contorno", "texto"] },
-        "tono":        { "rotulo": "Tono", "control": "seleccion", "heredaDe": { "rol": "accent" } },
-        "tamano":      { "rotulo": "Tamaño", "control": "seleccion", "opciones": ["sm", "md", "lg"] },
-        "ancho":       { "rotulo": "Ancho", "control": "seleccion", "opciones": ["auto", "completo"] },
-        "interaccion": { "rotulo": "Respuesta al pasar", "control": "seleccion" }
+        "variante": {
+          "rotulo": "Variante",
+          "control": "seleccion",
+          "opciones": [
+            "solido",
+            "contorno",
+            "texto"
+          ]
+        },
+        "tono": {
+          "rotulo": "Tono",
+          "control": "seleccion",
+          "heredaDe": {
+            "rol": "accent"
+          }
+        },
+        "tamano": {
+          "rotulo": "Tamaño",
+          "control": "seleccion",
+          "opciones": [
+            "sm",
+            "md",
+            "lg"
+          ]
+        },
+        "ancho": {
+          "rotulo": "Ancho",
+          "control": "seleccion",
+          "opciones": [
+            "auto",
+            "completo"
+          ]
+        },
+        "interaccion": {
+          "rotulo": "Respuesta al pasar",
+          "control": "seleccion"
+        }
       },
       "evidencia": "medido (1 uso) · divi (`button`, 15 campos)"
     },
-
     "enlace": {
       "rotulo": "Enlace",
       "kind": "anchor",
       "_nota": "En «configuracion»: a dónde lleva algo no es su aspecto.",
       "propiedades": {
-        "destino":  { "rotulo": "Destino", "control": "texto" },
-        "ventana":  { "rotulo": "Abrir en otra ventana", "control": "interruptor" },
-        "marcador": { "rotulo": "Nombre del marcador", "control": "texto" }
+        "destino": {
+          "rotulo": "Destino",
+          "control": "texto"
+        },
+        "ventana": {
+          "rotulo": "Abrir en otra ventana",
+          "control": "interruptor"
+        },
+        "marcador": {
+          "rotulo": "Nombre del marcador",
+          "control": "texto"
+        }
       },
       "evidencia": "divi (`link_options`) · medido (anclas del sitio)"
     }
   },
-
   "taxonomias": {
     "_": [
       "Qué familias se le ofrecen a cada tipo de objeto. Los nombres de",
@@ -339,77 +694,294 @@
       "traducen. Por eso el vocabulario es compartido y es la taxonomía la que",
       "resuelve qué significa cada palabra."
     ],
-
     "heading": {
       "rotulo": "Título",
-      "configuracion": ["enlace", "conducta"],
-      "diseno": ["tipografia", "color", "espaciado", "superficie", "posicion", "movimiento"],
+      "configuracion": [
+        "enlace",
+        "conducta"
+      ],
+      "diseno": [
+        "tipografia",
+        "color",
+        "espaciado",
+        "superficie",
+        "posicion",
+        "movimiento"
+      ],
       "_sin": "forma — un texto no lleva puntas redondeadas (ejemplo de Cristóbal). Divi coincide: su módulo de texto no declara `borders`."
     },
-
     "paragraph": {
       "rotulo": "Texto",
-      "configuracion": ["enlace", "conducta"],
-      "diseno": ["tipografia", "color", "espaciado", "superficie", "posicion", "movimiento"],
+      "configuracion": [
+        "enlace",
+        "conducta"
+      ],
+      "diseno": [
+        "tipografia",
+        "color",
+        "espaciado",
+        "superficie",
+        "posicion",
+        "movimiento"
+      ],
       "_sin": "forma, por lo mismo que el título."
     },
-
     "richText": {
       "rotulo": "Texto con formato",
-      "configuracion": ["enlace", "conducta"],
-      "diseno": ["tipografia", "color", "espaciado", "superficie", "posicion", "movimiento"]
+      "configuracion": [
+        "enlace",
+        "conducta"
+      ],
+      "diseno": [
+        "tipografia",
+        "color",
+        "espaciado",
+        "superficie",
+        "posicion",
+        "movimiento"
+      ]
     },
-
     "image": {
       "rotulo": "Imagen",
-      "configuracion": ["enlace", "conducta"],
-      "diseno": ["imagen", "forma", "espaciado", "superficie", "disposicion", "posicion", "movimiento"],
+      "configuracion": [
+        "enlace",
+        "conducta"
+      ],
+      "diseno": [
+        "imagen",
+        "forma",
+        "espaciado",
+        "superficie",
+        "disposicion",
+        "posicion",
+        "movimiento"
+      ],
       "_sin": "tipografia — una imagen no tiene texto (ejemplo de Cristóbal). Divi coincide: su módulo de imagen no declara `fonts`.",
       "_con": "forma SÍ: el radio de una imagen es de lo más usado. Divi también lo declara."
     },
-
-    "video":  { "rotulo": "Vídeo",  "configuracion": ["conducta"], "diseno": ["imagen", "forma", "espaciado", "disposicion", "posicion"] },
-    "audio":  { "rotulo": "Audio",  "configuracion": ["conducta"], "diseno": ["espaciado", "disposicion", "posicion"] },
-
+    "video": {
+      "rotulo": "Vídeo",
+      "configuracion": [
+        "conducta"
+      ],
+      "diseno": [
+        "imagen",
+        "forma",
+        "espaciado",
+        "disposicion",
+        "posicion"
+      ]
+    },
+    "audio": {
+      "rotulo": "Audio",
+      "configuracion": [
+        "conducta"
+      ],
+      "diseno": [
+        "espaciado",
+        "disposicion",
+        "posicion"
+      ]
+    },
     "button": {
       "rotulo": "Botón",
-      "configuracion": ["enlace", "conducta"],
-      "diseno": ["boton", "tipografia", "forma", "espaciado", "superficie", "posicion", "movimiento"]
+      "configuracion": [
+        "enlace",
+        "conducta"
+      ],
+      "diseno": [
+        "boton",
+        "tipografia",
+        "forma",
+        "espaciado",
+        "superficie",
+        "posicion",
+        "movimiento"
+      ]
     },
-
     "link": {
       "rotulo": "Enlace",
-      "configuracion": ["enlace", "conducta"],
-      "diseno": ["tipografia", "color", "espaciado", "posicion"]
+      "configuracion": [
+        "enlace",
+        "conducta"
+      ],
+      "diseno": [
+        "tipografia",
+        "color",
+        "espaciado",
+        "posicion"
+      ]
     },
-
     "group": {
       "rotulo": "Bloque",
-      "configuracion": ["conducta", "enlace"],
-      "diseno": ["disposicion", "espaciado", "superficie", "forma", "posicion", "divisor", "movimiento"],
+      "configuracion": [
+        "conducta",
+        "enlace"
+      ],
+      "diseno": [
+        "disposicion",
+        "espaciado",
+        "superficie",
+        "forma",
+        "posicion",
+        "divisor",
+        "movimiento"
+      ],
       "_sin": "tipografia — un bloque no tiene texto propio, aunque la herede para lo de dentro.",
       "_con": "disposicion es la familia principal de un bloque: 59 de las escapadas medidas son suyas."
     },
-
-    "layout":  { "rotulo": "Disposición", "configuracion": ["conducta"], "diseno": ["disposicion", "espaciado", "superficie", "posicion"] },
-
+    "layout": {
+      "rotulo": "Disposición",
+      "configuracion": [
+        "conducta"
+      ],
+      "diseno": [
+        "disposicion",
+        "espaciado",
+        "superficie",
+        "posicion"
+      ]
+    },
     "section": {
       "rotulo": "Sección",
-      "configuracion": ["conducta", "enlace"],
-      "diseno": ["disposicion", "espaciado", "superficie", "divisor", "posicion"],
+      "configuracion": [
+        "conducta",
+        "enlace"
+      ],
+      "diseno": [
+        "disposicion",
+        "espaciado",
+        "superficie",
+        "divisor",
+        "posicion"
+      ],
       "_con": "divisor: es donde Divi los pone, y es donde tienen sentido."
     },
-
-    "header":  { "rotulo": "Encabezado", "configuracion": ["conducta"], "diseno": ["disposicion", "espaciado", "superficie", "posicion", "forma"] },
-    "footer":  { "rotulo": "Pie",        "configuracion": ["conducta"], "diseno": ["disposicion", "espaciado", "superficie", "posicion", "forma"] },
-    "navigation": { "rotulo": "Navegación", "configuracion": ["conducta", "enlace"], "diseno": ["tipografia", "color", "disposicion", "espaciado", "posicion"] },
-
-    "list":    { "rotulo": "Lista",  "configuracion": ["conducta"], "diseno": ["tipografia", "color", "espaciado", "posicion"] },
-    "table":   { "rotulo": "Tabla",  "configuracion": ["conducta"], "diseno": ["tipografia", "color", "espaciado", "forma", "superficie", "posicion"] },
-    "gallery": { "rotulo": "Galería","configuracion": ["conducta"], "diseno": ["imagen", "disposicion", "espaciado", "forma", "posicion"] },
-    "social":  { "rotulo": "Redes sociales", "configuracion": ["enlace"], "diseno": ["color", "forma", "espaciado", "disposicion"] },
-    "separator": { "rotulo": "Separador", "configuracion": [], "diseno": ["divisor", "espaciado", "superficie"] },
-    "chart":   { "rotulo": "Gráfico", "configuracion": ["conducta"], "diseno": ["color", "espaciado", "disposicion", "posicion"] },
-    "form":    { "rotulo": "Formulario", "configuracion": ["conducta"], "diseno": ["tipografia", "color", "espaciado", "forma", "superficie", "disposicion"] }
+    "header": {
+      "rotulo": "Encabezado",
+      "configuracion": [
+        "conducta"
+      ],
+      "diseno": [
+        "disposicion",
+        "espaciado",
+        "superficie",
+        "posicion",
+        "forma"
+      ]
+    },
+    "footer": {
+      "rotulo": "Pie",
+      "configuracion": [
+        "conducta"
+      ],
+      "diseno": [
+        "disposicion",
+        "espaciado",
+        "superficie",
+        "posicion",
+        "forma"
+      ]
+    },
+    "navigation": {
+      "rotulo": "Navegación",
+      "configuracion": [
+        "conducta",
+        "enlace"
+      ],
+      "diseno": [
+        "tipografia",
+        "color",
+        "disposicion",
+        "espaciado",
+        "posicion"
+      ]
+    },
+    "list": {
+      "rotulo": "Lista",
+      "configuracion": [
+        "conducta"
+      ],
+      "diseno": [
+        "tipografia",
+        "color",
+        "espaciado",
+        "posicion"
+      ]
+    },
+    "table": {
+      "rotulo": "Tabla",
+      "configuracion": [
+        "conducta"
+      ],
+      "diseno": [
+        "tipografia",
+        "color",
+        "espaciado",
+        "forma",
+        "superficie",
+        "posicion"
+      ]
+    },
+    "gallery": {
+      "rotulo": "Galería",
+      "configuracion": [
+        "conducta"
+      ],
+      "diseno": [
+        "imagen",
+        "disposicion",
+        "espaciado",
+        "forma",
+        "posicion"
+      ]
+    },
+    "social": {
+      "rotulo": "Redes sociales",
+      "configuracion": [
+        "enlace"
+      ],
+      "diseno": [
+        "color",
+        "forma",
+        "espaciado",
+        "disposicion"
+      ]
+    },
+    "separator": {
+      "rotulo": "Separador",
+      "configuracion": [],
+      "diseno": [
+        "divisor",
+        "espaciado",
+        "superficie"
+      ]
+    },
+    "chart": {
+      "rotulo": "Gráfico",
+      "configuracion": [
+        "conducta"
+      ],
+      "diseno": [
+        "color",
+        "espaciado",
+        "disposicion",
+        "posicion"
+      ]
+    },
+    "form": {
+      "rotulo": "Formulario",
+      "configuracion": [
+        "conducta"
+      ],
+      "diseno": [
+        "tipografia",
+        "color",
+        "espaciado",
+        "forma",
+        "superficie",
+        "disposicion"
+      ]
+    }
   }
 }

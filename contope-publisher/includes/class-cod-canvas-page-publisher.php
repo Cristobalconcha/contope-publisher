@@ -1413,6 +1413,7 @@ CSS;
                 . self::marquesina_css($header_html . $body_html . $footer_html)
                 . self::aviso_css($header_html . $body_html . $footer_html)
                 . self::mapa_css($header_html . $body_html . $footer_html)
+                . COD_Divisor::css($header_html . $body_html . $footer_html)
                 . self::rotation_css() . self::carousel_rows_css()
                 . self::unir_css_de_documentos([$header_css, $body_css, $footer_css])
         );
@@ -1532,6 +1533,7 @@ CSS;
                 . self::marquesina_css($header_html . $body_html . $footer_html)
                 . self::aviso_css($header_html . $body_html . $footer_html)
                 . self::mapa_css($header_html . $body_html . $footer_html)
+                . COD_Divisor::css($header_html . $body_html . $footer_html)
                     . self::rotation_css() . self::carousel_rows_css()
                     . self::unir_css_de_documentos([$header_css, $body_css, $footer_css])
             );
@@ -1591,6 +1593,11 @@ CSS;
         // Lo mismo con la clave de Mapbox del mapa grande: la página guardada no la
         // lleva; aquí se pone la de ahora (o, si no hay, el mapa queda como enlace).
         $markup = COD_Mapa::resolver_en_html($markup);
+
+        // Y la forma de cada divisor, por la misma razón: el documento guarda
+        // la ruta, el dibujo se pone acá. Reemplazar el SVG llega a todas las
+        // páginas sin recomponer ninguna.
+        $markup = COD_Divisor::resolver_en_html($markup);
 
         // Los shortcodes se ejecutan al final, después de resolver los tokens
         // dinámicos: así un marcador puede llevar un valor ACF entre sus
