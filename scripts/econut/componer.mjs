@@ -200,7 +200,24 @@ R('portada-lienzo', 'properties', { declarations: {
 // mitad; el texto arranca adentro, no pegado al borde.
 R('portada-texto', 'properties', { declarations: {
   'grid-column': '1', 'grid-row': '1', width: '59%', 'margin-inline-start': '0px',
-  'padding-inline-start': '21%', 'padding-inline-end': '5%', 'z-index': '1',
+  // El relleno de la derecha tiene que dejar libre la franja por donde pasa el
+  // video, no sólo un respiro. Con el 5% del original el texto terminaba en el
+  // 54% de la sección y el video empieza en el 51%: medido el 4 de octubre de
+  // 2026 en una ventana de 1440, tapaba 41 px del párrafo —cinco de sus siete
+  // líneas— y la «e» final de «Servicio de verdad». El original de econut.cl
+  // tiene el mismo defecto; ésta es una divergencia deliberada, como la del
+  // icono de alerta.
+  //
+  // OJO CON LA ARITMÉTICA, que es donde me equivoqué primero: un relleno en
+  // porcentaje se mide contra el ANCHO DEL CONTENEDOR —la sección—, no contra
+  // el del propio elemento. Así que el 10% son 10% de la sección: la columna
+  // mide el 59%, el texto termina en el 49% y el video entra en el 51%. Quedan
+  // dos puntos de aire. Con 18% el texto quedaba estrangulado en una tira.
+  // La sangría de la izquierda baja de 21% a 16% para devolverle al texto el
+  // ancho que le quita el relleno nuevo de la derecha. Se prefiere mover el
+  // bloque que estrechar la medida: con 21% el título se partía en tres
+  // líneas («Servicio / de / verdad») donde el original lo parte en dos.
+  'padding-inline-start': '16%', 'padding-inline-end': '10%', 'z-index': '1',
 } });
 // El video monta sobre el borde entre el blanco y la foto: empieza antes de
 // que el panel termine y se mete en la foto. Es lo que lo vuelve protagonista.

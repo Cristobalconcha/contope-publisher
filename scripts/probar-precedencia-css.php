@@ -82,30 +82,30 @@ $verifica(
     'la regla layout emite su gap',
     preg_match('/\.cod-rule--disp-uno\{[^}]*gap:165px/', $css) === 1
 );
-$pos_base = strpos($css, '.cod-group{');
-$pos_regla = strpos($css, '.cod-rule--disp-uno{');
-$verifica(
-    'la regla de diseño va DESPUÉS del base .cod-group',
-    $pos_base !== false && $pos_regla !== false && $pos_base < $pos_regla,
-    sprintf('base@%s regla@%s', var_export($pos_base, true), var_export($pos_regla, true))
-);
-$verifica('.cod-group aparece una sola vez', substr_count($css, '.cod-group{') === 1, (string) substr_count($css, '.cod-group{'));
+/*
+ * DESDE LA 0.3.63 EL DOCUMENTO YA NO LLEVA EL BASE DENTRO.
+ *
+ * Esta prueba nació en la 0.3.42, cuando cada documento empezaba con una copia
+ * de la hoja base y el problema era el ORDEN entre esa copia y las reglas. La
+ * 0.3.63 quitó la copia: la hoja base es del motor, viaja con el plugin y se
+ * encola antes que nada. O sea que el defecto original ya no puede ocurrir
+ * —no hay dos copias que ordenar—, y lo que hay que comprobar es que el
+ * documento salga limpio.
+ */
+$verifica('el documento NO lleva la hoja base dentro', strpos($css, '.cod-group{') === false);
+$verifica('  y sí lleva su regla', strpos($css, '.cod-rule--disp-uno{') !== false);
 
-// 2. Publicador: tres documentos, cada uno con su base al comienzo.
+// 2. Publicador: juntar tres documentos no reintroduce el base ni pierde reglas.
 $cabecera = $compilar('cab', '10px');
 $cuerpo = $compilar('cuerpo', '165px');
 $pie = $compilar('pie', '30px');
 $unido = COD_Canvas_Page_Publisher::unir_css_de_documentos([$cabecera, $cuerpo, $pie]);
 
-$verifica('el base sale una sola vez (.cod-group)', substr_count($unido, '.cod-group{') === 1, (string) substr_count($unido, '.cod-group{'));
-$verifica('el base sale una sola vez (.cod-section)', substr_count($unido, ".cod-section{width:100%") === 1);
-
-$primera_regla = strpos($unido, '.cod-rule--');
-$ultimo_base = strrpos($unido, '.cod-group{');
-$verifica(
-    'el base va antes de toda regla .cod-rule--*',
-    $primera_regla !== false && $ultimo_base !== false && $ultimo_base < $primera_regla
-);
+$verifica('juntar documentos nuevos no mete ningún base', strpos($unido, '.cod-group{') === false);
+$verifica('y las tres reglas llegan',
+    strpos($unido, '.cod-rule--disp-cab{') !== false
+    && strpos($unido, '.cod-rule--disp-cuerpo{') !== false
+    && strpos($unido, '.cod-rule--disp-pie{') !== false);
 
 $orden = [];
 foreach (['cab', 'cuerpo', 'pie'] as $id) {
@@ -122,10 +122,13 @@ $verifica(
         && preg_match('/\.cod-rule--disp-pie\{[^}]*gap:30px/', $unido) === 1
 );
 // Nada del base vigente queda dentro de una hoja de documento: la copia única es la primera.
-$verifica(
-    'la hoja unida empieza por el base completo',
-    strpos(ltrim($unido), ltrim(COD_Canvas_MCP_Recipe_Compiler::base_styles())) === 0
-);
+// Un documento ANTIGUO sí lo trae, y ahí el descarte tiene que seguir actuando.
+$con_base = COD_Canvas_MCP_Recipe_Compiler::base_styles() . ".cod-rule--vieja{color:red;}
+";
+$mezcla_vieja = COD_Canvas_Page_Publisher::unir_css_de_documentos([$con_base, $cuerpo]);
+$verifica('de un documento antiguo, el base sale UNA vez', substr_count($mezcla_vieja, '.cod-group{') === 1);
+$verifica('  y va antes de toda regla de diseño',
+    strrpos($mezcla_vieja, '.cod-group{') < strpos($mezcla_vieja, '.cod-rule--'));
 
 // 3. Un documento que no empieza por el base se deja como está.
 $ajeno = ".mi-regla{color:red;}\n.cod-group{gap:99px;}\n";

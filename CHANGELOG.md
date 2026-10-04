@@ -5,6 +5,44 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.65 — 4 de octubre de 2026
+
+### Corregido en el sitio de Econut (local)
+
+- **El vídeo de la portada tapaba texto en escritorio.** No el panel blanco —eso
+  es el diseño—, sino las palabras: medido en una ventana de 1440, el vídeo
+  cubría **41 px del párrafo (cinco de sus siete líneas)** y la «e» final de
+  «Servicio de verdad». El original de econut.cl tiene el mismo defecto; ésta es
+  una divergencia deliberada, como la del icono de alerta.
+
+  Se arregla dejando libre la franja por donde pasa el vídeo, y devolviéndole al
+  texto por la izquierda el ancho que pierde por la derecha: **mover el bloque
+  es mejor que estrechar la medida**. Con el primer intento el título se partía
+  en tres líneas donde el original lo parte en dos.
+
+  **La aritmética tiene truco y me equivoqué en el primer intento**, así que
+  queda escrito: un relleno en porcentaje se mide contra el ancho del
+  **contenedor**, no contra el del propio elemento. Puse 18% creyendo que eran
+  151 px y eran 256.
+
+  Comprobado sin texto tapado en 1024, 1280, 1440 y 1920.
+
+### Corregido en las pruebas
+
+- **`probar-precedencia-css.php` seguía exigiendo la arquitectura anterior.**
+  Nació en la 0.3.42, cuando cada documento llevaba una copia de la hoja base y
+  el problema era el orden entre esa copia y las reglas. La 0.3.63 quitó la
+  copia, así que el defecto original ya no puede ocurrir: ahora comprueba que el
+  documento salga limpio, y que el descarte siga actuando sobre los documentos
+  antiguos, que sí la traen.
+
+  **Llevaba dos versiones fallando sin que se viera, y la culpa es mía**: al
+  resumir la batería filtré las líneas por su texto y uno de los filtros —`de
+  17`— tapaba justamente su resultado. Un filtro que esconde un fallo es peor
+  que no filtrar.
+
+---
+
 ## 0.3.64 — 4 de octubre de 2026
 
 ### Cambiado
