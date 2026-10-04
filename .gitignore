@@ -38,3 +38,5 @@ scripts/econut/pv-*.json
 scripts/econut/ap-*.json
 scripts/econut/estado-args.json
 scripts/econut/hoja.html
+
+scripts/econut/.*.json

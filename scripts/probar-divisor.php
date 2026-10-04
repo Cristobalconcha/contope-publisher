@@ -205,6 +205,39 @@ foreach ([
     $comprobar("rechaza $nombre", is_wp_error($rr));
 }
 
+/**
+ * La reserva. Un divisor está posicionado contra el borde de su sección, así
+ * que no ocupa sitio y se monta sobre lo que haya. Divi deja ese cálculo al
+ * que diseña; acá el divisor se reserva su hueco solo.
+ */
+echo "\n== el divisor se reserva su hueco ==\n";
+$r7 = $compilador->compile($componer(), $diseno([$regla([
+    'forma' => $ondaRel, 'alto' => '90px',
+    'capas' => [['alto' => '150px', 'opacidad' => 0.4]],
+])]));
+$h7 = is_wp_error($r7) ? '' : $r7['storage']['markup'];
+$comprobar('por omisión reserva', strpos($h7, 'cod-divisor-reserva') !== false, $mensaje($r7));
+$comprobar('  con el alto de la capa MÁS ALTA, que es la que asoma', strpos($h7, 'cod-divisor-reserva" aria-hidden="true" style="height:150px"') !== false);
+$comprobar('  después del contenido, porque el divisor va abajo',
+    strrpos($h7, 'cod-divisor-reserva') > strpos($h7, 'Contenido'));
+$comprobar('  y no se anuncia a un lector de pantalla', strpos($h7, 'cod-divisor-reserva" aria-hidden="true"') !== false);
+
+$r8 = $compilador->compile($componer(), $diseno([$regla(['forma' => $ondaRel, 'donde' => 'arriba', 'alto' => '70px'])]));
+$h8 = is_wp_error($r8) ? '' : $r8['storage']['markup'];
+$comprobar('arriba, el hueco va ANTES del contenido',
+    strpos($h8, 'cod-divisor-reserva') < strpos($h8, 'Contenido'), $mensaje($r8));
+
+$r9 = $compilador->compile($componer(), $diseno([$regla(['forma' => $ondaRel, 'donde' => 'ambos', 'alto' => '70px'])]));
+$comprobar('«ambos» reserva en los dos bordes',
+    !is_wp_error($r9) && substr_count($r9['storage']['markup'], 'cod-divisor-reserva') === 2, $mensaje($r9));
+
+$r10 = $compilador->compile($componer(), $diseno([$regla(['forma' => $ondaRel, 'reserva' => false])]));
+$comprobar('con reserva:false vuelve a flotar sobre el contenido',
+    !is_wp_error($r10) && strpos($r10['storage']['markup'], 'cod-divisor-reserva') === false, $mensaje($r10));
+
+$rr = $compilador->compile($componer(), $diseno([$regla(['forma' => $ondaRel, 'reserva' => 'si'])]));
+$comprobar('rechaza una reserva que no es sí o no', is_wp_error($rr));
+
 echo "\n== el saneador del documento lo deja pasar ==\n";
 $limpio = (new COD_Canvas_Document_Sanitizer())->sanitize_html($html);
 $comprobar('conserva el marcador', is_string($limpio) && strpos($limpio, COD_Divisor::ATRIBUTO_FORMA) !== false,

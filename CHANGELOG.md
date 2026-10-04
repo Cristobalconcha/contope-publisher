@@ -5,6 +5,61 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.58 — 4 de octubre de 2026
+
+### Agregado
+
+- **El divisor se reserva su propio hueco.** Un divisor está posicionado contra
+  el borde de su sección —tiene que estarlo, o no toca el filo—, así que no
+  ocupa sitio en el flujo y se monta sobre lo que haya debajo. Divi tiene el
+  mismo comportamiento y deja el cálculo al que diseña.
+
+  Cristóbal, al ver una cordillera comerse un párrafo: «no genera el espacio
+  que necesita, cae sobre el texto». Ahora el divisor emite un bloque vacío de
+  su alto dentro del flujo, antes o después del contenido según dónde vaya, y
+  con el alto de la **capa más alta**, que es la que asoma.
+
+  **Por qué un bloque y no relleno en la sección:** el relleno ya lo declara la
+  regla de espaciado, y sumarle algo desde acá exigiría conocer su valor, que
+  puede venir de varias reglas y cambiar por breakpoint. Un bloque en el flujo
+  se suma solo, sin saber nada de lo que hay.
+
+  Con `reserva: false` vuelve a flotar, que es lo que se quiere cuando el
+  solape ES el efecto buscado.
+
+### Corregido
+
+- **Un color con la sintaxis moderna de barra se perdía sin avisar.**
+  `rgb(229 0 126 / 0.3)` es CSS correcto, pasaba nuestra validación, se
+  guardaba… y no pintaba: `safecss_filter_attr` de WordPress lo descarta al
+  limpiar el atributo `style`. La declaración existía en el documento y no
+  hacía nada, que es la peor forma de fallar.
+
+  Ahora se rechaza al componer. La opacidad se escribe dentro del propio
+  color, con un hexadecimal de ocho dígitos: `#E5007E4D`.
+
+  Lo destapó el icono de alerta de Econut, que salía gris en vez de rosa.
+
+### En el sitio de Econut (local)
+
+- **El triángulo de alerta dejó de ser un fondo.** Iba como fondo de la sección
+  al «7% auto» —un porcentaje del **ancho**—, con dos defectos a la vez: en una
+  ventana de 1440 la franja mide 38px y el icono se dibujaba de 100×91, cortado
+  arriba y abajo; y al ser fondo no participa de la línea, así que el texto se
+  le montaba encima.
+
+  Ahora va con la familia `icono`, dentro del párrafo. El dibujo se vectorizó
+  desde el PNG original midiendo su canal alfa: resultó ser de **un solo color**
+  con el signo de exclamación como **hueco**, no una forma blanca. Por eso el
+  color viene de la regla y puede cambiarse desde el panel.
+
+- **Una cordillera en tres capas** entre «Nuestra historia» y las cifras, con
+  la transparencia bajando hacia atrás: perspectiva aérea, lo lejano más
+  pálido. El color es el de la banda siguiente entrando sobre el blanco, así
+  que no se introduce ningún color nuevo.
+
+---
+
 ## 0.3.57 — 3 de octubre de 2026
 
 ### Agregado

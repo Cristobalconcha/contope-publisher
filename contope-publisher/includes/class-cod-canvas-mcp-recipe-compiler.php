@@ -1884,7 +1884,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
     private function normalize_divisor_rule(array $value)
     {
         $codigo = 'cod_mcp_divisor_rule_invalid';
-        $permitidas = ['forma', 'donde', 'alto', 'repeticion', 'voltear', 'color', 'capas'];
+        $permitidas = ['forma', 'donde', 'alto', 'repeticion', 'voltear', 'color', 'capas', 'reserva'];
 
         if (!$this->has_only_keys($value, $permitidas)) {
             return new WP_Error($codigo, 'divisor admite: ' . implode(', ', $permitidas) . '.');
@@ -1944,6 +1944,15 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 return new WP_Error($codigo, 'divisor.voltear es verdadero o falso.');
             }
             $normalizado['voltear'] = $value['voltear'];
+        }
+
+        if (isset($value['reserva'])) {
+            // Por omisión, sí: lo normal es que un divisor no se coma el
+            // texto. Se pone en falso cuando el solape ES el efecto buscado.
+            if (!is_bool($value['reserva'])) {
+                return new WP_Error($codigo, 'divisor.reserva es verdadero o falso.');
+            }
+            $normalizado['reserva'] = $value['reserva'];
         }
 
         if (isset($value['capas'])) {
@@ -3617,7 +3626,9 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 // filo. Dentro de la columna quedaría metido hacia adentro por
                 // el relleno de la sección.
                 return '<section ' . $attrs . '>' . $this->render_divisor($behavior['divisor'] ?? null)
-                    . '<div class="cod-columns cod-columns--single"><div class="cod-column">' . $children . '</div></div></section>';
+                    . $this->render_divisor_reserva($behavior['divisor'] ?? null, 'arriba')
+                    . '<div class="cod-columns cod-columns--single"><div class="cod-column">' . $children . '</div></div>'
+                    . $this->render_divisor_reserva($behavior['divisor'] ?? null, 'abajo') . '</section>';
             case 'header':
             case 'footer':
                 $children = $this->render_nodes($node['children'], $rule_index, $node_ids, $depth + 1, $child_cadence, false);
@@ -3625,7 +3636,9 @@ final class COD_Canvas_MCP_Recipe_Compiler
                     return $children;
                 }
                 return '<' . $node['kind'] . ' ' . $attrs . '>' . $this->render_divisor($behavior['divisor'] ?? null)
-                    . '<div class="cod-columns cod-columns--single"><div class="cod-column">' . $children . '</div></div></' . $node['kind'] . '>';
+                    . $this->render_divisor_reserva($behavior['divisor'] ?? null, 'arriba')
+                    . '<div class="cod-columns cod-columns--single"><div class="cod-column">' . $children . '</div></div>'
+                    . $this->render_divisor_reserva($behavior['divisor'] ?? null, 'abajo') . '</' . $node['kind'] . '>';
             case 'navigation':
                 $children = $this->render_nodes($node['children'], $rule_index, $node_ids, $depth + 1, $child_cadence, false);
                 if (is_wp_error($children)) {
@@ -3640,7 +3653,10 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 if (($behavior['attributes']['data-cod-behavior'] ?? '') === 'mapa') {
                     $children = $this->render_mapa_mini($node['content']) . $children;
                 }
-                $children = $this->render_divisor($behavior['divisor'] ?? null) . $children;
+                $children = $this->render_divisor($behavior['divisor'] ?? null)
+                    . $this->render_divisor_reserva($behavior['divisor'] ?? null, 'arriba')
+                    . $children
+                    . $this->render_divisor_reserva($behavior['divisor'] ?? null, 'abajo');
                 return '<div ' . $attrs . '>' . $children . '</div>';
             case 'layout':
                 $children = $this->render_nodes($node['children'], $rule_index, $node_ids, $depth + 1, $child_cadence, true);
@@ -4208,6 +4224,61 @@ final class COD_Canvas_MCP_Recipe_Compiler
         }
 
         return $salida;
+    }
+
+    /**
+     * El hueco que el divisor se reserva para no caerle encima al contenido.
+     *
+     * POR QUÉ EXISTE. Un divisor está posicionado contra el borde de su
+     * sección —tiene que estarlo, o no toca el filo—, así que no ocupa sitio en
+     * el flujo y se monta sobre lo que haya debajo. Divi tiene el mismo
+     * comportamiento y deja el problema al que diseña: calcule usted el relleno
+     * de abajo. Cristóbal, el 4 de octubre de 2026, al ver la cordillera comerse
+     * un párrafo: «no genera el espacio que necesita, cae sobre el texto».
+     *
+     * Acá el divisor se reserva su hueco solo: se emite un bloque vacío de su
+     * alto —el de la capa MÁS ALTA, que es la que sobresale— dentro del flujo,
+     * antes o después del contenido según dónde vaya.
+     *
+     * POR QUÉ UN BLOQUE Y NO RELLENO EN LA SECCIÓN. Porque el relleno ya lo
+     * declara la regla de espaciado, y sumarle algo desde acá exigiría conocer
+     * su valor —que puede venir de varias reglas y cambiar por breakpoint—.
+     * Un bloque en el flujo se suma solo, sin saber nada de lo que hay.
+     *
+     * Con `reserva: false` el divisor vuelve a flotar sobre el contenido, que
+     * es lo que se quiere cuando la forma es decorativa y el solape es el
+     * efecto buscado.
+     *
+     * @param array<string, mixed>|null $divisor
+     * @param string $lugar 'arriba' o 'abajo': sólo se emite el de ese borde.
+     */
+    private function render_divisor_reserva(?array $divisor, string $lugar): string
+    {
+        if ($divisor === null || ($divisor['reserva'] ?? true) === false) {
+            return '';
+        }
+        $donde = (string) ($divisor['donde'] ?? 'abajo');
+        if ($donde !== 'ambos' && $donde !== $lugar) {
+            return '';
+        }
+
+        // La capa más alta es la que asoma, así que es la que manda. 80px es el
+        // alto por omisión del divisor, el mismo que declara su CSS.
+        $altos = [$divisor['alto'] ?? '80px'];
+        foreach (($divisor['capas'] ?? []) as $capa) {
+            $altos[] = $capa['alto'] ?? $divisor['alto'] ?? '80px';
+        }
+        $mayor = '0px';
+        $medida = -1.0;
+        foreach ($altos as $alto) {
+            $n = (float) $alto;
+            if ($n > $medida) {
+                $medida = $n;
+                $mayor = (string) $alto;
+            }
+        }
+
+        return '<div class="cod-divisor-reserva" aria-hidden="true" style="height:' . esc_attr($mayor) . '"></div>';
     }
 
     /**
@@ -5368,9 +5439,22 @@ final class COD_Canvas_MCP_Recipe_Compiler
         return preg_match('/^' . $sign . '(?:[0-9]+(?:\.[0-9]+)?|\.[0-9]+)(?:px|rem|em|%|vw|vh|vmin|vmax|ch)$/', $value) === 1;
     }
 
+    /**
+     * Un color que, además de ser válido, SOBREVIVE al saneador del documento.
+     *
+     * La barra de la sintaxis moderna —`rgb(229 0 126 / 0.3)`— queda fuera a
+     * propósito. Es CSS correcto y el navegador la entiende, pero
+     * `safecss_filter_attr` de WordPress la descarta al limpiar el atributo
+     * `style`, así que la declaración compilaba, se guardaba y NO pintaba:
+     * exactamente la peor forma de fallar. Medido el 4 de octubre de 2026 con
+     * el icono de alerta, que salió gris en vez de rosa.
+     *
+     * La opacidad se escribe en el propio color, con un hexadecimal de ocho
+     * dígitos: `#E5007E4D` es ese mismo rosa al 30%.
+     */
     private function is_css_color(string $value): bool
     {
-        return preg_match('/^(?:#[0-9a-fA-F]{3,8}|transparent|currentColor|(?:rgb|hsl|oklch)\([0-9.%\s,\/+-]+\))$/', $value) === 1;
+        return preg_match('/^(?:#[0-9a-fA-F]{3,8}|transparent|currentColor|(?:rgb|hsl|oklch)\([0-9.%\s,+-]+\))$/', $value) === 1;
     }
 
     private function is_css_font_family(string $value): bool

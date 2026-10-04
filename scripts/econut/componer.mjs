@@ -38,6 +38,10 @@ const f = {
   fichaNCC: M + 'Ficha-T-de-Proceso-NCC-2022.pdf',   // la ficha técnica que enlaza el primer servicio
   logoHorizontal: M + 'Logo-horizontal-@svg.svg',
   iconoAlerta: M + 'Icono-alerta@2x.png',
+  // El mismo triángulo en vector, trazado desde el alfa del PNG
+  // (scripts/vectorizar-icono-alerta.php). El PNG queda por si hiciera falta
+  // volver a medirlo.
+  iconoAlertaSvg: '/wp-content/uploads/2026/10/icono-alerta.svg',
   portadaFondo: M + 'portada-fondo.jpg',
   logoCalado: M + 'Logo-calado-20.png',
   linea: M + 'Linea-de-seleccion-manual-limpia-scaled-1.jpg',
@@ -220,14 +224,70 @@ R('portada-video-movil', 'properties', { declarations: {
 // de ella: en el original va como background-image al 7% de ancho, pegado al
 // 2% de la izquierda y centrado a lo alto. Puesto como <img> ocupaba una
 // columna y empujaba el texto.
-// El triángulo de advertencia es el FONDO de la sección, no una imagen dentro
-// de ella: en el original va al 7% de ancho, pegado al 2% de la izquierda y
-// centrado a lo alto. Como <img> ocupaba una columna y empujaba el texto.
-// Declararlo así necesitó ampliar el plugin (0.3.41): hasta entonces `surface`
-// sólo admitía palabras clave en la posición y cover/contain en el tamaño.
-R('s-aviso', 'surface', { backgroundColor: AVISO, foregroundColor: TEXTO,
-  backgroundAssetUrl: f.iconoAlerta, backgroundPosition: '2% 50%',
-  backgroundSize: '7% auto', backgroundRepeat: 'no-repeat' });
+// La franja del aviso: sólo color. El triángulo YA NO VA DE FONDO.
+//
+// Iba. El original de econut.cl lo pone como fondo de la sección al «7% auto»
+// —un porcentaje del ANCHO—, y de ahí salían dos defectos a la vez: cuanto más
+// ancha la ventana, más grande el triángulo, mientras la franja conserva su
+// alto (medido el 4 de octubre de 2026: en 1440px la franja mide 38px y el
+// icono se dibujaba de 100×91, dos veces y media su caja, cortado arriba y
+// abajo); y al ser fondo no participa de la línea, así que el texto se le
+// monta encima en cuanto se acomoda.
+//
+// Cristóbal, ese día: «me refiero al icono de alerta, que se repite y queda
+// metido bajo el texto… no lo pongas como fondo, agrégalo como ícono dentro
+// del texto». Ahora va con la familia `icono` (ver `ico-alerta`), que lo mete
+// DENTRO del párrafo: ocupa su sitio en la línea, se mide en `em` contra ella
+// y nadie se le encima.
+R('s-aviso', 'surface', { backgroundColor: AVISO, foregroundColor: TEXTO });
+
+// El triángulo, ahora como icono del propio párrafo.
+//
+// El dibujo se vectorizó desde el PNG original midiendo su canal alfa
+// (scripts/vectorizar-icono-alerta.php): es de un solo color y el signo de
+// exclamación es un HUECO, no una forma blanca. Por eso el color puede venir
+// de la regla —y cambiarse desde el panel— en vez de estar cocido en el
+// archivo. #E5007E al 30% es exactamente el del original.
+
+/**
+ * El borde entre «Nuestra historia» (blanca) y las cifras (beige): una
+ * cordillera en tres capas, en vez del corte recto que había.
+ *
+ * POR QUÉ TRES Y NO UNA. Una sola lee como un recorte —la banda de abajo
+ * mordiendo a la de arriba—. Tres de la misma forma, corridas entre sí y con
+ * menos opacidad hacia atrás, leen como distancia: es la perspectiva aérea de
+ * toda la vida, lo lejano más pálido. Pedido de Cristóbal el 4 de octubre de
+ * 2026: «un separador con montañas en triple capa y transparencia gradual
+ * hacia atrás».
+ *
+ * EL COLOR ES EL DE LA BANDA SIGUIENTE, no un tercero: el beige entrando sobre
+ * el blanco. Las capas de atrás son ese mismo beige rebajado, que sobre blanco
+ * da los tonos intermedios sin necesitar colores nuevos —y por eso no se salta
+ * la paleta—.
+ *
+ * Las de atrás van MÁS ALTAS que la principal: una cumbre lejana asoma por
+ * encima de la cercana, nunca por debajo.
+ */
+R('divisor-cordillera', 'divisor', {
+  forma: '/wp-content/uploads/2026/10/divisor-cordillera.svg',
+  donde: 'abajo',
+  // Bajo a propósito: ahora el divisor se RESERVA su hueco, así que cada
+  // píxel de alto es también un píxel de página. Una cordillera de 170 pedía
+  // 170 de aire. Cristóbal, 2026-10-04: «está muy alto».
+  alto: '70px',
+  color: BEIGE,
+  capas: [
+    { opacidad: 0.3, desplazamiento: '-120px', alto: '104px' },
+    { opacidad: 0.6, desplazamiento: '60px', alto: '88px' },
+  ],
+});
+R('ico-alerta', 'icono', {
+  forma: f.iconoAlertaSvg, donde: 'antes', tamano: '1.7em', separacion: '.5em',
+  // El 30% va DENTRO del color, en hexadecimal de ocho dígitos: la forma
+  // moderna `rgb(229 0 126 / .3)` la descarta el saneador del documento y la
+  // declaración se pierde sin avisar (medido el 4 de octubre de 2026).
+  color: '#E5007E4D',
+});
 // El aviso casi no tiene aire propio en el original: 2px arriba y 1 abajo.
 R('aire-aviso', 'spacing', { paddingBlock: '2px', paddingInline: '24px' });
 // El hero va a sangre: en el original su sección tiene padding 0 y los
@@ -488,7 +548,7 @@ nodes.push({
   id: 'aviso', marker: 'aviso', kind: 'section', ruleIds: ['aire-linea', 's-aviso'],
   children: [G([
     G([
-      P('Atención: hay cuentas falsas vendiendo a nombre de Econut. Verifique siempre que esté hablando con nuestras cuentas oficiales.', ['t-aviso-linea']),
+      P('Atención: hay cuentas falsas vendiendo a nombre de Econut. Verifique siempre que esté hablando con nuestras cuentas oficiales.', ['t-aviso-linea', 'ico-alerta']),
       A('Ver cuentas oficiales', '#aviso-estafas', ['t-aviso-enlace']),
     ], ['aviso-linea']),
   ], ['caja'])],
@@ -590,7 +650,7 @@ nodes.push({
 
 // 5 · Historia
 nodes.push({
-  id: 'historia', marker: 'historia', kind: 'section', ruleIds: ['aire', 's-blanco'],
+  id: 'historia', marker: 'historia', kind: 'section', ruleIds: ['aire', 's-blanco', 'divisor-cordillera'],
   // El título va a TODO EL ANCHO arriba —en el original ocupa de 410 a 1490—
   // y debajo las dos columnas. Acá estaba metido dentro de la columna del
   // texto, y por eso la sección quedaba 138px más corta que el original.

@@ -201,6 +201,9 @@ height:var(--cod-divisor-alto,80px);opacity:var(--cod-divisor-alfa,1);}
    bordes: el dibujo se hace más ancho que su caja y se corre hacia atrás la
    misma medida, así el desplazamiento ocurre DENTRO del recorte y nunca deja
    una esquina vacía. Sin esto, correr una capa 60px abre un hueco de 60px. */
+/* El hueco que el divisor se reserva en el flujo para no caerle encima al
+   contenido. Su alto lo escribe el compilador, con el de la capa más alta. */
+.cod-divisor-reserva{pointer-events:none;}
 {$r} > svg{display:block;height:100%;
 width:calc(100% * var(--cod-divisor-repeticion,1) + 2 * var(--cod-divisor-margen,0px));
 margin-inline-start:calc(-1 * var(--cod-divisor-margen,0px));
