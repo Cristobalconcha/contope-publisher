@@ -55,7 +55,10 @@ const propias = [
   // La lista de datos de contacto. En el original es un <ul> cuyos <li> llevan
   // enlaces; acá cada dato es su propio nodo, que es lo que lo hace editable.
   regla('sl-dato', 'typography', { role: 'dato', fontSize: '13.5px', lineHeight: 1.5 }),
+  // 44px es el mínimo para tocar con el dedo sin errarle. Los datos de
+  // contacto son enlaces (correo, WhatsApp, Instagram) y medían 41.
   regla('sl-dato-linea', 'properties', { declarations: {
+    'min-height': '44px',
     display: 'block',
     'padding-block-start': '10px',
     'padding-block-end': '10px',
@@ -255,7 +258,7 @@ propias.push(
   } }),
   regla('sl-wa-nota', 'typography', { role: 'wa-nota', fontSize: '11px', lineHeight: 1.35 }),
   regla('sl-wa-enviar', 'properties', { declarations: {
-    'justify-content': 'center', 'background-color': '#25D366', color: '#FFFFFF',
+    'justify-content': 'center', 'background-color': '#128C7E', color: '#FFFFFF',
     'padding-top': '10px', 'padding-right': '14px', 'padding-bottom': '10px', 'padding-left': '14px',
     'border-top-left-radius': '999px', 'border-top-right-radius': '999px',
     'border-bottom-right-radius': '999px', 'border-bottom-left-radius': '999px',

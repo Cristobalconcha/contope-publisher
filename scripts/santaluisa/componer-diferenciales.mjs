@@ -170,6 +170,18 @@ const propias = [
     'border-bottom-right-radius': '14px', 'border-bottom-left-radius': '14px',
     overflow: 'hidden',
   } }),
+  // Las flechas: 44px para el dedo. Medido, salían a 20x21 porque el runtime
+  // las fabrica sin clase y no había forma de alcanzarlas; la parte «flecha» del
+  // contrato de galería existe desde la 0.3.71 justo por esto.
+  regla('sl-galeria-flecha', 'properties', { declarations: {
+    'min-width': '44px', 'min-height': '44px',
+    'background-color': '#FFFFFF', color: 'var(--oliva-700)',
+    'border-top-left-radius': '50%', 'border-top-right-radius': '50%',
+    'border-bottom-right-radius': '50%', 'border-bottom-left-radius': '50%',
+    'box-shadow': '0 6px 16px rgba(40,35,20,0.18)', cursor: 'pointer',
+    'font-size': '20px', 'line-height': '1',
+  } }),
+
   regla('sl-galeria-flechas', 'properties', { declarations: {
     display: 'flex', 'justify-content': 'center', 'column-gap': '12px', 'margin-block-start': '16px',
   } }),
@@ -328,6 +340,7 @@ const composicion = {
             leyenda: ['sl-galeria-leyenda', 'sl-galeria-leyenda-color', 'sl-galeria-leyenda-aire'],
             pieza: ['sl-galeria-foto'],
             controles: ['sl-galeria-flechas'],
+            flecha: ['sl-galeria-flecha'],
           },
           content: {
             items: GALERIA.map(([archivo, alt, leyenda]) => ({

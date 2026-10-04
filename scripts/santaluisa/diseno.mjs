@@ -97,7 +97,11 @@ R('sl-pie-aire', 'properties', { declarations: {
   'text-align': 'center',
 } });
 R('sl-pie-texto', 'typography', { role: 'pie', fontSize: '12px', lineHeight: 1.5, align: 'center' });
+// 44px de alto mínimo para tocar con el dedo sin errarle: medido, los enlaces
+// del pie daban 18. El relleno vertical es lo que los agranda sin mover el texto.
 R('sl-pie-enlace', 'properties', { declarations: {
+  'display': 'inline-block',
+  'padding-block-start': '13px', 'padding-block-end': '13px',
   color: 'inherit',
   'text-decoration-line': 'underline',
   cursor: 'pointer',

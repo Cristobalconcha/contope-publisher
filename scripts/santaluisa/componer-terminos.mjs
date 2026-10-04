@@ -69,7 +69,11 @@ const propias = [
     'border-bottom-color': 'var(--dorado-600)',
   } }),
   regla('sl-legal-encabezado', 'typography', { role: 'seccion-legal', fontSize: '14.5px', fontWeight: 700, lineHeight: 1.5 }),
+  // Lo que se pincha de un pliegue tiene que medir 44px de alto: medido, los
+  // resúmenes daban 22. El relleno va en el párrafo y no en el botón para que
+  // la zona que responde al dedo sea la misma que se ve.
   regla('sl-legal-encabezado-caja', 'properties', { declarations: {
+    'padding-block-start': '11px', 'padding-block-end': '11px',
     'margin-block-start': '0', 'margin-block-end': '0',
   } }),
   regla('sl-legal-parrafo', 'typography', { role: 'parrafo-legal', fontSize: '13.5px', lineHeight: 1.5, measure: '620px' }),

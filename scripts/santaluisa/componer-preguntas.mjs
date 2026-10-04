@@ -102,7 +102,11 @@ const propias = [
   // ahí su margen por omisión se suma al relleno del pliegue: medido, cada
   // pliegue cerrado salía a 88px donde el original mide 58. El margen se quita
   // en el nodo y no en la parte, porque la parte es el botón, no el párrafo.
+  // Lo que se pincha de un pliegue tiene que medir 44px de alto: medido, los
+  // resúmenes daban 22. El relleno va en el párrafo y no en el botón para que
+  // la zona que responde al dedo sea la misma que se ve.
   regla('sl-faq-pregunta-caja', 'properties', { declarations: {
+    'padding-block-start': '11px', 'padding-block-end': '11px',
     'margin-block-start': '0', 'margin-block-end': '0',
   } }),
 

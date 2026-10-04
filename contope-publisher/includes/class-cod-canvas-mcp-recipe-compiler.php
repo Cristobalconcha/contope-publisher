@@ -329,6 +329,11 @@ final class COD_Canvas_MCP_Recipe_Compiler
                     'elegido' => null,
                     'descripcion' => 'el pie de cada ítem, cuando la regla gallery pide caption below u overlay',
                 ],
+                'flecha' => [
+                    'selector' => '.cod-mcp-gallery__controls button',
+                    'elegido' => null,
+                    'descripcion' => 'cada flecha del carrusel: las fabrica el runtime sin clase propia, así que ésta es la única forma de darles medida y color. La que no puede avanzar lleva disabled',
+                ],
                 'controles' => [
                     'selector' => '.cod-mcp-gallery__controls',
                     'elegido' => null,

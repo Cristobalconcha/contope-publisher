@@ -5,6 +5,55 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.71 — 4 de octubre de 2026
+
+### Un revisor que mide el sitio en vez de mirarlo
+
+`scripts/revisar-sitio.mjs` recorre un sitio entero en varios anchos y busca lo
+que se rompe: desborde horizontal, elementos que se salen de la pantalla,
+imágenes rotas, texto encima de texto, contraste insuficiente y zonas de toque
+demasiado chicas para un dedo.
+
+**Por qué existe.** Revisar a ojo con capturas falla de las dos formas. En esta
+misma sesión leí mal una captura dos veces: una por mirarla a media escala y
+concluir que una columna estaba a la mitad, otra por leer una imagen de doble
+densidad como si fuera el viewport. Lo que se mide no se discute.
+
+**Y la primera pasada demostró el punto al revés**: de 14 hallazgos graves, doce
+eran defectos del detector, no del sitio. Están corregidos, y cada corrección
+está escrita donde se hizo:
+
+- **Texto encima de texto se mide por LÍNEAS, no por cajas.** Dos cajas pueden
+  cruzarse sin que se toque una sola letra.
+- **Una línea que no se alcanza a sí misma está tapada y no cuenta.** Era el menú
+  de teléfono: sus enlaces tienen caja, pero un ancestro los recorta, así que
+  `elementFromPoint` sobre ellos devuelve la sección de abajo. La comprobación
+  anterior pedía que *alguno* de los dos estuviera arriba, cuando lo que prueba
+  un solape real es que **los dos** sean alcanzables. Daba cinco falsos positivos
+  por pantalla, que es la forma más rápida de que un informe deje de leerse.
+- **Dos tramos del mismo título no se solapan: se encajan.** La cara de caja alta
+  sube para que el trazo bajo de la script la toque.
+- **Una imagen de 0×0 no está rota.** Era el hueco del lightbox cerrado.
+- **44,0 px no es menos de 44.** El umbral se redondea.
+
+### Lo que el revisor encontró de verdad, y quedó arreglado
+
+- **El botón «Enviar por WhatsApp» tenía 2,0:1 de contraste** —blanco sobre el
+  verde claro—. Pasó al verde oscuro de la propia paleta de WhatsApp: 4,6:1.
+- **Zonas de toque bajo los 44 px**: los enlaces del pie medían 18, los datos de
+  contacto 41, los resúmenes del acordeón 22 y las flechas del carrusel 21.
+- Las flechas no se podían alcanzar: el runtime las fabrica sin clase propia. La
+  galería gana la parte **`flecha`**, que es la única forma de darles medida y
+  color desde el diseño.
+
+### Resultado
+
+Las cuatro páginas recompuestas quedan **sin un solo hallazgo** en 390, 768, 1024
+y 1440. Lo que queda son seis avisos de zona de toque en la portada, que no está
+recompuesta y los traía de antes.
+
+---
+
 ## 0.3.70 — 4 de octubre de 2026
 
 ### El divisor: el aire se declara aparte de la forma
