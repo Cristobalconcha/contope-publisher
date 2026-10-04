@@ -40,3 +40,6 @@ scripts/econut/estado-args.json
 scripts/econut/hoja.html
 
 scripts/econut/.*.json
+
+# Guiones de parcheo de un rato; no son del proyecto.
+.*.cjs

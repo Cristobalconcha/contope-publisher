@@ -17,11 +17,35 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const aquí = path.dirname(fileURLToPath(import.meta.url));
-const PAGINA = Number(process.argv[2] || 164);
 
-const config = JSON.parse(readFileSync(path.join(aquí, 'cod-grapes-runner', 'cod-grapes-runner.config.json'), 'utf8'));
-const endpoint = `${config.siteUrl.replace(/\/+$/, '')}/wp-json/contope/v1/mcp`;
-const auth = 'Basic ' + Buffer.from(`${config.username}:${config.applicationPassword.replace(/\s+/g, '')}`).toString('base64');
+/*
+ * CORRE CONTRA UN LOCAL, NO CONTRA UN SITIO PUBLICADO.
+ *
+ * Apuntaba a santaluisadepalpi.cl: una prueba de la batería leía una
+ * composición del sitio real de un cliente y la REENVIABA. Eso no puede estar
+ * en algo que se corre a diario.
+ *
+ * Desde el 4 de octubre de 2026 va al local de Econut, que es donde hay
+ * páginas con composición registrada de verdad. El espejo de Santa Luisa no
+ * sirve para esto: tiene el documento pero no su composición, porque se armó
+ * desde el HTML del sitio y no desde una composición aplicada.
+ *
+ * Para correrla contra otro sitio hay que pedirlo a propósito, con COD_SITIO y
+ * COD_CREDENCIAL en el entorno.
+ */
+const SITIO = process.env.COD_SITIO || 'http://localhost:8891';
+const RUTA_CREDENCIAL = process.env.COD_CREDENCIAL
+  || path.join(aquí, '..', '..', 'wp-local-econut', '.credencial-mcp-local.txt');
+
+// La página legal: pequeña y con composición registrada, que es lo que esta
+// prueba necesita. Se puede pasar otra como argumento.
+const PAGINA = Number(process.argv[2] || 55);
+
+// Por `?rest_route=` y no por `/wp-json/`: el servidor de PHP que levanta el
+// espejo no reescribe direcciones, así que la forma bonita devuelve el HTML de
+// la portada y el error habla de un «<» inesperado, que no dice nada.
+const endpoint = `${SITIO.replace(/\/+$/, '')}/index.php?rest_route=/contope/v1/mcp`;
+const auth = 'Basic ' + Buffer.from(readFileSync(RUTA_CREDENCIAL, 'utf8').trim()).toString('base64');
 
 let id = 0;
 async function llamar(name, args) {
