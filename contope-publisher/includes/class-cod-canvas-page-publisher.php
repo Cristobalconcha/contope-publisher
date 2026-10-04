@@ -1396,6 +1396,34 @@ CSS;
         return self::$shared_css_cache;
     }
 
+    /**
+     * La hoja base del lienzo, como ARCHIVO y una sola vez.
+     *
+     * Es del motor y no del contenido —describe cómo se comporta una sección o
+     * una columna en cualquier sitio hecho con el publicador—, así que viaja
+     * con el plugin y se versiona con él. Antes se guardaba dentro de cada
+     * documento y una página con tres regiones servía tres copias de versiones
+     * distintas.
+     *
+     * HAY QUE ENCOLARLA TEMPRANO, y costó una vuelta descubrirlo: pedida
+     * durante el dibujado de la página, WordPress la imprime en el PIE, o sea
+     * DESPUÉS de las reglas de diseño que van en la cabecera, y vuelve a
+     * pisarlas —el mismo defecto que esto venía a resolver, movido de sitio—.
+     *
+     * Como archivo, además, el navegador la guarda una vez y la reusa en todas
+     * las páginas del sitio; incrustada en el HTML se volvía a descargar con
+     * cada página.
+     */
+    public static function encolar_hoja_base(): void
+    {
+        wp_enqueue_style(
+            'cod-canvas-base',
+            plugins_url('assets/css/cod-canvas-base.css', COD_PUBLISHER_FILE),
+            [],
+            COD_PUBLISHER_VERSION
+        );
+    }
+
     public function estilos_en_cabecera(): void
     {
         if (self::$css_ya_emitido || !is_singular()) {
@@ -1417,6 +1445,10 @@ CSS;
         if (is_wp_error($document)) {
             return;
         }
+
+        // Acá es temprano —`wp_enqueue_scripts`— y por eso sale en la cabecera,
+        // delante de las reglas de diseño. Pedirla más tarde la manda al pie.
+        self::encolar_hoja_base();
 
         $post_id = (int) $post->ID;
         $body_css = (string) $document['css'];
@@ -1576,7 +1608,9 @@ CSS;
 
         $site_font_css = self::site_font_css();
         $theme_css = COD_Design_Core::css() . COD_Theme_Definitions::css();
-        wp_register_style('cod-canvas-public', false, [], COD_PUBLISHER_VERSION);
+
+        self::encolar_hoja_base();
+        wp_register_style('cod-canvas-public', false, ['cod-canvas-base'], COD_PUBLISHER_VERSION);
         wp_enqueue_style('cod-canvas-public');
         if (!self::$css_ya_emitido) {
             wp_add_inline_style(

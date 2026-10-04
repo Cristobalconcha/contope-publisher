@@ -3451,7 +3451,31 @@ final class COD_Canvas_MCP_Recipe_Compiler
         $markup = '<main class="' . esc_attr(implode(' ', array_unique($root_classes))) . '" data-cod-composition="v2" aria-label="'
             . esc_attr($label) . '">' . $body . '</main>';
 
-        $styles = self::base_styles();
+        /*
+         * LA HOJA BASE YA NO SE GUARDA DENTRO DEL DOCUMENTO.
+         *
+         * Hasta la 0.3.62 esta línea era `$styles = self::base_styles();`, y
+         * esa copia quedaba escrita en el documento. Cada documento conservaba
+         * así una foto de la hoja del día en que se compiló: una página con
+         * encabezado, cuerpo y pie servía TRES copias, de versiones distintas,
+         * y la última ganaba y pisaba el diseño.
+         *
+         * Cristóbal, el 4 de octubre de 2026, sobre el deduplicador que lo
+         * tapaba: «es como que hubieras pinchado un neumático y después lo
+         * tuvieras que parchar. Lo que necesitamos es que el neumático no se
+         * pinche. No tiene por qué generarse una hoja de estilo por cada página
+         * de un sitio; la hoja tiene que ser centralizada».
+         *
+         * Tiene razón y la razón de fondo es qué ES esta hoja: NO describe este
+         * sitio ni esta página, describe cómo se comporta una sección, una
+         * columna o una imagen en cualquier sitio hecho con el publicador. Es
+         * del motor, no del contenido, así que viaja con el plugin
+         * (`assets/css/cod-canvas-base.css`, que genera
+         * `scripts/generar-css-base.php` desde `base_styles()`).
+         *
+         * El documento guarda sólo lo suyo: las reglas de SU diseño.
+         */
+        $styles = '';
         foreach ($design['rules'] as $rule) {
             $styles .= $this->css_for_rule($rule);
         }

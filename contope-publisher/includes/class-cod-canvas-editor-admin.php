@@ -471,6 +471,10 @@ final class COD_Canvas_Editor_Admin
             // El canal del selector de iconos. Va por REST y no por admin-ajax
             // porque es una lectura de catálogo con filtros, no una acción.
             'restUrl' => esc_url_raw(rest_url()),
+            // La hoja base del lienzo, para que el iframe del editor muestre lo
+            // mismo que la página publicada. Desde la 0.3.63 vive en el plugin
+            // y ya no dentro de cada documento.
+            'baseCssUrl' => plugins_url('assets/css/cod-canvas-base.css', COD_PUBLISHER_FILE),
             'restNonce' => wp_create_nonce('wp_rest'),
             'loadAction' => self::AJAX_LOAD,
             'saveAction' => self::AJAX_SAVE,

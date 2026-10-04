@@ -5,6 +5,61 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.63 — 4 de octubre de 2026
+
+### Cambiado
+
+- **La hoja base del lienzo sale de los documentos y pasa a ser un archivo del
+  plugin.** Es el arreglo de fondo del que la 0.3.62 era sólo el parche.
+
+  Hasta ahora `compile()` empezaba con `$styles = self::base_styles()` y esa
+  copia quedaba escrita **dentro de cada documento**. Cada documento conservaba
+  así una foto de la hoja del día en que se compiló, una página con encabezado,
+  cuerpo y pie servía **tres copias de versiones distintas**, y la última ganaba
+  y pisaba el diseño. La 0.3.62 lo resolvió descartando las repetidas al
+  servir.
+
+  Cristóbal, el 4 de octubre de 2026: «el proceso de deduplicación es como que
+  hubieras pinchado un neumático y después lo tuvieras que parchar. Lo que
+  necesitamos es que el neumático no se pinche. No tiene por qué generarse una
+  hoja de estilo por cada página de un sitio; la hoja tiene que ser
+  centralizada».
+
+  **La razón de fondo es qué ES esta hoja**: no describe este sitio ni esta
+  página, describe cómo se comporta una sección, una columna o una imagen en
+  cualquier sitio hecho con el publicador. Es del motor, no del contenido, y le
+  corresponde viajar con el plugin y versionarse con él.
+
+  Qué cambia, medido sobre la portada de Econut:
+
+  | | antes | ahora |
+  |---|---|---|
+  | copias de la hoja base en el HTML | 3 | **0** |
+  | documento del encabezado | 3,6 KB | **1,2 KB** |
+  | documento del pie | 4,7 KB | **2,3 KB** |
+  | documento de la portada | 18,8 KB | **16,4 KB** |
+
+  Y como archivo, el navegador la guarda **una vez** y la reusa en todas las
+  páginas; incrustada en el HTML se volvía a descargar con cada página.
+
+  **La fuente sigue siendo una sola**: `base_styles()`. El archivo se genera de
+  ella con `scripts/generar-css-base.php`, y `probar-css-base.php` comprueba
+  que digan lo mismo, así que un olvido se nota en la batería y no en el sitio.
+
+  **Hay que encolarla temprano**, y costó una vuelta descubrirlo: pedida
+  durante el dibujado de la página, WordPress la imprime en el **pie** —después
+  de las reglas de diseño— y vuelve a pisarlas. El mismo defecto, movido de
+  sitio. Va en `wp_enqueue_scripts`.
+
+  El editor la carga en su lienzo desde el mismo archivo, para que muestre lo
+  mismo que la página publicada.
+
+  **El descarte de la 0.3.62 se queda**, pero ya sólo como red para los
+  documentos compilados antes de este cambio: cuando se recompilan, dejan de
+  traerla.
+
+---
+
 ## 0.3.62 — 4 de octubre de 2026
 
 ### Corregido

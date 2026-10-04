@@ -378,6 +378,11 @@
                 // Ctrl+Click). GrapesJS ya trae `true` por defecto; lo fijamos explícito
                 // para que un cambio de versión no desactive la función en silencio.
                 multipleSelection: true,
+                // La hoja base del lienzo, como archivo. Antes venía dentro del
+                // CSS de cada documento y por eso el editor la tenía sin pedirla;
+                // desde que vive en el plugin hay que cargarla acá, o el lienzo
+                // del editor se vería sin los estilos del motor.
+                canvas: options.baseCssUrl ? { styles: [options.baseCssUrl] } : {},
                 assetManager: { upload: false, custom: false },
                 blockManager: { blocks: blocks },
                 deviceManager: {

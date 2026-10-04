@@ -129,6 +129,7 @@
             oruganttForms: config.oruganttForms || [],
             oruganttFormTokens: config.oruganttFormTokens || [],
             canvasWidth: initialCanvasWidth,
+            baseCssUrl: config.baseCssUrl || '',
             inspectorMount: document.getElementById('cod-canvas-inspector'),
             gridControlsMount: '#cod-canvas-inspector .cod-ci__head',
             groupControlsMount: '#cod-canvas-inspector .cod-ci__head',
