@@ -1,0 +1,21 @@
+.estado.json
+local.json
+local-ritmo.json
+prev.txt
+aplicar-*.json
+est-pie.json
+region-*.json
+
+# Lo que generan los guiones de aplicar: son salida, no fuente. La fuente son
+# los componer-*.mjs, que las vuelven a producir idénticas.
+.estado-*.json
+.crear.json
+.publicar-*.json
+legal.json
+composicion-fiel.json
+preview.json
+estado-args.json
+ap-*.json
+pv-*.json
+divisores.json
+.crear-div.json
