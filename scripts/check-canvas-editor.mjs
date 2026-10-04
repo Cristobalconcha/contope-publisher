@@ -293,8 +293,17 @@ async function checkAdminSurface() {
     const enqueued = callsOf(enqueue).filter(
       (entry) => entry.name === 'wp_enqueue_script' || entry.name === 'wp_enqueue_style',
     );
-    check(enqueued.length === 12, 'enqueue_assets() debe encolar GrapesJS, los módulos Canvas, Luma, Interacciones, el core y los assets propios.');
+    check(enqueued.length === 13, 'enqueue_assets() debe encolar GrapesJS, los módulos Canvas, Luma, Interacciones, el core, los assets propios y la tipografía de vista previa.');
     for (const entry of enqueued) {
+      // Un encolado de UN solo argumento es un recurso ya registrado antes con
+      // `wp_register_*`; su origen se comprueba ahí, no acá. Es el caso de la
+      // tipografía del selector de iconos, que no vive en el plugin sino en
+      // `uploads` —se descarga una vez— y por eso no puede salir de
+      // plugins_url(). Lo que sigue prohibido, y es lo que esta prueba
+      // protege, es referenciar un CDN.
+      if (entry.node.arguments.length < 2) {
+        continue;
+      }
       check(
         firstCall(entry.node.arguments[1], 'plugins_url') !== null,
         'Cada asset debe resolverse con plugins_url() desde el propio plugin.',

@@ -428,6 +428,44 @@
       .cod-ci__divisor-capa input { min-width:0; padding:5px; font-size:11px; }
       .cod-ci__divisor-capa-quitar { padding:4px 0 !important; }
       .cod-ci__divisor-capa-sumar { width:100%; }
+      .cod-ci__icono { margin:8px 0; padding:10px; border:1px solid #6a8ca080; border-radius:6px; background:#6a8ca014; }
+      .cod-ci__icono-title { margin-bottom:8px; color:#9cc0d8; font-weight:650; }
+      .cod-ci__icono label { display:grid; gap:4px; margin-bottom:6px; color:#c7bda9; font-size:10px; }
+      .cod-ci__icono input, .cod-ci__icono select { border:1px solid #ffffff26; border-radius:5px; padding:6px; background:#20242b; color:#f2f3f5; font:inherit; }
+      .cod-ci__icono input[type="color"] { padding:2px; min-height:30px; cursor:pointer; }
+      .cod-ci__icono .cod-ci__field--inline { grid-auto-flow:column; justify-content:start; align-items:center; gap:8px; }
+      .cod-ci__icono button { border:1px solid #ffffff26; border-radius:5px; padding:6px 10px; background:#2a2e36; color:#f2f3f5; cursor:pointer; font:inherit; }
+      .cod-ci__icono button:hover { border-color:#6a8ca0; }
+      .cod-ci__icono-actual { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+      .cod-ci__icono-muestra { width:26px; height:26px; font-size:22px; line-height:1; color:#9cc0d8; display:inline-flex; align-items:center; justify-content:center; }
+      /* El icono propio se previsualiza como máscara, igual que el divisor: no
+         hace falta cargar el archivo como imagen para ver su silueta. */
+      .cod-ci__icono-muestra--archivo { background-color:#9cc0d8; -webkit-mask-size:contain; mask-size:contain;
+        -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat; -webkit-mask-position:center; mask-position:center; }
+      .cod-ci__icono-nombre { color:#a9a39a; font-size:11px; }
+      .cod-ci__icono-botones { display:flex; gap:6px; margin-bottom:8px; }
+      .cod-ci__icono-botones button { flex:1; }
+      /* --- el selector del set --- */
+      .cod-ci__selector-fondo { position:fixed; inset:0; z-index:2147483647; display:flex; align-items:center; justify-content:center;
+        padding:24px; background:rgba(0,0,0,.5); }
+      .cod-ci__selector { width:min(760px,100%); max-height:min(76vh,620px); display:flex; flex-direction:column;
+        background:#1f2228; color:#f4f1eb; border:1px solid #ffffff2e; border-radius:8px; box-shadow:0 12px 40px #000c;
+        font:12px/1.4 Inter,system-ui,sans-serif; overflow:hidden; }
+      .cod-ci__selector-cabecera { display:flex; gap:8px; padding:12px; border-bottom:1px solid #ffffff1a; }
+      .cod-ci__selector-buscar { flex:1; }
+      .cod-ci__selector-cabecera input, .cod-ci__selector-cabecera select {
+        border:1px solid #ffffff26; border-radius:5px; padding:7px; background:#20242b; color:#f2f3f5; font:inherit; }
+      .cod-ci__selector-cerrar { width:30px; border:1px solid #ffffff26; border-radius:5px; background:#2a2e36; color:#f2f3f5; cursor:pointer; font-size:16px; }
+      .cod-ci__selector-rejilla { flex:1; overflow:auto; padding:12px; display:grid;
+        grid-template-columns:repeat(auto-fill,minmax(88px,1fr)); gap:6px; align-content:start; }
+      .cod-ci__selector-icono { display:grid; gap:4px; justify-items:center; padding:8px 4px; border:1px solid transparent;
+        border-radius:6px; background:#20242b; color:#f2f3f5; cursor:pointer; font:inherit; }
+      .cod-ci__selector-icono:hover { border-color:#6a8ca0; background:#262b33; }
+      /* Marcados los que el sitio YA tiene: elegir uno de ésos no descarga nada. */
+      .cod-ci__selector-icono.is-en-el-set { border-color:#4a6a4a; }
+      .cod-ci__selector-icono .material-symbols-outlined { font-size:26px; line-height:1; }
+      .cod-ci__selector-nombre { font-size:9px; color:#a9a39a; word-break:break-all; line-height:1.2; text-align:center; }
+      .cod-ci__selector-pie { margin:0; padding:10px 12px; border-top:1px solid #ffffff1a; color:#a9a39a; font-size:10px; }
       .cod-ci__divisor-hint { margin:-2px 0 4px; color:#a9a39a; font-size:10px; line-height:1.4; }
       .cod-ci__marker-hint.is-ok { color:#8fb08f; }
       .cod-ci__marker-hint.is-error { color:#ffb4b4; }
@@ -2007,6 +2045,313 @@
     }
 
 
+
+    // ======================================================================
+    //  EL ICONO DEL OBJETO
+    // ======================================================================
+
+    const ICONO_CLASE = 'cod-icono';
+    const ICONO_ATTR_FORMA = 'data-cod-icono-forma';
+    const ICONO_ATTR_NOMBRE = 'data-cod-icono-nombre';
+
+    function admiteIcono(component) {
+      const cat = global.ocdCanvasEditorConfig?.catalogo || global.OCDCanvasEditor?.catalogo || null;
+      if (!cat) return false;
+      const def = cat.taxonomias?.[tipoDeNodoDe(component)];
+      return !!def && Array.isArray(def.diseno) && def.diseno.includes('icono');
+    }
+
+    function iconoDe(component) {
+      if (!component || typeof component.find !== 'function') return null;
+      try {
+        const encontrados = component.find('.' + ICONO_CLASE) || [];
+        return encontrados[0] || null;
+      } catch (_error) {
+        return null;
+      }
+    }
+
+    /**
+     * Escribe el icono dentro del nodo.
+     *
+     * Guarda el NOMBRE cuando viene del set y la RUTA cuando es un archivo
+     * propio, nunca las dos: con el nombre, el estilo lo pone el sitio al
+     * mostrar la página, así que cambiar el ajuste cambia todos los iconos sin
+     * tocar ninguna página.
+     */
+    function ponerIcono(component, cambios) {
+      const actual = iconoDe(component);
+      const attrs = actual ? componentAttributes(actual) : {};
+      const estado = {
+        nombre: String(attrs[ICONO_ATTR_NOMBRE] || ''),
+        forma: String(attrs[ICONO_ATTR_FORMA] || ''),
+        donde: String(attrs['data-cod-icono-donde'] || 'antes'),
+        tamano: leerVariable(actual, '--cod-icono-tamano'),
+        separacion: leerVariable(actual, '--cod-icono-separacion'),
+        color: leerColor(actual),
+        ...cambios,
+      };
+      // Uno u otro: elegir del set borra la ruta propia, y al revés.
+      if (cambios && cambios.nombre) estado.forma = '';
+      if (cambios && cambios.forma) estado.nombre = '';
+      if (!estado.nombre && !estado.forma) return;
+
+      if (actual && typeof actual.remove === 'function') actual.remove();
+
+      const estilo = [];
+      if (estado.tamano) estilo.push('--cod-icono-tamano:' + estado.tamano);
+      if (estado.separacion) estilo.push('--cod-icono-separacion:' + estado.separacion);
+      if (estado.color) estilo.push('color:' + estado.color);
+
+      const cual = estado.nombre
+        ? ICONO_ATTR_NOMBRE + '="' + estado.nombre + '"'
+        : ICONO_ATTR_FORMA + '="' + estado.forma + '"';
+      const marcador = '<span class="' + ICONO_CLASE + '" ' + cual
+        + ' data-cod-icono-donde="' + estado.donde + '"'
+        + ' style="' + estilo.join(';') + '"></span>';
+
+      try {
+        component.append(marcador, estado.donde === 'antes' ? { at: 0 } : {});
+      } catch (_error) {
+        // Un nodo que no admite hijos no puede llevar icono; no es un error
+        // que deba interrumpir nada.
+      }
+      refresh(component);
+    }
+
+    function renderIconoPanel(component) {
+      if (!component || !admiteIcono(component)) return null;
+
+      const actual = iconoDe(component);
+      const attrs = actual ? componentAttributes(actual) : {};
+      const nombre = String(attrs[ICONO_ATTR_NOMBRE] || '');
+      const forma = String(attrs[ICONO_ATTR_FORMA] || '');
+
+      const panel = createElement(hostDocument, 'section', 'cod-ci__icono');
+      panel.appendChild(createElement(hostDocument, 'div', 'cod-ci__icono-title', 'Icono'));
+
+      const fila = createElement(hostDocument, 'div', 'cod-ci__icono-actual');
+      const muestra = createElement(hostDocument, 'span', 'cod-ci__icono-muestra');
+      if (nombre) {
+        muestra.className += ' material-symbols-outlined';
+        muestra.textContent = nombre;
+      } else if (forma) {
+        muestra.style.setProperty('-webkit-mask-image', 'url("' + forma + '")');
+        muestra.style.setProperty('mask-image', 'url("' + forma + '")');
+        muestra.className += ' cod-ci__icono-muestra--archivo';
+      }
+      const rotulo = createElement(hostDocument, 'span', 'cod-ci__icono-nombre',
+        nombre || (forma ? 'archivo propio' : 'sin icono'));
+      fila.append(muestra, rotulo);
+      panel.appendChild(fila);
+
+      const botones = createElement(hostDocument, 'div', 'cod-ci__icono-botones');
+      const delSet = createElement(hostDocument, 'button', '', nombre ? 'Cambiar' : 'Elegir del set…');
+      delSet.type = 'button';
+      delSet.addEventListener('click', () => abrirSelectorDeIconos((elegido) => ponerIcono(component, { nombre: elegido })));
+      const propio = createElement(hostDocument, 'button', '', 'SVG propio…');
+      propio.type = 'button';
+      propio.title = 'Cualquier SVG de tu biblioteca: una silueta tuya, un logotipo.';
+      propio.addEventListener('click', () => elegirIconoPropio(component));
+      botones.append(delSet, propio);
+      panel.appendChild(botones);
+
+      if (!nombre && !forma) {
+        panel.appendChild(createElement(hostDocument, 'p', 'cod-ci__divisor-hint',
+          'Del set, el documento guarda el NOMBRE y el estilo lo pone el sitio: cambiarlo en '
+          + 'Configuración cambia todos los iconos sin tocar ninguna página.'));
+        return panel;
+      }
+
+      // --- dónde ---------------------------------------------------------
+      const campoDonde = createElement(hostDocument, 'label', 'cod-ci__field', 'Dónde');
+      const selDonde = createElement(hostDocument, 'select');
+      for (const par of [['antes', 'Antes del texto'], ['despues', 'Después del texto']]) {
+        const op = createElement(hostDocument, 'option', '', par[1]);
+        op.value = par[0];
+        selDonde.appendChild(op);
+      }
+      selDonde.value = String(attrs['data-cod-icono-donde'] || 'antes');
+      selDonde.addEventListener('change', () => ponerIcono(component, { donde: selDonde.value }));
+      campoDonde.appendChild(selDonde);
+      panel.appendChild(campoDonde);
+
+      // --- tamaño y separación, en em contra la línea que acompaña --------
+      for (const campoDef of [['tamano', 'Tamaño', '1.2em'], ['separacion', 'Separación del texto', '.5em']]) {
+        const campo = createElement(hostDocument, 'label', 'cod-ci__field', campoDef[1]);
+        const entrada = createElement(hostDocument, 'input');
+        entrada.type = 'text';
+        entrada.placeholder = campoDef[2];
+        entrada.value = leerVariable(actual, '--cod-icono-' + campoDef[0]);
+        entrada.addEventListener('change', () => {
+          const cambio = {};
+          cambio[campoDef[0]] = entrada.value.trim();
+          ponerIcono(component, cambio);
+        });
+        campo.appendChild(entrada);
+        panel.appendChild(campo);
+      }
+
+      // --- color ---------------------------------------------------------
+      // Sin declararlo lo hereda del texto, que es lo que uno quiere casi
+      // siempre: cambiar la tinta del sistema lo arrastra.
+      const campoColor = createElement(hostDocument, 'label', 'cod-ci__field cod-ci__field--inline', 'Color propio');
+      const inColor = createElement(hostDocument, 'input');
+      inColor.type = 'color';
+      inColor.value = leerColor(actual) || '#000000';
+      inColor.addEventListener('change', () => ponerIcono(component, { color: inColor.value }));
+      const heredar = createElement(hostDocument, 'button', '', 'Heredar del texto');
+      heredar.type = 'button';
+      heredar.addEventListener('click', () => ponerIcono(component, { color: '' }));
+      campoColor.append(inColor, heredar);
+      panel.appendChild(campoColor);
+
+      const quitar = createElement(hostDocument, 'button', 'cod-ci__divisor-quitar', 'Quitar el icono');
+      quitar.type = 'button';
+      quitar.addEventListener('click', () => {
+        const pieza = iconoDe(component);
+        if (pieza && typeof pieza.remove === 'function') pieza.remove();
+        refresh(component);
+      });
+      panel.appendChild(quitar);
+
+      return panel;
+    }
+
+    /** Un SVG de la biblioteca de Medios, para cuando el dibujo es propio. */
+    function elegirIconoPropio(component) {
+      if (!global.wp || !global.wp.media) {
+        global.alert('La biblioteca de medios no está disponible en esta pantalla.');
+        return;
+      }
+      const marco = global.wp.media({
+        title: 'Elegir un icono propio',
+        button: { text: 'Usar este icono' },
+        library: { type: 'image/svg+xml' },
+        multiple: false,
+      });
+      marco.on('select', () => {
+        const elegido = marco.state().get('selection').first();
+        const url = elegido && elegido.get ? String(elegido.get('url') || '') : '';
+        if (url) ponerIcono(component, { forma: rutaRelativa(url) });
+      });
+      marco.open();
+    }
+
+    /**
+     * El selector del set.
+     *
+     * La lista y los filtros salen del catálogo de Material, que el SERVIDOR
+     * lee y guarda: el navegador no puede pedírselo a Google, que no admite
+     * peticiones de otro origen. La vista previa la dibuja la tipografía, que
+     * se carga sólo en el panel —al sitio publicado no llega nunca—.
+     */
+    function abrirSelectorDeIconos(alElegir) {
+      const base = String(global.ocdCanvasEditorConfig?.restUrl || '/wp-json/').replace(/\/?$/, '/');
+      const nonce = global.ocdCanvasEditorConfig?.restNonce || '';
+
+      const fondo = createElement(hostDocument, 'div', 'cod-ci__selector-fondo');
+      const caja = createElement(hostDocument, 'div', 'cod-ci__selector');
+      const cabecera = createElement(hostDocument, 'div', 'cod-ci__selector-cabecera');
+
+      const buscar = createElement(hostDocument, 'input', 'cod-ci__selector-buscar');
+      buscar.type = 'search';
+      buscar.placeholder = 'Buscar: casa, basura, camión…';
+      const categoria = createElement(hostDocument, 'select', 'cod-ci__selector-categoria');
+      const cerrar = createElement(hostDocument, 'button', 'cod-ci__selector-cerrar', '×');
+      cerrar.type = 'button';
+      cabecera.append(buscar, categoria, cerrar);
+
+      const rejilla = createElement(hostDocument, 'div', 'cod-ci__selector-rejilla');
+      const pie = createElement(hostDocument, 'p', 'cod-ci__selector-pie', '');
+      caja.append(cabecera, rejilla, pie);
+      fondo.appendChild(caja);
+      hostDocument.body.appendChild(fondo);
+      buscar.focus();
+
+      const salir = () => { if (fondo.parentNode) fondo.parentNode.removeChild(fondo); };
+      cerrar.addEventListener('click', salir);
+      fondo.addEventListener('click', (evento) => { if (evento.target === fondo) salir(); });
+      hostDocument.addEventListener('keydown', function alEscapar(evento) {
+        if (evento.key === 'Escape') { salir(); hostDocument.removeEventListener('keydown', alEscapar); }
+      });
+
+      let categoriasPuestas = false;
+
+      async function pedir() {
+        pie.textContent = 'Buscando…';
+        const url = base + 'contope/v1/iconos?q=' + encodeURIComponent(buscar.value)
+          + '&categoria=' + encodeURIComponent(categoria.value || '') + '&limite=120';
+        let datos;
+        try {
+          const respuesta = await fetch(url, {
+            headers: nonce ? { 'X-WP-Nonce': nonce } : {},
+            credentials: 'same-origin',
+          });
+          datos = await respuesta.json();
+        } catch (_error) {
+          pie.textContent = 'No se pudo leer el catálogo.';
+          return;
+        }
+
+        if (!categoriasPuestas && datos.categorias) {
+          const todas = createElement(hostDocument, 'option', '', 'Todas las categorías');
+          todas.value = '';
+          categoria.appendChild(todas);
+          for (const par of Object.entries(datos.categorias)) {
+            const op = createElement(hostDocument, 'option', '', par[0] + ' (' + par[1] + ')');
+            op.value = par[0];
+            categoria.appendChild(op);
+          }
+          categoriasPuestas = true;
+        }
+
+        rejilla.textContent = '';
+        const iconos = datos.iconos || [];
+        for (const icono of iconos) {
+          const boton = createElement(hostDocument, 'button', 'cod-ci__selector-icono');
+          boton.type = 'button';
+          boton.title = icono.nombre + (icono.usos ? ' · ' + icono.usos.toLocaleString('es-CL') + ' usos en la web' : '');
+          const dibujo = createElement(hostDocument, 'span', 'material-symbols-outlined');
+          // Por punto de código y no por ligadura: escribir el nombre falla en
+          // los que empiezan por un número, como `10k`.
+          dibujo.textContent = icono.punto ? String.fromCodePoint(icono.punto) : icono.nombre;
+          const texto = createElement(hostDocument, 'span', 'cod-ci__selector-nombre', icono.nombre);
+          boton.append(dibujo, texto);
+          if (icono.enElSet) boton.classList.add('is-en-el-set');
+          boton.addEventListener('click', async () => {
+            pie.textContent = 'Trayendo «' + icono.nombre + '»…';
+            try {
+              await fetch(base + 'contope/v1/iconos/cachear', {
+                method: 'POST',
+                headers: Object.assign({ 'Content-Type': 'application/json' }, nonce ? { 'X-WP-Nonce': nonce } : {}),
+                credentials: 'same-origin',
+                body: JSON.stringify({ nombre: icono.nombre }),
+              });
+            } catch (_error) {
+              // Si la descarga falla igual se escribe el nombre: el documento
+              // queda correcto y el dibujo aparece en cuanto se pueda traer.
+            }
+            alElegir(icono.nombre);
+            salir();
+          });
+          rejilla.appendChild(boton);
+        }
+        pie.textContent = datos.aviso
+          || (iconos.length
+            ? iconos.length + ' iconos · los que ya están en el sitio van marcados'
+            : 'Nada con ese nombre.');
+      }
+
+      let espera = null;
+      buscar.addEventListener('input', () => {
+        if (espera) global.clearTimeout(espera);
+        espera = global.setTimeout(pedir, 220);
+      });
+      categoria.addEventListener('change', pedir);
+      pedir();
+    }
+
     function renderSaveModulePanel(component) {
       if (!componentHasChildren(component)) return null;
       const bridge = global.OCDCanvasEditor;
@@ -3019,6 +3364,8 @@
       // La paleta visual se abre desde el control principal de Columnas.
       const divisorPanel = renderDivisorPanel(snapshot?.component);
       if (divisorPanel) body.appendChild(divisorPanel);
+      const iconoPanel = renderIconoPanel(snapshot?.component);
+      if (iconoPanel) body.appendChild(iconoPanel);
       const saveModulePanel = renderSaveModulePanel(snapshot?.component);
       if (saveModulePanel) body.appendChild(saveModulePanel);
       const svgImage = externalSvgImageFor(snapshot?.component) || firstExternalSvgImage();

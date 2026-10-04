@@ -25,6 +25,7 @@ final class COD_Settings_Admin
         add_action('admin_enqueue_scripts', [$this, 'enqueue_assets']);
         add_action('wp_ajax_' . COD_Theme_Definitions::AJAX_SAVE, [$this, 'handle_save']);
         add_action('admin_post_cod_save_whatsapp_number', [$this, 'handle_save_whatsapp']);
+        add_action('admin_post_cod_save_icono_estilo', [$this, 'handle_save_icono_estilo']);
         add_action('admin_post_cod_save_embed_origins', [$this, 'handle_save_embed_origins']);
     }
 
@@ -38,6 +39,26 @@ final class COD_Settings_Admin
         $number = preg_replace('/[^0-9]/', '', (string) $raw);
         update_option('cod_whatsapp_number', $number, false);
         wp_safe_redirect(add_query_arg('cod_whatsapp_saved', '1', admin_url('admin.php?page=' . self::PAGE_SLUG)));
+        exit;
+    }
+
+    /**
+     * Guarda el estilo de los iconos del sitio.
+     *
+     * Un valor que no esté entre los tres se descarta y queda el que había: el
+     * ajuste llega de un formulario y no hay por qué confiar en lo que trae.
+     */
+    public function handle_save_icono_estilo(): void
+    {
+        if (!current_user_can(self::CAPABILITY)) {
+            wp_die(esc_html__('No tienes permisos para gestionar la configuración.', 'contope-publisher'));
+        }
+        check_admin_referer('cod_save_icono_estilo');
+        $estilo = isset($_POST['cod_icono_estilo']) ? (string) wp_unslash($_POST['cod_icono_estilo']) : '';
+        if (in_array($estilo, COD_Icono::ESTILOS, true)) {
+            update_option(COD_Icono::OPTION_KEY, $estilo, false);
+        }
+        wp_safe_redirect(add_query_arg('cod_icono_estilo_guardado', '1', admin_url('admin.php?page=' . self::PAGE_SLUG)));
         exit;
     }
 
@@ -228,6 +249,40 @@ final class COD_Settings_Admin
                                 placeholder="56981396967" class="regular-text">
                         </p>
                         <p><button type="submit" class="button button-primary">Guardar número</button></p>
+                    </form>
+                </section>
+
+                <section class="cod-settings-section" id="cod-iconos">
+                    <h2>Iconos</h2>
+                    <p class="cod-settings-intro">
+                        El estilo de los iconos del sitio. Material trae cada uno en tres, y aquí
+                        se elige <em>uno para todo el sitio</em>: si un sitio es redondeado, lo son
+                        sus cuarenta iconos. Elegirlo icono por icono es justamente como se
+                        desordena un sistema.
+                    </p>
+                    <p class="cod-settings-intro">
+                        Cambiarlo <strong>no exige rehacer ninguna página</strong>: las páginas
+                        guardan el nombre del icono, no el archivo, así que el dibujo se resuelve
+                        al mostrarlas. Los iconos que uses con un archivo propio —un logotipo, una
+                        silueta tuya— no se tocan.
+                    </p>
+                    <?php if (isset($_GET['cod_icono_estilo_guardado'])) : ?>
+                        <div class="notice notice-success"><p>Estilo de iconos guardado.</p></div>
+                    <?php endif; ?>
+                    <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+                        <input type="hidden" name="action" value="cod_save_icono_estilo">
+                        <?php wp_nonce_field('cod_save_icono_estilo'); ?>
+                        <?php $estilo_actual = COD_Icono::estilo(); ?>
+                        <p>
+                            <?php foreach (['outlined' => 'De contorno', 'rounded' => 'Redondeado', 'sharp' => 'De ángulo vivo'] as $valor => $rotulo) : ?>
+                                <label style="margin-inline-end:18px">
+                                    <input type="radio" name="cod_icono_estilo" value="<?php echo esc_attr($valor); ?>"
+                                        <?php checked($estilo_actual, $valor); ?>>
+                                    <?php echo esc_html($rotulo); ?>
+                                </label>
+                            <?php endforeach; ?>
+                        </p>
+                        <p><button type="submit" class="button button-primary">Guardar estilo</button></p>
                     </form>
                 </section>
 

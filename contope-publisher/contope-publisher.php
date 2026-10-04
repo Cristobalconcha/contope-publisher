@@ -2,7 +2,7 @@
 /**
  * Plugin Name: ContOpe Publisher
  * Description: Importa proyectos ContOpe Design como páginas Gutenberg nativas y editables.
- * Version: 0.3.60
+ * Version: 0.3.61
  * Requires at least: 6.5
  * Requires PHP: 8.0
  * Author: Cristóbal Concha
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('COD_PUBLISHER_VERSION', '0.3.60');
+define('COD_PUBLISHER_VERSION', '0.3.61');
 define('COD_PUBLISHER_FILE', __FILE__);
 define('COD_PUBLISHER_DIR', plugin_dir_path(__FILE__));
 
@@ -47,6 +47,9 @@ require_once COD_PUBLISHER_DIR . 'includes/class-cod-block-heading.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-redes-sociales.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-divisor.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-icono.php';
+require_once COD_PUBLISHER_DIR . 'includes/class-cod-iconos-catalogo.php';
+require_once COD_PUBLISHER_DIR . 'includes/class-cod-iconos-rest.php';
+require_once COD_PUBLISHER_DIR . 'includes/class-cod-imagen-progresiva.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-mapa.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-canvas-mcp-recipe-compiler.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-canvas-mcp-service.php';
@@ -112,6 +115,8 @@ add_action('plugins_loaded', static function (): void {
     (new COD_Settings_Admin())->register();
     (new COD_Medicion())->register();
     (new COD_SVG())->register();
+    (new COD_Iconos_Rest())->register();
+    (new COD_Imagen_Progresiva())->register();
     (new COD_Block_Lienzo())->register();
     (new COD_Block_Cuadrantes())->register();
     (new COD_Redes_Sociales())->register();

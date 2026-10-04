@@ -202,5 +202,28 @@ if ($guardar('red-whatsapp', $svgWa, 'WhatsApp')) {
     ++$fallos;
 }
 
+/**
+ * La tipografía de la vista previa del selector. Vive en el sitio y NO en el
+ * plugin, y se carga sólo en el panel: a la página publicada no llega nunca,
+ * porque allá cada icono es su propio SVG.
+ *
+ * Pesa 324 KB —medido el 4 de octubre de 2026—. La cifra de 3,7 MB que yo
+ * mismo había dado venía de un comentario de Orugantt sobre otra cosa.
+ */
+echo "\n== la tipografía de vista previa (sólo para el panel) ==\n";
+if ($solo_mirar) {
+    echo "  (en modo --mirar no se descarga)\n";
+} else {
+    $tipo = COD_Iconos_Catalogo::traer_tipografia();
+    if (!empty($tipo['ok'])) {
+        echo '  ok  ' . COD_Iconos_Catalogo::TIPOGRAFIA . ' · '
+            . number_format((int) ($tipo['bytes'] ?? 0) / 1024, 0, ',', '.') . " KB\n";
+    } else {
+        // Sin ella el selector funciona igual: busca, filtra y elige. Lo
+        // único que falta es el dibujo de lo que aún no está en el sitio.
+        fwrite(STDERR, '  sin tipografía: ' . ($tipo['error'] ?? '') . "\n");
+    }
+}
+
 echo "\n$puestos iconos en el set" . ($fallos > 0 ? ", $fallos sin traer" : '') . ".\n";
 exit($fallos === 0 ? 0 : 1);

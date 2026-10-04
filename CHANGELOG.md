@@ -5,6 +5,81 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.61 — 4 de octubre de 2026
+
+### Agregado
+
+- **El selector de iconos.** Busca sobre el catálogo de Material —6.126 iconos—
+  con filtro por categoría, ordenado por uso real en la web, y al elegir uno lo
+  trae al sitio en sus tres estilos.
+
+  **Se busca en castellano.** Las etiquetas de Material están en inglés, así
+  que sin esto el buscador era inútil: medido, «truck» encontraba cuatro
+  camiones y «camión» ninguno. Hay una tabla de sinónimos con las palabras con
+  las que uno busca un icono; si falta una, se agrega en una línea.
+
+  La vista previa la dibuja la tipografía de Material, **alojada en el sitio y
+  cargada sólo en el panel** —el editor no puede referenciar un CDN, es regla
+  del proyecto y hay una prueba que la hace cumplir—. A la página publicada no
+  llega nunca: allá cada icono es su propio SVG.
+
+  Y se dibuja **por punto de código, no por ligadura**: escribir el nombre
+  falla en los que empiezan por un número, como `10k`.
+
+- **El estilo de los iconos se elige en Configuración.** Uno para todo el
+  sitio. Cambiarlo no exige rehacer ninguna página, porque los documentos
+  guardan el nombre del icono y no el archivo.
+
+- **Un panel de icono en el inspector**, con el set, un SVG propio, dónde va,
+  tamaño, separación y color —o heredarlo del texto, que es lo normal—.
+
+### Corregido
+
+- **Las imágenes se descargaban enteras y todas a la vez.** Medido en la
+  portada de Econut: 33 imágenes, **ninguna** con `srcset`, **ninguna** diferida
+  y **una sola** con alto y ancho. La página pedía siempre el archivo original
+  —la línea de selección venía de 2560×1707 para mostrarse a 400×300— y sumaba
+  **6,6 MB**. WordPress ya tenía generados los tamaños intermedios; no los
+  usábamos.
+
+  Cristóbal lo planteó con la analogía justa: «pienso en lo que pesa un mapa y
+  cómo se hace streaming para que la descarga sea gradual a medida que se
+  navega o se hace zoom». Son las mismas dos ideas:
+
+  - `srcset` es el nivel de zoom: el navegador pide la resolución que de verdad
+    va a dibujar.
+  - `loading="lazy"` es el encuadre: lo que está fuera de pantalla no se baja
+    hasta acercarse.
+
+  Y una tercera que no se ve pero que Google mide: **declarar alto y ancho
+  reserva el hueco**, así la página no salta cuando cada foto llega.
+
+  **La primera imagen no se difiere**: es la que decide cuándo se considera
+  cargada la página, así que va con prioridad.
+
+  Resultado sobre la portada: **de 4.874 KB a 827 KB de imágenes**, y de 6,6 MB
+  a 1,9 MB en la primera pantalla.
+
+  El fallo que lo mantenía a medias merece quedar escrito: las composiciones
+  guardan rutas **relativas** —a propósito, para sobrevivir a un cambio de
+  dominio— y la búsqueda en Medios sólo entiende la dirección completa. Sin
+  completarla, el `srcset` salía vacío en las 33.
+
+- **Los JPEG se guardan en descarga progresiva.** Uno normal se dibuja línea a
+  línea y hasta el último byte la mitad de abajo es un hueco; uno progresivo
+  aparece entero y borroso enseguida y se afina. Es la misma idea del mapa,
+  dentro de un archivo. Idea de Cristóbal. Y pesan entre un 3% y un 16% menos.
+
+  WordPress no expone ningún filtro para esto, así que el plugin registra su
+  propio editor de imágenes: el de siempre, encendiendo el entrelazado justo
+  antes de guardar. Sin recomprimir nada de más.
+
+  Para lo ya subido está `scripts/pasar-jpeg-a-progresivo.php`, que no toca un
+  archivo si la conversión no gana tamaño: no vale una generación de pérdida
+  a cambio de nada.
+
+---
+
 ## 0.3.60 — 4 de octubre de 2026
 
 ### Agregado

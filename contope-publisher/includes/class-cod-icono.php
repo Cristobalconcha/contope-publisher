@@ -103,7 +103,10 @@ final class COD_Icono
     public static function ruta_de_nombre(string $nombre): string
     {
         $nombre = strtolower(trim($nombre));
-        if ($nombre === '' || preg_match('/^[a-z0-9_]{1,64}$/', $nombre) !== 1) {
+        // El guión entra por las redes (`red-whatsapp`), que no son de Material y
+        // por eso no siguen su convención de nombres. Ni punto ni barra: un
+        // nombre no puede salirse de la carpeta del set.
+        if ($nombre === '' || preg_match('/^[a-z0-9_-]{1,64}$/', $nombre) !== 1) {
             return '';
         }
 

@@ -334,6 +334,37 @@ final class COD_Canvas_Editor_Admin
         // sea un recurso. Es la misma `wp.media` que usa la pantalla de
         // Configuración, así que el usuario ve la ventana de siempre.
         wp_enqueue_media();
+
+        /*
+         * La tipografía de Material, para la VISTA PREVIA del selector de
+         * iconos. Alojada en el sitio, no traída de un CDN: es regla del
+         * proyecto y hay una prueba que la hace cumplir.
+         *
+         * Se carga sólo acá, en el panel, y nunca llega al sitio publicado:
+         * allá cada icono es su propio SVG, de unos cientos de bytes. La idea
+         * de usar la tipografía sólo en el selector es de Cristóbal, el 4 de
+         * octubre de 2026, y es mejor que la primera propuesta: su peso es un
+         * problema del visitante, no de quien está eligiendo.
+         *
+         * Si todavía no se ha descargado, esto no se encola y el selector
+         * funciona igual —busca, filtra y elige—; lo único que falta es el
+         * dibujo de los iconos que aún no están en el sitio.
+         */
+        $tipografia = class_exists('COD_Iconos_Catalogo') ? COD_Iconos_Catalogo::ruta_tipografia() : '';
+        if ($tipografia !== '') {
+            wp_register_style('cod-material-symbols', false, [], COD_PUBLISHER_VERSION);
+            wp_enqueue_style('cod-material-symbols');
+            wp_add_inline_style('cod-material-symbols', sprintf(
+                '@font-face{font-family:"Material Symbols Outlined";font-style:normal;font-weight:400;'
+                . 'src:url(%s) format("woff2");font-display:swap}'
+                . '.material-symbols-outlined{font-family:"Material Symbols Outlined";font-weight:normal;'
+                . 'font-style:normal;line-height:1;letter-spacing:normal;text-transform:none;display:inline-block;'
+                . 'white-space:nowrap;word-wrap:normal;direction:ltr;-webkit-font-feature-settings:"liga";'
+                . 'font-feature-settings:"liga";-webkit-font-smoothing:antialiased}',
+                esc_url($tipografia)
+            ));
+        }
+
         wp_enqueue_script(
             'cod-grapesjs',
             plugins_url('assets/vendor/grapesjs/grapes.min.js', COD_PUBLISHER_FILE),
@@ -437,6 +468,10 @@ final class COD_Canvas_Editor_Admin
         $config = [
             'ajaxUrl' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce(self::NONCE_ACTION),
+            // El canal del selector de iconos. Va por REST y no por admin-ajax
+            // porque es una lectura de catálogo con filtros, no una acción.
+            'restUrl' => esc_url_raw(rest_url()),
+            'restNonce' => wp_create_nonce('wp_rest'),
             'loadAction' => self::AJAX_LOAD,
             'saveAction' => self::AJAX_SAVE,
             'resolveAssetsAction' => self::AJAX_RESOLVE_ASSETS,

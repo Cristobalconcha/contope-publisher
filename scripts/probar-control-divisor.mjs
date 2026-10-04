@@ -64,6 +64,35 @@ ok('y sólo dentro del editor', beh.includes('if (!opts.editorPreview) return;')
 ok('se repinta al cambiar el árbol', beh.includes('MutationObserver'));
 ok('se limpia al salir', beh.includes('observador.disconnect()'));
 
+/**
+ * El panel y el selector de iconos. Comprobación estática: lo que no se puede
+ * verificar sin navegador —que la ventana abra y se vea— hay que mirarlo a
+ * mano, abriendo el editor y pinchando «Elegir del set…».
+ */
+console.log('\n== el panel del icono ==');
+ok('existe renderIconoPanel', insp.includes('function renderIconoPanel'));
+ok('se engancha al ensamblado', insp.includes('const iconoPanel = renderIconoPanel('));
+ok('sólo aparece si el catálogo lo declara', insp.includes('function admiteIcono'));
+ok('ofrece el set y también un SVG propio',
+  insp.includes('Elegir del set…') && insp.includes('function elegirIconoPropio'));
+ok('guarda el NOMBRE o la ruta, nunca las dos',
+  insp.includes("if (cambios && cambios.nombre) estado.forma = '';")
+  && insp.includes("if (cambios && cambios.forma) estado.nombre = '';"));
+ok('el color se puede devolver al del texto', insp.includes('Heredar del texto'));
+
+console.log('\n== el selector del set ==');
+ok('existe', insp.includes('function abrirSelectorDeIconos'));
+ok('busca contra el canal del plugin', insp.includes("'contope/v1/iconos?q='"));
+ok('filtra por categoría', insp.includes("'&categoria='"));
+ok('trae el icono al elegirlo', insp.includes("'contope/v1/iconos/cachear'"));
+ok('firma las peticiones', insp.includes("'X-WP-Nonce'"));
+ok('dibuja por punto de código, no por ligadura', insp.includes('String.fromCodePoint(icono.punto)'));
+ok('marca los que el sitio ya tiene', insp.includes("classList.add('is-en-el-set')"));
+ok('espera a que se deje de escribir antes de pedir', insp.includes('setTimeout(pedir, 220)'));
+ok('se cierra con Escape', insp.includes("evento.key === 'Escape'"));
+ok('si la descarga falla, igual escribe el nombre',
+  insp.includes('// Si la descarga falla igual se escribe el nombre'));
+
 console.log('\n== lo que el panel necesita del entorno ==');
 ok('se encola la biblioteca de Medios en el editor', admin.includes('wp_enqueue_media();'));
 ok('el catálogo declara la familia', !!cat.familias?.divisor);

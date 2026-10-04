@@ -29,6 +29,15 @@ final class COD_Canvas_MCP_Recipe_Compiler
      */
     private array $omitted_nodes = [];
 
+    /**
+     * Si la imagen que viene es la primera del documento.
+     *
+     * La de arriba es casi siempre la que decide cuándo se considera cargada
+     * la página, así que va con prioridad y sin diferir; las demás esperan a
+     * acercarse a la pantalla.
+     */
+    private bool $primera_imagen = true;
+
     /** @var array<int, string> */
     public const RULE_KINDS = [
         'color',
@@ -785,6 +794,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
     public function compile(array $composition, array $design)
     {
         $this->omitted_nodes = [];
+        $this->primera_imagen = true;
         $normalized_design = $this->normalize_design($design);
         if (is_wp_error($normalized_design)) {
             return $normalized_design;
@@ -2329,8 +2339,10 @@ final class COD_Canvas_MCP_Recipe_Compiler
 
         if ($tiene_nombre) {
             $nombre = strtolower(trim($value['nombre']));
-            if (preg_match('/^[a-z0-9_]{1,64}$/', $nombre) !== 1) {
-                return new WP_Error($codigo, 'icono.nombre son letras minúsculas, números y guión bajo: por ejemplo "local_shipping".');
+            // El guión entra por las redes (`red-whatsapp`). Ni punto ni barra:
+            // un nombre no puede salirse de la carpeta del set.
+            if (preg_match('/^[a-z0-9_-]{1,64}$/', $nombre) !== 1) {
+                return new WP_Error($codigo, 'icono.nombre son letras minúsculas, números, guión y guión bajo: por ejemplo "local_shipping" o "red-whatsapp".');
             }
             $normalizado['nombre'] = $nombre;
         } else {
@@ -4060,7 +4072,78 @@ final class COD_Canvas_MCP_Recipe_Compiler
             : '';
         $marco = $rotation === 90 || $rotation === 270 ? ' cod-marco-girado' : '';
         return '<figure ' . $this->add_class_to_attrs($attrs, $marco) . '><img src="' . esc_url($content['assetUrl'])
-            . '" alt="' . esc_attr($content['alt']) . '"' . $rot_attrs . '>' . $caption . '</figure>';
+            . '" alt="' . esc_attr($content['alt']) . '"' . $rot_attrs
+            . $this->atributos_de_carga($content['assetUrl']) . '>' . $caption . '</figure>';
+    }
+
+    /**
+     * Lo que hace que una foto se descargue como se descarga un mapa: sólo el
+     * trozo que hace falta, y sólo cuando hace falta.
+     *
+     * DE DÓNDE SALE. Medido en la portada de Econut el 4 de octubre de 2026:
+     * 33 imágenes, **ninguna** con `srcset`, **ninguna** diferida y **una sola**
+     * con alto y ancho. La página pedía siempre el archivo original —la línea
+     * de selección venía de 2560×1707 para mostrarse a 400×300— y sumaba 6,6 MB.
+     * WordPress ya tenía generados los tamaños intermedios; simplemente no los
+     * estábamos usando.
+     *
+     * Cristóbal lo planteó con la analogía justa: «pienso en lo que pesa un mapa
+     * y cómo se hace streaming para que la descarga sea gradual a medida que se
+     * navega o se hace zoom». Son las mismas dos ideas:
+     *
+     *  - `srcset` es el nivel de zoom: el navegador elige la resolución que de
+     *    verdad va a dibujar, en vez de bajar el mundo entero;
+     *  - `loading="lazy"` es el encuadre: lo que está fuera de pantalla no se
+     *    baja hasta que se acerca.
+     *
+     * Y una tercera que no se ve pero que Google sí mide: **declarar alto y
+     * ancho reserva el hueco**, así la página no salta cuando cada foto llega.
+     *
+     * LA PRIMERA NO SE DIFIERE. La imagen de arriba es casi siempre la que
+     * decide cuándo se considera cargada la página; diferirla la retrasa a
+     * propósito. Por eso la primera va con prioridad y las demás esperan.
+     */
+    private function atributos_de_carga(string $url): string
+    {
+        $atributos = ' decoding="async"';
+
+        // El identificador en Medios es lo que da acceso a los tamaños que
+        // WordPress ya generó. Si la imagen no es del sitio —o no está en
+        // Medios— no hay tamaños que ofrecer y se deja como está.
+        //
+        // La dirección se completa antes de buscar: las composiciones guardan
+        // rutas relativas —a propósito, para que un documento sobreviva a un
+        // cambio de dominio— y `attachment_url_to_postid` sólo entiende la
+        // dirección completa. Sin esto no encontraba ninguna y el `srcset`
+        // salía vacío en las 33 imágenes de la portada.
+        $absoluta = strpos($url, '/') === 0 && strpos($url, '//') !== 0
+            ? home_url($url)
+            : $url;
+        $id = attachment_url_to_postid($absoluta);
+        if ($id > 0) {
+            $srcset = wp_get_attachment_image_srcset($id, 'full');
+            if (is_string($srcset) && $srcset !== '') {
+                $atributos .= ' srcset="' . esc_attr($srcset) . '"';
+                // `sizes` le dice al navegador cuánto espacio ocupará, que es
+                // lo que necesita para elegir. Sin esto supone el ancho de la
+                // ventana y baja de más.
+                $sizes = wp_get_attachment_image_sizes($id, 'full');
+                if (is_string($sizes) && $sizes !== '') {
+                    $atributos .= ' sizes="' . esc_attr($sizes) . '"';
+                }
+            }
+            $meta = wp_get_attachment_metadata($id);
+            if (is_array($meta) && !empty($meta['width']) && !empty($meta['height'])) {
+                $atributos .= ' width="' . (int) $meta['width'] . '" height="' . (int) $meta['height'] . '"';
+            }
+        }
+
+        if ($this->primera_imagen) {
+            $this->primera_imagen = false;
+            return $atributos . ' loading="eager" fetchpriority="high"';
+        }
+
+        return $atributos . ' loading="lazy"';
     }
 
     /** @param array<string, mixed> $content */
