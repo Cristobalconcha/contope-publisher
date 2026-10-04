@@ -5,6 +5,97 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.69 — 4 de octubre de 2026
+
+### Las cuatro páginas interiores de Santa Luisa, por el constructor
+
+Contacto, Diferenciales, Preguntas frecuentes y Términos dejan de ser HTML
+escrito a mano y pasan a ser composiciones registradas, editables desde el page
+builder. El número que mejor lo resume: el sitio pasó de **50,7 KB de CSS
+repartidos en cuatro hojas de página** a **16,9 KB en una sola hoja de diseño**.
+
+El trinquete de páginas sin composición baja de 8 a 4, y las cuatro que quedan
+son la portada y tres páginas de prueba.
+
+### El acordeón, y el error que lo rodeó
+
+Dos de esas páginas son acordeón casi enteras —9 pliegues en Preguntas y 27 en
+Términos—, así que hubo que construir el módulo. **Y acá me equivoqué de una
+forma que conviene dejar escrita**, porque el arreglo de fondo no es el módulo.
+
+Ese mismo día, antes de una compactación de la conversación, ya habíamos
+establecido que WordPress trae `core/tabs`, `core/accordion` y `core/details`, y
+había dos páginas de muestra probando el anidamiento. Después de la compactación
+miré `INTERACTION_BEHAVIORS` —el único lugar donde suelo mirar—, no encontré
+«acordeón», **lo di por inexistente y lo construí de nuevo**, duplicando el
+bloque de core. El historial de la sesión estaba en disco y no lo leí.
+
+Cristóbal, al corregirlo: *«tu falla es doble, porque por un lado no miras dónde
+están las cosas y por otro lado no registras en el lugar que sueles mirar. Si
+siempre miras en el lugar equivocado, entonces es en ese lugar equivocado donde
+tienes que hacer tu registro»*.
+
+Así que el registro quedó en los dos lugares donde miro:
+
+- **`EQUIVALENCIA_GUTENBERG`**, una constante nueva justo encima de la lista de
+  behaviors, que dice a qué familia de bloques corresponde cada módulo nuestro y
+  obliga a mirar `wp-includes/blocks/` antes de construir uno nuevo. Se publica
+  además en el catálogo de capacidades.
+- La regla 11 del `CLAUDE.md` del proyecto, con el inventario de los bloques
+  propios que ya existen y las páginas de muestra.
+
+### La regla de arquitectura que quedó clara
+
+No es que las pestañas o el acordeón «no sean nuestros». Cristóbal:
+*«nuestro módulo tiene que ser coherente con el de WordPress… vamos a tomar esas
+familias de bloques y les vamos a dar formato»*.
+
+El acordeón quedó entonces **correspondiendo** con `core/accordion`, no
+duplicándolo ni reemplazándolo. Cada parte apunta a nuestro atributo **y** a la
+clase del bloque de core, en un solo selector:
+
+```
+.cod-node-id-terminos :is([data-cod-acordeon-rol="item"], .wp-block-accordion-item){…}
+```
+
+Una página armada con el bloque de Gutenberg recibe el mismo formato que una
+compuesta en el lienzo, sin escribir el diseño dos veces. Y tiene las dos
+capacidades que le faltaban frente a core: `autoclose` (varios abiertos a la vez)
+y elegir cuál pliegue nace abierto. Anida, comprobado: un acordeón dentro del
+pliegue de otro, cada uno con sus propias opciones.
+
+### Además
+
+- **Las piezas de una galería ya se pueden estilar.** Leyenda, flechas, pista y
+  diapositiva no eran alcanzables por ninguna regla —las leyendas salían a 16 px
+  donde el original las tiene a 11,5— porque los contratos de partes existían
+  sólo para behaviors. Ahora existen también por TIPO DE NODO.
+- **Y al agregarlas apareció que `parts_css()` miraba un solo registro**: las
+  partes se guardaban en la composición y no emitían una línea de CSS, en
+  silencio.
+- `text-shadow` y las ocho fotos que faltaban en la biblioteca de medios del
+  espejo (todas las de `/2026/09/`, siete del carrusel más la de Preguntas).
+- Un respaldo del contenido de un sitio publicado, `scripts/respaldar-sitio.mjs`,
+  que **falla si las páginas vienen vacías**: la primera versión devolvió seis
+  páginas de 0 B y dijo «6 páginas respaldadas». Un respaldo que miente es peor
+  que no tenerlo.
+- `probar-marquesina.php` fijaba la POSICIÓN de su behavior en la lista, así que
+  se rompió al meterle un hermano. Mismo defecto que ya había tenido
+  `probar-mapa.php`.
+
+### El separador de ondas y las tres bandas
+
+La página legal pasa a tres bandas —beige, blanca, beige— separadas por un
+divisor de ondas bajo, de 44 px y en tres capas con opacidad decreciente. El
+documento es largo y de una sola tinta: las bandas le dan al ojo dónde parar y
+dejan claro que son dos documentos, no uno. Pedido de Cristóbal señalando el
+corte exacto.
+
+Las 14 formas de divisor estaban sólo en la biblioteca de Econut; se llevaron
+también a la de Santa Luisa y se dieron de alta como adjuntos.
+
+---
+
 ## 0.3.68 — 4 de octubre de 2026
 
 ### La primera página de Santa Luisa construida por el constructor

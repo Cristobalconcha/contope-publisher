@@ -22,6 +22,9 @@ const cual = process.argv.slice(2).find((a) => !a.startsWith('--'));
 
 const PAGINAS = {
   contacto: { guion: 'componer-contacto.mjs', archivo: 'contacto.json', pageId: 60, documentId: 'ocd-canvas-page-14', variable: 'REV_CONTACTO' },
+  diferenciales: { guion: 'componer-diferenciales.mjs', archivo: 'diferenciales.json', pageId: 62, documentId: 'ocd-canvas-page-10', variable: 'REV_DIFERENCIALES' },
+  preguntas: { guion: 'componer-preguntas.mjs', archivo: 'preguntas.json', pageId: 61, documentId: 'ocd-canvas-page-12', variable: 'REV_PREGUNTAS' },
+  terminos: { guion: 'componer-terminos.mjs', archivo: 'terminos.json', pageId: 630, documentId: 'cod-canvas-page-164', variable: 'REV_TERMINOS' },
 };
 
 if (!cual || !PAGINAS[cual]) {

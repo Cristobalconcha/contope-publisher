@@ -35,11 +35,12 @@ $SITIOS = [
     ],
     'Santa Luisa (espejo local, heredado del HTML)' => [
         'wp' => __DIR__ . '/../../wp-local/wordpress/wp-load.php',
-        // 7 al 2026-10-04, después de recomponer Contacto. Era 8. Es deuda
-        // conocida, no un permiso: ver el encabezado. De las 7 que quedan, 3 son
-        // páginas de prueba y 4 son del sitio real (portada, Diferenciales,
-        // Preguntas y Términos).
-        'sin_composicion_aceptadas' => 7,
+        // 4 al 2026-10-04, tras recomponer las CUATRO páginas interiores. Era 8
+        // al empezar el día. Es deuda conocida, no un permiso: ver el encabezado.
+        // Las 4 que quedan: la portada del sitio y TRES páginas de prueba
+        // (f3b-legacy-doc, Prueba WhatsApp CTA y Prueba viewport y animación).
+        // El trinquete acusó que yo había puesto 3 contando mal: hizo su trabajo.
+        'sin_composicion_aceptadas' => 4,
     ],
 ];
 

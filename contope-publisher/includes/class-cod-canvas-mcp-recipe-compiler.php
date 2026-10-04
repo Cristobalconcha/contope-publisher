@@ -195,6 +195,26 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 ],
             ],
         ],
+        'acordeon' => [
+            'atributoRol' => 'data-cod-acordeon-rol',
+            'partes' => [
+                'item' => [
+                    'selector' => ':is([data-cod-acordeon-rol="item"], .wp-block-accordion-item)',
+                    'elegido' => ':is([data-cod-acordeon-estado="abierto"], .is-open)',
+                    'descripcion' => 'cada pliegue del acordeón (el propio hijo del grupo); el que está abierto se puede estilar con scope.state="current"',
+                ],
+                'resumen' => [
+                    'selector' => ':is([data-cod-acordeon-rol="resumen"], .wp-block-accordion-heading__toggle)',
+                    'elegido' => ':is([data-cod-acordeon-estado="abierto"], .is-open)',
+                    'descripcion' => 'el botón que se pincha para abrir o cerrar: lo fabrica el runtime y lleva adentro el primer hijo original, con su tipografía',
+                ],
+                'panel' => [
+                    'selector' => ':is([data-cod-acordeon-rol="panel"], .wp-block-accordion-panel)',
+                    'elegido' => ':is([data-cod-acordeon-visible="true"], .is-open .wp-block-accordion-panel)',
+                    'descripcion' => 'el contenido que se despliega (el resto de los hijos del pliegue)',
+                ],
+            ],
+        ],
         'cuadrantes' => [
             'atributoRol' => 'data-cod-cuadrantes-rol',
             'partes' => [
@@ -267,6 +287,62 @@ final class COD_Canvas_MCP_Recipe_Compiler
                     'selector' => '[data-cod-mapa-rol="cerrar"]',
                     'elegido' => null,
                     'descripcion' => 'el botón de la X, arriba a la derecha del mapa grande (lo fabrica el runtime; lleva un SVG que toma el color del texto del botón)',
+                ],
+            ],
+        ],
+    ];
+
+    /**
+     * Contratos de partes POR TIPO DE NODO, no por behavior.
+     *
+     * POR QUÉ EXISTEN. Al recomponer Diferenciales de Santa Luisa quedó a la
+     * vista que la galería fabrica piezas —la leyenda de cada foto, las flechas,
+     * la pista del carrusel— que NINGUNA regla de diseño podía alcanzar: no son
+     * nodos, así que no reciben clases de regla, y una regla sobre el nodo
+     * galería no llega a sus descendientes. Resultado medido: las leyendas
+     * salían a 16 px donde el original las tiene a 11,5 y las flechas sin
+     * estilo, y la única salida era volver a escribir CSS a mano.
+     *
+     * Van por tipo de nodo y no por behavior porque la leyenda existe aunque no
+     * haya carrusel: una galería en grilla con `caption: below` también la
+     * tiene. Atarlas a `carousel-basic` habría dejado fuera ese caso.
+     *
+     * A diferencia de los contratos de behavior, acá el `selector` es una CLASE
+     * y no un atributo de rol: estas piezas las emite el compilador, no el
+     * runtime, así que ya vienen con su clase puesta. El mecanismo de abajo es
+     * el mismo —un selector de descendiente anclado al nodo—, así que no hay
+     * dos caminos que mantener.
+     *
+     * @var array<string, array{atributoRol: string, partes: array<string, array{selector: string, elegido: string|null, descripcion: string}>}>
+     */
+    private const NODE_KIND_CONTRACTS = [
+        'gallery' => [
+            'atributoRol' => '',
+            'partes' => [
+                'pieza' => [
+                    'selector' => '.cod-mcp-gallery__item',
+                    'elegido' => null,
+                    'descripcion' => 'cada ítem de la galería (la figura que envuelve la foto o el video y su leyenda)',
+                ],
+                'leyenda' => [
+                    'selector' => 'figcaption',
+                    'elegido' => null,
+                    'descripcion' => 'el pie de cada ítem, cuando la regla gallery pide caption below u overlay',
+                ],
+                'controles' => [
+                    'selector' => '.cod-mcp-gallery__controls',
+                    'elegido' => null,
+                    'descripcion' => 'la zona de las flechas y los puntos del carrusel (sólo con controls distinto de none)',
+                ],
+                'pista' => [
+                    'selector' => '.cod-carousel__track',
+                    'elegido' => null,
+                    'descripcion' => 'la fila que se desplaza en un carrusel; su separación entre piezas sale de la regla gallery',
+                ],
+                'diapositiva' => [
+                    'selector' => '.cod-carousel__slide',
+                    'elegido' => '.is-active',
+                    'descripcion' => 'cada pieza dentro de la pista de un carrusel; la que está a la vista lleva is-active, así que con scope.state="current" se puede destacar',
                 ],
             ],
         ],
@@ -487,6 +563,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 ],
                 'nodeContentSchemas' => $this->node_content_schemas(),
                 'behaviorContracts' => $this->behavior_contracts_catalog(),
+                'equivalenciaGutenberg' => self::EQUIVALENCIA_GUTENBERG,
             ],
             'realization' => [
                 'canvasPrimitives' => [
@@ -643,6 +720,8 @@ final class COD_Canvas_MCP_Recipe_Compiler
                     'cuadrantes no admite threshold, targetId, toggleClass, mode, visible ni visibleMobile',
                     'pestanas sólo en un nodo group con 2 a 8 hijos; cada hijo es una pestaña: su PRIMER hijo es la etiqueta (lo que se pincha: un título, un número, un texto) y el RESTO es el panel de contenido. Al cargar queda activa la primera; al pinchar una etiqueta se muestra su panel y se ocultan los demás, sin que el alto salte de golpe. El runtime pone las etiquetas en una lista de botones reales (role="tablist" / role="tab"; flechas izquierda y derecha, Inicio y Fin) y convierte a cada hijo en su panel (role="tabpanel"). Para estilar el estado, la composición usa los atributos que emite el runtime: [data-cod-pestanas-rol="etiqueta"][data-cod-pestanas-estado="activa"|"inactiva"] y [data-cod-pestanas-rol="panel"][data-cod-pestanas-visible="true"|"false"]. Sin colores ni tipografía: eso lo ponen las reglas de diseño del sitio. Si la forma interna no calza (algún hijo con menos de 2 hijos propios) el runtime no toca nada y el contenido queda apilado.',
                     'wa-mensaje: una ventana para redactar el mensaje antes de abrir WhatsApp. El nodo que la declara ES la ventana, y no reemplaza los enlaces de WhatsApp: los INTERCEPTA, así que cada botón conserva el mensaje propio que ya viaja en su enlace y el número sale de ahí mismo (no hay un segundo lugar donde configurarlo). Si el JavaScript no corre, los enlaces siguen abriendo WhatsApp directo: se pierde la ventana, no el contacto. Apunta a nodos de la misma composición: sendNodeId (obligatorio, el botón de enviar; sin él el runtime no monta nada), fieldNodeId (el hueco donde se fabrica el campo de texto), closeNodeId y consentNodeId. El campo y la casilla NO viajan en el documento —el sanitizador bloquea textarea e input a propósito— sino que los crea el runtime dentro de esos huecos, así que quien diseña decide dónde van y cómo se ven. triggerSelector por omisión es a[href*="wa.me/"]; placeholder, fieldLabel y consentText son los textos.',
+                    'acordeon sólo en un nodo group con 1 a 40 hijos; cada hijo es un pliegue: su PRIMER hijo es lo que se pincha (la pregunta, el título del artículo) y el RESTO es lo que se despliega. Misma forma que pestanas, para que se entienda y se edite igual; lo que cambia es que va en vertical y que puede quedar todo cerrado. Se abre DE A UNO: abrir un pliegue cierra el anterior, que es lo que se espera de unas preguntas frecuentes y lo que hacía el sitio original con <details name>. Al cargar queda abierto el primero. El runtime convierte lo que se pincha en un button real (aria-expanded, aria-controls; flechas arriba y abajo, Inicio y Fin) y el resto en una región con role="region". Para estilar el estado, la composición usa las partes item, resumen y panel, y scope.state="current" para el pliegue abierto. Sin colores ni tipografía: eso lo ponen las reglas de diseño del sitio. Si la forma interna no calza, el runtime no toca nada y el contenido queda apilado y legible, que es como se ve también dentro del editor.',
+                    'acordeon admite autoclose (verdadero por omisión: abrir uno cierra el anterior, como el autoclose del bloque core/accordion de WordPress), openNodeId (cuál pliegue nace abierto; por omisión el primero) y startClosed (empieza todo cerrado). No admite threshold, targetId, toggleClass, mode, visible ni visibleMobile.',
                     'pestanas no admite threshold, targetId, toggleClass, mode, visible ni visibleMobile',
                     'marquesina sólo en un nodo group con 2 a 24 hijos; cada hijo es una pieza de una fila que se desplaza sola, de derecha a izquierda y en bucle continuo, sin controles (logos de certificación, sellos, una frase de cinta). El runtime mete las piezas en una pista y agrega una copia del juego (marcada aria-hidden y sin ids) para que el bucle cierre sin salto; si hay pocas piezas para llenar el ancho, repite el juego las veces que haga falta. La pista se mueve con CSS puro (@keyframes y translateX(-50%)): sin librerías ni JavaScript por cuadro. Con prefers-reduced-motion: reduce el movimiento se detiene y las piezas quedan quietas y a la vista, sin copias. Cuántas piezas se ven a la vez, la separación y la velocidad NO son parámetros de la regla interaction: se escriben con una regla properties sobre el nodo, que admite scope.breakpoint, así que el número cambia por ancho como cualquier otra regla: --cod-marquesina-visibles (piezas a la vez; por omisión 4), --cod-marquesina-separacion (espacio entre piezas; por omisión 0px) y --cod-marquesina-duracion-pieza (cuánto tarda en pasar una pieza; por omisión 8s, un desplazamiento lento y continuo). Para estilar la pista o cada pieza se usan las partes pista y pieza del nodo. Sin colores ni tipografía: eso lo ponen las reglas de diseño del sitio. Si el grupo no calza el runtime no toca nada y las piezas quedan apiladas.',
                     'marquesina no admite threshold, targetId, toggleClass, mode, visible ni visibleMobile (las piezas visibles se declaran con la variable --cod-marquesina-visibles, no con visible)',
@@ -1827,7 +1906,14 @@ final class COD_Canvas_MCP_Recipe_Compiler
             // properties porque son texto que lee una persona —y que algún día
             // habrá que traducir—, no apariencia.
             'fieldNodeId', 'sendNodeId', 'closeNodeId', 'consentNodeId',
-            'triggerSelector', 'placeholder', 'fieldLabel', 'consentText'];
+            'triggerSelector', 'placeholder', 'fieldLabel', 'consentText',
+            // acordeon. Son las dos capacidades que el bloque core/accordion de
+            // WordPress tiene y que a éste le faltaban: poder tener varios
+            // pliegues abiertos a la vez (autoclose en false) y elegir cuál nace
+            // abierto (openByDefault, acá por id de nodo). Lo hizo notar
+            // Cristóbal el 4 de octubre de 2026: «no modificar el plugin para
+            // perder una característica».
+            'autoclose', 'openNodeId', 'startClosed'];
         // Un parámetro que ninguna interacción conoce se rechaza NOMBRÁNDOLO:
         // «interaction.behavior no es un comportamiento disponible» no le dice a
         // quien lo escribió que el problema era la clave inventada.
@@ -1861,6 +1947,24 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 return new WP_Error('cod_mcp_interaction_rule_invalid', 'targetId no es válido.');
             }
             $normalized['targetId'] = $value['targetId'];
+        }
+        foreach (['autoclose', 'startClosed'] as $campo) {
+            if (!isset($value[$campo])) {
+                continue;
+            }
+            if (!is_bool($value[$campo])) {
+                return new WP_Error('cod_mcp_interaction_rule_invalid', $campo . ' es verdadero o falso.');
+            }
+            $normalized[$campo] = $value[$campo];
+        }
+        if (isset($value['openNodeId'])) {
+            if (!is_string($value['openNodeId']) || !$this->is_stable_id($value['openNodeId'])) {
+                return new WP_Error('cod_mcp_interaction_rule_invalid', 'openNodeId tiene que ser el id de un pliegue de esta composición.');
+            }
+            if (!empty($value['startClosed'])) {
+                return new WP_Error('cod_mcp_interaction_rule_invalid', 'openNodeId y startClosed se contradicen: o empieza cerrado, o empieza abierto uno.');
+            }
+            $normalized['openNodeId'] = $value['openNodeId'];
         }
         foreach (['fieldNodeId', 'sendNodeId', 'closeNodeId', 'consentNodeId'] as $campo) {
             if (!isset($value[$campo])) {
@@ -2751,13 +2855,18 @@ final class COD_Canvas_MCP_Recipe_Compiler
             return [];
         }
         $behavior = $this->contract_behavior_of($rule_ids, $rule_index);
+        if ($behavior === '' && isset(self::NODE_KIND_CONTRACTS[$node['kind']])) {
+            // Hay tipos de nodo que fabrican partes por sí solos, sin behavior:
+            // una galería tiene leyendas aunque no sea un carrusel.
+            $behavior = (string) $node['kind'];
+        }
         if ($behavior === '') {
             return new WP_Error(
                 'cod_mcp_composition_partes_invalid',
-                'El nodo "' . $node['id'] . '" declara partes pero no lleva un behavior que fabrique partes. Hoy lo hacen: ' . implode(', ', array_keys(self::BEHAVIOR_CONTRACTS)) . '. El nodo tiene que llevar en ruleIds una regla interaction con uno de ellos.'
+                'El nodo "' . $node['id'] . '" declara partes pero no fabrica ninguna. Las fabrican estos behaviors: ' . implode(', ', array_keys(self::BEHAVIOR_CONTRACTS)) . '; y estos tipos de nodo por sí solos: ' . implode(', ', array_keys(self::NODE_KIND_CONTRACTS)) . '.'
             );
         }
-        $contrato = self::BEHAVIOR_CONTRACTS[$behavior];
+        $contrato = self::contratos()[$behavior];
         $validas = implode(', ', array_keys($contrato['partes']));
         $normalized = [];
         foreach ($partes as $parte => $ids) {
@@ -2900,6 +3009,12 @@ final class COD_Canvas_MCP_Recipe_Compiler
      * @param array<int, string> $rule_ids
      * @param array<string, array<string, mixed>> $rule_index
      */
+    /** Los dos registros juntos: es donde se busca un contrato, venga de donde venga. */
+    private static function contratos(): array
+    {
+        return self::BEHAVIOR_CONTRACTS + self::NODE_KIND_CONTRACTS;
+    }
+
     private function contract_behavior_of(array $rule_ids, array $rule_index): string
     {
         foreach ($rule_ids as $rule_id) {
@@ -2920,7 +3035,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
     private function current_markers(): array
     {
         $marcas = [];
-        foreach (self::BEHAVIOR_CONTRACTS as $behavior => $contrato) {
+        foreach (self::contratos() as $behavior => $contrato) {
             foreach ($contrato['partes'] as $parte) {
                 if ($parte['elegido'] !== null) {
                     $marcas[$behavior][] = $parte['elegido'];
@@ -2940,7 +3055,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
     private function parts_with_current(string $behavior): string
     {
         $nombres = [];
-        foreach (self::BEHAVIOR_CONTRACTS[$behavior]['partes'] as $nombre => $parte) {
+        foreach (self::contratos()[$behavior]['partes'] as $nombre => $parte) {
             if ($parte['elegido'] !== null) {
                 $nombres[] = $nombre;
             }
@@ -4159,6 +4274,62 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 if ($hijos !== 4) {
                     return new WP_Error('cod_mcp_cuadrantes_children_invalid', 'cuadrantes exige un group con exactamente 4 hijos (uno por cuadrante); este tiene ' . $hijos . '.');
                 }
+            } elseif ($interaction['behavior'] === 'acordeon') {
+                /**
+                 * EL ACORDEÓN: una lista de pliegues que se abren de a uno.
+                 *
+                 * POR QUÉ EXISTE. Al recomponer Santa Luisa por el constructor,
+                 * dos de sus cuatro páginas interiores resultaron ser acordeón
+                 * casi enteras: 9 pliegues en Preguntas frecuentes y 27 en
+                 * Términos y condiciones, 36 en total. No había cómo decirlo en
+                 * el vocabulario del constructor, así que estaban escritas a
+                 * mano con <details> y su propio CSS.
+                 *
+                 * MISMA FORMA QUE PESTANAS, que es lo que lo hace fácil de
+                 * entender y de editar: un grupo cuyos hijos son los pliegues, y
+                 * en cada pliegue el PRIMER hijo es lo que se pincha y el RESTO
+                 * es lo que se despliega. Lo que cambia es la disposición
+                 * (vertical) y que acá puede no haber ninguno abierto.
+                 *
+                 * SE ABRE DE A UNO, como en el sitio original (que usaba
+                 * <details name>). Es lo que se espera de unas preguntas
+                 * frecuentes: abrir una cierra la anterior y la página no se
+                 * alarga sin control.
+                 */
+                if ($node['kind'] !== 'group') {
+                    return new WP_Error('cod_mcp_acordeon_target_invalid', 'acordeon sólo puede aplicarse a un nodo group.');
+                }
+                $pliegues = isset($node['children']) && is_array($node['children']) ? $node['children'] : [];
+                if (count($pliegues) < 1 || count($pliegues) > 40) {
+                    return new WP_Error('cod_mcp_acordeon_target_invalid', 'acordeon necesita entre 1 y 40 pliegues (los hijos del grupo).');
+                }
+                foreach ($pliegues as $pliegue) {
+                    $propios = isset($pliegue['children']) && is_array($pliegue['children']) ? $pliegue['children'] : [];
+                    if (count($propios) < 2) {
+                        return new WP_Error('cod_mcp_acordeon_target_invalid',
+                            'Cada pliegue del acordeón necesita al menos 2 hijos: el primero es lo que se pincha y el resto lo que se despliega. El pliegue "' . ($pliegue['id'] ?? '?') . '" tiene ' . count($propios) . '.');
+                    }
+                }
+                /*
+                 * Las dos opciones del bloque core/accordion de WordPress, con
+                 * sus mismos valores por omisión: se cierra el anterior al abrir
+                 * otro (autoclose) y nace abierto el primero.
+                 */
+                $attributes['data-cod-acordeon-autoclose'] =
+                    (!isset($interaction['autoclose']) || $interaction['autoclose']) ? '1' : '0';
+                if (!empty($interaction['startClosed'])) {
+                    $attributes['data-cod-acordeon-abre'] = 'ninguno';
+                } elseif (isset($interaction['openNodeId'])) {
+                    $ids_pliegues = [];
+                    foreach ($pliegues as $pliegue) {
+                        $ids_pliegues[] = $pliegue['id'] ?? '';
+                    }
+                    if (!in_array($interaction['openNodeId'], $ids_pliegues, true)) {
+                        return new WP_Error('cod_mcp_interaction_target_missing',
+                            'openNodeId refiere "' . $interaction['openNodeId'] . '", que no es un pliegue de este acordeón.');
+                    }
+                    $attributes['data-cod-acordeon-abre'] = $interaction['openNodeId'];
+                }
             } elseif ($interaction['behavior'] === 'pestanas') {
                 // Un juego de pestañas: cada hijo del group es una pestaña (su
                 // primer hijo es la etiqueta, el resto es el panel). Con menos
@@ -5017,10 +5188,31 @@ final class COD_Canvas_MCP_Recipe_Compiler
         foreach ($nodes as $node) {
             $partes = $node['partes'] ?? [];
             if ($partes !== []) {
-                $behavior = $this->contract_behavior_of($node['ruleIds'], $rule_index);
+                /*
+                 * EL CONTRATO SE RESUELVE IGUAL QUE AL VALIDAR.
+                 *
+                 * Esta línea miraba sólo BEHAVIOR_CONTRACTS. Al sumarse los
+                 * contratos por TIPO DE NODO (la galería), el behavior salía
+                 * vacío, el índice no existía y no se emitía ningún CSS: las
+                 * partes se guardaban en la composición y no pintaban nada.
+                 * Medido el 4 de octubre de 2026 en Diferenciales de Santa
+                 * Luisa —leyendas y flechas sin estilo, sin un solo aviso—,
+                 * que es exactamente la clase de fallo silencioso que esta
+                 * base de código ya pagó varias veces.
+                 */
+                $contrato = $this->contract_behavior_of($node['ruleIds'], $rule_index);
+                if ($contrato === '' && isset(self::NODE_KIND_CONTRACTS[$node['kind']])) {
+                    $contrato = (string) $node['kind'];
+                }
+                $definiciones = self::contratos()[$contrato]['partes'] ?? [];
                 $ancla = '.cod-node-id-' . sanitize_html_class($node['id']);
                 foreach ($partes as $parte => $rule_ids) {
-                    $definicion = self::BEHAVIOR_CONTRACTS[$behavior]['partes'][$parte];
+                    if (!isset($definiciones[$parte])) {
+                        // No puede pasar —se validó al componer—, pero si pasara
+                        // es mejor saltarla que emitir un selector a medias.
+                        continue;
+                    }
+                    $definicion = $definiciones[$parte];
                     $destino = [
                         'selector' => $ancla . ' ' . $definicion['selector'],
                         'elegido' => $definicion['elegido'],
@@ -5833,9 +6025,54 @@ final class COD_Canvas_MCP_Recipe_Compiler
     public const TRANSFORMACION_FACTORES = ['escalar', 'escalarX', 'escalarY'];
     public const TRANSFORMACION_CAMPOS = ['moverX', 'moverY', 'rotar', 'inclinarX', 'inclinarY', 'escalar', 'escalarX', 'escalarY', 'origen'];
     public const ICONO_CAMPOS = ['forma', 'nombre', 'donde', 'tamano', 'color', 'separacion'];
+    /**
+     * A qué familia de bloques de Gutenberg CORRESPONDE cada módulo nuestro.
+     *
+     * POR QUÉ EXISTE ESTE MAPA. ContOpe Publisher vive en dos mundos: el lienzo
+     * y los bloques. El sitio no va a tener sólo fotos, textos y títulos de
+     * WordPress —va a tener pestañas y cualquier otra familia de bloques que
+     * exista—, y lo que hace ContOpe es TOMAR esas familias y darles formato.
+     * Eso no quita que el plugin tenga su propia entidad para cada una; lo que
+     * exige es que se CORRESPONDA con la de Gutenberg, no que la duplique ni que
+     * la reemplace.
+     *
+     * Y está acá, en la lista que uno mira antes de construir, por una razón
+     * medida: el 4 de octubre de 2026 construí un acordeón desde cero después de
+     * mirar INTERACTION_BEHAVIORS, no encontrarlo y darlo por inexistente —
+     * cuando ese mismo día habíamos establecido que `core/accordion` ya existía y
+     * había dos páginas de muestra probando el anidamiento. Cristóbal: «si
+     * siempre miras en el lugar equivocado, entonces es en ese lugar equivocado
+     * donde tienes que hacer tu registro».
+     *
+     * Quien agregue un módulo acá: mirar primero `wp-includes/blocks/`. Si la
+     * familia ya existe, el trabajo es la correspondencia, no una pieza nueva.
+     *
+     * @var array<string, array{bloque: string, partes: array<string, string>, notas: string}>
+     */
+    public const EQUIVALENCIA_GUTENBERG = [
+        'acordeon' => [
+            'bloque' => 'core/accordion',
+            'partes' => [
+                'item' => 'core/accordion-item (openByDefault)',
+                'resumen' => 'core/accordion-heading (title, level, showIcon, iconPosition)',
+                'panel' => 'core/accordion-panel',
+            ],
+            'notas' => 'Misma estructura accesible: botón con aria-expanded y aria-controls, panel con aria-labelledby, estado abierto en el ítem, y autoclose con el mismo valor por omisión. Una página puede traer el acordeón como bloques de Gutenberg y recibir igual el formato del lienzo: las partes alcanzan tanto nuestros atributos data-cod-acordeon-* como las clases wp-block-accordion-*.',
+        ],
+        'pestanas' => [
+            'bloque' => 'core/tabs',
+            'partes' => [
+                'lista' => 'core/tab-list',
+                'etiqueta' => 'core/tab (dentro de core/tab-list)',
+                'panel' => 'core/tab-panel (dentro de core/tab-panels)',
+            ],
+            'notas' => 'Existe desde antes que el bloque de core. Pendiente de alinear igual que el acordeón.',
+        ],
+    ];
+
     public const INTERACTION_BEHAVIORS = [
         'scroll-threshold', 'nav-toggle', 'carousel-basic', 'lightbox', 'cuadrantes',
-        'pestanas', 'marquesina', 'aviso', 'mapa', 'preferencias-cookies', 'wa-mensaje',
+        'pestanas', 'acordeon', 'marquesina', 'aviso', 'mapa', 'preferencias-cookies', 'wa-mensaje',
     ];
     private function rule_class(string $rule_id): string
     {

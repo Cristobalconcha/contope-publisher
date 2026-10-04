@@ -10,11 +10,25 @@
  * Todo lo visible de acá se midió en el navegador sobre el espejo local, no se
  * copió del CSS ni se recordó. Las reglas compartidas están en `diseno.mjs`.
  *
- * LO QUE NO ESTÁ Y POR QUÉ. El formulario: la página referencia
- * `contacto-santa-luisa`, que NO existe en la tabla de formularios del espejo
- * (comprobado), y por eso hoy se ve una tarjeta blanca vacía. Poner otro
- * formulario sería cambiar la página, así que la tarjeta queda igual que está y
- * el nodo `form` se agrega cuando ese formulario exista.
+ * EL FORMULARIO, Y LA DIFERENCIA ENTRE EL ESPEJO Y PRODUCCIÓN.
+ *
+ * En PRODUCCIÓN el formulario existe, funciona y emite sus eventos a Google
+ * Tag Manager —confirmado por Cristóbal el 4 de octubre de 2026—. En el ESPEJO
+ * no:  no está en la tabla de formularios (comprobado),
+ * y por eso acá se ve una tarjeta blanca vacía.
+ *
+ * Poner otro de los formularios que sí existen en el espejo sería cambiar la
+ * página, así que la tarjeta queda como está. Al apuntar esta receta a
+ * producción hay que meter dentro de `form-tarjeta` un nodo:
+ *
+ *     { id: 'form', kind: 'form', ruleIds: [], content: { formSlug: 'contacto-santa-luisa' } }
+ *
+ * comprobando antes el identificador real con `cod_list_canvas_forms` contra
+ * ESE sitio: el slug es lo portable, el número de página no.
+ *
+ * Los eventos de Tag Manager no dependen de esto: los emite el runtime de
+ * Orugantt Forms, y el contenedor GTM lo imprime el plugin desde la opción
+ * cod_medicion, fuera del documento de la página. Recomponer no los toca.
  *
  *   node componer-contacto.mjs > contacto.json
  */

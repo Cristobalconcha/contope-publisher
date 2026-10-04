@@ -1922,6 +1922,190 @@
         };
     }
 
+    // acordeon: una lista de pliegues que se abren de a uno. Cada hijo del grupo
+    // es un pliegue: su PRIMER hijo es lo que se pincha (la pregunta) y el RESTO
+    // es lo que se despliega.
+    //
+    // POR QUÉ EXISTE. Al recomponer Santa Luisa por el constructor, dos de sus
+    // cuatro páginas interiores resultaron ser acordeón casi enteras: 9 pliegues
+    // en Preguntas frecuentes y 27 en Términos, 36 en total. No había cómo
+    // decirlo en el vocabulario del constructor, así que estaban escritas a mano
+    // con <details> y su propio CSS.
+    //
+    // MISMA FORMA QUE PESTANAS, a propósito: quien entiende una entiende la otra
+    // y se editan igual. Lo que cambia es que va en vertical y que puede quedar
+    // todo cerrado.
+    //
+    // POR QUÉ NO <details> NATIVO, que habría sido más corto. Tres razones
+    // medidas: dentro del editor un <details> cerrado esconde su contenido y no
+    // se puede editar; el estado abierto no se puede estilar con las partes del
+    // sistema como el resto de los behaviors; y la animación de alto no existe.
+    // Acá el contenido NUNCA se esconde del documento: si este archivo no corre,
+    // los pliegues quedan apilados y legibles, que es también como se ven en el
+    // editor.
+    //
+    // SE ABRE DE A UNO, como hacía el sitio original con <details name>. Es lo
+    // que se espera de unas preguntas frecuentes: abrir una cierra la anterior y
+    // la página no se alarga sin control.
+    //
+    // ATRIBUTOS QUE EMITE (el contrato para componer sin tocar el runtime):
+    //   raíz:     data-cod-acordeon-listo="1"
+    //   item:     data-cod-acordeon-rol="item", data-cod-acordeon-estado="abierto|cerrado"
+    //   resumen:  data-cod-acordeon-rol="resumen", data-cod-acordeon-estado="abierto|cerrado"
+    //   panel:    data-cod-acordeon-rol="panel", data-cod-acordeon-visible="true|false"
+    var contadorAcordeon = 0;
+
+    function montarAcordeon(root, doc) {
+        if (root.getAttribute('data-cod-acordeon-listo') === '1') return null;
+
+        var pliegues = Array.prototype.slice.call(root.children);
+        if (pliegues.length < 1 || pliegues.length > 40) return null;
+
+        // Reconocer la forma ANTES de tocar nada: si alguno no calza, no se toca
+        // nada y el contenido queda apilado y legible.
+        var formas = [];
+        for (var i = 0; i < pliegues.length; i++) {
+            var propios = pliegues[i].children;
+            if (!propios || propios.length < 2) return null;
+            formas.push({ item: pliegues[i], resumen: propios[0], cuerpo: Array.prototype.slice.call(propios, 1) });
+        }
+
+        contadorAcordeon += 1;
+        var numero = contadorAcordeon;
+        var botones = [];
+        var paneles = [];
+        var deshacer = [];
+
+        formas.forEach(function (forma, n) {
+            var idPanel = 'cod-acordeon-' + numero + '-panel-' + n;
+            var idBoton = 'cod-acordeon-' + numero + '-resumen-' + n;
+
+            // El botón envuelve al resumen original, que viaja ENTERO: conserva su
+            // clase y sus reglas, así que la composición le sigue dando tipografía.
+            var boton = doc.createElement('button');
+            boton.type = 'button';
+            boton.id = idBoton;
+            boton.className = 'cod-acordeon__resumen';
+            boton.setAttribute('data-cod-acordeon-rol', 'resumen');
+            boton.setAttribute('aria-expanded', 'false');
+            boton.setAttribute('aria-controls', idPanel);
+            forma.item.insertBefore(boton, forma.resumen);
+            boton.appendChild(forma.resumen);
+
+            // El panel envuelve al resto. role="region" para que un lector de
+            // pantalla lo anuncie como una zona con nombre: el del botón.
+            var panel = doc.createElement('div');
+            panel.id = idPanel;
+            panel.className = 'cod-acordeon__panel';
+            panel.setAttribute('data-cod-acordeon-rol', 'panel');
+            panel.setAttribute('data-cod-acordeon-visible', 'false');
+            panel.setAttribute('role', 'region');
+            panel.setAttribute('aria-labelledby', idBoton);
+            forma.item.appendChild(panel);
+            forma.cuerpo.forEach(function (nodo) { panel.appendChild(nodo); });
+
+            forma.item.setAttribute('data-cod-acordeon-rol', 'item');
+            forma.item.setAttribute('data-cod-acordeon-estado', 'cerrado');
+
+            botones.push(boton);
+            paneles.push(panel);
+        });
+
+        function abrir(n) {
+            for (var i = 0; i < botones.length; i++) {
+                var abierto = i === n;
+                botones[i].setAttribute('aria-expanded', abierto ? 'true' : 'false');
+                botones[i].setAttribute('data-cod-acordeon-estado', abierto ? 'abierto' : 'cerrado');
+                paneles[i].setAttribute('data-cod-acordeon-visible', abierto ? 'true' : 'false');
+                paneles[i].parentNode.setAttribute('data-cod-acordeon-estado', abierto ? 'abierto' : 'cerrado');
+            }
+        }
+
+        function cerrarTodo() {
+            abrir(-1);
+        }
+
+        // Las dos opciones del bloque core/accordion de WordPress.
+        var autoclose = root.getAttribute('data-cod-acordeon-autoclose') !== '0';
+        var abre = root.getAttribute('data-cod-acordeon-abre');
+
+        // Sin autoclose cada pliegue va por su cuenta: abrir uno no cierra nada.
+        function alternar(n) {
+            var abierto = botones[n].getAttribute('aria-expanded') === 'true';
+            if (autoclose) {
+                if (abierto) cerrarTodo(); else abrir(n);
+                return;
+            }
+            botones[n].setAttribute('aria-expanded', abierto ? 'false' : 'true');
+            botones[n].setAttribute('data-cod-acordeon-estado', abierto ? 'cerrado' : 'abierto');
+            paneles[n].setAttribute('data-cod-acordeon-visible', abierto ? 'false' : 'true');
+            paneles[n].parentNode.setAttribute('data-cod-acordeon-estado', abierto ? 'cerrado' : 'abierto');
+        }
+
+        botones.forEach(function (boton, n) {
+            function alPinchar() {
+                alternar(n);
+            }
+            function alTeclado(e) {
+                var k = e.key;
+                var destino = -1;
+                if (k === 'ArrowDown') destino = (n + 1) % botones.length;
+                else if (k === 'ArrowUp') destino = (n - 1 + botones.length) % botones.length;
+                else if (k === 'Home') destino = 0;
+                else if (k === 'End') destino = botones.length - 1;
+                if (destino < 0) return;
+                e.preventDefault();
+                botones[destino].focus();
+            }
+            boton.addEventListener('click', alPinchar);
+            boton.addEventListener('keydown', alTeclado);
+            deshacer.push(function () {
+                boton.removeEventListener('click', alPinchar);
+                boton.removeEventListener('keydown', alTeclado);
+            });
+        });
+
+        // Cuál nace abierto. Por omisión el primero: una lista toda cerrada se
+        // lee como una lista vacía y quien llega no sabe que hay algo debajo.
+        // Se puede pedir otro, o ninguno, igual que en el bloque de WordPress.
+        if (abre === 'ninguno') {
+            cerrarTodo();
+        } else if (abre) {
+            var cual = 0;
+            for (var k = 0; k < pliegues.length; k++) {
+                if (pliegues[k].getAttribute('data-cod-node') === abre) { cual = k; break; }
+            }
+            abrir(cual);
+        } else {
+            abrir(0);
+        }
+        root.setAttribute('data-cod-acordeon-listo', '1');
+
+        return function desmontar() {
+            while (deshacer.length) deshacer.pop()();
+            formas.forEach(function (forma) {
+                // Devolver todo a su lugar: el resumen sale del botón y el cuerpo
+                // del panel, en el orden original.
+                var boton = forma.item.querySelector(':scope > [data-cod-acordeon-rol="resumen"]');
+                var panel = forma.item.querySelector(':scope > [data-cod-acordeon-rol="panel"]');
+                if (boton) { forma.item.insertBefore(forma.resumen, boton); boton.parentNode.removeChild(boton); }
+                if (panel) {
+                    forma.cuerpo.forEach(function (nodo) { forma.item.appendChild(nodo); });
+                    panel.parentNode.removeChild(panel);
+                }
+                forma.item.removeAttribute('data-cod-acordeon-rol');
+                forma.item.removeAttribute('data-cod-acordeon-estado');
+            });
+            root.removeAttribute('data-cod-acordeon-listo');
+        };
+    }
+
+    function installAcordeon(nodes) {
+        Array.prototype.forEach.call(nodes, function (root) {
+            montarAcordeon(root, document);
+        });
+    }
+
     function installPestanas(nodes) {
         Array.prototype.forEach.call(nodes, function (root) {
             montarPestanas(root, document);
@@ -2889,6 +3073,7 @@
         var prefCookiesNodes = [];
         var cuadrantesNodes = [];
         var pestanasNodes = [];
+        var acordeonNodes = [];
         var marquesinaNodes = [];
         var avisoNodes = [];
         var mapaNodes = [];
@@ -2909,6 +3094,7 @@
             else if (behavior === 'preferencias-cookies') prefCookiesNodes.push(node);
             else if (behavior === 'cuadrantes') cuadrantesNodes.push(node);
             else if (behavior === 'pestanas') pestanasNodes.push(node);
+            else if (behavior === 'acordeon') acordeonNodes.push(node);
             else if (behavior === 'marquesina') marquesinaNodes.push(node);
             else if (behavior === 'aviso') avisoNodes.push(node);
             else if (behavior === 'mapa') mapaNodes.push(node);
@@ -2928,6 +3114,7 @@
         installPreferenciasCookies(prefCookiesNodes);
         installCuadrantes(cuadrantesNodes);
         installPestanas(pestanasNodes);
+        installAcordeon(acordeonNodes);
         installMarquesina(marquesinaNodes);
         installAviso(avisoNodes);
         installMapa(mapaNodes);

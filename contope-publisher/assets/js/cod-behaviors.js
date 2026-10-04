@@ -227,6 +227,7 @@
   var BEHAVIOR_PREFERENCIAS_COOKIES = 'preferencias-cookies';
   var BEHAVIOR_CUADRANTES = 'cuadrantes';
   var BEHAVIOR_PESTANAS = 'pestanas';
+  var BEHAVIOR_ACORDEON = 'acordeon';
   var BEHAVIOR_MARQUESINA = 'marquesina';
   var BEHAVIOR_AVISO = 'aviso';
   var BEHAVIOR_MAPA = 'mapa';
@@ -330,6 +331,10 @@
   BEHAVIORS[BEHAVIOR_PESTANAS] = {
     name: BEHAVIOR_PESTANAS,
     description: 'Juego de pestañas sobre un grupo con 2 a 8 hijos: cada hijo es una pestaña, su primer hijo es la etiqueta y el resto es el panel. Al cargar queda activa la primera; al pinchar una etiqueta se muestra su panel y se ocultan los demás, con el alto del bloque viajando del valor viejo al nuevo. Las etiquetas pasan a ser botones reales (role="tab" dentro de un role="tablist"; flechas izquierda y derecha, Inicio y Fin) y cada hijo pasa a ser un role="tabpanel". Emite data-cod-pestanas-* para que la composición estile activa e inactiva; respeta prefers-reduced-motion. No se ejecuta dentro del editor: allí el bloque se ve apilado y editable, con todos los paneles a la vista.',
+  };
+  BEHAVIORS[BEHAVIOR_ACORDEON] = {
+    name: BEHAVIOR_ACORDEON,
+    description: 'Lista de pliegues que se abren de a uno sobre un grupo con 1 a 40 hijos: cada hijo es un pliegue, su primer hijo es lo que se pincha (la pregunta) y el resto lo que se despliega. Misma forma que pestanas, para que se entienda y se edite igual; lo que cambia es que va en vertical y que puede quedar todo cerrado. Al cargar queda abierto el primero, porque una lista toda cerrada se lee como una lista vacia. Lo que se pincha pasa a ser un button real (aria-expanded, aria-controls; flechas arriba y abajo, Inicio y Fin) y el resto una region con nombre. Emite data-cod-acordeon-* para que la composicion estile abierto y cerrado con sus partes item, resumen y panel. El contenido NUNCA se esconde del documento: si el JavaScript no corre, los pliegues quedan apilados y legibles. No se ejecuta dentro del editor, y eso es a proposito: alli los pliegues se ven apilados y editables, que es como tienen que verse para poder escribirlos.',
   };
 
   BEHAVIORS[BEHAVIOR_MARQUESINA] = {

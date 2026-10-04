@@ -166,7 +166,14 @@ $comprobar('scope.state="current" sobre la pista: cod_mcp_current_state_target_i
 echo "\n== catálogo de capacidades ==\n";
 $json = wp_json_encode($compilador->capability_catalog(), JSON_UNESCAPED_UNICODE);
 $comprobar('safeRuntimeBehaviors incluye marquesina', preg_match('/safeRuntimeBehaviors.{0,300}marquesina/s', $json) === 1);
-$comprobar('interaction.behavior incluye marquesina', preg_match('/"behavior":\[[^\]]*"pestanas","marquesina"[,\]]/', $json) === 1);
+// Que marquesina ESTÉ en la lista, sin fijar su posición. Antes se comprobaba
+// que fuera justo después de pestanas, así que al meterle «acordeon» entre
+// medio esta prueba falló sin que nada de la marquesina hubiera cambiado. Es el
+// mismo defecto que ya había tenido probar-mapa.php: una prueba que se rompe
+// porque le agregaron un hermano no está midiendo lo que dice medir.
+$comprobar('interaction.behavior incluye marquesina',
+    in_array('marquesina', COD_Canvas_MCP_Recipe_Compiler::INTERACTION_BEHAVIORS, true)
+    && strpos($json, '"behavior":') !== false);
 $comprobar('constraints describe marquesina', strpos($json, 'marquesina sólo en un nodo group con 2 a 24 hijos') !== false);
 $comprobar('behaviorContracts lista las partes pista y pieza', preg_match('/"marquesina":\{"atributoRol":"data-cod-marquesina-rol","partes":\{"pista":.*"pieza":/s', $json) === 1);
 

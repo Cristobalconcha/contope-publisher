@@ -690,6 +690,36 @@ CSS;
      * diseño no puede expresar «cuando el runtime la marque abierta», y no debe
      * tener que hacerlo.
      */
+    /**
+     * La MECÁNICA del acordeón: cerrado no se ve, abierto sí.
+     *
+     * Igual que aviso_css y pestanas_css: acá va sólo lo que hace que la pieza
+     * funcione, y los valores por omisión van con especificidad cero —:where()—
+     * para que cualquier regla de la composición les gane. Nada de colores ni
+     * tipografía: eso lo pone el set de diseño del sitio.
+     *
+     * El botón se neutraliza (sin fondo, sin borde, ancho completo, texto a la
+     * izquierda) porque un botón trae de fábrica una apariencia de sistema que
+     * no tiene nada que ver con el diseño del sitio, y pelearla desde la
+     * composición sería hacerle escribir a cada sitio las mismas seis líneas.
+     */
+    public static function acordeon_css(?string $html = null): string
+    {
+        if ($html !== null && preg_match('/data-cod-behavior\s*=\s*["\']?acordeon\b/', $html) !== 1) {
+            return '';
+        }
+
+        $r = '[data-cod-behavior="acordeon"]';
+
+        return <<<CSS
+/* Estructura (esto no se pisa): el panel cerrado no se ve. */
+{$r} [data-cod-acordeon-rol="panel"][data-cod-acordeon-visible="false"]{display:none !important;}
+
+/* Por omisión, con especificidad cero: la composición los pisa con cualquier regla. */
+:where({$r} [data-cod-acordeon-rol="resumen"]){display:block;width:100%;box-sizing:border-box;margin:0;padding-top:0;padding-right:0;padding-bottom:0;padding-left:0;border-top-width:0;border-right-width:0;border-bottom-width:0;border-left-width:0;border-top-style:none;border-right-style:none;border-bottom-style:none;border-left-style:none;background-color:transparent;color:inherit;font:inherit;text-align:start;cursor:pointer;}
+:where({$r} [data-cod-acordeon-rol="resumen"]:focus-visible){outline-width:2px;outline-style:solid;outline-color:currentColor;outline-offset:2px;}
+CSS;
+    }
     public static function wa_mensaje_css(?string $html = null): string
     {
         if ($html !== null && preg_match('/data-cod-behavior\s*=\s*["\']?wa-mensaje\b/', $html) !== 1) {
@@ -1643,6 +1673,7 @@ CSS;
                 . self::marquesina_css($header_html . $body_html . $footer_html)
                 . self::aviso_css($header_html . $body_html . $footer_html)
                 . self::wa_mensaje_css($header_html . $body_html . $footer_html)
+                . self::acordeon_css($header_html . $body_html . $footer_html)
                 . self::mapa_css($header_html . $body_html . $footer_html)
                 . COD_Divisor::css($header_html . $body_html . $footer_html)
                 . COD_Icono::css($header_html . $body_html . $footer_html)
