@@ -5,6 +5,61 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.72 — 4 de octubre de 2026
+
+### El formulario de Contacto, traído de donde estaba
+
+La receta de Contacto dejaba la tarjeta vacía porque el formulario no existía en
+el espejo local, y yo lo había anotado como una limitación. Cristóbal: *«el hecho
+de que no exista no significa que no tengas cómo acceder a él… siempre te quedas
+pegado en cosas que no necesitas resolver»*.
+
+Tenía razón y no había nada que resolver: el formulario estaba publicado y su
+definición se pide por una ruta REST **pública**, la misma que usa el runtime
+para dibujarlo. `scripts/santaluisa/traer-formulario.mjs` la trae y la instala,
+para que la próxima vez sea un comando y no una investigación.
+
+Contacto lleva ahora su nodo `form` apuntando a `contacto-santa-luisa`, estilado
+**por variables** y nunca por reglas sobre sus campos —el contrato del tipo—, con
+el dorado de la marca, el oliva del texto y la tipografía del tema.
+
+### Una variable con dos nombres rompía la portabilidad
+
+Los nombres de las variables de diseño del formulario salen del runtime de
+Orugantt Forms cuando está instalado, y de una lista de respaldo de este plugin
+cuando no. De 29, **28 coinciden**. La que no: el runtime la llama `surfaceAlt`
+y el respaldo `superficieAlt`, las dos apuntando a `--ofr-color-surface-alt`.
+
+El efecto, medido al traer el formulario: **la misma receta pasaba en un sitio y
+se rechazaba en el otro** según si el plugin de formularios estaba instalado. Una
+composición que depende de eso no es portable, y la portabilidad es la razón de
+ser de todo esto. Ahora se admiten los dos nombres.
+
+No se renombra la variable en el runtime: eso rompería los formularios que ya la
+usan, y es una decisión del repo de Orugantt, no de éste.
+
+### Y una foto que se había perdido entre el espejo y el sitio
+
+La sección de contacto lleva en producción una foto de fondo —la mesa de la
+firma— que el ESPEJO no tenía: su copia de la regla decía `background-image:
+none`. Al componer medí el espejo y reproduje con fidelidad su carencia.
+
+**La lección no es la foto: es que el espejo puede divergir del sitio y medirlo a
+él no basta.** Comprobado después en el CSS de las cinco páginas del respaldo de
+producción: era la única imagen que vivía en una hoja y se había perdido.
+
+Va en dos reglas porque cada parte tiene su sitio: la imagen por `surface`
+—`properties` rechaza `url(` a propósito, para que las imágenes entren por donde
+el sistema las conoce— y la posición por `properties`, porque lleva un `calc()`
+con `100vw` que `surface.backgroundPosition` no admite.
+
+### Resultado
+
+Las cuatro páginas interiores pasan el revisor en 390, 768, 1024 y 1440 sin un
+solo hallazgo, y la batería en verde.
+
+---
+
 ## 0.3.71 — 4 de octubre de 2026
 
 ### Un revisor que mide el sitio en vez de mirarlo

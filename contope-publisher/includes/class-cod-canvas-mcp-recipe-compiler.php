@@ -1812,10 +1812,56 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 }
             }
             if ($desde_runtime !== []) {
+                /**
+                 * LOS DOS NOMBRES DE LA MISMA VARIABLE.
+                 *
+                 * El runtime de Orugantt Forms es la autoridad sobre estos
+                 * nombres, y de los 29 coincide en 28 con la lista de respaldo
+                 * de más abajo. El que no: el runtime la llama `surfaceAlt` y
+                 * el respaldo `superficieAlt`, las dos apuntando a
+                 * `--ofr-color-surface-alt`.
+                 *
+                 * Medido el 4 de octubre de 2026 al traer el formulario de
+                 * Santa Luisa: la misma receta pasaba en un sitio y se rechazaba
+                 * en el otro según si el plugin de formularios estaba instalado.
+                 * Una composición que depende de eso no es portable, y la
+                 * portabilidad es la razón de ser de todo esto.
+                 *
+                 * Se admiten los dos. No se corrige el nombre en el runtime
+                 * porque renombrar una variable pública rompería los formularios
+                 * que ya la usan; eso es una decisión del repo de Orugantt, no
+                 * de acá.
+                 */
+                foreach (self::form_theme_tokens_respaldo() as $clave => $def) {
+                    if (isset($desde_runtime[$clave])) {
+                        continue;
+                    }
+                    foreach ($desde_runtime as $otro) {
+                        if ($otro['token'] === $def['token']) {
+                            $desde_runtime[$clave] = $def;
+                            break;
+                        }
+                    }
+                }
                 return $desde_runtime;
             }
         }
 
+        return self::form_theme_tokens_respaldo();
+    }
+
+    /**
+     * Los nombres cuando el plugin de formularios NO está instalado.
+     *
+     * Es una copia de los del runtime, y por eso puede desincronizarse: ya lo
+     * hizo una vez (`superficieAlt` contra `surfaceAlt`). El bucle de arriba
+     * admite los dos nombres cuando el runtime está, así que una receta escrita
+     * contra cualquiera de los dos sitios funciona en el otro.
+     *
+     * @return array<string, array{token: string, type: string}>
+     */
+    private static function form_theme_tokens_respaldo(): array
+    {
         return [
             'texto' => ['token' => '--ofr-color-text', 'type' => 'color'],
             'textoSuave' => ['token' => '--ofr-color-text-muted', 'type' => 'color'],

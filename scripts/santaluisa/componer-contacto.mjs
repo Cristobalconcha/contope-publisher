@@ -10,25 +10,18 @@
  * Todo lo visible de acá se midió en el navegador sobre el espejo local, no se
  * copió del CSS ni se recordó. Las reglas compartidas están en `diseno.mjs`.
  *
- * EL FORMULARIO, Y LA DIFERENCIA ENTRE EL ESPEJO Y PRODUCCIÓN.
+ * EL FORMULARIO.
  *
- * En PRODUCCIÓN el formulario existe, funciona y emite sus eventos a Google
- * Tag Manager —confirmado por Cristóbal el 4 de octubre de 2026—. En el ESPEJO
- * no:  no está en la tabla de formularios (comprobado),
- * y por eso acá se ve una tarjeta blanca vacía.
+ * Está, y es el mismo que el sitio publicado: `contacto-santa-luisa`, versión 8.
+ * Durante un rato esta receta dejó la tarjeta vacía porque el formulario no
+ * existía en el espejo, y lo anoté como una limitación. Cristóbal, el 4 de
+ * octubre de 2026: *«el hecho de que no exista no significa que no tengas cómo
+ * acceder a él… siempre te quedas pegado en cosas que no necesitas resolver»*.
+ * Tenía razón: su definición se pide por una ruta REST pública, la misma que usa
+ * el runtime para dibujarlo. Lo trae `traer-formulario.mjs`.
  *
- * Poner otro de los formularios que sí existen en el espejo sería cambiar la
- * página, así que la tarjeta queda como está. Al apuntar esta receta a
- * producción hay que meter dentro de `form-tarjeta` un nodo:
- *
- *     { id: 'form', kind: 'form', ruleIds: [], content: { formSlug: 'contacto-santa-luisa' } }
- *
- * comprobando antes el identificador real con `cod_list_canvas_forms` contra
- * ESE sitio: el slug es lo portable, el número de página no.
- *
- * Los eventos de Tag Manager no dependen de esto: los emite el runtime de
- * Orugantt Forms, y el contenedor GTM lo imprime el plugin desde la opción
- * cod_medicion, fuera del documento de la página. Recomponer no los toca.
+ * Se estila por VARIABLES y nunca por reglas sobre sus campos: es el contrato
+ * del tipo `form`, y lo que lo hace sobrevivir a que el formulario cambie.
  *
  *   node componer-contacto.mjs > contacto.json
  */
@@ -39,6 +32,39 @@ const DOCUMENT_ID = 'ocd-canvas-page-14';
 
 /* --------------------------------------------------- reglas propias de la página */
 const propias = [
+  // LA FOTO DE LA BANDA, que casi se pierde.
+  //
+  // En producción la sección de contacto lleva una foto de fondo a la derecha,
+  // la mesa de la firma. En el ESPEJO esa misma regla decía
+  // `background-image: none`, así que al medir el espejo —y no el sitio— la
+  // reproduje sin la foto. Lo notó Cristóbal mirando la página.
+  //
+  // La lección no es la foto: es que el espejo puede divergir de producción y
+  // medirlo a él no basta. Comprobado después en el CSS de las cinco páginas:
+  // ésta era la única imagen que vivía en una hoja y se había perdido.
+  //
+  // Va en DOS reglas porque cada parte tiene su sitio: la imagen por `surface`
+  // —`properties` rechaza `url(` a propósito, para que las imágenes entren por
+  // donde el sistema las conoce— y la posición por `properties`, porque lleva
+  // un calc() con 100vw que surface.backgroundPosition no admite.
+  regla('sl-contacto-foto', 'surface', {
+    backgroundColor: 'var(--oliva-700)',
+    foregroundColor: 'var(--tierra-50)',
+    backgroundAssetUrl: '/wp-content/uploads/2026/09/contacto-mesa-firma.webp',
+    backgroundRepeat: 'no-repeat',
+    backgroundSize: '650px auto',
+  }, { porque: 'La foto de fondo que la sección tiene en el sitio publicado.' }),
+  regla('sl-contacto-foto-sitio', 'properties', { declarations: {
+    'background-position': 'calc((100vw - 1180px) / 2 + 831px) top',
+  } }),
+
+  // Bajo 1024 la foto quedaría encima del texto; en producción tampoco se ve.
+  regla('sl-contacto-foto-fuera', 'properties', { declarations: {
+    'background-image': 'none',
+  } }, { bp: 'tablet', porque: 'No cabe junto al texto; en producción tampoco aparece.' }),
+  regla('sl-contacto-foto-fuera-movil', 'properties', { declarations: {
+    'background-image': 'none',
+  } }, { bp: 'mobile' }),
   // .contacto__grid: dos columnas iguales con 48 de separación, alineadas arriba.
   // En el original cae a una sola columna a los 860, que parte la banda de tablet
   // por la mitad; acá se apila en tablet y en móvil, que es la decisión
@@ -82,6 +108,35 @@ const propias = [
     'margin-block-start': '16px',
     'margin-block-end': '16px',
   } }),
+  // EL FORMULARIO SE ESTILA POR VARIABLES, NUNCA POR REGLAS SOBRE SUS CAMPOS.
+  // Es el contrato del tipo `form`: el contenedor se ajusta con maxWidth y
+  // surface, y el interior con `theme`, que fija las variables del runtime. Una
+  // regla que apuntara a sus campos se rompería en cuanto el formulario cambie.
+  //
+  // Los valores salen de los que el sitio ya usaba en su CSS plano: el blanco
+  // de la tarjeta, el dorado de la marca para el botón y el oliva del texto.
+  regla('sl-form', 'form', {
+    surface: 'none',
+    // Las claves son los nombres del contrato, no las variables crudas: el
+    // compilador traduce «principal» a --ofr-color-primary. Así el día que el
+    // runtime renombre una variable, las composiciones no se enteran.
+    theme: {
+      texto: 'var(--oliva-700)',
+      textoSuave: 'var(--tierra-500)',
+      fondo: '#FFFFFF',
+      superficie: 'var(--tierra-50)',
+      superficieAlt: 'var(--tierra-100)',
+      borde: 'var(--tierra-300)',
+      bordeFuerte: 'var(--tierra-500)',
+      principal: 'var(--dorado-600)',
+      principalHover: 'var(--dorado-500)',
+      principalContraste: '#2B2210',
+      tipografia: 'var(--font-body)',
+      radio: '10px',
+      espaciado: '16px',
+    },
+  }, { porque: 'Los mismos valores que el sitio ya tenía en su CSS plano, ahora como variables del runtime.' }),
+
   // La tarjeta blanca. Las cuatro esquinas por separado: border-radius es una
   // abreviada y se escribe larga por norma de la casa, aunque acá no lleve
   // variable.
@@ -96,7 +151,6 @@ const propias = [
     'padding-bottom': '32px',
     'padding-left': '32px',
     'box-shadow': '0 8px 24px rgba(0,0,0,0.12)',
-    'min-height': '80px',
   } }),
 
   // La ventana de WhatsApp. El behavior existía en el motor desde hace tiempo
@@ -139,7 +193,7 @@ const composicion = {
       id: 'seccion-contacto',
       kind: 'section',
       marker: 'contacto',
-      ruleIds: ['sl-banda-oliva', 'sl-banda-aire'],
+      ruleIds: ['sl-contacto-foto', 'sl-contacto-foto-sitio', 'sl-banda-aire', 'sl-contacto-foto-fuera', 'sl-contacto-foto-fuera-movil'],
       children: [
         G('contacto-caja', ['sl-wrap', 'sl-contacto-grid', 'sl-contacto-grid-tablet'], [
           G('contacto-izquierda', [], [
@@ -170,9 +224,11 @@ const composicion = {
           ]),
           G('contacto-derecha', ['sl-columna-form'], [
             P('form-intro', 'Escríbenos directo y te respondemos a la brevedad.', ['sl-form-intro']),
-            // La tarjeta del formulario. Vacía a propósito: ver la cabecera.
             G('form-tarjeta', ['sl-tarjeta'], [
-              P('form-vacio', ' ', []),
+              {
+                id: 'form', kind: 'form', ruleIds: ['sl-form'],
+                content: { formSlug: 'contacto-santa-luisa' },
+              },
             ]),
           ]),
         ]),
