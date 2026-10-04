@@ -642,6 +642,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
                     'cuadrantes sólo en un nodo group con EXACTAMENTE 4 hijos; cada hijo es un contenedor (group) con una imagen y su texto (título y párrafo). En reposo las cuatro imágenes forman una grilla 2x2; al activar una, su imagen ocupa la mitad del bloque, su texto aparece en la otra mitad y las otras tres pasan a miniaturas que conservan su disposición 2x2 (un hueco donde estaba la activa), pegadas a la esquina de la imagen que mira al centro (ítems 1 y 3: imagen a la izquierda; 2 y 4: a la derecha; 1 y 2: miniaturas abajo; 3 y 4: arriba). El compilador sólo emite data-cod-behavior="cuadrantes"; el runtime arma botones, ×, atributos y clases. Sin colores ni tipografía: eso lo ponen las reglas de diseño del sitio.',
                     'cuadrantes no admite threshold, targetId, toggleClass, mode, visible ni visibleMobile',
                     'pestanas sólo en un nodo group con 2 a 8 hijos; cada hijo es una pestaña: su PRIMER hijo es la etiqueta (lo que se pincha: un título, un número, un texto) y el RESTO es el panel de contenido. Al cargar queda activa la primera; al pinchar una etiqueta se muestra su panel y se ocultan los demás, sin que el alto salte de golpe. El runtime pone las etiquetas en una lista de botones reales (role="tablist" / role="tab"; flechas izquierda y derecha, Inicio y Fin) y convierte a cada hijo en su panel (role="tabpanel"). Para estilar el estado, la composición usa los atributos que emite el runtime: [data-cod-pestanas-rol="etiqueta"][data-cod-pestanas-estado="activa"|"inactiva"] y [data-cod-pestanas-rol="panel"][data-cod-pestanas-visible="true"|"false"]. Sin colores ni tipografía: eso lo ponen las reglas de diseño del sitio. Si la forma interna no calza (algún hijo con menos de 2 hijos propios) el runtime no toca nada y el contenido queda apilado.',
+                    'wa-mensaje: una ventana para redactar el mensaje antes de abrir WhatsApp. El nodo que la declara ES la ventana, y no reemplaza los enlaces de WhatsApp: los INTERCEPTA, así que cada botón conserva el mensaje propio que ya viaja en su enlace y el número sale de ahí mismo (no hay un segundo lugar donde configurarlo). Si el JavaScript no corre, los enlaces siguen abriendo WhatsApp directo: se pierde la ventana, no el contacto. Apunta a nodos de la misma composición: sendNodeId (obligatorio, el botón de enviar; sin él el runtime no monta nada), fieldNodeId (el hueco donde se fabrica el campo de texto), closeNodeId y consentNodeId. El campo y la casilla NO viajan en el documento —el sanitizador bloquea textarea e input a propósito— sino que los crea el runtime dentro de esos huecos, así que quien diseña decide dónde van y cómo se ven. triggerSelector por omisión es a[href*="wa.me/"]; placeholder, fieldLabel y consentText son los textos.',
                     'pestanas no admite threshold, targetId, toggleClass, mode, visible ni visibleMobile',
                     'marquesina sólo en un nodo group con 2 a 24 hijos; cada hijo es una pieza de una fila que se desplaza sola, de derecha a izquierda y en bucle continuo, sin controles (logos de certificación, sellos, una frase de cinta). El runtime mete las piezas en una pista y agrega una copia del juego (marcada aria-hidden y sin ids) para que el bucle cierre sin salto; si hay pocas piezas para llenar el ancho, repite el juego las veces que haga falta. La pista se mueve con CSS puro (@keyframes y translateX(-50%)): sin librerías ni JavaScript por cuadro. Con prefers-reduced-motion: reduce el movimiento se detiene y las piezas quedan quietas y a la vista, sin copias. Cuántas piezas se ven a la vez, la separación y la velocidad NO son parámetros de la regla interaction: se escriben con una regla properties sobre el nodo, que admite scope.breakpoint, así que el número cambia por ancho como cualquier otra regla: --cod-marquesina-visibles (piezas a la vez; por omisión 4), --cod-marquesina-separacion (espacio entre piezas; por omisión 0px) y --cod-marquesina-duracion-pieza (cuánto tarda en pasar una pieza; por omisión 8s, un desplazamiento lento y continuo). Para estilar la pista o cada pieza se usan las partes pista y pieza del nodo. Sin colores ni tipografía: eso lo ponen las reglas de diseño del sitio. Si el grupo no calza el runtime no toca nada y las piezas quedan apiladas.',
                     'marquesina no admite threshold, targetId, toggleClass, mode, visible ni visibleMobile (las piezas visibles se declaran con la variable --cod-marquesina-visibles, no con visible)',
@@ -1819,7 +1820,14 @@ final class COD_Canvas_MCP_Recipe_Compiler
     /** @param array<string, mixed> $value */
     private function normalize_interaction_rule(array $value)
     {
-        $allowed = ['behavior', 'threshold', 'targetId', 'toggleClass', 'mode', 'visible', 'visibleMobile'];
+        $allowed = ['behavior', 'threshold', 'targetId', 'toggleClass', 'mode', 'visible', 'visibleMobile',
+            // wa-mensaje. Los tres primeros apuntan a NODOS de la misma
+            // composición, igual que targetId en nav-toggle: el compilador los
+            // traduce a selectores. Los textos van acá y no en una regla
+            // properties porque son texto que lee una persona —y que algún día
+            // habrá que traducir—, no apariencia.
+            'fieldNodeId', 'sendNodeId', 'closeNodeId', 'consentNodeId',
+            'triggerSelector', 'placeholder', 'fieldLabel', 'consentText'];
         // Un parámetro que ninguna interacción conoce se rechaza NOMBRÁNDOLO:
         // «interaction.behavior no es un comportamiento disponible» no le dice a
         // quien lo escribió que el problema era la clave inventada.
@@ -1853,6 +1861,37 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 return new WP_Error('cod_mcp_interaction_rule_invalid', 'targetId no es válido.');
             }
             $normalized['targetId'] = $value['targetId'];
+        }
+        foreach (['fieldNodeId', 'sendNodeId', 'closeNodeId', 'consentNodeId'] as $campo) {
+            if (!isset($value[$campo])) {
+                continue;
+            }
+            if (!is_string($value[$campo]) || !$this->is_stable_id($value[$campo])) {
+                return new WP_Error('cod_mcp_interaction_rule_invalid', $campo . ' tiene que ser el id de un nodo de esta composición.');
+            }
+            $normalized[$campo] = $value[$campo];
+        }
+        if (isset($value['triggerSelector'])) {
+            /*
+             * Un selector, no HTML: lista blanca estrecha a propósito. Alcanza
+             * para lo que esto necesita —`a[href*="wa.me/"]`, una clase, un
+             * atributo— y deja fuera comillas sueltas, llaves y paréntesis, que
+             * es por donde se cuela cualquier cosa al escribirlo en un atributo.
+             */
+            if (!is_string($value['triggerSelector'])
+                || preg_match('/^[a-zA-Z0-9\s.,_#*\[\]=":\/-]{1,200}$/D', $value['triggerSelector']) !== 1) {
+                return new WP_Error('cod_mcp_interaction_rule_invalid', 'triggerSelector no es un selector seguro.');
+            }
+            $normalized['triggerSelector'] = $value['triggerSelector'];
+        }
+        foreach (['placeholder', 'fieldLabel', 'consentText'] as $campo) {
+            if (!isset($value[$campo])) {
+                continue;
+            }
+            if (!$this->is_plain_text($value[$campo], 300)) {
+                return new WP_Error('cod_mcp_interaction_rule_invalid', $campo . ' tiene que ser texto plano de hasta 300 caracteres.');
+            }
+            $normalized[$campo] = $value[$campo];
         }
         if (isset($value['toggleClass'])) {
             if (!is_string($value['toggleClass']) || preg_match('/^[a-z][a-z0-9_-]{0,63}$/', $value['toggleClass']) !== 1) {
@@ -4024,6 +4063,67 @@ final class COD_Canvas_MCP_Recipe_Compiler
             if ($interaction['behavior'] === 'scroll-threshold') {
                 $attributes['data-cod-scroll-threshold'] = (string) ($interaction['threshold'] ?? 40);
                 $attributes['data-cod-scrolled-class'] = $interaction['toggleClass'] ?? 'nav--scrolled';
+            } elseif ($interaction['behavior'] === 'wa-mensaje') {
+                /**
+                 * LA VENTANA PARA REDACTAR ANTES DE ABRIR WHATSAPP.
+                 *
+                 * El runtime la tenía desde hace tiempo, pero no estaba en el
+                 * catálogo, así que una composición no podía pedirla y las
+                 * páginas que la usaban llevaban su marcado escrito a mano. Es
+                 * el mismo caso que preferencias-cookies: una desactualización,
+                 * no una pieza que faltara.
+                 *
+                 * El nodo que declara el behavior ES la ventana. El campo de
+                 * texto y la casilla NO viajan en el documento: los fabrica el
+                 * runtime, porque el sanitizador bloquea <textarea> e <input> a
+                 * propósito —para que un documento traído de otro sitio no pueda
+                 * colar un formulario falso que pida claves—. Lo que viaja son
+                 * los HUECOS donde van, que es lo que apuntan fieldNodeId y
+                 * consentNodeId, y por eso quien diseña decide dónde se ubican.
+                 */
+                foreach ([
+                    'fieldNodeId' => 'data-cod-wa-field',
+                    'sendNodeId' => 'data-cod-wa-send',
+                    'closeNodeId' => 'data-cod-wa-close',
+                    'consentNodeId' => 'data-cod-wa-consent',
+                ] as $campo => $attr) {
+                    if (!isset($interaction[$campo])) {
+                        continue;
+                    }
+                    if (!in_array($interaction[$campo], $node_ids, true)) {
+                        return new WP_Error('cod_mcp_interaction_target_missing',
+                            'wa-mensaje refiere en ' . $campo . ' un nodo que no está en esta composición.');
+                    }
+                    $attributes[$attr] = '[data-cod-node="' . $interaction[$campo] . '"]';
+                }
+                /*
+                 * sendNodeId es el único sin el que el runtime se va sin hacer
+                 * nada —comprobado en cod-canvas-public.js: `if (!enviar) return`—,
+                 * así que se exige al componer y no se descubre en el navegador.
+                 */
+                if (!isset($interaction['sendNodeId'])) {
+                    return new WP_Error('cod_mcp_interaction_rule_invalid',
+                        'wa-mensaje necesita sendNodeId: sin el botón de enviar, el runtime no monta la ventana.');
+                }
+                $attributes['data-cod-wa-trigger'] = $interaction['triggerSelector'] ?? 'a[href*="wa.me/"]';
+                /*
+                 * La clase NO se deja elegir, a diferencia de nav-toggle.
+                 * Mostrar y ocultar la ventana es MECÁNICA del behavior, y la
+                 * pone el plugin con su propia hoja (wa_mensaje_css), igual que
+                 * en aviso y en pestanas. Si la clase fuera configurable, esa
+                 * hoja no sabría a qué apuntar y la ventana quedaría invisible
+                 * o siempre abierta, sin que nada lo avisara.
+                 */
+                $attributes['data-cod-wa-open-class'] = 'is-open';
+                foreach ([
+                    'placeholder' => 'data-cod-wa-placeholder',
+                    'fieldLabel' => 'data-cod-wa-field-label',
+                    'consentText' => 'data-cod-wa-consent-text',
+                ] as $campo => $attr) {
+                    if (isset($interaction[$campo])) {
+                        $attributes[$attr] = $interaction[$campo];
+                    }
+                }
             } elseif ($interaction['behavior'] === 'nav-toggle') {
                 if (!in_array($interaction['targetId'], $node_ids, true)) {
                     return new WP_Error('cod_mcp_interaction_target_missing', 'nav-toggle refiere un targetId que no está en esta composición.');
@@ -5735,7 +5835,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
     public const ICONO_CAMPOS = ['forma', 'nombre', 'donde', 'tamano', 'color', 'separacion'];
     public const INTERACTION_BEHAVIORS = [
         'scroll-threshold', 'nav-toggle', 'carousel-basic', 'lightbox', 'cuadrantes',
-        'pestanas', 'marquesina', 'aviso', 'mapa', 'preferencias-cookies',
+        'pestanas', 'marquesina', 'aviso', 'mapa', 'preferencias-cookies', 'wa-mensaje',
     ];
     private function rule_class(string $rule_id): string
     {

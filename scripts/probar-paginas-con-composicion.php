@@ -35,8 +35,11 @@ $SITIOS = [
     ],
     'Santa Luisa (espejo local, heredado del HTML)' => [
         'wp' => __DIR__ . '/../../wp-local/wordpress/wp-load.php',
-        // 8 al 2026-10-04. Es deuda conocida, no un permiso: ver el encabezado.
-        'sin_composicion_aceptadas' => 8,
+        // 7 al 2026-10-04, después de recomponer Contacto. Era 8. Es deuda
+        // conocida, no un permiso: ver el encabezado. De las 7 que quedan, 3 son
+        // páginas de prueba y 4 son del sitio real (portada, Diferenciales,
+        // Preguntas y Términos).
+        'sin_composicion_aceptadas' => 7,
     ],
 ];
 

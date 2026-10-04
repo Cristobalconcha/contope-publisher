@@ -675,6 +675,38 @@ CSS;
      * @param string|null $html HTML de la página: si se entrega y no declara el
      *                          behavior «aviso», no se emite nada. Null = siempre.
      */
+    /**
+     * La MECÁNICA de la ventana de WhatsApp: cerrada no se ve, abierta sí.
+     *
+     * Igual que aviso_css y pestanas_css: acá va sólo lo que hace que la pieza
+     * funcione, y los valores por omisión van con especificidad cero —:where()—
+     * para que cualquier regla de la composición les gane. Nada de colores ni
+     * tipografía: eso lo pone el set de diseño del sitio.
+     *
+     * POR QUÉ EXISTE. Hasta la 0.3.68 este behavior no estaba en el catálogo,
+     * así que las páginas que lo usaban traían su marcado y su CSS escritos a
+     * mano, incluida la parte de mostrar y ocultar. Al poder pedirlo desde una
+     * composición, esa parte deja de ser trabajo de quien compone: una regla de
+     * diseño no puede expresar «cuando el runtime la marque abierta», y no debe
+     * tener que hacerlo.
+     */
+    public static function wa_mensaje_css(?string $html = null): string
+    {
+        if ($html !== null && preg_match('/data-cod-behavior\s*=\s*["\']?wa-mensaje\b/', $html) !== 1) {
+            return '';
+        }
+
+        $r = '[data-cod-behavior="wa-mensaje"]';
+
+        return <<<CSS
+/* Estructura (esto no se pisa): cerrada no se ve. */
+{$r}:not(.is-open){display:none !important;}
+
+/* Por omisión, con especificidad cero: la composición los pisa con cualquier regla. */
+:where({$r}){position:fixed;right:20px;bottom:92px;z-index:60;box-sizing:border-box;width:min(320px, calc(100vw - 32px));overflow:hidden;}
+:where({$r} textarea){box-sizing:border-box;width:100%;min-height:76px;resize:vertical;font-family:inherit;font-size:14px;line-height:1.4;padding-top:10px;padding-right:12px;padding-bottom:10px;padding-left:12px;}
+CSS;
+    }
     public static function aviso_css(?string $html = null): string
     {
         if ($html !== null && preg_match('/data-cod-behavior\s*=\s*["\']?aviso\b/', $html) !== 1) {
@@ -1432,10 +1464,41 @@ CSS;
      * @param array<int, string> $css_de_documentos su CSS, por si hace falta
      * @return string El CSS que haya que poner en línea; '' si fue por archivo.
      */
+    /**
+     * Las reglas de diseño de una página: por archivo las que tienen hoja, en
+     * línea las que no.
+     *
+     * EL DEFECTO QUE ARREGLA, medido el 4 de octubre de 2026. Esta función
+     * reunía los diseños de los tres documentos (encabezado, cuerpo, pie), y si
+     * todos tenían hoja encolaba los archivos y devolvía cadena vacía,
+     * DESCARTANDO el CSS de los tres. Eso funcionaba mientras todos los
+     * documentos de una página venían de una composición.
+     *
+     * Dejó de funcionar en cuanto se recompuso la primera página de Santa Luisa:
+     * su cuerpo pasó a tener diseño con hoja, pero el encabezado sigue siendo una
+     * región heredada con 9 KB de CSS plano y SIN composición. Como ningún diseño
+     * faltaba, se tomó el camino «todo por archivo» y los 9 KB del encabezado se
+     * fueron a la basura: el logo del sitio quedó a 526 px de alto.
+     *
+     * Ahora cada documento se decide por separado. El que tiene diseño con hoja
+     * aporta su hoja (una por diseño, aunque la compartan los tres); el que no
+     * tiene —una región vieja, un documento traído de antes— conserva su CSS en
+     * línea. Lo que no cambia es la regla que motivó todo esto: el CSS de un
+     * diseño NO se sirve dos veces.
+     *
+     * Si algún diseño todavía no tiene hoja generada se sigue sirviendo todo en
+     * línea, como antes: mezclar ahí sí duplicaría.
+     *
+     * @param array<int, string> $documentos      ids, en orden encabezado, cuerpo, pie
+     * @param array<int, string> $css_de_documentos  su CSS, en el MISMO orden
+     */
     private function reglas_de_diseno(array $documentos, array $css_de_documentos): string
     {
-        $disenos = [];
-        foreach ($documentos as $documento_id) {
+        $disenos = [];          // designId => true, los que aparecen en la página
+        $diseno_de = [];        // posición => designId (o cadena vacía)
+
+        foreach ($documentos as $i => $documento_id) {
+            $diseno_de[$i] = '';
             if ($documento_id === '') {
                 continue;
             }
@@ -1447,39 +1510,47 @@ CSS;
             $diseno = (string) ($composicion['design']['designId'] ?? '');
             if ($diseno !== '') {
                 $disenos[$diseno] = true;
+                $diseno_de[$i] = $diseno;
             }
         }
 
-        /*
-         * O TODOS POR ARCHIVO, O TODOS EN LÍNEA. Nunca mezclado.
-         *
-         * Primero se miran todas las hojas y recién después se encola. Al
-         * revés —encolar sobre la marcha y rendirse a mitad— la página se
-         * llevaba las hojas de los diseños que sí tenían y ADEMÁS todo el CSS
-         * en línea: lo mismo dos veces.
-         */
+        if ($disenos === []) {
+            // Ningún documento viene de una composición: la página es de antes.
+            return self::unir_css_de_documentos($css_de_documentos);
+        }
+
         $urls = [];
         foreach (array_keys($disenos) as $diseno) {
             $url = class_exists('COD_Diseno_Hoja') ? COD_Diseno_Hoja::url($diseno) : '';
             if ($url === '') {
-                // A este diseño todavía no se le generó la hoja —nunca se ha
-                // aplicado una composición desde que existe esto—, así que la
-                // página se sirve como antes.
+                /*
+                 * A este diseño todavía no se le generó la hoja. Se sirve TODO en
+                 * línea, como antes: servir unos por archivo y otros en línea es
+                 * lo que hacía que la página se llevara el CSS dos veces.
+                 */
                 return self::unir_css_de_documentos($css_de_documentos);
             }
             $urls[$diseno] = $url;
-        }
-        if ($urls === []) {
-            return self::unir_css_de_documentos($css_de_documentos);
         }
 
         foreach ($urls as $diseno => $url) {
             wp_enqueue_style('cod-diseno-' . sanitize_key($diseno), $url, ['cod-canvas-base'], null);
         }
 
-        return '';
-    }
+        /*
+         * Y en línea, sólo el CSS de los documentos que NO tienen diseño. El de
+         * los que sí ya viaja en su hoja: repetirlo acá sería la duplicación que
+         * esto vino a terminar.
+         */
+        $sueltos = [];
+        foreach ($css_de_documentos as $i => $css) {
+            if (($diseno_de[$i] ?? '') === '') {
+                $sueltos[] = $css;
+            }
+        }
 
+        return $sueltos === [] ? '' : self::unir_css_de_documentos($sueltos);
+    }
     public static function encolar_hoja_base(): void
     {
         wp_enqueue_style(
@@ -1571,6 +1642,7 @@ CSS;
                 . self::pestanas_css($header_html . $body_html . $footer_html)
                 . self::marquesina_css($header_html . $body_html . $footer_html)
                 . self::aviso_css($header_html . $body_html . $footer_html)
+                . self::wa_mensaje_css($header_html . $body_html . $footer_html)
                 . self::mapa_css($header_html . $body_html . $footer_html)
                 . COD_Divisor::css($header_html . $body_html . $footer_html)
                 . COD_Icono::css($header_html . $body_html . $footer_html)

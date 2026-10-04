@@ -5,6 +5,54 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.68 — 4 de octubre de 2026
+
+### La primera página de Santa Luisa construida por el constructor
+
+Contacto ya no es HTML escrito a mano: es una composición registrada, editable
+desde el page builder, con sus clases del sistema y su CSS saliendo de la hoja
+del diseño `santaluisa-web` en vez de los 11,5 KB propios que llevaba.
+
+Comparada con la página anterior, medida en el navegador: grilla 542+542 con 48
+de separación dentro de 1180, sección `125px 0px 70px`, pie a 12 px, lista con
+sus separadores de 1 px, y el título como **un solo `<h2>`** con sus dos caras.
+En móvil, una columna y sin desborde.
+
+### Tres defectos que aparecieron al hacerlo
+
+- **El CSS de un documento sin diseño se perdía.** `reglas_de_diseno()` reunía
+  los diseños de encabezado, cuerpo y pie, y si todos tenían hoja encolaba los
+  archivos y devolvía vacío, **descartando el CSS de los tres**. Eso funcionaba
+  mientras todos venían de una composición; dejó de funcionar en cuanto el
+  cuerpo pasó a tener diseño y el encabezado siguió siendo una región heredada
+  con 9 KB de CSS plano: el logo del sitio quedó a 526 px de alto. Ahora cada
+  documento se decide por separado, sin servir dos veces el CSS de un diseño.
+  **Esto habría ocurrido en producción en la primera página que se recompusiera.**
+
+- **`wa-mensaje` no estaba en el catálogo.** La ventana para redactar el mensaje
+  antes de abrir WhatsApp existía en el motor desde hacía tiempo, pero una
+  composición no podía pedirla, así que las páginas que la usaban llevaban su
+  marcado a mano. Ahora se declara con una regla `interaction` que apunta a los
+  nodos de la propia composición —igual que `nav-toggle` con su `targetId`— y el
+  plugin pone la mecánica de mostrarla y ocultarla con especificidad cero, para
+  que las reglas de diseño le ganen. El campo de texto lo sigue fabricando el
+  runtime: el sanitizador bloquea `<textarea>` a propósito, y ese bloqueo no se
+  debilita por una ventana de contacto.
+
+- **La hoja base del motor daba 24 px laterales a toda sección**, que se sumaban
+  a los del contenedor y dejaban el contenido 24 px más adentro.
+
+### Y una medida que conviene tener antes de tocar la portada
+
+En producción, la portada **no usa región de encabezado**: lleva el suyo dentro
+del HTML de la página, y sólo las interiores usan la región. El espejo local no
+refleja eso —ahí la portada muestra el menú dos veces—, y es la trampa que
+espera a quien recomponga la portada.
+
+El trinquete de páginas sin composición baja de 8 a 7.
+
+---
+
 ## 0.3.67 — 4 de octubre de 2026
 
 ### Lo que el catálogo decía y lo que el código hacía

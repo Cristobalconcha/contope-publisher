@@ -1,0 +1,1387 @@
+{
+  "pageId": 60,
+  "documentId": "ocd-canvas-page-14",
+  "expectedRevision": 55,
+  "design": {
+    "schemaVersion": 1,
+    "designId": "santaluisa-web",
+    "expectedDesignRevision": 0,
+    "reviewState": "session",
+    "rules": [
+      {
+        "id": "sl-wrap",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "espejo local de santaluisadepalpi.cl",
+              "rationale": "Medido con getComputedStyle sobre el espejo local."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "max-width": "var(--max-width)",
+            "margin-inline-start": "auto",
+            "margin-inline-end": "auto",
+            "padding-inline-start": "24px",
+            "padding-inline-end": "24px"
+          }
+        }
+      },
+      {
+        "id": "sl-banda-oliva",
+        "kind": "surface",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "espejo local de santaluisadepalpi.cl",
+              "rationale": "Medido con getComputedStyle sobre el espejo local."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "backgroundColor": "var(--oliva-700)",
+          "foregroundColor": "var(--tierra-50)"
+        }
+      },
+      {
+        "id": "sl-banda-aire",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "espejo local de santaluisadepalpi.cl",
+              "rationale": "Medido con getComputedStyle sobre el espejo local."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "padding-block-start": "125px",
+            "padding-block-end": "70px",
+            "padding-inline-start": "0",
+            "padding-inline-end": "0",
+            "margin-block-start": "-69px"
+          }
+        }
+      },
+      {
+        "id": "sl-rotulo",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "espejo local de santaluisadepalpi.cl",
+              "rationale": "Medido con getComputedStyle sobre el espejo local."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "rotulo",
+          "family": "var(--font-body)",
+          "fontSize": "11px",
+          "fontWeight": 500,
+          "letterSpacing": "0.12em",
+          "lineHeight": 1,
+          "transform": "uppercase"
+        }
+      },
+      {
+        "id": "sl-rotulo-color",
+        "kind": "color",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "espejo local de santaluisadepalpi.cl",
+              "rationale": "Medido con getComputedStyle sobre el espejo local."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "rotulo",
+          "color": "var(--dorado-600)"
+        }
+      },
+      {
+        "id": "sl-rotulo-aire",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "espejo local de santaluisadepalpi.cl",
+              "rationale": "Medido con getComputedStyle sobre el espejo local."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "margin-block-start": "0",
+            "margin-block-end": "6px"
+          }
+        }
+      },
+      {
+        "id": "sl-titulo-script",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "espejo local de santaluisadepalpi.cl",
+              "rationale": "Medido con getComputedStyle sobre el espejo local."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "titulo-script",
+          "family": "var(--font-hero)",
+          "fontSize": "clamp(40px, 5vw, 58px)",
+          "fontWeight": 400,
+          "lineHeight": 1
+        }
+      },
+      {
+        "id": "sl-titulo-script-caja",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "espejo local de santaluisadepalpi.cl",
+              "rationale": "Medido con getComputedStyle sobre el espejo local."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "display": "block"
+          }
+        }
+      },
+      {
+        "id": "sl-titulo-caps",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "espejo local de santaluisadepalpi.cl",
+              "rationale": "Medido con getComputedStyle sobre el espejo local."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "titulo-caps",
+          "family": "var(--font-body)",
+          "fontSize": "clamp(26px, 3.4vw, 36px)",
+          "fontWeight": 700,
+          "letterSpacing": "0.01em",
+          "lineHeight": 1.05,
+          "transform": "uppercase"
+        }
+      },
+      {
+        "id": "sl-titulo-caps-encaje",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "espejo local de santaluisadepalpi.cl",
+              "rationale": "Medido con getComputedStyle sobre el espejo local."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "display": "block",
+            "margin-block-start": "-10px"
+          }
+        }
+      },
+      {
+        "id": "sl-titulo-claro",
+        "kind": "color",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "espejo local de santaluisadepalpi.cl",
+              "rationale": "Medido con getComputedStyle sobre el espejo local."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "titulo",
+          "color": "#FFFFFF"
+        }
+      },
+      {
+        "id": "sl-titulo-aire",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "espejo local de santaluisadepalpi.cl",
+              "rationale": "Medido con getComputedStyle sobre el espejo local."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "margin-block-start": "0",
+            "margin-block-end": "18px"
+          }
+        }
+      },
+      {
+        "id": "sl-cuerpo",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "espejo local de santaluisadepalpi.cl",
+              "rationale": "Medido con getComputedStyle sobre el espejo local."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "cuerpo",
+          "fontSize": "15px",
+          "lineHeight": 1.5,
+          "measure": "480px"
+        }
+      },
+      {
+        "id": "sl-cuerpo-color",
+        "kind": "color",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "espejo local de santaluisadepalpi.cl",
+              "rationale": "Medido con getComputedStyle sobre el espejo local."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "cuerpo",
+          "color": "var(--tierra-100)"
+        }
+      },
+      {
+        "id": "sl-cuerpo-aire",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "espejo local de santaluisadepalpi.cl",
+              "rationale": "Medido con getComputedStyle sobre el espejo local."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "margin-block-start": "0",
+            "margin-block-end": "20px"
+          }
+        }
+      },
+      {
+        "id": "sl-pie",
+        "kind": "surface",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "espejo local de santaluisadepalpi.cl",
+              "rationale": "Medido con getComputedStyle sobre el espejo local."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "backgroundColor": "#2A2C22",
+          "foregroundColor": "var(--tierra-300)"
+        }
+      },
+      {
+        "id": "sl-pie-aire",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "espejo local de santaluisadepalpi.cl",
+              "rationale": "Medido con getComputedStyle sobre el espejo local."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "padding-block-start": "28px",
+            "padding-block-end": "28px",
+            "text-align": "center"
+          }
+        }
+      },
+      {
+        "id": "sl-pie-texto",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "espejo local de santaluisadepalpi.cl",
+              "rationale": "Medido con getComputedStyle sobre el espejo local."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "pie",
+          "fontSize": "12px",
+          "lineHeight": 1.5,
+          "align": "center"
+        }
+      },
+      {
+        "id": "sl-pie-enlace",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "espejo local de santaluisadepalpi.cl",
+              "rationale": "Medido con getComputedStyle sobre el espejo local."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "color": "inherit",
+            "text-decoration-line": "underline",
+            "cursor": "pointer"
+          }
+        }
+      },
+      {
+        "id": "sl-contacto-grid",
+        "kind": "layout",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "espejo local de santaluisadepalpi.cl",
+              "rationale": "Medido con getComputedStyle sobre el espejo local."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "mode": "grid",
+          "columns": 2,
+          "gap": "48px",
+          "align": "start",
+          "mobile": {
+            "mode": "stack",
+            "gap": "48px"
+          }
+        }
+      },
+      {
+        "id": "sl-contacto-grid-tablet",
+        "kind": "layout",
+        "scope": {
+          "breakpoint": "tablet",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "espejo local de santaluisadepalpi.cl",
+              "rationale": "El original cae a una columna a los 860px, que parte la banda de tablet; se apila en toda la banda."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "mode": "stack",
+          "gap": "48px",
+          "align": "start"
+        }
+      },
+      {
+        "id": "sl-dato",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "espejo local de santaluisadepalpi.cl",
+              "rationale": "Medido con getComputedStyle sobre el espejo local."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "dato",
+          "fontSize": "13.5px",
+          "lineHeight": 1.5
+        }
+      },
+      {
+        "id": "sl-dato-linea",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "espejo local de santaluisadepalpi.cl",
+              "rationale": "Medido con getComputedStyle sobre el espejo local."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "display": "block",
+            "padding-block-start": "10px",
+            "padding-block-end": "10px",
+            "border-bottom-width": "1px",
+            "border-bottom-style": "solid",
+            "border-bottom-color": "rgba(255,255,255,0.15)"
+          }
+        }
+      },
+      {
+        "id": "sl-dato-enlace",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "espejo local de santaluisadepalpi.cl",
+              "rationale": "Medido con getComputedStyle sobre el espejo local."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "font-weight": "700",
+            "color": "inherit",
+            "text-decoration-line": "none"
+          }
+        }
+      },
+      {
+        "id": "sl-columna-form",
+        "kind": "layout",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "espejo local de santaluisadepalpi.cl",
+              "rationale": "Medido con getComputedStyle sobre el espejo local."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "mode": "stack",
+          "gap": "12px",
+          "align": "start"
+        }
+      },
+      {
+        "id": "sl-form-intro",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "espejo local de santaluisadepalpi.cl",
+              "rationale": "Medido con getComputedStyle sobre el espejo local."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "text-shadow": "0 1px 6px rgba(0,0,0,0.55)",
+            "margin-block-start": "16px",
+            "margin-block-end": "16px"
+          }
+        }
+      },
+      {
+        "id": "sl-tarjeta",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "espejo local de santaluisadepalpi.cl",
+              "rationale": "Medido con getComputedStyle sobre el espejo local."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "background-color": "#FFFFFF",
+            "border-top-left-radius": "16px",
+            "border-top-right-radius": "16px",
+            "border-bottom-right-radius": "16px",
+            "border-bottom-left-radius": "16px",
+            "padding-top": "32px",
+            "padding-right": "32px",
+            "padding-bottom": "32px",
+            "padding-left": "32px",
+            "box-shadow": "0 8px 24px rgba(0,0,0,0.12)",
+            "min-height": "80px"
+          }
+        }
+      },
+      {
+        "id": "sl-wa",
+        "kind": "interaction",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "espejo local de santaluisadepalpi.cl",
+              "rationale": "La ventana que ya tenía la página, ahora pedida por el constructor."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "behavior": "wa-mensaje",
+          "sendNodeId": "wa-enviar",
+          "fieldNodeId": "wa-hueco",
+          "closeNodeId": "wa-cerrar",
+          "placeholder": "Escribe tu pregunta…",
+          "fieldLabel": "Tu mensaje para Santa Luisa de Palpi"
+        }
+      },
+      {
+        "id": "sl-wa-ventana",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "espejo local de santaluisadepalpi.cl",
+              "rationale": "Medido con getComputedStyle sobre el espejo local."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "background-color": "#FFFFFF",
+            "border-top-left-radius": "16px",
+            "border-top-right-radius": "16px",
+            "border-bottom-right-radius": "16px",
+            "border-bottom-left-radius": "16px",
+            "box-shadow": "0 18px 48px rgba(0,0,0,0.28)",
+            "color": "var(--oliva-700)"
+          }
+        }
+      },
+      {
+        "id": "sl-pie-linea",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "espejo local de santaluisadepalpi.cl",
+              "rationale": "Medido con getComputedStyle sobre el espejo local."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "display": "flex",
+            "flex-wrap": "wrap",
+            "justify-content": "center",
+            "align-items": "baseline",
+            "column-gap": "6px",
+            "row-gap": "2px"
+          }
+        }
+      },
+      {
+        "id": "sl-pie-cookies",
+        "kind": "interaction",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "espejo local de santaluisadepalpi.cl",
+              "rationale": "Reabrir el panel de consentimiento: la ley exige poder cambiarlo, no sólo darlo."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "behavior": "preferencias-cookies"
+        }
+      },
+      {
+        "id": "sl-wa-cabecera",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "espejo local de santaluisadepalpi.cl",
+              "rationale": "Medido con getComputedStyle sobre el espejo local."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "display": "flex",
+            "align-items": "center",
+            "column-gap": "10px",
+            "padding-top": "12px",
+            "padding-right": "12px",
+            "padding-bottom": "12px",
+            "padding-left": "16px",
+            "background-color": "var(--oliva-700)",
+            "color": "var(--tierra-50)"
+          }
+        }
+      },
+      {
+        "id": "sl-wa-nombre",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "espejo local de santaluisadepalpi.cl",
+              "rationale": "Medido con getComputedStyle sobre el espejo local."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "wa-nombre",
+          "fontSize": "14px",
+          "fontWeight": 600,
+          "lineHeight": 1.2
+        }
+      },
+      {
+        "id": "sl-wa-estado",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "espejo local de santaluisadepalpi.cl",
+              "rationale": "Medido con getComputedStyle sobre el espejo local."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "wa-estado",
+          "fontSize": "11.5px",
+          "lineHeight": 1.3
+        }
+      },
+      {
+        "id": "sl-wa-cerrar",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "espejo local de santaluisadepalpi.cl",
+              "rationale": "Medido con getComputedStyle sobre el espejo local."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "margin-inline-start": "auto",
+            "color": "var(--tierra-50)",
+            "cursor": "pointer",
+            "background-color": "transparent",
+            "text-decoration-line": "none",
+            "font-size": "12px",
+            "white-space": "nowrap",
+            "padding-top": "4px",
+            "padding-right": "4px",
+            "padding-bottom": "4px",
+            "padding-left": "4px"
+          }
+        }
+      },
+      {
+        "id": "sl-wa-cuerpo",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "espejo local de santaluisadepalpi.cl",
+              "rationale": "Medido con getComputedStyle sobre el espejo local."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "padding-top": "16px",
+            "padding-right": "16px",
+            "padding-bottom": "8px",
+            "padding-left": "16px"
+          }
+        }
+      },
+      {
+        "id": "sl-wa-saludo",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "espejo local de santaluisadepalpi.cl",
+              "rationale": "Medido con getComputedStyle sobre el espejo local."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "wa-saludo",
+          "fontSize": "13.5px",
+          "lineHeight": 1.45
+        }
+      },
+      {
+        "id": "sl-wa-pie",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "espejo local de santaluisadepalpi.cl",
+              "rationale": "Medido con getComputedStyle sobre el espejo local."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "display": "grid",
+            "row-gap": "10px",
+            "justify-items": "stretch",
+            "padding-top": "8px",
+            "padding-right": "16px",
+            "padding-bottom": "16px",
+            "padding-left": "16px"
+          }
+        }
+      },
+      {
+        "id": "sl-wa-nota",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "espejo local de santaluisadepalpi.cl",
+              "rationale": "Medido con getComputedStyle sobre el espejo local."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "wa-nota",
+          "fontSize": "11px",
+          "lineHeight": 1.35
+        }
+      },
+      {
+        "id": "sl-wa-enviar",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "espejo local de santaluisadepalpi.cl",
+              "rationale": "Medido con getComputedStyle sobre el espejo local."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "justify-content": "center",
+            "background-color": "#25D366",
+            "color": "#FFFFFF",
+            "padding-top": "10px",
+            "padding-right": "14px",
+            "padding-bottom": "10px",
+            "padding-left": "14px",
+            "border-top-left-radius": "999px",
+            "border-top-right-radius": "999px",
+            "border-bottom-right-radius": "999px",
+            "border-bottom-left-radius": "999px",
+            "text-decoration-line": "none",
+            "cursor": "pointer",
+            "white-space": "nowrap"
+          }
+        }
+      }
+    ]
+  },
+  "composition": {
+    "schemaVersion": 2,
+    "label": "Contacto",
+    "nodes": [
+      {
+        "id": "seccion-contacto",
+        "kind": "section",
+        "marker": "contacto",
+        "ruleIds": [
+          "sl-banda-oliva",
+          "sl-banda-aire"
+        ],
+        "children": [
+          {
+            "id": "contacto-caja",
+            "kind": "group",
+            "ruleIds": [
+              "sl-wrap",
+              "sl-contacto-grid",
+              "sl-contacto-grid-tablet"
+            ],
+            "children": [
+              {
+                "id": "contacto-izquierda",
+                "kind": "group",
+                "ruleIds": [],
+                "children": [
+                  {
+                    "id": "contacto-rotulo",
+                    "kind": "paragraph",
+                    "ruleIds": [
+                      "sl-rotulo",
+                      "sl-rotulo-color",
+                      "sl-rotulo-aire"
+                    ],
+                    "content": {
+                      "text": "Hablemos"
+                    }
+                  },
+                  {
+                    "id": "contacto-titulo",
+                    "kind": "heading",
+                    "ruleIds": [
+                      "sl-titulo-aire"
+                    ],
+                    "content": {
+                      "level": 2,
+                      "segments": [
+                        {
+                          "text": "Agenda",
+                          "ruleIds": [
+                            "sl-titulo-script",
+                            "sl-titulo-script-caja",
+                            "sl-rotulo-color"
+                          ]
+                        },
+                        {
+                          "text": "tu visita",
+                          "ruleIds": [
+                            "sl-titulo-caps",
+                            "sl-titulo-caps-encaje",
+                            "sl-titulo-claro"
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "id": "contacto-bajada",
+                    "kind": "paragraph",
+                    "ruleIds": [
+                      "sl-cuerpo",
+                      "sl-cuerpo-color",
+                      "sl-cuerpo-aire"
+                    ],
+                    "content": {
+                      "text": "Conversemos y coordinemos tu visita al proyecto. Trato directo, cercano y transparente."
+                    }
+                  },
+                  {
+                    "id": "contacto-datos",
+                    "kind": "group",
+                    "ruleIds": [],
+                    "children": [
+                      {
+                        "id": "dato-direccion",
+                        "kind": "paragraph",
+                        "ruleIds": [
+                          "sl-dato",
+                          "sl-dato-linea"
+                        ],
+                        "content": {
+                          "text": "Cam. Padre Hurtado, Paine, Región Metropolitana"
+                        }
+                      },
+                      {
+                        "id": "dato-correo",
+                        "kind": "link",
+                        "ruleIds": [
+                          "sl-dato",
+                          "sl-dato-linea",
+                          "sl-dato-enlace"
+                        ],
+                        "content": {
+                          "label": "carlosvaldivieso.d@gmail.com",
+                          "href": "mailto:carlosvaldivieso.d@gmail.com",
+                          "target": "self"
+                        }
+                      },
+                      {
+                        "id": "dato-whatsapp",
+                        "kind": "link",
+                        "ruleIds": [
+                          "sl-dato",
+                          "sl-dato-linea",
+                          "sl-dato-enlace"
+                        ],
+                        "content": {
+                          "label": "+56 9 8186 6742 (WhatsApp)",
+                          "href": "https://wa.me/56981866742",
+                          "target": "blank"
+                        }
+                      },
+                      {
+                        "id": "dato-instagram",
+                        "kind": "link",
+                        "ruleIds": [
+                          "sl-dato",
+                          "sl-dato-linea",
+                          "sl-dato-enlace"
+                        ],
+                        "content": {
+                          "label": "@santaluisadepalpi",
+                          "href": "https://www.instagram.com/santaluisadepalpi",
+                          "target": "blank"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "contacto-derecha",
+                "kind": "group",
+                "ruleIds": [
+                  "sl-columna-form"
+                ],
+                "children": [
+                  {
+                    "id": "form-intro",
+                    "kind": "paragraph",
+                    "ruleIds": [
+                      "sl-form-intro"
+                    ],
+                    "content": {
+                      "text": "Escríbenos directo y te respondemos a la brevedad."
+                    }
+                  },
+                  {
+                    "id": "form-tarjeta",
+                    "kind": "group",
+                    "ruleIds": [
+                      "sl-tarjeta"
+                    ],
+                    "children": [
+                      {
+                        "id": "form-vacio",
+                        "kind": "paragraph",
+                        "ruleIds": [],
+                        "content": {
+                          "text": " "
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "pie",
+        "kind": "footer",
+        "ruleIds": [
+          "sl-pie",
+          "sl-pie-aire",
+          "sl-pie-texto"
+        ],
+        "children": [
+          {
+            "id": "pie-marca",
+            "kind": "paragraph",
+            "ruleIds": [
+              "sl-pie-texto"
+            ],
+            "content": {
+              "text": "Santa Luisa de Palpi · Paine, Región Metropolitana, Chile"
+            }
+          },
+          {
+            "id": "pie-legal",
+            "kind": "group",
+            "ruleIds": [
+              "sl-pie-texto",
+              "sl-pie-linea"
+            ],
+            "children": [
+              {
+                "id": "pie-terminos",
+                "kind": "link",
+                "ruleIds": [
+                  "sl-pie-enlace"
+                ],
+                "content": {
+                  "label": "Términos y privacidad",
+                  "href": "/terminos-y-condiciones/",
+                  "target": "self"
+                }
+              },
+              {
+                "id": "pie-separador",
+                "kind": "paragraph",
+                "ruleIds": [],
+                "content": {
+                  "text": " · "
+                }
+              },
+              {
+                "id": "pie-preferencias",
+                "kind": "button",
+                "ruleIds": [
+                  "sl-pie-enlace",
+                  "sl-pie-cookies"
+                ],
+                "content": {
+                  "label": "Preferencias de cookies",
+                  "href": "/terminos-y-condiciones/",
+                  "target": "self"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "wa-ventana",
+        "kind": "group",
+        "ruleIds": [
+          "sl-wa",
+          "sl-wa-ventana"
+        ],
+        "children": [
+          {
+            "id": "wa-cabecera",
+            "kind": "group",
+            "ruleIds": [
+              "sl-wa-cabecera"
+            ],
+            "children": [
+              {
+                "id": "wa-nombre",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "sl-wa-nombre"
+                ],
+                "content": {
+                  "text": "Santa Luisa de Palpi"
+                }
+              },
+              {
+                "id": "wa-estado",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "sl-wa-estado"
+                ],
+                "content": {
+                  "text": "Te respondemos por WhatsApp"
+                }
+              },
+              {
+                "id": "wa-cerrar",
+                "kind": "button",
+                "ruleIds": [
+                  "sl-wa-cerrar"
+                ],
+                "content": {
+                  "label": "Cerrar",
+                  "href": "#",
+                  "target": "self"
+                }
+              }
+            ]
+          },
+          {
+            "id": "wa-cuerpo",
+            "kind": "group",
+            "ruleIds": [
+              "sl-wa-cuerpo"
+            ],
+            "children": [
+              {
+                "id": "wa-saludo",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "sl-wa-saludo"
+                ],
+                "content": {
+                  "text": "Hola 👋 Cuéntanos qué te gustaría saber y te respondemos por WhatsApp."
+                }
+              },
+              {
+                "id": "wa-hueco",
+                "kind": "group",
+                "ruleIds": [],
+                "children": []
+              }
+            ]
+          },
+          {
+            "id": "wa-pie",
+            "kind": "group",
+            "ruleIds": [
+              "sl-wa-pie"
+            ],
+            "children": [
+              {
+                "id": "wa-nota",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "sl-wa-nota"
+                ],
+                "content": {
+                  "text": "Se abrirá WhatsApp con tu mensaje escrito. Puedes revisarlo antes de enviarlo."
+                }
+              },
+              {
+                "id": "wa-enviar",
+                "kind": "button",
+                "ruleIds": [
+                  "sl-wa-enviar"
+                ],
+                "content": {
+                  "label": "Enviar por WhatsApp",
+                  "href": "#",
+                  "target": "self"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
