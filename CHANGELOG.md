@@ -5,6 +5,58 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.67 — 4 de octubre de 2026
+
+### Lo que el catálogo decía y lo que el código hacía
+
+Al empezar a recomponer el sitio de Santa Luisa por el constructor aparecieron
+varias listas que se habían quedado atrás del código. Cristóbal lo nombró mejor
+que yo: **«simplemente se trata de desactualizaciones»**. Tiene razón, y cambia
+el arreglo: no se trata de escribir cada lista al día —volvería a pasar— sino de
+que el validador y el catálogo lean la MISMA constante.
+
+- **Cinco familias de regla no estaban publicadas.** `divisor`, `posicion`,
+  `desborde`, `transformacion` e `icono` existen y funcionan desde el 3 y 4 de
+  octubre, pero `cod_get_capabilities` no traía su esquema: quien lo leyera no
+  tenía cómo saber que existían ni qué admitían. Ahora sus campos son constantes
+  que usan los dos lados.
+- `preferencias-cookies` faltaba además en `safeRuntimeBehaviors`, que ahora se
+  arma a partir de la lista de behaviors en vez de repetirla.
+- **Una prueba que compara las listas por su relación real**, que no siempre es
+  la igualdad: los tipos de regla y sus esquemas tienen que coincidir
+  exactamente; `safeRuntimeBehaviors` tiene que ser superconjunto (hay behaviors
+  que se piden con una regla `motion`, no `interaction`); y los contratos de
+  partes, subconjunto (sólo algunos fabrican partes). Comparar todo por igualdad
+  daba siete falsos desfases, y una prueba con falsos positivos no la mira nadie.
+
+### La identidad del tema, referenciable desde una regla
+
+En este sistema el tema declara la paleta y las tipografías como variables y el
+lienzo las extiende. Pero las reglas semánticas —`typography`, `color`,
+`surface`— rechazaban `var()`, y eso dejaba dos salidas, las dos malas: copiar
+los valores de la marca como literales dentro del diseño, o escribirlo todo con
+reglas `properties`, que aceptan var() pero pierden el rol y la procedencia.
+
+Ahora aceptan `var(--nombre)` y `var(--nombre, respaldo)`. El respaldo no admite
+paréntesis, así que no se puede anidar otra función ni colar `url(`.
+
+**Y la mitad que importa**, que salió de una precisión de Cristóbal —*«lo que
+rechaza son las abreviaciones, pero no las variables»*—: admitir variables es
+seguro sólo si lo que se EMITE va en forma larga, porque GrapesJS descarta en
+silencio una abreviada con var(). Al permitirlas apareció justo ese caso:
+`surface` con `borderColor` emitía `border-color:var(--x)`, que es abreviada de
+las cuatro `border-<lado>-color`. Se validaba, se guardaba y no pintaba. Ahora
+emite la forma larga cuando hay variable, y la prueba vigila la salida.
+
+### Además
+
+- `text-shadow` entra a la lista de propiedades: un párrafo sobre una foto lo
+  necesita para separarse del fondo, y sin él había que dejarlo en CSS plano.
+- `probar-mapa.php` fijaba el FINAL de la lista de behaviors en vez de que
+  `mapa` estuviera en ella, así que se rompía al agregarle un hermano.
+
+---
+
 ## 0.3.66 — 4 de octubre de 2026
 
 ### El constructor no podía decir lo que el sitio necesitaba

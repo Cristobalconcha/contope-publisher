@@ -309,7 +309,13 @@ final class COD_Canvas_MCP_Recipe_Compiler
         'border-top-style', 'border-right-style', 'border-bottom-style', 'border-left-style',
         'border-top-color', 'border-right-color', 'border-bottom-color', 'border-left-color',
         'border-radius', 'border-top-left-radius', 'border-top-right-radius', 'border-bottom-right-radius', 'border-bottom-left-radius',
-        'box-shadow', 'backdrop-filter', 'filter', 'opacity', 'mix-blend-mode',
+        'box-shadow',
+        // text-shadow: se agregó el 4 de octubre de 2026 al recomponer Santa
+        // Luisa por el constructor. Un párrafo sobre una foto lo usa para
+        // separarse del fondo; sin él no se podía expresar y había que dejarlo
+        // en el CSS plano de la página. Es de forma larga y no admite url().
+        'text-shadow',
+        'backdrop-filter', 'filter', 'opacity', 'mix-blend-mode',
         'transform', 'transform-origin', 'translate', 'rotate', 'scale',
         'position', 'top', 'right', 'bottom', 'left',
         'inset-block-start', 'inset-block-end', 'inset-inline-start', 'inset-inline-end', 'z-index',
@@ -488,8 +494,12 @@ final class COD_Canvas_MCP_Recipe_Compiler
                     'video', 'video con transparencia real (matte)', 'button', 'dynamic value', 'dynamic group', 'table', 'published Orugantt form',
                 ],
                 'safeRuntimeBehaviors' => [
-                    'scroll-threshold', 'nav-toggle', 'carousel-basic', 'reveal-on-scroll', 'lightbox', 'cuadrantes', 'pestanas', 'marquesina', 'aviso', 'mapa',
-                    'load-transition', 'scroll-transition',
+                    // Todo lo que sabe hacer el runtime. Es un SUPERCONJUNTO de
+                    // INTERACTION_BEHAVIORS: reveal-on-scroll, load-transition y
+                    // scroll-transition no se piden con una regla interaction sino
+                    // con una motion, así que están acá y no allá.
+                    ...self::INTERACTION_BEHAVIORS,
+                    'reveal-on-scroll', 'load-transition', 'scroll-transition',
                 ],
                 'assetPolicy' => 'cod_resolve_canvas_assets devuelve activos ya gestionados por Canvas. El compilador acepta URLs seguras, no carga archivos ni verifica recursos remotos.',
                 'formPolicy' => 'Los formularios se eligen desde cod_list_canvas_forms; Canvas no recibe HTML de formulario remoto.',
@@ -640,6 +650,34 @@ final class COD_Canvas_MCP_Recipe_Compiler
                     'mapa sólo en un nodo group, que lleva además content con los datos del mapa (ver nodeContentSchemas, group+mapa: lat, lng, zoom, mini, etiqueta, globo, globoEnlaceTexto, globoEnlaceHref, marcador). Es un mini mapa que al pincharlo despliega uno grande con un marcador y un globo. El mini es una IMAGEN del propio sitio (content.mini, un archivo que se genera una sola vez con scripts/generar-mini-mapa.mjs): se ve sin JavaScript, sin clave y sin pedirle nada a un tercero; sin JavaScript es un enlace a «cómo llegar» (OpenStreetMap). Los hijos del grupo —la dirección escrita— quedan SIEMPRE a la vista, al lado del mini. El mapa grande usa Mapbox GL, que se descarga de un tercero SÓLO cuando alguien lo abre (nunca al cargar la página), y necesita la clave pública de Mapbox, que NO va en la composición: se guarda una sola vez en Configuración → «Mapa (Mapbox)» y sirve para todas las páginas; si cambia, no hay que recomponer nada. Sin clave el mini sí se dibuja pero no se ofrece abrirlo (queda como enlace a «cómo llegar») y el aviso queda anotado en summary.omittedNodes. Si Mapbox no llega al pincharlo, se dice y se ofrece el enlace a «cómo llegar». El grupo pasa a ser el contenedor de todo: si es una fila flex, conviene flex-wrap:wrap para que el mapa grande se despliegue debajo (ocupa todo el ancho). El mapa grande no atrapa el foco (Escape y la X lo cierran; el foco vuelve al mini) y el desplazamiento hacia él respeta prefers-reduced-motion. Parámetros por regla properties sobre el grupo: --cod-mapa-alto (alto del mapa grande; por omisión 25rem) y --cod-mapa-ancho-maximo (por omisión 80rem). Partes: mini, grande y cerrar. Dentro del editor no se ejecuta.',
                     'mapa no admite threshold, targetId, toggleClass, mode, visible ni visibleMobile (el alto y el ancho del mapa grande se declaran con las variables --cod-mapa-alto y --cod-mapa-ancho-maximo, no con parámetros de la regla)',
                 ],
+            ],
+            'divisor' => [
+                'required' => ['forma'],
+                'fields' => array_fill_keys(self::DIVISOR_CAMPOS, 'ver el validador de divisor'),
+                'notes' => 'El borde de una sección: una forma (onda, diagonal, montañas…) que se dibuja arriba o abajo y se recorta sola. capas apila hasta 4 copias con su propia opacidad y desplazamiento, para dar profundidad. reserva es el aire que el divisor le pide a la sección para no montarse sobre el texto, y profundidad su z-index (negativo por omisión, para quedar DETRÁS del contenido).',
+            ],
+            'posicion' => [
+                'required' => ['modo'],
+                'fields' => array_fill_keys(self::POSICION_CAMPOS, 'modo: estatica|relativa|absoluta|fija|pegada; capa: z-index; los cuatro lados: longitud'),
+                'constraints' => ['una posición pegada dentro de un ancestro que recorta no se pega: el compilador la rechaza nombrando los dos nodos'],
+            ],
+            'desborde' => [
+                'atLeastOneOf' => self::DESBORDE_CAMPOS,
+                'fields' => array_fill_keys(self::DESBORDE_CAMPOS, 'visible|oculto|auto|desplazar'),
+            ],
+            'transformacion' => [
+                'atLeastOneOf' => self::TRANSFORMACION_CAMPOS,
+                'fields' => [
+                    'medidas' => self::TRANSFORMACION_MEDIDAS,
+                    'angulos' => self::TRANSFORMACION_ANGULOS,
+                    'factores' => self::TRANSFORMACION_FACTORES,
+                    'origen' => 'punto de origen de la transformación',
+                ],
+            ],
+            'icono' => [
+                'required' => ['donde'],
+                'fields' => array_fill_keys(self::ICONO_CAMPOS, 'forma o nombre (Material Symbols); donde: antes|despues|fondo; tamano, color y separacion'),
+                'notes' => 'Un icono dentro del texto del nodo, por nombre de Material Symbols o por forma propia. Nunca se deforma: a diferencia de divisor, no lleva preserveAspectRatio="none".',
             ],
             'properties' => [
                 'required' => ['declarations'],
@@ -1898,7 +1936,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
     private function normalize_divisor_rule(array $value)
     {
         $codigo = 'cod_mcp_divisor_rule_invalid';
-        $permitidas = ['forma', 'donde', 'alto', 'repeticion', 'voltear', 'color', 'capas', 'reserva', 'profundidad'];
+        $permitidas = self::DIVISOR_CAMPOS;
 
         if (!$this->has_only_keys($value, $permitidas)) {
             return new WP_Error($codigo, 'divisor admite: ' . implode(', ', $permitidas) . '.');
@@ -2123,8 +2161,8 @@ final class COD_Canvas_MCP_Recipe_Compiler
     private function normalize_posicion_rule(array $value)
     {
         $codigo = 'cod_mcp_posicion_rule_invalid';
-        $lados = ['arriba', 'abajo', 'izquierda', 'derecha'];
-        $permitidas = array_merge(['modo', 'capa'], $lados);
+        $lados = self::POSICION_LADOS;
+        $permitidas = self::POSICION_CAMPOS;
 
         if (!$this->has_only_keys($value, $permitidas) || $value === []) {
             return new WP_Error($codigo, 'posicion admite: ' . implode(', ', $permitidas) . '.');
@@ -2198,7 +2236,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
     private function normalize_desborde_rule(array $value)
     {
         $codigo = 'cod_mcp_desborde_rule_invalid';
-        if (!$this->has_only_keys($value, ['horizontal', 'vertical']) || $value === []) {
+        if (!$this->has_only_keys($value, self::DESBORDE_CAMPOS) || $value === []) {
             return new WP_Error($codigo, 'desborde admite: horizontal, vertical.');
         }
 
@@ -2236,10 +2274,10 @@ final class COD_Canvas_MCP_Recipe_Compiler
     private function normalize_transformacion_rule(array $value)
     {
         $codigo = 'cod_mcp_transformacion_rule_invalid';
-        $medidas = ['moverX', 'moverY'];
-        $angulos = ['rotar', 'inclinarX', 'inclinarY'];
-        $factores = ['escalar', 'escalarX', 'escalarY'];
-        $permitidas = array_merge($medidas, $angulos, $factores, ['origen']);
+        $medidas = self::TRANSFORMACION_MEDIDAS;
+        $angulos = self::TRANSFORMACION_ANGULOS;
+        $factores = self::TRANSFORMACION_FACTORES;
+        $permitidas = self::TRANSFORMACION_CAMPOS;
 
         if (!$this->has_only_keys($value, $permitidas) || $value === []) {
             return new WP_Error($codigo, 'transformacion admite: ' . implode(', ', $permitidas) . '.');
@@ -2307,7 +2345,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
     private function normalize_icono_rule(array $value)
     {
         $codigo = 'cod_mcp_icono_rule_invalid';
-        $permitidas = ['forma', 'nombre', 'donde', 'tamano', 'color', 'separacion'];
+        $permitidas = self::ICONO_CAMPOS;
 
         if (!$this->has_only_keys($value, $permitidas)) {
             return new WP_Error($codigo, 'icono admite: ' . implode(', ', $permitidas) . '.');
@@ -5239,7 +5277,35 @@ final class COD_Canvas_MCP_Recipe_Compiler
             }
         }
         if (isset($value['borderColor']) || isset($value['borderWidth'])) {
-            $css .= 'border-color:' . ($value['borderColor'] ?? 'currentColor') . ';border-style:solid;border-width:' . ($value['borderWidth'] ?? '1px') . ';';
+            /**
+             * EL BORDE, EN FORMA LARGA CUANDO LLEVA UNA VARIABLE.
+             *
+             * `border-color` y `border-width` son ABREVIADAS —de las cuatro
+             * `border-<lado>-color` y `border-<lado>-width`—, y están las dos
+             * en SHORTHAND_PROPERTIES por eso. GrapesJS descarta en silencio
+             * una abreviada que lleva var(), así que en cuanto las reglas
+             * semánticas empezaron a admitir variables del tema (4 de octubre
+             * de 2026) esta línea se volvió una trampa: el borde se validaba,
+             * se guardaba y no pintaba.
+             *
+             * Lo encontró Cristóbal al corregirme el motivo de la restricción:
+             * «lo que rechaza son las abreviaciones, pero no las variables».
+             * Exacto, y por eso el arreglo es por la forma y no por el valor.
+             *
+             * Sin variables se emite igual que siempre, para que ninguna
+             * composición existente cambie ni un byte.
+             */
+            $borde_color = $value['borderColor'] ?? 'currentColor';
+            $borde_ancho = $value['borderWidth'] ?? '1px';
+            if (strpos($borde_color, 'var(') !== false || strpos((string) $borde_ancho, 'var(') !== false) {
+                foreach (['top', 'right', 'bottom', 'left'] as $lado) {
+                    $css .= 'border-' . $lado . '-color:' . $borde_color . ';'
+                        . 'border-' . $lado . '-style:solid;'
+                        . 'border-' . $lado . '-width:' . $borde_ancho . ';';
+                }
+            } else {
+                $css .= 'border-color:' . $borde_color . ';border-style:solid;border-width:' . $borde_ancho . ';';
+            }
         }
         if (isset($value['shadow'])) {
             $shadows = ['none' => 'none', 'sm' => '0 1px 3px rgba(0,0,0,.12)', 'md' => '0 8px 24px rgba(0,0,0,.16)', 'lg' => '0 18px 48px rgba(0,0,0,.2)'];
@@ -5644,6 +5710,29 @@ final class COD_Canvas_MCP_Recipe_Compiler
      *
      * @var string[]
      */
+    /**
+     * Los campos de las cinco familias que se sumaron el 3 y 4 de octubre de
+     * 2026. Son constantes y no listas sueltas dentro de cada validador por un
+     * motivo medido: estaban sólo dentro, así que el catálogo que publica
+     * `cod_get_capabilities` NO traía su esquema y quien lo leía no tenía cómo
+     * saber que existían ni qué admitían.
+     *
+     * Cristóbal, el 4 de octubre de 2026, al ver la lista de desajustes:
+     * «simplemente se trata de desactualizaciones». Exacto, y por eso el
+     * arreglo no es escribir el esquema a mano —volvería a quedarse atrás— sino
+     * que el validador y el catálogo lean la MISMA constante.
+     *
+     * @var string[]
+     */
+    public const DIVISOR_CAMPOS = ['forma', 'donde', 'alto', 'repeticion', 'voltear', 'color', 'capas', 'reserva', 'profundidad'];
+    public const POSICION_LADOS = ['arriba', 'abajo', 'izquierda', 'derecha'];
+    public const POSICION_CAMPOS = ['modo', 'capa', 'arriba', 'abajo', 'izquierda', 'derecha'];
+    public const DESBORDE_CAMPOS = ['horizontal', 'vertical'];
+    public const TRANSFORMACION_MEDIDAS = ['moverX', 'moverY'];
+    public const TRANSFORMACION_ANGULOS = ['rotar', 'inclinarX', 'inclinarY'];
+    public const TRANSFORMACION_FACTORES = ['escalar', 'escalarX', 'escalarY'];
+    public const TRANSFORMACION_CAMPOS = ['moverX', 'moverY', 'rotar', 'inclinarX', 'inclinarY', 'escalar', 'escalarX', 'escalarY', 'origen'];
+    public const ICONO_CAMPOS = ['forma', 'nombre', 'donde', 'tamano', 'color', 'separacion'];
     public const INTERACTION_BEHAVIORS = [
         'scroll-threshold', 'nav-toggle', 'carousel-basic', 'lightbox', 'cuadrantes',
         'pestanas', 'marquesina', 'aviso', 'mapa', 'preferencias-cookies',
@@ -5718,14 +5807,47 @@ final class COD_Canvas_MCP_Recipe_Compiler
      * La opacidad se escribe en el propio color, con un hexadecimal de ocho
      * dígitos: `#E5007E4D` es ese mismo rosa al 30%.
      */
+    /**
+     * UNA REFERENCIA A UNA VARIABLE DEL TEMA: `var(--nombre)` o `var(--nombre, respaldo)`.
+     *
+     * POR QUÉ EXISTE. En este sistema la identidad vive en el TEMA: el tema
+     * declara la paleta y las tipografías como variables y el lienzo las
+     * extiende. Hasta el 4 de octubre de 2026 las reglas semánticas
+     * —typography, color, surface— rechazaban `var()`, y eso dejaba sólo dos
+     * salidas, las dos malas: copiar los valores de la marca como literales
+     * dentro del diseño (la identidad duplicada, que se desincroniza en
+     * cuanto el tema cambia un tono) o escribirlo todo con reglas
+     * `properties`, que sí aceptan var() pero pierden el rol y la
+     * procedencia que hacen reutilizable al set de diseño.
+     *
+     * Se encontró al ir a recomponer el sitio de Santa Luisa por el
+     * constructor: su paleta entera está en variables del tema
+     * (`--dorado-600`, `--oliva-700`, `--font-hero`…), así que sin esto la
+     * recomposición fiel era imposible.
+     *
+     * QUÉ SE ADMITE Y POR QUÉ ES SEGURO. Sólo el nombre de una propiedad
+     * personalizada y, si acaso, un respaldo de texto llano. El respaldo NO
+     * puede llevar paréntesis, así que no se puede anidar otra función ni
+     * colar `url(` ni `expression(`. Estas reglas emiten siempre propiedades
+     * en forma larga (`color`, `background-color`, `font-family`), que es la
+     * condición que ya cumple el tipo `properties`: lo que GrapesJS descarta
+     * en silencio son las ABREVIADAS con var(), no las largas.
+     */
+    private function is_css_var_reference(string $value): bool
+    {
+        return preg_match('/^var\(--[a-z0-9-]{1,60}(?:,\s*[a-zA-Z0-9#%.,\s\'\"-]{1,120})?\)$/D', $value) === 1;
+    }
+
     private function is_css_color(string $value): bool
     {
-        return preg_match('/^(?:#[0-9a-fA-F]{3,8}|transparent|currentColor|(?:rgb|hsl|oklch)\([0-9.%\s,+-]+\))$/', $value) === 1;
+        return preg_match('/^(?:#[0-9a-fA-F]{3,8}|transparent|currentColor|(?:rgb|hsl|oklch)\([0-9.%\s,+-]+\))$/', $value) === 1
+            || $this->is_css_var_reference($value);
     }
 
     private function is_css_font_family(string $value): bool
     {
-        return preg_match('/^[a-zA-Z0-9\s,\-\'\"]{1,240}$/', $value) === 1;
+        return preg_match('/^[a-zA-Z0-9\s,\-\'\"]{1,240}$/', $value) === 1
+            || $this->is_css_var_reference($value);
     }
 
     private function is_object_position(string $value): bool

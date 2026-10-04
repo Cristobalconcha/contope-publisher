@@ -94,6 +94,69 @@ foreach (COD_Canvas_MCP_Recipe_Compiler::INTERACTION_BEHAVIORS as $behavior) {
     );
 }
 
+echo "\n== y ninguna lista del catálogo se queda atrás del código ==\n";
+/*
+ * Cristóbal, el 4 de octubre de 2026, mirando la lista de desajustes:
+ * «simplemente se trata de desactualizaciones». Tenía razón, y es mejor
+ * diagnóstico que llamarlos defectos de diseño: ninguna de estas listas
+ * estaba mal pensada, sólo se quedaron atrás del código.
+ *
+ * El caso que lo probó: las cinco familias de regla que se sumaron el 3 y 4
+ * de octubre —divisor, posicion, desborde, transformacion e icono— existían y
+ * funcionaban, pero el catálogo no publicaba su esquema. Quien lo leyera no
+ * tenía cómo saber que existían.
+ *
+ * Cada comprobación de acá declara la RELACIÓN correcta, que no siempre es la
+ * igualdad: hay listas que son superconjunto de otra y listas que son
+ * subconjunto, y confundirlas da falsos positivos que después nadie mira.
+ */
+$cat = $compilador->capability_catalog();
+
+// 1. IGUALDAD. Todo tipo de regla que el código acepta tiene su esquema
+//    publicado, y no se publica un esquema de algo que no existe.
+$kinds = COD_Canvas_MCP_Recipe_Compiler::RULE_KINDS;
+$esquemas = array_keys($cat['designRuleSet']['ruleValueSchemas']);
+sort($kinds); sort($esquemas);
+$comprobar('cada tipo de regla tiene su esquema publicado', $kinds === $esquemas,
+    implode(', ', array_merge(array_diff($kinds, $esquemas), array_diff($esquemas, $kinds))));
+
+// 2. SUPERCONJUNTO. safeRuntimeBehaviors es todo lo que sabe hacer el
+//    runtime, así que contiene a los que se piden con una regla interaction y
+//    además los que se piden con una motion (reveal-on-scroll y compañía).
+$safe = $cat['realization']['safeRuntimeBehaviors'];
+$faltan = array_values(array_diff(COD_Canvas_MCP_Recipe_Compiler::INTERACTION_BEHAVIORS, $safe));
+$comprobar('safeRuntimeBehaviors contiene a todos los de interaction', $faltan === [],
+    $faltan === [] ? '' : 'faltan: ' . implode(', ', $faltan));
+
+// 3. SUBCONJUNTO. Sólo algunos behaviors fabrican partes en el navegador, así
+//    que los contratos son unos pocos de los de interaction. Lo que no puede
+//    pasar es que haya un contrato de un behavior que ya no existe.
+$contratos = array_keys($cat['composition']['behaviorContracts']);
+$huerfanos = array_values(array_diff($contratos, COD_Canvas_MCP_Recipe_Compiler::INTERACTION_BEHAVIORS));
+$comprobar('ningún contrato de partes sobra', $huerfanos === [],
+    $huerfanos === [] ? '' : 'sobran: ' . implode(', ', $huerfanos));
+
+// 4. COBERTURA. Los esquemas de contenido de nodo agrupan nombres en una sola
+//    clave («button|link», «section|header|footer|navigation|layout»), así que
+//    la comparación tiene que partir por la barra. Sin eso daba siete falsos
+//    desfases y la prueba no habría servido para nada.
+$cubiertos = [];
+foreach (array_keys($cat['composition']['nodeContentSchemas']) as $clave) {
+    foreach (explode('|', (string) $clave) as $parte) {
+        $cubiertos[] = trim(explode('+', $parte)[0]);
+    }
+}
+$sinEsquema = array_values(array_diff($cat['composition']['nodeKinds'], $cubiertos));
+$comprobar('cada tipo de nodo tiene su esquema de contenido', $sinEsquema === [],
+    $sinEsquema === [] ? '' : 'sin esquema: ' . implode(', ', $sinEsquema));
+
+// 5. Las cinco familias nuevas, por su nombre. La comparación de arriba
+//    pasaría igual si el código y el catálogo se olvidaran de las dos a la vez.
+foreach (['divisor', 'posicion', 'desborde', 'transformacion', 'icono'] as $familia) {
+    $comprobar('  ' . $familia . ' está publicada',
+        isset($cat['designRuleSet']['ruleValueSchemas'][$familia])
+        && in_array($familia, COD_Canvas_MCP_Recipe_Compiler::RULE_KINDS, true));
+}
 echo "\n";
 if ($fallas === 0) { echo "probar-catalogo-no-miente.php   TODO OK\n"; exit(0); }
 echo "probar-catalogo-no-miente.php   $fallas falla(s)\n";
