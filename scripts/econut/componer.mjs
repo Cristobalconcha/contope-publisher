@@ -213,13 +213,53 @@ R('portada-video', 'properties', { declarations: {
 // sabe estilar la pieza interna. En el original el video mide 515x600, más
 // alto que ancho, y eso es parte de lo que lo hace pesar sobre la foto.
 R('portada-video-forma', 'media', { aspectRatio: '6/7', fit: 'cover' });   // 6/7 = 0,857; el original mide 515x600 = 0,858. El validador sólo admite dos dígitos por lado.
-// En teléfono nada de esto aplica: las dos piezas se apilan a ancho completo.
+// En teléfono las dos piezas se apilan a ancho completo, UNA DEBAJO DE OTRA.
+//
+// Y eso último es lo que faltaba y lo que rompía la portada en móvil: los
+// ajustes de abajo cambiaban el ancho, pero las dos piezas seguían declarando
+// `grid-row: 1`, o sea la MISMA celda. En escritorio ese apilado es el efecto
+// buscado —el video monta sobre el panel blanco—; en un teléfono dejaba el
+// video encima del título y del párrafo. Medido el 4 de octubre de 2026 a 375
+// px: el video tapaba «Servicio de verdad» (48 px), «La clave es el
+// compromiso» (65 px) y 273 px del párrafo.
+//
+// Separar las filas es lo único que hace falta: el ancho ya era correcto.
+R('portada-lienzo-movil', 'properties', { declarations: {
+  // El alto del hero del original es una medida de escritorio. En un teléfono
+  // fuerza una caja altísima con el contenido flotando al medio.
+  'min-height': 'auto', 'align-items': 'start',
+} }, { bp: 'mobile' });
 R('portada-texto-movil', 'properties', { declarations: {
-  width: '100%', 'margin-inline-start': '0px',
+  width: '100%', 'margin-inline-start': '0px', 'grid-row': '1',
+  // La sangría del 21% es la del original en escritorio; en 375 px son 79 px
+  // de margen izquierdo que estrechan el texto a la mitad.
+  'padding-inline-start': '24px', 'padding-inline-end': '24px',
 } }, { bp: 'mobile' });
 R('portada-video-movil', 'properties', { declarations: {
   width: '100%', 'margin-inline-start': '0px', 'margin-block-start': '18px',
+  'grid-row': '2',
 } }, { bp: 'mobile' });
+
+// En TABLET pasa lo mismo y hay que repetirlo, porque los alcances del sistema
+// son bandas separadas: «mobile» es hasta 767 px y «tablet» de 768 a 1023.
+//
+// Se vio al medir, el 4 de octubre de 2026: a 768 px la composición de
+// escritorio seguía viva y dejaba la columna de texto en 248 px dentro de una
+// caja de 444 —el texto corría en una tira de unos 30 caracteres— mientras el
+// video le pisaba 23 px al subtítulo y 178 al párrafo. Ese solape es el efecto
+// buscado en pantalla ancha, donde el relleno del 5% mantiene las palabras
+// lejos del video; a 768 ya no alcanza.
+R('portada-lienzo-tablet', 'properties', { declarations: {
+  'min-height': 'auto', 'align-items': 'start',
+} }, { bp: 'tablet' });
+R('portada-texto-tablet', 'properties', { declarations: {
+  width: '100%', 'margin-inline-start': '0px', 'grid-row': '1',
+  'padding-inline-start': '40px', 'padding-inline-end': '40px',
+} }, { bp: 'tablet' });
+R('portada-video-tablet', 'properties', { declarations: {
+  width: '100%', 'margin-inline-start': '0px', 'margin-block-start': '18px',
+  'grid-row': '2',
+} }, { bp: 'tablet' });
 // El triángulo de advertencia es el FONDO de la sección, no una imagen dentro
 // de ella: en el original va como background-image al 7% de ancho, pegado al
 // 2% de la izquierda y centrado a lo alto. Puesto como <img> ocupaba una
@@ -360,9 +400,23 @@ R('t-servicio-vineta', 'typography', { role: 'cuerpo', fontSize: '13px', lineHei
 // En el original el título va de 410 a 680 y la marquesina de 680 a 1490.
 R('cert-fila', 'layout', { mode: 'grid', columns: 2, gap: '0px', align: 'center', mobile: { mode: 'stack', columns: 1, gap: '24px' } });
 R('cert-fila-reparto', 'properties', { declarations: { 'grid-template-columns': '270px minmax(0, 1fr)' } });
+// Lo mismo acá, por la misma razón.
+R('cert-fila-reparto-movil', 'properties', { declarations: { 'grid-template-columns': 'minmax(0, 1fr)' } }, { bp: 'mobile' });
 // Abajo: la foto mide 624 de ancho y el texto 366, separados por 60.
 R('cert-abajo', 'layout', { mode: 'grid', columns: 2, gap: '60px', align: 'center', mobile: { mode: 'stack', columns: 1, gap: '28px' } });
 R('cert-abajo-reparto', 'properties', { declarations: { 'grid-template-columns': 'minmax(0, 624fr) minmax(0, 366fr)' } });
+// UNA COLUMNA EN TELÉFONO, y hay que decirlo explícitamente.
+//
+// La regla `layout` de arriba ya declara su rama móvil —`mobile: { mode:
+// 'stack', columns: 1 }`—, pero la regla `properties` de esta línea no tiene
+// alcance, así que vale para TODOS los tamaños y la pisa. El resultado se
+// midió el 4 de octubre de 2026: en 375 px el texto de sustentabilidad corría
+// en una columna de 121 px.
+//
+// Es una trampa del sistema que conviene tener presente: cuando una
+// `properties` toca algo que una `layout` ya resuelve por breakpoint, hay que
+// darle su propia versión móvil o gana en todas partes.
+R('cert-abajo-reparto-movil', 'properties', { declarations: { 'grid-template-columns': 'minmax(0, 1fr)' } }, { bp: 'mobile' });
 // 624x430 en el original, o sea 1,45 y no 1,5. Con 3/2 la foto recortaba 10px
 // más de alto de lo que muestra el sitio.
 R('foto-sustentabilidad', 'media', { aspectRatio: '32/22', fit: 'cover' });
@@ -384,6 +438,25 @@ R('marquesina-ritmo', 'properties', { declarations: {
   'min-height': '200px',
   'align-content': 'center',
 } });
+
+// LA SEPARACIÓN NO PUEDE SER MAYOR QUE LOS LOGOS, y a 768 px lo era.
+//
+// La marquesina reparte el ancho de su caja entre los logos visibles,
+// descontando las separaciones. Con cuatro a la vista y 97 px entre medio
+// —medidas del original, pensadas para una caja de 810 px— en la columna de
+// 419 px de una tablet quedaban (419 − 3×97) / 4 = 32 px por logo. Los
+// certificados se veían como sellos de 32 px con 97 px de aire entre ellos.
+// Medido el 4 de octubre de 2026.
+//
+// La separación es lo que se encoge, no el logo: el logo ES el contenido.
+R('marquesina-ritmo-tablet', 'properties', { declarations: {
+  '--cod-marquesina-visibles': '3',
+  '--cod-marquesina-separacion': '28px',
+} }, { bp: 'tablet' });
+R('marquesina-ritmo-movil', 'properties', { declarations: {
+  '--cod-marquesina-visibles': '3',
+  '--cod-marquesina-separacion': '20px',
+} }, { bp: 'mobile' });
 // 54 arriba y 50 abajo: es lo que mide el original en esta sección, la única
 // que no usa el mismo aire en los dos lados.
 // OJO: la regla `spacing` sólo admite un mismo valor arriba y abajo
@@ -582,10 +655,10 @@ nodes.push({
       H('Servicio de verdad', 1, ['t-portada', 'c-naranja']),
       H('La clave es el compromiso', 3, ['t-sub']),
       P('No se trata de vender excedentes de capacidad de proceso, sino de brindar soluciones completas para exportadores, con control de calidad, proyección productiva, manejo de inventarios, informes completos de resultados, despacho SAG, trazabilidad y seguridad hasta destino. Y todo a un costo único y claro.', ['t-lead']),
-    ], ['columna', 'panel-blanco', 'aire-portada', 'portada-texto', 'portada-texto-movil']),
-    { id: id('v'), kind: 'video', ruleIds: ['portada-video', 'portada-video-forma', 'portada-video-movil'],
+    ], ['columna', 'panel-blanco', 'aire-portada', 'portada-texto', 'portada-texto-movil', 'portada-texto-tablet']),
+    { id: id('v'), kind: 'video', ruleIds: ['portada-video', 'portada-video-forma', 'portada-video-movil', 'portada-video-tablet'],
       content: { sourceUrl: f.videoBrazo, caption: '', ambient: true } },
-  ], ['portada-lienzo', 'entra'])],
+  ], ['portada-lienzo', 'portada-lienzo-movil', 'portada-lienzo-tablet', 'entra'])],
 });
 
 // 4 · Servicios
@@ -850,8 +923,8 @@ nodes.push({
         IMG(f.kosher, 'Kosher', ['cert-tam', 'cert-tam-caja']),
         IMG(f.halal, 'Halal', ['cert-tam', 'cert-tam-caja']),
         IMG(f.chile, 'Chilean Walnut Authentic', ['cert-tam', 'cert-tam-caja']),
-      ], ['marquesina-certificaciones', 'marquesina-ritmo']),
-    ], ['cert-fila', 'cert-fila-reparto']),
+      ], ['marquesina-certificaciones', 'marquesina-ritmo', 'marquesina-ritmo-tablet', 'marquesina-ritmo-movil']),
+    ], ['cert-fila', 'cert-fila-reparto', 'cert-fila-reparto-movil']),
     // Fila de abajo: la foto y el bloque de sustentabilidad.
     G([
       IMG(f.sustentabilidad, 'Huertos de nogales de Econut desde el aire', ['foto-sustentabilidad']),
@@ -860,7 +933,7 @@ nodes.push({
         H('Compromiso con el Futuro', 2, ['t-compromiso', 'c-naranja']),
         P('En Econut, implementamos prácticas de economía circular para maximizar el uso de recursos. Nuestra eficiencia hídrica y el uso de energía solar son pilares fundamentales para reducir el impacto ambiental y promover un futuro más sostenible.'),
       ], ['columna']),
-    ], ['cert-abajo', 'cert-abajo-reparto', 'entra']),
+    ], ['cert-abajo', 'cert-abajo-reparto', 'cert-abajo-reparto-movil', 'entra']),
   ], ['caja-certificaciones'])],
 });
 

@@ -5,6 +5,64 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.62 — 4 de octubre de 2026
+
+### Corregido
+
+- **La hoja de estilos base se emitía TRES veces, y la última pisaba el
+  diseño.** Es el defecto de fondo del día y explica desprolijidades repartidas
+  por todo el sitio.
+
+  El deduplicador comparaba **la línea entera**. Bastó cambiar una declaración
+  de la base —añadirle `height:auto` a las imágenes, en la 0.3.61— para que la
+  copia guardada dentro de cada documento dejara de coincidir, sobreviviera, y
+  al quedar **después** en la hoja ganara sobre todas las reglas de diseño
+  anteriores.
+
+  Se vio en el encabezado de Econut: `.cod-group{display:grid}` de una base
+  vieja vencía a la regla que ponía los iconos de redes en fila, y los dejaba
+  apilados en vertical, con el encabezado midiendo 168 px en un teléfono.
+
+  Ahora se compara por **selector**: una base de cualquier versión anterior se
+  reconoce igual y se descarta, y la única que queda es la de esta versión,
+  delante de todo.
+
+- **Una imagen con alto y ancho declarados perdía su proporción.** La 0.3.61
+  les puso `width` y `height` para reservar el hueco, pero sin `height:auto` el
+  atributo se impone: la foto conserva el alto del **archivo** mientras el
+  ancho se limita al de su caja. En las tarjetas de servicio la caja daba
+  200×462 para una foto que se dibujaba 200×150, con **312 px de hueco muerto**
+  debajo. Es el espacio que Cristóbal señaló.
+
+### Corregido en el sitio de Econut (local)
+
+Todo esto salió de auditar la página midiendo, no mirando.
+
+- **El vídeo de la portada se montaba sobre los tres textos en teléfono**: 48 px
+  sobre el título, 65 sobre el subtítulo y 273 sobre el párrafo. Los ajustes
+  móviles cambiaban el ancho de las dos piezas pero ninguna salía de la celda
+  de rejilla, así que seguían apiladas. En escritorio ese apilado es el efecto
+  buscado; en un teléfono, no.
+- **Lo mismo en tablet**, que además es una banda aparte y hay que escribirla
+  aparte: a 768 px la columna de texto quedaba en 248 px dentro de una caja de
+  444 —el texto corría en una tira de unos 30 caracteres—.
+- **Los logos de certificación se aplastaban a 32 px.** La marquesina reparte
+  el ancho de su caja entre los visibles descontando las separaciones; con
+  cuatro a la vista y 97 px entre medio —medidas del original, para una caja de
+  810 px— en la columna de 419 px de una tablet quedaban 32 px por logo. La
+  separación es lo que se encoge, no el logo.
+- **El texto de sustentabilidad corría en 121 px en teléfono.** Una regla
+  `properties` sin alcance pisaba la rama móvil de la regla `layout`. **Es una
+  trampa del sistema que conviene tener presente**: cuando una `properties`
+  toca algo que una `layout` ya resuelve por breakpoint, hay que darle su
+  propia versión móvil o gana en todas partes.
+- **En el encabezado, dos iconos de redes caían sobre el logotipo.** La barra
+  reparte en tres y a 375 px cada lateral queda en 65 px para cuatro cuentas
+  que necesitan 150. Ahora se parte en dos filas: apilar es mejor que achicar,
+  porque el logotipo es la identidad.
+
+---
+
 ## 0.3.61 — 4 de octubre de 2026
 
 ### Agregado

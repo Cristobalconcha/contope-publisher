@@ -134,5 +134,34 @@ $verifica('un documento sin base queda intacto', strpos($mezcla, ".mi-regla{colo
 $verifica('…y no se le antepone un base', strpos($mezcla, '.cod-section{width:100%') === false);
 $verifica('sin documentos no sale nada', COD_Canvas_Page_Publisher::unir_css_de_documentos(['', '']) === "\n\n");
 
+/**
+ * 4. Una base de una versión ANTERIOR también se descarta.
+ *
+ * Ésta es la que importa y la que faltaba. El deduplicador comparaba la línea
+ * entera, así que bastaba cambiar una declaración de la hoja base —pasó el 4
+ * de octubre de 2026 al añadirle `height:auto` a las imágenes— para que la
+ * copia guardada en un documento viejo dejara de coincidir, sobreviviera, y al
+ * quedar DESPUÉS en la hoja pisara todas las reglas de diseño anteriores.
+ *
+ * Se vio en el encabezado de Econut: `.cod-group{display:grid}` de una base
+ * vieja ganaba sobre la regla que ponía los iconos de redes en fila, y los
+ * dejaba apilados en vertical. La hoja servida traía TRES copias de la base.
+ */
+$base = COD_Canvas_MCP_Recipe_Compiler::base_styles();
+$vieja = str_replace('.cod-group{display:grid;gap:16px;}', '.cod-group{display:grid;gap:99px;}', $base);
+$verifica('la base de prueba quedó distinta de la actual', $vieja !== $base);
+
+$conVieja = COD_Canvas_Page_Publisher::unir_css_de_documentos([
+    $base . ".cod-rule--mia{display:flex;}\n",
+    $vieja . ".cod-rule--otra{color:red;}\n",
+]);
+$verifica('una base anterior no sobrevive', strpos($conVieja, 'gap:99px') === false);
+$verifica('la base actual sale UNA sola vez', substr_count($conVieja, '.cod-group{display:grid') === 1);
+$verifica('y va ANTES que las reglas de diseño, para no pisarlas',
+    strpos($conVieja, '.cod-group{display:grid') < strpos($conVieja, '.cod-rule--mia'));
+$verifica('las reglas de los dos documentos se conservan',
+    strpos($conVieja, '.cod-rule--mia{display:flex;}') !== false
+    && strpos($conVieja, '.cod-rule--otra{color:red;}') !== false);
+
 printf("\n%d de %d.\n", $total - $fallas, $total);
 exit($fallas === 0 ? 0 : 1);

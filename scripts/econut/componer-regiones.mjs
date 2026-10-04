@@ -105,6 +105,25 @@ const hacerReglas = () => {
   R('h-wa-lado', 'properties', { declarations: {
     display: 'flex', 'justify-content': 'flex-end', 'align-items': 'center', gap: '10px',
   } });
+
+  // EN TELÉFONO EL ENCABEZADO SE PARTE EN DOS FILAS.
+  //
+  // La barra reparte en tres —un hueco, el logo centrado, las cuentas a la
+  // derecha— y eso funciona mientras las columnas laterales den el ancho. A
+  // 375 px cada lateral queda en 65 px y las cuatro cuentas necesitan 150, así
+  // que se desbordaban hacia dentro y dos de ellas caían ENCIMA del logotipo.
+  // Medido el 4 de octubre de 2026.
+  //
+  // Apilar es mejor que achicar: el logotipo es la identidad y no se toca.
+  R('h-barra-movil', 'properties', { declarations: {
+    'grid-template-columns': 'minmax(0, 1fr)', 'justify-items': 'center', gap: '12px',
+  } }, { bp: 'mobile' });
+  R('h-wa-lado-movil', 'properties', { declarations: {
+    'justify-content': 'center', width: '100%',
+  } }, { bp: 'mobile' });
+  // El primer hueco de la barra existe sólo para centrar el logo entre tres
+  // columnas; apilado no centra nada y deja un salto de aire.
+  R('h-hueco-movil', 'properties', { declarations: { display: 'none' } }, { bp: 'mobile' });
   R('h-wa-pildora', 'properties', { declarations: {
     display: 'inline-flex', 'align-items': 'center', gap: '8px',
     'background-color': VERDE, 'border-radius': '999px',
@@ -121,13 +140,13 @@ const hacerReglas = () => {
   const nodes = [{
     id: 'encabezado', marker: 'encabezado', kind: 'header', ruleIds: ['h-aire', 'h-superficie'],
     children: [{
-      id: id('g'), kind: 'group', ruleIds: ['h-barra'], children: [
-        { id: id('g'), kind: 'group', ruleIds: [], children: [] },
+      id: id('g'), kind: 'group', ruleIds: ['h-barra', 'h-barra-movil'], children: [
+        { id: id('g'), kind: 'group', ruleIds: ['h-hueco-movil'], children: [] },
         { id: id('g'), kind: 'group', ruleIds: ['h-centrado'], children: [
           { id: id('i'), kind: 'image', ruleIds: ['h-logo'],
             content: { assetUrl: f.logoHorizontal, alt: 'Econut · procesos, productos, perspectiva' } },
         ] },
-        { id: id('g'), kind: 'group', ruleIds: ['h-wa-lado'], children: [
+        { id: id('g'), kind: 'group', ruleIds: ['h-wa-lado', 'h-wa-lado-movil'], children: [
           // Las cuentas oficiales, siempre a la vista. Acá van sin el nombre
           // —el encabezado no da para tanto— y el nombre completo está en el
           // pie. Lo que importa de este par es que existan y se vean: desde

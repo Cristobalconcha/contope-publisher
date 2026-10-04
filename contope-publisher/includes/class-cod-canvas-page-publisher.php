@@ -845,6 +845,32 @@ CSS;
     {
         $base = COD_Canvas_MCP_Recipe_Compiler::base_styles();
         $lineas_base = array_flip(array_filter(explode("\n", $base), static fn(string $l): bool => $l !== ''));
+
+        /**
+         * Los SELECTORES de la base, no sólo sus líneas completas.
+         *
+         * Comparar la línea entera parece más estricto y es justo lo contrario:
+         * basta cambiar una declaración de la hoja base —pasó el 4 de octubre
+         * de 2026 al añadirle `height:auto` a las imágenes— para que la copia
+         * guardada en un documento viejo deje de coincidir, sobreviva, y al
+         * quedar DESPUÉS en la hoja pise todas las reglas de diseño que vinieron
+         * antes. Se vio en el encabezado: sus iconos de redes volvieron a
+         * apilarse en vertical porque `.cod-group{display:grid}` de una base
+         * vieja ganaba sobre la regla que los ponía en fila.
+         *
+         * Comparando por selector, una base antigua se reconoce igual y se
+         * descarta, y la única que queda es la de esta versión del plugin.
+         *
+         * @var array<string, bool>
+         */
+        $selectores_base = [];
+        foreach (array_keys($lineas_base) as $linea) {
+            $selector = self::selector_de_linea((string) $linea);
+            if ($selector !== '') {
+                $selectores_base[$selector] = true;
+            }
+        }
+
         $hubo_base = false;
         $resto = '';
         foreach ($documentos as $css) {
@@ -860,6 +886,14 @@ CSS;
                     $lineas[$i] = null;
                     continue;
                 }
+                $selector = self::selector_de_linea($linea);
+                if ($selector !== '' && isset($selectores_base[$selector])) {
+                    // Misma regla de la base con otras declaraciones: es una
+                    // base de una versión anterior. Fuera.
+                    ++$quitadas;
+                    $lineas[$i] = null;
+                    continue;
+                }
                 break;
             }
             if ($quitadas > 0) {
@@ -869,6 +903,26 @@ CSS;
             $resto .= implode("\n", $lineas) . "\n";
         }
         return ($hubo_base ? $base : '') . $resto;
+    }
+
+    /**
+     * El selector de una línea de CSS, o '' si la línea no es una regla.
+     *
+     * Las líneas de la hoja base son de la forma `selector{declaraciones}` o
+     * `@media(...){...}`. Para una consulta de medios se devuelve la línea
+     * entera: dos bloques `@media` iguales en la condición pueden contener
+     * cosas distintas, y descartar el segundo por parecerse sería arriesgado.
+     */
+    private static function selector_de_linea(string $linea): string
+    {
+        $linea = trim($linea);
+        if ($linea === '' || strpos($linea, '{') === false) {
+            return '';
+        }
+        if (strpos($linea, '@') === 0) {
+            return $linea;
+        }
+        return trim(substr($linea, 0, strpos($linea, '{')));
     }
 
     public static function rotation_css(): string

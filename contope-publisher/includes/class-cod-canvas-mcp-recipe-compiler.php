@@ -4713,7 +4713,14 @@ final class COD_Canvas_MCP_Recipe_Compiler
             // texto como siempre lo hizo y COD_Design_Core dice cuál falta.
             . ".cod-mcp-page{color:var(--cod-color-ink);background-color:var(--cod-color-surface);line-height:1.5;}\n"
             . ".cod-mcp-page *{box-sizing:border-box;}\n"
-            . ".cod-mcp-page img,.cod-mcp-page video,.cod-mcp-page audio{display:block;max-width:100%;}\n"
+            // `height:auto` es obligatorio desde que la imagen declara su alto
+            // y su ancho reales (0.3.61, para reservar el hueco y que la página
+            // no salte). Sin esto, el atributo `height` se impone: la foto se
+            // queda con el alto del ARCHIVO mientras el ancho se limita al de
+            // su caja, y la proporción se rompe. Medido el 4 de octubre de 2026
+            // en las tarjetas de servicio: la caja daba 200×462 para una foto
+            // que se dibujaba 200×150, con 312 px de hueco muerto debajo.
+            . ".cod-mcp-page img,.cod-mcp-page video,.cod-mcp-page audio{display:block;max-width:100%;height:auto;}\n"
             . ".cod-section{width:100%;padding:48px 24px;position:relative;}\n"
             . ".cod-columns{display:grid;grid-template-columns:minmax(0,1fr);gap:24px;width:100%;}\n"
             . ".cod-column{min-width:0;}\n"
