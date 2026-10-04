@@ -733,17 +733,33 @@ final class COD_Canvas_MCP_Recipe_Compiler
             ],
             'divisor' => [
                 'required' => ['forma'],
-                'fields' => array_fill_keys(self::DIVISOR_CAMPOS, 'ver el validador de divisor'),
+                'fields' => [
+                    'forma' => 'URL de un SVG de la biblioteca de Medios del sitio; la forma es un recurso, no una lista fija del plugin',
+                    'donde' => 'arriba | abajo | ambos',
+                    'alto' => 'longitud; cuánto mide la franja dibujada (por omisión 80px). La forma se aplasta a ese alto, así que uno chico la deja casi plana',
+                    'repeticion' => 'cuántas veces se repite la forma a lo ancho',
+                    'voltear' => 'verdadero o falso; la misma forma del revés, sin necesitar otro archivo',
+                    'color' => 'color seguro del relleno',
+                    'capas' => '1 a 4 copias apiladas; cada una admite forma, color, alto, repeticion, voltear, opacidad y desplazamiento (longitud con signo, por ejemplo "-60px")',
+                    'reserva' => 'verdadero o falso; si el divisor le pide su hueco al contenido para no montarse encima',
+                    'espacio' => 'longitud; aire extra que se SUMA al alto de la forma en ese hueco. Permite una onda pronunciada con poco aire, o al revés',
+                    'profundidad' => 'z-index; negativo por omisión, para quedar detrás del contenido',
+                ],
                 'notes' => 'El borde de una sección: una forma (onda, diagonal, montañas…) que se dibuja arriba o abajo y se recorta sola. capas apila hasta 4 copias con su propia opacidad y desplazamiento, para dar profundidad. reserva es el aire que el divisor le pide a la sección para no montarse sobre el texto, y profundidad su z-index (negativo por omisión, para quedar DETRÁS del contenido).',
             ],
             'posicion' => [
                 'required' => ['modo'],
-                'fields' => array_fill_keys(self::POSICION_CAMPOS, 'modo: estatica|relativa|absoluta|fija|pegada; capa: z-index; los cuatro lados: longitud'),
+                'fields' => [
+                    'modo' => 'estatica | relativa | absoluta | fija | pegada',
+                    'capa' => 'z-index',
+                    'arriba' => 'longitud', 'abajo' => 'longitud',
+                    'izquierda' => 'longitud', 'derecha' => 'longitud',
+                ],
                 'constraints' => ['una posición pegada dentro de un ancestro que recorta no se pega: el compilador la rechaza nombrando los dos nodos'],
             ],
             'desborde' => [
                 'atLeastOneOf' => self::DESBORDE_CAMPOS,
-                'fields' => array_fill_keys(self::DESBORDE_CAMPOS, 'visible|oculto|auto|desplazar'),
+                'fields' => ['horizontal' => 'visible | oculto | auto | desplazar', 'vertical' => 'visible | oculto | auto | desplazar'],
             ],
             'transformacion' => [
                 'atLeastOneOf' => self::TRANSFORMACION_CAMPOS,
@@ -756,7 +772,12 @@ final class COD_Canvas_MCP_Recipe_Compiler
             ],
             'icono' => [
                 'required' => ['donde'],
-                'fields' => array_fill_keys(self::ICONO_CAMPOS, 'forma o nombre (Material Symbols); donde: antes|despues|fondo; tamano, color y separacion'),
+                'fields' => [
+                    'forma' => 'URL de un SVG propio',
+                    'nombre' => 'nombre de un icono de Material Symbols; se resuelve y se cachea en el sitio',
+                    'donde' => 'antes | despues | fondo',
+                    'tamano' => 'longitud', 'color' => 'color seguro', 'separacion' => 'longitud',
+                ],
                 'notes' => 'Un icono dentro del texto del nodo, por nombre de Material Symbols o por forma propia. Nunca se deforma: a diferencia de divisor, no lleva preserveAspectRatio="none".',
             ],
             'properties' => [
@@ -2152,6 +2173,26 @@ final class COD_Canvas_MCP_Recipe_Compiler
             $normalizado['profundidad'] = $value['profundidad'];
         }
 
+        if (isset($value['espacio'])) {
+            /*
+             * EL AIRE ALREDEDOR DEL DIVISOR, ASIGNABLE Y SUMADO A SU ALTO.
+             *
+             * Antes el único aire era el relleno de la sección, que sirve para
+             * todo y por eso no se podía ajustar sólo para el divisor: subir la
+             * onda obligaba a tocar el relleno de la banda entera. Cristóbal, el
+             * 4 de octubre de 2026: «el espacio es muy grande, deberías poder
+             * asignar un espacio y se debería sumar al alto del separador».
+             *
+             * Se suma a la RESERVA, no al dibujo: la onda conserva su alto y lo
+             * que crece es el hueco que le pide al contenido. Así se puede tener
+             * una forma pronunciada con poco aire, o al revés, que es justo lo
+             * que no se podía expresar.
+             */
+            if (!is_string($value['espacio']) || !$this->is_css_length($value['espacio'])) {
+                return new WP_Error($codigo, 'divisor.espacio debe ser una longitud CSS segura, por ejemplo "24px".');
+            }
+            $normalizado['espacio'] = $value['espacio'];
+        }
         if (isset($value['reserva'])) {
             // Por omisión, sí: lo normal es que un divisor no se coma el
             // texto. Se pone en falso cuando el solape ES el efecto buscado.
@@ -4822,7 +4863,13 @@ final class COD_Canvas_MCP_Recipe_Compiler
             }
         }
 
-        return '<div class="cod-divisor-reserva" aria-hidden="true" style="height:' . esc_attr($mayor) . '"></div>';
+        // El espacio declarado se SUMA al alto de la forma: el hueco total es la
+        // onda más el aire que se le pidió. Va con calc() y no sumando números
+        // para que las dos medidas puedan venir en unidades distintas.
+        $espacio = (string) ($divisor['espacio'] ?? '');
+        $alto = $espacio === '' ? $mayor : 'calc(' . $mayor . ' + ' . $espacio . ')';
+
+        return '<div class="cod-divisor-reserva" aria-hidden="true" style="height:' . esc_attr($alto) . '"></div>';
     }
 
     /**
@@ -6016,7 +6063,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
      *
      * @var string[]
      */
-    public const DIVISOR_CAMPOS = ['forma', 'donde', 'alto', 'repeticion', 'voltear', 'color', 'capas', 'reserva', 'profundidad'];
+    public const DIVISOR_CAMPOS = ['forma', 'donde', 'alto', 'repeticion', 'voltear', 'color', 'capas', 'reserva', 'espacio', 'profundidad'];
     public const POSICION_LADOS = ['arriba', 'abajo', 'izquierda', 'derecha'];
     public const POSICION_CAMPOS = ['modo', 'capa', 'arriba', 'abajo', 'izquierda', 'derecha'];
     public const DESBORDE_CAMPOS = ['horizontal', 'vertical'];

@@ -80,14 +80,42 @@ const propias = [
   // dónde parar y deja claro que son dos documentos, no uno. Pedido de Cristóbal
   // el 4 de octubre de 2026, señalando dónde va el corte.
   regla('sl-legal-banda-clara', 'surface', { backgroundColor: '#FFFFFF' }),
+  // Menos relleno donde hay onda: la forma ya hace de separación y sumarle los
+  // 80px de la banda daba el hueco enorme que se veía.
+  // La entrada: aire normal arriba, nada abajo. Ahí la onda es la separación, y
+  // sumarle los 80px de la banda dejaba 176px de vacío antes del blanco.
+  regla('sl-legal-aire-hasta-la-onda', 'properties', { declarations: {
+    'padding-block-start': '80px', 'padding-block-end': '0',
+    'padding-inline-start': '24px', 'padding-inline-end': '24px',
+  } }),
+
+  // Después de una onda tampoco hace falta relleno arriba: la curva ya separó.
+  regla('sl-legal-aire-tras-la-onda', 'properties', { declarations: {
+    'padding-block-start': '8px', 'padding-block-end': '80px',
+    'padding-inline-start': '24px', 'padding-inline-end': '24px',
+  } }),
+
+  regla('sl-legal-aire-con-onda', 'properties', { declarations: {
+    'padding-block-start': '24px', 'padding-block-end': '24px',
+    'padding-inline-start': '24px', 'padding-inline-end': '24px',
+  } }),
 
   // El separador: una onda baja, en tres capas con opacidad decreciente. La
   // forma es un SVG de la biblioteca de Medios, no una lista fija del plugin.
-  // 44px es «bajito»: marca el corte sin robarle altura al texto.
+  // LA ONDA Y EL AIRE SON DOS COSAS DISTINTAS, y por eso ahora se declaran por
+  // separado. A 44px la forma —que se dibuja en un lienzo de 120 de alto— queda
+  // tan aplastada que lee como un defecto, no como una decisión; y el espacio
+  // alrededor lo ponía el relleno de 80px de la banda, que sirve para todo y no
+  // se podía ajustar sólo acá. Cristóbal: «es tan poco pronunciada que parece un
+  // defecto y además el espacio es muy grande».
+  //
+  // Ahora: la onda sube a 96px para que se vea lo que es, y el aire baja a cero
+  // porque la propia forma ya separa.  suma al alto cuando se quiera lo
+  // contrario: una forma chica con mucho aire.
   regla('sl-legal-onda-abajo', 'divisor', {
-    forma: SUBIDAS + '/2026/10/divisor-ondas.svg',
+    forma: SUBIDAS + '/2026/10/divisor-onda.svg',
     donde: 'abajo',
-    alto: '44px',
+    alto: '96px',
     color: '#FFFFFF',
     capas: [
       { opacidad: 1 },
@@ -95,13 +123,25 @@ const propias = [
       { opacidad: 0.3, desplazamiento: '40px' },
     ],
     reserva: true,
+    espacio: '0px',
   }, { porque: 'Separador bajo entre la entrada y el primer bloque; tres capas para que no lea como un recorte.' }),
 
-  regla('sl-legal-onda-arriba', 'divisor', {
-    forma: SUBIDAS + '/2026/10/divisor-ondas.svg',
-    donde: 'arriba',
-    alto: '44px',
-    color: '#FFFFFF',
+  // UN CORTE, UN DIVISOR.
+  //
+  // Antes esta onda iba ARRIBA de la banda blanca, o sea en el mismo corte que
+  // la anterior: dos divisores en el mismo borde. El segundo dibujaba ondas
+  // blancas sobre blanco —invisible— y lo único que hacía era reservarse 96px
+  // de vacío. Lo vio Cristóbal: «lo puedes poner en cualquiera de las dos
+  // secciones, pero no en las dos».
+  //
+  // Ahora cierra el OTRO corte, el de vuelta al beige, y por eso su color es el
+  // del fondo que viene abajo: un divisor se dibuja con el color de la banda
+  // hacia la que lleva, no con el de la que está.
+  regla('sl-legal-onda-cierre', 'divisor', {
+    forma: SUBIDAS + '/2026/10/divisor-onda.svg',
+    donde: 'abajo',
+    alto: '96px',
+    color: '#F5F0EB',
     voltear: true,
     capas: [
       { opacidad: 1 },
@@ -109,7 +149,8 @@ const propias = [
       { opacidad: 0.3, desplazamiento: '-40px' },
     ],
     reserva: true,
-  }, { porque: 'El reverso del anterior: cierra la banda blanca y devuelve el beige.' }),
+    espacio: '0px',
+  }, { porque: 'Cierra la banda blanca y devuelve el beige; volteada para que no sea la misma curva dos veces.' }),
 
   regla('sl-texto-oliva', 'color', { role: 'cuerpo', color: 'var(--oliva-700)' }),
   regla('sl-pie-linea', 'properties', { declarations: {
@@ -144,7 +185,7 @@ const composicion = {
     // 1. La entrada, sobre el beige del documento. Se cierra con la onda.
     {
       id: 'seccion-entrada', kind: 'section', marker: 'legal',
-      ruleIds: ['sl-legal-pagina', 'sl-legal-aire', 'sl-legal-onda-abajo'],
+      ruleIds: ['sl-legal-pagina', 'sl-legal-aire-hasta-la-onda', 'sl-legal-onda-abajo'],
       children: [
         G('entrada-hoja', ['sl-legal-hoja'], [
           P('legal-marca', 'Santa Luisa de Palpi', ['sl-legal-marca', 'sl-texto-oliva', 'sl-legal-marca-aire']),
@@ -169,7 +210,7 @@ const composicion = {
     // 2. Términos, sobre blanco. La onda de arriba la cierra y devuelve el beige.
     {
       id: 'seccion-terminos', kind: 'section', marker: 'terminos',
-      ruleIds: ['sl-legal-banda-clara', 'sl-legal-aire', 'sl-legal-onda-arriba'],
+      ruleIds: ['sl-legal-banda-clara', 'sl-legal-aire-con-onda', 'sl-legal-onda-cierre'],
       children: [
         G('terminos-hoja', ['sl-legal-hoja'], [
           {
@@ -185,7 +226,7 @@ const composicion = {
     // 3. Privacidad, de vuelta en el beige.
     {
       id: 'seccion-privacidad', kind: 'section', marker: 'privacidad',
-      ruleIds: ['sl-legal-pagina', 'sl-legal-aire'],
+      ruleIds: ['sl-legal-pagina', 'sl-legal-aire-tras-la-onda'],
       children: [
         G('privacidad-hoja', ['sl-legal-hoja'], [
           {

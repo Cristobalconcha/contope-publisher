@@ -5,6 +5,47 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.70 — 4 de octubre de 2026
+
+### El divisor: el aire se declara aparte de la forma
+
+El divisor gana el campo **`espacio`**: una longitud que se SUMA a su alto en el
+hueco que le pide al contenido. Antes el único aire era el relleno de la sección,
+que sirve para todo y por eso no se podía ajustar sólo ahí: subir la onda
+obligaba a tocar el relleno de la banda entera.
+
+Cristóbal, viendo el primer intento: *«es tan poco pronunciada que parece un
+defecto y además el espacio es muy grande; deberías poder asignar un espacio y se
+debería sumar al alto del separador»*. Las dos cosas eran la misma: la forma se
+dibuja en un lienzo de 120 de alto, así que a 44px queda casi plana, mientras el
+vacío alrededor lo ponía otra cosa. Ahora la onda y su aire se declaran por
+separado.
+
+**Y un corte lleva UN divisor, no dos.** La página legal tenía uno abajo de la
+banda beige y otro arriba de la blanca: el segundo dibujaba ondas blancas sobre
+blanco —invisible— y lo único que hacía era reservarse 96px de vacío. Cristóbal:
+*«lo puedes poner en cualquiera de las dos secciones, pero no en las dos»*. El
+segundo divisor pasó al otro corte, el de vuelta al beige, volteado para que no
+sea la misma curva dos veces.
+
+### El catálogo del divisor deja de decir «ver el validador»
+
+Los esquemas de `divisor`, `posicion`, `desborde` e `icono` publicaban ese
+relleno en cada campo —obra mía en la 0.3.67— en vez de decir qué admiten. Por
+eso mismo adiviné mal los nombres `opacidad` y `desplazamiento` al escribir el
+separador. Ahora cada campo se describe.
+
+### El espejo local se puede navegar
+
+Pinchar «Términos y privacidad» en el pie llevaba a la portada aunque la
+dirección fuera la correcta. No era del sitio —en producción esa misma URL
+responde bien— sino dos cosas del espejo: `permalink_structure` estaba vacío, así
+que WordPress generaba `?page_id=` y no conocía la ruta con nombre; y `php -S` no
+reescribe direcciones. Ahora el espejo usa la misma estructura que producción y
+tiene su enrutador (`wp-local/wordpress/router.php`).
+
+---
+
 ## 0.3.69 — 4 de octubre de 2026
 
 ### Las cuatro páginas interiores de Santa Luisa, por el constructor
