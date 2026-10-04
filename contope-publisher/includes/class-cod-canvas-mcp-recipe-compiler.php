@@ -2293,27 +2293,59 @@ final class COD_Canvas_MCP_Recipe_Compiler
     private function normalize_icono_rule(array $value)
     {
         $codigo = 'cod_mcp_icono_rule_invalid';
-        $permitidas = ['forma', 'donde', 'tamano', 'color', 'separacion'];
+        $permitidas = ['forma', 'nombre', 'donde', 'tamano', 'color', 'separacion'];
 
         if (!$this->has_only_keys($value, $permitidas)) {
             return new WP_Error($codigo, 'icono admite: ' . implode(', ', $permitidas) . '.');
         }
-        if (!isset($value['forma']) || !is_string($value['forma']) || trim($value['forma']) === '') {
-            return new WP_Error($codigo, 'icono.forma es obligatoria: la ruta de un SVG del sitio.');
-        }
 
-        $forma = trim($value['forma']);
-        if (!$this->is_safe_link($forma) || !COD_Divisor::es_del_sitio($forma)) {
+        /**
+         * Dos formas de decir qué dibujo, y son distintas a propósito:
+         *
+         *  - `forma` es una RUTA a cualquier SVG del sitio. Es lo que mantiene
+         *    el sistema abierto: una silueta propia, un logotipo, lo que sea.
+         *  - `nombre` es un icono con nombre del set. El documento guarda sólo
+         *    el nombre y el ESTILO lo pone el sitio al mostrar la página, así
+         *    que cambiar el sitio de «outlined» a «rounded» cambia los
+         *    cuarenta iconos de una vez, sin tocar ninguna página. Si el
+         *    documento guardara el archivo, habría que reescribirlas todas.
+         *
+         * Las dos a la vez no: serían dos dibujos para un mismo icono y habría
+         * que inventar cuál gana.
+         */
+        $tiene_forma = isset($value['forma']) && is_string($value['forma']) && trim($value['forma']) !== '';
+        $tiene_nombre = isset($value['nombre']) && is_string($value['nombre']) && trim($value['nombre']) !== '';
+
+        if ($tiene_forma === $tiene_nombre) {
             return new WP_Error(
                 $codigo,
-                'icono.forma tiene que ser una ruta del propio sitio. Sube el SVG a Medios y usa su ruta.'
+                $tiene_forma
+                    ? 'icono admite forma O nombre, no las dos: serían dos dibujos para el mismo icono.'
+                    : 'icono necesita forma —la ruta de un SVG del sitio— o nombre —un icono del set—.'
             );
         }
-        if (substr(strtolower((string) parse_url($forma, PHP_URL_PATH)), -4) !== '.svg') {
-            return new WP_Error($codigo, 'icono.forma tiene que ser un archivo .svg: es lo que se recolorea y escala sin perder nitidez.');
-        }
 
-        $normalizado = ['forma' => $forma, 'donde' => 'antes'];
+        $normalizado = ['donde' => 'antes'];
+
+        if ($tiene_nombre) {
+            $nombre = strtolower(trim($value['nombre']));
+            if (preg_match('/^[a-z0-9_]{1,64}$/', $nombre) !== 1) {
+                return new WP_Error($codigo, 'icono.nombre son letras minúsculas, números y guión bajo: por ejemplo "local_shipping".');
+            }
+            $normalizado['nombre'] = $nombre;
+        } else {
+            $forma = trim($value['forma']);
+            if (!$this->is_safe_link($forma) || !COD_Divisor::es_del_sitio($forma)) {
+                return new WP_Error(
+                    $codigo,
+                    'icono.forma tiene que ser una ruta del propio sitio. Sube el SVG a Medios y usa su ruta.'
+                );
+            }
+            if (substr(strtolower((string) parse_url($forma, PHP_URL_PATH)), -4) !== '.svg') {
+                return new WP_Error($codigo, 'icono.forma tiene que ser un archivo .svg: es lo que se recolorea y escala sin perder nitidez.');
+            }
+            $normalizado['forma'] = $forma;
+        }
 
         if (isset($value['donde'])) {
             if (!is_string($value['donde']) || !in_array($value['donde'], COD_Icono::DONDE, true)) {
@@ -3602,8 +3634,12 @@ final class COD_Canvas_MCP_Recipe_Compiler
         }
 
         $donde = (string) ($icono['donde'] ?? 'antes');
+        // Por nombre o por ruta, nunca las dos: lo garantiza el contrato.
+        $cual = isset($icono['nombre'])
+            ? COD_Icono::ATRIBUTO_NOMBRE . '="' . esc_attr((string) $icono['nombre']) . '"'
+            : COD_Icono::ATRIBUTO_FORMA . '="' . esc_attr((string) $icono['forma']) . '"';
         $marcador = '<span class="' . COD_Icono::CLASE . '"'
-            . ' ' . COD_Icono::ATRIBUTO_FORMA . '="' . esc_attr((string) $icono['forma']) . '"'
+            . ' ' . $cual
             . ' data-cod-icono-donde="' . esc_attr($donde) . '"'
             . ($estilo === [] ? '' : ' style="' . esc_attr(implode(';', $estilo)) . '"')
             . '></span>';

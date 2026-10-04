@@ -5,6 +5,72 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.60 — 4 de octubre de 2026
+
+### Agregado
+
+- **Un set base de iconos, y un icono puede pedirse POR NOMBRE.**
+
+  Cristóbal ofreció poner gente a mirar cientos de sitios para deducir un set
+  estándar. No hizo falta: el catálogo de Material publica, por cada uno de sus
+  **6.126 iconos, cuántas veces se usa en la web**. `search` encabeza con
+  863.455.
+
+  Pero ese ranking no se puede tomar tal cual, y conviene saber por qué: lo
+  dominan **aplicaciones y paneles**, no sitios. Su top 50 está lleno de
+  `account_circle`, `logout`, `manage_accounts`, `dashboard` y `fingerprint`.
+  Así que el set usa el ranking como espina dorsal y lo filtra por lo que un
+  sitio necesita. **69 iconos**, y en el código cada uno lleva su puesto
+  mundial, para que una elección se discuta con el dato a la vista.
+
+  Más **las 9 redes** —Instagram, Facebook, LinkedIn, YouTube, TikTok, X,
+  Threads, Pinterest y WhatsApp—, que no están en Material porque son marcas
+  registradas pero el plugin ya las llevaba dibujadas, y en la misma retícula
+  de 24, de un solo trazo y sin color propio. WhatsApp deja así de estar
+  escrito dentro del compilador, que es el reclamo que originó todo esto.
+
+- **El estilo es un ajuste del SITIO, no de cada icono.** Material trae cada
+  icono en tres estilos, y elegirlo uno por uno es justamente como se desordena
+  un sistema: si un sitio es redondeado, lo son sus cuarenta iconos. Cristóbal:
+  «creo que debería quedar en sus 3 estilos cuando se selecciona».
+
+  De ahí sale la decisión que ordena todo lo demás: **el documento guarda el
+  NOMBRE, no el archivo.** Si guardara el archivo, cambiar el estilo del sitio
+  obligaría a reescribir todas las páginas una por una. Guardando el nombre, se
+  cambia un ajuste y cambian todos los iconos de golpe. Comprobado sobre la
+  página servida: el mismo documento, sin tocar una letra, da otro dibujo.
+
+  Es el mismo patrón que la forma del divisor —la ruta en el documento, el
+  dibujo al servir— un escalón más arriba.
+
+  La regla admite las dos vías y **sólo una a la vez**: `forma` para cualquier
+  SVG del sitio —lo que mantiene el sistema abierto— y `nombre` para un icono
+  del set.
+
+- **El set vive en `uploads/contope-iconos`, sin año ni mes.** WordPress archiva
+  lo que se sube por fecha, y para una foto está bien; para esto no. Un icono
+  se busca por nombre, y repartirlo entre `2026/10` y `2026/11` según cuándo se
+  descargó obligaría a recorrer carpetas o a guardar la fecha junto al nombre.
+
+### Decisiones que conviene conocer
+
+- **No se incrusta la tipografía de Material.** La familia completa pesa ~3,7 MB
+  y volvería a ser un repertorio cerrado —lo mismo que rechazamos para los
+  divisores—. Como SVG, cada icono es un recurso del sitio: se recolorea con
+  `currentColor` y se reemplaza por el dibujo que uno quiera. La tipografía sí
+  sirve, pero en el SELECTOR del panel, donde su peso no le cuesta nada al
+  visitante. La idea es de Cristóbal y es mejor que la primera propuesta.
+- **El peso y el relleno no se precargan**: tres estilos por cinco pesos por dos
+  rellenos son treinta archivos por icono. Se traen cuando el sitio cambie su
+  ajuste.
+- **Nunca se descarga al servir una página.** Una visita no puede depender de
+  que Google responda. Si el estilo pedido no está, se cae a otro que sí esté:
+  un icono con el estilo equivocado se nota y se arregla; un hueco, no.
+- Licencia: Material Symbols es Apache 2.0, redistribuible y compatible con la
+  GPLv3 del plugin.
+
+---
+
 ## 0.3.59 — 4 de octubre de 2026
 
 ### Corregido

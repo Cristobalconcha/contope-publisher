@@ -1,7 +1,7 @@
 {
   "pageId": 107,
   "documentId": "cod-canvas-page-107",
-  "expectedRevision": 1,
+  "expectedRevision": 2,
   "design": {
     "schemaVersion": 1,
     "designId": "econut-web",
@@ -507,28 +507,6 @@
         }
       },
       {
-        "id": "ico-hoja",
-        "kind": "icono",
-        "scope": {
-          "breakpoint": "all",
-          "state": "default",
-          "roles": []
-        },
-        "provenance": {
-          "sources": [
-            {
-              "kind": "user",
-              "rationale": "Muestra de las familias nuevas del catálogo."
-            }
-          ]
-        },
-        "status": "reviewed",
-        "value": {
-          "forma": "/wp-content/uploads/2026/10/icono-hoja.svg",
-          "tamano": "1.2em"
-        }
-      },
-      {
         "id": "ico-reloj",
         "kind": "icono",
         "scope": {
@@ -546,7 +524,7 @@
         },
         "status": "reviewed",
         "value": {
-          "forma": "/wp-content/uploads/2026/10/icono-reloj.svg",
+          "nombre": "schedule",
           "tamano": "1.2em"
         }
       },
@@ -568,7 +546,29 @@
         },
         "status": "reviewed",
         "value": {
-          "forma": "/wp-content/uploads/2026/10/icono-ubicacion.svg",
+          "nombre": "location_on",
+          "tamano": "1.2em"
+        }
+      },
+      {
+        "id": "ico-hoja",
+        "kind": "icono",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default",
+          "roles": []
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "user",
+              "rationale": "Muestra de las familias nuevas del catálogo."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "nombre": "eco",
           "tamano": "1.2em"
         }
       },
@@ -590,7 +590,7 @@
         },
         "status": "reviewed",
         "value": {
-          "forma": "/wp-content/uploads/2026/10/icono-correo.svg",
+          "nombre": "email",
           "tamano": "1.2em",
           "color": "#DC4017"
         }

@@ -133,6 +133,54 @@ $comp['nodes'][0]['ruleIds'] = ['r-ico', 'r-ico2'];
 $rr = $compilador->compile($comp, $diseno($dos));
 $comprobar('rechaza dos iconos en un nodo', is_wp_error($rr), $mensaje($rr));
 
+/**
+ * El icono POR NOMBRE. Es lo que permite que el estilo sea un ajuste del
+ * sitio: si el documento guardara el archivo, cambiar de «outlined» a
+ * «rounded» obligaría a reescribir todas las páginas una por una.
+ */
+echo "\n== el icono por nombre ==\n";
+$estiloPrevio = get_option(COD_Icono::OPTION_KEY, '');
+register_shutdown_function(static function () use ($estiloPrevio) {
+    update_option(COD_Icono::OPTION_KEY, $estiloPrevio, false);
+});
+
+$rn = $compilador->compile($componer(), $diseno([$regla(['nombre' => 'local_shipping'])]));
+$comprobar('un icono con nombre compila', !is_wp_error($rn), $mensaje($rn));
+$hn = is_wp_error($rn) ? '' : $rn['storage']['markup'];
+$comprobar('  el documento guarda el NOMBRE, no el archivo',
+    strpos($hn, 'data-cod-icono-nombre="local_shipping"') !== false && strpos($hn, '.svg') === false);
+
+update_option(COD_Icono::OPTION_KEY, 'outlined', false);
+$servidoO = COD_Icono::resolver_en_html($hn);
+$comprobar('al mostrar se resuelve al estilo del sitio (outlined)', strpos($servidoO, '<svg') !== false);
+update_option(COD_Icono::OPTION_KEY, 'rounded', false);
+$servidoR = COD_Icono::resolver_en_html($hn);
+$comprobar('y con el sitio en «rounded», el MISMO documento da otro dibujo',
+    strpos($servidoR, '<svg') !== false && $servidoR !== $servidoO);
+$comprobar('  sin que el documento haya cambiado una letra', $hn === (is_wp_error($rn) ? '' : $rn['storage']['markup']));
+
+$comprobar('la ruta del nombre apunta al estilo activo',
+    strpos(COD_Icono::ruta_de_nombre('local_shipping'), '-rounded.svg') !== false,
+    COD_Icono::ruta_de_nombre('local_shipping'));
+update_option(COD_Icono::OPTION_KEY, 'outlined', false);
+
+// Si el estilo pedido no está descargado se cae a otro: un icono con el
+// estilo equivocado se nota y se arregla; un hueco, no.
+$comprobar('un nombre que no existe no devuelve ruta', COD_Icono::ruta_de_nombre('no_existe_este_icono') === '');
+$comprobar('y una red, que no tiene estilos, se encuentra igual',
+    strpos(COD_Icono::ruta_de_nombre('red-whatsapp'), 'icono-red-whatsapp.svg') !== false
+    || COD_Icono::ruta_de_nombre('red_whatsapp') === '');
+
+foreach ([
+    'nombre y forma a la vez' => ['nombre' => 'search', 'forma' => $flecha],
+    'ni nombre ni forma'      => ['donde' => 'antes'],
+    'nombre con mayúsculas y espacios' => ['nombre' => 'Local Shipping'],
+    'nombre con ruta dentro'  => ['nombre' => '../../etc/passwd'],
+] as $caso => $malo) {
+    $rr = $compilador->compile($componer(), $diseno([$regla($malo)]));
+    $comprobar("rechaza $caso", is_wp_error($rr), $mensaje($rr));
+}
+
 echo "\n== el CSS ==\n";
 $css = COD_Icono::css($html);
 $comprobar('sale sólo si hay icono en la página', COD_Icono::css('<div>nada</div>') === '');

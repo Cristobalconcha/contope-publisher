@@ -28,10 +28,106 @@ if (!defined('ABSPATH')) {
 final class COD_Icono
 {
     public const ATRIBUTO_FORMA = 'data-cod-icono-forma';
+    public const ATRIBUTO_NOMBRE = 'data-cod-icono-nombre';
     public const CLASE = 'cod-icono';
 
     /** Dónde va respecto del texto que acompaña. */
     public const DONDE = ['antes', 'despues'];
+
+    /**
+     * El estilo de los iconos del sitio, y por qué es un ajuste del SITIO.
+     *
+     * Material trae cada icono en tres estilos. Elegirlo icono por icono es
+     * justamente como se desordena un sistema: si un sitio es redondeado, lo
+     * son sus cuarenta iconos. Cristóbal, el 4 de octubre de 2026: «creo que
+     * debería quedar en sus 3 estilos cuando se selecciona».
+     *
+     * De ahí sale la consecuencia que decide el diseño de todo esto: el
+     * documento NO puede guardar el archivo, porque entonces cambiar el estilo
+     * del sitio obligaría a reescribir todas las páginas. Guarda el NOMBRE, y
+     * el estilo se resuelve al mostrar. Es el mismo patrón que la forma del
+     * divisor —la ruta en el documento, el dibujo al servir— un escalón más
+     * arriba.
+     */
+    public const OPTION_KEY = 'cod_icono_estilo';
+
+    public const ESTILOS = ['outlined', 'rounded', 'sharp'];
+
+    /**
+     * La carpeta del set, dentro de `uploads` y SIN año ni mes.
+     *
+     * WordPress archiva lo que se sube por fecha, y para una foto está bien.
+     * Para esto no: un icono se busca por nombre, y si el set quedara repartido
+     * entre `2026/10` y `2026/11` —según cuándo se descargó cada uno— habría
+     * que recorrer carpetas para encontrar uno, o guardar la fecha junto al
+     * nombre. El set es un recurso del sitio, no una subida con fecha.
+     */
+    public const CARPETA = 'contope-iconos';
+
+    /** La carpeta del set en disco, creada si hace falta. */
+    public static function carpeta(): string
+    {
+        $subida = wp_upload_dir();
+        if (!empty($subida['error'])) {
+            return '';
+        }
+        $ruta = trailingslashit($subida['basedir']) . self::CARPETA;
+        if (!is_dir($ruta) && !wp_mkdir_p($ruta)) {
+            return '';
+        }
+        return $ruta;
+    }
+
+    /** La dirección pública de la carpeta del set. */
+    public static function carpeta_url(): string
+    {
+        $subida = wp_upload_dir();
+        return empty($subida['error']) ? trailingslashit($subida['baseurl']) . self::CARPETA : '';
+    }
+
+    /** El estilo activo del sitio. */
+    public static function estilo(): string
+    {
+        $guardado = (string) get_option(self::OPTION_KEY, '');
+        return in_array($guardado, self::ESTILOS, true) ? $guardado : 'outlined';
+    }
+
+    /**
+     * La ruta del archivo de un icono con nombre, en el estilo del sitio.
+     *
+     * Si ese estilo no está descargado se cae a otro que sí lo esté, en vez de
+     * no dibujar nada: un icono con el estilo equivocado se nota y se arregla;
+     * un hueco, no. La descarga ocurre al ELEGIR el icono, nunca al servir una
+     * página —una visita no puede depender de que Google responda—.
+     */
+    public static function ruta_de_nombre(string $nombre): string
+    {
+        $nombre = strtolower(trim($nombre));
+        if ($nombre === '' || preg_match('/^[a-z0-9_]{1,64}$/', $nombre) !== 1) {
+            return '';
+        }
+
+        $carpeta = self::carpeta();
+        $url = self::carpeta_url();
+        if ($carpeta === '' || $url === '') {
+            return '';
+        }
+
+        foreach (array_merge([self::estilo()], self::ESTILOS) as $estilo) {
+            $archivo = 'icono-' . $nombre . '-' . $estilo . '.svg';
+            if (is_readable(trailingslashit($carpeta) . $archivo)) {
+                return trailingslashit($url) . $archivo;
+            }
+        }
+
+        // Las redes no tienen estilos: una marca registrada se dibuja como es.
+        $archivo = 'icono-' . $nombre . '.svg';
+        if (is_readable(trailingslashit($carpeta) . $archivo)) {
+            return trailingslashit($url) . $archivo;
+        }
+
+        return '';
+    }
 
     /**
      * Reemplaza cada marcador de icono por su SVG, ya limpio.
@@ -41,9 +137,25 @@ final class COD_Icono
      */
     public static function resolver_en_html(string $html): string
     {
-        if (strpos($html, self::ATRIBUTO_FORMA) === false) {
+        if (strpos($html, self::ATRIBUTO_FORMA) === false && strpos($html, self::ATRIBUTO_NOMBRE) === false) {
             return $html;
         }
+
+        // Primero los que traen NOMBRE: se convierten en una ruta del sitio,
+        // en el estilo que el sitio tenga, y de ahí siguen el mismo camino que
+        // cualquier otro icono.
+        $html = (string) preg_replace_callback(
+            '#<span([^>]*\b' . preg_quote(self::ATRIBUTO_NOMBRE, '#') . '="([^"]*)"[^>]*)>\s*</span>#i',
+            static function (array $m): string {
+                $ruta = self::ruta_de_nombre(html_entity_decode($m[2], ENT_QUOTES));
+                if ($ruta === '') {
+                    return '';
+                }
+                $svg = self::svg_de($ruta);
+                return $svg === '' ? '' : '<span' . $m[1] . '>' . $svg . '</span>';
+            },
+            $html
+        );
 
         return (string) preg_replace_callback(
             '#<span([^>]*\b' . preg_quote(self::ATRIBUTO_FORMA, '#') . '="([^"]*)"[^>]*)>\s*</span>#i',

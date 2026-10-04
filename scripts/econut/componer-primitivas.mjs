@@ -76,10 +76,13 @@ R('foto-grande', 'properties', { declarations: { width: '420px', 'max-width': 'n
 
 // ICONO. El dibujo es un recurso del sitio, y el color lo hereda del texto.
 R('ico-flecha', 'icono', { forma: `${I}flecha.svg`, donde: 'despues', tamano: '1.1em', separacion: '.5em' });
-R('ico-hoja', 'icono', { forma: `${I}hoja.svg`, tamano: '1.2em' });
-R('ico-reloj', 'icono', { forma: `${I}reloj.svg`, tamano: '1.2em' });
-R('ico-ubicacion', 'icono', { forma: `${I}ubicacion.svg`, tamano: '1.2em' });
-R('ico-correo', 'icono', { forma: `${I}correo.svg`, tamano: '1.2em', color: NARANJA });
+// POR NOMBRE, no por ruta. El documento guarda «schedule» y el ESTILO lo pone
+// el sitio al mostrar la página: cambiar el ajuste de outlined a rounded
+// cambia los cuatro de una vez, sin tocar esta página ni ninguna otra.
+R('ico-reloj', 'icono', { nombre: 'schedule', tamano: '1.2em' });
+R('ico-ubicacion', 'icono', { nombre: 'location_on', tamano: '1.2em' });
+R('ico-hoja', 'icono', { nombre: 'eco', tamano: '1.2em' });
+R('ico-correo', 'icono', { nombre: 'email', tamano: '1.2em', color: NARANJA });
 R('boton', 'button', { variant: 'solid', tone: 'primary', size: 'md' });
 R('lista-aire', 'spacing', { paddingBlock: '0px', paddingInline: '0px', gap: '10px' });
 

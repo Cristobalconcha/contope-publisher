@@ -52,7 +52,8 @@
     "interruptor": "sí o no",
     "formas": "una paleta visual de miniaturas",
     "recurso": "un archivo del sitio (imagen, SVG, vídeo)",
-    "capas": "una lista de capas de la misma pieza, cada una con sus propios valores"
+    "capas": "una lista de capas de la misma pieza, cada una con sus propios valores",
+    "iconos": "el selector del set de iconos, con búsqueda y filtros"
   },
   "familias": {
     "_": "El vocabulario de propiedades. Cada una dice con qué clase de regla se expresa.",
@@ -908,11 +909,26 @@
         "",
         "El color no se declara por omisión: lo hereda del texto al que acompaña,",
         "que es lo que uno quiere casi siempre y lo que hace que cambiar la tinta",
-        "del sistema lo arrastre."
+        "del sistema lo arrastre.",
+        "",
+        "DOS FORMAS DE DECIR QUÉ DIBUJO, y la diferencia importa:",
+        "  `forma` es una RUTA a cualquier SVG del sitio — una silueta propia, un",
+        "  logotipo —, y es lo que mantiene el sistema abierto.",
+        "  `nombre` es un icono del set. El documento guarda sólo el nombre y el",
+        "  ESTILO lo pone el sitio al mostrar la página, así que cambiar el ajuste",
+        "  de outlined a rounded cambia todos los iconos de una vez. Si el",
+        "  documento guardara el archivo habría que reescribir todas las páginas.",
+        "",
+        "Cristóbal, 2026-10-04: «creo que debería quedar en sus 3 estilos cuando se",
+        "selecciona». De ahí sale que el estilo sea un ajuste del SITIO."
       ],
       "propiedades": {
+        "nombre": {
+          "rotulo": "Icono del set",
+          "control": "iconos"
+        },
         "forma": {
-          "rotulo": "Forma",
+          "rotulo": "O un SVG propio",
           "control": "recurso"
         },
         "donde": {
