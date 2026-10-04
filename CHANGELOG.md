@@ -5,6 +5,39 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.59 — 4 de octubre de 2026
+
+### Corregido
+
+- **El divisor pasa a ir DETRÁS del contenido.** La 0.3.58 le dio su propio
+  hueco, y eso evita el solape, pero no lo resuelve: Cristóbal lo vio enseguida
+  —«no sé si está resuelto, porque se ve bien en la página porque dejaste el
+  espacio»—. En cuanto el solape ocurre por cualquier otra vía —un texto más
+  largo, otro breakpoint, una previsualización— el divisor volvía a tapar las
+  letras.
+
+  La causa: **un elemento posicionado se pinta encima del texto en flujo aunque
+  no declare `z-index`.** Así funciona el orden de pintado, y no hacía falta
+  ningún `z-index:1` para que tapara —aunque lo teníamos—.
+
+  Ahora va en capa negativa. Entre una forma y una palabra, gana la palabra.
+  Con `profundidad: "delante"` vuelve a montarse encima, para cuando eso sea lo
+  buscado.
+
+  El contenedor se **aísla** (`isolation`), que es lo que hace posible la capa
+  negativa: sin eso, un hijo en capa negativa se va detrás del fondo de su
+  propio contenedor y desaparece.
+
+  Son dos mecanismos independientes y los dos hacen falta: la reserva evita que
+  se solapen, y la profundidad decide quién gana cuando igual se solapan.
+
+  La comprobación cubre además que **los dos motores digan lo mismo** —el del
+  editor y el de la página publicada son copias distintas—, porque un divisor
+  que se ve de una forma al componer y de otra al publicar es el defecto más
+  caro de encontrar.
+
+---
+
 ## 0.3.58 — 4 de octubre de 2026
 
 ### Agregado

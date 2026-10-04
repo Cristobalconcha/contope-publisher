@@ -1884,7 +1884,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
     private function normalize_divisor_rule(array $value)
     {
         $codigo = 'cod_mcp_divisor_rule_invalid';
-        $permitidas = ['forma', 'donde', 'alto', 'repeticion', 'voltear', 'color', 'capas', 'reserva'];
+        $permitidas = ['forma', 'donde', 'alto', 'repeticion', 'voltear', 'color', 'capas', 'reserva', 'profundidad'];
 
         if (!$this->has_only_keys($value, $permitidas)) {
             return new WP_Error($codigo, 'divisor admite: ' . implode(', ', $permitidas) . '.');
@@ -1944,6 +1944,17 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 return new WP_Error($codigo, 'divisor.voltear es verdadero o falso.');
             }
             $normalizado['voltear'] = $value['voltear'];
+        }
+
+        if (isset($value['profundidad'])) {
+            // Detrás por omisión: entre una forma y una palabra, gana la
+            // palabra. `delante` existe para cuando la forma tiene que
+            // montarse encima a propósito —una silueta recortando un retrato,
+            // por ejemplo—.
+            if (!is_string($value['profundidad']) || !in_array($value['profundidad'], ['detras', 'delante'], true)) {
+                return new WP_Error($codigo, 'divisor.profundidad admite: detras, delante.');
+            }
+            $normalizado['profundidad'] = $value['profundidad'];
         }
 
         if (isset($value['reserva'])) {
@@ -4308,6 +4319,9 @@ final class COD_Canvas_MCP_Recipe_Compiler
         }
         if (isset($capa['opacidad'])) {
             $estilo[] = '--cod-divisor-alfa:' . rtrim(rtrim(number_format((float) $capa['opacidad'], 3, '.', ''), '0'), '.');
+        }
+        if (($divisor['profundidad'] ?? 'detras') === 'delante') {
+            $estilo[] = '--cod-divisor-profundidad:1';
         }
         if (isset($capa['desplazamiento'])) {
             $dx = (string) $capa['desplazamiento'];

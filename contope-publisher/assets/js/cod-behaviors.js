@@ -3363,7 +3363,12 @@
     var estilo = doc.createElement('style');
     estilo.id = 'cod-divisor-preview-css';
     estilo.textContent = [
-      '.cod-divisor{position:absolute;left:0;right:0;z-index:1;pointer-events:none;',
+      // Detrás del contenido, igual que en la página publicada: un elemento
+      // posicionado se pinta encima del texto en flujo aunque no declare
+      // z-index, y por eso el divisor tapaba las letras. Si esto se
+      // desincronizara del CSS del publicador, el editor mostraría una cosa y
+      // la página otra —que es el defecto más caro de encontrar—.
+      '.cod-divisor{position:absolute;left:0;right:0;z-index:var(--cod-divisor-profundidad,-1);pointer-events:none;',
       'height:var(--cod-divisor-alto,80px);background-color:currentColor;',
       'opacity:var(--cod-divisor-alfa,1);',
       '-webkit-mask-size:calc(100% / var(--cod-divisor-repeticion,1)) 100%;',
@@ -3377,7 +3382,10 @@
       '.cod-divisor[data-cod-divisor-donde="abajo"]{bottom:0;}',
       '.cod-divisor[data-cod-divisor-voltear="1"]{transform:scaleX(-1);}',
       '.cod-divisor[data-cod-divisor-donde="arriba"][data-cod-divisor-voltear="1"]{transform:scale(-1,-1);}',
-      '.cod-node:has(> .cod-divisor){position:relative;}'
+      // `isolation` es lo que hace posible el z-index negativo de arriba: sin
+      // él, un hijo en capa negativa se va detrás del fondo de su propio
+      // contenedor y desaparece.
+      '.cod-node:has(> .cod-divisor){position:relative;isolation:isolate;}'
     ].join('');
     doc.head.appendChild(estilo);
 

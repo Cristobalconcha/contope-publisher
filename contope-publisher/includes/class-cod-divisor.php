@@ -192,8 +192,16 @@ final class COD_Divisor
         $r = '.' . self::CLASE;
 
         return <<<CSS
-/* El divisor se apoya en el borde de su sección y no empuja el contenido. */
-{$r}{position:absolute;left:0;right:0;z-index:1;pointer-events:none;line-height:0;overflow:hidden;
+/* El divisor se apoya en el borde de su sección y no empuja el contenido.
+
+   DETRÁS DEL CONTENIDO POR OMISIÓN. Un elemento posicionado se pinta encima
+   del texto en flujo aunque no declare `z-index` —así funciona el orden de
+   pintado—, y por eso el divisor tapaba las letras cuando se solapaban. Con
+   `z-index:-1` pasa al fondo; es la decisión correcta porque entre una forma
+   y una palabra, gana la palabra. `delante` sigue disponible para cuando la
+   forma tiene que montarse encima a propósito. */
+{$r}{position:absolute;left:0;right:0;z-index:var(--cod-divisor-profundidad,-1);
+pointer-events:none;line-height:0;overflow:hidden;
 height:var(--cod-divisor-alto,80px);opacity:var(--cod-divisor-alfa,1);}
 {$r}[data-cod-divisor-donde="arriba"]{top:0;--cod-divisor-sy:-1;}
 {$r}[data-cod-divisor-donde="abajo"]{bottom:0;}
@@ -213,8 +221,13 @@ transform:translateX(var(--cod-divisor-dx,0px)) scale(var(--cod-divisor-sx,1),va
 {$r}[data-cod-divisor-voltear="1"]{--cod-divisor-sx:-1;}
 /* El contenedor del divisor tiene que ser el ancla de su posición. `:has` es
    lo que permite no exigirle al diseño que lo declare: si hay divisor dentro,
-   el contenedor se vuelve relativo solo. */
-:where(section, header, footer, .cod-node):has(> {$r}){position:relative;}
+   el contenedor se vuelve relativo solo.
+
+   `isolation:isolate` es lo que hace posible el `z-index:-1` de arriba: sin
+   él, un hijo en capa negativa se va DETRÁS del fondo de su propio contenedor
+   y desaparece. Aislando, el −1 se queda dentro de la sección: por debajo del
+   texto y por encima de su color de fondo, que es exactamente donde va. */
+:where(section, header, footer, .cod-node):has(> {$r}){position:relative;isolation:isolate;}
 CSS;
     }
 }

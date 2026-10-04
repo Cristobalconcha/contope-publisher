@@ -238,6 +238,31 @@ $comprobar('con reserva:false vuelve a flotar sobre el contenido',
 $rr = $compilador->compile($componer(), $diseno([$regla(['forma' => $ondaRel, 'reserva' => 'si'])]));
 $comprobar('rechaza una reserva que no es sí o no', is_wp_error($rr));
 
+/**
+ * La profundidad. Un elemento posicionado se pinta ENCIMA del texto en flujo
+ * aunque no declare z-index: por eso el divisor tapaba las letras donde se
+ * solapaban. Entre una forma y una palabra, gana la palabra.
+ */
+echo "\n== el divisor va detrás del texto ==\n";
+$comprobar('por omisión, en capa negativa', strpos($css, 'z-index:var(--cod-divisor-profundidad,-1)') !== false);
+$comprobar('  y el contenedor se aísla, o el negativo se iría tras su propio fondo',
+    strpos($css, 'isolation:isolate') !== false);
+$r11 = $compilador->compile($componer(), $diseno([$regla(['forma' => $ondaRel])]));
+$comprobar('  sin escribir nada en el marcador', !is_wp_error($r11)
+    && strpos($r11['storage']['markup'], '--cod-divisor-profundidad') === false, $mensaje($r11));
+
+$r12 = $compilador->compile($componer(), $diseno([$regla(['forma' => $ondaRel, 'profundidad' => 'delante'])]));
+$comprobar('«delante» lo sube sobre el contenido', !is_wp_error($r12)
+    && strpos($r12['storage']['markup'], '--cod-divisor-profundidad:1') !== false, $mensaje($r12));
+$rr = $compilador->compile($componer(), $diseno([$regla(['forma' => $ondaRel, 'profundidad' => 'encima'])]));
+$comprobar('rechaza una profundidad inventada', is_wp_error($rr));
+
+// Los dos motores son copias distintas: si se desincronizan, el editor
+// muestra una cosa y la página publicada otra.
+$motorEditor = (string) file_get_contents(__DIR__ . '/../contope-publisher/assets/js/cod-behaviors.js');
+$comprobar('el motor del editor usa la MISMA capa', strpos($motorEditor, 'z-index:var(--cod-divisor-profundidad,-1)') !== false);
+$comprobar('  y el mismo aislamiento', strpos($motorEditor, ':has(> .cod-divisor){position:relative;isolation:isolate;}') !== false);
+
 echo "\n== el saneador del documento lo deja pasar ==\n";
 $limpio = (new COD_Canvas_Document_Sanitizer())->sanitize_html($html);
 $comprobar('conserva el marcador', is_string($limpio) && strpos($limpio, COD_Divisor::ATRIBUTO_FORMA) !== false,
