@@ -5,6 +5,64 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.66 — 4 de octubre de 2026
+
+### El constructor no podía decir lo que el sitio necesitaba
+
+Cristóbal reclamó, con razón, que el sitio de Santa Luisa se hubiera subido como
+HTML en vez de construirse por el constructor: «Tenemos un MCP hecho
+especialmente para poder intervenir con nuestro Page Builder, tenemos un editor
+de plantillas, tenemos unos módulos que permiten construir las piezas de la
+página. ¿Y por qué lo subimos como HTML?».
+
+Medido ese día, en el equipo y también en producción pidiendo las páginas como
+cualquier visitante: **ninguna de las páginas de Santa Luisa tiene composición
+registrada**. La portada son 578 KB con cinco nodos del sistema y **cero reglas
+de diseño**; toda su apariencia sale de 77 KB de hoja plana propia de esa
+página. La de términos es la única que asoma, con once clases de regla.
+
+Al ir a recomponer la primera página aparecieron dos agujeros de vocabulario.
+No excusan el método, pero explican el atajo: había cosas del sitio que el
+constructor no podía expresar.
+
+- **Un título con dos caras tipográficas.** Los títulos de Santa Luisa mezclan
+  una cara script y una de caja alta —«Agenda» + «tu visita»— y un encabezado
+  sólo aceptaba texto plano. Ahora acepta `segments`: de dos a cuatro tramos,
+  cada uno con sus propias reglas, que salen como `<span>` dentro de un único
+  encabezado. Sigue siendo **un solo título** para el lector de pantalla y para
+  los buscadores, y el texto completo se **deriva** de los tramos, así que no
+  puede desincronizarse. Lo que se lee del sitio se puede reenviar sin tocar: el
+  primer intento rompía eso, que es el issue #8, y se corrigió antes de entrar.
+
+- **El catálogo mentía sobre un behavior.** El botón de preferencias de cookies
+  funcionaba desde siempre, pero la lista que `cod_get_capabilities` publica no
+  lo mencionaba. Había dos listas y no coincidían. Eso importa más de lo que
+  parece: quien lee el catálogo —una persona o una IA— concluye que la pieza no
+  existe y la resuelve a mano en HTML. Un catálogo que miente empuja justo a lo
+  que el catálogo existe para evitar. Ahora hay **una sola lista** y una prueba
+  que pide cada behavior anunciado y comprueba que se acepta.
+
+  (`reveal-on-scroll` parecía un tercer desajuste y no lo era: llega por una
+  regla `motion`, no por `interaction`. Queda anotado para que nadie lo
+  «arregle».)
+
+### Para que esto no vuelva a pasar en silencio
+
+- **Una página sin composición ahora sale en rojo en la batería.** Es un
+  trinquete, no un semáforo: cada sitio declara cuánta deuda se le acepta hoy
+  —Econut cero, el espejo de Santa Luisa ocho—, y si aparece una página nueva
+  construida por fuera del constructor, la batería falla. Cuando se recompone
+  una, el número baja y hay que bajar el techo. La deuda sólo puede ir en una
+  dirección y no se puede volver a esconder en un comentario al pasar.
+
+### Medido
+
+- Las cuatro páginas interiores de Santa Luisa son **113 reglas** de contenido
+  propio en total; la portada sola, **343**; y **33** selectores son cromo
+  repetido en todas, que es material de región y no de página.
+
+---
+
 ## 0.3.65 — 4 de octubre de 2026
 
 ### Corregido en el sitio de Econut (local)

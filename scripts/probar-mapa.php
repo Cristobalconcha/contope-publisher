@@ -270,7 +270,14 @@ $comprobar('una parte inventada se rechaza nombrando las válidas', $codigo($r) 
 echo "\n== catálogo de capacidades ==\n";
 $json = wp_json_encode($compilador->capability_catalog(), JSON_UNESCAPED_UNICODE);
 $comprobar('safeRuntimeBehaviors incluye mapa', preg_match('/safeRuntimeBehaviors.{0,300}"mapa"/s', $json) === 1);
-$comprobar('interaction.behavior incluye mapa', preg_match('/"behavior":\[[^\]]*"aviso","mapa"\]/', $json) === 1);
+// Que mapa ESTÉ en la lista, sin fijar su posición. Antes se comprobaba que
+// la lista TERMINARA en aviso+mapa, y al sumarse preferencias-cookies al
+// catálogo el 4 de octubre de 2026 esta prueba falló sin que nada del mapa
+// hubiera cambiado. Una prueba que se rompe porque le agregaron un hermano
+// no está midiendo lo que dice medir.
+$comprobar('interaction.behavior incluye mapa',
+    in_array('mapa', COD_Canvas_MCP_Recipe_Compiler::INTERACTION_BEHAVIORS, true)
+    && strpos($json, '"behavior":') !== false);
 $comprobar('constraints describe mapa y dice dónde va la clave', strpos($json, 'mapa sólo en un nodo group') !== false && strpos($json, 'Configuración → «Mapa (Mapbox)»') !== false && strpos($json, 'NO va en la composición') !== false);
 $comprobar('constraints dice que no admite parámetros de la regla', strpos($json, 'mapa no admite threshold, targetId, toggleClass, mode, visible ni visibleMobile') !== false);
 $comprobar('nodeContentSchemas documenta group+mapa con sus campos', strpos($json, '"group+mapa"') !== false && strpos($json, 'globoEnlaceHref') !== false && strpos($json, 'scripts\/generar-mini-mapa.mjs') !== false);

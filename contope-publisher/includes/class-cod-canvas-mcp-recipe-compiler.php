@@ -623,7 +623,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
             'interaction' => [
                 'required' => ['behavior'],
                 'fields' => [
-                    'behavior' => ['scroll-threshold', 'nav-toggle', 'carousel-basic', 'lightbox', 'cuadrantes', 'pestanas', 'marquesina', 'aviso', 'mapa'],
+                    'behavior' => self::INTERACTION_BEHAVIORS,
                     'threshold' => '0..4000', 'targetId' => 'requerido por nav-toggle', 'toggleClass' => 'clase segura',
                     'mode' => ['single', 'track'], 'visible' => '1..8', 'visibleMobile' => '1..8',
                 ],
@@ -681,7 +681,11 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 'globoEnlaceHref' => 'opcional, enlace seguro: se dibuja como un enlace de verdad (<a>), nunca como texto con corchetes',
                 'marcador' => 'opcional, URL de activo: la imagen del marcador (50px de ancho). Sin ella, el marcador por omisión de Mapbox',
             ]],
-            'heading' => ['content' => ['text' => 'texto plano <=500', 'level' => '1..6']],
+            'heading' => ['content' => [
+                'level' => '1..6',
+                'text' => 'texto plano <=500; exactamente uno de text o segments',
+                'segments' => '2..4 tramos {text, ruleIds} para un título con dos caras tipográficas; cada tramo sale como span con sus clases y el título sigue siendo un solo encabezado. text se deriva de los tramos.',
+            ]],
             'paragraph' => ['content' => ['text' => 'texto plano <=5000']],
             'richText' => ['content' => ['paragraphs' => '1..24 textos planos']],
             'image' => ['content' => [
@@ -1796,7 +1800,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
         }
         if (!isset($value['behavior'])
             || !is_string($value['behavior'])
-            || !in_array($value['behavior'], ['scroll-threshold', 'nav-toggle', 'carousel-basic', 'lightbox', 'cuadrantes', 'pestanas', 'marquesina', 'aviso', 'mapa', 'preferencias-cookies'], true)) {
+            || !in_array($value['behavior'], self::INTERACTION_BEHAVIORS, true)) {
             return new WP_Error('cod_mcp_interaction_rule_invalid', 'interaction.behavior no es un comportamiento Canvas disponible.');
         }
         $normalized = ['behavior' => $value['behavior']];
@@ -2621,7 +2625,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
             return new WP_Error('cod_mcp_composition_content_invalid', 'El contenido del nodo debe ser un objeto declarativo.');
         }
         if (!$allows_children) {
-            $content = $this->normalize_node_content($node['kind'], $content);
+            $content = $this->normalize_node_content($node['kind'], $content, $rule_index);
             if (is_wp_error($content)) {
                 return $content;
             }
@@ -2911,16 +2915,80 @@ final class COD_Canvas_MCP_Recipe_Compiler
      * @param array<string, mixed> $content
      * @return array<string, mixed>|WP_Error
      */
-    private function normalize_node_content(string $kind, array $content)
+    private function normalize_node_content(string $kind, array $content, array $rule_index = [])
     {
         switch ($kind) {
             case 'heading':
-                if (!$this->has_only_keys($content, ['text', 'level']) || !isset($content['text'], $content['level'])
-                    || !$this->is_plain_text($content['text'], 500)
-                    || !is_int($content['level']) || $content['level'] < 1 || $content['level'] > 6) {
-                    return new WP_Error('cod_mcp_heading_invalid', 'heading requiere text y level entre 1 y 6.');
+                /**
+                 * UN TÍTULO CON DOS TIPOGRAFÍAS.
+                 *
+                 * Hasta acá un heading era texto plano, así que un título que
+                 * mezcla dos caras —una script y una de caja alta, que es la
+                 * firma de Santa Luisa— no se podía expresar. Medido el 4 de
+                 * octubre de 2026: ésa es, con bastante probabilidad, la razón
+                 * por la que ese sitio terminó subido como HTML en vez de
+                 * construido por el constructor. El reclamo de Cristóbal ese
+                 * día fue el método; el agujero era de vocabulario.
+                 *
+                 * Los tramos son HERMANOS tipográficos dentro del mismo
+                 * encabezado, no nodos: un span cada uno con su propia regla.
+                 * Sigue siendo un solo encabezado para el lector de pantalla y
+                 * para los buscadores.
+                 *
+                 * `text` SE DERIVA de los tramos y NO PUEDE DIVERGIR: cuando
+                 * vienen los dos, mandan los tramos y el texto se recalcula.
+                 *
+                 * Que vengan los dos no es un error, y esto importa: lo que
+                 * devuelve `cod_read_canvas_composition` trae el `text`
+                 * derivado junto a los tramos, y el flujo documentado del MCP
+                 * exige poder REENVIAR esa lectura sin tocarla. Rechazar la
+                 * pareja rompía la ida y vuelta, que es justo el issue #8.
+                 */
+                if (!$this->has_only_keys($content, ['text', 'level', 'segments'])
+                    || !isset($content['level'])
+                    || !is_int($content['level']) || $content['level'] < 1 || $content['level'] > 6
+                    || (!isset($content['text']) && !isset($content['segments']))) {
+                    return new WP_Error('cod_mcp_heading_invalid', 'heading requiere level entre 1 y 6 y text o segments.');
                 }
-                return ['text' => $content['text'], 'level' => $content['level']];
+                if (!isset($content['segments'])) {
+                    if (!$this->is_plain_text($content['text'], 500)) {
+                        return new WP_Error('cod_mcp_heading_invalid', 'El texto del heading debe ser texto plano acotado.');
+                    }
+                    return ['text' => $content['text'], 'level' => $content['level']];
+                }
+                if (!is_array($content['segments']) || !$this->is_list($content['segments'])
+                    || count($content['segments']) < 2 || count($content['segments']) > 4) {
+                    return new WP_Error('cod_mcp_heading_invalid', 'segments es una lista de 2 a 4 tramos; para uno solo va text.');
+                }
+                $tramos = [];
+                $textos = [];
+                foreach ($content['segments'] as $tramo) {
+                    if (!is_array($tramo) || !$this->has_only_keys($tramo, ['text', 'ruleIds'])
+                        || !isset($tramo['text']) || !$this->is_plain_text($tramo['text'], 250)) {
+                        return new WP_Error('cod_mcp_heading_invalid', 'Cada tramo del heading necesita su text plano.');
+                    }
+                    $ids = isset($tramo['ruleIds']) ? $tramo['ruleIds'] : [];
+                    if (!is_array($ids) || !$this->is_list($ids) || count($ids) > 8) {
+                        return new WP_Error('cod_mcp_heading_invalid', 'ruleIds de un tramo es una lista de hasta 8.');
+                    }
+                    $limpios = [];
+                    foreach ($ids as $id) {
+                        // Mismo rigor que para un nodo: una regla que no existe
+                        // emitiría una clase sin estilo y el título saldría sin
+                        // su tipografía, en silencio.
+                        if (!is_string($id) || in_array($id, $limpios, true)
+                            || ($rule_index !== [] && (!isset($rule_index[$id]) || $rule_index[$id]['kind'] === 'cadence'))) {
+                            return new WP_Error('cod_mcp_heading_invalid', 'Un tramo del heading refiere una regla inexistente, una cadencia o la misma dos veces.');
+                        }
+                        $limpios[] = $id;
+                    }
+                    $tramos[] = ['text' => $tramo['text'], 'ruleIds' => $limpios];
+                    $textos[] = $tramo['text'];
+                }
+                // El texto completo se guarda derivado: cualquier cosa que lea
+                // content['text'] —resúmenes, marcadores, el editor— sigue
+                // funcionando sin saber de tramos.
+                return ['text' => implode(' ', $textos), 'level' => $content['level'], 'segments' => $tramos];
             case 'paragraph':
                 if (!$this->has_only_keys($content, ['text']) || !isset($content['text']) || !$this->is_plain_text($content['text'], 5000)) {
                     return new WP_Error('cod_mcp_paragraph_invalid', 'paragraph requiere texto plano acotado.');
@@ -3749,7 +3817,20 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 return '<div ' . $attrs . '>' . $children . '</div>';
             case 'heading':
                 $level = $node['content']['level'];
-                return '<h' . $level . ' ' . $attrs . '>' . esc_html($node['content']['text']) . '</h' . $level . '>';
+                $dentro = esc_html($node['content']['text']);
+                if (!empty($node['content']['segments'])) {
+                    $spans = '';
+                    foreach ($node['content']['segments'] as $tramo) {
+                        $clases = [];
+                        foreach ($tramo['ruleIds'] as $rule_id) {
+                            $clases[] = $this->rule_class($rule_id);
+                        }
+                        $spans .= '<span' . ($clases === [] ? '' : ' class="' . esc_attr(implode(' ', $clases)) . '"') . '>'
+                            . esc_html($tramo['text']) . '</span>';
+                    }
+                    $dentro = $spans;
+                }
+                return '<h' . $level . ' ' . $attrs . '>' . $dentro . '</h' . $level . '>';
             case 'paragraph':
                 return '<p ' . $attrs . '>' . esc_html($node['content']['text']) . '</p>';
             case 'richText':
@@ -5546,6 +5627,27 @@ final class COD_Canvas_MCP_Recipe_Compiler
         return implode(' ', $parts);
     }
 
+    /**
+     * Los behaviors que una regla `interaction` puede pedir.
+     *
+     * UNA SOLA LISTA, a propósito. Había dos —la que valida y la que se
+     * publica en capabilities— y el 4 de octubre de 2026 se encontró que no
+     * coincidían: `preferencias-cookies` funcionaba desde siempre pero el
+     * catálogo no lo mencionaba, así que un cliente que leyera las
+     * capacidades concluía que no existía y resolvía el botón a mano, en
+     * HTML. Un catálogo que miente empuja justo a lo que el catálogo
+     * existe para evitar.
+     *
+     * Ojo: NO es la lista de todo lo que sabe hacer el runtime.
+     * `reveal-on-scroll` también es un behavior, pero se pide con una regla
+     * `motion` con trigger scroll, no por acá.
+     *
+     * @var string[]
+     */
+    public const INTERACTION_BEHAVIORS = [
+        'scroll-threshold', 'nav-toggle', 'carousel-basic', 'lightbox', 'cuadrantes',
+        'pestanas', 'marquesina', 'aviso', 'mapa', 'preferencias-cookies',
+    ];
     private function rule_class(string $rule_id): string
     {
         return 'cod-rule--' . sanitize_html_class($rule_id);
