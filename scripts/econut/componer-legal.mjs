@@ -78,7 +78,12 @@ R('hoja', 'properties', {
     'row-gap': '0px',
   },
 });
-R('aire', 'spacing', { paddingBlock: '64px', paddingInline: '24px' });
+// El MISMO aire que el resto del sitio. Antes eran 64 px contra los 54 de la
+// portada: dos valores para el mismo nombre dentro del mismo diseño, lo que
+// hace imposible centralizar la hoja —la última definición ganaría para todas—.
+// Si algún día esta página necesitara respirar distinto, la regla se llamaría
+// distinto; una excepción tiene que decir que lo es.
+R('aire', 'spacing', { paddingBlock: '54px', paddingInline: '24px' });
 // En el teléfono, 24px de aire a cada lado dejan la columna en 342px, que es
 // lo que hay. Lo que sí baja es el aire de arriba y abajo: 64px en una
 // pantalla de 844 se come casi un sexto antes de la primera palabra.

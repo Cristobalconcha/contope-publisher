@@ -352,6 +352,14 @@ final class COD_Canvas_MCP_Service
                 return new WP_Error('cod_mcp_canvas_page_unavailable', 'La página Canvas no pudo leerse después de aplicar la composición.');
             }
         }
+        // La hoja del diseño se rehace ACÁ, al aplicar, y no al servir una
+        // página: una visita no puede quedar esperando a que se recorra el
+        // sitio. Si falla, la página se sigue sirviendo con el CSS del propio
+        // documento, que es lo que había antes de centralizar.
+        if (class_exists('COD_Diseno_Hoja')) {
+            COD_Diseno_Hoja::regenerar((string) ($design['designId'] ?? ''), $this->repository);
+        }
+
         return [
             'page' => $page,
             'document' => $stored['document'],

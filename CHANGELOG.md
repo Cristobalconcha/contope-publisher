@@ -5,6 +5,70 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.64 — 4 de octubre de 2026
+
+### Cambiado
+
+- **Las reglas de diseño salen del HTML: una hoja por DISEÑO.** Segundo paso de
+  lo que empezó la 0.3.63, y el que Cristóbal pedía: «no tiene por qué
+  generarse una hoja de estilo por cada página de un sitio; la hoja tiene que
+  ser centralizada».
+
+  La base es del **motor**, las reglas son del **sitio**, y ninguna de las dos
+  es de la **página**. Ahora cada diseño tiene su hoja, escrita al aplicar una
+  composición y servida como archivo con la huella de su contenido en el nombre
+  —así el navegador la guarda para siempre y, si el diseño cambia, cambia el
+  nombre—.
+
+  | | antes | ahora |
+  |---|---|---|
+  | reglas en línea en la portada | 138 | **0** |
+  | HTML de la portada | 198 KB | **179 KB** |
+  | HTML de la página legal | 136 KB | **125 KB** |
+
+  Y lo que no se ve en la tabla: esos 22 KB de reglas se descargaban **con cada
+  página**; ahora se descargan una vez para todo el sitio.
+
+### Lo que hubo que arreglar antes, y es lo más importante
+
+- **Siete nombres de regla significaban dos cosas distintas.** Al medir qué se
+  repetía apareció algo peor que la repetición: de 205 clases sólo 9 estaban en
+  más de un documento, y siete de esas nueve decían cosas diferentes.
+  `.cod-rule--titulo` era 40 px en una página y 34 en otra; `.cod-rule--aire`,
+  54, 64 y 56; `.cod-rule--caja`, una rejilla de 1080 px en una y una caja de
+  lectura de 760 en otra.
+
+  Funcionaba **por casualidad**, porque cada página cargaba sólo su documento.
+  Fundir las hojas sin arreglarlo habría cambiado el aspecto de páginas que
+  nadie tocó.
+
+  Significa además algo de fondo: el diseño todavía no era un sistema, sino
+  variables locales de cada página que compartían nombre.
+
+  - Las páginas de **muestra** del publicador (`/divisores/`, `/primitivas/`)
+    pasan a su propio diseño, `contope-muestras`. Enseñan lo que la herramienta
+    sabe hacer; no son páginas de Econut y no tienen por qué ocupar sus
+    nombres. **El `designId` es el espacio de nombres**: dos diseños pueden
+    llamar `caja` a cosas distintas sin estorbarse.
+  - El **aire de la página legal** pasa a ser el mismo del sitio (54 px, antes
+    64). Si algún día necesitara respirar distinto, la regla se llamará
+    distinto: una excepción tiene que decir que lo es.
+
+- **`probar-reglas-sin-colision.php`**, el guardarraíl: dentro de un mismo
+  diseño, un identificador no puede compilar a dos declaraciones distintas. El
+  compilador no puede verlo solo —sólo ve un documento a la vez—, así que hace
+  falta mirar el sitio entero.
+
+- **O todas por archivo, o todas en línea.** Encolar sobre la marcha y
+  rendirse a mitad dejaba la página con las hojas de los diseños que sí tenían
+  **y además** todo el CSS en línea: lo mismo dos veces. Ahora se miran todas
+  antes de encolar ninguna.
+
+Un sitio que todavía no haya aplicado ninguna composición desde esta versión se
+sigue sirviendo como antes: actualizar el plugin no deja a nadie sin estilos.
+
+---
+
 ## 0.3.63 — 4 de octubre de 2026
 
 ### Cambiado

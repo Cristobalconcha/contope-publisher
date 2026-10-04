@@ -184,7 +184,14 @@ writeFileSync('divisores.json', JSON.stringify({
   expectedRevision: Number(process.env.REV_DIVISORES || 0),
   design: {
     schemaVersion: 1,
-    designId: 'econut-web',
+    // Las páginas de MUESTRA no pertenecen al diseño del sitio.
+    //
+    // El `designId` es el espacio de nombres de las reglas: dentro de uno, un
+    // nombre significa una sola cosa. Estas páginas enseñan lo que el
+    // publicador sabe hacer, no son páginas de Econut, y usar su diseño hacía
+    // que `titulo`, `caja` o `aire` dijeran aquí una cosa y en la portada otra.
+    // Medido el 4 de octubre de 2026: siete nombres con dos significados.
+    designId: 'contope-muestras',
     expectedDesignRevision: 2,
     reviewState: 'session',
     rules: reglas,

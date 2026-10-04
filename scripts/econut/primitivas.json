@@ -1,10 +1,10 @@
 {
   "pageId": 107,
   "documentId": "cod-canvas-page-107",
-  "expectedRevision": 2,
+  "expectedRevision": 4,
   "design": {
     "schemaVersion": 1,
-    "designId": "econut-web",
+    "designId": "contope-muestras",
     "expectedDesignRevision": 2,
     "reviewState": "session",
     "rules": [

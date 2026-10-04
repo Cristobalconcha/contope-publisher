@@ -1414,6 +1414,72 @@ CSS;
      * las páginas del sitio; incrustada en el HTML se volvía a descargar con
      * cada página.
      */
+    /**
+     * Las reglas de diseño: la hoja del DISEÑO si la hay, o el CSS de los
+     * documentos si todavía no se ha generado.
+     *
+     * La hoja del diseño se escribe al aplicar una composición
+     * (COD_Diseno_Hoja). Mientras un sitio no haya vuelto a aplicar nada,
+     * sigue sirviéndose lo de siempre: así actualizar el plugin no deja un
+     * sitio sin estilos esperando a que alguien recomponga.
+     *
+     * Cuando existe, se encola como ARCHIVO y el navegador la guarda una vez
+     * para todo el sitio; incrustada en el HTML se volvía a descargar con cada
+     * página. En Econut son unos 17 KB por visita que pasan a ser 17 KB una
+     * sola vez.
+     *
+     * @param array<int, string> $documentos ids de los documentos de la página
+     * @param array<int, string> $css_de_documentos su CSS, por si hace falta
+     * @return string El CSS que haya que poner en línea; '' si fue por archivo.
+     */
+    private function reglas_de_diseno(array $documentos, array $css_de_documentos): string
+    {
+        $disenos = [];
+        foreach ($documentos as $documento_id) {
+            if ($documento_id === '') {
+                continue;
+            }
+            $documento = $this->repository->load($documento_id);
+            if (!is_array($documento)) {
+                continue;
+            }
+            $composicion = json_decode((string) ($documento['composition'] ?? ''), true);
+            $diseno = (string) ($composicion['design']['designId'] ?? '');
+            if ($diseno !== '') {
+                $disenos[$diseno] = true;
+            }
+        }
+
+        /*
+         * O TODOS POR ARCHIVO, O TODOS EN LÍNEA. Nunca mezclado.
+         *
+         * Primero se miran todas las hojas y recién después se encola. Al
+         * revés —encolar sobre la marcha y rendirse a mitad— la página se
+         * llevaba las hojas de los diseños que sí tenían y ADEMÁS todo el CSS
+         * en línea: lo mismo dos veces.
+         */
+        $urls = [];
+        foreach (array_keys($disenos) as $diseno) {
+            $url = class_exists('COD_Diseno_Hoja') ? COD_Diseno_Hoja::url($diseno) : '';
+            if ($url === '') {
+                // A este diseño todavía no se le generó la hoja —nunca se ha
+                // aplicado una composición desde que existe esto—, así que la
+                // página se sirve como antes.
+                return self::unir_css_de_documentos($css_de_documentos);
+            }
+            $urls[$diseno] = $url;
+        }
+        if ($urls === []) {
+            return self::unir_css_de_documentos($css_de_documentos);
+        }
+
+        foreach ($urls as $diseno => $url) {
+            wp_enqueue_style('cod-diseno-' . sanitize_key($diseno), $url, ['cod-canvas-base'], null);
+        }
+
+        return '';
+    }
+
     public static function encolar_hoja_base(): void
     {
         wp_enqueue_style(
@@ -1455,6 +1521,8 @@ CSS;
         $body_html = (string) $document['html'];
         $header_css = '';
         $footer_css = '';
+        $header_document_id = '';
+        $footer_document_id = '';
         $header_html = '';
         $footer_html = '';
         if ($this->region_resolver !== null && $post_id > 0) {
@@ -1465,6 +1533,7 @@ CSS;
             if ($header !== null) {
                 $header_css = (string) $header['css'];
                 $header_html = (string) $header['html'];
+                $header_document_id = (string) ($header['documentId'] ?? '');
             }
             $footer = $this->region_resolver->resolve(
                 COD_Canvas_Document_Repository::REGION_KIND_FOOTER,
@@ -1473,6 +1542,7 @@ CSS;
             if ($footer !== null) {
                 $footer_css = (string) $footer['css'];
                 $footer_html = (string) $footer['html'];
+                $footer_document_id = (string) ($footer['documentId'] ?? '');
             }
             $body = $this->region_resolver->resolve(
                 COD_Canvas_Document_Repository::REGION_KIND_BODY,
@@ -1481,10 +1551,13 @@ CSS;
             if ($body !== null && trim((string) $body['html']) !== '') {
                 $body_css = (string) $body['css'];
                 $body_html = (string) $body['html'];
+                // El cuerpo puede venir de una región, y entonces el diseño que
+                // manda es el de ESE documento y no el de la página.
+                $documento_id = (string) ($body['documentId'] ?? $documento_id);
             }
         }
 
-        wp_register_style('cod-canvas-public', false, [], COD_PUBLISHER_VERSION);
+        wp_register_style('cod-canvas-public', false, ['cod-canvas-base'], COD_PUBLISHER_VERSION);
         wp_enqueue_style('cod-canvas-public');
         wp_add_inline_style(
             'cod-canvas-public',
@@ -1502,7 +1575,7 @@ CSS;
                 . COD_Divisor::css($header_html . $body_html . $footer_html)
                 . COD_Icono::css($header_html . $body_html . $footer_html)
                 . self::rotation_css() . self::carousel_rows_css()
-                . self::unir_css_de_documentos([$header_css, $body_css, $footer_css])
+                . $this->reglas_de_diseno([$header_document_id, $documento_id, $footer_document_id], [$header_css, $body_css, $footer_css])
         );
         self::$css_ya_emitido = true;
     }
@@ -1587,6 +1660,8 @@ CSS;
         $footer_html = '';
         $header_css = '';
         $footer_css = '';
+        $header_document_id = '';
+        $footer_document_id = '';
         if ($this->region_resolver !== null && $post_id > 0) {
             $header = $this->region_resolver->resolve(
                 COD_Canvas_Document_Repository::REGION_KIND_HEADER,
@@ -1595,6 +1670,7 @@ CSS;
             if ($header !== null) {
                 $header_html = (string) $header['html'];
                 $header_css = (string) $header['css'];
+                $header_document_id = (string) ($header['documentId'] ?? '');
             }
             $footer = $this->region_resolver->resolve(
                 COD_Canvas_Document_Repository::REGION_KIND_FOOTER,
@@ -1603,6 +1679,7 @@ CSS;
             if ($footer !== null) {
                 $footer_html = (string) $footer['html'];
                 $footer_css = (string) $footer['css'];
+                $footer_document_id = (string) ($footer['documentId'] ?? '');
             }
         }
 
@@ -1625,7 +1702,7 @@ CSS;
                 . COD_Divisor::css($header_html . $body_html . $footer_html)
                 . COD_Icono::css($header_html . $body_html . $footer_html)
                     . self::rotation_css() . self::carousel_rows_css()
-                    . self::unir_css_de_documentos([$header_css, $body_css, $footer_css])
+                    . $this->reglas_de_diseno([$header_document_id, $body_document_id, $footer_document_id], [$header_css, $body_css, $footer_css])
             );
             self::$css_ya_emitido = true;
         }

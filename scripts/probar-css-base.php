@@ -76,6 +76,29 @@ $comprobar('el editor la carga en su lienzo', strpos($nucleo, 'canvas: options.b
 $comprobar('y el panel le pasa la dirección', strpos($admin, "'baseCssUrl'") !== false);
 $comprobar('  del propio plugin, no de un CDN', strpos($admin, "plugins_url('assets/css/cod-canvas-base.css'") !== false);
 
+/**
+ * Las reglas de diseño también salieron del HTML.
+ *
+ * Segundo paso de lo mismo: la hoja base es del motor y las reglas son del
+ * sitio, pero ninguna de las dos es de la PÁGINA. Ahora hay una hoja por
+ * diseño, escrita al aplicar una composición y servida como archivo.
+ */
+echo "\n== las reglas de diseño: una hoja por diseño ==\n";
+$carpeta_disenos = COD_Diseno_Hoja::carpeta();
+$comprobar('la carpeta existe y no lleva año ni mes',
+    $carpeta_disenos !== '' && strpos($carpeta_disenos, COD_Diseno_Hoja::CARPETA) !== false);
+$url = COD_Diseno_Hoja::url('econut-web');
+$comprobar('el diseño del sitio tiene su hoja', $url !== '', $url);
+$comprobar('  con la huella del contenido en el nombre, para poder guardarse para siempre',
+    preg_match('/econut-web-[0-9a-f]{12}\.css$/', $url) === 1);
+$comprobar('un diseño que no existe no devuelve nada', COD_Diseno_Hoja::url('no-existe-este-diseno') === '');
+
+// Los bloques se parten por llaves de PRIMER nivel: una consulta de medios
+// lleva reglas dentro y partirla por cada «}» la rompería.
+$bloques = COD_Diseno_Hoja::bloques('.a{color:red;}@media(max-width:767px){.b{gap:1px;}.c{gap:2px;}}.d{color:blue;}');
+$comprobar('una consulta de medios cuenta como UN bloque', count($bloques) === 3, implode(' | ', $bloques));
+$comprobar('  y llega entera', isset($bloques[1]) && strpos($bloques[1], '.c{gap:2px;}}') !== false);
+
 echo "\n";
 if ($fallas === 0) { echo "probar-css-base.php   TODO OK\n"; exit(0); }
 echo "probar-css-base.php   $fallas falla(s)\n";
