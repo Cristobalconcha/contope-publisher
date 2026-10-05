@@ -47,13 +47,21 @@ const propias = [
   } }),
   regla('sl-legal-marca', 'typography', { role: 'marca', fontSize: '11px', lineHeight: 1.5 }),
   regla('sl-legal-marca-aire', 'properties', { declarations: { 'margin-block-start': '11px', 'margin-block-end': '11px' } }),
-  regla('sl-legal-titulo', 'typography', { role: 'titulo-legal', fontSize: '32px', fontWeight: 700, lineHeight: 1.05 }),
+  // LOS TÍTULOS NO SE DECLARAN ACÁ: salen de la escala compartida.
+  //
+  // Esta página los declaraba por su cuenta —32px el del documento, 24px el de
+  // cada tema— y daba la casualidad de que coincidían con dos niveles de la
+  // escala. Una coincidencia no es un sistema: el día que la escala cambie,
+  // esta página se queda atrás sin que nada avise. Ahora usa
+  // sl-titulo-portada-llana y sl-titulo-seccion-llana, que son esos mismos dos
+  // niveles en su cara LLANA —un documento legal no lleva la cursiva ni las
+  // versales de la marca— y que además escalan en teléfono, cosa que estas dos
+  // medidas fijas no hacían.
   regla('sl-legal-titulo-aire', 'properties', { declarations: { 'margin-block-start': '21px', 'margin-block-end': '21px' } }),
   regla('sl-legal-nota', 'typography', { role: 'nota', fontSize: '13px', lineHeight: 1.5 }),
   regla('sl-legal-nota-aire', 'properties', { declarations: { 'margin-block-start': '13px', 'margin-block-end': '13px' } }),
   regla('sl-legal-entrada', 'typography', { role: 'entrada', fontSize: '17.5px', lineHeight: 1.6 }),
   regla('sl-legal-entrada-aire', 'properties', { declarations: { 'margin-block-start': '17px', 'margin-block-end': '17px' } }),
-  regla('sl-legal-tema', 'typography', { role: 'tema', fontSize: '24px', fontWeight: 700, lineHeight: 1.05 }),
   regla('sl-legal-tema-aire', 'properties', { declarations: { 'margin-block-start': '40px', 'margin-block-end': '8px' } }),
 
   // El acordeón de cada bloque.
@@ -195,7 +203,7 @@ const composicion = {
           P('legal-marca', 'Santa Luisa de Palpi', ['sl-legal-marca', 'sl-texto-oliva', 'sl-legal-marca-aire']),
           {
             id: 'legal-titulo', kind: 'heading',
-            ruleIds: ['sl-legal-titulo', 'sl-texto-oliva', 'sl-legal-titulo-aire'],
+            ruleIds: ['sl-titulo-portada-llana', 'sl-texto-oliva', 'sl-legal-titulo-aire'],
             content: { level: 1, text: 'Términos y condiciones y Política de Privacidad' },
           },
           // Las fichas de fecha las resuelve el plugin al mostrar la página.
@@ -219,7 +227,7 @@ const composicion = {
         G('terminos-hoja', ['sl-legal-hoja'], [
           {
             id: 'legal-tema-1', kind: 'heading',
-            ruleIds: ['sl-legal-tema', 'sl-texto-oliva', 'sl-legal-tema-aire'],
+            ruleIds: ['sl-titulo-seccion-llana', 'sl-texto-oliva', 'sl-legal-tema-aire'],
             content: { level: 2, text: 'Términos y condiciones' },
           },
           acordeon('terminos', TERMINOS),
@@ -235,7 +243,7 @@ const composicion = {
         G('privacidad-hoja', ['sl-legal-hoja'], [
           {
             id: 'legal-tema-2', kind: 'heading',
-            ruleIds: ['sl-legal-tema', 'sl-texto-oliva', 'sl-legal-tema-aire'],
+            ruleIds: ['sl-titulo-seccion-llana', 'sl-texto-oliva', 'sl-legal-tema-aire'],
             content: { level: 2, text: 'Política de Privacidad' },
           },
           acordeon('privacidad', PRIVACIDAD),

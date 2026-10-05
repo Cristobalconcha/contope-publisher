@@ -81,6 +81,62 @@ R('sl-titulo-caps-encaje', 'properties', { declarations: { display: 'block', 'ma
 R('sl-titulo-claro', 'color', { role: 'titulo', color: '#FFFFFF' });
 R('sl-titulo-aire', 'properties', { declarations: { 'margin-block-start': '0', 'margin-block-end': '18px' } });
 
+// --- LA ESCALA DE TÍTULOS: TRES NIVELES --------------------------------------
+//
+// Aprobada por Cristóbal el 4 de octubre de 2026, con sus palabras como
+// criterio: «la portada tiene en el hero una clase especial porque es un tamaño
+// más grande; las secciones tienen un título de sección; los mapas podrían
+// tener un tipo de título un poco más pequeño, porque están metidos en un
+// recuadro».
+//
+// DE DÓNDE SALE. El sitio entregado tenía 26 tamaños de letra distintos entre
+// sus cinco páginas y 47 tratamientos tipográficos en la portada, cada uno usado
+// una vez. Los inventé yo al construirlo; nadie los pidió. Él: «si vamos a
+// considerar que es un tipo de título distinto porque es más chico o más grande,
+// entonces ni servirían los estilos CSS, mejor sería hacerlo con estilos en
+// línea… estamos trabajando en un sistema de diseño sin sistema de diseño».
+//
+// DOS EJES, no uno. El NIVEL es el tamaño —de qué jerarquía es este título—. La
+// CARA es el trazo: cursiva (Birthstone), versales (Montserrat en caja alta) o
+// llana (Montserrat tal cual). La cursiva no es otro nivel: es la otra cara del
+// mismo título, y por eso las dos van dentro del MISMO encabezado.
+//
+//   nivel      cursiva   versales   llana     dónde
+//   portada       —         68        32      el hero, y el título de un documento
+//   sección       58        36        24      la entrada de cada sección
+//   recuadro      44        26        18      un título dentro de una caja o un mapa
+//
+// LAS MEDIDAS NO SON INVENTADAS. Portada y sección salen de medir el sitio que
+// funciona: 68 es el hero, 58/36 es lo que usan las cuatro interiores, 32/24 son
+// los títulos de la página legal. Lo que SÍ estaba inventado y desaparece es la
+// dispersión de la portada —55 y 48 en la cursiva, 34 y 30 en las versales—, que
+// no eran niveles sino descuido.
+//
+// El nivel RECUADRO es el único que no estaba, porque el sitio nunca lo declaró:
+// sus medidas son un paso proporcional (0,74 del nivel de sección, el mismo
+// salto que hay entre portada y sección), no un número elegido a ojo.
+//
+// El límite inferior de cada clamp es la medida en teléfono y el superior la de
+// escritorio; entre medio escala con el ancho.
+
+// Portada. Un solo título por sitio: el hero. Tener su propia clase es
+// exactamente lo que él pidió, y lo que evita que «más grande» se resuelva
+// estirando el de sección.
+R('sl-titulo-portada', 'typography', { role: 'titulo-portada', family: 'var(--font-body)', fontSize: 'clamp(38px, 5.4vw, 68px)', fontWeight: 700, letterSpacing: '0.01em', lineHeight: 1.02, transform: 'uppercase' });
+R('sl-titulo-portada-llana', 'typography', { role: 'titulo-portada-llana', family: 'var(--font-body)', fontSize: 'clamp(26px, 2.8vw, 32px)', fontWeight: 700, lineHeight: 1.05 });
+
+// Sección. El nivel de trabajo del sitio: lo usan las cuatro interiores y casi
+// toda la portada. Sus dos caras son sl-titulo-script y sl-titulo-caps, que ya
+// existían con estas mismas medidas; acá quedan NOMBRADAS como un nivel para que
+// se note cuándo algo se sale de la escala.
+R('sl-titulo-seccion-llana', 'typography', { role: 'titulo-seccion-llana', family: 'var(--font-body)', fontSize: 'clamp(20px, 2.1vw, 24px)', fontWeight: 700, lineHeight: 1.05 });
+
+// Recuadro. Para un título que vive DENTRO de algo —una tarjeta, el marco de un
+// mapa—, donde el de sección compite con el contenido que lo rodea.
+R('sl-titulo-recuadro-script', 'typography', { role: 'titulo-recuadro-script', family: 'var(--font-hero)', fontSize: 'clamp(32px, 3.8vw, 44px)', fontWeight: 400, lineHeight: 1 });
+R('sl-titulo-recuadro', 'typography', { role: 'titulo-recuadro', family: 'var(--font-body)', fontSize: 'clamp(20px, 2.4vw, 26px)', fontWeight: 700, letterSpacing: '0.01em', lineHeight: 1.05, transform: 'uppercase' });
+R('sl-titulo-recuadro-llana', 'typography', { role: 'titulo-recuadro-llana', family: 'var(--font-body)', fontSize: 'clamp(16px, 1.6vw, 18px)', fontWeight: 700, lineHeight: 1.1 });
+
 // --- Cuerpo ------------------------------------------------------------------
 R('sl-cuerpo', 'typography', { role: 'cuerpo', fontSize: '15px', lineHeight: 1.5, measure: '480px' });
 R('sl-cuerpo-color', 'color', { role: 'cuerpo', color: 'var(--tierra-100)' });

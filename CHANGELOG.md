@@ -5,6 +5,66 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.75 — 4 de octubre de 2026
+
+### La escala de títulos: tres niveles, y nada fuera de ellos
+
+El sitio entregado al cliente tenía **26 tamaños de letra distintos** entre sus
+cinco páginas y 47 tratamientos tipográficos en la portada, cada uno usado una
+sola vez. Nadie los pidió. Cristóbal: *«si tengo un estilo de título, el estilo
+de título debería ser el mismo para todas las secciones… si vamos a considerar
+que es un tipo de título distinto porque es más chico o más grande, entonces ni
+servirían los estilos CSS, mejor sería hacerlo con estilos en línea. Estamos
+trabajando en un sistema de diseño sin sistema de diseño»*.
+
+La escala que aprobó tiene **dos ejes, no uno**. El NIVEL es el tamaño —de qué
+jerarquía es este título—. La CARA es el trazo: cursiva, versales o llana. La
+cursiva no es otro nivel: es la otra cara del mismo título, y por eso las dos
+viven dentro del mismo encabezado.
+
+| nivel | cursiva | versales | llana | dónde |
+|---|---|---|---|---|
+| **portada** | — | 68 | 32 | el hero, y el título de un documento |
+| **sección** | 58 | 36 | 24 | la entrada de cada sección |
+| **recuadro** | 44 | 26 | 18 | dentro de una caja o un mapa |
+
+Sus palabras son el criterio, textual: *«la portada tiene en el hero una clase
+especial porque es un tamaño más grande; las secciones tienen un título de
+sección; los mapas podrían tener un tipo de título un poco más pequeño, porque
+están metidos en un recuadro»*.
+
+**Las medidas no son inventadas.** Portada y sección salen de medir el sitio que
+funciona: 68 es el hero, 58 y 36 es lo que usan las cuatro páginas interiores, 32
+y 24 son los títulos de la página legal. El nivel *recuadro* es el único que no
+estaba, porque el sitio nunca lo declaró: sus medidas son un paso proporcional
+—0,74 del nivel de sección, el mismo salto que hay entre portada y sección—, no
+un número elegido a ojo. Y ahora son los extremos de un `clamp`, así que cada
+nivel baja en teléfono en vez de quedarse fijo.
+
+**La página legal deja de declarar los suyos.** Tenía 32 y 24 escritos por su
+cuenta, que daba la casualidad de coincidir con dos niveles. Una coincidencia no
+es un sistema: el día que la escala cambiara, esa página se quedaba atrás sin que
+nada avisara.
+
+### Y un trinquete que cuenta los títulos en la página, no en el código
+
+`scripts/probar-escala-de-titulos.mjs` abre el espejo local y mide cada título.
+Se mide **en el navegador y no leyendo las reglas** porque el defecto no era
+declarar mal: era declarar de más, en muchos sitios distintos, y que nada lo
+sumara. Leer un archivo no habría visto los 48px que salían de otro.
+
+Y mide los **tramos**, no el encabezado que los contiene: un título de dos caras
+es un solo `h2` con dos `<span>` adentro. Medir el `h2` devuelve el tamaño
+heredado del contenedor y no dice nada — la primera medición de este sitio dio
+«24px en todas partes» y era falsa.
+
+Las cuatro páginas interiores quedan en **cero** títulos fuera de escala. La
+portada, que sigue siendo HTML heredado, arrastra cuatro: 55 y 48 en la cursiva,
+34 y 30 en las versales. No son otro nivel — son el de sección escrito dos veces
+a ojo, en la misma sección — y desaparecen cuando se componga.
+
+---
+
 ## 0.3.74 — 4 de octubre de 2026
 
 ### Un enlace puede llevar una imagen, que es lo que es un logo
