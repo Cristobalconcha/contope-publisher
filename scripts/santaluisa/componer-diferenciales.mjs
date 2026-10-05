@@ -197,15 +197,6 @@ const propias = [
     display: 'flex', 'flex-wrap': 'wrap', 'justify-content': 'center',
     'align-items': 'center', 'column-gap': '20px', 'row-gap': '14px',
   } }),
-  regla('sl-boton', 'properties', { declarations: {
-    'background-color': 'var(--dorado-600)', color: '#2B2210',
-    'padding-top': '13px', 'padding-right': '22px',
-    'padding-bottom': '13px', 'padding-left': '22px',
-    'border-top-left-radius': '999px', 'border-top-right-radius': '999px',
-    'border-bottom-right-radius': '999px', 'border-bottom-left-radius': '999px',
-    'text-decoration-line': 'none', 'font-weight': '700', 'font-size': '14px',
-    'white-space': 'nowrap', cursor: 'pointer',
-  } }),
 ];
 
 /* ------------------------------------------------------------------- los nodos */
@@ -359,7 +350,7 @@ const composicion = {
         G('cierre-linea', ['sl-cierre-linea'], [
           P('cierre-texto', '¿Tu duda no está aquí? Contacta a Carlos en el +56 9 8186 6742.', ['sl-cuerpo', 'sl-cuerpo-color']),
           {
-            id: 'cierre-boton', kind: 'button', ruleIds: ['sl-boton'],
+            id: 'cierre-boton', kind: 'button', ruleIds: ['sl-btn', 'sl-btn-primario', 'sl-btn-foco'],
             content: {
               label: 'Escríbele directo a Carlos',
               href: 'https://wa.me/56981866742?text=Hola%2C%20tengo%20una%20consulta%20sobre%20Santa%20Luisa%20de%20Palpi.',

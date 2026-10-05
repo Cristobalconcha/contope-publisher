@@ -79,20 +79,35 @@ $verifica = function (string $nombre, bool $bien, string $detalle) use (&$fallas
     printf("%s  %-44s  %s\n", $bien ? 'OK  ' : 'FALLA', $nombre, $detalle);
 };
 
-// 1. Imagen sin velo: lo de siempre, byte a byte.
+/*
+ * 1. Imagen sin velo: lo de siempre, byte a byte.
+ *
+ * EL position:relative YA NO VA EN EL CUERPO, y es a propósito. Hasta el 4 de
+ * octubre de 2026 esta regla lo emitía con la misma especificidad que el resto,
+ * y una superficie pisaba en silencio la posición que el nodo declarara: la
+ * barra de navegación de Santa Luisa pedía position:sticky, tenía las dos
+ * reglas correctas y computaba relative. Ahora sale aparte, envuelto en
+ * :where(), con especificidad cero. Lo que dependía de él lo sigue teniendo;
+ * lo que declara su propia posición, gana. Lo comprueba más abajo y lo fija
+ * probar-barra-pegada.php.
+ */
 $css = $compilar(['backgroundAssetUrl' => $URL]);
 $c = is_string($css) ? $cuerpo($css) : null;
-$esperado = 'position:relative;background-image:url("' . $URL . '");background-repeat:no-repeat;background-position:center;background-size:cover;';
+$esperado = 'background-image:url("' . $URL . '");background-repeat:no-repeat;background-position:center;background-size:cover;';
 $verifica('imagen sin velo (no cambia nada)', $c === $esperado, (string) $c);
 
 // 2. Imagen con velo.
 $css = $compilar(['backgroundAssetUrl' => $URL, 'overlayColor' => '#000000', 'overlayOpacity' => 0.75]);
 $c = is_string($css) ? $cuerpo($css) : null;
 $velo = 'color-mix(in srgb,#000000 75%,transparent)';
-$esperado = 'position:relative;background-image:linear-gradient(' . $velo . ',' . $velo . '),url("' . $URL . '");'
+$esperado = 'background-image:linear-gradient(' . $velo . ',' . $velo . '),url("' . $URL . '");'
     . 'background-repeat:no-repeat,no-repeat;background-position:center,center;background-size:cover,cover;';
 $verifica('imagen con velo: dos capas', $c === $esperado, (string) $c);
 $verifica('velo: sin ::before duplicado', is_string($css) && strpos($css, '.cod-rule--fondo::before') === false, '');
+// La posición no desapareció: salió del cuerpo a una regla de especificidad
+// cero. Comprobarlo acá evita que "sacarla del cuerpo" se convierta en
+// "perderla", que rompería cualquier velo con ::before.
+$verifica('la posición sigue, con :where()', is_string($css) && strpos($css, ':where(.cod-rule--fondo){position:relative;}') !== false, '');
 // El mismo valor (con paréntesis anidados) en los dos extremos: opacidad pareja.
 $verifica('velo: mismo color en los dos extremos', preg_match('/linear-gradient\((color-mix\([^)]*\))\s*,\s*\1\)/', (string) $c) === 1, '');
 

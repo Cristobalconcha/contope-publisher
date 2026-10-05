@@ -203,11 +203,28 @@ final class COD_Diseno_Hoja
                 $ids[] = $documento;
             }
         }
-        foreach ([
-            COD_Canvas_Document_Repository::REGION_KIND_HEADER,
-            COD_Canvas_Document_Repository::REGION_KIND_FOOTER,
-            COD_Canvas_Document_Repository::REGION_KIND_BODY,
-        ] as $region) {
+        /*
+         * LAS REGIONES LAS ENUMERA EL REPOSITORIO, no una lista de nombres.
+         *
+         * Acá había tres nombres escritos a mano —cod-region-header, -footer,
+         * -body— y era el TERCER sitio del plugin con la misma lista. El efecto,
+         * medido el 4 de octubre de 2026 al componer la barra de navegación de
+         * Santa Luisa: el encabezado real del sitio es un documento de plantilla
+         * (ocd-template-…) con regionKind header, su composición se escribió
+         * bien y sus 41 reglas quedaron guardadas en el documento, pero NINGUNA
+         * llegó a la página porque esta función no lo incluía en la hoja
+         * compartida. En pantalla se veía una barra con el contenido correcto y
+         * sin una sola regla aplicada: sin posición pegada, con el botón de
+         * teléfono visible en escritorio y el menú desplegado. Un fallo
+         * silencioso, de los peores: no hay error en ningún lado.
+         *
+         * Las canónicas se agregan igual aunque todavía no existan como
+         * documento, porque la hoja tiene que preverlas.
+         */
+        foreach ((new COD_Canvas_Document_Repository())->list_region_documents() as $documento) {
+            $ids[] = (string) $documento['documentId'];
+        }
+        foreach (COD_Canvas_Document_Repository::REGION_KINDS as $region) {
             $ids[] = 'cod-region-' . $region;
         }
         return array_values(array_unique($ids));

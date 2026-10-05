@@ -86,6 +86,79 @@ R('sl-cuerpo', 'typography', { role: 'cuerpo', fontSize: '15px', lineHeight: 1.5
 R('sl-cuerpo-color', 'color', { role: 'cuerpo', color: 'var(--tierra-100)' });
 R('sl-cuerpo-aire', 'properties', { declarations: { 'margin-block-start': '0', 'margin-block-end': '20px' } });
 
+// --- Los botones: tres niveles, uno por jerarquía ---------------------------
+//
+// NO SON INVENTO. Salen de «Ancho, ritmo y botones» (9 de septiembre de 2026),
+// el documento que norma el diseño de este sitio y que el cliente aprobó. Nació
+// de una observación suya —«los botones no son consistentes»— medida en el sitio
+// publicado: había CUATRO tratamientos distintos conviviendo y dos páginas cuyo
+// llamado a la acción era un enlace sin estilo.
+//
+// La regla que el documento fija, textual: «Primario y secundario comparten
+// EXACTAMENTE la misma altura, radio, tipografía y espaciado interno. Solo
+// cambia el relleno». Por eso la base es una sola regla y los niveles sólo
+// agregan color.
+//
+// Y la razón por la que esto está acá y no en cada página: el 4 de octubre
+// compuse cuatro páginas sin abrir el documento y volví a hacer lo mismo que
+// condena —dos botones primarios distintos entre sí, 14px sin mayúsculas en una
+// y 12,5px con otro espaciado en la otra—. Un sistema que vive en una sola
+// regla no se puede desviar página por página.
+R('sl-btn', 'properties', { declarations: {
+  display: 'inline-flex', 'align-items': 'center', 'justify-content': 'center',
+  'column-gap': '8px',
+  'font-size': '12.5px', 'font-weight': '700', 'letter-spacing': '0.04em',
+  'text-transform': 'uppercase', 'text-decoration-line': 'none',
+  'padding-top': '13px', 'padding-right': '26px',
+  'padding-bottom': '13px', 'padding-left': '26px',
+  'border-top-left-radius': '999px', 'border-top-right-radius': '999px',
+  'border-bottom-right-radius': '999px', 'border-bottom-left-radius': '999px',
+  'border-top-width': '1px', 'border-right-width': '1px',
+  'border-bottom-width': '1px', 'border-left-width': '1px',
+  'border-top-style': 'solid', 'border-right-style': 'solid',
+  'border-bottom-style': 'solid', 'border-left-style': 'solid',
+  cursor: 'pointer', 'white-space': 'nowrap',
+} });
+
+// El primario: la acción que queremos que ocurra. UNO solo por pantalla, dice
+// el documento. El dorado es suyo.
+R('sl-btn-primario', 'properties', { declarations: {
+  'background-color': 'var(--dorado-600)', color: '#2B2210',
+  'border-top-color': 'var(--dorado-600)', 'border-right-color': 'var(--dorado-600)',
+  'border-bottom-color': 'var(--dorado-600)', 'border-left-color': 'var(--dorado-600)',
+} });
+
+// El secundario: alternativas válidas. Misma forma y tamaño; sólo cambia que
+// no lleva relleno.
+R('sl-btn-secundario', 'properties', { declarations: {
+  'background-color': 'transparent', color: 'var(--oliva-700)',
+  'border-top-color': 'var(--oliva-500)', 'border-right-color': 'var(--oliva-500)',
+  'border-bottom-color': 'var(--oliva-500)', 'border-left-color': 'var(--oliva-500)',
+} });
+
+// El enlace de texto: navegación entre páginas, no compite con los otros dos.
+//
+// OJO, una contradicción del documento que conviene saber: sus viñetas dicen
+// que «el dorado queda reservado para el primario; hoy también lo usa la línea
+// bajo los enlaces, lo que diluye su valor de señal», pero la muestra que el
+// cliente vio renderizada SÍ lleva la línea dorada. Se sigue lo que se vio,
+// que es lo que se aprobó, y queda anotado para resolverlo con él.
+R('sl-enlace-flecha', 'properties', { declarations: {
+  'font-size': '13px', 'font-weight': '700', 'letter-spacing': '0.04em',
+  'text-transform': 'uppercase', 'text-decoration-line': 'none',
+  color: 'var(--oliva-700)',
+  'border-bottom-width': '1px', 'border-bottom-style': 'solid',
+  'border-bottom-color': 'var(--dorado-600)',
+  'padding-bottom': '3px', display: 'inline-block',
+} });
+
+// El foco por teclado, que el documento marca como ausente hoy: «queda visible
+// en los tres. Hoy no lo está». Va en su propia regla con scope focus.
+R('sl-btn-foco', 'properties', { declarations: {
+  'outline-width': '2px', 'outline-style': 'solid',
+  'outline-color': 'var(--dorado-600)', 'outline-offset': '3px',
+} }, { estado: 'focus' });
+
 // --- El pie, que es de todo el sitio ----------------------------------------
 // Va como nodos en cada página y no como región porque el MCP puede LEER
 // regiones pero no crearlas ni darles alcance. Anotado como lo que falta; el

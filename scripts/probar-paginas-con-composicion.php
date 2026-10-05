@@ -1,6 +1,6 @@
 <?php
 /**
- * Toda página publicada por el lienzo tiene que tener su COMPOSICIÓN registrada.
+ * Toda página Y TODA REGIÓN del lienzo tiene que tener su COMPOSICIÓN registrada.
  *
  * POR QUÉ EXISTE. El 4 de octubre de 2026 medí el espejo de Santa Luisa y
  * encontré sus 8 páginas con documento pero SIN composición: la portada son
@@ -23,6 +23,14 @@
  * se recompone una, el número baja y hay que bajar el techo. Así la deuda sólo
  * puede ir en una dirección y no se puede volver a esconder en un comentario.
  *
+ * LAS REGIONES TAMBIÉN CUENTAN, y hubo que agregarlas. Esta prueba miraba sólo
+ * las páginas, así que el encabezado compartido de Santa Luisa —14.688 B de
+ * HTML suelto, con el logo incrustado como un <symbol> de 13 KB y los enlaces
+ * apuntando a ?page_id=— estuvo semanas fuera del tablero. El trinquete decía
+ * «todo en orden» con la pieza que aparece en TODAS las páginas interiores
+ * construida por fuera del constructor. Una deuda que el medidor no mira es
+ * una deuda que no existe, y ésta se arregló el 4 de octubre de 2026.
+ *
  *   php scripts/probar-paginas-con-composicion.php
  *   php scripts/probar-paginas-con-composicion.php <ruta a wp-load.php>   (un sitio)
  */
@@ -32,6 +40,7 @@ $SITIOS = [
     'Econut (local, el que se construye por el MCP)' => [
         'wp' => __DIR__ . '/../../wp-local-econut/wordpress/wp-load.php',
         'sin_composicion_aceptadas' => 0,
+        'regiones_sin_composicion_aceptadas' => 0,
     ],
     'Santa Luisa (espejo local, heredado del HTML)' => [
         'wp' => __DIR__ . '/../../wp-local/wordpress/wp-load.php',
@@ -41,6 +50,11 @@ $SITIOS = [
         // (f3b-legacy-doc, Prueba WhatsApp CTA y Prueba viewport y animación).
         // El trinquete acusó que yo había puesto 3 contando mal: hizo su trabajo.
         'sin_composicion_aceptadas' => 4,
+        // 1 al 2026-10-04, tras componer la BARRA DE NAVEGACIÓN. Era 2. La que
+        // queda es un encabezado de plantilla vacío y duplicado que sobró de
+        // una prueba («Landing», 0 B); no se borra acá porque borrar es del
+        // dueño del sitio, y mientras esté se cuenta.
+        'regiones_sin_composicion_aceptadas' => 1,
     ],
 ];
 
@@ -72,7 +86,34 @@ if ($argc > 1) {
             preg_match_all('/cod-rule--[a-z0-9-]+/i', $html));
     }
 
-    echo json_encode(['con' => $con, 'sin' => $sin], JSON_UNESCAPED_UNICODE);
+    /*
+     * Y LAS REGIONES, que son documentos del lienzo sin página propia. Se
+     * enumeran preguntándole al repositorio por su regionKind, igual que lo
+     * hacen el resolvedor y el canal MCP: una lista de nombres escrita a mano
+     * se queda fuera de los encabezados de plantilla, que es justo el caso que
+     * se nos escapó.
+     */
+    $regionesCon = 0;
+    $regionesSin = [];
+    foreach ($repo->list_region_documents() as $region) {
+        $id = (string) $region['documentId'];
+        $cargado = $repo->load($id);
+        $comp = is_array($cargado) ? json_decode((string) ($cargado['composition'] ?? ''), true) : null;
+        $nodos = is_array($comp) ? count($comp['composition']['nodes'] ?? []) : 0;
+        if ($nodos > 0) {
+            $regionesCon++;
+            continue;
+        }
+        $html = is_array($cargado) ? (string) ($cargado['html'] ?? '') : '';
+        $regionesSin[] = sprintf('región %s «%s» (%d B de HTML, %d clases del sistema)',
+            (string) $region['regionKind'], $id, strlen($html),
+            preg_match_all('/cod-rule--[a-z0-9-]+/i', $html));
+    }
+
+    echo json_encode([
+        'con' => $con, 'sin' => $sin,
+        'regionesCon' => $regionesCon, 'regionesSin' => $regionesSin,
+    ], JSON_UNESCAPED_UNICODE);
     exit(0);
 }
 
@@ -116,6 +157,29 @@ foreach ($SITIOS as $nombre => $sitio) {
     }
 
     foreach ($sin as $linea) {
+        echo "           · $linea\n";
+    }
+
+    /*
+     * Y LAS REGIONES, con su propio techo. Van aparte y no sumadas a las
+     * páginas porque son otra cosa: una región aparece en TODAS las páginas que
+     * la usan, así que una región sin composición pesa mucho más que una página
+     * suelta y merece su propia cuenta.
+     */
+    $regionesSin = $datos['regionesSin'] ?? [];
+    $techoRegiones = (int) ($sitio['regiones_sin_composicion_aceptadas'] ?? 0);
+    $regionesCon = (int) ($datos['regionesCon'] ?? 0);
+
+    $comprobar(sprintf('%d regiones, %d con composición', $regionesCon + count($regionesSin), $regionesCon), true);
+    $comprobar(
+        sprintf('regiones sin composición: %d, techo %d', count($regionesSin), $techoRegiones),
+        count($regionesSin) <= $techoRegiones,
+        count($regionesSin) > $techoRegiones ? 'APARECIÓ UNA NUEVA: se construyó por fuera del constructor' : ''
+    );
+    if (count($regionesSin) < $techoRegiones) {
+        $comprobar('  el techo de regiones quedó alto: bajarlo a ' . count($regionesSin) . ' en este archivo', false);
+    }
+    foreach ($regionesSin as $linea) {
         echo "           · $linea\n";
     }
 }

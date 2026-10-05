@@ -88,17 +88,25 @@ $img = 'background-image:url("' . $URL . '");';
 
 // 1. Lo de siempre, byte a byte.
 $c = $cuerpoDe(['backgroundAssetUrl' => $URL]);
-$verifica('sin declarar nada (no cambia)', $c === 'position:relative;' . $img . 'background-repeat:no-repeat;background-position:center;background-size:cover;', $c);
+/*
+ * EL position:relative YA NO VA EN EL CUERPO. Lo emite css_for_rule aparte,
+ * envuelto en :where() —especificidad cero—, desde el 4 de octubre de 2026:
+ * salía con la misma especificidad que el resto y una superficie pisaba en
+ * silencio la posición del nodo. La barra de navegación de Santa Luisa pedía
+ * position:sticky, tenía las dos reglas correctas y computaba relative.
+ * Lo fija probar-barra-pegada.php.
+ */
+$verifica('sin declarar nada (no cambia)', $c === '' . $img . 'background-repeat:no-repeat;background-position:center;background-size:cover;', $c);
 $c = $cuerpoDe(['backgroundAssetUrl' => $URL, 'backgroundPosition' => 'center', 'backgroundSize' => 'cover']);
-$verifica('center / cover (no cambia)', $c === 'position:relative;' . $img . 'background-repeat:no-repeat;background-position:center;background-size:cover;', $c);
+$verifica('center / cover (no cambia)', $c === '' . $img . 'background-repeat:no-repeat;background-position:center;background-size:cover;', $c);
 foreach (['top left', 'bottom', 'center right', 'left top'] as $p) {
     $c = $cuerpoDe(['backgroundAssetUrl' => $URL, 'backgroundPosition' => $p, 'backgroundSize' => 'contain']);
-    $verifica('palabras de siempre: ' . $p, $c === 'position:relative;' . $img . 'background-repeat:no-repeat;background-position:' . $p . ';background-size:contain;', $c);
+    $verifica('palabras de siempre: ' . $p, $c === '' . $img . 'background-repeat:no-repeat;background-position:' . $p . ';background-size:contain;', $c);
 }
 
 // 2. El caso de econut.cl.
 $c = $cuerpoDe(['backgroundAssetUrl' => $URL, 'backgroundSize' => '7% auto', 'backgroundPosition' => '2% 50%', 'backgroundRepeat' => 'no-repeat']);
-$verifica('econut: 7% auto / 2% 50% / no-repeat', $c === 'position:relative;' . $img . 'background-repeat:no-repeat;background-position:2% 50%;background-size:7% auto;', $c);
+$verifica('econut: 7% auto / 2% 50% / no-repeat', $c === '' . $img . 'background-repeat:no-repeat;background-position:2% 50%;background-size:7% auto;', $c);
 
 // 3. Otras formas válidas.
 $validos = [
@@ -121,7 +129,7 @@ foreach (['repeat', 'no-repeat', 'repeat-x', 'repeat-y', 'space', 'round'] as $r
 $velo = 'color-mix(in srgb,#000000 60%,transparent)';
 $c = $cuerpoDe(['backgroundAssetUrl' => $URL, 'overlayColor' => '#000000', 'overlayOpacity' => 0.6,
     'backgroundSize' => '7% auto', 'backgroundPosition' => '2% 50%', 'backgroundRepeat' => 'no-repeat']);
-$esperado = 'position:relative;background-image:linear-gradient(' . $velo . ',' . $velo . '),url("' . $URL . '");'
+$esperado = 'background-image:linear-gradient(' . $velo . ',' . $velo . '),url("' . $URL . '");'
     . 'background-repeat:no-repeat,no-repeat;background-position:50% 50%,2% 50%;background-size:cover,7% auto;';
 $verifica('velo + medidas: dos capas alineadas', $c === $esperado, $c);
 $c = $cuerpoDe(['backgroundAssetUrl' => $URL, 'overlayColor' => '#000000', 'overlayOpacity' => 0.6, 'backgroundRepeat' => 'repeat-x', 'backgroundSize' => '200px']);

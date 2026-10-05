@@ -121,16 +121,6 @@ const propias = [
   } }),
   regla('sl-faq-cta-texto', 'typography', { role: 'cta', fontSize: '13.5px', fontWeight: 600, lineHeight: 1.5 }),
   regla('sl-faq-cta-aire', 'properties', { declarations: { 'margin-block-end': '14px' } }),
-  regla('sl-faq-boton', 'properties', { declarations: {
-    'display': 'inline-block',
-    'background-color': 'var(--dorado-600)', color: '#2B2210',
-    'padding-top': '13px', 'padding-right': '26px',
-    'padding-bottom': '13px', 'padding-left': '26px',
-    'border-top-left-radius': '999px', 'border-top-right-radius': '999px',
-    'border-bottom-right-radius': '999px', 'border-bottom-left-radius': '999px',
-    'font-size': '12.5px', 'font-weight': '700', 'letter-spacing': '0.5px',
-    'text-decoration-line': 'none', cursor: 'pointer',
-  } }),
 
   // Compartidas con las otras páginas (el pie y los tramos del título).
   regla('sl-titulo-caps-caja', 'properties', { declarations: { display: 'block' } }),
@@ -203,7 +193,7 @@ const composicion = {
               P('faq-cta-texto', '¿Tu duda no está aquí? Contacta a Carlos en el +56 9 8186 6742.',
                 ['sl-faq-cta-texto', 'sl-texto-oliva', 'sl-faq-cta-aire']),
               {
-                id: 'faq-cta-boton', kind: 'button', ruleIds: ['sl-faq-boton'],
+                id: 'faq-cta-boton', kind: 'button', ruleIds: ['sl-btn', 'sl-btn-primario', 'sl-btn-foco'],
                 content: {
                   label: 'Escríbele directo a Carlos',
                   href: 'https://wa.me/56981866742?text=Hola%2C%20tengo%20una%20consulta%20sobre%20Santa%20Luisa%20de%20Palpi.',

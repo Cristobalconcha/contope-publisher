@@ -25,6 +25,16 @@ const PAGINAS = {
   diferenciales: { guion: 'componer-diferenciales.mjs', archivo: 'diferenciales.json', pageId: 62, documentId: 'ocd-canvas-page-10', variable: 'REV_DIFERENCIALES' },
   preguntas: { guion: 'componer-preguntas.mjs', archivo: 'preguntas.json', pageId: 61, documentId: 'ocd-canvas-page-12', variable: 'REV_PREGUNTAS' },
   terminos: { guion: 'componer-terminos.mjs', archivo: 'terminos.json', pageId: 630, documentId: 'cod-canvas-page-164', variable: 'REV_TERMINOS' },
+
+  /*
+   * La barra de navegación NO es una página: es una región global, compartida
+   * por las cuatro interiores. Se identifica con pageId 0 y su documentId, y
+   * su revisión se lee por el mismo cod_get_canvas_page_state pero pasándole
+   * las dos cosas. El resto del ciclo —previsualizar y aplicar con el
+   * previewId exacto— es idéntico, que es justamente la razón de que el canal
+   * devuelva la misma clave `document` en los dos casos.
+   */
+  encabezado: { guion: 'componer-encabezado.mjs', archivo: 'encabezado.json', pageId: 0, documentId: 'ocd-template-d5a667af-b7aa-498f-a986-bbe61a63add6', variable: 'REV_ENCABEZADO' },
 };
 
 if (!cual || !PAGINAS[cual]) {
@@ -43,7 +53,7 @@ const llamar = (herramienta, nombreArchivo) => {
 
 // 1. La revisión que está ahora. Nunca suponerla: el apply la compara y, si no
 //    calza, rechaza — que es justamente lo que protege de pisar un cambio ajeno.
-writeFileSync(`${aqui}/.estado.json`, JSON.stringify({ pageId }));
+writeFileSync(`${aqui}/.estado.json`, JSON.stringify(pageId === 0 ? { pageId, documentId } : { pageId }));
 const estado = llamar('cod_get_canvas_page_state', '.estado.json');
 const revision = estado?.document?.revision;
 if (typeof revision !== 'number') {

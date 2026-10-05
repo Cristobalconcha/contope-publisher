@@ -134,14 +134,44 @@ final class COD_Canvas_MCP_Service
      */
     public function canvas_region_state(string $document_id)
     {
-        $esperados = [];
-        foreach (COD_Canvas_Document_Repository::REGION_KINDS as $kind) {
-            $esperados[] = 'cod-region-' . $kind;
+        // QUÉ ES UNA REGIÓN lo contesta el repositorio, no una lista de
+        // nombres escrita acá. Esto estaba al revés y cerró una puerta de
+        // verdad: el encabezado compartido de un sitio real es un documento de
+        // PLANTILLA —ocd-template-…, con regionKind header y scope global— y el
+        // apply ya lo aceptaba, porque valida contra list_region_documents().
+        // Era sólo esta lectura la que lo rechazaba por no llamarse
+        // cod-region-header, así que no se podía leer la revisión que el propio
+        // apply exige: el encabezado quedaba inalcanzable por composición y el
+        // único camino era copiarlo a mano. Ésa es la clase de hueco del
+        // catálogo que empuja al atajo, y el arreglo es abrir la puerta, no
+        // rodearla. Ahora las dos mitades del circuito preguntan lo mismo al
+        // mismo sitio —el que además usa el resolvedor para armar la página—,
+        // así que no pueden discrepar.
+        $es_region = false;
+        $disponibles = [];
+        foreach ($this->repository->list_region_documents() as $region_document) {
+            $disponibles[] = (string) $region_document['documentId'];
+            if (hash_equals((string) $region_document['documentId'], $document_id)) {
+                $es_region = true;
+            }
         }
-        if (!in_array($document_id, $esperados, true)) {
+
+        // Una región canónica que todavía no existe como documento tampoco
+        // aparece en la lista, y preguntar por su revisión es legítimo: así se
+        // averigua que hay que escribirla con expectedRevision 0.
+        $canonicas = [];
+        foreach (COD_Canvas_Document_Repository::REGION_KINDS as $kind) {
+            $canonicas[] = 'cod-region-' . $kind;
+        }
+        if (!$es_region && in_array($document_id, $canonicas, true)) {
+            $es_region = true;
+        }
+
+        if (!$es_region) {
+            $lista = array_values(array_unique(array_merge($disponibles, $canonicas)));
             return new WP_Error(
                 'cod_mcp_canvas_region_unknown',
-                'Ese documentId no es una región global. Las que hay: ' . implode(', ', $esperados) . '.'
+                'Ese documentId no es una región global. Las que hay: ' . implode(', ', $lista) . '.'
             );
         }
 
@@ -434,13 +464,13 @@ final class COD_Canvas_MCP_Service
                 'title' => 'Estado de página Canvas',
                 'description' => 'Obtiene identidad, revisión y regiones resueltas de una página Canvas. '
                     . 'Con pageId 0 y documentId devuelve la revisión de una región global '
-                    . '(cod-region-header, cod-region-body, cod-region-footer), que es la que exige el apply '
+                    . '(cualquier documento con regionKind, incluidos los de plantilla), que es la que exige el apply '
                     . 'para escribirla. Una región que nunca se escribió devuelve revisión 0 y exists: false.',
                 'inputSchema' => [
                     'type' => 'object',
                     'properties' => [
                         'pageId' => ['type' => 'integer', 'minimum' => 0, 'description' => '0 = región global; requiere documentId.'],
-                        'documentId' => ['type' => 'string', 'pattern' => '^cod-region-(header|body|footer)$'],
+                        'documentId' => ['type' => 'string', 'minLength' => 1, 'description' => 'El documento de la región. Lo que cuenta como región lo decide el repositorio por su regionKind, no el nombre: el encabezado compartido de un sitio suele ser un ocd-template-…'],
                     ],
                     'required' => ['pageId'],
                     'additionalProperties' => false,

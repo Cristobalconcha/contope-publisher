@@ -5,6 +5,115 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.73 — 4 de octubre de 2026
+
+### La barra de navegación, por fin construida con el constructor
+
+Era la última pieza del sitio de Santa Luisa que seguía escrita como HTML suelto:
+14.688 bytes, con el logo incrustado dentro del marcado como un `<symbol>` de
+13 KB, los enlaces apuntando a `?page_id=7,10,12,14` —números que identifican
+filas de una base de datos y que en cualquier otra instalación apuntan a otra
+parte, o a ninguna— y el menú diciendo «Contactos» en plural para una página que
+se llama «Contacto».
+
+Ahora son **9 nodos y 41 reglas**. Los enlaces van por slug, el nombre está en
+singular y el logo pasó a ser un archivo del sitio
+(`uploads/2026/10/logo-santa-luisa.svg`) en vez de marcado enterrado en un
+documento.
+
+Pero lo que importa de esta versión no es la barra: es **por qué no se podía
+componer antes**. Fueron cinco puertas cerradas, y cada una habría bastado para
+justificar el atajo de copiarla a mano.
+
+### Lo que una región es, lo decide el repositorio
+
+Para escribir una composición hay que leer primero la revisión actual, porque el
+guardado la compara y rechaza si no calza. Esa lectura decidía qué era una
+región con tres nombres escritos a mano: `cod-region-header`, `-body`, `-footer`.
+El encabezado compartido de un sitio real es un documento de **plantilla**
+(`ocd-template-…`) con el papel de encabezado, y el guardado sí lo aceptaba
+—porque él sí le pregunta al repositorio—. Así que se podía escribir pero no se
+podía averiguar la revisión que hacía falta para escribir.
+
+El mismo nombre a mano estaba en un **tercer** sitio, y ése era peor: en la
+función que decide qué documentos entran en la hoja de estilos compartida. La
+composición de la barra se guardó bien, sus 41 reglas quedaron registradas, y
+**ninguna llegó a la página**. En pantalla se veía una barra con el contenido
+correcto y sin una sola regla aplicada. Sin error en ningún lado.
+
+Las tres mitades le preguntan ahora al mismo sitio, que es también el que usa el
+armador de páginas.
+
+### Un botón que actúa es un botón, no un enlace
+
+`button` y `link` eran la misma cosa y los dos salían como `<a href>`, con el
+destino obligatorio. El botón de las tres rayas no va a ninguna parte. Y en este
+mismo sitio el botón de «Preferencias de cookies» —cuyo trabajo es abrir el
+panel del plugin— ya llevaba un destino a la página de términos puesto sólo para
+pasar la validación.
+
+No es incomodidad: un lector de pantalla anuncia un enlace, el teclado lo activa
+con Enter y no con espacio, y pulsarlo navega. Un destino inventado le miente a
+quien no ve la pantalla. Ahora el destino es opcional en `button` —sin él sale un
+`<button type="button">` de verdad— y sigue siendo obligatorio en `link`, que sin
+destino no significa nada. Un botón con destino se dibuja igual que antes.
+
+### Un menú replegable se puede componer
+
+El comportamiento `nav-toggle` sólo ponía una clase en un elemento y dejaba el
+mostrar y ocultar a quien compusiera. Pero una regla de diseño describe un nodo,
+no la relación «cuando mi antepasado tenga tal clase, aparezco». El menú de
+teléfono era literalmente inexpresable: se podía marcar la barra y no había forma
+de reaccionar a la marca.
+
+Ahora `nav-toggle` puede nombrar su **panel** y la mecánica la pone el plugin,
+como en el acordeón, el aviso, las pestañas y la ventana de WhatsApp. Abierto
+vuelve con `var(--cod-nav-panel-display, flex)`, así que el set de diseño puede
+pedir otra cosa: la mecánica fija el estado, no la forma. Es opcional, de modo
+que los `nav-toggle` que ya existen funcionan igual.
+
+### Dos defectos que fallaban en silencio
+
+Los peores de todos, porque la regla se guardaba, el navegador la aplicaba y la
+evidencia decía que todo estaba bien.
+
+**Una superficie pisaba la posición.** La regla `surface` emitía
+`position:relative` siempre, con la misma especificidad que el resto. Una barra
+con un fondo y una posición pegada tenía las dos reglas correctas y computaba
+`relative`: no se quedaba arriba al bajar. Ahora esa posición sale aparte, con
+especificidad cero, así que lo que ya dependía de ella lo sigue teniendo y lo que
+declara su propia posición gana.
+
+**Y los envoltorios la ahogaban.** El plugin mete cada región en dos cajas, y
+las dos miden lo que mide su contenido. Un elemento pegado sólo puede viajar
+dentro de su contenedor, así que encerrado en una caja de su propio alto no
+tiene por dónde viajar. Ahora, cuando la raíz de una composición pide quedarse
+pegada, el compilador saca esas dos cajas del árbol apuntándoles al nodo
+concreto, sin tocar las regiones de las demás páginas.
+
+### Se puede diseñar un subrayado
+
+Faltaban `text-decoration-color`, `-style`, `-thickness` y `text-underline-offset`.
+Sin ellas sólo quedaba el subrayado por omisión del navegador —pegado a la letra
+y del color del texto— o renunciar y fingirlo con un borde inferior, que no es lo
+mismo: un borde no sigue los descendentes de la letra.
+
+### Y el tablero dejó de mentir
+
+- El trinquete de composiciones **mira también las regiones**. Sólo miraba
+  páginas, y por eso la barra —la pieza que aparece en todas las interiores—
+  estuvo semanas fuera del tablero mientras el tablero decía «todo en orden».
+- El corredor de pruebas lanza cada prueba **desde la raíz del repositorio**.
+  Heredaba el directorio de quien lo llamara, y tres pruebas que resuelven rutas
+  del plugin daban FALLA por eso. Tres falsos negativos, que es peor que no tener
+  la prueba: un tablero con fallas que no significan nada enseña a ignorarlo.
+
+Cuatro pruebas nuevas lo fijan: `probar-region-de-plantilla.php`,
+`probar-barra-pegada.php`, `probar-boton-y-menu.php`, y las regiones dentro de
+`probar-paginas-con-composicion.php`.
+
+---
+
 ## 0.3.72 — 4 de octubre de 2026
 
 ### El formulario de Contacto, traído de donde estaba

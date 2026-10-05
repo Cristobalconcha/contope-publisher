@@ -53,7 +53,19 @@ const empezó = Date.now();
 
 for (const prueba of pruebas) {
   const esPhp = prueba.endsWith('.php');
+  /*
+   * DESDE LA RAÍZ DEL REPO, no desde scripts/.
+   *
+   * Algunas pruebas resuelven rutas del plugin contra el directorio de trabajo
+   * —por ejemplo contope-publisher/includes/— y aquí se lanzaban sin fijar cwd,
+   * así que heredaban el de quien llamara al corredor. Medido el 4 de octubre de
+   * 2026: probar-css-del-tema, probar-firmas y probar-icono-del-tema daban FALLA
+   * con un ENOENT buscando scripts/contope-publisher/includes, y las tres pasan
+   * desde la raíz. Tres falsos negativos, que es peor que no tener la prueba:
+   * un tablero con fallas que no significan nada enseña a ignorarlo.
+   */
   const r = spawnSync(esPhp ? PHP : 'node', [path.join(aquí, prueba)], {
+    cwd: path.join(aquí, '..'),
     encoding: 'utf8',
     maxBuffer: 1e8,
   });

@@ -396,6 +396,11 @@ final class COD_Canvas_MCP_Recipe_Compiler
         // separarse del fondo; sin él no se podía expresar y había que dejarlo
         // en el CSS plano de la página. Es de forma larga y no admite url().
         'text-shadow',
+        // outline-*: el anillo de foco por teclado. Lo exige el documento que
+        // norma el diseño de Santa Luisa —«el foco por teclado queda visible en
+        // los tres; hoy no lo está»— y sin estas cuatro no había forma de
+        // declararlo desde una composición. Son de forma larga y no admiten url().
+        'outline-width', 'outline-style', 'outline-color', 'outline-offset',
         'backdrop-filter', 'filter', 'opacity', 'mix-blend-mode',
         'transform', 'transform-origin', 'translate', 'rotate', 'scale',
         'position', 'top', 'right', 'bottom', 'left',
@@ -403,7 +408,18 @@ final class COD_Canvas_MCP_Recipe_Compiler
         'overflow', 'overflow-x', 'overflow-y', 'cursor', 'pointer-events', 'visibility',
         'aspect-ratio', 'object-fit', 'object-position', 'fill', 'stroke', 'stroke-width',
         'font-family', 'font-size', 'font-weight', 'font-style', 'line-height', 'letter-spacing',
-        'text-align', 'text-transform', 'text-decoration-line', 'text-wrap', 'white-space', 'word-break', 'writing-mode',
+        'text-align', 'text-transform', 'text-wrap', 'white-space', 'word-break', 'writing-mode',
+        // Un subrayado se diseña: color, grosor, estilo y distancia a la letra.
+        // Faltaban las cuatro últimas y lo destapó la barra de navegación del
+        // 4 de octubre de 2026, cuyo subrayado al pasar por encima va en dorado
+        // separado de la línea base. Sin ellas lo único que se podía hacer era
+        // el subrayado por omisión del navegador —pegado a la letra y del color
+        // del texto— o renunciar y resolverlo con un borde inferior, que no es
+        // lo mismo: un borde no sigue los descendentes de la letra. El texto
+        // del rechazo ya decía «se puede pedir que se agregue a la lista»; esto
+        // es pedirlo.
+        'text-decoration-line', 'text-decoration-color', 'text-decoration-style',
+        'text-decoration-thickness', 'text-underline-offset',
         'transition-property', 'transition-duration', 'transition-timing-function', 'transition-delay',
         'animation-name', 'animation-duration', 'animation-timing-function', 'animation-iteration-count', 'animation-delay',
         'list-style-type', 'list-style-position', 'vertical-align', 'table-layout', 'border-collapse', 'border-spacing',
@@ -717,6 +733,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 'fields' => [
                     'behavior' => self::INTERACTION_BEHAVIORS,
                     'threshold' => '0..4000', 'targetId' => 'requerido por nav-toggle', 'toggleClass' => 'clase segura',
+                    'panelId' => 'nav-toggle: el nodo que aparece y desaparece (el menú). Con él, el plugin pone el mostrar/ocultar y la composición sólo el aspecto.',
                     'mode' => ['single', 'track'], 'visible' => '1..8', 'visibleMobile' => '1..8',
                 ],
                 'constraints' => [
@@ -846,7 +863,11 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 'ambient' => 'opcional, boolean, default false. true = video ambiental: emite <video autoplay loop muted playsinline> SIN controles y sin botón de sonido (va solo, en bucle y mudo, como fondo o textura viva). false o ausente = el video de siempre, con controles. Si viene junto con matte:true manda matte y ambient se ignora (el compositor de luma matte ya arranca el video por su cuenta).',
             ]],
             'audio' => ['content' => ['sourceUrl' => 'URL de activo', 'label' => 'opcional']],
-            'button|link' => ['content' => ['label' => 'texto', 'href' => 'enlace seguro', 'target' => ['self', 'blank']]],
+            'link' => ['content' => ['label' => 'texto', 'href' => 'enlace seguro (requerido)', 'target' => ['self', 'blank']]],
+            'button' => [
+                'content' => ['label' => 'texto', 'href' => 'enlace seguro (opcional)', 'target' => ['self', 'blank']],
+                'notes' => 'Con href navega y se dibuja como enlace; SIN href se dibuja como <button type="button">, que es lo que corresponde a un botón que actúa —abrir un menú, abrir las preferencias de cookies— y no lleva destino. No inventar un href para que pase la validación: un lector de pantalla lo anunciaría como enlace.',
+            ],
             'list' => ['content' => ['ordered' => 'boolean', 'items' => '1..100 textos planos']],
             'table' => ['content' => ['headers' => '1..20 textos', 'rows' => '0..100 filas con el mismo ancho']],
             'gallery' => ['content' => ['items' => "1..80 items. Cada item declara su primitiva con 'kind': image (por defecto) {assetUrl, alt, caption?}, video {sourceUrl?, posterUrl?, caption?, matte?, ambient?, pendingLabel?} o dynamic {token, fallback?}. La galería solo aporta presentación (grilla/metro/masonry/carrusel, leyenda, controles): el dibujo de cada item lo hace su propia primitiva. Galería de fotos, de videos y de artículos son la misma máquina con distinta primitiva adentro."]],
@@ -1972,6 +1993,9 @@ final class COD_Canvas_MCP_Recipe_Compiler
     private function normalize_interaction_rule(array $value)
     {
         $allowed = ['behavior', 'threshold', 'targetId', 'toggleClass', 'mode', 'visible', 'visibleMobile',
+            // nav-toggle: el nodo que aparece y desaparece. Ver más abajo por
+            // qué hizo falta.
+            'panelId',
             // wa-mensaje. Los tres primeros apuntan a NODOS de la misma
             // composición, igual que targetId en nav-toggle: el compilador los
             // traduce a selectores. Los textos van acá y no en una regla
@@ -2091,6 +2115,31 @@ final class COD_Canvas_MCP_Recipe_Compiler
         }
         if ($normalized['behavior'] === 'nav-toggle' && !isset($normalized['targetId'])) {
             return new WP_Error('cod_mcp_interaction_rule_invalid', 'nav-toggle requiere targetId.');
+        }
+        /*
+         * panelId: el nodo que aparece y desaparece —el menú—, nombrado igual
+         * que wa-mensaje nombra sus partes.
+         *
+         * POR QUÉ HACÍA FALTA. nav-toggle sólo ponía una clase en un elemento
+         * y dejaba el mostrar/ocultar a quien compusiera. Pero una regla de
+         * diseño describe un nodo, no la relación «cuando mi antepasado tenga
+         * tal clase, aparezco», así que por composición el menú de teléfono era
+         * inexpresable: se podía poner la clase y no había forma de reaccionar
+         * a ella. Eso es lo que obligaba a escribir el encabezado a mano.
+         *
+         * Con el panel nombrado, la MECÁNICA la pone el plugin —igual que en
+         * acordeon, aviso, pestanas y wa-mensaje— y la composición se queda con
+         * lo que le toca: el aspecto. Es opcional, así que los nav-toggle que ya
+         * existen siguen funcionando igual.
+         */
+        if (isset($value['panelId']) && !$this->is_stable_id($value['panelId'])) {
+            return new WP_Error('cod_mcp_interaction_rule_invalid', 'panelId debe ser el id de un nodo.');
+        }
+        if (isset($value['panelId'])) {
+            $normalized['panelId'] = $value['panelId'];
+        }
+        if ($normalized['behavior'] !== 'nav-toggle' && isset($normalized['panelId'])) {
+            return new WP_Error('cod_mcp_interaction_rule_invalid', 'panelId sólo lo admite nav-toggle.');
         }
         // cuadrantes, pestanas, marquesina, aviso y mapa no tienen parámetros: la geometría
         // sale del CSS del plugin y el estado del propio runtime. Aceptar uno y
@@ -3302,13 +3351,47 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 return ['sourceUrl' => $content['sourceUrl'], 'label' => isset($content['label']) ? $content['label'] : ''];
             case 'button':
             case 'link':
-                if (!$this->has_only_keys($content, ['label', 'href', 'target']) || !isset($content['label'], $content['href'])
+                /*
+                 * UN BOTÓN QUE ACTÚA NO LLEVA DESTINO, y hasta el 4 de octubre
+                 * de 2026 el catálogo lo exigía igual: 'button' y 'link' eran
+                 * la misma cosa y los dos salían como <a href>. El efecto
+                 * estaba a la vista en este mismo sitio —el botón de
+                 * «Preferencias de cookies», cuyo trabajo es abrir el panel del
+                 * plugin, llevaba un href a la página de términos sólo para
+                 * pasar por acá— y lo volvió a destapar el botón de las tres
+                 * rayas de la barra, que no va a ninguna parte.
+                 *
+                 * No es sólo incomodidad: un lector de pantalla anuncia un
+                 * enlace, el teclado lo activa con Enter y no con espacio, y
+                 * pulsarlo navega. Un href inventado le miente a quien no ve la
+                 * pantalla.
+                 *
+                 * Ahora el href es OPCIONAL en 'button' —sin él se dibuja un
+                 * <button type="button"> de verdad— y sigue siendo obligatorio
+                 * en 'link', que sin destino no significa nada. Lo que ya
+                 * existía no cambia: un botón con href se dibuja igual que
+                 * antes.
+                 */
+                $exige_destino = $kind === 'link';
+                $tiene_destino = isset($content['href']);
+                if (!$this->has_only_keys($content, ['label', 'href', 'target']) || !isset($content['label'])
                     || !$this->is_plain_text($content['label'], 300)
-                    || !is_string($content['href']) || !$this->is_safe_link($content['href'])
+                    || ($exige_destino && !$tiene_destino)
+                    || ($tiene_destino && (!is_string($content['href']) || !$this->is_safe_link($content['href'])))
                     || (isset($content['target']) && (!is_string($content['target']) || !in_array($content['target'], ['self', 'blank'], true)))) {
-                    return new WP_Error('cod_mcp_link_invalid', $kind . ' requiere label y href seguros.');
+                    return new WP_Error(
+                        'cod_mcp_link_invalid',
+                        $exige_destino
+                            ? 'link requiere label y href seguros.'
+                            : 'button requiere label, y href sólo si navega a alguna parte.'
+                    );
                 }
-                return ['label' => $content['label'], 'href' => $content['href'], 'target' => isset($content['target']) ? $content['target'] : 'self'];
+                $normalizado = ['label' => $content['label']];
+                if ($tiene_destino) {
+                    $normalizado['href'] = $content['href'];
+                    $normalizado['target'] = isset($content['target']) ? $content['target'] : 'self';
+                }
+                return $normalizado;
             case 'list':
                 if (!$this->has_only_keys($content, ['ordered', 'items']) || !isset($content['ordered'], $content['items'])
                     || !is_bool($content['ordered']) || !is_array($content['items']) || !$this->is_list($content['items'])
@@ -3834,6 +3917,10 @@ final class COD_Canvas_MCP_Recipe_Compiler
         // Reglas dirigidas a partes que fabrica un behavior (campo `partes`):
         // van DESPUÉS de las de clase y con selector de descendiente anclado al nodo.
         $styles .= $this->parts_css($composition['nodes'], $design['ruleIndex']);
+        // La mecanica del menu replegable, cuando nav-toggle nombra su panel.
+        $styles .= $this->nav_panel_css($composition['nodes'], $design['ruleIndex']);
+        // Y la que le permite a una region quedarse pegada al bajar.
+        $styles .= $this->region_sticky_css($composition['nodes'], $design['ruleIndex']);
 
         $kind_counts = [];
         $this->count_node_kinds($composition['nodes'], $kind_counts);
@@ -4337,6 +4424,12 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 }
                 $attributes['data-cod-toggle-target'] = '[data-cod-node="' . $interaction['targetId'] . '"]';
                 $attributes['data-cod-toggle-class'] = $interaction['toggleClass'] ?? 'is-menu-open';
+                if (isset($interaction['panelId'])) {
+                    if (!in_array($interaction['panelId'], $node_ids, true)) {
+                        return new WP_Error('cod_mcp_interaction_target_missing', 'nav-toggle refiere en panelId un nodo que no está en esta composición.');
+                    }
+                    $attributes['data-cod-toggle-panel'] = '[data-cod-node="' . $interaction['panelId'] . '"]';
+                }
             } elseif ($interaction['behavior'] === 'carousel-basic') {
                 if ($node['kind'] !== 'gallery') {
                     return new WP_Error('cod_mcp_carousel_target_invalid', 'carousel-basic sólo puede aplicarse a un nodo gallery.');
@@ -4707,7 +4800,12 @@ final class COD_Canvas_MCP_Recipe_Compiler
     /** @param array<string, mixed> $content */
     private function render_link(array $content, string $attrs): string
     {
-        $target = $content['target'] === 'blank' ? ' target="_blank" rel="noopener noreferrer"' : '';
+        // Sin destino es un botón de verdad, no un enlace disfrazado. type
+        // explícito para que no envíe el formulario que lo contenga.
+        if (!isset($content['href'])) {
+            return '<button type="button" ' . $attrs . '>' . esc_html($content['label']) . '</button>';
+        }
+        $target = ($content['target'] ?? 'self') === 'blank' ? ' target="_blank" rel="noopener noreferrer"' : '';
         return '<a ' . $attrs . ' href="' . esc_url($content['href']) . '"' . $target . '>' . esc_html($content['label']) . '</a>';
     }
 
@@ -5280,6 +5378,130 @@ final class COD_Canvas_MCP_Recipe_Compiler
      * @param array<int, array<string, mixed>> $nodes
      * @param array<string, array<string, mixed>> $rule_index
      */
+    /**
+     * La MECÁNICA del menú replegable: cerrado no se ve, abierto sí.
+     *
+     * POR QUÉ ESTÁ ACÁ Y NO EN EL PLUGIN. Las otras mecánicas —acordeon,
+     * aviso, pestanas, wa-mensaje— viven en hojas estáticas del plugin porque
+     * sus piezas las fabrica el runtime y llevan un atributo de rol fijo al
+     * que una hoja puede apuntar. El panel de un menú, en cambio, es un nodo
+     * que escribe quien compone: lo único que lo identifica es su id, y ese id
+     * sólo lo conoce el compilador. Por eso la mecánica se emite acá, con el
+     * id del nodo en el selector.
+     *
+     * POR QUÉ HACÍA FALTA. nav-toggle sólo ponía una clase en un elemento. Una
+     * regla de diseño describe un nodo, no la relación «cuando mi antepasado
+     * tenga tal clase, aparezco», así que el menú de teléfono era inexpresable
+     * por composición: se podía marcar la barra y no había forma de reaccionar
+     * a la marca. Eso es lo que obligaba a escribir el encabezado de este
+     * sitio a mano, que es el atajo que este proyecto existe para no
+     * necesitar.
+     *
+     * LO QUE NO DECIDE. Cerrado se oculta; abierto vuelve a mostrarse con
+     * var(--cod-nav-panel-display, flex), así que el set de diseño puede pedir
+     * grid o cualquier otra cosa declarando esa variable. La mecánica fija el
+     * estado, no la forma.
+     *
+     * El corte va en el mismo máximo que el breakpoint mobile del sistema y no
+     * en una medida propia: un iPhone Pro Max apaisado mide 932, así que un
+     * corte en 900 deja el menú replegado en una pantalla ancha.
+     *
+     * @param array<int, array<string, mixed>> $nodes
+     * @param array<string, array<string, mixed>> $rule_index
+     */
+    /**
+     * Deja que una REGIÓN pegada pueda pegarse de verdad.
+     *
+     * EL PROBLEMA, medido el 4 de octubre de 2026 en la barra de navegación de
+     * Santa Luisa. El plugin envuelve cada región en su propia etiqueta:
+     * <header class="cod-canvas-region cod-canvas-region-header">. Ese
+     * envoltorio mide exactamente lo que mide su contenido —73 px en este
+     * caso—, y un elemento con position:sticky sólo puede viajar DENTRO de su
+     * contenedor. Encerrado en una caja de su propio tamaño no tiene por donde
+     * viajar: se va con la página.
+     *
+     * Y falla de la peor manera. La regla se guarda, el navegador la aplica
+     * —getComputedStyle devuelve sticky—, la evidencia dice que todo está
+     * bien, y la barra se va igual. No hay error en ningún lado.
+     *
+     * EL ARREGLO. Cuando la raíz de la composición pide sticky o fixed, se
+     * saca el envoltorio del árbol de cajas con display:contents, apuntándole
+     * con :has() al nodo concreto. Así el contenedor del elemento pasa a ser
+     * el de la página y el sticky recorre lo que tiene que recorrer.
+     *
+     * POR QUÉ CON :has() Y NO SOBRE LA CLASE. Porque alcanza SÓLO al
+     * envoltorio de esta región. Neutralizar .cod-canvas-region a secas
+     * cambiaría el pie y las regiones de las demás páginas —entre ellas la
+     * portada, que lleva un encabezado heredado— por un arreglo que ninguna
+     * pidió.
+     *
+     * @param array<int, array<string, mixed>> $nodes
+     * @param array<string, array<string, mixed>> $rule_index
+     */
+    private function region_sticky_css(array $nodes, array $rule_index): string
+    {
+        $css = '';
+        // Sólo la RAÍZ: un sticky anidado viaja dentro de su sección, que es
+        // su comportamiento correcto y no hay nada que destrabar.
+        foreach ($nodes as $node) {
+            foreach (($node['ruleIds'] ?? []) as $rule_id) {
+                $rule = $rule_index[$rule_id] ?? null;
+                if (!is_array($rule) || ($rule['kind'] ?? '') !== 'properties') {
+                    continue;
+                }
+                $pos = $rule['value']['declarations']['position'] ?? null;
+                if ($pos !== 'sticky' && $pos !== 'fixed') {
+                    continue;
+                }
+                /*
+                 * SON DOS ENVOLTORIOS, no uno, y eso costó una vuelta: el
+                 * plugin mete la región en <header class="cod-canvas-region">
+                 * y DENTRO un <main class="cod-mcp-page"> con el contenido.
+                 * Los dos miden lo que mide la barra, así que neutralizar sólo
+                 * el de afuera no cambia nada —y la primera versión de este
+                 * arreglo apuntaba con :has(> …) al de afuera, cuyo hijo
+                 * directo es el main y no el nodo: no alcanzaba a nada—.
+                 *
+                 * El de afuera se busca por descendiente y el de adentro por
+                 * hijo directo. El id del nodo es único en la composición, así
+                 * que la primera no se desborda a otras regiones.
+                 */
+                $suyo = '[data-cod-node="' . esc_attr((string) $node['id']) . '"]';
+                $css .= '.cod-canvas-region:has(' . $suyo . '){display:contents;}'
+                    . '.cod-mcp-page:has(> ' . $suyo . '){display:contents;}';
+                break;
+            }
+        }
+        return $css;
+    }
+
+    private function nav_panel_css(array $nodes, array $rule_index): string
+    {
+        $css = '';
+        foreach ($nodes as $node) {
+            foreach (($node['ruleIds'] ?? []) as $rule_id) {
+                $rule = $rule_index[$rule_id] ?? null;
+                if (!is_array($rule) || ($rule['kind'] ?? '') !== 'interaction') {
+                    continue;
+                }
+                $valor = $rule['value'] ?? [];
+                if (($valor['behavior'] ?? '') !== 'nav-toggle' || !isset($valor['panelId'])) {
+                    continue;
+                }
+                $panel = '[data-cod-node="' . esc_attr((string) $valor['panelId']) . '"]';
+                $abierta = '.' . sanitize_html_class((string) ($valor['toggleClass'] ?? 'is-menu-open'));
+                $css .= '@media (max-width:767px){'
+                    . $panel . '{display:none;}'
+                    . $abierta . ' ' . $panel . '{display:var(--cod-nav-panel-display, flex);}'
+                    . '}';
+            }
+            if (isset($node['children']) && is_array($node['children'])) {
+                $css .= $this->nav_panel_css($node['children'], $rule_index);
+            }
+        }
+        return $css;
+    }
+
     private function parts_css(array $nodes, array $rule_index): string
     {
         $css = '';
@@ -5499,6 +5721,12 @@ final class COD_Canvas_MCP_Recipe_Compiler
         $rule_css = in_array($rule['kind'], self::SELF_SELECTED_RULE_KINDS, true)
             ? $css
             : $selector . '{' . $css . '}';
+        if ($rule['kind'] === 'surface') {
+            // Ver el comentario largo en surface_css(): la posición de una
+            // superficie va con especificidad cero para no pisar la que el
+            // nodo declare.
+            $rule_css = ':where(' . $selector . '){position:relative;}' . $rule_css;
+        }
         if ($rule['kind'] === 'form' && isset($value['theme']) && is_array($value['theme']) && $value['theme'] !== []) {
             // El runtime del formulario declara sus valores por defecto sobre
             // .ofr-form, que está DENTRO de este contenedor. Heredar no basta:
@@ -5624,7 +5852,26 @@ final class COD_Canvas_MCP_Recipe_Compiler
     /** @param array<string, mixed> $value */
     private function surface_css(array $value): string
     {
-        $css = 'position:relative;';
+        /*
+         * EL position:relative NO VA ACÁ, y durante mucho tiempo sí.
+         *
+         * Una superficie lo necesita cuando pinta un velo con ::before, que
+         * se posiciona contra ella. Pero se emitía SIEMPRE, con la misma
+         * especificidad que el resto de la regla, así que una superficie
+         * pisaba en silencio cualquier posición que el nodo declarara.
+         *
+         * Medido el 4 de octubre de 2026 en la barra de navegación de Santa
+         * Luisa: la barra pedía position:sticky por una regla properties y
+         * tenía una surface para su fondo. Las dos se guardaron, las dos
+         * figuraban aplicadas, y la barra computaba relative —no se quedaba
+         * arriba al bajar—. Nada avisaba: dos reglas correctas, una se come a
+         * la otra.
+         *
+         * Ahora lo emite css_for_rule aparte, envuelto en :where(), que tiene
+         * especificidad cero. Lo que ya dependía de él lo sigue teniendo; lo
+         * que declara su propia posición, gana.
+         */
+        $css = '';
         if (isset($value['backgroundColor'])) {
             $css .= 'background-color:' . $value['backgroundColor'] . ';';
         }
