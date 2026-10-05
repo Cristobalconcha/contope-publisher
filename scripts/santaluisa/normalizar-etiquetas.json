@@ -1,0 +1,77 @@
+{
+  "_comentario": "Mete visor360__titulo, plano-360 y social-card__msg en la familia de ETIQUETAS (11,5px), que es donde les corresponde por papel. A 10,5 se achicaban sin motivo: en escritorio estaban en 11 y 12. SÓLO se cambia la regla base: sus variantes de teléfono (10px) son un ajuste responsivo deliberado y se respetan. El gancho de precio queda fuera entero por decisión de Cristóbal.",
+  "mode": "append",
+  "structure": [],
+  "styles": [
+    {
+      "selector": ".ubicacion__filters select",
+      "media": "(max-width: 900px), (max-aspect-ratio: 4 / 5)",
+      "_antes": "12px",
+      "style": {
+        "padding-top": "9px",
+        "padding-bottom": "9px",
+        "padding-left": "10px",
+        "padding-right": "10px",
+        "font-size": "11.5px"
+      }
+    },
+    {
+      "selector": ".visor360__titulo",
+      "_antes": "12px",
+      "style": {
+        "font-family": "Montserrat, sans-serif",
+        "font-size": "11.5px",
+        "font-weight": "700",
+        "letter-spacing": "1.2px",
+        "text-transform": "uppercase",
+        "color": "#CDA23C",
+        "margin-top": "0px",
+        "margin-right": "0px",
+        "margin-bottom": "0px",
+        "margin-left": "0px"
+      }
+    },
+    {
+      "selector": ".plano-360",
+      "_antes": "11px",
+      "style": {
+        "display": "flex",
+        "align-items": "center",
+        "justify-content": "center",
+        "gap": "8px",
+        "width": "100%",
+        "margin-top": "14px",
+        "margin-right": "0px",
+        "margin-bottom": "18px",
+        "margin-left": "0px",
+        "padding-top": "11px",
+        "padding-right": "18px",
+        "padding-bottom": "11px",
+        "padding-left": "18px",
+        "border-style": "solid",
+        "border-width": "1px",
+        "border-color": "rgba(205,162,60,0.55)",
+        "border-radius": "999px",
+        "background-color": "transparent",
+        "color": "#CDA23C",
+        "font-family": "Montserrat, sans-serif",
+        "font-size": "11.5px",
+        "font-weight": "700",
+        "letter-spacing": "0.44px",
+        "text-transform": "uppercase",
+        "text-decoration": "none",
+        "cursor": "pointer",
+        "transition": "background-color .18s ease, color .18s ease, border-color .18s ease"
+      }
+    },
+    {
+      "selector": ".social-card--contact .social-card__msg",
+      "_antes": "12px",
+      "style": {
+        "font-size": "11.5px",
+        "line-height": "1.4",
+        "font-weight": "600"
+      }
+    }
+  ]
+}

@@ -69,19 +69,21 @@ const PLAN = {
   '.plano-frame__header .section__title-caps': 'clamp(20px, 2.4vw, 26px)',
   '.plano-frame__title h3': 'clamp(20px, 2.4vw, 26px)',
 
-  // Texto diminuto: lo que hoy está en 10 o 10,5, todo a 10,5.
+  // Texto diminuto, todo a 10,5.
+  //
+  // EL GANCHO DE PRECIO QUEDA FUERA, entero. Decisión de Cristóbal: es una
+  // pieza muy visual, ya aprobada por el cliente, y no debe alterarse —sobre
+  // todo en escritorio—. Sus dos instancias ya son idénticas entre sí, que es
+  // lo que importaba. Tampoco se toca la cifra (73px / 47px) ni la huincha
+  // legal, que va pegada al gancho y coincide con su pie.
   '.plano-frame__coords': '10.5px',
   '.plano-frame__title p': '10.5px',
   '.social-card--contact .social-card__cta': '10.5px',
   '.plano-contacto__rotulo': '10.5px',
   '.wa-ventana__nota': '10.5px',
-  '.precio-gancho__pie': '10.5px',
-  '.precio-gancho__batch': '10.5px',
-  '.visor360__titulo': '10.5px',
-  '.plano-360': '10.5px',
-  '.social-card--contact .social-card__msg': '10.5px',
-  '.huincha-legal': '10.5px',
-  '.precio-gancho__rotulo': '10.5px',
+  '.visor360__titulo': '11.5px',
+  '.plano-360': '11.5px',
+  '.social-card--contact .social-card__msg': '11.5px',
 };
 
 /* ---------------------------------------------------------------- leer --- */
