@@ -5,6 +5,59 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.77 — 5 de octubre de 2026
+
+### El sistema de respaldos no respaldaba
+
+Cada vez que se guardaba un documento, el plugin anunciaba «respaldo &lt;id&gt;» y
+anotaba la entrada en su índice. **Ninguno de esos respaldos se podía
+restaurar.**
+
+`create_snapshot_for_post()` guardaba el contenido con `update_post_meta()` sin
+pasar por `wp_slash()`, y WordPress le quita una capa de barras invertidas al
+valor. El JSON quedaba con las comillas de `projectData` sin escapar,
+`json_decode` devolvía `null`, y el contenido era inalcanzable. Lo peor es cómo
+fallaba: en silencio y con cara de estar bien.
+
+`save()` **sí** aplicaba `wp_slash()`, con un comentario largo explicando
+exactamente este problema. El único sitio que escribe respaldos era el único que
+se lo había saltado.
+
+Se descubrió el 5 de octubre intentando deshacer un cambio en la portada de Santa
+Luisa: hubo que recuperarla de un respaldo externo. Lo fija
+`probar-respaldo-se-puede-restaurar.php`, que guarda un documento con JSON
+anidado de tres capas —el caso real: los lugares de un mapa, como JSON dentro de
+un atributo, dentro del JSON del proyecto, dentro del JSON del respaldo— y
+comprueba que vuelve byte a byte.
+
+Los respaldos tomados antes de esta versión siguen sin poder leerse.
+
+### Dos herramientas para normalizar una página existente
+
+**`scripts/santaluisa/limpiar-inertes.mjs`** quita las declaraciones que repiten
+el valor por defecto del navegador. Al importar un HTML, el editor expande cada
+abreviada en todas sus partes y escribe el defecto en cada una: `background:
+none` queda como nueve propiedades, `border: none` como trece. En la portada de
+Santa Luisa eran **332 de 3.148 (11%)**, y el botón de las tres rayas tenía 45
+declaraciones donde alguien escribió trece.
+
+Mide la página antes y después, elemento por elemento, y deshace si aparece una
+sola diferencia. Mide **dos veces antes** para saber qué se mueve solo: la flecha
+del «Desliza» se mece y daba un falso positivo que deshizo una limpieza correcta.
+
+**`scripts/santaluisa/normalizar-texto.mjs`** unifica el texto de lectura a un
+solo tamaño, y lista aparte —con su motivo— lo que no toca por tener otro papel.
+
+### Y una nota de método que vale más que las dos
+
+Escribir el JSON del documento a mano **no cambia nada**: la página se pinta
+desde una hoja plana que le gana. Un estilo se cambia por el runner de Grapes
+(`--build`), que pasa por el motor real, actualiza las dos cosas y trae su propio
+guardia. Y `setRule` reemplaza la regla entera, así que hay que reescribir el
+cuerpo completo o se borra el resto en silencio.
+
+---
+
 ## 0.3.76 — 4 de octubre de 2026
 
 ### OJO: la composición de la portada NO está aprobada

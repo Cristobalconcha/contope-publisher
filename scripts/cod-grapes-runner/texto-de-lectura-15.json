@@ -1,0 +1,31 @@
+{
+  "_comentario": "EL TEXTO DE LECTURA DE LA PORTADA, A UN SOLO TAMAÑO. La página decía el mismo texto de diecinueve maneras, todas entre 13 y 15px, una por sección: mismo papel, mismo color, misma interlínea proporcional, misma columna, y diferencias de medio píxel que nadie ve. Criterio de Cristóbal (5-10-2026): si dos estilos comparten tipografía, color y peso, son uno solo; y el valor que manda es el de proyecto y modelos, que es .section__body = 15px. En este archivo van los dos casos que son PROSA sin discusión: el relato de la historia y la respuesta de cada pregunta frecuente. Los que viven dentro de una tarjeta o de un recuadro (exit-card__desc, contacto__list, wa-ventana__saludo, lote-ficha__*) quedan fuera a propósito: pueden pertenecer al nivel RECUADRO de la escala, y eso lo decide él. El cuerpo va COMPLETO porque setRule reemplaza la regla entera: escribir sólo font-size borraría el resto.",
+  "mode": "append",
+  "structure": [],
+  "styles": [
+    {
+      "selector": ".historia__copy p",
+      "_antes": "font-size 14px — a 14px en una columna de 560 la línea queda en ~80 caracteres, contra ~72 del resto; la medida cómoda de lectura anda en 65-75, así que el píxel de menos no afinaba nada",
+      "style": {
+        "font-size": "15px",
+        "color": "var(--oliva-700)",
+        "margin-top": "0px",
+        "margin-right": "0px",
+        "margin-bottom": "14px",
+        "margin-left": "0px"
+      }
+    },
+    {
+      "selector": ".faq__item p",
+      "_antes": "font-size 13.5px",
+      "style": {
+        "font-size": "15px",
+        "margin-top": "12px",
+        "margin-right": "0px",
+        "margin-bottom": "0px",
+        "margin-left": "0px",
+        "max-width": "620px"
+      }
+    }
+  ]
+}

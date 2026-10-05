@@ -44,14 +44,18 @@ $SITIOS = [
     ],
     'Santa Luisa (espejo local, heredado del HTML)' => [
         'wp' => __DIR__ . '/../../wp-local/wordpress/wp-load.php',
-        // 3 al 2026-10-04, tras componer también LA PORTADA. Era 8 al empezar el
-        // día: las cuatro interiores, la portada, y la barra de navegación que
-        // ni siquiera se contaba porque esta prueba no miraba las regiones.
+        // 4, y vuelve a ser 4 a propósito.
         //
-        // Las 3 que quedan NO son contenido del sitio: son páginas de prueba
-        // (f3b-legacy-doc, Prueba WhatsApp CTA y Prueba viewport y animación).
-        // El sitio de Santa Luisa está, de hecho, completamente compuesto.
-        'sin_composicion_aceptadas' => 3,
+        // Llegó a 3 el 4 de octubre al componer la portada. Al día siguiente esa
+        // composición se descartó entera —no reproducía el diseño, lo
+        // reinterpretaba— y se restauró la portada original, que no tiene
+        // composición. Las otras 3 son páginas de prueba (f3b-legacy-doc,
+        // Prueba WhatsApp CTA y Prueba viewport y animación).
+        //
+        // La portada baja a 0 cuando se normalice como corresponde: ver
+        // Sesión Claude/MIGRACION-normalizar-paginas.md. Bajar el techo antes
+        // sería esconder deuda, que es justo lo que este trinquete evita.
+        'sin_composicion_aceptadas' => 4,
         // 1 al 2026-10-04, tras componer la BARRA DE NAVEGACIÓN. Era 2. La que
         // queda es un encabezado de plantilla vacío y duplicado que sobró de
         // una prueba («Landing», 0 B); no se borra acá porque borrar es del

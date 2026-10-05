@@ -1598,7 +1598,24 @@ final class COD_Canvas_Document_Repository
             'html' => (string) get_post_meta($post_id, self::META_HTML, true),
             'css' => (string) get_post_meta($post_id, self::META_CSS, true),
         ]);
-        update_post_meta($post_id, self::SNAPSHOT_META_PREFIX . $id, $content);
+        /*
+         * wp_slash() TAMBIÉN ACÁ. Es la misma razón que en save() —ver la nota
+         * larga ahí arriba: update_post_meta() le quita una capa de barras
+         * invertidas al valor— y acá se había olvidado.
+         *
+         * El efecto era que NINGÚN respaldo se podía restaurar. El JSON se
+         * guardaba con las comillas de projectData sin escapar, así que
+         * json_decode devolvía null y el contenido quedaba inalcanzable. El
+         * índice de respaldos seguía listándolos, el guardado decía
+         * «respaldo <id>» y todo parecía en orden: un sistema de respaldos que
+         * no respalda y que no avisa, que es la peor clase de fallo que hay.
+         *
+         * Lo descubrí el 5 de octubre de 2026 intentando deshacer un cambio mío
+         * en la portada de Santa Luisa. Hubo que recuperarla de un respaldo
+         * externo. Lo fija probar-respaldo-se-puede-restaurar.php, y
+         * reparar_snapshots() recupera los que ya están guardados mal.
+         */
+        update_post_meta($post_id, self::SNAPSHOT_META_PREFIX . $id, wp_slash($content));
 
         $entry = [
             'id' => $id,
