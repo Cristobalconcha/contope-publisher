@@ -5,6 +5,48 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.74 — 4 de octubre de 2026
+
+### Un enlace puede llevar una imagen, que es lo que es un logo
+
+Debe ser de los elementos más comunes que hay en una web —el logo que lleva a la
+portada— y no se podía componer. Un `image` tiene medidas propias y texto
+alternativo; un `link` sólo tenía una etiqueta de texto, y no admitía nada
+adentro.
+
+Las dos salidas posibles eran malas. Poner el logo por `icono` encaja el dibujo
+en un **cuadrado**, y el de Santa Luisa es 2,6 veces más ancho que alto: a 44
+píxeles de caja salía de 17 de alto, además de dejar el nombre escrito al lado
+del dibujo —la marca dos veces—. Y dejar el logo fuera del enlace no es lo que se
+quiere.
+
+Por eso el encabezado de ese sitio seguía escrito a mano, con el logo incrustado
+en el marcado como un `<symbol>` de 13 KB.
+
+Ahora un `link` o un `button` admiten **una imagen** adentro, y sólo eso: un
+enlace con secciones dentro es HTML inválido y un agujero por donde se cuela
+cualquier cosa. La etiqueta pasa a ser opcional cuando hay imagen, porque el
+nombre accesible lo da su texto alternativo y repetirlo fuera haría que un lector
+de pantalla lo dijera dos veces.
+
+### Y la imagen ya tiene partes
+
+Un nodo `image` se dibuja como un `<figure>` con un `<img>` adentro, así que una
+regla sobre el nodo mide el **marco** y no el dibujo: pedirle 44 píxeles de alto
+al logo daba una caja de 0 × 44 y el logo sin tamaño. Sólo `gallery` declaraba sus
+partes; ahora `image` también declara las suyas —`pieza` para el dibujo y
+`leyenda` para el pie—, que es donde van sus medidas.
+
+Con eso el logo del encabezado queda en sus 96 píxeles de ancho medidos en el
+sitio publicado, con su proporción real y su texto alternativo.
+
+### Y la zona de toque del menú
+
+El botón de teléfono medía 31 píxeles de alto, bajo el mínimo de 44 de una zona
+de toque. Lo acusó el revisor del sitio y queda en 44 × 44.
+
+---
+
 ## 0.3.73 — 4 de octubre de 2026
 
 ### La barra de navegación, por fin construida con el constructor

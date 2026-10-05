@@ -83,10 +83,29 @@ const propias = [
     'padding-inline-start': '24px', 'padding-inline-end': '24px',
   } }),
 
-  // El logo, por icono. 44px de alto es la medida que tiene en el sitio.
-  regla('sl-barra-logo', 'icono', {
-    forma: LOGO, donde: 'antes', tamano: '44px', color: 'var(--oliva-700)',
-  }, { porque: 'El logo es un recurso del sitio, no marcado de este documento.' }),
+  // El logo es una IMAGEN dentro del enlace, no un icono.
+  //
+  // Primero lo puse por `icono` y salió diminuto: el icono encaja el dibujo en
+  // un CUADRADO, y este logo es 2,6 veces más ancho que alto, así que a 44px
+  // de caja quedaba de 17 de alto. Un icono es para una pieza cuadrada; un
+  // logo no lo es. Además, por icono el texto del enlace se veía al lado del
+  // dibujo —la marca salía dos veces—, y como imagen el nombre accesible lo da
+  // el alt, sin repetirse.
+  //
+  // Que un enlace pueda llevar una imagen hubo que abrirlo en el plugin el 4
+  // de octubre de 2026; era justo lo que faltaba para poder componer esto.
+  // 96px de ANCHO con el alto libre, que es la medida medida en el sitio
+  // publicado (`.site-nav__logo{width:96px}`). Por ancho y no por alto porque
+  // así lo declaraba el original y porque es lo que conserva la proporción sin
+  // depender de cuánto mide el dibujo.
+  //
+  // El color va DENTRO del archivo (#171717, el del sitio) y no por regla: el
+  // logo entra como <img>, y un SVG referenciado así no hereda el color del
+  // texto de la página. Con `currentColor` salía negro por omisión, que daba
+  // el pego pero por casualidad.
+  regla('sl-barra-logo-img', 'properties', { declarations: {
+    width: '96px', height: 'auto', display: 'block',
+  } }, { porque: 'Medido en el sitio publicado: .site-nav__logo lleva width:96px.' }),
   regla('sl-barra-logo-caja', 'properties', { declarations: {
     display: 'inline-flex', 'align-items': 'center',
     'text-decoration-line': 'none',
@@ -185,8 +204,16 @@ const composicion = {
           children: [
             {
               id: 'barra-logo', kind: 'link',
-              ruleIds: ['sl-barra-logo', 'sl-barra-logo-caja'],
-              content: { label: 'Santa Luisa de Palpi', href: '/', target: 'self' },
+              ruleIds: ['sl-barra-logo-caja'],
+              content: { label: '', href: '/', target: 'self' },
+              children: [{
+                id: 'barra-logo-img', kind: 'image',
+                // La regla va a la PARTE `pieza` —el <img>— y no al nodo: el nodo
+                // es el <figure> que lo envuelve, y medirlo a él deja el dibujo
+                // sin tamaño (salía una caja de 0x44).
+                partes: { pieza: ['sl-barra-logo-img'] }, ruleIds: [],
+                content: { assetUrl: LOGO, alt: 'Santa Luisa de Palpi' },
+              }],
             },
             {
               id: 'barra-menu', kind: 'navigation',

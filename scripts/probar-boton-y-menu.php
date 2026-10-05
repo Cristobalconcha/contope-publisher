@@ -150,6 +150,65 @@ echo "\n== y el catálogo lo publica ==\n";
  * mismo. Un catálogo que no menciona panelId empuja a resolver el menú a mano,
  * que es justo de donde venimos.
  */
+echo PHP_EOL . "== un logo es una imagen DENTRO de un enlace ==" . PHP_EOL;
+/*
+ * Debe ser de los elementos mas comunes que hay en una web y no se podia
+ * componer. Un image tiene medidas propias y texto alternativo; un link solo
+ * tenia una etiqueta de texto. Las dos salidas eran malas: por `icono`, que
+ * encaja el dibujo en un CUADRADO —el logo de Santa Luisa es 2,6 veces mas
+ * ancho que alto y salia diminuto, con el nombre escrito al lado—, o dejar el
+ * logo fuera del enlace, que no es lo que se quiere.
+ */
+$IMG = ['assetUrl' => '/wp-content/uploads/logo.svg', 'alt' => 'Marca'];
+$logo = $compilar([[
+    'id' => 'marca', 'kind' => 'link', 'ruleIds' => [], 'content' => ['label' => '', 'href' => '/'],
+    'children' => [['id' => 'marca-img', 'kind' => 'image', 'ruleIds' => [], 'content' => $IMG]],
+]], []);
+$mLogo = is_wp_error($logo) ? '' : (string) ($logo['storage']['markup'] ?? '');
+$comprobar('un enlace acepta una imagen adentro', !is_wp_error($logo), is_wp_error($logo) ? $logo->get_error_message() : '');
+$comprobar('y la imagen sale DENTRO del enlace',
+    (bool) preg_match('~<a [^>]*>.*<img [^>]*src="[^"]*logo.svg"~s', $mLogo), substr($mLogo, 0, 120));
+/*
+ * La etiqueta vacia es deliberada: el nombre accesible lo da el alt de la
+ * imagen. Escribirlo tambien fuera haria que un lector de pantalla lo dijera
+ * dos veces, que fue justo lo que paso en el primer intento con `icono`.
+ */
+$comprobar('con etiqueta vacia, el nombre lo da el alt',
+    str_contains($mLogo, 'alt="Marca"') && !preg_match('~>s*Marcas*<~', $mLogo));
+
+echo PHP_EOL . "== pero solo UNA imagen, y nada mas ==" . PHP_EOL;
+/*
+ * Un enlace con secciones adentro es HTML invalido y un agujero por donde se
+ * cuela cualquier cosa. La restriccion deja abierto exactamente el caso real.
+ */
+$dos = $compilar([[
+    'id' => 'm2', 'kind' => 'link', 'ruleIds' => [], 'content' => ['label' => '', 'href' => '/'],
+    'children' => [
+        ['id' => 'a1', 'kind' => 'image', 'ruleIds' => [], 'content' => $IMG],
+        ['id' => 'a2', 'kind' => 'image', 'ruleIds' => [], 'content' => $IMG],
+    ],
+]], []);
+$comprobar('dos imagenes se rechazan', is_wp_error($dos), is_wp_error($dos) ? $dos->get_error_message() : 'las acepto');
+$seccion = $compilar([[
+    'id' => 'm3', 'kind' => 'link', 'ruleIds' => [], 'content' => ['label' => '', 'href' => '/'],
+    'children' => [['id' => 's1', 'kind' => 'section', 'ruleIds' => [], 'children' => []]],
+]], []);
+$comprobar('una seccion dentro de un enlace se rechaza', is_wp_error($seccion), is_wp_error($seccion) ? $seccion->get_error_message() : 'la acepto');
+
+echo PHP_EOL . "== y la imagen tiene partes, que es donde van sus medidas ==" . PHP_EOL;
+/*
+ * Un image se dibuja como un <figure> con un <img> adentro: una regla sobre el
+ * NODO mide el marco. Pedirle 44px de alto al logo daba una caja de 0x44 y el
+ * logo sin tamano. Solo gallery declaraba sus partes.
+ */
+$conParte = $compilar(
+    [['id' => 'foto', 'kind' => 'image', 'ruleIds' => [], 'partes' => ['pieza' => ['medida']], 'content' => $IMG]],
+    [$R('medida', 'properties', ['declarations' => ['width' => '96px']])]);
+$cssParte = is_wp_error($conParte) ? '' : (string) ($conParte['storage']['styles'] ?? '');
+$comprobar('image declara la parte pieza', !is_wp_error($conParte), is_wp_error($conParte) ? $conParte->get_error_message() : '');
+$comprobar('y la regla alcanza la imagen, no el marco',
+    (bool) preg_match('~cod-node-id-foto img{[^}]*width:96px~', $cssParte), substr($cssParte, 0, 130));
+
 $catalogo = wp_json_encode($compilador->capability_catalog());
 $comprobar('panelId figura en el catálogo', is_string($catalogo) && str_contains($catalogo, 'panelId'));
 $comprobar('y el botón dice que el href es opcional',

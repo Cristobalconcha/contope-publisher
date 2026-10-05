@@ -316,6 +316,31 @@ final class COD_Canvas_MCP_Recipe_Compiler
      * @var array<string, array{atributoRol: string, partes: array<string, array{selector: string, elegido: string|null, descripcion: string}>}>
      */
     private const NODE_KIND_CONTRACTS = [
+        /*
+         * LA IMAGEN TIENE DOS PARTES, y hasta el 4 de octubre de 2026 ninguna
+         * era alcanzable. Un nodo `image` se dibuja como un <figure> con un
+         * <img> adentro, así que una regla sobre el nodo mide el MARCO y no el
+         * dibujo: pedirle 44px de alto al logo del encabezado de Santa Luisa
+         * daba una caja de 0x44 y el logo sin tamaño.
+         *
+         * Es el mismo motivo por el que gallery declara las suyas: lo que se
+         * quiere estilar es un elemento interno que el nodo no es.
+         */
+        'image' => [
+            'atributoRol' => '',
+            'partes' => [
+                'pieza' => [
+                    'selector' => 'img',
+                    'elegido' => null,
+                    'descripcion' => 'el dibujo en sí. Es DONDE van sus medidas: una regla sobre el nodo alcanza el <figure> que lo envuelve, no la imagen',
+                ],
+                'leyenda' => [
+                    'selector' => 'figcaption',
+                    'elegido' => null,
+                    'descripcion' => 'el pie de la imagen, cuando tiene caption',
+                ],
+            ],
+        ],
         'gallery' => [
             'atributoRol' => '',
             'partes' => [
@@ -2914,8 +2939,36 @@ final class COD_Canvas_MCP_Recipe_Compiler
             return new WP_Error('cod_mcp_composition_children_invalid', 'children debe ser una lista acotada.');
         }
         $allows_children = in_array($node['kind'], ['section', 'header', 'footer', 'navigation', 'group', 'layout'], true);
-        if (!$allows_children && $children !== []) {
-            return new WP_Error('cod_mcp_composition_children_invalid', 'Este tipo de nodo no admite children; usa una estructura o colección declarada.');
+        /*
+         * UN ENLACE PUEDE LLEVAR UNA IMAGEN, y sólo eso.
+         *
+         * El caso es el logo que lleva a la portada, que debe ser de los
+         * elementos más comunes que hay en una web, y hasta el 4 de octubre de
+         * 2026 no se podía componer. Un `image` tiene medidas propias y texto
+         * alternativo; un `link` sólo tenía una etiqueta de texto. Las dos
+         * salidas posibles eran malas: poner el logo por `icono` —que encaja el
+         * dibujo en un CUADRADO, y el de Santa Luisa es 2,6 veces más ancho que
+         * alto, así que salía diminuto— o dejar el logo fuera del enlace, que
+         * no es lo que se quiere.
+         *
+         * Por eso el encabezado de ese sitio seguía escrito a mano, con el logo
+         * incrustado en el marcado como un <symbol> de 13 KB.
+         *
+         * Se admite UNA imagen y nada más. Un enlace con secciones adentro es
+         * HTML inválido y un agujero por donde se cuela cualquier cosa; la
+         * restricción mantiene abierto justo el caso que existe.
+         */
+        $imagen_enlazada = in_array($node['kind'], ['link', 'button'], true)
+            && count($children) === 1
+            && is_array($children[0])
+            && ($children[0]['kind'] ?? '') === 'image';
+        if (!$allows_children && !$imagen_enlazada && $children !== []) {
+            return new WP_Error(
+                'cod_mcp_composition_children_invalid',
+                in_array($node['kind'], ['link', 'button'], true)
+                    ? $node['kind'] . ' admite como hijo UNA imagen y nada más (el caso del logo que lleva a la portada).'
+                    : 'Este tipo de nodo no admite children; usa una estructura o colección declarada.'
+            );
         }
         // Un content VACÍO no es «usar content». La normalización devuelve
         // 'content' => [] para todo nodo estructural, así que rechazarlo por
@@ -3374,7 +3427,13 @@ final class COD_Canvas_MCP_Recipe_Compiler
                  */
                 $exige_destino = $kind === 'link';
                 $tiene_destino = isset($content['href']);
-                if (!$this->has_only_keys($content, ['label', 'href', 'target']) || !isset($content['label'])
+                // Con una imagen adentro, la etiqueta puede ir vacía: el nombre
+                // accesible lo da el texto alternativo de la imagen, y repetirlo
+                // fuera haría que un lector de pantalla lo dijera dos veces.
+                if (!isset($content['label'])) {
+                    $content['label'] = '';
+                }
+                if (!$this->has_only_keys($content, ['label', 'href', 'target'])
                     || !$this->is_plain_text($content['label'], 300)
                     || ($exige_destino && !$tiene_destino)
                     || ($tiene_destino && (!is_string($content['href']) || !$this->is_safe_link($content['href'])))
@@ -4217,9 +4276,16 @@ final class COD_Canvas_MCP_Recipe_Compiler
             case 'audio':
                 return $this->render_audio($node['content'], $attrs);
             case 'button':
-                return $this->render_link($node['content'], $attrs);
             case 'link':
-                return $this->render_link($node['content'], $attrs);
+                // Los hijos —una imagen, cuando los hay— van DENTRO del enlace,
+                // después de la etiqueta. Ver el comentario en la validación.
+                $dentro = empty($node['children'])
+                    ? ''
+                    : $this->render_nodes($node['children'], $rule_index, $node_ids, $depth + 1, $child_cadence, false);
+                if (is_wp_error($dentro)) {
+                    return $dentro;
+                }
+                return $this->render_link($node['content'], $attrs, (string) $dentro);
             case 'list':
                 return $this->render_list($node['content'], $attrs);
             case 'table':
@@ -4798,15 +4864,16 @@ final class COD_Canvas_MCP_Recipe_Compiler
     }
 
     /** @param array<string, mixed> $content */
-    private function render_link(array $content, string $attrs): string
+    private function render_link(array $content, string $attrs, string $dentro = ''): string
     {
+        $cuerpo = esc_html($content['label']) . $dentro;
         // Sin destino es un botón de verdad, no un enlace disfrazado. type
         // explícito para que no envíe el formulario que lo contenga.
         if (!isset($content['href'])) {
-            return '<button type="button" ' . $attrs . '>' . esc_html($content['label']) . '</button>';
+            return '<button type="button" ' . $attrs . '>' . $cuerpo . '</button>';
         }
         $target = ($content['target'] ?? 'self') === 'blank' ? ' target="_blank" rel="noopener noreferrer"' : '';
-        return '<a ' . $attrs . ' href="' . esc_url($content['href']) . '"' . $target . '>' . esc_html($content['label']) . '</a>';
+        return '<a ' . $attrs . ' href="' . esc_url($content['href']) . '"' . $target . '>' . $cuerpo . '</a>';
     }
 
     /** @param array<string, mixed> $content */
