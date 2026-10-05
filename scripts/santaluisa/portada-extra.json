@@ -1,0 +1,99 @@
+{
+  "heroFondo": [],
+  "heroImgs": [
+    "/wp-content/uploads/2026/09/fondo-portada-celular.webp",
+    "/wp-content/uploads/2026/09/fondo-portada-escritorio.webp",
+    null,
+    "/wp-content/uploads/2026/08/Familia-video-lumamatte-3.mp4"
+  ],
+  "heroTexto": [
+    {
+      "tag": "P",
+      "t": "Aquí ya hay vida",
+      "href": null
+    }
+  ],
+  "galeria": [
+    {
+      "src": "/wp-content/uploads/open-codesign/santa-luisa/DJI_0174-scaled.jpg",
+      "alt": "Vista aérea del loteo de Santa Luisa de Palpi"
+    },
+    {
+      "src": "/wp-content/uploads/open-codesign/galeria-ingreso.jpg",
+      "alt": "Acceso al loteo de Santa Luisa de Palpi"
+    },
+    {
+      "src": "/wp-content/uploads/open-codesign/galeria-cordillera.jpg",
+      "alt": "Cordillera nevada sobre los potreros del entorno"
+    },
+    {
+      "src": "/wp-content/uploads/open-codesign/galeria-camino.jpg",
+      "alt": "Camino de acceso bajo eucaliptos"
+    },
+    {
+      "src": "/wp-content/uploads/open-codesign/galeria-campo.png",
+      "alt": "Campo dorado con cerros de fondo"
+    },
+    {
+      "src": "/wp-content/uploads/open-codesign/galeria-estero.jpg",
+      "alt": "Estero natural del entorno"
+    },
+    {
+      "src": "/wp-content/uploads/open-codesign/galeria-caballos.jpg",
+      "alt": "Caballos pastando en el entorno de Santa Luisa de Palpi"
+    },
+    {
+      "src": "/wp-content/uploads/open-codesign/galeria-flora.jpg",
+      "alt": "Flora nativa del entorno"
+    },
+    {
+      "src": "/wp-content/uploads/open-codesign/galeria-camino2.jpg",
+      "alt": "Camino interior entre árboles"
+    },
+    {
+      "src": "/wp-content/uploads/2026/09/galeria-porton-cordillera.jpg",
+      "alt": "Portón de acceso a Santa Luisa de Palpi con la cordillera al fondo"
+    },
+    {
+      "src": "/wp-content/uploads/2026/09/galeria-camino-cercos.jpg",
+      "alt": "Camino interior entre cercos, con la cordillera nevada al fondo"
+    },
+    {
+      "src": "/wp-content/uploads/2026/09/galeria-camino-cerros.jpg",
+      "alt": "Camino de ripio hacia los cerros bajo un cielo aborregado"
+    },
+    {
+      "src": "/wp-content/uploads/2026/09/galeria-nogales-pajaro.jpg",
+      "alt": "Nogales en invierno y un pájaro en vuelo sobre el campo"
+    },
+    {
+      "src": "/wp-content/uploads/2026/09/galeria-casa-fachada.jpg",
+      "alt": "Casa terminada en una parcela, frente a los cerros"
+    },
+    {
+      "src": "/wp-content/uploads/2026/09/galeria-casa-jardin.jpg",
+      "alt": "Casa con jardín y camino de acceso, con la cordillera detrás"
+    },
+    {
+      "src": "/wp-content/uploads/2026/09/galeria-casa-construccion.jpg",
+      "alt": "Casa en construcción con revestimiento de madera y piedra"
+    },
+    {
+      "src": "/wp-content/uploads/2026/09/galeria-arbol-atardecer.jpg",
+      "alt": "Árbol solitario entre pasto alto con espigas, al atardecer"
+    },
+    {
+      "src": "/wp-content/uploads/2026/09/galeria-cielo-atardecer.jpg",
+      "alt": "Nubes encendidas por el atardecer sobre el campo de Santa Luisa de Palpi"
+    },
+    {
+      "src": "/wp-content/uploads/2026/09/serv-camino.jpg",
+      "alt": "Camino interior del loteo hacia el cerro"
+    },
+    {
+      "src": "/wp-content/uploads/2026/09/galeria-potrero-atardecer.jpg",
+      "alt": "Potrero con pasto seco y árboles recortados contra el atardecer"
+    }
+  ],
+  "galeriaCls": "wrap proyecto__grid cod-grid-i8nmqf"
+}

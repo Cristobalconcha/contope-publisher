@@ -5,6 +5,107 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.76 — 4 de octubre de 2026
+
+### OJO: la composición de la portada NO está aprobada
+
+Esta versión trae las capacidades del plugin que hacían falta para componer la
+portada —ésas sí están terminadas y probadas— y la receta de la página, que
+**está a medio camino y no debe desplegarse**.
+
+Al recomponerla no reproduje el diseño de Cristóbal: lo reconstruí desde mi
+lectura del contenido, y eso es otra cosa. El hero quedó con el título abajo a
+la izquierda, sin el logo y con la cursiva convertida en un rótulo pequeño; el
+vídeo de la familia, pegado al borde derecho en vez de centrado. Su pregunta,
+textual: *«¿qué tiene esto que ver con mi diseño? ¿Es una patudez tuya?»*. Lo
+era: componer la página no obligaba a mover un píxel.
+
+El hero ya está reproducido contra el sitio publicado y coincide en
+coordenadas. **El resto de las secciones sigue simplificado**, medido:
+
+| sección | sitio → receta |
+|---|---|
+| cierre | 28 imágenes → 0 · 26 enlaces → 3 |
+| ubicación | 9 párrafos → 3 |
+| modelos | 11 párrafos → 8 · 14 tarjetas → 12 |
+| historia | 454 px de alto → 1.259 |
+
+Queda pendiente decidir si se reproduce sección por sección o se restaura la
+portada original del espejo (revisión 410) y se rehace. **Producción no se ha
+tocado en ningún momento.**
+
+### La portada, por el constructor
+
+Era la última página y la más grande: **281 KB de HTML, 3.029 nodos**, ocho
+secciones, una galería de veinte fotos, dos mapas y un vídeo recortado. Ahora son
+**86 nodos y 75 reglas**.
+
+Con esto el sitio de Santa Luisa está completo por el constructor: cinco páginas
+y la barra compartida, todo compuesto. Lo único que queda sin componer en ese
+espejo son tres páginas de prueba.
+
+### Un módulo de la biblioteca se puede NOMBRAR desde una composición
+
+Los dos mapas y el visor 360 no son contenido que alguien escriba: el de
+ubicación lo produce `build-geo-map.mjs` consultando OpenStreetMap y son 2.642
+nodos. Mientras vivieran dentro del marcado de la página, esa página no se podía
+componer.
+
+El plugin ya tenía dónde guardarlos —`COD_Custom_Module_Library`, la biblioteca
+de súper-módulos, con HTML y CSS saneados e id estable para viajar entre sitios
+en un paquete—. **Lo que faltaba era poder referirse a uno desde una
+composición**: la biblioteca se usaba sólo desde el editor, copiando el módulo
+dentro de la página, y copiar es justo lo que no sirve para una pieza generada
+—el día que el mapa se regenere habría que volver a pegarlo en cada página—.
+
+Ahora un nodo `shortcode` lo nombra:
+
+```js
+{ kind: 'shortcode', content: { tag: 'contope_modulo', atts: { nombre: 'mapa-de-ubicacion' } } }
+```
+
+El CSS del módulo viaja con él y se emite una sola vez por página. Y
+`contope_modulo` entra en la lista de shortcodes que el lienzo ejecuta: sin eso
+una página podía pedir un módulo y recibir un comentario vacío, que es como se
+publicó la portada la primera vez —con sus tres módulos ausentes y sin que nada
+avisara—.
+
+Una nota de método, porque costó: el primer arreglo fue inventar un almacén
+nuevo, con archivos sueltos. Cristóbal lo paró en una línea: *«como que no está
+declarado, es un módulo del plugin»*. Dos almacenes parten en dos la respuesta a
+«¿qué módulos tiene este sitio?».
+
+### Una imagen puede traer su otro encuadre
+
+El fondo de esa portada es un plano apaisado en escritorio y uno **vertical** en
+teléfono. No es la misma foto más chica —para eso está el tamaño—: es otro
+recorte, porque recortar el apaisado deja la casa fuera del cuadro. El nodo
+`image` sólo sabía una fuente.
+
+Ahora acepta `assetUrlVertical` y sale como `<picture>`. El corte va por
+**proporción** y no por ancho, porque lo que decide cuál encuadre sirve es la
+forma de la pantalla, no cuántos píxeles mide.
+
+### Y un módulo no lleva el título de su sección
+
+Al guardar el plano de lotes se fue con el título de su sección dentro, así que
+la portada decía «Ven a elegir tu terreno» **dos veces**: una a 58/36, que es el
+nivel de sección, y otra a 55/34, que no es ningún nivel. Lo acusó el trinquete
+de la escala de títulos. `guardar-modulos.mjs` ahora los quita al extraer.
+
+### Los trinquetes, al día
+
+- **Títulos fuera de escala: cero en las cinco páginas.** La portada era la que
+  tenía los cuatro tamaños sueltos.
+- **Páginas sin composición: 3**, y las tres son páginas de prueba. El contenido
+  del sitio está completo.
+- El trinquete de títulos deja de contar el título del **formulario**: lo dibuja
+  el runtime de Orugantt Forms y, por contrato, el lienzo lo estila por variables
+  y nunca con reglas sobre sus campos. Contarlo hacía fallar a Contacto por un
+  tamaño que no se puede arreglar desde la composición.
+
+---
+
 ## 0.3.75 — 4 de octubre de 2026
 
 ### La escala de títulos: tres niveles, y nada fuera de ellos

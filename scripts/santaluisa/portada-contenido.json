@@ -1,0 +1,312 @@
+{
+  "hero": {
+    "titulos": [
+      {
+        "tag": "H1",
+        "tramos": [],
+        "todo": "Suma latuya"
+      }
+    ],
+    "parrafos": [
+      "Aquí ya hay vida"
+    ],
+    "listas": [],
+    "enlaces": [],
+    "imgs": [
+      {
+        "src": "/wp-content/uploads/2026/09/fondo-portada-escritorio.webp",
+        "alt": "Casa en Santa Luisa de Palpi vista desde el camino, entre pasto alto con espigas y un cerco de madera, con los cerros al fondo"
+      }
+    ]
+  },
+  "proyecto": {
+    "titulos": [
+      {
+        "tag": "H2",
+        "tramos": [
+          "Una forma distinta",
+          "de vivir"
+        ],
+        "todo": "Una forma distintade vivir"
+      }
+    ],
+    "parrafos": [
+      "El Proyecto",
+      "Santa Luisa es un proyecto de parcelas agrícolas en Paine, donde la naturaleza y la tranquilidad se encuentran para que disfrutes realmente lo que importa. Emplazado en un loteo de 13 hectáreas, Santa Luisa ha desarrollado un conjunto de 22 parcelas de 5.000 m² cada una, con servidumbres para acceso vehicular directo, urbanización soterrada, agua potable y rol propio para cada parcela.",
+      "Parcelas con rol propio, subdivisión autorizada por el SAG e inscripción en el Conservador de Bienes Raíces de Buin, sin hipotecas ni gravámenes. El proyecto cuenta además con estudios de títulos aprobados por distintas instituciones bancarias para operaciones con crédito hipotecario."
+    ],
+    "listas": [],
+    "enlaces": [
+      {
+        "t": "Conoce más del proyecto →",
+        "href": "/diferenciales/"
+      },
+      {
+        "t": "",
+        "href": "https://wa.me/56981866742?text=Hola%2C%20quiero%20m%C3%A1s%20informaci%C3%B3n%20sobre%20Santa%20Luisa%20de%20Palpi."
+      }
+    ],
+    "imgs": [
+      {
+        "src": "/wp-content/uploads/open-codesign/santa-luisa/DJI_0174-scaled.jpg",
+        "alt": "Vista aérea del loteo de Santa Luisa de Palpi"
+      },
+      {
+        "src": "/wp-content/uploads/open-codesign/galeria-ingreso.jpg",
+        "alt": "Acceso al loteo de Santa Luisa de Palpi"
+      },
+      {
+        "src": "/wp-content/uploads/open-codesign/galeria-cordillera.jpg",
+        "alt": "Cordillera nevada sobre los potreros del entorno"
+      },
+      {
+        "src": "/wp-content/uploads/open-codesign/galeria-camino.jpg",
+        "alt": "Camino de acceso bajo eucaliptos"
+      },
+      {
+        "src": "/wp-content/uploads/open-codesign/galeria-campo.png",
+        "alt": "Campo dorado con cerros de fondo"
+      },
+      {
+        "src": "/wp-content/uploads/open-codesign/galeria-estero.jpg",
+        "alt": "Estero natural del entorno"
+      },
+      {
+        "src": "/wp-content/uploads/open-codesign/galeria-caballos.jpg",
+        "alt": "Caballos pastando en el entorno de Santa Luisa de Palpi"
+      },
+      {
+        "src": "/wp-content/uploads/open-codesign/galeria-flora.jpg",
+        "alt": "Flora nativa del entorno"
+      },
+      {
+        "src": "/wp-content/uploads/open-codesign/galeria-camino2.jpg",
+        "alt": "Camino interior entre árboles"
+      },
+      {
+        "src": "/wp-content/uploads/2026/09/galeria-porton-cordillera.jpg",
+        "alt": "Portón de acceso a Santa Luisa de Palpi con la cordillera al fondo"
+      },
+      {
+        "src": "/wp-content/uploads/2026/09/galeria-camino-cercos.jpg",
+        "alt": "Camino interior entre cercos, con la cordillera nevada al fondo"
+      },
+      {
+        "src": "/wp-content/uploads/2026/09/galeria-camino-cerros.jpg",
+        "alt": "Camino de ripio hacia los cerros bajo un cielo aborregado"
+      },
+      {
+        "src": "/wp-content/uploads/2026/09/galeria-nogales-pajaro.jpg",
+        "alt": "Nogales en invierno y un pájaro en vuelo sobre el campo"
+      },
+      {
+        "src": "/wp-content/uploads/2026/09/galeria-casa-fachada.jpg",
+        "alt": "Casa terminada en una parcela, frente a los cerros"
+      },
+      {
+        "src": "/wp-content/uploads/2026/09/galeria-casa-jardin.jpg",
+        "alt": "Casa con jardín y camino de acceso, con la cordillera detrás"
+      },
+      {
+        "src": "/wp-content/uploads/2026/09/galeria-casa-construccion.jpg",
+        "alt": "Casa en construcción con revestimiento de madera y piedra"
+      },
+      {
+        "src": "/wp-content/uploads/2026/09/galeria-arbol-atardecer.jpg",
+        "alt": "Árbol solitario entre pasto alto con espigas, al atardecer"
+      },
+      {
+        "src": "/wp-content/uploads/2026/09/galeria-cielo-atardecer.jpg",
+        "alt": "Nubes encendidas por el atardecer sobre el campo de Santa Luisa de Palpi"
+      },
+      {
+        "src": "/wp-content/uploads/2026/09/serv-camino.jpg",
+        "alt": "Camino interior del loteo hacia el cerro"
+      },
+      {
+        "src": "/wp-content/uploads/2026/09/galeria-potrero-atardecer.jpg",
+        "alt": "Potrero con pasto seco y árboles recortados contra el atardecer"
+      }
+    ]
+  },
+  "mapaLotes": {
+    "titulos": [
+      {
+        "tag": "H2",
+        "tramos": [
+          "Ven a elegir",
+          "tu terreno"
+        ],
+        "todo": "Ven a elegirtu terreno"
+      }
+    ],
+    "parrafos": [
+      "Plano de parcelas",
+      "Lotes desde 5.000 m² cada uno.",
+      "Pasa el cursor —o toca— una parcela del plano para ver su información.",
+      "Lote Nº —",
+      "Solo quedan 10 parcelas disponibles",
+      "¿Te interesa un lote?",
+      "Carlos Valdivieso",
+      "+56 9 8186 6742"
+    ],
+    "listas": [],
+    "enlaces": [
+      {
+        "t": "Escríbele por WhatsApp",
+        "href": "https://wa.me/56981866742?text=Hola%2C%20quiero%20consultar%20por%20un%20lote%20del%20plano%20de%20Santa%20Luisa%20de%20Palpi."
+      },
+      {
+        "t": "",
+        "href": "https://wa.me/56981866742?text=Hola%2C%20quiero%20consultar%20por%20un%20lote%20espec%C3%ADfico%20del%20plano%20de%20Santa%20Luisa%20de%20Palpi."
+      }
+    ],
+    "imgs": []
+  },
+  "modelos": {
+    "titulos": [
+      {
+        "tag": "H2",
+        "tramos": [
+          "Aquí ya está el lugar.",
+          "Ahora suma tu casa"
+        ],
+        "todo": "Aquí ya está el lugar.Ahora suma tu casa"
+      }
+    ],
+    "parrafos": [
+      "Construye tu casa",
+      "En Santa Luisa los caminos ya existen, la infraestructura está instalada y los sistemas están funcionando. Además de elegir tu parcela, puedes acceder a una solución integral para construir tu casa.",
+      "Construir una casa desde cero puede generar muchas dudas: cómo elegir un arquitecto, desarrollar los planos y especialidades, gestionar los permisos o encontrar quién se haga cargo de la construcción.",
+      "Por eso, Santa Luisa pone a disposición de sus propietarios tres modelos de viviendas prediseñadas y una solución integral para acompañar el proceso completo, desde el proyecto arquitectónico hasta la recepción final.",
+      "Cada alternativa contempla el desarrollo arquitectónico, los proyectos de especialidades, la gestión de permisos municipales y ante el Servicio de Impuestos Internos, la construcción y la recepción final de la vivienda.",
+      "El servicio es opcional, se contrata a solicitud de cada propietario y se desarrolla específicamente para su parcela.",
+      "El servicio de construcción es opcional y se contrata por solicitud del propietario. Los modelos corresponden a viviendas por construir y no a casas terminadas disponibles para entrega inmediata. Santa Luisa no financia la construcción. Los valores y condiciones están sujetos a las características del terreno, las especificaciones del proyecto y la forma de pago acordada.*Valor referencial. Los precios y modelos de casas pueden cambiar sin previo aviso, quedando la inmobiliaria exenta de cualquier responsabilidad por dichas modificaciones.",
+      "Valle · 140 m²",
+      "Ladera · 215 m²",
+      "Cordillera · 248 m²",
+      "Aquí ya hay caminos, infraestructura y sistemas funcionando. También hay una solución para construir tu casa."
+    ],
+    "listas": [
+      "Tres modelos de vivienda para elegir.",
+      "Diseño y desarrollo arquitectónico.",
+      "Planos y proyectos de especialidades.",
+      "Gestión de permisos municipales.",
+      "Tramitación ante el Servicio de Impuestos Internos.",
+      "Construcción de la vivienda.",
+      "Gestión de la recepción final."
+    ],
+    "enlaces": [
+      {
+        "t": "Conoce los modelos disponibles →",
+        "href": "https://wa.me/56981866742?text=Hola%2C%20quiero%20conocer%20los%20modelos%20de%20casa%20disponibles."
+      },
+      {
+        "t": "",
+        "href": "https://wa.me/56981866742?text=Hola%2C%20quiero%20conocer%20los%20modelos%20de%20casa%20disponibles%20en%20Santa%20Luisa%20de%20Palpi."
+      }
+    ],
+    "imgs": []
+  },
+  "ubicacion": {
+    "titulos": [
+      {
+        "tag": "H2",
+        "tramos": [
+          "Ubicación",
+          "privilegiada"
+        ],
+        "todo": "Ubicaciónprivilegiada"
+      }
+    ],
+    "parrafos": [
+      "Cómo llegar",
+      "Camino Padre Hurtado en dirección sur, pasando la localidad de Alto Jahuel, comuna de Paine — a 45 minutos de Santiago. Mirando hacia el este se aprecia la majestuosa Cordillera de Los Andes.",
+      "Datos de calles: © contribuyentes de OpenStreetMap (ODbL) — arrastra o usa la rueda del mouse para explorar",
+      "Elige una categoría y un lugar arriba para verlo en el mapa.",
+      "— · — · — · —",
+      "Leyenda",
+      "calle / avenida",
+      "camino interior / huella",
+      "santa luisa de palpi"
+    ],
+    "listas": [],
+    "enlaces": [
+      {
+        "t": "Ver el proyecto en Google Maps ↗",
+        "href": "https://www.google.com/maps/search/?api=1&query=Condominio+Santa+Luisa+de+Palpi%2C+Paine"
+      },
+      {
+        "t": "",
+        "href": "https://wa.me/56981866742?text=Hola%2C%20tengo%20una%20consulta%20sobre%20la%20ubicaci%C3%B3n%20de%20Santa%20Luisa%20de%20Palpi."
+      }
+    ],
+    "imgs": []
+  },
+  "historia": {
+    "titulos": [
+      {
+        "tag": "H2",
+        "tramos": [
+          "Detrás del nombre"
+        ],
+        "todo": "Detrás del nombre"
+      }
+    ],
+    "parrafos": [
+      "La historia",
+      "Hay proyectos que nacen de un plano, y otros que nacen de la historia. Santa Luisa de Palpi es de los segundos.",
+      "Con el legado del antiguo Fundo El Palpi, nuestro nombre rinde homenaje a la hierba dulce que crece en estas tierras desde 1930. Aquí la tierra no solo tiene valor: tiene alma.",
+      "No te estamos ofreciendo un terreno. Te invitamos a continuar una historia de bienestar y naturaleza que ha perdurado casi un siglo.",
+      "“Santa Luisa no vende terrenos. Propone una forma distinta de vivir.”"
+    ],
+    "listas": [],
+    "enlaces": [],
+    "imgs": [
+      {
+        "src": "/wp-content/uploads/open-codesign/historia-palpi.jpg",
+        "alt": "Fachada de la antigua casona del Fundo El Palpi (recreación)"
+      }
+    ]
+  },
+  "drone": {
+    "titulos": [],
+    "parrafos": [
+      "Santa Luisaen Instagram",
+      "Resuelve tus dudas sobre parcelas, factibilidad y proceso de compra.",
+      "Escríbenos o agenda una visita guiada al terreno."
+    ],
+    "listas": [],
+    "enlaces": [
+      {
+        "t": "",
+        "href": "https://wa.me/56981866742?text=Hola%2C%20vi%20el%20Instagram%20de%20Santa%20Luisa%20de%20Palpi%20y%20quiero%20agendar%20una%20visita."
+      },
+      {
+        "t": "Santa Luisaen Instagram",
+        "href": "https://www.instagram.com/santaluisadepalpi"
+      },
+      {
+        "t": "Preguntas FrecuentesResuelve tus dudas sobre parcelas, factibilidad y proceso de compra.",
+        "href": "/preguntas-frecuentes/"
+      },
+      {
+        "t": "ContactoEscríbenos o agenda una visita guiada al terreno.",
+        "href": "/contacto/"
+      }
+    ],
+    "imgs": []
+  },
+  "pie": {
+    "titulos": [],
+    "parrafos": [],
+    "listas": [],
+    "enlaces": [
+      {
+        "t": "Términos y privacidad",
+        "href": "/terminos-y-condiciones/"
+      }
+    ],
+    "imgs": []
+  }
+}

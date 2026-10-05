@@ -876,6 +876,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
             'richText' => ['content' => ['paragraphs' => '1..24 textos planos']],
             'image' => ['content' => [
                 'assetUrl' => 'URL de activo',
+                'assetUrlVertical' => 'opcional. El OTRO ENCUADRE, para pantalla alta (no la misma foto más chica: otro recorte). Sale como <picture> y el navegador elige por la forma de la pantalla, no por su ancho.',
                 'alt' => 'texto requerido',
                 'caption' => 'opcional',
                 'rotation' => 'opcional, 0|90|180|270 (por defecto 0). Cuarto de vuelta de la imagen, en sentido horario. Es propiedad de la IMAGEN, no del marco: dentro de una galería cada ítem lleva el suyo, y el giro se respeta también al ampliar en el lightbox. Sirve para material de teléfono al que WordPress le borró la orientación EXIF sin girar los píxeles.',
@@ -3523,7 +3524,21 @@ final class COD_Canvas_MCP_Recipe_Compiler
     /** @param array<string, mixed> $content */
     private function normalize_image_content(array $content, bool $gallery_item)
     {
-        $allowed = ['assetUrl', 'alt', 'caption', 'rotation'];
+        /*
+         * assetUrlVertical: EL OTRO RECORTE, el de pantalla alta.
+         *
+         * No es la misma foto más chica —para eso está el tamaño—: es OTRO
+         * encuadre. El fondo de la portada de Santa Luisa es un plano apaisado
+         * en escritorio y uno vertical en teléfono, porque recortar el apaisado
+         * deja la casa fuera del cuadro. Eso en la web se dice con <picture>, y
+         * el nodo image sólo sabía una fuente: por eso ese hero seguía escrito a
+         * mano.
+         *
+         * El corte va por PROPORCIÓN y no por ancho (max-aspect-ratio 4/5, que es
+         * lo que usa el sitio), porque lo que decide cuál encuadre sirve es la
+         * forma de la pantalla, no cuántos píxeles mide.
+         */
+        $allowed = ['assetUrl', 'assetUrlVertical', 'alt', 'caption', 'rotation'];
         if (!$this->has_only_keys($content, $allowed) || !isset($content['assetUrl'], $content['alt'])
             || !is_string($content['assetUrl']) || !$this->is_safe_asset_url($content['assetUrl'])
             || !$this->is_plain_text($content['alt'], 1000)
@@ -3542,8 +3557,13 @@ final class COD_Canvas_MCP_Recipe_Compiler
             }
             $rotation = $content['rotation'];
         }
+        if (isset($content['assetUrlVertical'])
+            && (!is_string($content['assetUrlVertical']) || !$this->is_safe_asset_url($content['assetUrlVertical']))) {
+            return new WP_Error('cod_mcp_image_invalid', 'assetUrlVertical debe ser un activo Canvas resuelto.');
+        }
         return [
             'assetUrl' => $content['assetUrl'],
+            'assetUrlVertical' => isset($content['assetUrlVertical']) ? $content['assetUrlVertical'] : '',
             'alt' => $content['alt'],
             'caption' => isset($content['caption']) ? $content['caption'] : '',
             'rotation' => $rotation,
@@ -4736,9 +4756,16 @@ final class COD_Canvas_MCP_Recipe_Compiler
             ? ' class="cod-rot-' . $rotation . '" data-cod-rotation="' . $rotation . '"'
             : '';
         $marco = $rotation === 90 || $rotation === 270 ? ' cod-marco-girado' : '';
-        return '<figure ' . $this->add_class_to_attrs($attrs, $marco) . '><img src="' . esc_url($content['assetUrl'])
+        $img = '<img src="' . esc_url($content['assetUrl'])
             . '" alt="' . esc_attr($content['alt']) . '"' . $rot_attrs
-            . $this->atributos_de_carga($content['assetUrl']) . '>' . $caption . '</figure>';
+            . $this->atributos_de_carga($content['assetUrl']) . '>';
+        // Con el otro encuadre, la imagen va dentro de un <picture>: el
+        // navegador elige por la FORMA de la pantalla, no por su ancho.
+        if (($content['assetUrlVertical'] ?? '') !== '') {
+            $img = '<picture><source media="(max-aspect-ratio: 4 / 5)" srcset="'
+                . esc_url($content['assetUrlVertical']) . '">' . $img . '</picture>';
+        }
+        return '<figure ' . $this->add_class_to_attrs($attrs, $marco) . '>' . $img . $caption . '</figure>';
     }
 
     /**

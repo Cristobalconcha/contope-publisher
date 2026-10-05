@@ -36,6 +36,16 @@ final class COD_Canvas_Shortcode_Renderer
      */
     private const PERMITIDOS = [
         'instagram-feed',   // Smash Balloon Instagram Feed
+        /*
+         * El nuestro. Va en la constante y no por el filtro —que es la vía para
+         * los de TERCEROS— porque es el que permite nombrar un módulo de la
+         * biblioteca del propio plugin desde una composición. Dejarlo fuera
+         * significaba que una página podía pedir un módulo y recibir un
+         * comentario vacío: así se publicó la portada de Santa Luisa la primera
+         * vez, con sus tres módulos (los dos mapas y el visor 360) ausentes y
+         * sin que nada avisara.
+         */
+        COD_Modulo::SHORTCODE,
     ];
 
     /** @return list<string> */

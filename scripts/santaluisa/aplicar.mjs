@@ -34,6 +34,7 @@ const PAGINAS = {
    * previewId exacto— es idéntico, que es justamente la razón de que el canal
    * devuelva la misma clave `document` en los dos casos.
    */
+  portada: { guion: 'componer-portada.mjs', archivo: 'portada.json', pageId: 308, documentId: 'ocd-canvas-page-7', variable: 'REV_PORTADA' },
   encabezado: { guion: 'componer-encabezado.mjs', archivo: 'encabezado.json', pageId: 0, documentId: 'ocd-template-d5a667af-b7aa-498f-a986-bbe61a63add6', variable: 'REV_ENCABEZADO' },
 };
 

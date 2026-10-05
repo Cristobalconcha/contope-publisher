@@ -102,7 +102,7 @@ R('sl-titulo-aire', 'properties', { declarations: { 'margin-block-start': '0', '
 // mismo título, y por eso las dos van dentro del MISMO encabezado.
 //
 //   nivel      cursiva   versales   llana     dónde
-//   portada       —         68        32      el hero, y el título de un documento
+//   portada       64        68        32      el hero, y el título de un documento
 //   sección       58        36        24      la entrada de cada sección
 //   recuadro      44        26        18      un título dentro de una caja o un mapa
 //
@@ -122,7 +122,15 @@ R('sl-titulo-aire', 'properties', { declarations: { 'margin-block-start': '0', '
 // Portada. Un solo título por sitio: el hero. Tener su propia clase es
 // exactamente lo que él pidió, y lo que evita que «más grande» se resuelva
 // estirando el de sección.
-R('sl-titulo-portada', 'typography', { role: 'titulo-portada', family: 'var(--font-body)', fontSize: 'clamp(38px, 5.4vw, 68px)', fontWeight: 700, letterSpacing: '0.01em', lineHeight: 1.02, transform: 'uppercase' });
+// Medido en el hero del sitio publicado: 68px, peso 800, espaciado NEGATIVO
+// (-0,01em) y altura de línea 0,98. El espaciado negativo no es un detalle: a
+// este tamaño junta las letras y es lo que le da el bloque compacto.
+R('sl-titulo-portada', 'typography', { role: 'titulo-portada', family: 'var(--font-body)', fontSize: 'clamp(38px, 5.4vw, 68px)', fontWeight: 800, letterSpacing: '-0.01em', lineHeight: 0.98, transform: 'uppercase' });
+// Y su cara cursiva, que yo había dado por inexistente: es «Aquí ya hay vida»,
+// en Birthstone a 64px y en el dorado de la marca, pegada al título por un
+// margen inferior negativo. No es un rótulo: es la otra cara del mismo título.
+R('sl-titulo-portada-script', 'typography', { role: 'titulo-portada-script', family: 'var(--font-hero)', fontSize: 'clamp(40px, 5vw, 64px)', fontWeight: 400, lineHeight: 1 });
+R('sl-titulo-portada-script-encaje', 'properties', { declarations: { display: 'block', 'margin-block-end': '-14px' } });
 R('sl-titulo-portada-llana', 'typography', { role: 'titulo-portada-llana', family: 'var(--font-body)', fontSize: 'clamp(26px, 2.8vw, 32px)', fontWeight: 700, lineHeight: 1.05 });
 
 // Sección. El nivel de trabajo del sitio: lo usan las cuatro interiores y casi

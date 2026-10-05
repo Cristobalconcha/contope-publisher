@@ -60,11 +60,15 @@ const TECHOS = {
   '/preguntas-frecuentes/': 0,
   '/contacto/': 0,
   '/terminos-y-condiciones/': 0,
-  // 4 al 2026-10-04, medidos: 55 y 48 en la cursiva, 34 y 30 en las versales.
-  // Los cuatro son la misma sección —«Ven a elegir tu terreno» y «Ubicación
-  // privilegiada»— y no son otro nivel: son el de sección escrito dos veces a
-  // ojo. Desaparecen cuando la portada se componga.
-  '/': 4,
+  // 0 desde el 2026-10-04, al componerla. Era 4: 55 y 48 en la cursiva, 34 y 30
+  // en las versales, todos en la misma sección y todos el nivel de sección
+  // escrito dos veces a ojo.
+  //
+  // Dos de ellos sobrevivieron un rato a la composición y no por la página: el
+  // módulo del plano de lotes se había guardado CON el título de su sección
+  // dentro, así que la portada lo decía dos veces, una a 58/36 y otra a 55/34.
+  // Un módulo no lleva el título de su sección; lo arregla guardar-modulos.mjs.
+  '/': 0,
 };
 
 let fallas = 0;
@@ -97,7 +101,11 @@ for (const ruta of Object.keys(TECHOS)) {
    */
   const medidas = JSON.parse(await evaluar(`JSON.stringify(
     [...document.querySelectorAll('h1,h2,h3')]
-      .filter((h) => h.closest('.cod-mcp-page, .cod-canvas-published'))
+      // El título del FORMULARIO no cuenta: lo dibuja el runtime de Orugantt
+      // Forms y, por contrato, el lienzo lo estila por variables y nunca con
+      // reglas sobre sus campos. Contarlo acá hacía fallar a Contacto por un
+      // tamaño que no es nuestro y que no se arregla desde la composición.
+      .filter((h) => h.closest('.cod-mcp-page, .cod-canvas-published') && !h.closest('.ofr-form'))
       .flatMap((h) => {
         const tramos = [...h.querySelectorAll('span')];
         return (tramos.length ? tramos : [h]).map((e) => ({

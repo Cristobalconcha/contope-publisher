@@ -44,12 +44,14 @@ $SITIOS = [
     ],
     'Santa Luisa (espejo local, heredado del HTML)' => [
         'wp' => __DIR__ . '/../../wp-local/wordpress/wp-load.php',
-        // 4 al 2026-10-04, tras recomponer las CUATRO páginas interiores. Era 8
-        // al empezar el día. Es deuda conocida, no un permiso: ver el encabezado.
-        // Las 4 que quedan: la portada del sitio y TRES páginas de prueba
+        // 3 al 2026-10-04, tras componer también LA PORTADA. Era 8 al empezar el
+        // día: las cuatro interiores, la portada, y la barra de navegación que
+        // ni siquiera se contaba porque esta prueba no miraba las regiones.
+        //
+        // Las 3 que quedan NO son contenido del sitio: son páginas de prueba
         // (f3b-legacy-doc, Prueba WhatsApp CTA y Prueba viewport y animación).
-        // El trinquete acusó que yo había puesto 3 contando mal: hizo su trabajo.
-        'sin_composicion_aceptadas' => 4,
+        // El sitio de Santa Luisa está, de hecho, completamente compuesto.
+        'sin_composicion_aceptadas' => 3,
         // 1 al 2026-10-04, tras componer la BARRA DE NAVEGACIÓN. Era 2. La que
         // queda es un encabezado de plantilla vacío y duplicado que sobró de
         // una prueba («Landing», 0 B); no se borra acá porque borrar es del

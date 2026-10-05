@@ -1,0 +1,18 @@
+{
+  "heroBg": "<picture><source media=\"(max-aspect-ratio: 4 / 5)\" srcset=\"/wp-content/uploads/2026/09/fondo-portada-celular.webp\" type=\"image/webp\"><img fetchpriority=\"high\" src=\"/wp-content/uploads/2026/09/fondo-portada-escritorio.webp\" alt=\"Casa en Santa Luisa de Palpi vista desde el camino, entre pasto alto con espigas y un cerco de madera, con los cerros al fondo\" width=\"2880\" height=\"1800\" decoding=\"async\">",
+  "heroFamily": "<div data-cod-luma-matte=\"1\" class=\"cod-luma-matte cod-luma-matte--listo\" data-cod-luma-matte-runtime=\"1\"><video id=\"ip0gb\" hidden=\"\" autoplay=\"\" muted=\"\" loop=\"\" playsinline=\"\" preload=\"auto\" class=\"cod-luma-matte__video\"><source src=\"/wp-content/uploads/2026/08/Familia-video-lumamatte-3.mp4\" type=\"video/mp4\"></video><canvas class=\"cod-luma-matte__canvas\" width=\"1280\" height=\"720\"></canvas></div>",
+  "heroContent": "Aquí ya hay vida\n\nSUMA LA\nTUYA",
+  "heroHint": "DESLIZA",
+  "fichas": [
+    "PARCELAS PLANAS DE 5.000 M² EN 13 HECTÁREAS",
+    "AGUA POTABLE Y ELECTRICIDAD INDIVIDUAL POR PARCELA",
+    "LOTEO CONSOLIDADO CON ACCESO CONTROLADO",
+    "ROL PROPIO, PROPIEDAD INDEPENDIENTE A TU NOMBRE",
+    "DESDE RUTA 5 Y AUTOPISTA ACCESO SUR, POR BUIN Y PAINE",
+    "LOCALIZADO A SOLO 45 MINUTOS EN AUTO DESDE SANTIAGO",
+    "SERVICIOS Y COLEGIOS A 10 MINUTOS DEL LUGAR",
+    "ENTRADA DIRECTA POR CAMINO PADRE HURTADO"
+  ],
+  "drone": "SANTA LUISAen Instagram\n\nPREGUNTAS FRECUENTES\n\nResuelve tus dudas sobre parcelas, factibilidad y proceso de compra.\n\nCONTACTO\n\nEscríbenos o agenda una visita guiada al terreno.",
+  "visor360": "<div class=\"visor360__barra\"><p class=\"visor360__titulo\">Recorrido aéreo · Santa Luisa de Palpi</p><button type=\"button\" aria-label=\"Cerrar el recorrido\" class=\"visor360__cerrar\">Cerrar ✕</button></div><iframe title=\"Recorrido aéreo 360° de Santa Luisa de Palpi\" allowfullscreen=\"true\" loading=\"eager"
+}

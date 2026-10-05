@@ -2,7 +2,7 @@
 /**
  * Plugin Name: ContOpe Publisher
  * Description: Importa proyectos ContOpe Design como páginas Gutenberg nativas y editables.
- * Version: 0.3.75
+ * Version: 0.3.76
  * Requires at least: 6.5
  * Requires PHP: 8.0
  * Author: Cristóbal Concha
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('COD_PUBLISHER_VERSION', '0.3.75');
+define('COD_PUBLISHER_VERSION', '0.3.76');
 define('COD_PUBLISHER_FILE', __FILE__);
 define('COD_PUBLISHER_DIR', plugin_dir_path(__FILE__));
 
@@ -30,6 +30,7 @@ require_once COD_PUBLISHER_DIR . 'includes/class-cod-canvas-asset-resolver.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-template-region-resolver.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-dynamic-token-resolver.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-canvas-shortcode-renderer.php';
+require_once COD_PUBLISHER_DIR . 'includes/class-cod-modulo.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-canvas-page-publisher.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-canvas-editor-admin.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-custom-module-library.php';
@@ -69,6 +70,7 @@ require_once COD_PUBLISHER_DIR . 'includes/class-cod-migracion-nombres.php';
 // antes de que cualquier otra pieza intente leerlos. Corre una sola vez.
 (new COD_Migracion_Nombres())->register();
 
+
 add_action('plugins_loaded', static function (): void {
     $validator = new COD_Package_Validator();
     $serializer = new COD_Block_Serializer();
@@ -95,6 +97,12 @@ add_action('plugins_loaded', static function (): void {
     $canvas_publisher = new COD_Canvas_Page_Publisher($canvas_repository, $region_resolver, $token_resolver);
     $canvas_publisher->register();
     $custom_module_library = new COD_Custom_Module_Library();
+    // Y poder NOMBRAR uno de esos módulos desde una composición, que es lo
+    // único que le faltaba a la biblioteca: se usaba sólo desde el editor,
+    // copiando el módulo dentro de la página. Una pieza generada —un mapa— no
+    // se puede copiar: el día que se regenere habría que volver a pegarla en
+    // cada página que la use.
+    (new COD_Modulo($custom_module_library))->register();
     $canvas_asset_resolver = new COD_Canvas_Asset_Resolver();
     (new COD_Canvas_Editor_Admin(
         $canvas_repository,
