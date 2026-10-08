@@ -109,7 +109,14 @@ final class COD_Consentimiento
          * gestor que lo recoja; forzarlo a `true` sin gestor deja el sitio sin
          * medición alguna, porque nadie podrá conceder nada.
          */
-        return (bool) apply_filters('cod_consentimiento_exigir', self::hay_gestor());
+        // «Como antes»: un sitio que ya medía cuando se actualizó el plugin sigue
+        // midiendo igual hasta que quien lo administra decida lo contrario (ver
+        // COD_Medicion::CONSENTIMIENTO_HEREDADO).
+        $base = COD_Medicion::ajustes()['consentimiento'] === COD_Medicion::CONSENTIMIENTO_HEREDADO
+            ? false
+            : self::hay_gestor();
+
+        return (bool) apply_filters('cod_consentimiento_exigir', $base);
     }
 
     /**
@@ -291,6 +298,12 @@ final class COD_Consentimiento
      */
     public static function fragmento_consent_mode(): string
     {
+        // «Como antes»: el sitio medía sin declarar nada de consentimiento y sigue igual.
+        // Declarar aquí un valor por omisión cambiaría lo que ya hacían sus etiquetas.
+        if (COD_Medicion::ajustes()['consentimiento'] === COD_Medicion::CONSENTIMIENTO_HEREDADO) {
+            return '';
+        }
+
         $concedidas = self::exigir() ? self::concedidas() : array_fill_keys(self::CATEGORIAS, true);
 
         $estado = static fn (bool $si): string => $si ? 'granted' : 'denied';

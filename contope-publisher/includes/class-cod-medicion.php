@@ -27,8 +27,31 @@ final class COD_Medicion
     public const OPTION_KEY = 'cod_medicion';
     public const CAPABILITY = 'manage_options';
 
+    /**
+     * Cómo trata este sitio el consentimiento de cookies.
+     *
+     *  - `auto`:     si hay un gestor de consentimiento, lo medido espera el permiso;
+     *                 si no lo hay, se mide como siempre. Es lo que corresponde a un
+     *                 sitio nuevo.
+     *  - `heredado`: se mide como antes de que existiera la puerta, sin esperar nada.
+     *                 Es lo que recibe un sitio que YA tenía medición configurada
+     *                 cuando se actualizó el plugin.
+     *
+     * POR QUÉ EXISTE (7-oct-2026). Santa Luisa tenía Tag Manager andando. Al
+     * subirlo de 0.3.29 a 0.3.78 el contenedor quedó dormido hasta que alguien
+     * aceptara cookies, y el noscript desapareció. La configuración guardada no
+     * se había perdido —seguía el mismo GTM-…—; lo que cambió fue el
+     * comportamiento, sin aviso y sin que nadie lo decidiera. Cristóbal: «las
+     * actualizaciones deberían verificar si existe una configuración y
+     * guardarla al cambiar la versión». Una actualización no cambia lo que un
+     * sitio ya hacía; ofrece el cambio y lo dice.
+     */
+    public const CONSENTIMIENTO_AUTO = 'auto';
+    public const CONSENTIMIENTO_HEREDADO = 'heredado';
+
     public function register(): void
     {
+        self::migrar_consentimiento();
         add_action('wp_head', [$this, 'imprimir_en_head'], 1);
         add_action('wp_body_open', [$this, 'imprimir_tras_body'], 1);
         add_action('admin_post_cod_save_medicion', [$this, 'guardar']);
@@ -51,7 +74,57 @@ final class COD_Medicion
             'meta_pixel' => (string) ($guardado['meta_pixel'] ?? ''),
             'verificaciones' => (string) ($guardado['verificaciones'] ?? ''),
             'excluir_admin' => !empty($guardado['excluir_admin']),
+            'consentimiento' => self::modo_de_consentimiento($guardado),
         ];
+    }
+
+    /**
+     * ¿Hay algo que medir configurado? (Un identificador cualquiera.)
+     *
+     * @param array<string, mixed> $guardado
+     */
+    private static function hay_etiquetas(array $guardado): bool
+    {
+        foreach (['gtm', 'ga4', 'ads', 'meta_pixel'] as $campo) {
+            if ((string) ($guardado[$campo] ?? '') !== '') {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * El modo que corresponde a lo guardado. Función pura: no escribe nada.
+     * Lo que ya se decidió manda; si nunca se decidió, un sitio con medición
+     * configurada es uno que viene de antes de la puerta (heredado) y uno sin
+     * ella es nuevo (auto).
+     *
+     * @param array<string, mixed> $guardado
+     */
+    public static function modo_de_consentimiento(array $guardado): string
+    {
+        $modo = (string) ($guardado['consentimiento'] ?? '');
+        if ($modo === self::CONSENTIMIENTO_AUTO || $modo === self::CONSENTIMIENTO_HEREDADO) {
+            return $modo;
+        }
+        return self::hay_etiquetas($guardado) ? self::CONSENTIMIENTO_HEREDADO : self::CONSENTIMIENTO_AUTO;
+    }
+
+    /**
+     * Fija el modo la primera vez, en vez de recalcularlo siempre: si un sitio
+     * heredado queda decidido y luego se le añade otra etiqueta, no cambia de
+     * modo por eso. Sólo escribe cuando hay algo que fijar.
+     */
+    public static function migrar_consentimiento(): void
+    {
+        $guardado = get_option(self::OPTION_KEY, false);
+        if (!is_array($guardado) || array_key_exists('consentimiento', $guardado)) {
+            return;
+        }
+        if (self::hay_etiquetas($guardado)) {
+            $guardado['consentimiento'] = self::CONSENTIMIENTO_HEREDADO;
+            update_option(self::OPTION_KEY, $guardado, true);
+        }
     }
 
     /**
@@ -371,6 +444,13 @@ final class COD_Medicion
         $errores = [];
         $valores = ['excluir_admin' => !empty($post['cod_medicion_excluir_admin'])];
 
+        // El modo de consentimiento sólo admite sus dos valores; cualquier otra
+        // cosa (o su ausencia) conserva lo que estaba decidido.
+        $elegido = isset($post['cod_medicion_consentimiento']) ? (string) $post['cod_medicion_consentimiento'] : '';
+        $valores['consentimiento'] = in_array($elegido, [self::CONSENTIMIENTO_AUTO, self::CONSENTIMIENTO_HEREDADO], true)
+            ? $elegido
+            : self::modo_de_consentimiento($previos);
+
         foreach (self::formatos() as $campo => $formato) {
             $crudo = isset($post['cod_medicion_' . $campo])
                 ? self::normalizar((string) $post['cod_medicion_' . $campo], $campo)
@@ -453,6 +533,13 @@ final class COD_Medicion
                 . '—vigente desde el 1 de diciembre de 2026— pide pedir permiso antes de medir y antes de '
                 . 'hacer publicidad. Instalando un plugin de consentimiento, estas etiquetas esperan solas: '
                 . 'no hay que volver a esta pantalla.';
+        }
+
+        if ($hay_algo && ($a['consentimiento'] ?? '') === self::CONSENTIMIENTO_HEREDADO && COD_Consentimiento::hay_gestor()) {
+            $avisos[] = 'Este sitio mide SIN esperar el consentimiento («como antes»), aunque tiene un gestor de '
+                . 'cookies. Se dejó así al actualizar el plugin para no cambiar lo que ya funcionaba. La Ley 21.719 '
+                . '—vigente desde el 1 de diciembre de 2026— pide permiso antes de medir: cambia «Consentimiento» '
+                . 'a «Esperar el consentimiento» abajo antes de esa fecha.';
         }
 
         $hay_gtag = (string) ($a['ga4'] ?? '') !== '' || (string) ($a['ads'] ?? '') !== '';

@@ -125,7 +125,8 @@ function comprobar(string $que, bool $cierto): void
 /** El HTML que el plugin imprimiría con esta cookie y estos ajustes. */
 function salida(?string $cookie, array $ajustes, bool $con_gestor = true): string
 {
-    $GLOBALS['cod_opciones'][COD_Medicion::OPTION_KEY] = $ajustes;
+    // Estas pruebas miden la PUERTA, así que el modo es «auto»; el modo «heredado» tiene la suya (probar-consentimiento-modo.php).
+    $GLOBALS['cod_opciones'][COD_Medicion::OPTION_KEY] = $ajustes + ['consentimiento' => 'auto'];
     $GLOBALS['cod_plugins_activos'] = $con_gestor ? ['cookieadmin/cookieadmin.php'] : [];
     $GLOBALS['cod_opciones']['active_plugins'] = $GLOBALS['cod_plugins_activos'];
 

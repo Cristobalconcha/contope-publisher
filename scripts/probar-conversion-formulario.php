@@ -43,6 +43,7 @@ $verifica = function (string $nombre, bool $bien, string $detalle = '') use (&$f
 $FORM = 'AW-751289133/dnRYCLmy84odEK2Gn-YC';
 $WA = 'AW-751289133/WhAtSaPpLaBeL_01';
 $BASE = [
+    'consentimiento' => 'auto', // estas pruebas miden la PUERTA; el modo «heredado» tiene su prueba aparte
     'gtm' => '', 'ga4' => '', 'ads' => 'AW-751289133', 'meta_pixel' => '', 'verificaciones' => '',
     'excluir_admin' => false, 'ads_conv_formulario' => '', 'ads_conv_whatsapp' => '',
 ];
@@ -138,6 +139,11 @@ $verifica('prefijo en minúsculas: se corrige, la etiqueta no', $valores['ads_co
 $verifica('vaciar el campo a propósito sí lo vacía', $errores === [] && $valores['ads_conv_formulario'] === '');
 
 // 6. Avisos en la pantalla.
+// Los avisos dependen de COD_Consentimiento::exigir(), que lee la opción guardada: se fija en «auto»
+// para que lo que se mide sea el aviso y no el estado de la base de este local.
+$fija_auto = static fn () => $BASE;
+add_filter('pre_option_cod_medicion', $fija_auto);
+COD_Consentimiento::olvidar();
 $av = COD_Medicion::avisos_de_conversion(array_merge($BASE, ['ads' => '', 'ads_conv_formulario' => $FORM]));
 $verifica('etiqueta sin ningún ID: avisa', count($av) === 1 && strpos($av[0], 'no medirá nada') !== false, $av[0] ?? '');
 $av = COD_Medicion::avisos_de_conversion(array_merge($BASE, ['ads' => 'AW-999999999', 'ads_conv_whatsapp' => $WA]));
@@ -146,6 +152,7 @@ $av = COD_Medicion::avisos_de_conversion(array_merge($BASE, ['ads' => '', 'ga4' 
 $verifica('sólo Analytics 4 y etiqueta de Ads: avisa', count($av) === 1, $av[0] ?? '');
 $verifica('etiqueta con su ID: sin avisos', COD_Medicion::avisos_de_conversion(array_merge($BASE, ['ads_conv_formulario' => $FORM, 'ads_conv_whatsapp' => $WA])) === []);
 $verifica('sin etiquetas: sin avisos', COD_Medicion::avisos_de_conversion($BASE) === []);
+remove_filter('pre_option_cod_medicion', $fija_auto);
 
 // La pantalla de verdad: los campos nuevos y el aviso salen en el HTML.
 if ($admin !== []) {

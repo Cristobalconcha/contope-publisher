@@ -5,6 +5,32 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.79 — 8 de octubre de 2026
+
+### Una actualización ya no cambia lo que un sitio medía
+
+Al subir Santa Luisa de 0.3.29 a 0.3.78, Tag Manager pasó de cargarse siempre a
+quedar dormido hasta que alguien aceptara cookies, y el `<noscript>` desapareció.
+La configuración guardada no se había perdido —seguía el mismo `GTM-…`—; lo que
+cambió fue el comportamiento, sin aviso y sin que nadie lo decidiera.
+
+Ahora el consentimiento es un ajuste explícito, en la pantalla de Medición:
+
+- **Esperar el consentimiento** (`auto`): si hay un gestor de cookies, lo medido
+  espera el permiso. Es lo que recibe un sitio nuevo.
+- **Como antes** (`heredado`): se mide sin esperar, exactamente como antes de que
+  existiera la puerta. Lo recibe solo un sitio que **ya tenía medición
+  configurada** cuando se actualizó, y la pantalla le avisa que conviene cambiarlo
+  antes del 1 de diciembre de 2026 (Ley 21.719).
+
+En modo «como antes» el contenedor sale activo, vuelve el `<noscript>` y no se
+declara ningún consentimiento por omisión. El filtro `cod_consentimiento_exigir`
+sigue mandando sobre todo. Lo fija `scripts/probar-consentimiento-modo.php`; las
+pruebas de la puerta (`probar-consentimiento.php`, `probar-conversion-formulario.php`)
+ahora declaran su modo en vez de depender del estado de la base.
+
+---
+
 ## 0.3.78 — 7 de octubre de 2026
 
 ### Módulo de trama: un fondo que se dibuja, no un video

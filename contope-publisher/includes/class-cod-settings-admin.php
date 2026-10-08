@@ -502,6 +502,28 @@ final class COD_Settings_Admin
                                     </td>
                                 </tr>
                                 <tr>
+                                    <th scope="row">
+                                        <label for="cod_medicion_consentimiento">Consentimiento</label>
+                                    </th>
+                                    <td>
+                                        <select id="cod_medicion_consentimiento" name="cod_medicion_consentimiento">
+                                            <option value="auto" <?php selected($cod_medicion['consentimiento'], 'auto'); ?>>
+                                                Esperar el consentimiento (si hay un gestor de cookies)
+                                            </option>
+                                            <option value="heredado" <?php selected($cod_medicion['consentimiento'], 'heredado'); ?>>
+                                                Como antes: medir sin esperar
+                                            </option>
+                                        </select>
+                                        <p class="description">
+                                            Con «Esperar», lo de arriba no se carga hasta que la persona acepta las
+                                            cookies del banner; es lo que pide la Ley 21.719 desde el 1 de diciembre
+                                            de 2026. «Como antes» deja el sitio midiendo desde la primera visita:
+                                            es lo que se aplica solo a un sitio que ya medía cuando se actualizó
+                                            el plugin, para no cambiarle el comportamiento sin que lo decidas.
+                                        </p>
+                                    </td>
+                                </tr>
+                                <tr>
                                     <th scope="row">Tus propias visitas</th>
                                     <td>
                                         <label for="cod_medicion_excluir_admin">
