@@ -33,6 +33,9 @@ Qué cambió en cada versión: **[CHANGELOG.md](CHANGELOG.md)**
 - **Comportamientos declarativos** —carruseles, acordeones, visores de
   contenido externo, ventana de WhatsApp con evento medible— sin escribir
   JavaScript en el contenido.
+- **Módulo de trama**: fondo generativo de puntos en 3D, vivo o fijo, definido
+  por un código de captura que siempre reproduce la misma imagen. Sin video,
+  sin red, sin lag. Detalle en [`docs/modulo-trama.md`](docs/modulo-trama.md).
 - **Portabilidad**: exportar e importar un sitio completo entre instalaciones.
 
 ## Qué NO hace todavía

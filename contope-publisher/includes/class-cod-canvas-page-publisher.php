@@ -1830,6 +1830,15 @@ CSS;
             COD_PUBLISHER_VERSION,
             true
         );
+        // Módulo de trama (superficie de puntos): fondo generativo declarativo,
+        // `data-cod-trama="SP1.…"`. Ver docs/modulo-trama.md.
+        wp_enqueue_script(
+            'cod-trama',
+            plugins_url('assets/js/cod-trama.js', COD_PUBLISHER_FILE),
+            [],
+            COD_PUBLISHER_VERSION,
+            true
+        );
         wp_enqueue_script(
             'cod-preload',
             plugins_url('assets/js/cod-preload.js', COD_PUBLISHER_FILE),

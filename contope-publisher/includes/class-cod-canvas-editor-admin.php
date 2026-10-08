@@ -414,10 +414,19 @@ final class COD_Canvas_Editor_Admin
             COD_PUBLISHER_VERSION,
             true
         );
+        // Módulo de trama (superficie de puntos): fondo generativo declarativo,
+        // `data-cod-trama="SP1.…"`. Ver docs/modulo-trama.md.
+        wp_enqueue_script(
+            'cod-trama',
+            plugins_url('assets/js/cod-trama.js', COD_PUBLISHER_FILE),
+            [],
+            COD_PUBLISHER_VERSION,
+            true
+        );
         wp_enqueue_script(
             'cod-editor-core',
             plugins_url('assets/js/cod-editor-core.js', COD_PUBLISHER_FILE),
-            ['cod-grapesjs', 'cod-computed-inspector', 'cod-canvas-grid', 'cod-grid-controls', 'cod-behaviors', 'cod-luma-matte-video', 'cod-interactions'],
+            ['cod-grapesjs', 'cod-computed-inspector', 'cod-canvas-grid', 'cod-grid-controls', 'cod-behaviors', 'cod-luma-matte-video', 'cod-trama', 'cod-interactions'],
             COD_PUBLISHER_VERSION,
             true
         );

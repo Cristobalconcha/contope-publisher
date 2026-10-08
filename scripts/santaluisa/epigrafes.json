@@ -1,0 +1,10 @@
+{
+  "_comentario": "Los cuatro epígrafes de título de sección (El proyecto, Construye tu casa, Cómo llegar, La historia) con el MISMO tamaño y la MISMA distancia al título: 11px, 6px. Cristóbal, 7-oct-2026: que producción lo tenga igual no es argumento; se está normalizando. Cómo llegar: epígrafe 0px abajo + título 4px arriba (ahora 6 y 0, que es lo que tienen las otras). La historia: la regla `.historia__copy p` (15px, margen 14px) le ganaba a `.section__kicker`; se le pone una regla propia de mayor especificidad. Cuerpos COMPLETOS porque setRule reemplaza la regla entera.",
+  "mode": "append",
+  "structure": [],
+  "styles": [
+    { "selector": ".plano-frame__header .section__kicker", "style": { "margin-top": "0px", "margin-right": "0px", "margin-bottom": "6px", "margin-left": "0px" } },
+    { "selector": ".plano-frame__header .section__title", "style": { "margin-top": "0px", "margin-right": "0px", "margin-bottom": "0px", "margin-left": "0px" } },
+    { "selector": ".historia__copy .section__kicker", "style": { "font-size": "11px", "margin-bottom": "6px" } }
+  ]
+}

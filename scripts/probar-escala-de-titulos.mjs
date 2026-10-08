@@ -60,18 +60,12 @@ const TECHOS = {
   '/preguntas-frecuentes/': 0,
   '/contacto/': 0,
   '/terminos-y-condiciones/': 0,
-  // 4, y vuelve a ser 4 a propósito.
-  //
-  // El 4 de octubre llegó a 0 porque compuse la portada. Al día siguiente esa
-  // composición se descartó entera: no reproducía el diseño de Cristóbal, lo
-  // reinterpretaba. Se restauró su portada original y con ella volvieron sus
-  // cuatro tamaños sueltos: 55 y 48 en la cursiva, 34 y 30 en las versales.
-  //
-  // No son otro nivel: son el de sección escrito dos veces a ojo, y bajan a 0
-  // cuando se normalice la página de verdad (ver
-  // Sesión Claude/MIGRACION-normalizar-paginas.md). Dejarlo en 0 sería mentir
-  // sobre el estado del sitio, que es lo que este trinquete existe para evitar.
-  '/': 4,
+  // 0. Había vuelto a 4 el 5 de octubre, cuando se restauró la portada original
+  // con sus cuatro tamaños sueltos (55 y 48 en la cursiva, 34 y 30 en las
+  // versales). Se normalizó de verdad (ver Sesión Claude/MIGRACION-normalizar-
+  // paginas.md): hoy sus títulos salen de los dos niveles de la escala y el
+  // techo baja a 0, que es lo que este trinquete pedía.
+  '/': 0,
 };
 
 let fallas = 0;

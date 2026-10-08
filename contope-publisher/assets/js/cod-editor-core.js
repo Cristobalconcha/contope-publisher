@@ -424,6 +424,22 @@
                     }
                 }
             });
+            editor.Components.addType('cod-trama', {
+                isComponent: function (element) {
+                    return (
+                        !!element &&
+                        element.nodeType === 1 &&
+                        typeof element.hasAttribute === 'function' &&
+                        element.hasAttribute('data-cod-trama')
+                    );
+                },
+                model: {
+                    defaults: {
+                        droppable: true,
+                        draggable: true
+                    }
+                }
+            });
             editor.Components.addType('cod-dynamic', {
                 isComponent: function (element) {
                     if (!element || element.nodeType !== 1) {
@@ -1485,6 +1501,39 @@ editor.Components.addType('cod-columns', {
             }
 
             /**
+             * Vista previa del módulo de trama (`data-cod-trama`) dentro del
+             * iframe del lienzo: el mismo runtime que corre publicado.
+             */
+            function installCanvasTramaRuntime() {
+                if (!window.OcdTrama || typeof window.OcdTrama.createRuntime !== 'function') {
+                    return;
+                }
+                if (!editor.Canvas || typeof editor.Canvas.getDocument !== 'function') {
+                    return;
+                }
+                var canvasDocument = null;
+                try {
+                    canvasDocument = editor.Canvas.getDocument();
+                } catch (_error) {
+                    return;
+                }
+                if (!canvasDocument) {
+                    return;
+                }
+                var canvasWindow =
+                    canvasDocument.defaultView ||
+                    (typeof editor.Canvas.getWindow === 'function' ? editor.Canvas.getWindow() : null);
+                if (!canvasWindow) {
+                    return;
+                }
+                try {
+                    window.OcdTrama.createRuntime({ window: canvasWindow, document: canvasDocument });
+                } catch (_error) {
+                    // Es presentación: si el iframe no está listo, no bloquea nada.
+                }
+            }
+
+            /**
              * Instala en el iframe del canvas el runtime de interacciones
              * (`data-cod-interaction`). Mismo patrón dual que el luma matte:
              * el mismo motor que corre publicado se ejecuta acá para previsualizar.
@@ -1543,6 +1592,7 @@ editor.Components.addType('cod-columns', {
                 }
                 behaviorApi.installCanvasRuntime();
                 installCanvasLumaRuntime();
+                installCanvasTramaRuntime();
                 installCanvasInteractionsRuntime();
             }
 
@@ -1675,6 +1725,7 @@ editor.Components.addType('cod-columns', {
                     }
                     behaviorApi.installCanvasRuntime();
                     installCanvasLumaRuntime();
+                    installCanvasTramaRuntime();
                     installCanvasInteractionsRuntime();
                 });
                 if (onDocumentApplied) {

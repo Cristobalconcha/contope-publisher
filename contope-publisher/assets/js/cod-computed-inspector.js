@@ -762,6 +762,22 @@
       }
     }
 
+    function installCanvasTramaRuntime() {
+      if (!global.OcdTrama || typeof global.OcdTrama.createRuntime !== 'function') return;
+      let canvasDocument = null;
+      try { canvasDocument = editor.Canvas?.getDocument?.(); } catch (_error) { return; }
+      if (!canvasDocument) return;
+      const canvasWindow =
+        canvasDocument.defaultView ||
+        (typeof editor.Canvas?.getWindow === 'function' ? editor.Canvas.getWindow() : null);
+      if (!canvasWindow) return;
+      try {
+        global.OcdTrama.createRuntime({ window: canvasWindow, document: canvasDocument });
+      } catch (_error) {
+        // Presentación progresiva: se reintenta en el próximo refresco.
+      }
+    }
+
     function interactionsApi() {
       return global.OcdInteractions || null;
     }
@@ -2711,6 +2727,7 @@
       sourceInput.addEventListener('change', async () => {
         setVideoSource(target.component, sourceInput.value);
         installCanvasLumaRuntime();
+        installCanvasTramaRuntime();
         await refreshAfterRender();
       });
       sourceLabel.appendChild(sourceInput);
@@ -2734,12 +2751,14 @@
           selected = Array.isArray(replacement) ? replacement[0] : replacement;
           if (selected) editor.select(selected);
           installCanvasLumaRuntime();
+          installCanvasTramaRuntime();
           await refreshAfterRender();
         } else if (!toggle.checked && currentTarget.kind === 'luma') {
           const replacement = currentTarget.component.replaceWith(normalVideoMarkup(currentTarget.component));
           selected = Array.isArray(replacement) ? replacement[0] : replacement;
           if (selected) editor.select(selected);
           installCanvasLumaRuntime();
+          installCanvasTramaRuntime();
           await refreshAfterRender();
         } else {
           toggle.checked = currentTarget.kind === 'luma';

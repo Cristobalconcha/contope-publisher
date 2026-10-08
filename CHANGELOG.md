@@ -5,6 +5,55 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.78 — 7 de octubre de 2026
+
+### Módulo de trama: un fondo que se dibuja, no un video
+
+Una sección puede llevar de fondo una **superficie de puntos**: una lámina 3D
+de líneas punteadas que se pliega en el espacio, se mueve sola y reacciona al
+cursor. Se marca con un solo atributo, `data-cod-trama="SP1.…"`, cuyo valor es
+el código de una captura hecha en el editor de la superficie.
+
+El código es la pieza. Contiene la forma, la cámara, los colores y el instante
+exacto, y el mismo código produce siempre los mismos puntos en cualquier
+equipo. No hay archivo que subir ni que se pixele: pesa unos cientos de bytes
+y se ve nítido a cualquier tamaño.
+
+Con `data-cod-trama-modo="estatico"` se dibuja una vez y no consume nada más;
+con `data-cod-trama-interaccion="0"` ignora el cursor.
+
+**Sin lag.** La primera versión dibujaba todo en el hilo principal y se
+trababa: medido, pintar 30.000 puntos costaba ~22 ms por cuadro. El módulo
+calcula la geometría por adelantado en un worker, interpola entre cuadros y
+dibuja en la GPU; el hilo principal bajó a menos de 1 ms por cuadro. No
+trabaja fuera de pantalla ni con la pestaña oculta, y con movimiento reducido
+muestra un cuadro fijo.
+
+**El contenido no depende de la trama.** El runtime agrega un `<canvas>`
+decorativo detrás del contenido y nada más; si no corre, la sección queda
+igual.
+
+Detalle y reglas de uso en [`docs/modulo-trama.md`](docs/modulo-trama.md). Lo
+fija `scripts/probar-trama.mjs`, que además guarda la huella de un código de
+referencia para avisar si un cambio en el motor alterara los códigos ya
+publicados.
+
+### El paquete de sitio se llevaba las páginas pero no sus botones
+
+Las páginas llevan `class="cod-btn cod-btn--primario"`, pero la regla que las
+viste vive en un documento propio, `cod-shared-styles`, que no es de ninguna
+página ni plantilla. El exportador sólo recogía páginas y plantillas, así que
+un sitio exportado e importado perdía esos estilos: el espejo local de Santa
+Luisa mostraba el botón de WhatsApp como texto suelto, y en producción es
+dorado. Nada avisaba de la falta.
+
+Ahora el paquete incluye ese documento cuando tiene estilos que llevar (un
+sitio sin ellos no gana un documento vacío). El importador no necesitó cambios:
+ya guardaba cada documento del manifiesto. Lo fija
+`scripts/probar-paquete-estilos-compartidos.php`, que falla sin el arreglo.
+
+---
+
 ## 0.3.77 — 5 de octubre de 2026
 
 ### El sistema de respaldos no respaldaba

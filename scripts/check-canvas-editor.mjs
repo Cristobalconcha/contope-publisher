@@ -293,7 +293,7 @@ async function checkAdminSurface() {
     const enqueued = callsOf(enqueue).filter(
       (entry) => entry.name === 'wp_enqueue_script' || entry.name === 'wp_enqueue_style',
     );
-    check(enqueued.length === 13, 'enqueue_assets() debe encolar GrapesJS, los módulos Canvas, Luma, Interacciones, el core, los assets propios y la tipografía de vista previa.');
+    check(enqueued.length === 14, 'enqueue_assets() debe encolar GrapesJS, los módulos Canvas, Luma, Trama, Interacciones, el core, los assets propios y la tipografía de vista previa.');
     for (const entry of enqueued) {
       // Un encolado de UN solo argumento es un recurso ya registrado antes con
       // `wp_register_*`; su origen se comprueba ahí, no acá. Es el caso de la

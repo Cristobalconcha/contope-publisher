@@ -61,6 +61,8 @@ function limpiar(composicion) {
     if (n.marker) salida.marker = n.marker;
     if (Array.isArray(n.ruleIds) && n.ruleIds.length) salida.ruleIds = n.ruleIds;
     if (n.cadenceRuleId) salida.cadenceRuleId = n.cadenceRuleId;
+    // Sin esto, al reaplicar se pierden las reglas de las partes que fabrica un behavior (pestañas, aviso…): el compilador no avisa.
+    if (n.partes && Object.keys(n.partes).length) salida.partes = n.partes;
     if (estructurales.includes(n.kind)) {
       salida.children = (n.children || []).map(nodo);
     } else if (n.content && Object.keys(n.content).length) {

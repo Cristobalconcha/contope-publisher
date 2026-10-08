@@ -51,6 +51,20 @@ final class COD_Site_Package_Exporter
             }
         }
 
+        // Los estilos compartidos (.cod-btn, .contacto__cta--ghost, el matte de
+        // luminancia…) viven en un documento propio que NO pertenece a ninguna
+        // página ni plantilla, así que ninguna de las dos vueltas de arriba lo
+        // alcanza. Sin él, un sitio exportado e importado pierde sus botones:
+        // las páginas llevan `class="cod-btn cod-btn--primario"` y la regla que
+        // las viste se quedó en el origen. Pasó de verdad (7-oct-2026): el
+        // espejo local de Santa Luisa mostraba el botón de WhatsApp como texto
+        // suelto, y en producción es dorado. Se incluye sólo si tiene hojas que
+        // llevar; un sitio sin estilos compartidos no gana un documento vacío.
+        $shared = $this->repository->load(COD_Canvas_Document_Repository::SHARED_STYLES_DOCUMENT_ID);
+        if (!is_wp_error($shared) && trim((string) ($shared['css'] ?? '')) !== '') {
+            $document_ids[COD_Canvas_Document_Repository::SHARED_STYLES_DOCUMENT_ID] = true;
+        }
+
         $documents = [];
         foreach (array_keys($document_ids) as $document_id) {
             $document = $this->repository->load($document_id);
