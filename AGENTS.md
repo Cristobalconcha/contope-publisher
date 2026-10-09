@@ -49,7 +49,7 @@ WordPress must remain fully usable without AI or ContOpe Design Desktop. Imports
 - Preserve user changes and unrelated work.
 - Never read, print, copy, or edit `.env.local`.
 - Never deploy, activate themes/plugins, call production APIs, push, or alter Git history. The Codex integrator owns those actions.
-- Commits and versioning are not reserved to Codex. An agent the owner has authorized to work directly in this repository may commit (and bump the plugin version following the repository convention) on its own task branch; pushing stays with the owner. Owner, 2026-10-09: «No tiene por qué ser para codex. No tengo reglas para eso».
+- Commits and versioning are not reserved to Codex. An agent the owner has authorized to work directly in this repository may commit (and bump the plugin version following the repository convention) on its own task branch, push that branch and open a draft pull request; merging into `main`, deploying and activating stay with the owner. Owner, 2026-10-09: «No tiene por qué ser para codex. No tengo reglas para eso».
 - Never declare a stage complete. Report changed files, exact command results, limitations, and remaining work.
 - Any failed required check means `NOT COMPLETE`.
 - Do not add runtime dependencies without documenting license, size, and need.
