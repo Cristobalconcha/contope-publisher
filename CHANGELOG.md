@@ -5,6 +5,41 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.80 — 9 de octubre de 2026
+
+### El módulo de trama pasa a ser sólo un reproductor
+
+Decisión 36: *«Core genera las tramas. El reproductor solo los muestra»*. Hasta
+ahora `cod-trama.js` llevaba una copia del motor pegada adentro, sólo leía
+códigos `SP1.` (un instante), se cargaba en toda página Canvas y no se podía
+elegir desde el back. Ahora:
+
+- **Un solo motor.** El motor, la línea de tiempo y el formato del archivo de
+  trama vienen de contopedesign-core, tal cual, en
+  `assets/vendor/contope-trama/`. Los trae `scripts/traer-motor-trama.mjs`,
+  que verifica el sha256 de cada archivo; el reproductor no tiene motor propio.
+- **Archivos de trama en Medios.** Se puede subir un `.trama.json` a la
+  biblioteca de Medios; cualquier otro JSON se rechaza. Al mostrar la página,
+  el archivo se valida otra vez y su receta va dentro del HTML, sin peticiones
+  extra. Si no valida, la sección se publica sin trama y con su contenido.
+- **Puntos, líneas o mixto**, con líneas de grosor real; **luz o tinta** sobre
+  el fondo del archivo; **en vivo sin final o como secuencia** con su línea de
+  tiempo; cursor y paralaje según el archivo. Sin ninguna interfaz visible.
+- **Se elige en el back.** En el editor, el bloque «Sección con trama» y, en
+  sus ajustes, «Elegir archivo de trama…» (o pegar un código), el modo y la
+  interacción. En las recetas del MCP, la regla `trama` (`fuente`, `modo`,
+  `interaccion`, `fondo`), publicada en `cod_get_capabilities`.
+- **Sólo donde se usa.** La página publicada carga el reproductor y el motor
+  únicamente si lleva una trama.
+- **Lo publicado se ve igual.** Un código `SP1.` se dibuja idéntico al de
+  antes (comparado píxel a píxel). La huella de referencia del motor no cambió.
+
+Para revisar en desarrollo: con `WP_DEBUG`, o como administrador con
+`?cod-trama-diagnostico=1`, el reproductor informa en la consola. Detalle en
+`docs/modulo-trama.md`.
+
+---
+
 ## 0.3.79 — 8 de octubre de 2026
 
 ### Una actualización ya no cambia lo que un sitio medía

@@ -772,7 +772,7 @@
         (typeof editor.Canvas?.getWindow === 'function' ? editor.Canvas.getWindow() : null);
       if (!canvasWindow) return;
       try {
-        global.OcdTrama.createRuntime({ window: canvasWindow, document: canvasDocument });
+        global.OcdTrama.createRuntime({ window: canvasWindow, document: canvasDocument, buscarFuente: true });
       } catch (_error) {
         // Presentación progresiva: se reintenta en el próximo refresco.
       }

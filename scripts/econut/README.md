@@ -96,6 +96,30 @@ Swiper mueve por `transform` desde JS, así que ese barrido devuelve sólo las
 dos animaciones del reproductor de medios de WordPress. Lo que sí la delata es
 el juego de logos duplicado.
 
+## Tramas generativas en la migración
+
+Si una sección del original lleva un fondo animado de puntos o líneas (la
+«superficie de puntos»), **no se rehace con un video ni con un `<canvas>` a
+mano**: es una trama. La trama la genera el generador de core y se exporta
+como archivo (`.trama.json`); el plugin sólo la reproduce.
+
+1. Pedirle a Cristóbal el archivo de trama (o el código `CT1.…` / `SP1.…`) de
+   esa sección. No inventarlo ni escribirlo a mano.
+2. Subirlo a Medios del WordPress de Econut. Medios sólo acepta un `.json` si
+   es una trama válida, así que si lo rechaza, el archivo está mal: no forzarlo.
+3. En `componer.mjs`, una regla `trama` con `fuente` = la ruta de Medios, y en
+   el nodo de la sección esa regla más una `properties` con `min-height`:
+
+   ```js
+   R('trama-portada', 'trama', { fuente: '/wp-content/uploads/2026/10/portada.trama.json', modo: 'vivo' });
+   ```
+
+4. `cod_preview_canvas_composition` valida el archivo; si no existe o no es
+   una trama, lo dice y no aplica.
+
+Un código `SP1.…` publicado antes se sigue viendo igual. Detalle en
+`docs/modulo-trama.md` y en el skill `operar-canvas`.
+
 ## Lo que falta
 
 - La marquesina de certificaciones en la página (la capacidad en el plugin

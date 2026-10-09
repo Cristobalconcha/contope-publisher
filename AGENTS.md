@@ -48,7 +48,8 @@ WordPress must remain fully usable without AI or ContOpe Design Desktop. Imports
 - Modify only the explicit allowlist in that task. Stop and report if another path is required.
 - Preserve user changes and unrelated work.
 - Never read, print, copy, or edit `.env.local`.
-- Never deploy, activate themes/plugins, call production APIs, commit, push, or alter Git history. The Codex integrator owns those actions.
+- Never deploy, activate themes/plugins, call production APIs, push, or alter Git history. The Codex integrator owns those actions.
+- Commits and versioning are not reserved to Codex. An agent the owner has authorized to work directly in this repository may commit (and bump the plugin version following the repository convention) on its own task branch, push that branch and open a draft pull request; merging into `main`, deploying and activating stay with the owner. Owner, 2026-10-09: «No tiene por qué ser para codex. No tengo reglas para eso».
 - Never declare a stage complete. Report changed files, exact command results, limitations, and remaining work.
 - Any failed required check means `NOT COMPLETE`.
 - Do not add runtime dependencies without documenting license, size, and need.
@@ -70,7 +71,7 @@ WordPress must remain fully usable without AI or ContOpe Design Desktop. Imports
 - One owner per file at a time.
 - Claude Code and OpenCode implement in separate worktrees.
 - Cline is not on the critical path and may receive only small mechanical tasks with a closed file allowlist.
-- Codex owns architecture, shared contracts, integration, final verification, commits, deployment, and the Obsidian bitácora.
+- Codex owns architecture, shared contracts, integration, final verification, deployment, and the Obsidian bitácora. Commits are not exclusive to Codex (see «Safety and ownership», 2026-10-09).
 - Handoffs must include base commit, files changed, tests with exit status, risks, and a concise diff summary.
 
 ### Review loop

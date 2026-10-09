@@ -155,6 +155,28 @@ la misma vía que usa el puente headless), sin pasar por el editor del lienzo.
 editor** — el doble clic en el lienzo queda para cuando hace falta texto con
 formato mixto (negritas, enlaces internos) que el campo simple no cubre.
 
+## Una trama generativa de fondo (regla `trama`)
+
+Una sección puede llevar de fondo una **trama**: la superficie de puntos o líneas que se pliega y evoluciona, dibujada detrás del contenido. **El plugin no genera tramas, sólo las reproduce** (decisión 36): la trama es un *archivo de trama* (`.trama.json`, `kind: contope/trama`) exportado del generador de ContOpe Design (core) y subido a Medios. Nunca se escribe ni se inventa a mano.
+
+Se pide con una regla en la receta y se pone en el `ruleIds` de un nodo `section`, `header`, `footer` o `group`:
+
+```json
+{ "id": "trama-portada", "kind": "trama",
+  "scope": { "breakpoint": "all", "state": "default" },
+  "provenance": { "sources": [{ "kind": "user", "rationale": "Fondo de la portada pedido por Cristóbal." }] },
+  "status": "reviewed",
+  "value": { "fuente": "/wp-content/uploads/2026/10/portada.trama.json", "modo": "vivo", "interaccion": "archivo" } }
+```
+
+- `fuente` (obligatoria): la ruta del archivo en Medios (se valida al compilar: si no existe o no es una trama, el preview lo dice) o un código de una línea `CT1.…` (o un `SP1.…` viejo) si te lo entregan así.
+- `modo`: `vivo` (se mueve como diga el archivo) o `estatico` (un cuadro quieto). `interaccion`: `archivo`, `ninguna`, `cursor`, `paralaje` o `ambos`. `fondo`: `false` deja ver el fondo de la sección.
+- **No existe `variante`**: una variante es otro archivo de trama. El compilador la rechaza explicándolo.
+- El nodo necesita **alto propio**: una regla `properties` con `min-height`. Sin alto no hay dónde dibujar.
+- Una o dos tramas vivas por página; para más, `estatico`.
+
+El esquema al día está en `cod_get_capabilities` → `designRuleSet.ruleValueSchemas.trama`. El detalle del formato y del reproductor, en `docs/modulo-trama.md`.
+
 ## Reglas duras
 
 Cada una de estas costó horas y un defecto visible en producción.

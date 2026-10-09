@@ -1830,15 +1830,12 @@ CSS;
             COD_PUBLISHER_VERSION,
             true
         );
-        // Módulo de trama (superficie de puntos): fondo generativo declarativo,
-        // `data-cod-trama="SP1.…"`. Ver docs/modulo-trama.md.
-        wp_enqueue_script(
-            'cod-trama',
-            plugins_url('assets/js/cod-trama.js', COD_PUBLISHER_FILE),
-            [],
-            COD_PUBLISHER_VERSION,
-            true
-        );
+        // Reproductor de tramas y su motor (traído de core): sólo si la página
+        // lleva una. Una trama pesa ~130 KB de motor más el reproductor; una
+        // página sin trama no tiene por qué cargarlos. Ver docs/modulo-trama.md.
+        if (COD_Trama::hay_trama($header_html . $body_html . $footer_html)) {
+            COD_Trama::encolar();
+        }
         wp_enqueue_script(
             'cod-preload',
             plugins_url('assets/js/cod-preload.js', COD_PUBLISHER_FILE),
@@ -1878,6 +1875,11 @@ CSS;
         // páginas sin recomponer ninguna.
         $markup = COD_Divisor::resolver_en_html($markup);
         $markup = COD_Icono::resolver_en_html($markup);
+
+        // Y la receta de cada trama que viene de un archivo de Medios: se
+        // valida otra vez y se pone en línea, junto a su elemento, para que el
+        // navegador no tenga que pedirla aparte.
+        $markup = COD_Trama::resolver_en_html($markup);
 
         // Los shortcodes se ejecutan al final, después de resolver los tokens
         // dinámicos: así un marcador puede llevar un valor ACF entre sus

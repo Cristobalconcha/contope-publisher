@@ -1,0 +1,38 @@
+{
+  "paquete": {
+    "nombre": "@contope/trama",
+    "version": "0.1.0"
+  },
+  "motor": {
+    "id": "superficie-de-puntos",
+    "version": "1.0.0"
+  },
+  "formato": {
+    "kind": "contope/trama",
+    "version": 1
+  },
+  "codigos": {
+    "compacto": "CT1",
+    "compatibles": [
+      "SP1"
+    ]
+  },
+  "archivos": {
+    "contope-trama.js": {
+      "sha256": "7b1284fa09be4e0dd3efaba31dbdc282654dbfdb7d61d3844d608afc2f19c148",
+      "bytes": 71418
+    },
+    "contope-trama-worker.js": {
+      "sha256": "f0a0a0e58a3155590cbf343c4e502f30d13d103206765c37117ca3bb164d0040",
+      "bytes": 54864
+    }
+  },
+  "fecha": "2026-10-09T17:49:09.819Z",
+  "origen": {
+    "repositorio": "contopedesign-core",
+    "ruta": "packages/trama/dist",
+    "commit": "c7a8ef514838f05329b4608fb2947724ab6c6a3a",
+    "rama": "claude/trama",
+    "distConCambiosSinCommit": false
+  }
+}

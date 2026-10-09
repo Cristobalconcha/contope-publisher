@@ -69,6 +69,23 @@
                 '</section>'
         },
         {
+            id: 'cod-section-trama',
+            label: 'Sección con trama',
+            category: 'ContOpe Design',
+            media: '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="16" rx="1.5"/><path d="M4 15c3-5 6 1 9-3s5-3 7-1" stroke-dasharray="1 2"/></svg>',
+            // Una Sección con la trama por omisión del motor (la «Lámina
+            // plegada», en puntos). La trama de verdad se elige después en
+            // los ajustes: un archivo de Medios o un código pegado. Necesita
+            // alto propio: la trama ocupa el tamaño de la sección.
+            content:
+                '<section class="cod-section" data-cod-trama="CT1.eyJraW5kIjoiY29udG9wZS90cmFtYSIsInZlcnNpb24iOjEsIm1vdG9yIjp7ImlkIjoic3VwZXJmaWNpZS1kZS1wdW50b3MiLCJ2ZXJzaW9uIjoiMS4wLjAifX0" ' +
+                'data-cod-trama-modo="vivo" style="padding:48px 24px;min-height:360px;background-color:#000000">' +
+                '<div class="cod-columns cod-columns--single" style="display:grid;grid-template-columns:minmax(0, 1fr);gap:24px">' +
+                '<div class="cod-column" style="min-width:0"></div>' +
+                '</div>' +
+                '</section>'
+        },
+        {
             id: 'cod-columns',
             label: 'Fila de 2 columnas',
             category: 'ContOpe Design',
@@ -424,19 +441,134 @@
                     }
                 }
             });
+            /*
+             * Trama generativa: cualquier contenedor con `data-cod-trama` (o con
+             * un archivo de Medios en `data-cod-trama-fuente`). En el panel de
+             * ajustes se elige la trama —un archivo de Medios o un código CT1/
+             * SP1 pegado—, el modo y la interacción. El reproductor la muestra
+             * en el lienzo con el mismo motor que en la página publicada.
+             * Ver docs/modulo-trama.md.
+             */
+            var TRAMA_FUENTE = 'data-cod-trama-fuente';
+            function tramaRutaRelativa(url) {
+                try {
+                    var u = new URL(url, window.location.href);
+                    return u.pathname + (u.search || '');
+                } catch (_error) {
+                    return url;
+                }
+            }
+            function tramaElegirArchivo(editor, trait) {
+                var component = trait && trait.target ? trait.target : editor.getSelected();
+                if (!component) {
+                    return;
+                }
+                if (!window.wp || !window.wp.media) {
+                    window.alert('La biblioteca de medios no está disponible en esta pantalla.');
+                    return;
+                }
+                var marco = window.wp.media({
+                    title: 'Elegir el archivo de trama',
+                    button: { text: 'Usar esta trama' },
+                    // Medios sólo acepta un .json si es un archivo de trama válido
+                    // (COD_Trama), así que todo JSON de la biblioteca es una trama.
+                    library: { type: 'application/json' },
+                    multiple: false
+                });
+                marco.on('select', function () {
+                    var elegido = marco.state().get('selection').first();
+                    var url = elegido ? elegido.toJSON().url || '' : '';
+                    if (!url) {
+                        return;
+                    }
+                    // Un archivo reemplaza al código pegado: si quedaran los dos,
+                    // el editor y la página publicada podrían mostrar cosas distintas.
+                    var atributos = {};
+                    atributos['data-cod-trama'] = '';
+                    atributos[TRAMA_FUENTE] = tramaRutaRelativa(url);
+                    component.addAttributes(atributos);
+                });
+                marco.open();
+            }
             editor.Components.addType('cod-trama', {
                 isComponent: function (element) {
                     return (
                         !!element &&
                         element.nodeType === 1 &&
                         typeof element.hasAttribute === 'function' &&
-                        element.hasAttribute('data-cod-trama')
+                        (element.hasAttribute('data-cod-trama') || element.hasAttribute(TRAMA_FUENTE))
                     );
                 },
                 model: {
                     defaults: {
                         droppable: true,
-                        draggable: true
+                        draggable: true,
+                        traits: [
+                            {
+                                type: 'button',
+                                name: 'cod-trama-archivo',
+                                label: 'Trama',
+                                text: 'Elegir archivo de trama…',
+                                full: true,
+                                command: tramaElegirArchivo
+                            },
+                            {
+                                type: 'text',
+                                name: TRAMA_FUENTE,
+                                label: 'Archivo (Medios)',
+                                placeholder: '/wp-content/uploads/…/portada.trama.json'
+                            },
+                            {
+                                type: 'text',
+                                name: 'data-cod-trama',
+                                label: 'O pegar un código',
+                                placeholder: 'CT1.… o SP1.…'
+                            },
+                            {
+                                type: 'select',
+                                name: 'data-cod-trama-modo',
+                                label: 'Modo',
+                                options: [
+                                    { id: 'vivo', name: 'Vivo: se mueve según el archivo' },
+                                    { id: 'estatico', name: 'Estático: un cuadro quieto' }
+                                ]
+                            },
+                            {
+                                type: 'select',
+                                name: 'data-cod-trama-interaccion',
+                                label: 'Interacción',
+                                options: [
+                                    { id: '1', name: 'La del archivo' },
+                                    { id: '0', name: 'Ninguna' },
+                                    { id: 'cursor', name: 'Cursor' },
+                                    { id: 'paralaje', name: 'Paralaje' },
+                                    { id: 'ambos', name: 'Cursor y paralaje' }
+                                ]
+                            }
+                        ]
+                    },
+                    init: function () {
+                        this.codTramaPrevia = this.getAttributes();
+                        this.on('change:attributes', this.codTramaAlCambiar);
+                    },
+                    codTramaAlCambiar: function () {
+                        var antes = this.codTramaPrevia || {};
+                        var ahora = this.getAttributes();
+                        this.codTramaPrevia = ahora;
+                        var codigo = String(ahora['data-cod-trama'] || '').trim();
+                        if (codigo === String(antes['data-cod-trama'] || '').trim() || codigo === '') {
+                            return;
+                        }
+                        // Un código pegado reemplaza al archivo.
+                        if (ahora[TRAMA_FUENTE]) {
+                            this.removeAttributes(TRAMA_FUENTE);
+                        }
+                        var lectura = window.OcdTrama && typeof window.OcdTrama.leer === 'function' ? window.OcdTrama.leer(codigo) : null;
+                        if (lectura && !lectura.ok) {
+                            window.alert('Ese código no es una trama válida: ' + lectura.errores.map(function (e) {
+                                return (e.ruta ? e.ruta + ': ' : '') + e.mensaje;
+                            }).slice(0, 3).join('; '));
+                        }
                     }
                 }
             });
@@ -1527,7 +1659,10 @@ editor.Components.addType('cod-columns', {
                     return;
                 }
                 try {
-                    window.OcdTrama.createRuntime({ window: canvasWindow, document: canvasDocument });
+                    // buscarFuente: en el editor la receta de Medios no viene en
+                    // línea (eso lo hace PHP al servir la página), así que el
+                    // reproductor la lee del propio sitio.
+                    window.OcdTrama.createRuntime({ window: canvasWindow, document: canvasDocument, buscarFuente: true });
                 } catch (_error) {
                     // Es presentación: si el iframe no está listo, no bloquea nada.
                 }

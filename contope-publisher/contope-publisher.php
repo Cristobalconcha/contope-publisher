@@ -2,7 +2,7 @@
 /**
  * Plugin Name: ContOpe Publisher
  * Description: Importa proyectos ContOpe Design como páginas Gutenberg nativas y editables.
- * Version: 0.3.79
+ * Version: 0.3.80
  * Requires at least: 6.5
  * Requires PHP: 8.0
  * Author: Cristóbal Concha
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('COD_PUBLISHER_VERSION', '0.3.79');
+define('COD_PUBLISHER_VERSION', '0.3.80');
 define('COD_PUBLISHER_FILE', __FILE__);
 define('COD_PUBLISHER_DIR', plugin_dir_path(__FILE__));
 
@@ -59,6 +59,7 @@ require_once COD_PUBLISHER_DIR . 'includes/class-cod-mcp-server.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-consentimiento.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-catalogo.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-svg.php';
+require_once COD_PUBLISHER_DIR . 'includes/class-cod-trama.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-block-lienzo.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-block-cuadrantes.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-medicion.php';
@@ -124,6 +125,7 @@ add_action('plugins_loaded', static function (): void {
     (new COD_Settings_Admin())->register();
     (new COD_Medicion())->register();
     (new COD_SVG())->register();
+    (new COD_Trama())->register();
     (new COD_Iconos_Rest())->register();
     (new COD_Imagen_Progresiva())->register();
     (new COD_Block_Lienzo())->register();

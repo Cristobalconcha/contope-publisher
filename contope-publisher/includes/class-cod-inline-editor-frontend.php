@@ -313,15 +313,24 @@ final class COD_Inline_Editor_Frontend
             COD_PUBLISHER_VERSION,
             true
         );
-        // Módulo de trama (superficie de puntos): fondo generativo declarativo,
-        // `data-cod-trama="SP1.…"`. Ver docs/modulo-trama.md.
-        wp_enqueue_script(
-            'cod-trama',
-            plugins_url('assets/js/cod-trama.js', COD_PUBLISHER_FILE),
+        // Reproductor de tramas y el motor traído de core (assets/vendor/
+        // contope-trama). En el editor se cargan siempre: cualquier sección
+        // puede recibir una trama. Ver docs/modulo-trama.md.
+        wp_register_script(
+            'contope-trama',
+            plugins_url('assets/vendor/contope-trama/contope-trama.js', COD_PUBLISHER_FILE),
             [],
             COD_PUBLISHER_VERSION,
             true
         );
+        wp_enqueue_script(
+            'cod-trama',
+            plugins_url('assets/js/cod-trama.js', COD_PUBLISHER_FILE),
+            ['contope-trama'],
+            COD_PUBLISHER_VERSION,
+            true
+        );
+        wp_add_inline_script('cod-trama', COD_Trama::configuracion_js(), 'before');
         wp_enqueue_script(
             'cod-editor-core',
             plugins_url('assets/js/cod-editor-core.js', COD_PUBLISHER_FILE),
