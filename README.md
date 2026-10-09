@@ -33,9 +33,12 @@ Qué cambió en cada versión: **[CHANGELOG.md](CHANGELOG.md)**
 - **Comportamientos declarativos** —carruseles, acordeones, visores de
   contenido externo, ventana de WhatsApp con evento medible— sin escribir
   JavaScript en el contenido.
-- **Módulo de trama**: fondo generativo de puntos en 3D, vivo o fijo, definido
-  por un código de captura que siempre reproduce la misma imagen. Sin video,
-  sin red, sin lag. Detalle en [`docs/modulo-trama.md`](docs/modulo-trama.md).
+- **Reproductor de tramas**: fondo generativo (puntos, líneas o mixto) que
+  lee un archivo de trama de Medios o un código `CT1.`/`SP1.` y lo dibuja
+  detrás del contenido, sin interfaz visible. El motor es el único de
+  contopedesign-core, traído y verificado por sha256; se elige en el editor
+  y en las recetas MCP (regla `trama`), y sólo se carga en las páginas que
+  lo usan. Detalle en [`docs/modulo-trama.md`](docs/modulo-trama.md).
 - **Portabilidad**: exportar e importar un sitio completo entre instalaciones.
 
 ## Qué NO hace todavía
@@ -112,6 +115,14 @@ Este proyecto incluye y redistribuye:
   colaboradores para respaldar o promocionar productos derivados. ContOpe
   Publisher menciona a GrapesJS como un hecho técnico —está construido sobre
   él— y no da a entender ningún respaldo por parte de sus autores.
+
+- **Motor de tramas `@contope/trama` 0.1.0** — de `contopedesign-core`
+  (`packages/trama/dist/`), del mismo autor, bajo la licencia de ese
+  repositorio (GPL-3.0). Copia sin modificar en
+  `contope-publisher/assets/vendor/contope-trama/` (~126 KB sin minificar),
+  traída con `scripts/traer-motor-trama.mjs`, que verifica cada archivo contra
+  su `MOTOR.json`. Es necesaria porque el motor existe una sola vez, en core
+  (decisión 36): el reproductor no puede tener uno propio.
 
 ContOpe Publisher no contiene código del proyecto OpenDesign de manalkaff, con
 el que comparte una raíz conceptual pero ninguna línea de código: aquel es una
