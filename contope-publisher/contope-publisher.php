@@ -59,6 +59,7 @@ require_once COD_PUBLISHER_DIR . 'includes/class-cod-mcp-server.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-consentimiento.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-catalogo.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-svg.php';
+require_once COD_PUBLISHER_DIR . 'includes/class-cod-trama.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-block-lienzo.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-block-cuadrantes.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-medicion.php';
@@ -124,6 +125,7 @@ add_action('plugins_loaded', static function (): void {
     (new COD_Settings_Admin())->register();
     (new COD_Medicion())->register();
     (new COD_SVG())->register();
+    (new COD_Trama())->register();
     (new COD_Iconos_Rest())->register();
     (new COD_Imagen_Progresiva())->register();
     (new COD_Block_Lienzo())->register();
