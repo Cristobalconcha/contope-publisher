@@ -56,6 +56,9 @@ final class COD_Canvas_MCP_Recipe_Compiler
         'cadence',
         'anchor',
         'divisor',
+        // Fondo generativo de una sección (decisión 36): el archivo de trama
+        // lo genera core y Publisher sólo lo muestra. Ver class-cod-trama.php.
+        'trama',
         // Las tres que Divi reparte entre su pestaña «Avanzado» y su
         // subsistema de sticky, y que acá son lo que son: propiedades
         // visuales del objeto, en diseño, con el mismo trato que un color.
@@ -592,6 +595,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
                     'interaction' => 'Comportamientos declarativos ya presentes en Canvas, sin código remoto.',
                     'cadence' => 'Ciclo de reglas aplicado a hijos para alternancia visual y ritmo de una colección.',
                     'anchor' => 'Ancla CUALQUIER nodo a un borde/esquina de su contenedor position:relative más cercano, con cuánto cuelga afuera y cómo entra en vista al hacer scroll. No es exclusiva de whatsapp: separa "dónde nace y cómo entra" (esta regla) de "cómo se ve" (propiedades propias del nodo).',
+                    'trama' => 'Fondo generativo de una sección: una superficie de puntos o líneas que se pliega y evoluciona, dibujada detrás del contenido. La trama es un archivo de trama de Medios (o un código CT1./SP1.); el plugin sólo la reproduce, no la genera.',
                     'properties' => 'Escribe propiedades CSS directamente, cualquiera de la lista permitida más cualquier propiedad personalizada (--nombre), con scope completo (breakpoint y state, incluido current). Los 15 tipos semánticos anteriores siguen siendo el camino preferido cuando aplican, porque llevan rol y procedencia y son lo que el set de diseño reconoce y reutiliza; este tipo existe para que ninguna propiedad quede inalcanzable. Forma larga obligatoria: una abreviada (background, border-radius, gap…) con var() se rechaza, porque GrapesJS la descartaría en silencio. Las imágenes van por media, no por acá.',
                 ],
                 'ruleValueSchemas' => $this->rule_value_schemas(),
@@ -793,6 +797,17 @@ final class COD_Canvas_MCP_Recipe_Compiler
                     'profundidad' => 'z-index; negativo por omisión, para quedar detrás del contenido',
                 ],
                 'notes' => 'El borde de una sección: una forma (onda, diagonal, montañas…) que se dibuja arriba o abajo y se recorta sola. capas apila hasta 4 copias con su propia opacidad y desplazamiento, para dar profundidad. reserva es el aire que el divisor le pide a la sección para no montarse sobre el texto, y profundidad su z-index (negativo por omisión, para quedar DETRÁS del contenido).',
+            ],
+            'trama' => [
+                'required' => ['fuente'],
+                'fields' => [
+                    'fuente' => 'la trama: la ruta de un archivo de trama (.json, kind contope/trama) de la biblioteca de Medios del sitio, por ejemplo "/wp-content/uploads/2026/10/portada.trama.json"; o un código de una línea CT1.… (o un SP1.… viejo). El archivo se valida al compilar y otra vez al servir la página',
+                    'variante' => 'NO existe en el formato v1 y se rechaza: una variante de una trama (otros colores, otro modo, otra secuencia) es OTRO archivo de trama; se sube a Medios y se usa como fuente',
+                    'modo' => 'vivo (por omisión: se mueve como diga el archivo, en vivo sin final o su secuencia) | estatico (un cuadro quieto, el cuadroQuieto del archivo; no consume nada después de dibujarse)',
+                    'interaccion' => 'archivo (por omisión: lo que diga el archivo) | ninguna | cursor | paralaje | ambos. Sólo actúa en una trama en vivo; una secuencia sigue lo grabado',
+                    'fondo' => 'verdadero (por omisión con un archivo o CT1) pinta el color de fondo del archivo; falso deja el lienzo transparente sobre el fondo de la sección',
+                ],
+                'notes' => 'Se pone en un nodo section, header, footer o group, que necesita alto propio (min-height con una regla spacing o properties): la trama ocupa el tamaño del nodo y el contenido queda encima, seleccionable. El reproductor no muestra ninguna interfaz; con prefers-reduced-motion muestra un cuadro quieto; no trabaja fuera de pantalla. Si el archivo falta o no valida, la sección se publica sin trama y su contenido intacto. Una o dos tramas vivas por página: cada una usa un worker y un contexto WebGL; para más, modo estatico. El archivo de trama lo exporta el generador de ContOpe Design (core); no se escribe a mano.',
             ],
             'posicion' => [
                 'required' => ['modo'],
@@ -1420,6 +1435,8 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 return $this->normalize_anchor_rule($value);
             case 'divisor':
                 return $this->normalize_divisor_rule($value);
+            case 'trama':
+                return $this->normalize_trama_rule($value);
             case 'posicion':
                 return $this->normalize_posicion_rule($value);
             case 'desborde':
@@ -2210,6 +2227,85 @@ final class COD_Canvas_MCP_Recipe_Compiler
      * @param array<string, mixed> $value
      * @return array<string, mixed>|WP_Error
      */
+    /**
+     * La regla `trama`: el fondo generativo de una sección.
+     *
+     * `fuente` es un archivo de trama de Medios (ruta del propio sitio a un
+     * `.json`) o un código de una línea (`CT1.…`, o un `SP1.…` viejo). Se
+     * valida ACÁ, al compilar, para que quien compone se entere de inmediato,
+     * y otra vez al servir la página (`COD_Trama::resolver_en_html`): un
+     * archivo puede cambiar después. El documento guarda la ruta; la receta
+     * se pone en línea al mostrar.
+     *
+     * @param array<string, mixed> $value
+     * @return array<string, mixed>|WP_Error
+     */
+    private function normalize_trama_rule(array $value)
+    {
+        $codigo = 'cod_mcp_trama_rule_invalid';
+        if (!$this->has_only_keys($value, self::TRAMA_CAMPOS)) {
+            return new WP_Error($codigo, 'trama admite: ' . implode(', ', self::TRAMA_CAMPOS) . '.');
+        }
+        if (array_key_exists('variante', $value)) {
+            return new WP_Error(
+                $codigo,
+                'trama.variante no existe en el formato de trama v1. Una variante (otros colores, otro modo, otra '
+                    . 'secuencia) es OTRO archivo de trama: expórtalo del generador, súbelo a Medios y úsalo como fuente.'
+            );
+        }
+        if (!isset($value['fuente']) || !is_string($value['fuente']) || trim($value['fuente']) === '') {
+            return new WP_Error($codigo, 'trama.fuente es obligatoria: la ruta de un archivo de trama de Medios o un código CT1.… / SP1.….');
+        }
+
+        $fuente = trim($value['fuente']);
+        $normalizado = [];
+        if (strpos($fuente, 'CT1.') === 0 || strpos($fuente, 'SP1.') === 0) {
+            $resultado = COD_Trama::validar($fuente);
+            if (!$resultado['ok']) {
+                return new WP_Error($codigo, 'trama.fuente: el código no es una trama válida: ' . implode('; ', array_slice($resultado['errores'], 0, 3)) . '.');
+            }
+            $normalizado['codigo'] = $fuente;
+        } else {
+            if (!$this->is_safe_link($fuente) || !COD_Trama::es_ruta_de_trama($fuente)) {
+                return new WP_Error(
+                    $codigo,
+                    'trama.fuente tiene que ser la ruta de un archivo .json de Medios del propio sitio (o un código CT1./SP1.). '
+                        . 'Una trama traída de otro servidor dejaría al sitio dependiendo de que ese servidor siga ahí.'
+                );
+            }
+            if (COD_Trama::receta_de($fuente) === null) {
+                return new WP_Error(
+                    $codigo,
+                    'trama.fuente: "' . $fuente . '" no existe en el sitio o no es un archivo de trama válido (kind contope/trama, '
+                        . 'formato ' . COD_Trama::FORMATO_VERSION . ', motor ' . COD_Trama::MOTOR_ID . ' ' . COD_Trama::MOTOR_VERSION_MAYOR . '.x). Súbelo a Medios: '
+                        . 'Medios sólo acepta un .json si es una trama válida.'
+                );
+            }
+            $normalizado['archivo'] = $fuente;
+        }
+
+        if (isset($value['modo'])) {
+            if (!is_string($value['modo']) || !in_array($value['modo'], COD_Trama::MODOS, true)) {
+                return new WP_Error($codigo, 'trama.modo admite: ' . implode(', ', COD_Trama::MODOS) . '.');
+            }
+            $normalizado['modo'] = $value['modo'];
+        }
+        if (isset($value['interaccion'])) {
+            if (!is_string($value['interaccion']) || !in_array($value['interaccion'], COD_Trama::INTERACCIONES, true)) {
+                return new WP_Error($codigo, 'trama.interaccion admite: ' . implode(', ', COD_Trama::INTERACCIONES) . '.');
+            }
+            $normalizado['interaccion'] = $value['interaccion'];
+        }
+        if (isset($value['fondo'])) {
+            if (!is_bool($value['fondo'])) {
+                return new WP_Error($codigo, 'trama.fondo es verdadero o falso.');
+            }
+            $normalizado['fondo'] = $value['fondo'];
+        }
+
+        return $normalizado;
+    }
+
     /**
      * La regla `divisor`: el borde no recto entre una sección y la siguiente.
      *
@@ -4371,6 +4467,31 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 $divisor = $rule['value'];
                 continue;
             }
+            if ($rule['kind'] === 'trama') {
+                // La trama sí son atributos del nodo: el reproductor los lee y
+                // dibuja su canvas detrás del contenido.
+                if (!in_array($node['kind'], ['section', 'header', 'footer', 'group'], true)) {
+                    return new WP_Error('cod_mcp_trama_target_invalid', 'trama sólo puede aplicarse a un nodo section, header, footer o group (un contenedor con alto propio).');
+                }
+                if (array_key_exists('data-cod-trama', $attributes)) {
+                    return new WP_Error('cod_mcp_trama_duplicada', 'Un nodo no puede llevar dos tramas.');
+                }
+                if (($rule['scope']['breakpoint'] ?? 'all') !== 'all' || ($rule['scope']['state'] ?? 'default') !== 'default') {
+                    return new WP_Error('cod_mcp_trama_scope_invalid', 'trama no admite scope.breakpoint ni scope.state: el fondo de una sección es el mismo en todos los anchos (el reproductor ya se adapta al tamaño).');
+                }
+                $trama = $rule['value'];
+                $attributes['data-cod-trama'] = (string) ($trama['codigo'] ?? '');
+                if (isset($trama['archivo'])) {
+                    $attributes[COD_Trama::ATRIBUTO_FUENTE] = (string) $trama['archivo'];
+                }
+                $attributes['data-cod-trama-modo'] = (string) ($trama['modo'] ?? 'vivo');
+                $interacciones = ['archivo' => '1', 'ninguna' => '0', 'cursor' => 'cursor', 'paralaje' => 'paralaje', 'ambos' => 'ambos'];
+                $attributes['data-cod-trama-interaccion'] = $interacciones[$trama['interaccion'] ?? 'archivo'];
+                if (isset($trama['fondo'])) {
+                    $attributes['data-cod-trama-fondo'] = $trama['fondo'] ? '1' : '0';
+                }
+                continue;
+            }
             if ($rule['kind'] === 'icono') {
                 // Igual que el divisor: no es un atributo del nodo sino
                 // marcado que se le pone dentro.
@@ -6464,6 +6585,8 @@ final class COD_Canvas_MCP_Recipe_Compiler
     public const TRANSFORMACION_FACTORES = ['escalar', 'escalarX', 'escalarY'];
     public const TRANSFORMACION_CAMPOS = ['moverX', 'moverY', 'rotar', 'inclinarX', 'inclinarY', 'escalar', 'escalarX', 'escalarY', 'origen'];
     public const ICONO_CAMPOS = ['forma', 'nombre', 'donde', 'tamano', 'color', 'separacion'];
+    /** `variante` se acepta como clave sólo para rechazarla con su explicación (el formato v1 no la tiene). */
+    public const TRAMA_CAMPOS = ['fuente', 'variante', 'modo', 'interaccion', 'fondo'];
     /**
      * A qué familia de bloques de Gutenberg CORRESPONDE cada módulo nuestro.
      *
