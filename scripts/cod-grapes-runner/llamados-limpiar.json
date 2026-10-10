@@ -1,0 +1,10 @@
+{
+  "_nota": "Limpieza sin cambio visual: en teléfono, .feature-card tenía DOS reglas (media «4/5» y «4 / 5»). La vieja, con relleno 19.5/16.5 y separación 9, venía después y pisaba a la nueva (14/11, 7), que nunca llegó a aplicarse. Lo aprobado por Cristóbal en pantalla es lo EFECTIVO (19.5/16.5, 9), así que la regla única conserva esos valores: borde inferior + relleno 19.5/16.5 + separación 9.",
+  "mode": "append",
+  "structure": [],
+  "styles": [
+    { "selector": ".feature-card", "media": "(max-width: 900px), (max-aspect-ratio: 4/5)", "remove": true },
+    { "selector": ".feature-card", "media": "(max-width: 900px), (max-aspect-ratio: 4 / 5)", "remove": true },
+    { "selector": ".feature-card", "media": "(max-width: 900px), (max-aspect-ratio: 4 / 5)", "style": { "border-bottom-width": "1px", "border-bottom-style": "solid", "border-bottom-color": "var(--tierra-100)", "padding-top": "19.5px", "padding-right": "16.5px", "padding-bottom": "19.5px", "padding-left": "16.5px", "gap": "9px" } }
+  ]
+}
