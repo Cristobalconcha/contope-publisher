@@ -31,7 +31,7 @@ const llamar = (herramienta, archivo) => {
 };
 
 // 1. La revisión que está ahora. Nunca suponerla: el apply la compara.
-writeFileSync(`${aqui}/.estado.json`, JSON.stringify({ pageId: 20 }));
+writeFileSync(`${aqui}/.estado.json`, JSON.stringify({ pageId: Number(process.env.ECONUT_PAGE_ID || 20) }));
 const estado = llamar('cod_get_canvas_page_state', '.estado.json');
 const revision = estado?.document?.revision;
 if (typeof revision !== 'number') {

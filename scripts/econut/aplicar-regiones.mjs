@@ -25,8 +25,8 @@ const soloProbar = process.argv.includes('--probar');
 const pedidas = process.argv.slice(2).filter((a) => !a.startsWith('--'));
 
 const REGIONES = {
-  encabezado: { archivo: 'region-header.json', documentId: 'cod-region-header', variable: 'REV_HEADER' },
-  pie: { archivo: 'region-footer.json', documentId: 'cod-region-footer', variable: 'REV_FOOTER' },
+  encabezado: { archivo: 'region-header.json', documentId: process.env.ECONUT_REGION_HEADER_ID || 'cod-region-header', variable: 'REV_HEADER' },
+  pie: { archivo: 'region-footer.json', documentId: process.env.ECONUT_REGION_FOOTER_ID || 'cod-region-footer', variable: 'REV_FOOTER' },
 };
 
 const cuales = pedidas.length ? pedidas : Object.keys(REGIONES);

@@ -105,3 +105,28 @@ el juego de logos duplicado.
 - El original oscurece la foto de la portada con un degradado; acá no se copió,
   por la regla de no usar degradados. La legibilidad la da la columna blanca,
   que es el mismo mecanismo que usa el original.
+
+## Instalar en un sitio nuevo (ensayado el 10-oct-2026)
+
+Reproducido desde un WordPress en blanco (sólo plugin 0.3.79 + temas `contope-canvas` y `contope-econut`):
+los 194 nodos de la portada dan los **mismos estilos computados** que el espejo en escritorio, tablet y celular
+(sólo cambia la dirección del servidor) y no falla ninguna petición.
+
+Las ID de página y de región cambian entre instalaciones, así que los guiones las leen del entorno:
+
+| variable | para qué | por omisión |
+|---|---|---|
+| `ENDPOINT` | endpoint MCP del sitio (`…/index.php?rest_route=/contope/v1/mcp`) | espejo local 8891 |
+| `AUTH_FILE` | archivo con `usuario:contraseña-de-aplicación` | `wp-local-econut/.credencial-mcp-local.txt` |
+| `ECONUT_PAGE_ID` | ID de la página Inicio (Canvas) | 20 |
+| `ECONUT_LEGAL_PAGE_ID` | ID de «Términos y privacidad» | 55 |
+| `ECONUT_REGION_HEADER_ID` / `ECONUT_REGION_FOOTER_ID` | documentId de las regiones | `cod-region-header` / `cod-region-footer` |
+| `WP_LOAD` | (sólo `crear-regiones.php`) ruta a `wp-load.php` | espejo local 8891 |
+
+Orden: `cod_create_canvas_page` («Inicio» y «Términos y privacidad») → crear las dos regiones
+(`crear-regiones.php`, o el panel) → `aplicar.mjs` → `aplicar-regiones.mjs` → `aplicar-legal.mjs` →
+`cod_publish_canvas_page` de Inicio → Ajustes → Lectura: página de inicio estática.
+Los medios (`uploads/2026/…`) tienen que estar en el servidor antes: la composición los nombra por ruta.
+
+**No unificar** `cert-fila-reparto-movil` con `cert-abajo-reparto-movil`: valen lo mismo, pero en la hoja cada
+regla móvil tiene que venir después de su propia base o gana la de escritorio (+237 px medidos).

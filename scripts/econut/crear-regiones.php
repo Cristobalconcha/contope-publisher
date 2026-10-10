@@ -18,7 +18,7 @@
  * Uso:  php crear-regiones.php
  */
 define('WP_USE_THEMES', false);
-require __DIR__ . '/../../../wp-local-econut/wordpress/wp-load.php';
+require getenv('WP_LOAD') ?: __DIR__ . '/../../../wp-local-econut/wordpress/wp-load.php';
 
 $repositorio = new COD_Canvas_Document_Repository();
 

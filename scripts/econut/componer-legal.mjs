@@ -29,8 +29,8 @@
  */
 import { writeFileSync } from 'node:fs';
 
-const PAGE_ID = 55;
-const DOCUMENT_ID = 'cod-canvas-page-55';
+const PAGE_ID = Number(process.env.ECONUT_LEGAL_PAGE_ID || 55);
+const DOCUMENT_ID = 'cod-canvas-page-' + PAGE_ID;
 
 const VERDE = '#2E594A';
 const TEXTO = '#333333';

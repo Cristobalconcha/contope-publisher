@@ -97,7 +97,7 @@ R('t-portada', 'typography', { role: 'portada', family: "'Bodoni Moda', Georgia,
 // pasión» en 46, e «Instalaciones de Vanguardia» y «Compromiso con el Futuro»
 // en 50. Por eso hay tres reglas y no una.
 R('t-seccion', 'typography', { role: 'titulo-seccion', fontSize: 'clamp(34px, 4.4vw, 58px)', fontWeight: 600, lineHeight: 1.2, align: 'start' });
-R('t-seccion-46', 'typography', { role: 'titulo-seccion', fontSize: 'clamp(30px, 2.5vw, 46px)', fontWeight: 600, lineHeight: 1, align: 'start' });
+R('t-subseccion', 'typography', { role: 'titulo-seccion', fontSize: 'clamp(32px, 2.7vw, 50px)', fontWeight: 600, lineHeight: 1, align: 'start' });
 R('t-seccion-centro', 'typography', { role: 'titulo-centrado', fontSize: 'clamp(34px, 4.4vw, 58px)', fontWeight: 600, lineHeight: 1.1, align: 'center' });
 R('t-sub', 'typography', { role: 'subtitulo', family: "'Bodoni Moda', Georgia, serif", fontSize: '26px', fontWeight: 600, lineHeight: 1.25 });
 // Medido en el original: 14px, interlínea 19,6, espaciado 1px y peso 500. Y
@@ -112,10 +112,9 @@ R('t-rotulo-servicios', 'typography', { role: 'rotulo', family: "'Big Shoulders 
 R('t-rotulo-centro', 'typography', { role: 'rotulo', fontSize: '13px', fontWeight: 600, letterSpacing: '0.14em', transform: 'uppercase', align: 'center' });
 R('t-instalaciones', 'typography', { role: 'titulo-centrado', fontSize: 'clamp(32px, 2.7vw, 50px)', fontWeight: 600, lineHeight: 1.4, align: 'center' });
 R('video-plantas', 'media', { aspectRatio: '16/9', fit: 'cover' });
-R('aire-plantas', 'spacing', { paddingBlock: '54px', paddingInline: '24px' });
 R('t-cuerpo', 'typography', { role: 'cuerpo', fontSize: '16px', lineHeight: 1.75, measure: '62ch' });
 R('t-lead', 'typography', { role: 'bajada', fontSize: '19px', lineHeight: 1.6, measure: '54ch' });
-R('t-cifra', 'typography', { role: 'cifra', fontSize: 'clamp(38px, 4.6vw, 62px)', fontWeight: 700, lineHeight: 1, align: 'center' });
+R('t-cifra', 'typography', { role: 'cifra', fontSize: 'clamp(34px, 4.4vw, 58px)', fontWeight: 700, lineHeight: 1, align: 'center' });
 R('t-cifra-pie', 'typography', { role: 'cifra-pie', fontSize: '13px', lineHeight: 1.45, align: 'center' });
 R('t-aviso', 'typography', { role: 'aviso', fontSize: '13px', lineHeight: 1.6 });
 R('t-pie', 'typography', { role: 'pie', fontSize: '13px', lineHeight: 1.7 });
@@ -377,7 +376,6 @@ R('t-aviso-titulo', 'typography', { role: 'aviso-titulo', fontSize: '30px', font
 // rótulo y su texto que el original no tiene.
 R('sin-margen', 'properties', { declarations: { 'margin-block-start': '0', 'margin-block-end': '0' } });
 R('s-tarjeta', 'surface', { backgroundColor: BLANCO, shadow: 'sm' });
-R('s-barra-cifras', 'surface', { backgroundColor: BLANCO, shadow: 'sm' });
 
 // --- Forma, medio, movimiento, botón ---------------------------------------
 R('redondo', 'shape', { radius: '10px' });
@@ -422,6 +420,9 @@ R('cert-fila-reparto-movil', 'properties', { declarations: { 'grid-template-colu
 // Abajo: la foto mide 624 de ancho y el texto 366, separados por 60.
 R('cert-abajo', 'layout', { mode: 'grid', columns: 2, gap: '60px', align: 'center', mobile: { mode: 'stack', columns: 1, gap: '28px' } });
 R('cert-abajo-reparto', 'properties', { declarations: { 'grid-template-columns': 'minmax(0, 624fr) minmax(0, 366fr)' } });
+// NO unificar con cert-fila-reparto-movil aunque el valor sea idéntico: en la hoja cada regla móvil
+// tiene que venir DESPUÉS de su propia base, o la base de escritorio gana en teléfono (probado: +237 px).
+R('cert-abajo-reparto-movil', 'properties', { declarations: { 'grid-template-columns': 'minmax(0, 1fr)' } }, { bp: 'mobile' });
 // UNA COLUMNA EN TELÉFONO, y hay que decirlo explícitamente.
 //
 // La regla `layout` de arriba ya declara su rama móvil —`mobile: { mode:
@@ -433,12 +434,10 @@ R('cert-abajo-reparto', 'properties', { declarations: { 'grid-template-columns':
 // Es una trampa del sistema que conviene tener presente: cuando una
 // `properties` toca algo que una `layout` ya resuelve por breakpoint, hay que
 // darle su propia versión móvil o gana en todas partes.
-R('cert-abajo-reparto-movil', 'properties', { declarations: { 'grid-template-columns': 'minmax(0, 1fr)' } }, { bp: 'mobile' });
 // 624x430 en el original, o sea 1,45 y no 1,5. Con 3/2 la foto recortaba 10px
 // más de alto de lo que muestra el sitio.
 R('foto-sustentabilidad', 'media', { aspectRatio: '32/22', fit: 'cover' });
 // El original pone estos dos títulos en 46px y 50px, no en los 58 del resto.
-R('t-certificaciones', 'typography', { role: 'titulo-seccion', fontSize: 'clamp(30px, 2.5vw, 46px)', fontWeight: 600, lineHeight: 1, align: 'start' });
 R('t-compromiso', 'typography', { role: 'titulo-seccion', fontSize: 'clamp(32px, 2.7vw, 50px)', fontWeight: 600, lineHeight: 1.2, align: 'start' });
 // La marquesina: cuatro logos a la vista, desplazamiento continuo. El original
 // lo hace con Swiper (loop, delay 0, speed 8000) dentro de un módulo de código
@@ -492,7 +491,6 @@ R('caja-certificaciones', 'layout', { mode: 'stack', maxWidth: '1080px', gap: '1
 // bajada y las tres columnas. Con los 64 de la caja normal la sección se iba
 // 133px por encima del original.
 R('caja-servicios', 'layout', { mode: 'stack', maxWidth: '1080px', gap: '40px', align: 'start' });
-R('panel-blanco', 'surface', { backgroundColor: BLANCO, foregroundColor: TEXTO });
 R('tarjeta-blanca', 'surface', { backgroundColor: BLANCO, foregroundColor: TEXTO, shadow: 'sm' });
 R('entra', 'motion', { trigger: 'scroll', effect: 'rise', duration: 520, easing: 'ease-out', threshold: 0.15, stagger: 110 });
 R('boton', 'button', { variant: 'solid', tone: 'primary', size: 'md', width: 'auto', interaction: 'lift' });
@@ -606,14 +604,12 @@ const avisoEmergente = () => ({
   // El marcador va en el GRUPO que lleva la conducta, no en la sección: es el
   // que el aviso reconoce para reabrirse desde un enlace. Con el marcador en
   // la sección, el enlace de la línea no lo reabría.
-  ], ['aviso-estafas', 'aviso-caja'], { panel: ['aviso-panel'], velo: ['aviso-velo'], cerrar: ['aviso-cerrar'] },
+  ], ['aviso-estafas', 'aviso-caja'], { panel: ['s-blanco'], velo: ['aviso-velo'], cerrar: ['s-blanco'] },
      'aviso-estafas')],
 });
 R('aviso-estafas', 'interaction', { behavior: 'aviso' });
 R('aviso-caja', 'layout', { mode: 'stack', gap: '14px', align: 'start' });
-R('aviso-panel', 'surface', { backgroundColor: BLANCO, foregroundColor: TEXTO });
 R('aviso-velo', 'surface', { backgroundColor: OSCURO });
-R('aviso-cerrar', 'surface', { backgroundColor: BLANCO, foregroundColor: TEXTO });
 R('aviso-cuentas', 'properties', { declarations: {
   display: 'flex', 'flex-direction': 'column', 'align-items': 'flex-start', gap: '8px', 'margin-block-start': '4px',
 } });
@@ -672,7 +668,7 @@ nodes.push({
       H('Servicio de verdad', 1, ['t-portada', 'c-naranja']),
       H('La clave es el compromiso', 3, ['t-sub']),
       P('No se trata de vender excedentes de capacidad de proceso, sino de brindar soluciones completas para exportadores, con control de calidad, proyección productiva, manejo de inventarios, informes completos de resultados, despacho SAG, trazabilidad y seguridad hasta destino. Y todo a un costo único y claro.', ['t-lead']),
-    ], ['columna', 'panel-blanco', 'aire-portada', 'portada-texto', 'portada-texto-movil', 'portada-texto-tablet']),
+    ], ['columna', 's-blanco', 'aire-portada', 'portada-texto', 'portada-texto-movil', 'portada-texto-tablet']),
     { id: id('v'), kind: 'video', ruleIds: ['portada-video', 'portada-video-forma', 'portada-video-movil', 'portada-video-tablet'],
       content: { sourceUrl: f.videoBrazo, caption: '', ambient: true } },
   ], ['portada-lienzo', 'portada-lienzo-movil', 'portada-lienzo-tablet', 'entra'])],
@@ -712,7 +708,7 @@ const servicio = (url, alt, nombre, texto, puntos, enlace = '') => G([
 nodes.push({
   id: 'servicios', marker: 'servicios', kind: 'section', ruleIds: ['aire', 's-beige'],
   children: [G([
-    ...abre('Nuestros Servicios', 'Procesamos con pasión', false, 't-rotulo-servicios', 't-seccion-46'),
+    ...abre('Nuestros Servicios', 'Procesamos con pasión', false, 't-rotulo-servicios', 't-subseccion'),
     P('En Econut nos dedicamos al procesamiento de nueces desde su llegada desde el campo hasta el empaque final para exportación. Nuestro trabajo combina precisión técnica, compromiso humano y control de calidad en cada etapa.', ['t-lead']),
     G([
       servicio(f.saco, 'Nuez con cáscara en saco', 'Nuez con Cáscara',
@@ -763,7 +759,7 @@ nodes.push({
 // 6 · Cifras: pestañas, como en el sitio. El número es la etiqueta;
 //     su panel trae icono, título y texto.
 R('pestanas', 'interaction', { behavior: 'pestanas' });
-R('t-etiqueta-cifra', 'typography', { role: 'etiqueta-cifra', fontSize: 'clamp(32px, 4.4vw, 63px)', fontWeight: 600, lineHeight: 1, align: 'center' });
+R('t-etiqueta-cifra', 'typography', { role: 'etiqueta-cifra', fontSize: 'clamp(34px, 4.4vw, 58px)', fontWeight: 600, lineHeight: 1, align: 'center' });
 
 // Las pestañas, con lo medido en econut.cl el 2026-09-30. Van sobre las PARTES
 // que fabrica el runtime (el botón de la etiqueta, la lista y el panel), que
@@ -805,8 +801,8 @@ const pestana = (numero, titulo, texto, icono, foto, subtitulo = '') => G([
   H(numero, 3, ['t-etiqueta-cifra']),
   G([
     G([
-      IMG(f.logo, 'Veinte años de Econut', ['icono-cifra']),
-      IMG(icono, titulo, ['icono-cifra']),
+      IMG(f.logo, 'Veinte años de Econut', ['icono']),
+      IMG(icono, titulo, ['icono']),
     ], ['columna-iconos', 'columna-iconos-movil']),
     G([
       H(titulo, 2, ['t-titulo-cifra', 'c-naranja']),   // H2 en el original
@@ -830,7 +826,6 @@ R('partida-cifra-movil', 'properties', { declarations: {
 R('columna-iconos-movil', 'properties', { declarations: {
   display: 'flex', 'flex-direction': 'row', 'align-items': 'center', gap: '20px',
 } }, { bp: 'mobile' });
-R('icono-cifra', 'media', { fit: 'contain' });
 R('t-titulo-cifra', 'typography', { role: 'subtitulo', family: "'Bodoni Moda', Georgia, serif", fontSize: '26px', fontWeight: 600, lineHeight: 1.35 });
 R('t-texto-cifra', 'typography', { role: 'cuerpo', fontSize: '18px', lineHeight: 1.6, measure: '54ch' });
 R('foto-cifra', 'media', { aspectRatio: '3/2', fit: 'cover' });
@@ -862,7 +857,7 @@ nodes.push({
 //     se ve el reproductor con su tiempo— y la vista aérea como póster. La
 //     foto suelta que había es lo que faltaba corregir.
 nodes.push({
-  id: 'plantas', marker: 'plantas', kind: 'section', ruleIds: ['aire-plantas', 's-blanco'],
+  id: 'plantas', marker: 'plantas', kind: 'section', ruleIds: ['aire', 's-blanco'],
   children: [G([
     H('Nuestras Plantas de Procesamiento', 4, ['t-rotulo-centro', 'c-texto']),
     H('Instalaciones de Vanguardia', 2, ['t-instalaciones', 'c-naranja']),
@@ -934,7 +929,7 @@ nodes.push({
   children: [G([
     // Fila de arriba: el título y la marquesina.
     G([
-      H('Certificaciones', 2, ['t-certificaciones', 'c-naranja']),
+      H('Certificaciones', 2, ['t-subseccion', 'c-naranja']),
       G([
         IMG(f.brc, 'BRCGS Food Safety', ['cert-tam', 'cert-tam-caja']),
         IMG(f.kosher, 'Kosher', ['cert-tam', 'cert-tam-caja']),
@@ -961,8 +956,8 @@ nodes.push({
 nodes.push(avisoEmergente());
 
 writeFileSync('composicion-fiel.json', JSON.stringify({
-  pageId: 20,
-  documentId: 'cod-canvas-page-20',
+  pageId: Number(process.env.ECONUT_PAGE_ID || 20),
+  documentId: 'cod-canvas-page-' + Number(process.env.ECONUT_PAGE_ID || 20),
   expectedRevision: Number(process.env.REV || 5),
   design: { schemaVersion: 1, designId: 'econut-web', expectedDesignRevision: 2, reviewState: 'session', rules: reglas },
   composition: { schemaVersion: 2, nodes },

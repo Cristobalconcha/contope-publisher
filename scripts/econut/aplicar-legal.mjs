@@ -17,8 +17,8 @@ import { execFileSync } from 'node:child_process';
 
 const aqui = path.dirname(fileURLToPath(import.meta.url));
 const soloProbar = process.argv.includes('--probar');
-const PAGE_ID = 55;
-const DOCUMENT_ID = 'cod-canvas-page-55';
+const PAGE_ID = Number(process.env.ECONUT_LEGAL_PAGE_ID || 55);
+const DOCUMENT_ID = 'cod-canvas-page-' + PAGE_ID;
 
 const llamar = (herramienta, archivo) => {
   const args = ['lienzo.mjs', herramienta];

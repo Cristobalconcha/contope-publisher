@@ -183,7 +183,7 @@ const hacerReglas = () => {
 
   writeFileSync('region-header.json', JSON.stringify({
     pageId: 0,
-    documentId: 'cod-region-header',
+    documentId: process.env.ECONUT_REGION_HEADER_ID || 'cod-region-header',
     expectedRevision: Number(process.env.REV_HEADER || 0),
     design: { schemaVersion: 1, designId: 'econut-web', expectedDesignRevision: 2, reviewState: 'session', rules: reglas },
     composition: { schemaVersion: 2, nodes },
@@ -382,7 +382,7 @@ const hacerReglas = () => {
 
   writeFileSync('region-footer.json', JSON.stringify({
     pageId: 0,
-    documentId: 'cod-region-footer',
+    documentId: process.env.ECONUT_REGION_FOOTER_ID || 'cod-region-footer',
     expectedRevision: Number(process.env.REV_FOOTER || 0),
     design: { schemaVersion: 1, designId: 'econut-web', expectedDesignRevision: 2, reviewState: 'session', rules: reglas },
     composition: { schemaVersion: 2, nodes },
