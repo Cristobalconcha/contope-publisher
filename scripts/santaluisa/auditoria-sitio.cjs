@@ -30,9 +30,17 @@ const rutas = (process.argv[3] || '/').split(',');
         let pasos = 0;
         const sinCargar = new Set();
         const mira = async () => car.evaluate((root) => { const cr = root.getBoundingClientRect(); return [...root.querySelectorAll('img')].filter((i) => { const r = i.getBoundingClientRect(); return r.width > 0 && r.right > cr.left + 5 && r.left < cr.right - 5; }).filter((i) => !(i.complete && i.naturalWidth > 0)).map((i) => (i.getAttribute('src') || '').split('/').pop()); });
-        (await mira()).forEach((x) => sinCargar.add(x));
-        while ((await sig.count()) && !(await sig.first().isDisabled()) && pasos < 30) { await sig.first().click(); await p.waitForTimeout(1300); pasos++; (await mira()).forEach((x) => sinCargar.add(x)); }
+        // Descargada no es lo mismo que vista: el 19-oct-2026 las 8 fotos de Diferenciales
+        // cargaban pero quedaban fuera del recorte de la pista, y esta auditoría daba «sin
+        // hallazgos». Se cuenta como vista sólo la foto cuyo centro es lo que el navegador pinta.
+        const vistas = new Set();
+        const pinta = async () => car.evaluate((root) => [...root.querySelectorAll('img')].filter((i) => { if (!(i.complete && i.naturalWidth > 0)) return false; const r = i.getBoundingClientRect(); if (!r.width) return false; const x = r.left + r.width / 2, y = r.top + r.height / 2; if (x < 0 || y < 0 || x > innerWidth || y > innerHeight) return false; return document.elementFromPoint(x, y) === i; }).map((i) => (i.getAttribute('src') || '').split('/').pop()));
+        (await mira()).forEach((x) => sinCargar.add(x)); (await pinta()).forEach((x) => vistas.add(x));
+        while ((await sig.count()) && !(await sig.first().isDisabled()) && pasos < 30) { await sig.first().click(); await p.waitForTimeout(1300); pasos++; (await mira()).forEach((x) => sinCargar.add(x)); (await pinta()).forEach((x) => vistas.add(x)); }
         if (sinCargar.size) anota(ruta, vn, 'CARRUSEL: foto a la vista sin cargar', [...sinCargar].join(', '));
+        const todas = await car.evaluate((root) => [...new Set([...root.querySelectorAll('.cod-carousel__track img')].map((i) => (i.getAttribute('src') || '').split('/').pop()).filter(Boolean))]);
+        const nunca = todas.filter((x) => !vistas.has(x));
+        if (nunca.length) anota(ruta, vn, 'CARRUSEL: fotos que nunca se ven al recorrerlo', nunca.join(', '));
         const total = await car.locator('img').count();
         if (pasos === 0 && total > 4 && vn === 'cel') anota(ruta, vn, 'CARRUSEL: no avanza', total + ' fotos');
       }
