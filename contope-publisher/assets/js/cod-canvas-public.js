@@ -194,6 +194,18 @@
         try { slides = Array.prototype.slice.call(track.querySelectorAll(slideSelector)); } catch (error) { return; }
         if (!slides.length) return;
 
+        // Las fotos que esperan fuera de cuadro viven en una pista que se mueve
+        // con transform, y un loading="lazy" ahí no se dispara nunca: medido el
+        // 18-oct-2026 en Diferenciales de Santa Luisa, en celular sólo cargaba la
+        // primera y de la quinta en adelante no aparecía ninguna, aunque la
+        // flecha las trajera a la vista. Se cargan todas de una vez; son pocas
+        // y el carrusel las va a mostrar de todos modos.
+        slides.forEach(function (slide) {
+            Array.prototype.forEach.call(slide.querySelectorAll('img[loading="lazy"]'), function (img) {
+                img.loading = 'eager';
+            });
+        });
+
         var nextButton = root.querySelector('[data-cod-carousel-next]');
         var previousButton = root.querySelector('[data-cod-carousel-prev]');
         var index = 0;

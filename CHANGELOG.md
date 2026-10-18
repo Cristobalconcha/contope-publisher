@@ -5,6 +5,26 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.80 — 18 de octubre de 2026
+
+### Las fotos de un carrusel ya aparecen todas
+
+En la galería de Diferenciales de Santa Luisa, en un celular se veía una sola foto
+(el grifo amarillo) y las demás quedaban en blanco, aunque la flecha las trajera a
+la vista. En escritorio fallaba la última.
+
+La causa: las fotos llevaban `loading="lazy"` (cargar sólo cuando se acercan a la
+pantalla), pero en un carrusel las que esperan viven fuera de cuadro, en una pista
+que se desplaza con `transform`, y el navegador nunca las considera cercanas. Medido
+con Chrome: en celular 5 de 8 fotos no cargaban ni esperando nueve segundos; al
+quitarles el `lazy`, cargaban las 8.
+
+Ahora el carrusel pide todas sus fotos de una vez al montarse. Son pocas, y las va a
+mostrar de todos modos. Vale para todo sitio que use el carrusel, sin tener que
+recomponer ninguna página.
+
+---
+
 ## 0.3.79 — 8 de octubre de 2026
 
 ### Una actualización ya no cambia lo que un sitio medía
