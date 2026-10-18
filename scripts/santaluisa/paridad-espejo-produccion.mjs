@@ -21,10 +21,8 @@
  *   - Instagram Feed: necesita MySQL y la cuenta conectada (credenciales).
  *   - Plugins de administración (copias de seguridad, correo, seguridad).
  *
- * Excepción conocida del HTML de la portada: el `src` del visor de la galería
- * lleva `data:image/svg+xml…` en producción y el espejo lo guarda sin `data:`
- * (el filtro de protocolos de WordPress local no lo admite). El projectData sí es
- * idéntico.
+ * (El visor de la galería de la portada llevaba un `src` sin `data:` en el espejo; se
+ * corrigió el 18-oct-2026 y la portada es idéntica también en HTML.)
  *
  * Uso:  node scripts/santaluisa/paridad-espejo-produccion.mjs
  */
