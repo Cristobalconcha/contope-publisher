@@ -739,13 +739,46 @@
       if (slides.length < 2) return slides[0].getBoundingClientRect().width;
       return slides[1].getBoundingClientRect().left - slides[0].getBoundingClientRect().left;
     }
-    function update() {
+    // Gemelo de cod-canvas-public.js: si la pista es deslizable (overflow-x:auto
+    // del compilador), transform se lleva su propio recorte y las fotos quedan
+    // en blanco (Diferenciales, 18-oct-2026). Ahí las flechas la deslizan.
+    function scrolls() {
+      var overflowX = win.getComputedStyle(track).overflowX;
+      return overflowX === 'auto' || overflowX === 'scroll';
+    }
+    function reducedMotion() {
+      return !!(win.matchMedia && win.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    }
+    function update(fromScroll) {
       var step = slideStep();
       track.style.setProperty('--cod-carousel-columnas', String(visibleCount()));
-      track.style.transform = 'translateX(' + (-index * step) + 'px)';
+      if (scrolls()) {
+        track.style.transform = '';
+        if (!fromScroll) {
+          var left = index * step;
+          if (typeof track.scrollTo === 'function') {
+            track.scrollTo({ left: left, behavior: reducedMotion() ? 'auto' : 'smooth' });
+          } else {
+            track.scrollLeft = left;
+          }
+        }
+      } else {
+        track.style.transform = 'translateX(' + (-index * step) + 'px)';
+      }
       if (prevBtn) prevBtn.disabled = index <= 0;
       if (nextBtn) nextBtn.disabled = index >= maxIndex();
     }
+    var scrollTimer = null;
+    function onScroll() {
+      if (!scrolls()) return;
+      win.clearTimeout(scrollTimer);
+      scrollTimer = win.setTimeout(function () {
+        var step = slideStep();
+        if (step > 0) index = Math.max(0, Math.min(maxIndex(), Math.round(track.scrollLeft / step)));
+        update(true);
+      }, 120);
+    }
+    track.addEventListener('scroll', onScroll, { passive: true });
     function onNext(e) {
       if (e && typeof e.preventDefault === 'function') e.preventDefault();
       index = Math.min(maxIndex(), index + 1);
@@ -769,6 +802,8 @@
       if (nextBtn) nextBtn.removeEventListener('click', onNext);
       if (prevBtn) prevBtn.removeEventListener('click', onPrev);
       win.removeEventListener('resize', onResize);
+      track.removeEventListener('scroll', onScroll);
+      win.clearTimeout(scrollTimer);
       if (opts.autoRemove) track.style.transform = '';
     });
   }

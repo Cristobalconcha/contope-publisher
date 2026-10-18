@@ -223,14 +223,49 @@
             if (slides.length < 2) return slides[0].getBoundingClientRect().width;
             return slides[1].getBoundingClientRect().left - slides[0].getBoundingClientRect().left;
         }
-        function update() {
+        // Si la pista es deslizable (el compilador le da overflow-x:auto y
+        // scroll-snap), moverla con transform se lleva también su propio
+        // recorte, y la foto que entra al cuadro queda fuera de él: medido el
+        // 18-oct-2026 en Diferenciales de Santa Luisa, en celular todas en
+        // blanco desde la segunda; en escritorio, la última. En ese caso las
+        // flechas la deslizan, y deslizar con el dedo actualiza las flechas.
+        function scrolls() {
+            var overflowX = window.getComputedStyle(track).overflowX;
+            return overflowX === 'auto' || overflowX === 'scroll';
+        }
+        function reducedMotion() {
+            return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+        }
+        function update(fromScroll) {
             var step = slideStep();
             // El CSS reparte el ancho según cuántas columnas caben.
             track.style.setProperty('--cod-carousel-columnas', String(visibleCount()));
-            track.style.transform = 'translateX(' + (-index * step) + 'px)';
+            if (scrolls()) {
+                track.style.transform = '';
+                if (!fromScroll) {
+                    var left = index * step;
+                    if (typeof track.scrollTo === 'function') {
+                        track.scrollTo({ left: left, behavior: reducedMotion() ? 'auto' : 'smooth' });
+                    } else {
+                        track.scrollLeft = left;
+                    }
+                }
+            } else {
+                track.style.transform = 'translateX(' + (-index * step) + 'px)';
+            }
             if (previousButton) previousButton.disabled = index <= 0;
             if (nextButton) nextButton.disabled = index >= maxIndex();
         }
+        var scrollTimer = null;
+        track.addEventListener('scroll', function () {
+            if (!scrolls()) return;
+            clearTimeout(scrollTimer);
+            scrollTimer = setTimeout(function () {
+                var step = slideStep();
+                if (step > 0) index = Math.max(0, Math.min(maxIndex(), Math.round(track.scrollLeft / step)));
+                update(true);
+            }, 120);
+        }, { passive: true });
         if (nextButton) {
             nextButton.addEventListener('click', function (event) {
                 if (event && typeof event.preventDefault === 'function') event.preventDefault();

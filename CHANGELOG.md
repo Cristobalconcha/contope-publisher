@@ -5,6 +5,30 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.81 — 19 de octubre de 2026
+
+### El carrusel ya muestra las fotos al avanzar con las flechas
+
+La 0.3.80 hizo que las fotos del carrusel se descargaran todas, pero en
+Diferenciales de Santa Luisa seguían sin verse: en celular, desde la segunda
+foto el cuadro quedaba en blanco; en escritorio, las fotos 5 a 8 no aparecían
+nunca.
+
+La causa: la pista del carrusel es deslizable (el compilador le da
+`overflow-x:auto` con encaje, para poder pasar las fotos con el dedo), y las
+flechas la movían con `transform`. Una pista deslizable recorta lo que tiene
+dentro a su propio ancho, y al moverla con `transform` se llevaba ese recorte
+con ella: la foto entraba al cuadro, pero quedaba fuera del recorte.
+
+Ahora, cuando la pista es deslizable, las flechas la deslizan (con suavidad,
+salvo que el visitante haya pedido menos movimiento), y pasar las fotos con el
+dedo actualiza las flechas. Si la pista no es deslizable, todo sigue como antes.
+Medido sobre la página real: en celular se ven las 8 fotos, una por paso; en
+escritorio avanza hasta la octava. Vale para todo carrusel de cualquier sitio,
+sin recomponer páginas, y el editor recibió el mismo arreglo.
+
+---
+
 ## 0.3.80 — 18 de octubre de 2026
 
 ### Las fotos de un carrusel ya aparecen todas
