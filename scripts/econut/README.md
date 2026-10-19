@@ -106,6 +106,35 @@ el juego de logos duplicado.
   por la regla de no usar degradados. La legibilidad la da la columna blanca,
   que es el mismo mecanismo que usa el original.
 
+## La página de Contacto (19-oct-2026)
+
+econut.cl tiene `/contactos` con un formulario de Gravity Forms; el sitio nuevo no
+tenía ninguno. La página **Contacto** (`/contacto/`) la crea y escribe
+`aplicar-contacto.mjs` a partir de `componer-contacto.mjs` (fuente única: no se
+edita a mano en la base). Lleva el formulario de **Orugantt Forms**
+`contacto-econut`, que se importa ANTES (panel de Orugantt Forms → Importar →
+`fixtures/contacto-econut.json` de ese plugin → Publicar): área (obligatoria),
+nombre, apellidos, correo y su repetición, teléfono, mensaje (máx. 600) y una
+sola casilla desmarcada. El aviso va a administracion@ (Recursos Humanos),
+ventas@ (Productos y servicios) o secretaria@ (Consultas generales), con
+responder-a el correo de quien escribe; las tres casillas viven en el JSON del
+formulario (`_formMetadata.notificaciones`). **El sitio necesita SMTP funcionando**
+para que lleguen.
+
+```
+node aplicar-contacto.mjs          # crea la página «Contacto» si falta, la compone, la aplica y la publica
+node aplicar-regiones.mjs pie      # el pie suma el enlace «Contacto» (el encabezado no tiene menú, como el original)
+```
+
+El formulario se estila por variables (regla `contacto-form`, tipo `form`), nunca
+con reglas sobre sus campos. Las reglas compartidas (`aire`, `s-beige`, `c-naranja`,
+`c-texto`, `t-rotulo`, `t-seccion`, `t-lead`, `titulo-par`, `texto-sin-margen`) son copia
+exacta de las de `componer.mjs`: si cambia un valor allá, hay que cambiarlo en
+`componer-contacto.mjs` también.
+
+Prueba: `pruebas/probar-contacto-econut.cjs` en el repositorio de Orugantt Forms
+(Playwright contra el espejo, con `wp_mail` capturado: no envía correos).
+
 ## Instalar en un sitio nuevo (ensayado el 10-oct-2026)
 
 Reproducido desde un WordPress en blanco (sólo plugin 0.3.79 + temas `contope-canvas` y `contope-econut`):

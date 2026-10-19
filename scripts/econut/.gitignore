@@ -12,6 +12,7 @@ region-*.json
 .crear.json
 .publicar-*.json
 legal.json
+contacto.json
 composicion-fiel.json
 preview.json
 estado-args.json
