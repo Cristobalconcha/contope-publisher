@@ -42,6 +42,11 @@ const HAY_WHATSAPP = false;
 // /contactos.
 const LEGAL = '/terminos-y-privacidad/';
 
+// La página de Contacto, también por su dirección (la crea `aplicar-contacto.mjs`).
+// El encabezado de Econut no tiene menú —igual que el original—, así que la
+// única navegación del sitio es la línea de enlaces del pie, y ahí va.
+const CONTACTO = '/contacto/';
+
 // La imagen del mini mapa. Es un archivo del SITIO, no una llamada a Mapbox:
 // se generó una sola vez con `scripts/generar-mini-mapa.mjs` a zoom 2 —el país
 // entero— y se subió a Medios. El encuadre del mini nunca cambia, así que
@@ -314,6 +319,10 @@ const hacerReglas = () => {
   R('p-legal-punto', 'typography', { role: 'pie', fontSize: '11px', lineHeight: 1.4 });
   R('p-legal-punto-color', 'properties', { declarations: { opacity: '0.5' } });
   R('p-preferencias', 'interaction', { behavior: 'preferencias-cookies' });
+  // Los enlaces de esta línea heredan el color del pie (blanco). Sin esto
+  // tomaban el verde de los enlaces del tema SOBRE el verde del pie y casi no
+  // se leían (visto el 19-oct-2026 al agregar «Contacto»).
+  R('p-legal-enlace', 'properties', { declarations: { color: 'inherit' } });
 
   const nodes = [{
     id: 'pie', marker: 'pie', kind: 'footer', ruleIds: ['p-aire', 'p-superficie'],
@@ -369,11 +378,15 @@ const hacerReglas = () => {
       ],
     }, {
       id: id('g'), kind: 'group', ruleIds: ['p-legal-barra'], children: [
-        { id: id('l'), kind: 'link', ruleIds: ['p-legal-texto'], content: {
+        { id: id('l'), kind: 'link', ruleIds: ['p-legal-texto', 'p-legal-enlace'], content: {
+          label: 'Contacto', href: CONTACTO,
+        } },
+        { id: id('p'), kind: 'paragraph', ruleIds: ['p-legal-punto', 'p-legal-punto-color'], content: { text: '·' } },
+        { id: id('l'), kind: 'link', ruleIds: ['p-legal-texto', 'p-legal-enlace'], content: {
           label: 'Términos y privacidad', href: LEGAL,
         } },
         { id: id('p'), kind: 'paragraph', ruleIds: ['p-legal-punto', 'p-legal-punto-color'], content: { text: '·' } },
-        { id: id('l'), kind: 'link', ruleIds: ['p-legal-texto', 'p-preferencias'], content: {
+        { id: id('l'), kind: 'link', ruleIds: ['p-legal-texto', 'p-legal-enlace', 'p-preferencias'], content: {
           label: 'Preferencias de cookies', href: LEGAL,
         } },
       ],
