@@ -5,6 +5,27 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.82 — 19 de octubre de 2026
+
+### Un sitio sin acceso a PHP ya se puede armar entero por el canal MCP
+
+Al armar Econut en un servidor donde no se puede ejecutar PHP (sólo la API
+REST y el canal MCP con una contraseña de aplicación) faltaban dos cosas que
+hasta ahora sólo se hacían desde el panel o con un guion local:
+
+- **Crear el encabezado y el pie globales.** Nueva herramienta
+  `cod_create_canvas_region` (`kind`: header, body o footer): crea la región
+  canónica con alcance global, y si ya existe la deja como está. Después se
+  escribe como siempre, con `pageId: 0`.
+- **Guardar la clave pública de Mapbox.** Nueva herramienta
+  `cod_set_mapbox_token`: pasa por la misma validación de la pantalla de
+  Configuración (rechaza claves secretas) y nunca devuelve la clave.
+
+Las dos exigen permiso de administrador, como el resto del canal. Sólo cambia
+`includes/class-cod-canvas-mcp-service.php` (y el número de versión).
+
+---
+
 ## 0.3.81 — 19 de octubre de 2026
 
 ### El carrusel ya muestra las fotos al avanzar con las flechas

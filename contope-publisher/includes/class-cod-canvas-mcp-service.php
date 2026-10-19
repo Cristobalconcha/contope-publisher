@@ -268,6 +268,58 @@ final class COD_Canvas_MCP_Service
         ];
     }
 
+    /**
+     * Crea la región global canónica de un tipo (cod-region-header, -body o
+     * -footer), con alcance global y sin exclusiones, y la deja publicada.
+     * Idempotente: si ya es una región, no cambia su alcance ni su contenido.
+     *
+     * Existe porque la única otra forma de crearlas era el panel de WordPress
+     * o un guion PHP local (`scripts/econut/crear-regiones.php`), y en un
+     * servidor donde no se puede ejecutar PHP ninguna de las dos sirve: sin
+     * región no hay dónde escribir el encabezado ni el pie con `pageId: 0`.
+     *
+     * @return array<string, mixed>|WP_Error
+     */
+    public function create_canvas_region(string $kind, string $title = '')
+    {
+        $document_id = 'cod-region-' . $kind;
+        $titulos = ['header' => 'Encabezado global', 'body' => 'Cuerpo global', 'footer' => 'Pie global'];
+        $titulo = $title !== '' ? $title : ($titulos[$kind] ?? $document_id);
+
+        $post_id = $this->repository->find_post_id($document_id);
+        $existia = $post_id !== null
+            && (string) get_post_meta($post_id, COD_Canvas_Document_Repository::META_REGION_KIND, true) === $kind;
+
+        if (!$existia) {
+            $guardada = $this->repository->save_region(
+                $document_id,
+                $kind,
+                COD_Canvas_Document_Repository::REGION_SCOPE_GLOBAL,
+                []
+            );
+            if (is_wp_error($guardada)) {
+                return $guardada;
+            }
+            $post_id = $this->repository->find_post_id($document_id);
+            if ($post_id === null) {
+                return new WP_Error('cod_mcp_canvas_region_incomplete', 'La región se creó, pero no pudo verificarse su vínculo persistente.');
+            }
+            update_post_meta($post_id, COD_Canvas_Document_Repository::META_REGION_TEMPLATE_TITLE, $titulo);
+            wp_update_post(['ID' => $post_id, 'post_title' => $titulo, 'post_status' => 'publish']);
+        }
+
+        $document = $this->repository->describe_existing($document_id);
+
+        return [
+            'documentId' => $document_id,
+            'kind' => $kind,
+            'scope' => COD_Canvas_Document_Repository::REGION_SCOPE_GLOBAL,
+            'created' => !$existia,
+            'revision' => is_array($document) ? ($document['revision'] ?? 0) : 0,
+            'next' => 'Escríbela con cod_preview_canvas_composition y cod_apply_canvas_composition usando pageId 0 y este documentId.',
+        ];
+    }
+
     /** @return array{mapping: array<string, string>, missing: array<int, string>} */
     public function resolve_canvas_assets(array $references): array
     {
@@ -756,6 +808,35 @@ final class COD_Canvas_MCP_Service
                 'annotations' => $mutation,
             ],
             [
+                'name' => 'cod_create_canvas_region',
+                'title' => 'Crear región global (encabezado, cuerpo o pie)',
+                'description' => 'Crea —o deja tal como está si ya existe— el documento de una región global canónica (cod-region-header, cod-region-body o cod-region-footer) con alcance global y sin exclusiones, para poder escribirlo después con pageId 0. Es lo que hacía el panel (o un guion PHP local): sirve en un sitio donde no se puede ejecutar PHP.',
+                'inputSchema' => [
+                    'type' => 'object',
+                    'properties' => [
+                        'kind' => ['type' => 'string', 'enum' => ['header', 'body', 'footer']],
+                        'title' => ['type' => 'string', 'minLength' => 1, 'maxLength' => 120],
+                    ],
+                    'required' => ['kind'],
+                    'additionalProperties' => false,
+                ],
+                'outputSchema' => ['type' => 'object'],
+                'annotations' => $publish,
+            ],
+            [
+                'name' => 'cod_set_mapbox_token',
+                'title' => 'Configurar la clave pública de Mapbox del sitio',
+                'description' => 'Guarda la clave pública de Mapbox (empieza con pk.) que usan el mapa del pie y los nodos de mapa. Pasa por la misma validación que la pantalla de Configuración. Una cadena vacía la borra.',
+                'inputSchema' => [
+                    'type' => 'object',
+                    'properties' => ['token' => ['type' => 'string', 'maxLength' => 400]],
+                    'required' => ['token'],
+                    'additionalProperties' => false,
+                ],
+                'outputSchema' => ['type' => 'object'],
+                'annotations' => $publish,
+            ],
+            [
                 'name' => 'cod_publish_canvas_page',
                 'title' => 'Publicar página Canvas',
                 'description' => 'Publica de forma separada una página Canvas ya revisada en la revisión indicada.',
@@ -954,6 +1035,28 @@ final class COD_Canvas_MCP_Service
             }
             update_option('cod_whatsapp_number', $arguments['number'], false);
             return ['number' => $arguments['number'], 'saved' => true];
+        }
+        if ($tool_name === 'cod_create_canvas_region') {
+            if (!$this->has_only_keys($arguments, ['kind', 'title'])
+                || !isset($arguments['kind']) || !is_string($arguments['kind'])
+                || !in_array($arguments['kind'], COD_Canvas_Document_Repository::REGION_KINDS, true)
+                || (isset($arguments['title']) && (!is_string($arguments['title']) || trim($arguments['title']) === ''))) {
+                return new WP_Error('cod_mcp_invalid_arguments', 'kind debe ser header, body o footer; title, si va, texto no vacío.');
+            }
+            return $this->create_canvas_region($arguments['kind'], isset($arguments['title']) ? trim($arguments['title']) : '');
+        }
+        if ($tool_name === 'cod_set_mapbox_token') {
+            if (!$this->has_only_keys($arguments, ['token']) || !isset($arguments['token']) || !is_string($arguments['token'])) {
+                return new WP_Error('cod_mcp_invalid_arguments', 'token debe ser texto (la clave pública pk.…, o vacío para borrarla).');
+            }
+            $previa = get_option(COD_Mapa::OPTION_KEY, '');
+            [$clave, $error] = COD_Mapa::procesar_envio($arguments['token'], is_string($previa) ? $previa : '');
+            if ($error !== '') {
+                return new WP_Error('cod_mcp_invalid_arguments', $error);
+            }
+            update_option(COD_Mapa::OPTION_KEY, $clave, false);
+            // La clave NO se devuelve: ni en la respuesta ni en ningún registro.
+            return ['saved' => true, 'configured' => $clave !== ''];
         }
         if ($tool_name === 'cod_publish_canvas_page') {
             $target = $this->target_arguments($arguments, []);
