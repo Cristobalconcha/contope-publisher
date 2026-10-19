@@ -22,11 +22,10 @@
  * misma página `EconutChile`: no son dos páginas, es una compartida de dos
  * formas.
  *
- * PROVISORIO (3 de octubre de 2026): en Instagram hay DOS cuentas con el
- * logotipo de Econut, `econutchile.oficial` (19 publicaciones) y `econutchile`
- * (2 publicaciones). Se usa la primera porque es la que tiene el contenido y la
- * que enlaza al sitio y a las otras tres redes. Arturo confirma cuál queda.
- * Si queda la otra, se cambia esta línea y nada más.
+ * CONFIRMADO por Cristóbal el 19 de octubre de 2026: en Instagram hay DOS
+ * cuentas con el logotipo de Econut, `econutchile.oficial` (la de muchas
+ * publicaciones) y `econutchile` (2 o 3). La oficial es la primera, la que
+ * tiene el contenido y enlaza al sitio y a las otras tres redes.
  *
  * Nota para cuando se decida: `econutchile`, sin sufijo, es el nombre que
  * conviene. Coincide con el de YouTube, y un sufijo como «.oficial» no
