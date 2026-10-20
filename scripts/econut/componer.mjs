@@ -378,12 +378,21 @@ R('sin-margen', 'properties', { declarations: { 'margin-block-start': '0', 'marg
 R('s-tarjeta', 'surface', { backgroundColor: BLANCO, shadow: 'sm' });
 
 // --- Forma, medio, movimiento, botón ---------------------------------------
-R('redondo', 'shape', { radius: '10px' });
-R('foto', 'media', { aspectRatio: '4/3', fit: 'cover', frame: 'rounded' });
+// Puntas redondeadas: el original usa DOS radios y ninguno es el «rounded»
+// del catálogo (20px). Medido el 20-oct en econut.cl, pieza por pieza:
+//   6px  fotos de servicios, línea de selección manual, foto de sustentabilidad
+//   8px  video de la portada, íconos y fotos de las pestañas de cifras
+// Una regla por radio, compartida: el mismo estilo no se repite con otro nombre.
+// overflow hidden es lo que hace que la foto o el video respeten la curva.
+R('puntas-6', 'properties', { declarations: { 'border-radius': '6px', overflow: 'hidden' } });
+R('puntas-8', 'properties', { declarations: { 'border-radius': '8px', overflow: 'hidden' } });
+R('foto', 'media', { aspectRatio: '4/3', fit: 'cover' });
 // La foto de cada servicio es CHICA en el original: 200x155, no una foto a lo
 // ancho de la columna. Acá salían a 383x287, y ese tamaño de más empujaba
 // hacia abajo el nombre, el texto y el botón de las tres columnas.
-R('foto-servicio', 'media', { aspectRatio: '4/3', fit: 'contain' });
+// La foto llena su marco (cover) para que la punta redondeada caiga sobre la
+// foto: con contain quedaban bandas a los lados y la esquina se perdía.
+R('foto-servicio', 'media', { aspectRatio: '4/3', fit: 'cover' });
 R('foto-servicio-tam', 'properties', { declarations: { 'max-width': '200px', width: '100%' } });
 // El nombre de cada servicio va en 18px, no en los 26 del subtítulo general.
 R('t-servicio', 'typography', { role: 'subtitulo', family: "'Bodoni Moda', Georgia, serif", fontSize: '18px', fontWeight: 600, lineHeight: 1.5 });
@@ -669,7 +678,7 @@ nodes.push({
       H('La clave es el compromiso', 3, ['t-sub']),
       P('No se trata de vender excedentes de capacidad de proceso, sino de brindar soluciones completas para exportadores, con control de calidad, proyección productiva, manejo de inventarios, informes completos de resultados, despacho SAG, trazabilidad y seguridad hasta destino. Y todo a un costo único y claro.', ['t-lead']),
     ], ['columna', 's-blanco', 'aire-portada', 'portada-texto', 'portada-texto-movil', 'portada-texto-tablet']),
-    { id: id('v'), kind: 'video', ruleIds: ['portada-video', 'portada-video-forma', 'portada-video-movil', 'portada-video-tablet'],
+    { id: id('v'), kind: 'video', ruleIds: ['portada-video', 'portada-video-forma', 'puntas-8', 'portada-video-movil', 'portada-video-tablet'],
       content: { sourceUrl: f.videoBrazo, caption: '', ambient: true } },
   ], ['portada-lienzo', 'portada-lienzo-movil', 'portada-lienzo-tablet', 'entra'])],
 });
@@ -682,7 +691,7 @@ nodes.push({
 // hay. El destino de los otros dos queda pendiente de que lo decida Cristóbal:
 // copiar un botón que no hace nada no ayuda a nadie.
 const servicio = (url, alt, nombre, texto, puntos, enlace = '') => G([
-  IMG(url, alt, ['foto-servicio', 'foto-servicio-tam']),
+  IMG(url, alt, ['foto-servicio', 'foto-servicio-tam', 'puntas-6']),
   // H4 y no H3: es el nivel que usa el original para el título de cada
   // tarjeta. El nivel no es decoración, ordena el documento para los
   // buscadores y para quien navega con lector de pantalla.
@@ -727,7 +736,9 @@ nodes.push({
         ['Capacidad diaria aproximada de 20 toneladas de producto en cáscara de ingreso.',
          'Envasado en atmósfera modificada en bolsas de 5, 6, 10 ó 12 kilos y en cajas de hasta 12 kilos.']),
       servicio(f.mecanico, 'Partido y selección mecánica', 'Nuez sin Cáscara Mecánico',
-        'Partido y selección mecánica con inspección digital y visual de nueces por tamaño, color y calidad, según estándares internacionales.',
+        // Acortada por Cristóbal el 20-oct; el original decía «Partido y
+        // selección mecánica con inspección digital y visual de nueces…».
+        'Partido mecánico y selección digital y visual por tamaño, color y calidad, según estándar internacional.',
         ['Capacidad diaria aproximada de 40 toneladas de producto en cáscara de ingreso.',
          'Envasado en atmósfera modificada en bolsas de 10 ó 12 kilos y en cajas de hasta 12 kilos.']),
     ], ['tres', 'entra']),
@@ -751,7 +762,7 @@ nodes.push({
       // viene después de «internacionales». Copiado literal del original.
       P('Estamos certificados en los protocolos sanitarios, éticos y de calidad más importantes con una profunda comprensión de los estándares internacionales. Todo lo anterior nos permite garantizar la confiabilidad en las sensibles áreas de manejo de alimentos y nos da la capacidad de entregar productos en todo el mundo.'),
     ], ['columna']),
-    IMG(f.linea, 'Línea de selección manual en la planta', ['foto', 'redondo']),
+    IMG(f.linea, 'Línea de selección manual en la planta', ['foto', 'puntas-6']),
     ], ['partida', 'entra']),
   ], ['caja'])],
 });
@@ -801,14 +812,14 @@ const pestana = (numero, titulo, texto, icono, foto, subtitulo = '') => G([
   H(numero, 3, ['t-etiqueta-cifra']),
   G([
     G([
-      IMG(f.logo, 'Veinte años de Econut', ['icono']),
-      IMG(icono, titulo, ['icono']),
+      IMG(f.logo, 'Veinte años de Econut', ['icono', 'puntas-8']),
+      IMG(icono, titulo, ['icono', 'puntas-8']),
     ], ['columna-iconos', 'columna-iconos-movil']),
     G([
       H(titulo, 2, ['t-titulo-cifra', 'c-naranja']),   // H2 en el original
       ...(subtitulo ? [H(subtitulo, 4, ['t-subtitulo-cifra'])] : []),
       P(texto, ['t-texto-cifra']),
-      IMG(foto, titulo, ['foto-cifra', 'foto-cifra-tam']),
+      IMG(foto, titulo, ['foto-cifra', 'foto-cifra-tam', 'puntas-8']),
     ], ['columna']),
   ], ['partida-cifra', 'partida-cifra-movil']),
 ]);
@@ -939,7 +950,7 @@ nodes.push({
     ], ['cert-fila', 'cert-fila-reparto', 'cert-fila-reparto-movil']),
     // Fila de abajo: la foto y el bloque de sustentabilidad.
     G([
-      IMG(f.sustentabilidad, 'Huertos de nogales de Econut desde el aire', ['foto-sustentabilidad']),
+      IMG(f.sustentabilidad, 'Huertos de nogales de Econut desde el aire', ['foto-sustentabilidad', 'puntas-6']),
       G([
         H('Sustentabilidad en Acción', 4, ['t-rotulo', 'c-texto']),
         H('Compromiso con el Futuro', 2, ['t-compromiso', 'c-naranja']),
