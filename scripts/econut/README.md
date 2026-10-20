@@ -135,6 +135,32 @@ exacta de las de `componer.mjs`: si cambia un valor allá, hay que cambiarlo en
 Prueba: `pruebas/probar-contacto-econut.cjs` en el repositorio de Orugantt Forms
 (Playwright contra el espejo, con `wp_mail` capturado: no envía correos).
 
+## Armar el sitio en un servidor donde NO se puede ejecutar PHP (nuevo.econut.cl, 19-oct-2026)
+
+Todo el circuito va por el canal MCP del plugin (ContOpe **0.3.82 o más**) y la API REST de WordPress,
+con una contraseña de aplicación; no se sube ningún guion al servidor. Variables: `ENDPOINT`
+(`https://<sitio>/index.php?rest_route=/contope/v1/mcp`), `SITIO` (`https://<sitio>`), `AUTH_FILE`
+(`usuario:contraseña`; no se copia a ningún lado) y, sólo si el host no tiene certificado propio,
+`NODE_TLS_REJECT_UNAUTHORIZED=0`. Los medios (`uploads/2026/…`) tienen que estar copiados antes: las
+páginas los nombran por ruta y no hace falta registrarlos como adjuntos.
+
+```
+node instalar-formulario-contacto.mjs                # importa y publica contacto-econut (REST de Orugantt Forms)
+node lienzo.mjs cod_create_canvas_page  …            # «Inicio» y «Términos y privacidad» (anotar los id)
+node lienzo.mjs cod_create_canvas_region …           # {"kind":"header"} y {"kind":"footer"}  (reemplaza a crear-regiones.php)
+ECONUT_PAGE_ID=<id> node aplicar.mjs                 # portada
+node aplicar-regiones.mjs                            # encabezado y pie
+ECONUT_LEGAL_PAGE_ID=<id> node aplicar-legal.mjs     # términos y privacidad (publica)
+node aplicar-contacto.mjs                            # crea, compone y publica Contacto
+node lienzo.mjs cod_publish_canvas_page …            # publicar Inicio
+ECONUT_PAGE_ID=<id> MAPBOX_TOKEN=pk.… node configurar-sitio.mjs   # portada estática, favicon, Mapbox
+```
+
+Para comprobar: `node comparar-estilos.mjs <espejo> <sitio>` (estilos computados de todos los nodos de la
+portada, en escritorio, tablet y celular), `node capturar-paginas.mjs <sitio> <carpeta>` (capturas y
+formulario de contacto probado SIN enviar) y `scripts/santaluisa/auditoria-sitio.cjs`.
+Lo que sigue siendo manual: nada del circuito; sólo decisiones del sitio (idioma, indexación, SMTP).
+
 ## Instalar en un sitio nuevo (ensayado el 10-oct-2026)
 
 Reproducido desde un WordPress en blanco (sólo plugin 0.3.79 + temas `contope-canvas` y `contope-econut`):
