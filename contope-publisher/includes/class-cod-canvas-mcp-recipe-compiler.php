@@ -2155,6 +2155,12 @@ final class COD_Canvas_MCP_Recipe_Compiler
             'sombra' => ['token' => '--ofr-shadow', 'type' => 'shadow'],
             'anilloFoco' => ['token' => '--ofr-focus-ring', 'type' => 'shadow'],
             // Contrato ampliado (Orugantt Forms, 30 de octubre de 2026): campos, etiquetas y botón.
+            'ayudaInterlineado' => ['token' => '--ofr-help-line', 'type' => 'ratio'],
+            'opcionTamano' => ['token' => '--ofr-option-size', 'type' => 'length'],
+            'opcionInterlineado' => ['token' => '--ofr-option-line', 'type' => 'ratio'],
+            'opcionPeso' => ['token' => '--ofr-option-weight', 'type' => 'weight'],
+            'opcionColor' => ['token' => '--ofr-option-color', 'type' => 'color'],
+            'botonSombra' => ['token' => '--ofr-submit-shadow', 'type' => 'shadow'],
             'interlineado' => ['token' => '--ofr-line-height', 'type' => 'ratio'],
             'peso' => ['token' => '--ofr-weight', 'type' => 'weight'],
             'contadorTamano' => ['token' => '--ofr-counter-size', 'type' => 'length'],

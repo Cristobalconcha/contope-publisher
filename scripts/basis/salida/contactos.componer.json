@@ -224,6 +224,27 @@
         }
       },
       {
+        "id": "mapa-ca1d42",
+        "kind": "interaction",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "behavior": "mapa"
+        }
+      },
+      {
         "id": "mg-d782eb",
         "kind": "properties",
         "scope": {
@@ -267,29 +288,6 @@
           "declarations": {
             "padding-top": "50px",
             "padding-bottom": "50px"
-          }
-        }
-      },
-      {
-        "id": "enl-c8a933",
-        "kind": "properties",
-        "scope": {
-          "breakpoint": "all",
-          "state": "default"
-        },
-        "provenance": {
-          "sources": [
-            {
-              "kind": "reference",
-              "reference": "https://basisbodegas.com",
-              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
-            }
-          ]
-        },
-        "status": "reviewed",
-        "value": {
-          "declarations": {
-            "display": "block"
           }
         }
       },
@@ -430,7 +428,7 @@
         }
       },
       {
-        "id": "form-b19630",
+        "id": "form-1069ab",
         "kind": "form",
         "scope": {
           "breakpoint": "all",
@@ -477,6 +475,8 @@
             "subetiquetaColor": "#585E6A",
             "ayudaTamano": "13px",
             "contadorTamano": "13px",
+            "ayudaInterlineado": "1.43",
+            "botonSombra": "rgba(18, 25, 97, 0.08) 0px 1px 4px 0px",
             "interlineado": "1.7",
             "peso": "400",
             "botonAncho": "100%",
@@ -489,7 +489,32 @@
         }
       },
       {
-        "id": "mapa-img-0f7ca7",
+        "id": "mapa-88f0d2",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "display": "block",
+            "width": "100%",
+            "min-height": "800px"
+          }
+        }
+      },
+      {
+        "id": "mini-e17ac6",
         "kind": "properties",
         "scope": {
           "breakpoint": "all",
@@ -509,9 +534,37 @@
           "declarations": {
             "width": "100%",
             "height": "800px",
-            "object-fit": "cover",
             "border-radius": "8px",
+            "object-fit": "cover",
             "display": "block"
+          }
+        }
+      },
+      {
+        "id": "mapa-grande-7f6d74",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "--cod-mapa-alto": "800px",
+            "margin-top": "0px",
+            "margin-bottom": "0px",
+            "max-width": "none",
+            "border-radius": "8px",
+            "box-shadow": "2px 2px 10px rgba(0,0,0,0.2)"
           }
         }
       },
@@ -567,7 +620,7 @@
             ],
             "children": [
               {
-                "id": "group-13",
+                "id": "group-14",
                 "kind": "group",
                 "ruleIds": [
                   "col-542b47",
@@ -576,7 +629,7 @@
                 ],
                 "children": [
                   {
-                    "id": "heading-11",
+                    "id": "heading-12",
                     "kind": "heading",
                     "ruleIds": [
                       "t-d4b7f9",
@@ -592,10 +645,10 @@
                     }
                   },
                   {
-                    "id": "form-12",
+                    "id": "form-13",
                     "kind": "form",
                     "ruleIds": [
-                      "form-b19630",
+                      "form-1069ab",
                       "mg-a343db"
                     ],
                     "content": {
@@ -614,29 +667,29 @@
                 ],
                 "children": [
                   {
-                    "id": "link-15",
-                    "kind": "link",
+                    "id": "group-15",
+                    "kind": "group",
                     "ruleIds": [
-                      "enl-c8a933"
+                      "mapa-ca1d42",
+                      "mapa-88f0d2"
                     ],
-                    "content": {
-                      "label": "",
-                      "href": "https://www.openstreetmap.org/?mlat=-33.80413624737442&mlon=-70.68161681668681#map=17/-33.80413624737442/-70.68161681668681",
-                      "target": "blank"
+                    "partes": {
+                      "mini": [
+                        "mini-e17ac6"
+                      ],
+                      "grande": [
+                        "mapa-grande-7f6d74"
+                      ]
                     },
-                    "children": [
-                      {
-                        "id": "image-14",
-                        "kind": "image",
-                        "ruleIds": [
-                          "mapa-img-0f7ca7"
-                        ],
-                        "content": {
-                          "assetUrl": "/wp-content/uploads/2025/07/Mapa-contacto-recorte.png",
-                          "alt": "Mapa de ubicación: Planta Econut, Av 18 de Septiembre sn Hijuela 2, Fundo San Rafael - Sector Nuevo Sendero,, Paine, Región Metropolitana, "
-                        }
-                      }
-                    ]
+                    "content": {
+                      "lat": -33.80413624737442,
+                      "lng": -70.68161681668681,
+                      "zoom": 17,
+                      "mini": "/wp-content/uploads/2025/07/Mapa-contacto-recorte.png",
+                      "etiqueta": "Abrir el mapa de ubicación",
+                      "globo": "Planta Econut Av 18 de Septiembre sn Hijuela 2 Fundo San Rafael - Sector Nuevo Sendero, Paine, Región Metropolitana www.econut.cl",
+                      "fijo": true
+                    }
                   }
                 ]
               }

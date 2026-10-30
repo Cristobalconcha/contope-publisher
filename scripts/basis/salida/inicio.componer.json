@@ -910,7 +910,7 @@
         }
       },
       {
-        "id": "img-c46f28",
+        "id": "img-b3967c",
         "kind": "properties",
         "scope": {
           "breakpoint": "all",
@@ -929,6 +929,8 @@
         "value": {
           "declarations": {
             "width": "100%",
+            "margin-inline-start": "0px",
+            "margin-inline-end": "0px",
             "height": "auto"
           }
         }
@@ -1530,7 +1532,7 @@
         }
       },
       {
-        "id": "blurb-46f793",
+        "id": "blurb-61a5a0",
         "kind": "properties",
         "scope": {
           "breakpoint": "all",
@@ -1550,7 +1552,7 @@
           "declarations": {
             "display": "flex",
             "align-items": "flex-start",
-            "gap": "20px",
+            "gap": "15px",
             "margin-block-start": "0px",
             "margin-block-end": "0px"
           }
@@ -2116,7 +2118,7 @@
         }
       },
       {
-        "id": "sublista-6202c4",
+        "id": "sublista-d40040",
         "kind": "properties",
         "scope": {
           "breakpoint": "all",
@@ -2134,6 +2136,7 @@
         "status": "reviewed",
         "value": {
           "declarations": {
+            "list-style-type": "disc",
             "padding-inline-start": "20px",
             "padding-block-end": "20px",
             "margin-block-start": "0px",
@@ -2188,6 +2191,32 @@
             "padding-right": "30px",
             "padding-inline-start": "calc(14px + 30px)",
             "padding-bottom": "30px"
+          }
+        }
+      },
+      {
+        "id": "img-4adfac",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "width": "calc(100% - 30px)",
+            "margin-inline-start": "0px",
+            "margin-inline-end": "0px",
+            "height": "auto"
           }
         }
       },
@@ -3121,6 +3150,32 @@
         }
       },
       {
+        "id": "img-c4345c",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "tablet",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "width": "704px",
+            "max-width": "100%",
+            "margin-inline-start": "auto",
+            "margin-inline-end": "auto"
+          }
+        }
+      },
+      {
         "id": "media-a9a5c9",
         "kind": "media",
         "scope": {
@@ -3197,7 +3252,7 @@
     "schemaVersion": 2,
     "nodes": [
       {
-        "id": "section-16",
+        "id": "section-17",
         "kind": "section",
         "ruleIds": [
           "sec-d72755",
@@ -3207,14 +3262,14 @@
         ],
         "children": [
           {
-            "id": "group-15",
+            "id": "group-16",
             "kind": "group",
             "ruleIds": [
               "fila-c45543"
             ],
             "children": [
               {
-                "id": "group-14",
+                "id": "group-15",
                 "kind": "group",
                 "ruleIds": [
                   "col-542b47",
@@ -3224,7 +3279,7 @@
                 ],
                 "children": [
                   {
-                    "id": "heading-11",
+                    "id": "heading-12",
                     "kind": "heading",
                     "ruleIds": [
                       "t-eeaf66",
@@ -3241,7 +3296,7 @@
                     }
                   },
                   {
-                    "id": "paragraph-12",
+                    "id": "paragraph-13",
                     "kind": "paragraph",
                     "ruleIds": [
                       "t-6246ce",
@@ -3257,7 +3312,7 @@
                     }
                   },
                   {
-                    "id": "button-13",
+                    "id": "button-14",
                     "kind": "button",
                     "ruleIds": [
                       "btn-504eb8",
@@ -3279,7 +3334,7 @@
         ]
       },
       {
-        "id": "section-33",
+        "id": "section-34",
         "kind": "section",
         "ruleIds": [
           "sec-f1b5a7",
@@ -3289,7 +3344,7 @@
         ],
         "children": [
           {
-            "id": "group-19",
+            "id": "group-20",
             "kind": "group",
             "ruleIds": [
               "fila-3c232e",
@@ -3298,7 +3353,7 @@
             ],
             "children": [
               {
-                "id": "group-18",
+                "id": "group-19",
                 "kind": "group",
                 "ruleIds": [
                   "col-542b47",
@@ -3306,7 +3361,7 @@
                 ],
                 "children": [
                   {
-                    "id": "heading-17",
+                    "id": "heading-18",
                     "kind": "heading",
                     "ruleIds": [
                       "t-a16ae0",
@@ -3325,7 +3380,7 @@
             ]
           },
           {
-            "id": "group-32",
+            "id": "group-33",
             "kind": "group",
             "ruleIds": [
               "fila-15f16a",
@@ -3334,7 +3389,7 @@
             ],
             "children": [
               {
-                "id": "group-23",
+                "id": "group-24",
                 "kind": "group",
                 "ruleIds": [
                   "col-542b47",
@@ -3342,10 +3397,10 @@
                 ],
                 "children": [
                   {
-                    "id": "image-20",
+                    "id": "image-21",
                     "kind": "image",
                     "ruleIds": [
-                      "img-c46f28",
+                      "img-b3967c",
                       "media-f157f7",
                       "media-492b24",
                       "mg-2c79cc",
@@ -3357,7 +3412,7 @@
                     }
                   },
                   {
-                    "id": "heading-21",
+                    "id": "heading-22",
                     "kind": "heading",
                     "ruleIds": [
                       "t-ced61b",
@@ -3372,7 +3427,7 @@
                     }
                   },
                   {
-                    "id": "paragraph-22",
+                    "id": "paragraph-23",
                     "kind": "paragraph",
                     "ruleIds": [
                       "t-658434",
@@ -3389,7 +3444,7 @@
                 ]
               },
               {
-                "id": "group-27",
+                "id": "group-28",
                 "kind": "group",
                 "ruleIds": [
                   "col-542b47",
@@ -3397,10 +3452,10 @@
                 ],
                 "children": [
                   {
-                    "id": "image-24",
+                    "id": "image-25",
                     "kind": "image",
                     "ruleIds": [
-                      "img-c46f28",
+                      "img-b3967c",
                       "media-f157f7",
                       "media-5c84f6",
                       "mg-2c79cc"
@@ -3411,7 +3466,7 @@
                     }
                   },
                   {
-                    "id": "heading-25",
+                    "id": "heading-26",
                     "kind": "heading",
                     "ruleIds": [
                       "t-ced61b",
@@ -3427,7 +3482,7 @@
                     }
                   },
                   {
-                    "id": "paragraph-26",
+                    "id": "paragraph-27",
                     "kind": "paragraph",
                     "ruleIds": [
                       "t-658434",
@@ -3444,7 +3499,7 @@
                 ]
               },
               {
-                "id": "group-31",
+                "id": "group-32",
                 "kind": "group",
                 "ruleIds": [
                   "col-542b47",
@@ -3452,10 +3507,10 @@
                 ],
                 "children": [
                   {
-                    "id": "image-28",
+                    "id": "image-29",
                     "kind": "image",
                     "ruleIds": [
-                      "img-c46f28",
+                      "img-b3967c",
                       "media-f157f7",
                       "media-5c84f6",
                       "mg-2c79cc"
@@ -3466,7 +3521,7 @@
                     }
                   },
                   {
-                    "id": "heading-29",
+                    "id": "heading-30",
                     "kind": "heading",
                     "ruleIds": [
                       "t-ced61b",
@@ -3481,7 +3536,7 @@
                     }
                   },
                   {
-                    "id": "paragraph-30",
+                    "id": "paragraph-31",
                     "kind": "paragraph",
                     "ruleIds": [
                       "t-658434",
@@ -3503,7 +3558,7 @@
         ]
       },
       {
-        "id": "section-60",
+        "id": "section-61",
         "kind": "section",
         "ruleIds": [
           "sec-79ee4b",
@@ -3513,7 +3568,7 @@
         ],
         "children": [
           {
-            "id": "group-37",
+            "id": "group-38",
             "kind": "group",
             "ruleIds": [
               "fila-3c232e",
@@ -3522,7 +3577,7 @@
             ],
             "children": [
               {
-                "id": "group-36",
+                "id": "group-37",
                 "kind": "group",
                 "ruleIds": [
                   "col-542b47",
@@ -3530,7 +3585,7 @@
                 ],
                 "children": [
                   {
-                    "id": "heading-34",
+                    "id": "heading-35",
                     "kind": "heading",
                     "ruleIds": [
                       "t-424b46",
@@ -3546,7 +3601,7 @@
                     }
                   },
                   {
-                    "id": "paragraph-35",
+                    "id": "paragraph-36",
                     "kind": "paragraph",
                     "ruleIds": [
                       "t-5f6bb4",
@@ -3563,7 +3618,7 @@
             ]
           },
           {
-            "id": "group-56",
+            "id": "group-57",
             "kind": "group",
             "ruleIds": [
               "fila-32dae4",
@@ -3572,7 +3627,7 @@
             ],
             "children": [
               {
-                "id": "group-43",
+                "id": "group-44",
                 "kind": "group",
                 "ruleIds": [
                   "col-542b47",
@@ -3580,14 +3635,14 @@
                 ],
                 "children": [
                   {
-                    "id": "group-42",
+                    "id": "group-43",
                     "kind": "group",
                     "ruleIds": [
-                      "blurb-46f793"
+                      "blurb-61a5a0"
                     ],
                     "children": [
                       {
-                        "id": "paragraph-38",
+                        "id": "paragraph-39",
                         "kind": "paragraph",
                         "ruleIds": [
                           "ico-3f6359",
@@ -3598,7 +3653,7 @@
                         }
                       },
                       {
-                        "id": "group-41",
+                        "id": "group-42",
                         "kind": "group",
                         "ruleIds": [
                           "col-542b47",
@@ -3606,7 +3661,7 @@
                         ],
                         "children": [
                           {
-                            "id": "heading-39",
+                            "id": "heading-40",
                             "kind": "heading",
                             "ruleIds": [
                               "t-ced61b",
@@ -3621,7 +3676,7 @@
                             }
                           },
                           {
-                            "id": "paragraph-40",
+                            "id": "paragraph-41",
                             "kind": "paragraph",
                             "ruleIds": [
                               "t-658434",
@@ -3641,7 +3696,7 @@
                 ]
               },
               {
-                "id": "group-49",
+                "id": "group-50",
                 "kind": "group",
                 "ruleIds": [
                   "col-542b47",
@@ -3649,14 +3704,14 @@
                 ],
                 "children": [
                   {
-                    "id": "group-48",
+                    "id": "group-49",
                     "kind": "group",
                     "ruleIds": [
-                      "blurb-46f793"
+                      "blurb-61a5a0"
                     ],
                     "children": [
                       {
-                        "id": "paragraph-44",
+                        "id": "paragraph-45",
                         "kind": "paragraph",
                         "ruleIds": [
                           "ico-da524d",
@@ -3667,7 +3722,7 @@
                         }
                       },
                       {
-                        "id": "group-47",
+                        "id": "group-48",
                         "kind": "group",
                         "ruleIds": [
                           "col-542b47",
@@ -3675,7 +3730,7 @@
                         ],
                         "children": [
                           {
-                            "id": "heading-45",
+                            "id": "heading-46",
                             "kind": "heading",
                             "ruleIds": [
                               "t-ced61b",
@@ -3690,7 +3745,7 @@
                             }
                           },
                           {
-                            "id": "paragraph-46",
+                            "id": "paragraph-47",
                             "kind": "paragraph",
                             "ruleIds": [
                               "t-658434",
@@ -3710,7 +3765,7 @@
                 ]
               },
               {
-                "id": "group-55",
+                "id": "group-56",
                 "kind": "group",
                 "ruleIds": [
                   "col-542b47",
@@ -3718,14 +3773,14 @@
                 ],
                 "children": [
                   {
-                    "id": "group-54",
+                    "id": "group-55",
                     "kind": "group",
                     "ruleIds": [
-                      "blurb-46f793"
+                      "blurb-61a5a0"
                     ],
                     "children": [
                       {
-                        "id": "paragraph-50",
+                        "id": "paragraph-51",
                         "kind": "paragraph",
                         "ruleIds": [
                           "ico-157fa9",
@@ -3736,7 +3791,7 @@
                         }
                       },
                       {
-                        "id": "group-53",
+                        "id": "group-54",
                         "kind": "group",
                         "ruleIds": [
                           "col-542b47",
@@ -3744,7 +3799,7 @@
                         ],
                         "children": [
                           {
-                            "id": "heading-51",
+                            "id": "heading-52",
                             "kind": "heading",
                             "ruleIds": [
                               "t-ced61b",
@@ -3759,7 +3814,7 @@
                             }
                           },
                           {
-                            "id": "paragraph-52",
+                            "id": "paragraph-53",
                             "kind": "paragraph",
                             "ruleIds": [
                               "t-658434",
@@ -3781,7 +3836,7 @@
             ]
           },
           {
-            "id": "group-59",
+            "id": "group-60",
             "kind": "group",
             "ruleIds": [
               "fila-1c9785",
@@ -3790,7 +3845,7 @@
             ],
             "children": [
               {
-                "id": "group-58",
+                "id": "group-59",
                 "kind": "group",
                 "ruleIds": [
                   "col-542b47",
@@ -3798,7 +3853,7 @@
                 ],
                 "children": [
                   {
-                    "id": "button-57",
+                    "id": "button-58",
                     "kind": "button",
                     "ruleIds": [
                       "btn-504eb8",
@@ -3822,7 +3877,7 @@
         ]
       },
       {
-        "id": "section-68",
+        "id": "section-69",
         "kind": "section",
         "ruleIds": [
           "sec-56504b",
@@ -3833,7 +3888,7 @@
         ],
         "children": [
           {
-            "id": "video-67",
+            "id": "video-68",
             "kind": "video",
             "ruleIds": [
               "video-fondo-12268a",
@@ -3847,7 +3902,7 @@
             }
           },
           {
-            "id": "group-66",
+            "id": "group-67",
             "kind": "group",
             "ruleIds": [
               "fila-739852",
@@ -3856,7 +3911,7 @@
             ],
             "children": [
               {
-                "id": "group-63",
+                "id": "group-64",
                 "kind": "group",
                 "ruleIds": [
                   "col-542b47",
@@ -3864,7 +3919,7 @@
                 ],
                 "children": [
                   {
-                    "id": "heading-61",
+                    "id": "heading-62",
                     "kind": "heading",
                     "ruleIds": [
                       "t-359376",
@@ -3878,7 +3933,7 @@
                     }
                   },
                   {
-                    "id": "list-62",
+                    "id": "list-63",
                     "kind": "list",
                     "ruleIds": [
                       "t-829a89",
@@ -3922,14 +3977,14 @@
                     },
                     "partes": {
                       "sublista": [
-                        "sublista-6202c4"
+                        "sublista-d40040"
                       ]
                     }
                   }
                 ]
               },
               {
-                "id": "group-65",
+                "id": "group-66",
                 "kind": "group",
                 "ruleIds": [
                   "col-542b47",
@@ -3937,13 +3992,14 @@
                 ],
                 "children": [
                   {
-                    "id": "image-64",
+                    "id": "image-65",
                     "kind": "image",
                     "ruleIds": [
-                      "img-c46f28",
+                      "img-4adfac",
                       "media-792b82",
                       "media-774ff8",
                       "mg-978b3f",
+                      "img-c4345c",
                       "media-a9a5c9"
                     ],
                     "content": {
@@ -3958,7 +4014,7 @@
         ]
       },
       {
-        "id": "section-75",
+        "id": "section-76",
         "kind": "section",
         "ruleIds": [
           "sec-d8d911",
@@ -3966,7 +4022,7 @@
         ],
         "children": [
           {
-            "id": "group-74",
+            "id": "group-75",
             "kind": "group",
             "ruleIds": [
               "fila-1c9785",
@@ -3975,7 +4031,7 @@
             ],
             "children": [
               {
-                "id": "group-73",
+                "id": "group-74",
                 "kind": "group",
                 "ruleIds": [
                   "col-542b47",
@@ -3983,7 +4039,7 @@
                 ],
                 "children": [
                   {
-                    "id": "group-72",
+                    "id": "group-73",
                     "kind": "group",
                     "ruleIds": [
                       "col-542b47",
@@ -3994,7 +4050,7 @@
                     ],
                     "children": [
                       {
-                        "id": "heading-69",
+                        "id": "heading-70",
                         "kind": "heading",
                         "ruleIds": [
                           "t-424b46",
@@ -4009,13 +4065,13 @@
                         }
                       },
                       {
-                        "id": "paragraph-70",
+                        "id": "paragraph-71",
                         "kind": "paragraph",
                         "ruleIds": [
                           "t-2b48ef",
                           "t-f3d33d",
                           "c-8eff11",
-                          "mg-2c79cc",
+                          "mg-082b3c",
                           "t-7322e4"
                         ],
                         "content": {
@@ -4023,7 +4079,7 @@
                         }
                       },
                       {
-                        "id": "button-71",
+                        "id": "button-72",
                         "kind": "button",
                         "ruleIds": [
                           "btn-504eb8",

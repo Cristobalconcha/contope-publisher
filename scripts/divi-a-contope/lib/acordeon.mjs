@@ -33,15 +33,42 @@ export function moduloAcordeon(ctx, d, m, { gapD, gapM, ubicacion, independiente
     const arbol = leerHtml(it.contenidoHtml || '');
     const estC = it.estiloContenido; const estCM = iM?.estiloContenido;
     const contenido = [];
+    // Separación entre los bloques del pliegue: la que midió el navegador (caja de cada hijo del contenido), no un valor supuesto.
+    const blD = it.contenidoBloques || []; const blM = iM?.contenidoBloques || [];
+    // Lo que se VE de cada hijo: su última imagen si la tiene (un <img style="margin: 20px auto"> sobresale de su <p>) o su propia caja.
+    const cajasImg = { d: (it.imagenes || []).map((x) => x.caja), m: (iM?.imagenes || []).map((x) => x.caja) };
+    let nImg = 0;
+    const visto = []; // por hijo: { d: caja, m: caja }
+    const brecha = (bl, vis, k, cual) => {
+      if (k + 1 >= bl.length) return 0;
+      const v = vis[k]?.[cual] || bl[k].caja;
+      return Math.max(0, Math.round(bl[k + 1].caja.y - (v.y + v.h)));
+    };
+    // Aire antes del primer hijo: lo que lo separa del relleno de arriba del contenido (el margen del <img> que sale del <p>).
+    const arriba = (cajaCont, rellenoCont, bl) => (cajaCont && bl.length ? Math.max(0, Math.round(bl[0].caja.y - (cajaCont.y + (rellenoCont ? rellenoCont[0] : 0)))) : 0);
+    const arribaD = arriba(it.contenidoCaja, it.contenidoRelleno4, blD);
+    const arribaM = iM ? arriba(iM.contenidoCaja, iM.contenidoRelleno4, blM) : arribaD;
+    let k = -1;
+    const cerrarBloque = () => {
+      const ult = contenido[contenido.length - 1];
+      if (!ult || k < 0 || !blD.length) return;
+      if (k === 0 && (arribaD || arribaM)) ctx.reg.inicioPendiente = { d: arribaD, m: arribaM };
+      ult.ruleIds = [...ult.ruleIds.filter((r) => !r.startsWith('mg-')), ...reglasMargen(ctx.reg, brecha(blD, visto, k, 'd'), blM.length ? brecha(blM, visto, k, 'm') : brecha(blD, visto, k, 'd'))];
+      ctx.reg.inicioPendiente = null;
+    };
     const parrafo = (t) => ctx.nodo('paragraph', [...(estC ? reglasTexto(ctx.reg, { d: estC, m: estCM }) : []), ...reglasMargen(ctx.reg, 12, 12)], { text: t });
     const buscar = (n, tag, acc = []) => { if (n.texto !== undefined) return acc; if (n.tag === tag) acc.push(n); n.hijos.forEach((h) => buscar(h, tag, acc)); return acc; };
     for (const h of arbol.hijos) {
       if (h.texto !== undefined) { const t = limpiarTexto(h.texto); if (t) contenido.push(parrafo(t)); continue; }
+      if (k >= 0) cerrarBloque();
+      k += 1;
       if (h.tag === 'p' || h.tag === 'div') {
         const imgs = buscar(h, 'img'); const enl = buscar(h, 'a');
         const t = limpiarTexto(textoDe(h));
         for (const im of imgs) {
-          const medida = (it.imagenes || [])[0];
+          const medida = (it.imagenes || [])[nImg];
+          visto[k] = { d: cajasImg.d[nImg] || null, m: cajasImg.m[nImg] || null };
+          nImg += 1;
           const url = ctx.url(im.attrs.src, ubicacion);
           if (!url) continue;
           const a = enl.find((x) => buscar(x, 'img').includes(im)) || null;
@@ -64,6 +91,7 @@ export function moduloAcordeon(ctx, d, m, { gapD, gapM, ubicacion, independiente
         ctx.avisar({ ...ubicacion, modulo: 'toggle', clase: `<${h.tag}>`, severidad: 'sin-transcribir', motivo: `<${h.tag}> dentro del pliegue «${it.titulo.slice(0, 40)}»: se omite` });
       }
     }
+    cerrarBloque();
     // El último bloque del pliegue no lleva aire debajo.
     const ult = contenido[contenido.length - 1];
     if (ult) ult.ruleIds = [...ult.ruleIds.filter((r) => !r.startsWith('mg-')), ...reglasMargen(ctx.reg, 0, 0)];

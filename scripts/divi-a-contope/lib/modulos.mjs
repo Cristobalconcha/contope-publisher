@@ -138,7 +138,7 @@ export function moduloTexto(ctx, d, m, { gapD, gapM, ubicacion }) {
       // Sublistas: parte `sublista` del nodo `list` (0.3.84), con la sangría medida de su nivel.
       const subD = lD.find((l) => l.nivel >= 1); const subM = lM.find((l) => l.nivel >= 1);
       if (anidada && subD) {
-        const declSub = { 'padding-inline-start': pxs(subD.relleno4[3]), 'padding-block-end': pxs(subD.relleno4[2]), 'margin-block-start': pxs(subD.margen4[0]), 'margin-block-end': pxs(subD.margen4[2]) };
+        const declSub = { 'list-style-type': subD.vineta || 'disc', 'padding-inline-start': pxs(subD.relleno4[3]), 'padding-block-end': pxs(subD.relleno4[2]), 'margin-block-start': pxs(subD.margen4[0]), 'margin-block-end': pxs(subD.margen4[2]) };
         const declSubM = subM ? { 'padding-inline-start': pxs(subM.relleno4[3]), 'padding-block-end': pxs(subM.relleno4[2]) } : {};
         nodoLista.partes = { sublista: ctx.reg.propiedades(declSub, { mobile: declSubM }, { prefijo: 'sublista' }) };
       }
@@ -200,19 +200,34 @@ export function moduloImagen(ctx, d, m, { col, gapD, gapM, ubicacion }) {
     const decl = {};
     const declM = {};
     const colW = col?.d?.w || caja.w; const colWM = col?.m?.w || cajaM?.w;
-    const llena = caja.w >= colW - 1;
+    // Interior real de la columna: sin el relleno propio del módulo (Design → Spacing). A 768 el módulo de Basis tiene 30px a la derecha y
+    // la foto queda CENTRADA en lo que sobra, no pegada a la izquierda.
+    const padIzq = d.estiloCaja?.relleno4?.[3] || 0; const padDer = d.estiloCaja?.relleno4?.[1] || 0;
+    const interiorW = colW - padIzq - padDer;
+    const llena = caja.w >= interiorW - 1;
     // Ancho: a todo el ancho de la columna, o el propio de la imagen si es menor.
-    if (llena || fit) { decl.width = '100%'; } else { decl.width = pxs(caja.w); decl['max-width'] = '100%'; }
+    // «Llena» = todo el interior de la columna: 100% de la columna menos el relleno propio del módulo (que la foto no usa).
+    const llenoDe = (padI, padD) => (padI + padD > 0 ? `calc(100% - ${pxs(padI + padD)})` : '100%');
+    // Dónde queda la foto dentro del interior de la columna, a cada ancho: llena (con el relleno propio del módulo a su izquierda), centrada,
+    // pegada a la derecha o pegada a la izquierda. Se escribe SIEMPRE el margen de los dos lados para que una variante de otro ancho pueda
+    // deshacer lo de escritorio (y no se emite lo que no cambia).
+    const colocar = (c, colX, interior, padI, llenaX) => {
+      if (llenaX) return { 'margin-inline-start': padI > 0 ? pxs(padI) : '0px', 'margin-inline-end': '0px' };
+      const sobra = interior - c.w; const izq = c.x - (colX + padI);
+      if (sobra > 2 && Math.abs(izq - sobra / 2) < 3) return { 'margin-inline-start': 'auto', 'margin-inline-end': 'auto' };
+      if (sobra > 2 && izq > sobra - 3) return { 'margin-inline-start': 'auto', 'margin-inline-end': '0px' };
+      return { 'margin-inline-start': padI > 0 ? pxs(padI) : '0px', 'margin-inline-end': '0px' };
+    };
+    if (llena) decl.width = llenoDe(padIzq, padDer); else { decl.width = pxs(caja.w); decl['max-width'] = '100%'; }
+    Object.assign(decl, colocar(caja, col?.d?.x ?? caja.x, interiorW, padIzq, llena));
     decl.height = fit ? 'auto' : 'auto';
     if (cajaM) {
-      const llenaM = cajaM.w >= (colWM || cajaM.w) - 1;
-      declM.width = llenaM || fit ? '100%' : pxs(cajaM.w);
-    }
-    // Alineación dentro de la columna cuando no llena.
-    if (!llena) {
-      const sobra = colW - caja.w; const izq = caja.x - (col?.d?.x ?? caja.x);
-      if (sobra > 2 && Math.abs(izq - sobra / 2) < 3) { decl['margin-inline-start'] = 'auto'; decl['margin-inline-end'] = 'auto'; }
-      else if (sobra > 2 && izq > sobra - 3) decl['margin-inline-start'] = 'auto';
+      const padIzqM = m?.estiloCaja?.relleno4?.[3] || 0; const padDerM = m?.estiloCaja?.relleno4?.[1] || 0;
+      const interiorWM = (colWM || cajaM.w) - padIzqM - padDerM;
+      const llenaM = cajaM.w >= interiorWM - 1;
+      declM.width = llenaM ? llenoDe(padIzqM, padDerM) : pxs(cajaM.w);
+      if (!llenaM) declM['max-width'] = '100%';
+      Object.assign(declM, colocar(cajaM, col?.m?.x ?? cajaM.x, interiorWM, padIzqM, llenaM));
     }
     const reglas = [...ctx.reg.propiedades(decl, { mobile: declM }, { prefijo: 'img' })];
     const aspecto = (c) => razon(c.w, c.h);
@@ -333,7 +348,8 @@ export function moduloBlurb(ctx, d, m, { gapD, gapM, ubicacion }) {
     textos.push(ctx.nodo('paragraph', reglasP, { text: limpiarTexto(d.descripcion) }));
   }
   const contenedor = iconoNodo
-    ? ctx.nodo('group', [...ctx.reg.propiedades({ display: 'flex', 'align-items': 'flex-start', gap: '20px', ...reglasMargenDecl(gapD) }, { mobile: reglasMargenDecl(gapM, true) }, { prefijo: 'blurb' })], undefined, [iconoNodo,
+    // 15px: el relleno izquierdo que Divi le da al contenedor del texto de un blurb con ícono a la izquierda (medido).
+    ? ctx.nodo('group', [...ctx.reg.propiedades({ display: 'flex', 'align-items': 'flex-start', gap: '15px', ...reglasMargenDecl(gapD) }, { mobile: reglasMargenDecl(gapM, true) }, { prefijo: 'blurb' })], undefined, [iconoNodo,
       ctx.nodo('group', [ctx.reg.R('layout', { mode: 'stack', gap: '0px', align: 'stretch' }, { prefijo: 'col' }), ...ctx.reg.propiedades({ 'min-width': '0px', 'flex-grow': '1', 'flex-shrink': '1', 'flex-basis': '0px' }, {}, { prefijo: 'blurb-t' })], undefined, textos)])
     : null;
   if (contenedor) nodos.push(contenedor);
@@ -361,7 +377,8 @@ export function moduloPromo(ctx, d, m, { gapD, gapM, ubicacion }) {
   const rolDescM = m?.estiloDescripcion || estiloPorTexto(ctx.medidaM, d.descripcion || '');
   if (d.descripcion) {
     const reglasP = rolDesc ? reglasTexto(ctx.reg, { d: rolDesc, m: rolDescM }) : [];
-    reglasP.push(...reglasMargen(ctx.reg, 30, 30));
+    // El aire entre el párrafo y el botón es el relleno inferior que Divi le da a la descripción (medido: 20px), no un valor inventado.
+    reglasP.push(...reglasMargen(ctx.reg, d.estiloInterior?.relleno4?.[2] ?? 30, m?.estiloInterior?.relleno4?.[2] ?? d.estiloInterior?.relleno4?.[2] ?? 30));
     hijos.push(ctx.nodo('paragraph', reglasP, { text: limpiarTexto(d.descripcion) }));
   }
   if (d.boton) hijos.push(...moduloBoton(ctx, { boton: d.boton, alineacion: 'et_pb_button_alignment_center' }, m ? { boton: m.boton } : null, { gapD: 0, gapM: 0, ubicacion }));
@@ -405,6 +422,9 @@ export function moduloFormulario(ctx, d, m, { gapD, gapM, ubicacion }) {
     if (sub) Object.assign(tema, { subetiquetaTamano: sub.tam, subetiquetaPeso: String(Math.round(Number(sub.peso) / 100) * 100), subetiquetaColor: colorRegla(sub.color), textoSuave: colorRegla(sub.color) });
     if (forma.ayuda) tema.ayudaTamano = forma.ayuda.tam;
     if (forma.contador) tema.contadorTamano = forma.contador.tam;
+    if (forma.ayuda) tema.ayudaInterlineado = String(Math.round((px(forma.ayuda.interlineado) / px(forma.ayuda.tam)) * 100) / 100);
+    if (forma.consentimiento) Object.assign(tema, { opcionTamano: forma.consentimiento.tam, opcionInterlineado: String(Math.round((px(forma.consentimiento.interlineado) / px(forma.consentimiento.tam)) * 100) / 100), opcionPeso: String(Math.round(Number(forma.consentimiento.peso) / 100) * 100), opcionColor: colorRegla(forma.consentimiento.color) });
+    if (enviar && enviar.sombra && enviar.sombra !== 'none') tema.botonSombra = enviar.sombra;
     // Interlineado y peso de la letra del formulario entero (Gravity: 1.7 y 400 sobre la tipografía del sitio).
     const lh = px(e.interlineado) / px(e.tam);
     if (lh) tema.interlineado = String(Math.round(lh * 100) / 100);

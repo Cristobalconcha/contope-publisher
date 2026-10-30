@@ -24,11 +24,21 @@ const arg = (n, d) => { const i = process.argv.indexOf('--' + n); return i > 0 ?
 const quitarAsterisco = (t) => String(t || '').replace(/\*\s*$/, '').trim();
 const id = (t) => String(t).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '').slice(0, 40) || 'campo';
 
+/** Filas del cuadro de texto largo: las que caben en el alto MEDIDO del original (alto − relleno, entre el interlineado); 5 si no se midió. */
+const filasDe = (form) => {
+  const a = form.forma?.area;
+  if (!a || !a.alto) return 5;
+  const lh = parseFloat(a.interlineado) || 0;
+  const pad = (a.relleno4 || [0, 0, 0, 0]);
+  return lh ? Math.max(3, Math.round((a.alto - pad[0] - pad[2]) / lh)) : 5;
+};
+
 export function fixtureDesdeGravity(form, { nombre, maxLength, avisos = [] }) {
   const items = [];
   const usados = new Set();
   const unico = (b) => { let x = b, i = 2; while (usados.has(x)) x = `${b}_${i++}`; usados.add(x); return x; };
-  for (const c of form.campos) {
+  for (const [indice, c] of form.campos.entries()) {
+    const antes = items.length;
     const clase = c.clase || '';
     const tipo = (clase.match(/gfield--type-([a-z]+)/) || [])[1] || 'desconocido';
     const etiqueta = quitarAsterisco(c.etiqueta);
@@ -55,7 +65,8 @@ export function fixtureDesdeGravity(form, { nombre, maxLength, avisos = [] }) {
     } else if (tipo === 'text') {
       items.push({ type: 'texto', id: unico(id(etiqueta)), label: etiqueta, obligatorio: req, registrarEnDb: true });
     } else if (tipo === 'textarea') {
-      items.push({ type: 'texto-largo', id: unico(id(etiqueta) || 'mensaje'), label: etiqueta, obligatorio: req, registrarEnDb: true, rows: 5, ...(maxLength ? { maxLength } : {}), ...(c.descripcion ? { ayuda: c.descripcion } : {}) });
+      // En Gravity la descripción va ARRIBA del campo (entre la etiqueta y el cuadro): `ayudaArriba`.
+      items.push({ type: 'texto-largo', id: unico(id(etiqueta) || 'mensaje'), label: etiqueta, obligatorio: req, registrarEnDb: true, rows: filasDe(form), ...(maxLength ? { maxLength } : {}), ...(c.descripcion ? { ayuda: c.descripcion, ayudaArriba: true } : {}) });
     } else if (tipo === 'consent' || tipo === 'checkbox') {
       items.push({ type: 'boolean_check', id: unico(id(etiqueta) || 'acepta'), label: etiqueta, obligatorio: req, registrarEnDb: true, opciones: [{ value: 'si', label: e[0]?.etiqueta || etiqueta }] });
     } else if (tipo === 'select' || tipo === 'radio') {
@@ -63,7 +74,21 @@ export function fixtureDesdeGravity(form, { nombre, maxLength, avisos = [] }) {
     } else {
       avisos.push({ campo: etiqueta, motivo: `tipo de campo «${tipo}» sin traducción: se omite` });
     }
+    for (const it of items.slice(antes)) it._campo = indice;
   }
+  // Campos de MEDIO ancho que comparten renglón en el original (teléfono y consentimiento, lado a lado) → una fila de dos columnas.
+  const cajas = form.forma?.campos || [];
+  const total = Math.max(0, ...cajas.map((x) => x.caja.w));
+  for (let i = 0; i < items.length - 1; i++) {
+    const a = items[i]; const b = items[i + 1];
+    const ca = cajas[a._campo]?.caja; const cb = cajas[b._campo]?.caja;
+    if (a.type === 'GridSection' || b.type === 'GridSection' || !ca || !cb) continue;
+    if (ca.w <= total * 0.55 && cb.w <= total * 0.55 && Math.abs(ca.y - cb.y) <= 2 && ca.x < cb.x) {
+      items.splice(i, 2, { type: 'GridSection', id: unico('fila_' + a.id), items: [{ ...a, layoutClasses: ['col-6'] }, { ...b, layoutClasses: ['col-6'] }], _campo: a._campo });
+    }
+  }
+  const limpiar = (x) => { delete x._campo; (x.items || []).forEach(limpiar); };
+  items.forEach(limpiar);
   return {
     name: nombre,
     _formMetadata: {

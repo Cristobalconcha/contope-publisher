@@ -85,7 +85,8 @@ export const leerHtml = (html) => {
 
 /** Texto plano de un nodo; <br> pasa a salto de línea. */
 export const textoDe = (n) => {
-  if (n.texto !== undefined) return n.texto;
+  // Un salto de línea del CÓDIGO FUENTE es un espacio (HTML lo colapsa); sólo <br> parte la línea.
+  if (n.texto !== undefined) return n.texto.replace(/[\r\n]+\s*/g, ' ');
   if (n.tag === 'br') return '\n';
   return n.hijos.map(textoDe).join('');
 };

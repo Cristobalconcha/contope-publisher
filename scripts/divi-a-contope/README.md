@@ -15,6 +15,8 @@ Una carpeta de descarga con:
 ```
 datos/medida-<pagina>-1440.json     medición a escritorio  (secciones › filas › columnas › módulos)
 datos/medida-<pagina>-393.json      medición a celular     (misma página, mismo recorrido)
+datos/medida-<pagina>-768.json      medición a tablet      (opcional: con ella salen las reglas con scope `tablet`)
+datos/glifos.json                   contorno de los glifos de las fuentes de íconos del sitio (opcional; ver basis/descarga/glifos.mjs)
 html/<pagina>.html                  HTML renderizado       (sólo para leer animaciones)
 ```
 
@@ -25,7 +27,7 @@ local, formularios, imagen del mini mapa, reemplazos de medios faltantes, rutas.
 ## Uso
 
 ```
-node transcribir.mjs --original <carpeta> --perfil <perfil.json> --salida <carpeta> [--paginas a,b] [--anchos 1440,393]
+node transcribir.mjs --original <carpeta> --perfil <perfil.json> --salida <carpeta> [--paginas a,b] [--anchos 1440,393,768]
 node formulario-a-orugantt.mjs --original <carpeta> --pagina contactos --perfil <perfil.json> --salida fixture.json [--instalar]
 node aplicar.mjs pagina <x.componer.json> [--probar] [--sin-publicar]
 node aplicar.mjs region <header|footer> <x.componer.json> [--probar]
@@ -56,6 +58,10 @@ WhatsApp, íconos que hay que traer, mapa). Como biblioteca: `transcribirSitio()
 | módulos más angostos que su columna | `max-width` (centrado si lo estaba) |
 | animación de entrada (`et_pb_animation_*`, `data-animation-*`) | regla `motion` (`slide-left/right`, `rise`, `fade`, `scale`); apagada en celular → duración 0 |
 | valores distintos en celular | variante `mobile` atada a la regla base |
+| valores distintos en tablet (768) | variante `tablet`: la página se transcribe OTRA VEZ contra la medición de 768 como si fuera «el celular» y lo que esa pasada guarda como `mobile` se re-escopa a `tablet` (`fusionarTablet`); si los árboles no calzan se avisa y esa rama queda con escritorio |
+| ícono de FontAwesome / ETmodules (blurb, pliegue del acordeón) | el contorno del glifo sale de la fuente del propio sitio (`glifos.json`) y va como SVG de Medios con la regla `icono` (`forma`) o como `iconoCerrado` del acordeón: el ícono es el mismo, relleno y todo |
+| ícono SVG de un botón fijo | el trazado original guardado como forma del sitio + regla `icono` |
+| lista con sublistas | `list` con la sangría de cada nivel medida y la parte `sublista` |
 | reglas repetidas | UNA regla por valor (el id lleva un hash del contenido; estable entre páginas) |
 
 ## Lo que NO sabe hacer (y lo dice)
@@ -69,15 +75,14 @@ clase Divi, con severidad `faltante` / `sin-transcribir` / `aproximado` / `ok`. 
   deben salir a la conducta `pestanas` (`core/tabs`) y las galerías a `gallery`.
 - **Animaciones:** la lectura está hecha según el marcado de Divi 4 pero **probada sólo con HTML sintético**
   (`pruebas/probar-animacion.mjs`); Basis no anima nada.
-- **Tablet:** sólo se mide y transcribe escritorio y celular. Las reglas por ancho tienen el hueco para `tablet`
-  (`Registro.conAnchos`) pero el transcriptor no lo alimenta: haría falta una tercera medición (p. ej. 768).
+- **Tablet:** con la medición de 768 hay variantes `tablet` (ver arriba). El plugin corta tablet en 768–1023 y Divi en 768–980: entre 981 y 1023 el plugin aplica lo de tablet donde Divi ya muestra escritorio (ahí no se mide).
 - **Degradados:** se traducen a `backgroundGradient` (ángulo, paradas, encima o debajo de la foto) y salen `ok`. Se avisa `aproximado` de lo que no cabe: puntos medios, tamaños de radial distintos del predeterminado, esquinas (`to top right`), más de 8 paradas, más de un degradado en la sección. Código: `lib/fondos.mjs`.
 - **Trama y máscara de fondo de Divi** (`et_pb_background_pattern` / `_mask`): la medición las registra (`fondoTrama`, `fondoMascara`) y se avisa si una sección las trae con imagen; no se traducen solas porque su dibujo viene incrustado y no es un recurso de Medios. Se componen con `backgroundPattern` / `backgroundMask` de la regla `surface`, eligiendo una forma de Medios (las mismas del divisor).
 - **Formato en línea** (negrita, enlaces dentro de un párrafo): el nodo de texto es plano; se avisa. Sólo un bloque
   que es *entero* un enlace pasa a `link`.
 - **Código a mano** no reconocido (HTML/JS/CSS pegado en un módulo de código): se reporta con un resumen.
 - **Video de fondo:** si el archivo está en el sitio, va como nodo `video` ambiental detrás del contenido (sección aislada, `media` con la proporción de la sección y recorte cover); si falta, se avisa como «faltante» y se usa la imagen de reemplazo del perfil.
-- **Ícono «+» de los pliegues**, **mapa siempre abierto**: huecos del plugin (ver `scripts/basis/HUECOS.md`).
+- **Ícono de los pliegues:** resuelto en 0.3.84 (`showIcon` + parte `icono`). **Mapa siempre abierto:** `content.fijo` (0.3.84); necesita la clave de Mapbox para ser un mapa en vivo (ver `scripts/basis/HUECOS.md`).
 
 ## Cómo se prueba
 

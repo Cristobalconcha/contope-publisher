@@ -86,7 +86,9 @@ export function transcribirCodigo(ctx, mod, { pagina, ubicacion }) {
       continue;
     }
     const svg = todos.find((n) => n.tag === 'svg' && a.hijos.includes(n)) || a.hijos.map((h) => h).flatMap((h) => (h.hijos || [])).find((n) => n.tag === 'svg');
-    const trazos = svg ? todos.filter((n) => n.tag === 'path' && n.attrs.d) : [];
+    // Los trazados de ESTE svg (no los de toda la pieza de código: ahí caben también los del botón de WhatsApp).
+    const trazosDe = (n) => (n.texto !== undefined ? [] : [...(n.tag === 'path' && n.attrs.d ? [n] : []), ...n.hijos.flatMap(trazosDe)]);
+    const trazos = svg ? trazosDe(svg) : [];
     if (svg && trazos.length === 1 && ctx.perfil.carpetaUploads) {
       // El dibujo del original (un solo trazado) se guarda como forma del sitio y se usa con la regla «icono»:
       // el ícono es el mismo, relleno y todo, y toma el color del texto del enlace.

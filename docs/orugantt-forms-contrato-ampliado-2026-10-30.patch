@@ -1,0 +1,265 @@
+diff --git a/includes/class-ofr-design-tokens.php b/includes/class-ofr-design-tokens.php
+index 386826f..3ee1166 100644
+--- a/includes/class-ofr-design-tokens.php
++++ b/includes/class-ofr-design-tokens.php
+@@ -75,6 +75,37 @@ final class OFR_Design_Tokens
+             'espacioLg' => ['token' => '--ofr-space-lg', 'label' => 'Espaciado grande', 'type' => 'length', 'group' => 'Forma'],
+             'sombra' => ['token' => '--ofr-shadow', 'label' => 'Sombra', 'type' => 'shadow', 'group' => 'Forma'],
+             'anilloFoco' => ['token' => '--ofr-focus-ring', 'label' => 'Anillo de foco', 'type' => 'shadow', 'group' => 'Forma'],
++            'interlineado' => ['token' => '--ofr-line-height', 'label' => 'Interlineado', 'type' => 'ratio', 'group' => 'Forma'],
++            'peso' => ['token' => '--ofr-weight', 'label' => 'Peso de la letra del formulario', 'type' => 'weight', 'group' => 'Forma'],
++            'contadorTamano' => ['token' => '--ofr-counter-size', 'label' => 'Contador de caracteres: tamaño', 'type' => 'length', 'group' => 'Campos'],
++            'ayudaInterlineado' => ['token' => '--ofr-help-line', 'label' => 'Texto de ayuda: interlineado', 'type' => 'ratio', 'group' => 'Etiquetas'],
++            'opcionTamano' => ['token' => '--ofr-option-size', 'label' => 'Casillas y opciones: tamaño de la letra', 'type' => 'length', 'group' => 'Campos'],
++            'opcionInterlineado' => ['token' => '--ofr-option-line', 'label' => 'Casillas y opciones: interlineado', 'type' => 'ratio', 'group' => 'Campos'],
++            'opcionPeso' => ['token' => '--ofr-option-weight', 'label' => 'Casillas y opciones: peso de la letra', 'type' => 'weight', 'group' => 'Campos'],
++            'opcionColor' => ['token' => '--ofr-option-color', 'label' => 'Casillas y opciones: color', 'type' => 'color', 'group' => 'Campos'],
++            'botonSombra' => ['token' => '--ofr-submit-shadow', 'label' => 'Botón: sombra', 'type' => 'shadow', 'group' => 'Botón'],
++            // Contrato ampliado el 30 de octubre de 2026 (campos, etiquetas y botón), al llevar el formulario de Basis a un
++            // diseño que el contrato anterior no alcanzaba: campos blancos sobre un panel gris, etiqueta chica bajo el título
++            // de grupo y botón a todo el ancho. Los valores por omisión del runtime son los de siempre.
++            'campoFondo' => ['token' => '--ofr-field-bg', 'label' => 'Campo: fondo', 'type' => 'color', 'group' => 'Campos'],
++            'campoTexto' => ['token' => '--ofr-field-color', 'label' => 'Campo: color del texto', 'type' => 'color', 'group' => 'Campos'],
++            'campoTamano' => ['token' => '--ofr-field-size', 'label' => 'Campo: tamaño de la letra', 'type' => 'length', 'group' => 'Campos'],
++            'campoBordeAncho' => ['token' => '--ofr-field-border-width', 'label' => 'Campo: grosor del borde', 'type' => 'length', 'group' => 'Campos'],
++            'campoRellenoY' => ['token' => '--ofr-field-pad-y', 'label' => 'Campo: relleno vertical', 'type' => 'length', 'group' => 'Campos'],
++            'campoRellenoX' => ['token' => '--ofr-field-pad-x', 'label' => 'Campo: relleno horizontal', 'type' => 'length', 'group' => 'Campos'],
++            'etiquetaTamano' => ['token' => '--ofr-label-size', 'label' => 'Etiqueta: tamaño', 'type' => 'length', 'group' => 'Etiquetas'],
++            'etiquetaPeso' => ['token' => '--ofr-label-weight', 'label' => 'Etiqueta: peso de la letra', 'type' => 'weight', 'group' => 'Etiquetas'],
++            'etiquetaColor' => ['token' => '--ofr-label-color', 'label' => 'Etiqueta: color', 'type' => 'color', 'group' => 'Etiquetas'],
++            'subetiquetaTamano' => ['token' => '--ofr-sublabel-size', 'label' => 'Etiqueta chica (bajo un título de grupo): tamaño', 'type' => 'length', 'group' => 'Etiquetas'],
++            'subetiquetaPeso' => ['token' => '--ofr-sublabel-weight', 'label' => 'Etiqueta chica: peso de la letra', 'type' => 'weight', 'group' => 'Etiquetas'],
++            'subetiquetaColor' => ['token' => '--ofr-sublabel-color', 'label' => 'Etiqueta chica: color', 'type' => 'color', 'group' => 'Etiquetas'],
++            'ayudaTamano' => ['token' => '--ofr-help-size', 'label' => 'Texto de ayuda: tamaño', 'type' => 'length', 'group' => 'Etiquetas'],
++            'botonAncho' => ['token' => '--ofr-submit-width', 'label' => 'Botón: ancho', 'type' => 'length', 'group' => 'Botón'],
++            'botonTamano' => ['token' => '--ofr-submit-size', 'label' => 'Botón: tamaño de la letra', 'type' => 'length', 'group' => 'Botón'],
++            'botonPeso' => ['token' => '--ofr-submit-weight', 'label' => 'Botón: peso de la letra', 'type' => 'weight', 'group' => 'Botón'],
++            'botonRellenoY' => ['token' => '--ofr-submit-pad-y', 'label' => 'Botón: relleno vertical', 'type' => 'length', 'group' => 'Botón'],
++            'botonRellenoX' => ['token' => '--ofr-submit-pad-x', 'label' => 'Botón: relleno horizontal', 'type' => 'length', 'group' => 'Botón'],
++            'botonRadio' => ['token' => '--ofr-submit-radius', 'label' => 'Botón: radio de las esquinas', 'type' => 'length', 'group' => 'Botón'],
+         ];
+ 
+         /**
+diff --git a/runtime-src/src/Field.tsx b/runtime-src/src/Field.tsx
+index 3dbdb5a..6e9de88 100644
+--- a/runtime-src/src/Field.tsx
++++ b/runtime-src/src/Field.tsx
+@@ -167,13 +167,14 @@ export function Field(props: FieldRenderProps): JSX.Element {
+                 </label>
+             )}
+             <div className="ofr-control">
++                {item.ayudaArriba === true && <HelpText item={item} />}
+                 {input}
+                 {typeof item.maxLength === 'number' && item.maxLength > 0 && (type === 'texto' || type === 'texto-largo') && (
+                     <p className="ofr-counter" aria-hidden="true">
+                         {String(value ?? '').length}/{item.maxLength}
+                     </p>
+                 )}
+-                <HelpText item={item} />
++                {item.ayudaArriba !== true && <HelpText item={item} />}
+                 {error && (
+                     <p className="ofr-error" role="alert">
+                         {error}
+diff --git a/runtime-src/src/FormRuntime.tsx b/runtime-src/src/FormRuntime.tsx
+index 58478d0..60147c7 100644
+--- a/runtime-src/src/FormRuntime.tsx
++++ b/runtime-src/src/FormRuntime.tsx
+@@ -304,9 +304,13 @@ function GridSectionBlock(props: {
+ }): JSX.Element {
+     const { item, ctx, suffixChain } = props;
+     const cells = item.items || [];
++    // Con `titulo` el grupo lleva su propio título (un <legend>) y sus campos usan la etiqueta chica
++    // (`etiquetaChica`, por omisión sí cuando hay título): el «Nombre*» con «Nombre» y «Apellidos» debajo.
++    const titulo = typeof item.titulo === 'string' && item.titulo.trim() !== '' ? item.titulo : '';
++    const chica = titulo !== '' && item.etiquetaChica !== false;
+ 
+-    return (
+-        <div className="ofr-grid" data-grid-id={item.id}>
++    const grilla = (
++        <div className={`ofr-grid${chica ? ' ofr-grid--sub' : ''}`} data-grid-id={item.id}>
+             {cells.map((cell, index) => {
+                 const span = colSpanFromLayout(cell.layoutClasses);
+                 return (
+@@ -317,6 +321,20 @@ function GridSectionBlock(props: {
+             })}
+         </div>
+     );
++    if (titulo === '') return grilla;
++    return (
++        <fieldset className="ofr-group">
++            <legend className="ofr-group-title">
++                {titulo}
++                {item.obligatorio === true && (
++                    <span className="ofr-required-mark" aria-hidden="true">
++                        *
++                    </span>
++                )}
++            </legend>
++            {grilla}
++        </fieldset>
++    );
+ }
+ 
+ export function FormRuntime(props: FormRuntimeProps): JSX.Element {
+diff --git a/runtime-src/src/runtime.css b/runtime-src/src/runtime.css
+index e32c859..da4eb06 100644
+--- a/runtime-src/src/runtime.css
++++ b/runtime-src/src/runtime.css
+@@ -32,10 +32,42 @@
+     --ofr-focus-ring: 3px solid rgba(37, 99, 235, 0.35);
+     --ofr-shadow: 0 1px 2px rgba(16, 24, 40, 0.06);
+ 
++    /* Contrato ampliado (campos, etiquetas y botón). Los valores por omisión son los de siempre:
++       un formulario que no los fija se ve exactamente igual que antes. */
++    --ofr-line-height: 1.5;
++    --ofr-weight: inherit;
++    --ofr-counter-size: 0.75rem;
++    --ofr-field-bg: var(--ofr-color-bg);
++    --ofr-field-color: var(--ofr-color-text);
++    --ofr-field-size: inherit;
++    --ofr-field-border-width: 1px;
++    --ofr-field-pad-y: 8px;
++    --ofr-field-pad-x: 10px;
++    --ofr-label-size: 0.9rem;
++    --ofr-label-weight: 600;
++    --ofr-label-color: var(--ofr-color-text);
++    --ofr-sublabel-size: 0.9rem;
++    --ofr-sublabel-weight: 400;
++    --ofr-sublabel-color: var(--ofr-color-text-muted);
++    --ofr-help-size: 0.8125rem;
++    --ofr-help-line: inherit;
++    --ofr-option-size: 0.9375rem;
++    --ofr-option-line: inherit;
++    --ofr-option-weight: inherit;
++    --ofr-option-color: var(--ofr-color-text);
++    --ofr-submit-shadow: none;
++    --ofr-submit-width: auto;
++    --ofr-submit-size: inherit;
++    --ofr-submit-weight: 600;
++    --ofr-submit-pad-y: 10px;
++    --ofr-submit-pad-x: 22px;
++    --ofr-submit-radius: var(--ofr-radius);
++
+     box-sizing: border-box;
+     font-family: var(--ofr-font);
+     font-size: 15px;
+-    line-height: 1.5;
++    font-weight: var(--ofr-weight);
++    line-height: var(--ofr-line-height);
+     color: var(--ofr-color-text);
+     background: var(--ofr-color-bg);
+     max-width: 100%;
+@@ -98,9 +130,12 @@
+     background: var(--ofr-color-primary);
+     color: var(--ofr-color-primary-contrast);
+     font: inherit;
+-    font-weight: 600;
+-    padding: 10px 22px;
+-    border-radius: var(--ofr-radius);
++    font-size: var(--ofr-submit-size);
++    font-weight: var(--ofr-submit-weight);
++    width: var(--ofr-submit-width);
++    padding: var(--ofr-submit-pad-y) var(--ofr-submit-pad-x);
++    border-radius: var(--ofr-submit-radius);
++    box-shadow: var(--ofr-submit-shadow);
+     cursor: pointer;
+ }
+ 
+@@ -202,9 +237,9 @@
+ }
+ 
+ .ofr-label {
+-    font-weight: 600;
+-    font-size: 0.9rem;
+-    color: var(--ofr-color-text);
++    font-weight: var(--ofr-label-weight);
++    font-size: var(--ofr-label-size);
++    color: var(--ofr-label-color);
+     padding-top: 6px;
+ }
+ 
+@@ -230,11 +265,12 @@
+     width: 100%;
+     max-width: 100%;
+     font: inherit;
+-    color: var(--ofr-color-text);
+-    background: var(--ofr-color-bg);
+-    border: 1px solid var(--ofr-color-border);
++    font-size: var(--ofr-field-size);
++    color: var(--ofr-field-color);
++    background: var(--ofr-field-bg);
++    border: var(--ofr-field-border-width) solid var(--ofr-color-border);
+     border-radius: var(--ofr-radius);
+-    padding: 8px 10px;
++    padding: var(--ofr-field-pad-y) var(--ofr-field-pad-x);
+     box-shadow: var(--ofr-shadow);
+ }
+ 
+@@ -288,7 +324,37 @@
+ .ofr-help {
+     margin: 0;
+     color: var(--ofr-color-text-muted);
+-    font-size: 0.8125rem;
++    font-size: var(--ofr-help-size);
++    line-height: var(--ofr-help-line);
++}
++
++/* ---------- Grupo de campos con título (GridSection con `titulo`) ----------
++   Un título de grupo y, debajo, campos con la etiqueta CHICA: «Nombre*» con «Nombre» y «Apellidos» debajo. */
++
++.ofr-group {
++    border: 0;
++    margin: 0;
++    padding: 0;
++    min-width: 0;
++}
++
++.ofr-group-title {
++    padding: 0;
++    margin-bottom: var(--ofr-space-xs);
++    font-weight: var(--ofr-label-weight);
++    font-size: var(--ofr-label-size);
++    color: var(--ofr-label-color);
++}
++
++.ofr-grid--sub .ofr-required-mark {
++    display: none;
++}
++
++.ofr-grid--sub .ofr-label {
++    font-weight: var(--ofr-sublabel-weight);
++    font-size: var(--ofr-sublabel-size);
++    color: var(--ofr-sublabel-color);
++    padding-top: 0;
+ }
+ 
+ /* ---------- Opciones (checkbox / radio) ---------- */
+@@ -304,7 +370,9 @@
+     display: flex;
+     align-items: flex-start;
+     gap: var(--ofr-space-sm);
+-    font-size: 0.9375rem;
++    font-size: var(--ofr-option-size);
++    line-height: var(--ofr-option-line);
++    font-weight: var(--ofr-option-weight);
+ }
+ 
+ .ofr-option input[type="checkbox"],
+@@ -323,7 +391,7 @@
+ 
+ .ofr-option label {
+     cursor: pointer;
+-    color: var(--ofr-color-text);
++    color: var(--ofr-option-color);
+ }
+ 
+ /* ---------- Bloques de contenido ---------- */
+@@ -607,7 +675,7 @@
+ .ofr-thankyou-body{margin:0;color:var(--ofr-color-text-muted);max-width:46ch;}
+ 
+ /* Contador de caracteres de un campo con largo máximo y nota bajo el botón. */
+-.ofr-counter{margin:4px 0 0;font-size:0.75rem;color:var(--ofr-color-text-muted);text-align:right;}
++.ofr-counter{margin:4px 0 0;font-size:var(--ofr-counter-size);color:var(--ofr-color-text-muted);text-align:right;}
+ .ofr-form-note{margin:var(--ofr-space-sm) 0 0;font-size:0.8125rem;color:var(--ofr-color-text-muted);}
+ .ofr-form-note a{color:inherit;text-decoration:underline;text-underline-offset:2px;}
+ 

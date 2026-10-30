@@ -1,118 +1,123 @@
 # Basis sobre ContOpe: huecos, diferencias y pendientes
 
-Escrito el 30-oct-2026, al terminar la primera reconstrucción local (WordPress en `wp-local-basis`, puerto 8894).
-Nada de esto se rodeó con CSS a mano: cada punto es un hueco del plugin o una decisión que queda para Cristóbal.
+Primera reconstrucción local el 30-oct-2026 (WordPress en `wp-local-basis`, puerto 8894); segunda pasada el mismo día para dejarla
+**visualmente idéntica al original** en escritorio (1440), tablet (768) y celular (393). Nada de esto se rodeó con CSS a mano: cada
+punto es un hueco del plugin que se amplió (con prueba y en el catálogo), una diferencia que se explica, o una decisión de Cristóbal.
 
-## Huecos del plugin (lo que el catálogo de ContOpe no alcanza)
+## Cómo se mide la identidad
 
-Resueltos en esta rama, con sus pruebas (`scripts/probar-lista-anidada.php` y `scripts/probar-fondos.php`, TODO OK):
+`node scripts/basis/comparar-vivo.mjs todas todos` abre el ORIGINAL EN VIVO y el local al mismo ancho, recorre cada página y compara
+**nodo a nodo** el estilo computado de cada elemento con texto propio (familia, tamaño, peso, interlineado, color, alineación,
+espaciado, mayúsculas, subrayado, cursiva), la posición y el alto de sus renglones, las imágenes (nombre de archivo y caja) y las cajas con
+fondo, borde, radio o sombra. Deja `comparacion-estilos-<pagina>-<ancho>.json` en `entregables/basis/capturas-comparacion/` y un resumen.
+El resultado de la última corrida está en la sección «Qué queda» más abajo.
 
-1. **Saltos de línea en títulos, párrafos e ítems.** El nodo de texto escapaba todo y un `<br>` del original se perdía
-   (el título de la portada se parte a propósito en «eficiente / a su demanda»). Ahora un salto de línea del texto plano se
-   dibuja como `<br>`; el HTML sigue escapado.
-2. **Listas anidadas.** `list` sólo admitía ítems de texto; la lista de «Características» tiene sublistas. Ahora un ítem
-   puede ser `{ text, items }` hasta tres niveles.
-3. **El mini del mapa no llenaba su caja** cuando se usa grande (la imagen interna quedaba en 60×60). Se agregó
-   `width/height:100%` a la imagen del mini. *Ojo:* sin clave de Mapbox el plugin ni siquiera monta la conducta, así que
-   esto sólo se nota con clave (ver 6).
+Las láminas «original | local» las arma `node scripts/basis/capturar-comparar.mjs`: **captura el original en vivo** con el mismo
+procedimiento que el local (las capturas viejas del original, de cuando el hosting estaba caído, mostraban la foto de la portada cortada
+al 84% y comparar contra ellas inventaba una diferencia que no existe; ver el punto 2 de «Resuelto»).
 
-4. **Fondos: degradado, trama y máscara (RESUELTO, plugin 0.3.83).** El original usa dos degradados: la portada (azul →
-   transparente sobre la foto) y el aviso naranja (negro → transparente a 65°). El plugin los excluía porque «nada de
-   degradados» es una decisión del set de diseño de Santa Luisa y se había escrito en el plugin como si fuera de todos; eso
-   se corrigió. La regla `surface` (el módulo de fondos) ahora lleva `backgroundGradient` (lineal o radial, ángulo,
-   2 a 8 paradas, encima o debajo de la foto con `gradientPlacement`), `backgroundPattern` (trama recoloreable) y
-   `backgroundMask` (máscara con forma), además de color plano, imagen y velo. El video de fondo sigue siendo el nodo `video`
-   ambiental. El transcriptor traduce los degradados a esa estructura (ya no los aplana) y avisa `aproximado` sólo de lo que
-   no cabe. Medido en el sitio local: el `background-image` computado de la portada y del aviso es idéntico al del original
-   (`scripts/basis/capturar-fondos.mjs` → `fondos-medidas.json`). Prueba: `scripts/probar-fondos.php` y
-   `scripts/probar-transcriptor-fondos.mjs`. El original de Basis **no usa** trama ni máscara de Divi (las clases existen en
-   su CSS pero ningún elemento las lleva); la medición ahora las registra por si otro sitio sí (`fondoTrama`, `fondoMascara`)
-   y el transcriptor avisa cuando una sección las tiene, sin traducirlas solas (su dibujo es un SVG incrustado, no un recurso).
-   Las formas de la máscara y de la trama son las **mismas** de Medios que se eligen para un divisor.
+`node scripts/basis/auditoria-sitio.mjs` prueba el comportamiento en celular de verdad (agente y toque de teléfono): desborde lateral,
+imágenes y video, cada pliegue (abre, cierra, autoclose, ícono), botones fijos dentro de la pantalla, formulario (campos que caben y se
+escriben), encabezado pegado y errores de consola.
 
-Sin resolver (anotados, no rodeados):
+## Resuelto en esta pasada (plugin 0.3.84 y transcriptor)
 
-5. **Ícono de los pliegues.** Divi pone un «+» gris en un círculo (glifo ETmodules) en cada pliegue; las partes del
-   acordeón no admiten la regla `icono`, así que los pliegues salen sin ese ícono. También se probó que el color del
-   título del pliegue abierto (#333 contra #666 cerrado) no cambia con `state: current` sobre la parte `resumen`.
-6. **Mapa siempre abierto.** La página Contactos trae un mapa de Mapbox interactivo de 379×800. ContOpe sólo tiene el
-   «mini que se abre al pincharlo». Quedó como una imagen del mapa (recorte de la captura) con enlace a OpenStreetMap.
-   Con la clave pública de Mapbox en Configuración → Mapa el pie sí abre el mapa grande. **La clave NO se cargó**:
-   viene en el HTML del original, pero es una credencial y la pone quien publica (`cod_set_mapbox_token`).
-7. **Íconos rellenos.** Los íconos de «Opciones comerciales» (FontAwesome sólidos) quedan en Material Symbols
-   «rounded», que es de contorno; el ícono de ayuda del botón fijo es un disco con «?» y sale como círculo con «?».
-8. **Texto en línea.** Negrita, cursiva o enlaces *dentro* de un párrafo no existen en los nodos de texto (`richText` son
-   párrafos planos). En Basis sólo había un enlace que ocupa todo su bloque (el «Cotizaciones / Contactos» del
-   encabezado) y quedó como `link`.
-9. **WhatsApp.** El nodo `whatsapp` es de un solo color; el original era verde con degradado dentro de un círculo negro.
-10. **Catálogo contra validador.** `cod_get_capabilities` dice que `icono.donde` admite `antes | despues | fondo`, pero
-    el validador rechaza `fondo` («icono.donde admite: antes, despues»). Hallazgo colateral, no tocado.
-11. **Formulario.** El estilo del formulario es sólo por variables (contrato de Orugantt Forms): el original tiene los
-    campos blancos sobre el panel gris, con la etiqueta pequeña encima y el botón a todo el ancho. Aquí el formulario
-    queda como una tarjeta blanca dentro del panel y el botón no se estira.
-12. **Tablet.** Sólo se midió escritorio (1440) y celular (393).
+1. **Tipografía de los textos.** La causa: la medición guardaba el estilo del contenedor (`.et_pb_promo_description`, `.et_pb_blurb_description`,
+   `.et_pb_toggle_content`) y no el del texto que se ve; y cuando todo el texto de un bloque va dentro de un `<span>` o un `<a>`, Divi pone ahí
+   el color, el tamaño o el peso. Ahora la medición toma «la hoja del texto» (`tipoTexto`: desciende por `<span>`/`<a>` que envuelven TODO el
+   texto, nunca por un enlace que sólo envuelve una imagen). El párrafo del aviso naranja pasó de 14 px gris Open Sans a 18 px Roboto
+   oscuro con su interlineado; el contenido de los pliegues recuperó su peso 400; el enlace del encabezado, su interlineado. La comparación
+   nodo a nodo ya no encuentra diferencias de familia, tamaño, peso, color ni interlineado en ninguna página ni ancho (salvo lo listado abajo).
+2. **Portada de Inicio: no había diferencia.** Medido en vivo (viewport y página completa, 1440 y 393): la sección mide 650, el fondo es
+   `cover` + `scroll` (sin paralaje) y la foto llega hasta el final. La foto «cortada al 84%» era un defecto de las capturas viejas del
+   original (se tomaron con el hosting a medias). `capturar-comparar.mjs` ahora captura el original vivo.
+3. **Pliegues de Preguntas frecuentes.** El ícono «+» en círculo gris es el glifo `e050` de ETmodules (rellena), 16 px, color #ccc, que el
+   original esconde con el pliegue abierto. Se lleva con las ampliaciones del acordeón de 0.3.84: `showIcon` / `iconPosition` (igual que
+   `core/accordion-heading`), `iconoCerrado` / `iconoAbierto` (SVG de Medios; el abierto admite `"ninguno"`) y la parte `icono`. El SVG es
+   el contorno del glifo sacado de la propia fuente del sitio. El título del pliegue abierto (#333) ya sale oscuro: el hueco que se había
+   anotado («`state: current` sobre `resumen` no cambia el color») era una medición vieja; verificado en vivo con el color computado.
+   La separación entre los bloques del pliegue (la imagen del PDF con `margin: 20px auto` y su texto) sale de las cajas medidas, no de un 12.
+4. **Íconos rellenos.** Los de «Opciones comerciales» (FontAwesome sólido: carrito, bodega; ETmodules: reloj de arena) se llevan como SVG del
+   glifo ORIGINAL con la regla `icono` + `forma` (`descarga/glifos.mjs` lee la versión SVG de la fuente que Divi publica junto a las
+   otras). El ícono de ayuda del botón fijo es el trazado original (Material «help» relleno) guardado como forma del sitio.
+5. **Formulario de Contactos.** Campos blancos sobre el panel gris, título de grupo («Nombre*», «Email*») con la etiqueta chica debajo,
+   teléfono y consentimiento lado a lado, la ayuda arriba del cuadro de texto, el cuadro del alto del original y el botón a todo el ancho. Se
+   hizo **ampliando el contrato de variables** de Orugantt Forms (nunca con reglas sobre sus campos): 28 variables nuevas (campo, etiqueta,
+   etiqueta chica, ayuda, contador, opciones, botón, interlineado, peso) con los valores por omisión de siempre, más `GridSection` con
+   `titulo` / `obligatorio` / `etiquetaChica` y `ayudaArriba` en el campo. El compilador de ContOpe las acepta en `form.theme` (tipos nuevos
+   `weight` y `ratio`). **El runtime vive en otro repositorio:** el clon `C:\Users\Cristobal concha\orugantt-forms-basis`, rama
+   `basis-tokens` (4 commits sobre `main` del de Santa Luisa, que NO se tocó), y su diferencia está en
+   `docs/orugantt-forms-contrato-ampliado-2026-10-30.patch`. Sólo se copió al local de Basis. Para subirlo hay que fusionar esa rama en
+   el repositorio de Orugantt Forms (o aplicar el parche), compilar (`npm run build` en `runtime-src`) y llevar el plugin.
+6. **Sangría de las listas.** Medida por nivel (14 px el primer nivel, 20 px las sublistas) y escrita con la parte nueva `sublista` del nodo
+   `list` (más `item`), no con la sangría del navegador.
+7. **Botón WhatsApp.** `iconStyle: "logo"` del nodo `whatsapp`: la marca con su degradado verde (#57d163 → #23b33a), contorno y teléfono
+   blancos, dentro del círculo negro, y el verde del original al pasar el mouse. El sanitizador del lienzo admite ahora `linearGradient` y
+   `stop`. Se omitió la sombra gris desenfocada del SVG original (un `feGaussianBlur` bajo la burbuja, invisible sobre el fondo negro).
+8. **Pie.** Eran las direcciones con el doble salto de línea (`<br>` más el salto del código fuente: la dirección medía 84 px en vez de 51):
+   el transcriptor ahora trata el salto de línea del código fuente como espacio, como HTML.
+9. **`icono.donde: fondo`.** Se sacó del catálogo (no hace falta para Basis y el validador nunca lo aceptó): el catálogo publica
+   `COD_Icono::DONDE`, la misma constante que valida, y declara `forma` o `nombre` como lo que sí se exige en vez de un `required: donde`
+   que el validador no pide. Prueba: `scripts/probar-basis-0384.php`.
+10. **Tablet (768).** Se midió el original a 768 (las cinco páginas) y el transcriptor aprendió reglas con scope `tablet`: transcribe la
+    página una segunda vez contra la medición de 768 «como si fuera el celular» y re-escopa lo que esa pasada guarda como `mobile` a
+    `tablet` (`fusionarTablet`). Las columnas se apilan o no según lo medido (antes se suponía apiladas a todo lo que no fuera escritorio).
+    A 768 Inicio pasó de 5395 px (con escritorio comprimido) a ±0,5% del original.
+11. **Mapa de Contactos: dejado listo para la clave.** `content.fijo: true` (0.3.84): el mapa grande queda ABIERTO siempre, sin mini que
+    pinchar ni X, con el alto del original (`--cod-mapa-alto: 800px` en la parte `grande`). **Con la clave pública de Mapbox cargada en
+    Configuración → Mapa es un mapa en vivo del mismo tamaño; sin ella** (hoy) el mini —la imagen recortada— llena esa misma caja y sigue
+    siendo un enlace a «cómo llegar». La clave NO se buscó ni se cargó: la pone quien publica.
+12. **Tablet y celular de verdad.** `auditoria-sitio.mjs` pasa en las cinco páginas a 1440, 768 y 393.
 
-## Medios
+## Huecos del plugin que quedan abiertos
 
-Al principio el hosting estaba caído y la descarga quedó a medias; ese día se rescató lo posible de la caché del Chrome sin
-ventana y se armaron reemplazos con recortes de las capturas. **Ya llegaron los 39 originales** (`original/medios/`, 0 errores) y
-se reemplazó todo en `uploads/2025/07/`:
-
-| medio | estado |
-|---|---|
-| fotos, logos, dibujo de fondo, íconos, PDF, favicon | originales íntegros (incluye `aRecurso-12.png`, el logo BASIS del pie, que antes era un recorte) |
-| Video-Aereo-Carpas.mp4 (fondo de «Características») | **original, 34 MB**: vuelve a ser VIDEO (nodo `video` ambiental, sin controles, en bucle y mudo, detrás del contenido; `media` con la proporción de la sección y recorte «cover») |
-| mapa de Contactos | **sigue siendo un recorte de la captura**: en el original es un mapa de Mapbox en vivo, no hay archivo que recuperar |
-| mini mapa del pie | el de Econut (mismo lugar y estilo); en el original también lo dibuja Mapbox en vivo |
-| tipografías | archivos de la descarga (variables, subconjunto latino) |
-
-Desaparecieron del perfil los reemplazos de `aRecurso-12.png` y del fondo de «Características». Si algún día un medio vuelve a faltar,
-el transcriptor lo avisa como «faltante» y el perfil admite un reemplazo (`reemplazos.medios` / `reemplazos.fondos`).
+A. **Los widgets de la página `basis-carpas-industriales` (buscador, «Recent Posts», «Recent Comments»).** El original es una página de
+   WordPress con la barra lateral del tema Divi, que lleva bloques nativos de core (`wp-block-search`, últimas entradas, últimos
+   comentarios). Son contenido DINÁMICO de WordPress, no de la página, y ContOpe no tiene todavía la correspondencia con esas familias de
+   Gutenberg (`core/search`, `core/latest-posts`, `core/latest-comments`; regla de arquitectura: tomar la familia de Gutenberg y darle
+   formato). No se imitaron con texto fijo: una lista de entradas copiada a mano envejece desde el primer día y un buscador que no busca
+   engaña. Lo que sí se transcribió es el título, el encabezado y el pie. Es el único módulo del original que quedó sin transcribir.
+B. **Texto en línea** (negrita, cursiva o enlaces *dentro* de un párrafo): los nodos de texto son planos. En Basis sólo había un enlace que
+   ocupa todo su bloque y se transcribe como `link`.
+C. **Contador de caracteres y orden de la ayuda.** Orugantt Forms escribe «0/600» a la derecha del cuadro; Gravity escribe «0 de 600
+   caracteres máximos» a la izquierda. Es el texto y la posición de un componente del runtime de formularios, no del diseño.
+D. **Casilla de consentimiento:** se dibuja con la del navegador (que Orugantt estila con `accent-color`); la de Gravity es una casilla
+   gris propia.
+E. **Entre 981 y 1023 px** el plugin aplica lo de tablet (corta tablet en 768–1023) donde Divi ya muestra escritorio (corta en 980). No
+   se midió ahí porque el encargo era 768; los anchos de prueba no caen en ese tramo.
 
 ## Diferencias visibles que quedan contra el original
 
-- Portada: el degradado ya es el del original (ver 4). Queda una diferencia que NO se explicó: en la captura de página completa del original la foto termina antes del fondo de la sección (hacia el 84% de la altura a 1440 y el 77% a 393) y debajo se ve sólo el degradado sobre blanco; el estilo computado del original dice `cover` y la foto local la cubre entera. Puede ser un artefacto de esa captura; no se pudo comprobar porque el hosting original no responde. También a 393 la foto se recorta un poco distinto.
-- Aviso naranja de cierre: ya con su degradado negro → transparente a 65° sobre el naranja, igual que el original (ver 4). El original declara `background-size: cover` y aquí queda `auto`: sin imagen no cambia nada, la capa llena la caja.
-- «Características»: con el video original de fondo y el relleno del módulo (30 px) ya aplicado: el título, la foto y el panel calzan. Falta la sangría de las sublistas: el `<ul>` anidado trae la del navegador (40 px) y el original usa ~1 em; la regla `properties` sólo alcanza la lista de primer nivel (hueco: no hay forma de estilar el `<ul>` interior).
-- Pliegues de Preguntas frecuentes: sin el ícono «+» y el título del pliegue abierto no se oscurece (ver 5).
-- Contactos: mapa estático (ver 6) y formulario con otro dibujo de campos (ver 11).
-- Pie: 6 px más alto que el original (126 contra 120) y el mini mapa trae su leyenda de «Mapbox» abajo.
-- Botones «Explorar Soluciones» y «Solicita Información»: **no llevan a ninguna parte en el original** (`href` vacío y `#`).
-  Se respetó; si Cristóbal quiere que lleven a Contactos, es una línea en el perfil.
-- La globo del mapa dice «Planta Econut / www.econut.cl»: es lo que dice el original de Basis (copia del código de Econut).
-- Banner de cookies: el original no tiene; aquí está como en Econut (pedido), con la paleta de Basis. Se oculta sólo en las capturas.
-- El texto «Gracias» del formulario no se pudo medir (nunca se envió): es uno mínimo.
+Ver la tabla de la última corrida de `comparar-vivo.mjs` (abajo). Lo que no es un defecto del sitio local:
 
-## Medición nueva (30-oct-2026): relleno y margen de cada módulo
+- **Botones «Explorar Soluciones» y «Solicita Información»:** no llevan a ninguna parte en el original (`href` vacío y `#`). Se respetó.
+- **«Planta Econut / www.econut.cl»** en el globo del mapa: es lo que dice el original de Basis (copia del código de Econut).
+- **Banner de cookies:** el original no tiene; aquí está como en Econut (pedido), con la paleta de Basis. Se oculta sólo en las capturas.
+- **«Reproductor de vídeo»:** texto de accesibilidad de MediaElement (el reproductor de Divi) que el video de fondo local no necesita.
+- **Mapa y mini mapa:** el original dibuja los dos con Mapbox en vivo; sin clave quedan como imagen (ver 11).
+- **El encabezado a 393/768 mide 80 px con `overflow: hidden`** en los dos sitios: el enlace «Cotizaciones / Contactos» queda recortado
+  en los dos (la comparación lo ve 14 px más abajo en el local; no se ve en pantalla).
+- **Cajas que la comparación no puede emparejar** (el encabezado y el pie como `et_pb_section` contra `header`/`footer`, los
+  controles internos de Mapbox, el divisor de la sección de Preguntas que Divi dibuja con fondo SVG y ContOpe con un SVG en línea): son
+  de implementación, no de lo que se ve; las láminas lo confirman.
+- **El texto «Gracias»** del formulario no se pudo medir (nunca se envió): es uno mínimo.
 
-**Qué faltaba.** La primera medición guardaba el relleno de sección, fila y columna pero no el del módulo (Divi: Design → Spacing). Un
-módulo de texto con 30 px de relleno medía 866 px de alto y su texto empezaba 30 px más adentro; sin ese dato el transcriptor lo
-dejaba pegado al borde y 37 px más bajo. **Arreglo de fondo:** `descarga/medir-pagina.js` ahora guarda, para TODO módulo,
-`estiloCaja` (relleno, margen por lado, ancho, ancho máximo, posición) y, si lo hay, `estiloInterior` (el `.et_pb_text_inner`,
-el contenedor del blurb, etc.); de cada bloque de texto guarda además su caja y sus márgenes. El transcriptor lo consume
-(`aplicarRellenoPropio`: texto, título y blurb; imágenes: el relleno pasa a márgenes de la imagen).
-Se midió una vez Inicio, Preguntas frecuentes y Contactos a 1440 y 393 (carpeta `entregables/basis/medicion-2/`).
+## Qué queda (última corrida)
 
-**Un defecto de esa medición, resuelto sin repetirla.** Dos imágenes del pie (logo BASIS y crédito de diseño) tienen
-`loading="lazy"` y no se alcanzaron a cargar: salieron con caja 0×0. El transcriptor acepta una *medición complementaria*
-(`perfil.medicionComplemento`, aquí la primera) y toma de ella esos módulos por posición. `medir.mjs` ahora fuerza la carga
-de las imágenes diferidas antes de medir (sin probar: no se volvió a pedir nada al sitio).
+<<TABLA>>
 
-**Por qué Preguntas frecuentes medía 3671 y Contactos 1182/2334.**
+## Medios
 
-| página y ancho | antes | ahora | original | causa |
-|---|---|---|---|---|
-| Preguntas frecuentes 393 | 3671 | **3308** | 3305 | los pliegues se separan 10 px en celular y 30 en escritorio (margen inferior de cada pliegue, ahora con variante móvil); el pie se rompía en celular por los márgenes negativos del logo (−28 px) y por el texto de la dirección, que saltaba debajo del mini mapa |
-| Inicio 393 | 5894 | **5778** | 5776 | el aviso naranja conservaba el alto mínimo de escritorio (321) también en celular (264); el mismo pie |
-| Preguntas frecuentes 1440 | 1757 | 1757 | 1754 | — |
-| Contactos 1440 / 393 | 1182 / 2392 | 1182 / 2334 | 1354 / 2653 | **el formulario**: Orugantt Forms lo dibuja más compacto que Gravity Forms (campos más bajos, sin la etiqueta pequeña encima, botón del ancho del contenido) y su estilo sólo se toca por variables: −178 px en escritorio y −320 en celular. No es un error de transcripción sino la diferencia entre los dos motores de formularios |
+Los 39 originales (`original/medios/`) están en `uploads/2025/07/`. El mapa de Contactos y el mini mapa del pie siguen siendo recortes de
+captura: en el original los dibuja Mapbox en vivo (ver 11). Las tipografías son los archivos de la descarga. Los íconos de Divi se guardan
+en `uploads/iconos-divi/` y las formas del divisor en `uploads/divisores/` y `uploads/formas/` (los genera el transcriptor; no se versionan).
 
 ## Para subirlo
 
-1. Subdominio de prueba en el hosting (p. ej. `nuevo.basisbodegas.com`) con WordPress, plugin ContOpe 0.3.83+ (trae el módulo de fondos y
-   las dos ampliaciones chicas de esta rama), Orugantt Forms, CookieAdmin y los temas `contope-canvas` y `contope-basis`.
-2. Copiar `uploads/2025/07/*` y `uploads/divisores/*` y `uploads/formas/*` (las formas de máscara y trama, que instala `scripts/instalar-formas-de-divisor.php`); bajar de nuevo los originales marcados arriba.
+1. Subdominio de prueba (p. ej. `nuevo.basisbodegas.com`) con WordPress, plugin ContOpe **0.3.84**, **Orugantt Forms con el runtime de la rama
+   `basis-tokens`** (ver 5), CookieAdmin y los temas `contope-canvas` y `contope-basis`.
+2. Copiar `uploads/2025/07/*`, `uploads/divisores/*`, `uploads/formas/*` (`scripts/instalar-formas-de-divisor.php`) y `uploads/iconos-divi/*`.
 3. `SITIO=… AUTH_FILE=… node scripts/basis/aplicar.mjs` (todo por el canal MCP y REST; no sube ningún guion).
-4. Poner la clave de Mapbox, la casilla real de destino del formulario `contacto-basis` (hoy apagado, con
-   `PENDIENTE-DESTINO@basis.invalid`) y SMTP; revisar los `[PENDIENTE: …]` del texto legal (P1, P2, P3, P6, P10).
-5. Comparar: `node scripts/basis/capturar-comparar.mjs <subdominio>` y `comparar-estilos.mjs`.
+4. Poner la clave de Mapbox (Configuración → Mapa: con ella el mapa de Contactos es el de verdad), la casilla real de destino del
+   formulario `contacto-basis` (hoy apagado, con `PENDIENTE-DESTINO@basis.invalid`) y SMTP; revisar los `[PENDIENTE: …]` del texto legal.
+5. Comparar: `node scripts/basis/comparar-vivo.mjs todas todos http://<subdominio>`, `capturar-comparar.mjs <subdominio>` y `auditoria-sitio.mjs <subdominio>`.

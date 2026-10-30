@@ -41,8 +41,8 @@
     "modulo": "code",
     "indiceModulo": 0,
     "clase": "logo-faq-sticky",
-    "severidad": "sin-transcribir",
-    "motivo": "botón fijo con un SVG que no está en la tabla de íconos conocidos"
+    "severidad": "ok",
+    "motivo": "botón fijo con ícono SVG → enlace con la regla «icono» y el trazado original guardado como enlace-af329f38.svg"
   },
   {
     "pagina": "inicio",
@@ -231,8 +231,8 @@
     "modulo": "code",
     "indiceModulo": 0,
     "clase": "logo-faq-sticky",
-    "severidad": "sin-transcribir",
-    "motivo": "botón fijo con un SVG que no está en la tabla de íconos conocidos"
+    "severidad": "ok",
+    "motivo": "botón fijo con ícono SVG → enlace con la regla «icono» y el trazado original guardado como enlace-af329f38.svg"
   },
   {
     "pagina": "basis-carpas-industriales",
@@ -338,8 +338,8 @@
     "modulo": "code",
     "indiceModulo": 0,
     "clase": "logo-faq-sticky",
-    "severidad": "sin-transcribir",
-    "motivo": "botón fijo con un SVG que no está en la tabla de íconos conocidos"
+    "severidad": "ok",
+    "motivo": "botón fijo con ícono SVG → enlace con la regla «icono» y el trazado original guardado como enlace-af329f38.svg"
   },
   {
     "pagina": "preguntas-frecuentes",
@@ -486,8 +486,8 @@
     "modulo": "code",
     "indiceModulo": 0,
     "clase": "logo-faq-sticky",
-    "severidad": "sin-transcribir",
-    "motivo": "botón fijo con un SVG que no está en la tabla de íconos conocidos"
+    "severidad": "ok",
+    "motivo": "botón fijo con ícono SVG → enlace con la regla «icono» y el trazado original guardado como enlace-af329f38.svg"
   },
   {
     "pagina": "contactos",
@@ -523,7 +523,7 @@
     "indiceModulo": 0,
     "clase": "mapbox",
     "severidad": "aproximado",
-    "motivo": "mapa de Mapbox siempre abierto → imagen del mapa (recorte de la captura) con enlace a OpenStreetMap, porque sin clave de Mapbox el plugin no abre el mapa y ContOpe no tiene un mapa incrustado siempre abierto (hueco del plugin)"
+    "motivo": "mapa de Mapbox siempre abierto → conducta `mapa` (mini que se abre al pincharlo): ContOpe no tiene un mapa incrustado siempre abierto (hueco del plugin)"
   },
   {
     "pagina": "contactos",

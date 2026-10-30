@@ -935,7 +935,7 @@
         }
       },
       {
-        "id": "acordeon-41a28a",
+        "id": "acordeon-00ae35",
         "kind": "interaction",
         "scope": {
           "breakpoint": "all",
@@ -953,7 +953,7 @@
         "status": "reviewed",
         "value": {
           "behavior": "acordeon",
-          "openNodeId": "group-19",
+          "openNodeId": "group-20",
           "showIcon": true,
           "iconPosition": "right",
           "iconoCerrado": "/wp-content/uploads/iconos-divi/etmodules-e050.svg",
@@ -1102,8 +1102,8 @@
         }
       },
       {
-        "id": "c-4bd9de",
-        "kind": "color",
+        "id": "mg-37cfff",
+        "kind": "properties",
         "scope": {
           "breakpoint": "all",
           "state": "default"
@@ -1119,9 +1119,10 @@
         },
         "status": "reviewed",
         "value": {
-          "role": "c-2ea3f2",
-          "color": "#2EA3F2",
-          "apply": "text"
+          "declarations": {
+            "margin-block-start": "20px",
+            "margin-block-end": "34px"
+          }
         }
       },
       {
@@ -1152,7 +1153,7 @@
         }
       },
       {
-        "id": "acordeon-f0df62",
+        "id": "acordeon-bc1a31",
         "kind": "interaction",
         "scope": {
           "breakpoint": "all",
@@ -1170,7 +1171,7 @@
         "status": "reviewed",
         "value": {
           "behavior": "acordeon",
-          "openNodeId": "group-60",
+          "openNodeId": "group-61",
           "showIcon": true,
           "iconPosition": "right",
           "iconoCerrado": "/wp-content/uploads/iconos-divi/etmodules-e050.svg",
@@ -1397,7 +1398,7 @@
     "schemaVersion": 2,
     "nodes": [
       {
-        "id": "section-15",
+        "id": "section-16",
         "kind": "section",
         "ruleIds": [
           "div-850adc",
@@ -1408,7 +1409,7 @@
         ],
         "children": [
           {
-            "id": "group-14",
+            "id": "group-15",
             "kind": "group",
             "ruleIds": [
               "fila-1c9785",
@@ -1417,7 +1418,7 @@
             ],
             "children": [
               {
-                "id": "group-13",
+                "id": "group-14",
                 "kind": "group",
                 "ruleIds": [
                   "col-542b47",
@@ -1425,7 +1426,7 @@
                 ],
                 "children": [
                   {
-                    "id": "heading-11",
+                    "id": "heading-12",
                     "kind": "heading",
                     "ruleIds": [
                       "t-daab63",
@@ -1443,7 +1444,7 @@
                     }
                   },
                   {
-                    "id": "paragraph-12",
+                    "id": "paragraph-13",
                     "kind": "paragraph",
                     "ruleIds": [
                       "t-d728a4",
@@ -1464,7 +1465,7 @@
         ]
       },
       {
-        "id": "section-90",
+        "id": "section-91",
         "kind": "section",
         "ruleIds": [
           "sec-79ee4b",
@@ -1472,7 +1473,7 @@
         ],
         "children": [
           {
-            "id": "group-89",
+            "id": "group-90",
             "kind": "group",
             "ruleIds": [
               "fila-ac16e0",
@@ -1481,7 +1482,7 @@
             ],
             "children": [
               {
-                "id": "group-54",
+                "id": "group-55",
                 "kind": "group",
                 "ruleIds": [
                   "col-542b47",
@@ -1489,7 +1490,7 @@
                 ],
                 "children": [
                   {
-                    "id": "heading-16",
+                    "id": "heading-17",
                     "kind": "heading",
                     "ruleIds": [
                       "t-e1f729",
@@ -1503,10 +1504,10 @@
                     }
                   },
                   {
-                    "id": "group-53",
+                    "id": "group-54",
                     "kind": "group",
                     "ruleIds": [
-                      "acordeon-41a28a",
+                      "acordeon-00ae35",
                       "pila-388a42",
                       "pila-5922dd",
                       "mg-a343db",
@@ -1516,14 +1517,14 @@
                     ],
                     "children": [
                       {
-                        "id": "group-19",
+                        "id": "group-20",
                         "kind": "group",
                         "ruleIds": [
                           "col-542b47"
                         ],
                         "children": [
                           {
-                            "id": "paragraph-17",
+                            "id": "paragraph-18",
                             "kind": "paragraph",
                             "ruleIds": [
                               "mg-a343db"
@@ -1533,7 +1534,7 @@
                             }
                           },
                           {
-                            "id": "paragraph-18",
+                            "id": "paragraph-19",
                             "kind": "paragraph",
                             "ruleIds": [
                               "t-98669e",
@@ -1547,14 +1548,14 @@
                         ]
                       },
                       {
-                        "id": "group-22",
+                        "id": "group-23",
                         "kind": "group",
                         "ruleIds": [
                           "col-542b47"
                         ],
                         "children": [
                           {
-                            "id": "paragraph-20",
+                            "id": "paragraph-21",
                             "kind": "paragraph",
                             "ruleIds": [
                               "mg-a343db"
@@ -1564,7 +1565,7 @@
                             }
                           },
                           {
-                            "id": "paragraph-21",
+                            "id": "paragraph-22",
                             "kind": "paragraph",
                             "ruleIds": [
                               "t-98669e",
@@ -1578,14 +1579,14 @@
                         ]
                       },
                       {
-                        "id": "group-25",
+                        "id": "group-26",
                         "kind": "group",
                         "ruleIds": [
                           "col-542b47"
                         ],
                         "children": [
                           {
-                            "id": "paragraph-23",
+                            "id": "paragraph-24",
                             "kind": "paragraph",
                             "ruleIds": [
                               "mg-a343db"
@@ -1595,7 +1596,7 @@
                             }
                           },
                           {
-                            "id": "paragraph-24",
+                            "id": "paragraph-25",
                             "kind": "paragraph",
                             "ruleIds": [
                               "t-98669e",
@@ -1609,14 +1610,14 @@
                         ]
                       },
                       {
-                        "id": "group-28",
+                        "id": "group-29",
                         "kind": "group",
                         "ruleIds": [
                           "col-542b47"
                         ],
                         "children": [
                           {
-                            "id": "paragraph-26",
+                            "id": "paragraph-27",
                             "kind": "paragraph",
                             "ruleIds": [
                               "mg-a343db"
@@ -1626,7 +1627,7 @@
                             }
                           },
                           {
-                            "id": "paragraph-27",
+                            "id": "paragraph-28",
                             "kind": "paragraph",
                             "ruleIds": [
                               "t-98669e",
@@ -1640,14 +1641,14 @@
                         ]
                       },
                       {
-                        "id": "group-31",
+                        "id": "group-32",
                         "kind": "group",
                         "ruleIds": [
                           "col-542b47"
                         ],
                         "children": [
                           {
-                            "id": "paragraph-29",
+                            "id": "paragraph-30",
                             "kind": "paragraph",
                             "ruleIds": [
                               "mg-a343db"
@@ -1657,7 +1658,7 @@
                             }
                           },
                           {
-                            "id": "paragraph-30",
+                            "id": "paragraph-31",
                             "kind": "paragraph",
                             "ruleIds": [
                               "t-98669e",
@@ -1671,14 +1672,14 @@
                         ]
                       },
                       {
-                        "id": "group-34",
+                        "id": "group-35",
                         "kind": "group",
                         "ruleIds": [
                           "col-542b47"
                         ],
                         "children": [
                           {
-                            "id": "paragraph-32",
+                            "id": "paragraph-33",
                             "kind": "paragraph",
                             "ruleIds": [
                               "mg-a343db"
@@ -1688,7 +1689,7 @@
                             }
                           },
                           {
-                            "id": "paragraph-33",
+                            "id": "paragraph-34",
                             "kind": "paragraph",
                             "ruleIds": [
                               "t-98669e",
@@ -1702,14 +1703,14 @@
                         ]
                       },
                       {
-                        "id": "group-38",
+                        "id": "group-39",
                         "kind": "group",
                         "ruleIds": [
                           "col-542b47"
                         ],
                         "children": [
                           {
-                            "id": "paragraph-35",
+                            "id": "paragraph-36",
                             "kind": "paragraph",
                             "ruleIds": [
                               "mg-a343db"
@@ -1719,19 +1720,19 @@
                             }
                           },
                           {
-                            "id": "paragraph-36",
+                            "id": "paragraph-37",
                             "kind": "paragraph",
                             "ruleIds": [
                               "t-98669e",
                               "c-3bcd26",
-                              "mg-6596e3"
+                              "mg-a343db"
                             ],
                             "content": {
                               "text": "El arriendo incluye:"
                             }
                           },
                           {
-                            "id": "list-37",
+                            "id": "list-38",
                             "kind": "list",
                             "ruleIds": [
                               "t-98669e",
@@ -1745,21 +1746,21 @@
                                 "Instalación y desinstalación",
                                 "Mantenimiento durante el período de uso",
                                 "Extintores",
-                                "Opcional:\n\npisos,\niluminación,\nportones sólidos y flexibles,\nanclaje reforzado y cierres perimetrales"
+                                "Opcional: pisos, iluminación, portones sólidos y flexibles, anclaje reforzado y cierres perimetrales"
                               ]
                             }
                           }
                         ]
                       },
                       {
-                        "id": "group-41",
+                        "id": "group-42",
                         "kind": "group",
                         "ruleIds": [
                           "col-542b47"
                         ],
                         "children": [
                           {
-                            "id": "paragraph-39",
+                            "id": "paragraph-40",
                             "kind": "paragraph",
                             "ruleIds": [
                               "mg-a343db"
@@ -1769,7 +1770,7 @@
                             }
                           },
                           {
-                            "id": "paragraph-40",
+                            "id": "paragraph-41",
                             "kind": "paragraph",
                             "ruleIds": [
                               "t-98669e",
@@ -1783,14 +1784,14 @@
                         ]
                       },
                       {
-                        "id": "group-44",
+                        "id": "group-45",
                         "kind": "group",
                         "ruleIds": [
                           "col-542b47"
                         ],
                         "children": [
                           {
-                            "id": "paragraph-42",
+                            "id": "paragraph-43",
                             "kind": "paragraph",
                             "ruleIds": [
                               "mg-a343db"
@@ -1800,7 +1801,7 @@
                             }
                           },
                           {
-                            "id": "paragraph-43",
+                            "id": "paragraph-44",
                             "kind": "paragraph",
                             "ruleIds": [
                               "t-7d64ba",
@@ -1814,14 +1815,14 @@
                         ]
                       },
                       {
-                        "id": "group-52",
+                        "id": "group-53",
                         "kind": "group",
                         "ruleIds": [
                           "col-542b47"
                         ],
                         "children": [
                           {
-                            "id": "paragraph-45",
+                            "id": "paragraph-46",
                             "kind": "paragraph",
                             "ruleIds": [
                               "mg-a343db"
@@ -1831,27 +1832,15 @@
                             }
                           },
                           {
-                            "id": "paragraph-46",
-                            "kind": "paragraph",
-                            "ruleIds": [
-                              "t-7d64ba",
-                              "c-3bcd26",
-                              "mg-6596e3"
-                            ],
-                            "content": {
-                              "text": "Sí. Nuestras bodegas cuentan con garantía de Materiales por 6 años, y el servicio de arriendo incluye mantenimiento sin costo adicional durante el período contratado."
-                            }
-                          },
-                          {
                             "id": "paragraph-47",
                             "kind": "paragraph",
                             "ruleIds": [
                               "t-7d64ba",
                               "c-3bcd26",
-                              "mg-6596e3"
+                              "mg-a343db"
                             ],
                             "content": {
-                              "text": "Garantía:"
+                              "text": "Sí. Nuestras bodegas cuentan con garantía de Materiales por 6 años, y el servicio de arriendo incluye mantenimiento sin costo adicional durante el período contratado."
                             }
                           },
                           {
@@ -1860,34 +1849,46 @@
                             "ruleIds": [
                               "t-7d64ba",
                               "c-3bcd26",
-                              "mg-6596e3"
+                              "mg-a343db"
                             ],
                             "content": {
-                              "text": "Los materiales de estructura* y cubiertas** de nuestras bodegas cuentan con una Garantía de 6 años. Incluye esta garantía eventos de lluvia y viento con rachas o flujos ocasionales máximos de 70km/hora.\nSe excluye de esta garantía, los daños ocasionados por el uso indebido de las estructuras, anclajes, soportes y cobertores, su exposición al fuego o materiales corrosivos, su intervención con herramientas y/u objetos cortopunzantes, perforaciones, soldaduras, golpes y/o colisiones de maquinaria, de vehículos, de otras construcciones o sus partes, de personas o animales; así como catástrofes de cualquier tipo y/o eventos naturales fuera de las condiciones geoclimáticas cotidianas de la zona de emplazamiento."
+                              "text": "Garantía:"
                             }
                           },
                           {
-                            "id": "separator-49",
-                            "kind": "separator",
-                            "ruleIds": [
-                              "mg-6596e3"
-                            ],
-                            "content": {}
-                          },
-                          {
-                            "id": "paragraph-50",
+                            "id": "paragraph-49",
                             "kind": "paragraph",
                             "ruleIds": [
                               "t-7d64ba",
                               "c-3bcd26",
-                              "mg-6596e3"
+                              "mg-a343db"
+                            ],
+                            "content": {
+                              "text": "Los materiales de estructura* y cubiertas** de nuestras bodegas cuentan con una Garantía de 6 años. Incluye esta garantía eventos de lluvia y viento con rachas o flujos ocasionales máximos de 70km/hora. Se excluye de esta garantía, los daños ocasionados por el uso indebido de las estructuras, anclajes, soportes y cobertores, su exposición al fuego o materiales corrosivos, su intervención con herramientas y/u objetos cortopunzantes, perforaciones, soldaduras, golpes y/o colisiones de maquinaria, de vehículos, de otras construcciones o sus partes, de personas o animales; así como catástrofes de cualquier tipo y/o eventos naturales fuera de las condiciones geoclimáticas cotidianas de la zona de emplazamiento."
+                            }
+                          },
+                          {
+                            "id": "separator-50",
+                            "kind": "separator",
+                            "ruleIds": [
+                              "mg-a343db"
+                            ],
+                            "content": {}
+                          },
+                          {
+                            "id": "paragraph-51",
+                            "kind": "paragraph",
+                            "ruleIds": [
+                              "t-7d64ba",
+                              "c-3bcd26",
+                              "mg-a343db"
                             ],
                             "content": {
                               "text": "*Bases de Pilar, Pilares, Flanjes esquineros, Cerchas, Uniones de cumbrera, Bigas y anclajes de bigas y Arriostramientos."
                             }
                           },
                           {
-                            "id": "paragraph-51",
+                            "id": "paragraph-52",
                             "kind": "paragraph",
                             "ruleIds": [
                               "t-7d64ba",
@@ -1923,7 +1924,7 @@
                 ]
               },
               {
-                "id": "group-88",
+                "id": "group-89",
                 "kind": "group",
                 "ruleIds": [
                   "col-542b47",
@@ -1931,7 +1932,7 @@
                 ],
                 "children": [
                   {
-                    "id": "heading-55",
+                    "id": "heading-56",
                     "kind": "heading",
                     "ruleIds": [
                       "t-e1f729",
@@ -1946,10 +1947,10 @@
                     }
                   },
                   {
-                    "id": "group-76",
+                    "id": "group-77",
                     "kind": "group",
                     "ruleIds": [
-                      "acordeon-f0df62",
+                      "acordeon-bc1a31",
                       "pila-388a42",
                       "pila-5922dd",
                       "mg-b06d27",
@@ -1957,14 +1958,14 @@
                     ],
                     "children": [
                       {
-                        "id": "group-60",
+                        "id": "group-61",
                         "kind": "group",
                         "ruleIds": [
                           "col-542b47"
                         ],
                         "children": [
                           {
-                            "id": "paragraph-56",
+                            "id": "paragraph-57",
                             "kind": "paragraph",
                             "ruleIds": [
                               "mg-a343db"
@@ -1974,10 +1975,11 @@
                             }
                           },
                           {
-                            "id": "link-58",
+                            "id": "link-59",
                             "kind": "link",
                             "ruleIds": [
-                              "enl-c8a933"
+                              "enl-c8a933",
+                              "mg-37cfff"
                             ],
                             "content": {
                               "label": "",
@@ -1986,7 +1988,7 @@
                             },
                             "children": [
                               {
-                                "id": "image-57",
+                                "id": "image-58",
                                 "kind": "image",
                                 "ruleIds": [
                                   "img-192d0d",
@@ -2000,11 +2002,11 @@
                             ]
                           },
                           {
-                            "id": "paragraph-59",
+                            "id": "paragraph-60",
                             "kind": "paragraph",
                             "ruleIds": [
                               "t-7d64ba",
-                              "c-4bd9de",
+                              "c-3bcd26",
                               "mg-a343db"
                             ],
                             "content": {
@@ -2014,14 +2016,14 @@
                         ]
                       },
                       {
-                        "id": "group-65",
+                        "id": "group-66",
                         "kind": "group",
                         "ruleIds": [
                           "col-542b47"
                         ],
                         "children": [
                           {
-                            "id": "paragraph-61",
+                            "id": "paragraph-62",
                             "kind": "paragraph",
                             "ruleIds": [
                               "mg-a343db"
@@ -2031,10 +2033,11 @@
                             }
                           },
                           {
-                            "id": "link-63",
+                            "id": "link-64",
                             "kind": "link",
                             "ruleIds": [
-                              "enl-c8a933"
+                              "enl-c8a933",
+                              "mg-a343db"
                             ],
                             "content": {
                               "label": "",
@@ -2043,7 +2046,7 @@
                             },
                             "children": [
                               {
-                                "id": "image-62",
+                                "id": "image-63",
                                 "kind": "image",
                                 "ruleIds": [
                                   "img-6ee097",
@@ -2057,11 +2060,11 @@
                             ]
                           },
                           {
-                            "id": "paragraph-64",
+                            "id": "paragraph-65",
                             "kind": "paragraph",
                             "ruleIds": [
                               "t-7d64ba",
-                              "c-4bd9de",
+                              "c-3bcd26",
                               "mg-a343db"
                             ],
                             "content": {
@@ -2071,14 +2074,14 @@
                         ]
                       },
                       {
-                        "id": "group-70",
+                        "id": "group-71",
                         "kind": "group",
                         "ruleIds": [
                           "col-542b47"
                         ],
                         "children": [
                           {
-                            "id": "paragraph-66",
+                            "id": "paragraph-67",
                             "kind": "paragraph",
                             "ruleIds": [
                               "mg-a343db"
@@ -2088,10 +2091,11 @@
                             }
                           },
                           {
-                            "id": "link-68",
+                            "id": "link-69",
                             "kind": "link",
                             "ruleIds": [
-                              "enl-c8a933"
+                              "enl-c8a933",
+                              "mg-a343db"
                             ],
                             "content": {
                               "label": "",
@@ -2100,7 +2104,7 @@
                             },
                             "children": [
                               {
-                                "id": "image-67",
+                                "id": "image-68",
                                 "kind": "image",
                                 "ruleIds": [
                                   "img-6ee097",
@@ -2114,10 +2118,10 @@
                             ]
                           },
                           {
-                            "id": "paragraph-69",
+                            "id": "paragraph-70",
                             "kind": "paragraph",
                             "ruleIds": [
-                              "t-98669e",
+                              "t-7d64ba",
                               "c-3bcd26",
                               "mg-a343db"
                             ],
@@ -2128,14 +2132,14 @@
                         ]
                       },
                       {
-                        "id": "group-75",
+                        "id": "group-76",
                         "kind": "group",
                         "ruleIds": [
                           "col-542b47"
                         ],
                         "children": [
                           {
-                            "id": "paragraph-71",
+                            "id": "paragraph-72",
                             "kind": "paragraph",
                             "ruleIds": [
                               "mg-a343db"
@@ -2145,10 +2149,11 @@
                             }
                           },
                           {
-                            "id": "link-73",
+                            "id": "link-74",
                             "kind": "link",
                             "ruleIds": [
-                              "enl-c8a933"
+                              "enl-c8a933",
+                              "mg-a343db"
                             ],
                             "content": {
                               "label": "",
@@ -2157,7 +2162,7 @@
                             },
                             "children": [
                               {
-                                "id": "image-72",
+                                "id": "image-73",
                                 "kind": "image",
                                 "ruleIds": [
                                   "img-6ee097",
@@ -2171,10 +2176,10 @@
                             ]
                           },
                           {
-                            "id": "paragraph-74",
+                            "id": "paragraph-75",
                             "kind": "paragraph",
                             "ruleIds": [
-                              "t-98669e",
+                              "t-7d64ba",
                               "c-3bcd26",
                               "mg-a343db"
                             ],
@@ -2205,7 +2210,7 @@
                     }
                   },
                   {
-                    "id": "heading-77",
+                    "id": "heading-78",
                     "kind": "heading",
                     "ruleIds": [
                       "t-e1f729",
@@ -2218,7 +2223,7 @@
                     }
                   },
                   {
-                    "id": "group-87",
+                    "id": "group-88",
                     "kind": "group",
                     "ruleIds": [
                       "acordeon-a744c2",
@@ -2231,14 +2236,14 @@
                     ],
                     "children": [
                       {
-                        "id": "group-80",
+                        "id": "group-81",
                         "kind": "group",
                         "ruleIds": [
                           "col-542b47"
                         ],
                         "children": [
                           {
-                            "id": "paragraph-78",
+                            "id": "paragraph-79",
                             "kind": "paragraph",
                             "ruleIds": [
                               "mg-a343db"
@@ -2248,7 +2253,7 @@
                             }
                           },
                           {
-                            "id": "paragraph-79",
+                            "id": "paragraph-80",
                             "kind": "paragraph",
                             "ruleIds": [
                               "t-98669e",
@@ -2262,14 +2267,14 @@
                         ]
                       },
                       {
-                        "id": "group-83",
+                        "id": "group-84",
                         "kind": "group",
                         "ruleIds": [
                           "col-542b47"
                         ],
                         "children": [
                           {
-                            "id": "paragraph-81",
+                            "id": "paragraph-82",
                             "kind": "paragraph",
                             "ruleIds": [
                               "mg-a343db"
@@ -2279,7 +2284,7 @@
                             }
                           },
                           {
-                            "id": "paragraph-82",
+                            "id": "paragraph-83",
                             "kind": "paragraph",
                             "ruleIds": [
                               "t-7d64ba",
@@ -2293,14 +2298,14 @@
                         ]
                       },
                       {
-                        "id": "group-86",
+                        "id": "group-87",
                         "kind": "group",
                         "ruleIds": [
                           "col-542b47"
                         ],
                         "children": [
                           {
-                            "id": "paragraph-84",
+                            "id": "paragraph-85",
                             "kind": "paragraph",
                             "ruleIds": [
                               "mg-a343db"
@@ -2310,7 +2315,7 @@
                             }
                           },
                           {
-                            "id": "paragraph-85",
+                            "id": "paragraph-86",
                             "kind": "paragraph",
                             "ruleIds": [
                               "t-98669e",

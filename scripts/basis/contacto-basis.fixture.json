@@ -80,24 +80,36 @@
       ]
     },
     {
-      "type": "texto",
-      "id": "telefono",
-      "label": "Teléfono",
-      "obligatorio": false,
-      "registrarEnDb": true,
-      "tipoEntrada": "tel",
-      "autocompletar": "tel"
-    },
-    {
-      "type": "boolean_check",
-      "id": "consentimiento_de_agregacion",
-      "label": "Consentimiento de agregación",
-      "obligatorio": false,
-      "registrarEnDb": true,
-      "opciones": [
+      "type": "GridSection",
+      "id": "fila_telefono",
+      "items": [
         {
-          "value": "si",
-          "label": "Acepto ser agregado en una lista de contactos y recibir novedades de Basis."
+          "type": "texto",
+          "id": "telefono",
+          "label": "Teléfono",
+          "obligatorio": false,
+          "registrarEnDb": true,
+          "tipoEntrada": "tel",
+          "autocompletar": "tel",
+          "layoutClasses": [
+            "col-6"
+          ]
+        },
+        {
+          "type": "boolean_check",
+          "id": "consentimiento_de_agregacion",
+          "label": "Consentimiento de agregación",
+          "obligatorio": false,
+          "registrarEnDb": true,
+          "opciones": [
+            {
+              "value": "si",
+              "label": "Acepto ser agregado en una lista de contactos y recibir novedades de Basis."
+            }
+          ],
+          "layoutClasses": [
+            "col-6"
+          ]
         }
       ]
     },
@@ -107,9 +119,10 @@
       "label": "Mensaje",
       "obligatorio": true,
       "registrarEnDb": true,
-      "rows": 5,
+      "rows": 10,
       "maxLength": 600,
-      "ayuda": "Cuéntanos en qué podemos ayudarte. ¿Tienes alguna consulta o sugerencia? Estamos aquí para escucharte."
+      "ayuda": "Cuéntanos en qué podemos ayudarte. ¿Tienes alguna consulta o sugerencia? Estamos aquí para escucharte.",
+      "ayudaArriba": true
     }
   ]
 }

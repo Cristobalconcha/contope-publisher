@@ -877,6 +877,9 @@ CSS;
 {$r} > {$grande} > {$cerrar}{position:absolute;top:.5rem;right:.5rem;z-index:2;appearance:none;}
 /* Mapa fijo: no hay nada que cerrar. */
 {$r}[data-cod-mapa-fijo="1"] > {$grande} > {$cerrar}{display:none !important;}
+/* Mapa fijo sin clave de Mapbox (o sin JavaScript): el mini es la imagen del sitio y llena la caja del mapa, que mide lo que el sitio le pida a la parte mini. No depende de que el runtime haya montado nada. */
+[data-cod-mapa-fijo="1"] > [data-cod-mapa-rol="mini"]{display:block;}
+[data-cod-mapa-fijo="1"] > [data-cod-mapa-rol="mini"] img{display:block;width:100%;height:100%;object-fit:cover;}
 /* Sin guion el mini es un enlace con una imagen: la imagen respeta el radio que le ponga el diseño al mini. */
 [data-cod-behavior="mapa"] > [data-cod-mapa-rol="mini"] > img{border-radius:inherit;width:100%;height:100%;object-fit:inherit;}
 

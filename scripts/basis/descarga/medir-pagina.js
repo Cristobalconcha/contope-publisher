@@ -15,7 +15,7 @@
     for (let i = 0; i < 4; i++) {
       const propio = [...cur.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim());
       const hijos = [...cur.children].filter((c) => c.tagName !== 'BR');
-      if (propio || hijos.length !== 1 || !['SPAN', 'A'].includes(hijos[0].tagName)) break;
+      if (propio || hijos.length !== 1 || !['SPAN', 'A'].includes(hijos[0].tagName) || !limpio(hijos[0].textContent)) break;
       cur = hijos[0];
     }
     return cur;
@@ -120,7 +120,7 @@
       d.codigoHtml = inner.innerHTML;
     } else if (tipoM === 'toggle' || tipoM === 'accordion_item') {
       const t = m.querySelector('.et_pb_toggle_title'); const c = m.querySelector('.et_pb_toggle_content');
-      d.titulo = t ? limpio(t.textContent) : ''; d.contenido = c ? limpio(c.textContent) : ''; d.contenidoHtml = c ? c.innerHTML.trim() : '';
+      d.titulo = t ? limpio(t.textContent) : ''; d.contenido = c ? limpio(c.textContent) : ''; d.contenidoCaja = c ? rect(c) : null; d.contenidoBloques = c ? [...c.children].map((x) => ({ tag: x.tagName.toLowerCase(), caja: rect(x), margen4: lados4(x, 'margin'), relleno4: lados4(x, 'padding') })) : []; d.contenidoHtml = c ? c.innerHTML.trim() : '';
       d.abierto = m.classList.contains('et_pb_toggle_open'); if (t) d.estiloTitulo = tipo(t); if (c) d.estiloContenido = tipoTexto(c.querySelector('p, li') || c); d.cajaToggle = caja(m);
       const p = cs(t || m, '::before'); d.iconoToggle = { contenido: p.content, color: p.color, tam: p.fontSize, familia: familia(p), display: p.display, posicion: p.position, arriba: p.top, derecha: p.right, ancho: p.width, alto: p.height, margenSuperior: p.marginTop, fondo: p.backgroundColor, radio: p.borderRadius };
       d.enlaces = c ? enlaces(c) : [];
@@ -129,7 +129,7 @@
       d.items = q('.et_pb_toggle, .et_pb_tab', m).map((t) => {
         const ti = t.querySelector('.et_pb_toggle_title'); const co = t.querySelector('.et_pb_toggle_content') || t;
         const p = ti ? cs(ti, '::before') : null;
-        return { titulo: ti ? limpio(ti.textContent) : limpio(t.getAttribute('class')), contenido: limpio(co.textContent), contenidoHtml: co.innerHTML.trim(), abierto: t.classList.contains('et_pb_toggle_open'), enlaces: enlaces(co), imagenes: imagenes(co),
+        return { titulo: ti ? limpio(ti.textContent) : limpio(t.getAttribute('class')), contenido: limpio(co.textContent), contenidoHtml: co.innerHTML.trim(), contenidoCaja: rect(co), contenidoBloques: [...co.children].map((x) => ({ tag: x.tagName.toLowerCase(), caja: rect(x), margen4: lados4(x, 'margin'), relleno4: lados4(x, 'padding') })), abierto: t.classList.contains('et_pb_toggle_open'), enlaces: enlaces(co), imagenes: imagenes(co),
           estiloTitulo: ti ? tipo(ti) : null, estiloContenido: tipoTexto(co.querySelector('p, li') || co), caja: caja(t), tamano: rect(t), tituloRelleno4: ti ? lados4(ti, 'padding') : null, contenidoRelleno4: lados4(co, 'padding'), margenInferior: cs(t).marginBottom, iconoToggle: p ? { contenido: p.content, color: p.color, tam: p.fontSize, familia: familia(p), display: p.display, posicion: p.position, arriba: p.top, derecha: p.right, ancho: p.width, alto: p.height, margenSuperior: p.marginTop, fondo: p.backgroundColor, radio: p.borderRadius } : null };
       });
       d.cajaAcordeon = caja(m);

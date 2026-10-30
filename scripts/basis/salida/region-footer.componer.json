@@ -263,7 +263,7 @@
         }
       },
       {
-        "id": "img-302830",
+        "id": "img-a8fc03",
         "kind": "properties",
         "scope": {
           "breakpoint": "all",
@@ -283,6 +283,8 @@
           "declarations": {
             "width": "131px",
             "max-width": "100%",
+            "margin-inline-start": "0px",
+            "margin-inline-end": "0px",
             "height": "auto"
           }
         }
@@ -465,7 +467,7 @@
         }
       },
       {
-        "id": "img-666820",
+        "id": "img-debbb6",
         "kind": "properties",
         "scope": {
           "breakpoint": "all",
@@ -485,8 +487,32 @@
           "declarations": {
             "width": "71px",
             "max-width": "100%",
-            "height": "auto",
-            "margin-inline-start": "auto"
+            "margin-inline-start": "auto",
+            "margin-inline-end": "0px",
+            "height": "auto"
+          }
+        }
+      },
+      {
+        "id": "img-5fa8d4",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "margin-inline-start": "20px"
           }
         }
       },
@@ -574,7 +600,7 @@
     "schemaVersion": 2,
     "nodes": [
       {
-        "id": "footer-86",
+        "id": "footer-87",
         "kind": "footer",
         "ruleIds": [
           "sec-83739f",
@@ -582,7 +608,7 @@
         ],
         "children": [
           {
-            "id": "group-85",
+            "id": "group-86",
             "kind": "group",
             "ruleIds": [
               "fila-44e63a",
@@ -591,7 +617,7 @@
             ],
             "children": [
               {
-                "id": "group-77",
+                "id": "group-78",
                 "kind": "group",
                 "ruleIds": [
                   "col-542b47",
@@ -600,10 +626,10 @@
                 ],
                 "children": [
                   {
-                    "id": "image-76",
+                    "id": "image-77",
                     "kind": "image",
                     "ruleIds": [
-                      "img-302830",
+                      "img-a8fc03",
                       "mg-7be022"
                     ],
                     "content": {
@@ -614,7 +640,7 @@
                 ]
               },
               {
-                "id": "group-80",
+                "id": "group-81",
                 "kind": "group",
                 "ruleIds": [
                   "col-542b47",
@@ -623,7 +649,7 @@
                 ],
                 "children": [
                   {
-                    "id": "group-79",
+                    "id": "group-80",
                     "kind": "group",
                     "ruleIds": [
                       "mapa-ca1d42",
@@ -631,7 +657,7 @@
                     ],
                     "children": [
                       {
-                        "id": "paragraph-78",
+                        "id": "paragraph-79",
                         "kind": "paragraph",
                         "ruleIds": [
                           "t-7d73ba",
@@ -639,7 +665,7 @@
                           "mg-dir-81746f"
                         ],
                         "content": {
-                          "text": "Av 18 de Septiembre sn Hijuela 2\n\nFundo San Rafael - Sector Nuevo Sendero,\n\nPaine, Región Metropolitana"
+                          "text": "Av 18 de Septiembre sn Hijuela 2\nFundo San Rafael - Sector Nuevo Sendero,\nPaine, Región Metropolitana"
                         }
                       }
                     ],
@@ -654,13 +680,13 @@
                       "zoom": 17,
                       "mini": "/wp-content/uploads/2025/07/Mini-mapa.png",
                       "etiqueta": "Abrir el mapa de ubicación",
-                      "globo": "Planta Econut, Av 18 de Septiembre sn Hijuela 2, Fundo San Rafael - Sector Nuevo Sendero,, Paine, Región Metropolitana, www.econut.cl"
+                      "globo": "Planta Econut Av 18 de Septiembre sn Hijuela 2 Fundo San Rafael - Sector Nuevo Sendero, Paine, Región Metropolitana www.econut.cl"
                     }
                   }
                 ]
               },
               {
-                "id": "group-84",
+                "id": "group-85",
                 "kind": "group",
                 "ruleIds": [
                   "col-542b47",
@@ -669,17 +695,18 @@
                 ],
                 "children": [
                   {
-                    "id": "group-83",
+                    "id": "group-84",
                     "kind": "group",
                     "ruleIds": [
                       "racimo-94d787"
                     ],
                     "children": [
                       {
-                        "id": "image-81",
+                        "id": "image-82",
                         "kind": "image",
                         "ruleIds": [
-                          "img-666820",
+                          "img-debbb6",
+                          "img-5fa8d4",
                           "mg-a343db"
                         ],
                         "content": {
@@ -688,7 +715,7 @@
                         }
                       },
                       {
-                        "id": "paragraph-82",
+                        "id": "paragraph-83",
                         "kind": "paragraph",
                         "ruleIds": [
                           "t-01952a",

@@ -70,7 +70,7 @@ const EXTRAER = `(() => {
         subrayado: s.textDecorationLine, op: s.opacity, caja: cajaDeTexto(el) || rect(r),
       });
     }
-    if (el.tagName === 'IMG') imagenes.push({ archivo: (el.currentSrc || el.src || '').split('/').pop().split('?')[0], alt: el.alt, caja: rect(r), ajuste: s.objectFit });
+    if (el.tagName === 'IMG') imagenes.push({ archivo: (el.currentSrc || el.src || '').split('/').pop().split('?')[0].replace(/-[0-9]+x[0-9]+(?=.[a-z0-9]+$)/i, ''), alt: el.alt, caja: rect(r), ajuste: s.objectFit });
     const fondo = s.backgroundColor !== 'rgba(0, 0, 0, 0)' || s.backgroundImage !== 'none';
     const borde = parseFloat(s.borderTopWidth) > 0 || parseFloat(s.borderBottomWidth) > 0 || parseFloat(s.borderLeftWidth) > 0;
     if ((fondo || borde || s.boxShadow !== 'none') && r.width >= 12 && r.height >= 12 && el.tagName !== 'IMG' && el.tagName !== 'BODY' && el.tagName !== 'HTML') {
