@@ -22,7 +22,20 @@
  *  - `viewBox` de 1200×120 y sin `width`/`height`. El alto real lo decide quien
  *    lo usa, y el estirado es a propósito: un divisor se adapta al ancho de su
  *    sección.
- *  - Sirven igual como máscara, que es como se previsualizan en el editor.
+ *  - Sirven igual como máscara, que es como se previsualizan en el editor, y
+ *    desde 0.3.83 también como `backgroundMask` de la regla `surface`: el módulo
+ *    de fondos elige estas MISMAS formas por su ruta. Como la máscara las carga
+ *    por `url()` y no en línea, el archivo lleva `preserveAspectRatio="none"`
+ *    él mismo (sin eso el navegador no estira la forma a la caja: la deja
+ *    centrada y proporcional). El divisor, que las pone en línea, ya forzaba lo
+ *    mismo, así que no cambia nada para él.
+ *
+ * Además de las bandas hay TRAMAS: baldosas chicas que se repiten (puntos,
+ * líneas diagonales, cuadrícula) para `backgroundPattern`. Son la excepción a
+ * lo de arriba: llevan `width`/`height` propios —el tamaño de una baldosa— y
+ * NO se estiran. Un divisor hecho con una trama sale como una franja de puntos
+ * estirada, que no es lo que se quiere; están en el mismo juego porque se
+ * eligen de la misma forma (la ruta de un SVG de Medios), no porque sirvan igual.
  *
  * Uso:
  *   node scripts/generar-formas-divisor.mjs --destino "../wp-local-econut/wordpress/wp-content/uploads/formas"
@@ -123,6 +136,14 @@ function nubes(bultos) {
   return `${d}L${A} ${H}Z`;
 }
 
+/**
+ * Una esquina: un cuarto de elipse apoyado en el borde inferior derecho. Como
+ * máscara, redondea una esquina de la sección; como divisor, un remate curvo.
+ */
+function esquina() {
+  return `M0 ${H}A${A} ${H} 0 0 1 ${A} 0L${A} ${H}Z`;
+}
+
 const FORMAS = [
   {
     archivo: 'pendiente.svg',
@@ -199,6 +220,11 @@ const FORMAS = [
     ]),
   },
   {
+    archivo: 'esquina.svg',
+    nombre: 'Esquina',
+    d: esquina(),
+  },
+  {
     archivo: 'asimetrica.svg',
     nombre: 'Asimétrica',
     // Una curva descentrada: el recurso más útil cuando la sección de al lado
@@ -207,9 +233,49 @@ const FORMAS = [
   },
 ];
 
+/**
+ * Las tramas: baldosas que se repiten. Cada una declara su tamaño (el de UNA
+ * baldosa) y empalma con su vecina por los cuatro lados.
+ */
+const TRAMAS = [
+  {
+    archivo: 'trama-puntos.svg',
+    nombre: 'Trama de puntos',
+    lado: 24,
+    // Un punto al centro de cada baldosa de 24.
+    cuerpo: '<circle cx="12" cy="12" r="1.6"/>',
+  },
+  {
+    archivo: 'trama-lineas.svg',
+    nombre: 'Trama de líneas diagonales',
+    lado: 16,
+    // La diagonal x+y=16 con 2 de grosor, más la esquina que la completa al
+    // empalmar con la baldosa de al lado (sin ella la línea se corta).
+    cuerpo: '<path d="M0 16L16 0h-2L0 14zM16 16v-2l-2 2z"/>',
+  },
+  {
+    archivo: 'trama-cuadricula.svg',
+    nombre: 'Trama de cuadrícula',
+    lado: 24,
+    // Una línea de 1 a la izquierda y otra arriba: al repetir cierran cuadros.
+    cuerpo: '<path d="M0 0h24v1H0zM0 0h1v24H0z"/>',
+  },
+];
+
+function svgTrama(t) {
+  return [
+    '<svg xmlns="http://www.w3.org/2000/svg" width="' + t.lado + '" height="' + t.lado + '" viewBox="0 0 ' + t.lado + ' ' + t.lado + '">',
+    '  <!-- ' + t.nombre + ' — trama de ContOpe (una baldosa de ' + t.lado + ' que se repite).',
+    '       Sin fill propio a propósito: el color lo pone el diseño. -->',
+    '  ' + t.cuerpo,
+    '</svg>',
+    '',
+  ].join('\n');
+}
+
 function svg(forma) {
   return [
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + A + ' ' + H + '">',
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + A + ' ' + H + '" preserveAspectRatio="none">',
     '  <!-- ' + forma.nombre + ' — forma de divisor de ContOpe.',
     '       Sin fill propio a propósito: el color lo pone el diseño. -->',
     '  <path d="' + forma.d + '"/>',
@@ -224,9 +290,13 @@ if (!destinoRel && !soloMirar) {
   process.exit(1);
 }
 
-console.log(`\n${FORMAS.length} formas, en ${A}×${H}:\n`);
+console.log(`\n${FORMAS.length} formas, en ${A}×${H}, y ${TRAMAS.length} tramas:\n`);
 for (const f of FORMAS) {
   console.log(`  ${f.archivo.padEnd(24)} ${f.nombre.padEnd(20)} ${f.d.length} caracteres de trazo`);
+}
+
+for (const t of TRAMAS) {
+  console.log(`  ${t.archivo.padEnd(24)} ${t.nombre.padEnd(20)} baldosa de ${t.lado}`);
 }
 
 if (soloMirar) {
@@ -239,6 +309,10 @@ await fs.mkdir(destino, { recursive: true });
 let escritas = 0;
 for (const f of FORMAS) {
   await fs.writeFile(path.join(destino, f.archivo), svg(f), 'utf8');
+  escritas++;
+}
+for (const t of TRAMAS) {
+  await fs.writeFile(path.join(destino, t.archivo), svgTrama(t), 'utf8');
   escritas++;
 }
 console.log(`\nEscritas ${escritas} en ${destino}\n`);
