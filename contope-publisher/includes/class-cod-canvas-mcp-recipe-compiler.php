@@ -894,7 +894,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 'content' => ['label' => 'texto', 'href' => 'enlace seguro (opcional)', 'target' => ['self', 'blank']],
                 'notes' => 'Con href navega y se dibuja como enlace; SIN href se dibuja como <button type="button">, que es lo que corresponde a un botón que actúa —abrir un menú, abrir las preferencias de cookies— y no lleva destino. No inventar un href para que pase la validación: un lector de pantalla lo anunciaría como enlace.',
             ],
-            'list' => ['content' => ['ordered' => 'boolean', 'items' => '1..100 textos planos']],
+            'list' => ['content' => ['ordered' => 'boolean', 'items' => '1..100 ítems: texto plano, o {text, items} con una sublista (hasta 3 niveles)']],
             'table' => ['content' => ['headers' => '1..20 textos', 'rows' => '0..100 filas con el mismo ancho']],
             'gallery' => ['content' => ['items' => "1..80 items. Cada item declara su primitiva con 'kind': image (por defecto) {assetUrl, alt, caption?}, video {sourceUrl?, posterUrl?, caption?, matte?, ambient?, pendingLabel?} o dynamic {token, fallback?}. La galería solo aporta presentación (grilla/metro/masonry/carrusel, leyenda, controles): el dibujo de cada item lo hace su propia primitiva. Galería de fotos, de videos y de artículos son la misma máquina con distinta primitiva adentro."]],
             'form' => ['content' => ['formSlug' => 'valor devuelto por cod_list_canvas_forms']],
@@ -3458,12 +3458,13 @@ final class COD_Canvas_MCP_Recipe_Compiler
                     || count($content['items']) < 1 || count($content['items']) > 100) {
                     return new WP_Error('cod_mcp_list_invalid', 'list requiere ordered e items.');
                 }
-                foreach ($content['items'] as $item) {
-                    if (!$this->is_plain_text($item, 1000)) {
-                        return new WP_Error('cod_mcp_list_invalid', 'Cada item de list debe ser texto plano.');
-                    }
+                // Un ítem es texto plano o {text, items}: una sublista de ítems del
+                // mismo tipo, hasta tres niveles (la forma de un <ul> dentro de un <li>).
+                $items_normalizados = $this->normalize_list_items($content['items'], 1);
+                if (is_wp_error($items_normalizados)) {
+                    return $items_normalizados;
                 }
-                return ['ordered' => $content['ordered'], 'items' => array_values($content['items'])];
+                return ['ordered' => $content['ordered'], 'items' => $items_normalizados];
             case 'table':
                 return $this->normalize_table_content($content);
             case 'gallery':
@@ -4267,7 +4268,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 return '<div ' . $attrs . '>' . $children . '</div>';
             case 'heading':
                 $level = $node['content']['level'];
-                $dentro = esc_html($node['content']['text']);
+                $dentro = nl2br(esc_html($node['content']['text']), false);
                 if (!empty($node['content']['segments'])) {
                     $spans = '';
                     foreach ($node['content']['segments'] as $tramo) {
@@ -4282,7 +4283,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 }
                 return '<h' . $level . ' ' . $attrs . '>' . $dentro . '</h' . $level . '>';
             case 'paragraph':
-                return '<p ' . $attrs . '>' . esc_html($node['content']['text']) . '</p>';
+                return '<p ' . $attrs . '>' . nl2br(esc_html($node['content']['text']), false) . '</p>';
             case 'richText':
                 $paragraphs = [];
                 foreach ($node['content']['paragraphs'] as $paragraph) {
@@ -4907,11 +4908,49 @@ final class COD_Canvas_MCP_Recipe_Compiler
     private function render_list(array $content, string $attrs): string
     {
         $tag = $content['ordered'] ? 'ol' : 'ul';
-        $items = [];
-        foreach ($content['items'] as $item) {
-            $items[] = '<li>' . esc_html($item) . '</li>';
+        return '<' . $tag . ' ' . $attrs . '>' . $this->render_list_items($content['items'], $tag) . '</' . $tag . '>';
+    }
+
+    /** @param array<int, string|array<string, mixed>> $items */
+    private function render_list_items(array $items, string $tag): string
+    {
+        $html = '';
+        foreach ($items as $item) {
+            if (is_string($item)) {
+                $html .= '<li>' . nl2br(esc_html($item), false) . '</li>';
+                continue;
+            }
+            $html .= '<li>' . nl2br(esc_html($item['text']), false)
+                . '<' . $tag . '>' . $this->render_list_items($item['items'], $tag) . '</' . $tag . '></li>';
         }
-        return '<' . $tag . ' ' . $attrs . '>' . implode('', $items) . '</' . $tag . '>';
+        return $html;
+    }
+
+    /**
+     * @param array<int, mixed> $items
+     * @return array<int, string|array<string, mixed>>|WP_Error
+     */
+    private function normalize_list_items(array $items, int $nivel)
+    {
+        $salida = [];
+        foreach ($items as $item) {
+            if ($this->is_plain_text($item, 1000)) {
+                $salida[] = $item;
+                continue;
+            }
+            if ($nivel < 3 && is_array($item) && $this->has_only_keys($item, ['text', 'items']) && isset($item['text'], $item['items'])
+                && $this->is_plain_text($item['text'], 1000) && is_array($item['items']) && $this->is_list($item['items'])
+                && count($item['items']) >= 1 && count($item['items']) <= 100) {
+                $hijos = $this->normalize_list_items($item['items'], $nivel + 1);
+                if (is_wp_error($hijos)) {
+                    return $hijos;
+                }
+                $salida[] = ['text' => $item['text'], 'items' => $hijos];
+                continue;
+            }
+            return new WP_Error('cod_mcp_list_invalid', 'Cada item de list debe ser texto plano, o {text, items} con una sublista (hasta 3 niveles).');
+        }
+        return $salida;
     }
 
     /** @param array<string, mixed> $content */

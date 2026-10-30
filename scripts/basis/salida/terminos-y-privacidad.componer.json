@@ -1,0 +1,1522 @@
+{
+  "titulo": "Términos y privacidad",
+  "slug": "terminos-y-privacidad",
+  "design": {
+    "schemaVersion": 1,
+    "designId": "basis-web",
+    "expectedDesignRevision": 2,
+    "reviewState": "session",
+    "rules": [
+      {
+        "id": "t-13a6aa",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "basis-terminos-BORRADOR.md",
+              "rationale": "Texto del borrador legal de Basis, en revisión; tipografía y colores del sitio medido."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "legal-h1",
+          "family": "'Big Shoulders Display', sans-serif",
+          "fontSize": "50px",
+          "fontWeight": 500,
+          "lineHeight": 1.2,
+          "align": "start"
+        }
+      },
+      {
+        "id": "c-458e22",
+        "kind": "color",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "basis-terminos-BORRADOR.md",
+              "rationale": "Texto del borrador legal de Basis, en revisión; tipografía y colores del sitio medido."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "c-0e0c19",
+          "color": "#0E0C19",
+          "apply": "text"
+        }
+      },
+      {
+        "id": "mg-6596e3",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "basis-terminos-BORRADOR.md",
+              "rationale": "Texto del borrador legal de Basis, en revisión; tipografía y colores del sitio medido."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "margin-block-start": "0px",
+            "margin-block-end": "12px"
+          }
+        }
+      },
+      {
+        "id": "t-fc04da",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "basis-terminos-BORRADOR.md",
+              "rationale": "Texto del borrador legal de Basis, en revisión; tipografía y colores del sitio medido."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "legal-h1",
+          "fontSize": "34px"
+        }
+      },
+      {
+        "id": "t-4465e6",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "basis-terminos-BORRADOR.md",
+              "rationale": "Texto del borrador legal de Basis, en revisión; tipografía y colores del sitio medido."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "legal-h2",
+          "family": "'Big Shoulders Display', sans-serif",
+          "fontSize": "32px",
+          "fontWeight": 500,
+          "lineHeight": 1.2,
+          "align": "start"
+        }
+      },
+      {
+        "id": "mg-1d770c",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "basis-terminos-BORRADOR.md",
+              "rationale": "Texto del borrador legal de Basis, en revisión; tipografía y colores del sitio medido."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "margin-block-start": "40px",
+            "margin-block-end": "10px"
+          }
+        }
+      },
+      {
+        "id": "t-ee5226",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "basis-terminos-BORRADOR.md",
+              "rationale": "Texto del borrador legal de Basis, en revisión; tipografía y colores del sitio medido."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "legal-h3",
+          "family": "'Big Shoulders Display', sans-serif",
+          "fontSize": "24px",
+          "fontWeight": 500,
+          "lineHeight": 1.2,
+          "align": "start"
+        }
+      },
+      {
+        "id": "mg-b8788a",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "basis-terminos-BORRADOR.md",
+              "rationale": "Texto del borrador legal de Basis, en revisión; tipografía y colores del sitio medido."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "margin-block-start": "24px",
+            "margin-block-end": "8px"
+          }
+        }
+      },
+      {
+        "id": "t-8a65a8",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "basis-terminos-BORRADOR.md",
+              "rationale": "Texto del borrador legal de Basis, en revisión; tipografía y colores del sitio medido."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "legal-p",
+          "family": "'Open Sans', sans-serif",
+          "fontSize": "16px",
+          "fontWeight": 500,
+          "lineHeight": 1.7,
+          "align": "start"
+        }
+      },
+      {
+        "id": "c-3bcd26",
+        "kind": "color",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "basis-terminos-BORRADOR.md",
+              "rationale": "Texto del borrador legal de Basis, en revisión; tipografía y colores del sitio medido."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "c-666666",
+          "color": "#666666",
+          "apply": "text"
+        }
+      },
+      {
+        "id": "mg-cd2ce9",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "basis-terminos-BORRADOR.md",
+              "rationale": "Texto del borrador legal de Basis, en revisión; tipografía y colores del sitio medido."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "margin-block-start": "0px",
+            "margin-block-end": "16px"
+          }
+        }
+      },
+      {
+        "id": "lista-42a9d4",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "basis-terminos-BORRADOR.md",
+              "rationale": "Texto del borrador legal de Basis, en revisión; tipografía y colores del sitio medido."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "padding-inline-start": "1.4em"
+          }
+        }
+      },
+      {
+        "id": "t-b979d3",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "basis-terminos-BORRADOR.md",
+              "rationale": "Texto del borrador legal de Basis, en revisión; tipografía y colores del sitio medido."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "legal-nota",
+          "family": "'Open Sans', sans-serif",
+          "fontSize": "16px",
+          "fontWeight": 500,
+          "lineHeight": 1.7,
+          "align": "start"
+        }
+      },
+      {
+        "id": "c-c1089a",
+        "kind": "color",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "basis-terminos-BORRADOR.md",
+              "rationale": "Texto del borrador legal de Basis, en revisión; tipografía y colores del sitio medido."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "c-333333",
+          "color": "#333333",
+          "apply": "text"
+        }
+      },
+      {
+        "id": "t-66f881",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "basis-terminos-BORRADOR.md",
+              "rationale": "Texto del borrador legal de Basis, en revisión; tipografía y colores del sitio medido."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "legal-tabla",
+          "family": "'Open Sans', sans-serif",
+          "fontSize": "14px",
+          "fontWeight": 500,
+          "lineHeight": 1.5,
+          "align": "start"
+        }
+      },
+      {
+        "id": "tabla-18f09d",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "basis-terminos-BORRADOR.md",
+              "rationale": "Texto del borrador legal de Basis, en revisión; tipografía y colores del sitio medido."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "width": "100%",
+            "margin-block-end": "24px"
+          }
+        }
+      },
+      {
+        "id": "hoja-4e11fd",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "basis-terminos-BORRADOR.md",
+              "rationale": "Texto del borrador legal de Basis, en revisión; tipografía y colores del sitio medido."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "width": "100%",
+            "max-width": "760px",
+            "margin-inline-start": "auto",
+            "margin-inline-end": "auto",
+            "padding-left": "24px",
+            "padding-right": "24px"
+          }
+        }
+      },
+      {
+        "id": "sec-79ee4b",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "basis-terminos-BORRADOR.md",
+              "rationale": "Texto del borrador legal de Basis, en revisión; tipografía y colores del sitio medido."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "padding-top": "54px",
+            "padding-bottom": "54px",
+            "padding-left": "0px",
+            "padding-right": "0px"
+          }
+        }
+      },
+      {
+        "id": "sec-987a52",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "basis-terminos-BORRADOR.md",
+              "rationale": "Texto del borrador legal de Basis, en revisión; tipografía y colores del sitio medido."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "padding-top": "32px",
+            "padding-bottom": "32px"
+          }
+        }
+      },
+      {
+        "id": "nota-407148",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "basis-terminos-BORRADOR.md",
+              "rationale": "Texto del borrador legal de Basis, en revisión; tipografía y colores del sitio medido."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "background-color": "#F4F4F4",
+            "border-radius": "10px",
+            "padding-top": "16px",
+            "padding-right": "20px",
+            "padding-bottom": "16px",
+            "padding-left": "20px",
+            "margin-block-end": "24px"
+          }
+        }
+      },
+      {
+        "id": "mg-a343db",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "basis-terminos-BORRADOR.md",
+              "rationale": "Texto del borrador legal de Basis, en revisión; tipografía y colores del sitio medido."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "margin-block-start": "0px",
+            "margin-block-end": "0px"
+          }
+        }
+      }
+    ]
+  },
+  "composition": {
+    "schemaVersion": 2,
+    "nodes": [
+      {
+        "id": "section-68",
+        "kind": "section",
+        "ruleIds": [
+          "sec-79ee4b",
+          "sec-987a52"
+        ],
+        "children": [
+          {
+            "id": "group-67",
+            "kind": "group",
+            "ruleIds": [
+              "hoja-4e11fd"
+            ],
+            "children": [
+              {
+                "id": "heading-1",
+                "kind": "heading",
+                "ruleIds": [
+                  "t-13a6aa",
+                  "c-458e22",
+                  "mg-6596e3",
+                  "t-fc04da"
+                ],
+                "content": {
+                  "text": "Términos de uso y política de privacidad",
+                  "level": 1
+                }
+              },
+              {
+                "id": "group-3",
+                "kind": "group",
+                "ruleIds": [
+                  "nota-407148"
+                ],
+                "children": [
+                  {
+                    "id": "paragraph-2",
+                    "kind": "paragraph",
+                    "ruleIds": [
+                      "t-b979d3",
+                      "c-c1089a",
+                      "mg-a343db"
+                    ],
+                    "content": {
+                      "text": "Versión en revisión legal. Este documento está siendo revisado y puede modificarse. Última actualización: [PENDIENTE: fecha de publicación — P3]."
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "paragraph-4",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "t-8a65a8",
+                  "c-3bcd26",
+                  "mg-cd2ce9"
+                ],
+                "content": {
+                  "text": "Este documento se aplica al sitio basisbodegas.com (en adelante, «el sitio»). Al usar el sitio usted declara haberlo leído. Si no está de acuerdo, le pedimos que no lo use."
+                }
+              },
+              {
+                "id": "heading-5",
+                "kind": "heading",
+                "ruleIds": [
+                  "t-4465e6",
+                  "c-458e22",
+                  "mg-1d770c"
+                ],
+                "content": {
+                  "text": "1. Quién es el responsable",
+                  "level": 2
+                }
+              },
+              {
+                "id": "paragraph-6",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "t-8a65a8",
+                  "c-3bcd26",
+                  "mg-cd2ce9"
+                ],
+                "content": {
+                  "text": "El sitio es operado por Inmobiliaria Basis SpA, RUT 76.933.998-1, con domicilio en Av. 18 de Septiembre S/N, Hijuela 2, Fundo San Rafael, Sector Nuevo Sendero, Paine, Región Metropolitana [PENDIENTE: confirmar que es el domicilio legal — P2] (en adelante, «Basis», «nosotros»)."
+                }
+              },
+              {
+                "id": "paragraph-7",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "t-8a65a8",
+                  "c-3bcd26",
+                  "mg-cd2ce9"
+                ],
+                "content": {
+                  "text": "Basis es la responsable del tratamiento de los datos personales que se recogen en el sitio."
+                }
+              },
+              {
+                "id": "paragraph-8",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "t-8a65a8",
+                  "c-3bcd26",
+                  "mg-cd2ce9"
+                ],
+                "content": {
+                  "text": "Para cualquier consulta sobre este documento o sobre sus datos personales puede escribir a [PENDIENTE: correo de contacto — P1]. Para consultas comerciales también puede usar el WhatsApp +56 9 9799 5132."
+                }
+              },
+              {
+                "id": "heading-9",
+                "kind": "heading",
+                "ruleIds": [
+                  "t-4465e6",
+                  "c-458e22",
+                  "mg-1d770c"
+                ],
+                "content": {
+                  "text": "2. Qué ofrece el sitio y cuál es su alcance",
+                  "level": 2
+                }
+              },
+              {
+                "id": "paragraph-10",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "t-8a65a8",
+                  "c-3bcd26",
+                  "mg-cd2ce9"
+                ],
+                "content": {
+                  "text": "2.1. Qué es el sitio. Basis ofrece bodegas temporales trasladables (carpas industriales) en arriendo, en venta y en arriendo con compromiso de compra [PENDIENTE: confirmar que la venta la realiza Basis SpA — P10]. El sitio informa sobre esos productos y servicios y recibe consultas y solicitudes de cotización. No es una tienda en línea: no se contrata, no se compra ni se paga a través del sitio, y el sitio no procesa pagos ni datos de tarjetas."
+                }
+              },
+              {
+                "id": "paragraph-11",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "t-8a65a8",
+                  "c-3bcd26",
+                  "mg-cd2ce9"
+                ],
+                "content": {
+                  "text": "2.2. El contrato es aparte. Cualquier arriendo, venta o arriendo con compromiso de compra se rige exclusivamente por el contrato o la cotización aceptada que se firme entre las partes. Nada de lo que aparece en el sitio modifica ese contrato ni obliga a Basis a contratar. Si algo del sitio difiere del contrato firmado, prevalece el contrato."
+                }
+              },
+              {
+                "id": "paragraph-12",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "t-8a65a8",
+                  "c-3bcd26",
+                  "mg-cd2ce9"
+                ],
+                "content": {
+                  "text": "2.3. Información referencial. Las medidas, materiales, plazos de instalación, certificaciones, garantías, permisos y demás información técnica o comercial que aparece en el sitio (incluidas las Preguntas Frecuentes) es general y referencial. Las condiciones aplicables a su caso —por ejemplo, la garantía y sus exclusiones, lo que incluye el servicio de arriendo o los plazos de instalación— son las que consten en la cotización y en el contrato. Los requisitos de permisos municipales o autorizaciones sanitarias dependen de cada comuna y de cada proyecto, y pueden cambiar: verifíquelos con la autoridad correspondiente."
+                }
+              },
+              {
+                "id": "paragraph-13",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "t-8a65a8",
+                  "c-3bcd26",
+                  "mg-cd2ce9"
+                ],
+                "content": {
+                  "text": "2.4. Destinatarios. El sitio está dirigido principalmente a empresas y a personas mayores de edad. Si usted contrata como consumidor final, le siguen aplicando los derechos que la Ley N° 19.496 sobre protección de los derechos de los consumidores le reconoce, que no se pueden renunciar y que nada de este documento limita."
+                }
+              },
+              {
+                "id": "heading-14",
+                "kind": "heading",
+                "ruleIds": [
+                  "t-4465e6",
+                  "c-458e22",
+                  "mg-1d770c"
+                ],
+                "content": {
+                  "text": "3. Uso del sitio",
+                  "level": 2
+                }
+              },
+              {
+                "id": "paragraph-15",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "t-8a65a8",
+                  "c-3bcd26",
+                  "mg-cd2ce9"
+                ],
+                "content": {
+                  "text": "Usted puede navegar el sitio y usar sus formularios y canales de contacto para fines lícitos. No puede:"
+                }
+              },
+              {
+                "id": "list-16",
+                "kind": "list",
+                "ruleIds": [
+                  "t-8a65a8",
+                  "c-3bcd26",
+                  "mg-cd2ce9",
+                  "lista-42a9d4"
+                ],
+                "content": {
+                  "ordered": false,
+                  "items": [
+                    "usar el sitio para fines ilegales, engañosos o que dañen a Basis o a terceros;",
+                    "intentar acceder sin autorización a sistemas o datos del sitio, alterarlo, sobrecargarlo o introducir código malicioso (conductas que la Ley N° 21.459 sobre delitos informáticos sanciona);",
+                    "enviar información falsa, suplantar a otra persona o enviar datos personales de terceros sin que ellos lo hayan autorizado;",
+                    "enviar por los formularios datos sensibles (salud, origen racial, creencias, situación socioeconómica u otros) ni información que no sea necesaria para su consulta;",
+                    "copiar el sitio de forma masiva ni usarlo para envíos no solicitados."
+                  ]
+                }
+              },
+              {
+                "id": "paragraph-17",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "t-8a65a8",
+                  "c-3bcd26",
+                  "mg-cd2ce9"
+                ],
+                "content": {
+                  "text": "Basis puede bloquear el acceso a quien incumpla estas reglas. El sitio no tiene cuentas de usuario."
+                }
+              },
+              {
+                "id": "heading-18",
+                "kind": "heading",
+                "ruleIds": [
+                  "t-4465e6",
+                  "c-458e22",
+                  "mg-1d770c"
+                ],
+                "content": {
+                  "text": "4. Propiedad intelectual",
+                  "level": 2
+                }
+              },
+              {
+                "id": "paragraph-19",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "t-8a65a8",
+                  "c-3bcd26",
+                  "mg-cd2ce9"
+                ],
+                "content": {
+                  "text": "Los textos, fotografías, imágenes, planos, diseños, logotipos, marcas y demás contenidos del sitio, así como su estructura y diseño, pertenecen a Inmobiliaria Basis SpA o a terceros que autorizaron su uso, y están protegidos por la Ley N° 17.336 sobre propiedad intelectual y la Ley N° 19.039 sobre propiedad industrial [PENDIENTE: confirmar titularidad y registro de la marca BASIS ante INAPI — P9]."
+                }
+              },
+              {
+                "id": "paragraph-20",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "t-8a65a8",
+                  "c-3bcd26",
+                  "mg-cd2ce9"
+                ],
+                "content": {
+                  "text": "Usted puede verlos y compartir el enlace al sitio. No puede copiarlos, reproducirlos, modificarlos ni usarlos con fines comerciales sin autorización escrita previa de Basis. Usar el sitio no le otorga ninguna licencia sobre ellos."
+                }
+              },
+              {
+                "id": "heading-21",
+                "kind": "heading",
+                "ruleIds": [
+                  "t-4465e6",
+                  "c-458e22",
+                  "mg-1d770c"
+                ],
+                "content": {
+                  "text": "5. Enlaces y servicios de terceros",
+                  "level": 2
+                }
+              },
+              {
+                "id": "paragraph-22",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "t-8a65a8",
+                  "c-3bcd26",
+                  "mg-cd2ce9"
+                ],
+                "content": {
+                  "text": "El sitio contiene enlaces o botones hacia servicios de terceros (por ejemplo, WhatsApp, o el sitio de Econut, empresa que diseñó y desarrolló el sitio). Al usarlos usted se rige por los términos y la política de privacidad de ese tercero. Basis no controla esos servicios ni responde por su contenido."
+                }
+              },
+              {
+                "id": "heading-23",
+                "kind": "heading",
+                "ruleIds": [
+                  "t-4465e6",
+                  "c-458e22",
+                  "mg-1d770c"
+                ],
+                "content": {
+                  "text": "6. Datos personales",
+                  "level": 2
+                }
+              },
+              {
+                "id": "paragraph-24",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "t-8a65a8",
+                  "c-3bcd26",
+                  "mg-cd2ce9"
+                ],
+                "content": {
+                  "text": "Esta sección es nuestra política de privacidad. Se rige por la Ley N° 19.628 sobre protección de la vida privada y por la Ley N° 21.719, que la reemplaza y regula la protección de los datos personales a contar del 1 de diciembre de 2026."
+                }
+              },
+              {
+                "id": "heading-25",
+                "kind": "heading",
+                "ruleIds": [
+                  "t-ee5226",
+                  "c-458e22",
+                  "mg-b8788a"
+                ],
+                "content": {
+                  "text": "6.1. Qué datos recogemos",
+                  "level": 3
+                }
+              },
+              {
+                "id": "paragraph-26",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "t-8a65a8",
+                  "c-3bcd26",
+                  "mg-cd2ce9"
+                ],
+                "content": {
+                  "text": "Los que usted nos entrega, cuando completa el formulario de «Contactos & Cotizaciones»: nombre y apellidos, correo electrónico (se pide dos veces para evitar errores), teléfono (opcional), el mensaje que escriba (hasta 600 caracteres) y, si la marca, su aceptación de recibir novedades. Si en lugar del formulario nos escribe por WhatsApp, recibimos su número de teléfono, su nombre de perfil y lo que usted escriba."
+                }
+              },
+              {
+                "id": "paragraph-27",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "t-8a65a8",
+                  "c-3bcd26",
+                  "mg-cd2ce9"
+                ],
+                "content": {
+                  "text": "Los que se recogen automáticamente. Al enviar el formulario se guardan la fecha, la página de origen y datos técnicos de la conexión (dirección IP y tipo de navegador), que sirven para dar seguridad y evitar envíos automáticos. Si usted lo acepta en el banner de cookies, también se recogen datos de navegación: qué páginas visita, cuánto tiempo permanece, desde qué tipo de dispositivo y país accede y qué acciones realiza en el sitio (por ejemplo, abrir WhatsApp o enviar el formulario)."
+                }
+              },
+              {
+                "id": "paragraph-28",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "t-8a65a8",
+                  "c-3bcd26",
+                  "mg-cd2ce9"
+                ],
+                "content": {
+                  "text": "Aunque no acepte cookies, al cargar el mapa y las tipografías del sitio, sus proveedores (§6.4) reciben necesariamente su dirección IP y datos técnicos del navegador."
+                }
+              },
+              {
+                "id": "heading-29",
+                "kind": "heading",
+                "ruleIds": [
+                  "t-ee5226",
+                  "c-458e22",
+                  "mg-b8788a"
+                ],
+                "content": {
+                  "text": "6.2. No pedimos datos sensibles",
+                  "level": 3
+                }
+              },
+              {
+                "id": "paragraph-30",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "t-8a65a8",
+                  "c-3bcd26",
+                  "mg-cd2ce9"
+                ],
+                "content": {
+                  "text": "No necesitamos ni le pedimos datos sensibles. Le rogamos que no los incluya en el mensaje."
+                }
+              },
+              {
+                "id": "heading-31",
+                "kind": "heading",
+                "ruleIds": [
+                  "t-ee5226",
+                  "c-458e22",
+                  "mg-b8788a"
+                ],
+                "content": {
+                  "text": "6.3. Para qué los usamos, con qué base legal y por cuánto tiempo",
+                  "level": 3
+                }
+              },
+              {
+                "id": "table-32",
+                "kind": "table",
+                "ruleIds": [
+                  "t-66f881",
+                  "c-3bcd26",
+                  "tabla-18f09d"
+                ],
+                "content": {
+                  "headers": [
+                    "Finalidad",
+                    "Datos",
+                    "Base de licitud",
+                    "Cuánto los conservamos"
+                  ],
+                  "rows": [
+                    [
+                      "Responder su consulta y preparar una cotización",
+                      "Nombre, apellidos, correo, teléfono, mensaje",
+                      "Medidas precontractuales adoptadas a solicitud suya; interés legítimo de Basis en atender consultas comerciales",
+                      "[PENDIENTE: confirmar — P6] Propuesta: hasta 24 meses desde el último contacto si no se contrata; luego se suprimen o anonimizan"
+                    ],
+                    [
+                      "Celebrar y cumplir el contrato de arriendo, venta o ACC, si se concreta",
+                      "Los del contrato",
+                      "Ejecución del contrato",
+                      "Mientras dure el contrato y después por los plazos legales de conservación (tributarios y de prescripción civil, hasta 6 años)"
+                    ],
+                    [
+                      "Enviarle novedades de Basis",
+                      "Nombre, correo",
+                      "Su consentimiento (la casilla del formulario, que viene desmarcada y es opcional)",
+                      "Hasta que lo retire"
+                    ],
+                    [
+                      "Medir cómo se usa el sitio y mejorarlo",
+                      "Datos de navegación, cookies",
+                      "Su consentimiento (banner de cookies)",
+                      "Mientras duren las cookies (§7)"
+                    ],
+                    [
+                      "Medir y mejorar nuestra publicidad, incluida la que se le muestra después de visitar el sitio (remarketing)",
+                      "Datos de navegación, cookies, identificadores",
+                      "Su consentimiento (banner de cookies)",
+                      "Mientras duren las cookies (§7)"
+                    ],
+                    [
+                      "Mostrar el mapa y las tipografías del sitio",
+                      "Dirección IP y datos técnicos",
+                      "Interés legítimo de Basis en que el sitio funcione y se vea correctamente",
+                      "Los define cada proveedor (§6.4)"
+                    ],
+                    [
+                      "Seguridad del sitio y prevención de envíos automáticos o abusivos",
+                      "Dirección IP, datos técnicos",
+                      "Interés legítimo de Basis",
+                      "Mientras se conserve el envío al que están asociados"
+                    ],
+                    [
+                      "Cumplir obligaciones legales y defender derechos de Basis",
+                      "Los que correspondan",
+                      "Obligación legal; interés legítimo",
+                      "Plazos legales y de prescripción"
+                    ]
+                  ]
+                }
+              },
+              {
+                "id": "paragraph-33",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "t-8a65a8",
+                  "c-3bcd26",
+                  "mg-cd2ce9"
+                ],
+                "content": {
+                  "text": "Cuando la base es su consentimiento, puede retirarlo en cualquier momento, con la misma facilidad con que lo dio; retirarlo no afecta lo hecho antes. Para las novedades, escriba al correo del §6.7. Para las cookies, use «Preferencias de cookies» (§7)."
+                }
+              },
+              {
+                "id": "paragraph-34",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "t-8a65a8",
+                  "c-3bcd26",
+                  "mg-cd2ce9"
+                ],
+                "content": {
+                  "text": "No vendemos sus datos personales. No tomamos decisiones que le produzcan efectos jurídicos basadas únicamente en tratamiento automatizado. La publicidad segmentada que realizamos con Google y Meta se activa sólo si usted acepta las cookies de publicidad."
+                }
+              },
+              {
+                "id": "heading-35",
+                "kind": "heading",
+                "ruleIds": [
+                  "t-ee5226",
+                  "c-458e22",
+                  "mg-b8788a"
+                ],
+                "content": {
+                  "text": "6.4. Con quién los compartimos y transferencias al extranjero",
+                  "level": 3
+                }
+              },
+              {
+                "id": "paragraph-36",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "t-8a65a8",
+                  "c-3bcd26",
+                  "mg-cd2ce9"
+                ],
+                "content": {
+                  "text": "Sus datos pueden ser tratados por estos terceros, en su mayoría fuera de Chile:"
+                }
+              },
+              {
+                "id": "table-37",
+                "kind": "table",
+                "ruleIds": [
+                  "t-66f881",
+                  "c-3bcd26",
+                  "tabla-18f09d"
+                ],
+                "content": {
+                  "headers": [
+                    "Tercero",
+                    "Para qué",
+                    "País",
+                    "Qué recibe"
+                  ],
+                  "rows": [
+                    [
+                      "Google LLC (Tag Manager, Analytics, Ads)",
+                      "Medir el uso del sitio y medir y dirigir nuestra publicidad, incluido el remarketing",
+                      "Estados Unidos y otros países donde Google opera",
+                      "Identificadores en cookies, IP, datos de navegación; sólo si usted acepta las cookies"
+                    ],
+                    [
+                      "Google LLC (Fonts)",
+                      "Servir las tipografías del sitio",
+                      "Estados Unidos",
+                      "IP y datos técnicos del navegador"
+                    ],
+                    [
+                      "Meta Platforms, Inc. (Píxel de Meta)",
+                      "Medir y dirigir nuestra publicidad en Facebook e Instagram",
+                      "Estados Unidos",
+                      "Identificadores en cookies, IP, páginas visitadas; sólo si usted acepta las cookies"
+                    ],
+                    [
+                      "Meta / WhatsApp",
+                      "Atender su consulta si nos escribe por WhatsApp",
+                      "Estados Unidos",
+                      "Lo que usted envíe; opera bajo los términos de WhatsApp"
+                    ],
+                    [
+                      "Mapbox, Inc.",
+                      "Mostrar el mapa de ubicación",
+                      "Estados Unidos",
+                      "IP y datos técnicos del navegador"
+                    ],
+                    [
+                      "[PENDIENTE: proveedor de hosting y correo — P4, P5]",
+                      "Alojar el sitio, guardar los envíos del formulario y notificarlos",
+                      "[PENDIENTE]",
+                      "Los datos del formulario"
+                    ],
+                    [
+                      "Comercializadora Econut SpA, empresa del mismo grupo",
+                      "Diseño, desarrollo y mantención del sitio; puede acceder a los datos sólo para ello y por encargo de Basis [PENDIENTE: confirmar y formalizar el contrato de encargo — P7]",
+                      "Chile",
+                      "Acceso técnico al sitio"
+                    ]
+                  ]
+                }
+              },
+              {
+                "id": "paragraph-38",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "t-8a65a8",
+                  "c-3bcd26",
+                  "mg-cd2ce9"
+                ],
+                "content": {
+                  "text": "Basis no entrega sus datos a otras empresas con fines propios de ellas. [PENDIENTE: confirmar que los contactos no se comparten con Econut ni con otras sociedades del grupo para sus propias campañas — P7.]"
+                }
+              },
+              {
+                "id": "paragraph-39",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "t-8a65a8",
+                  "c-3bcd26",
+                  "mg-cd2ce9"
+                ],
+                "content": {
+                  "text": "Las transferencias a Estados Unidos se realizan al amparo de las condiciones contractuales de protección de datos que cada proveedor ofrece a sus clientes, y las de publicidad y medición sólo ocurren con su consentimiento. Si no lo desea, no acepte las cookies de medición y publicidad: podrá usar el sitio igual."
+                }
+              },
+              {
+                "id": "paragraph-40",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "t-8a65a8",
+                  "c-3bcd26",
+                  "mg-cd2ce9"
+                ],
+                "content": {
+                  "text": "Podemos además comunicar datos a autoridades u organismos cuando la ley lo exija."
+                }
+              },
+              {
+                "id": "heading-41",
+                "kind": "heading",
+                "ruleIds": [
+                  "t-ee5226",
+                  "c-458e22",
+                  "mg-b8788a"
+                ],
+                "content": {
+                  "text": "6.5. Seguridad",
+                  "level": 3
+                }
+              },
+              {
+                "id": "paragraph-42",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "t-8a65a8",
+                  "c-3bcd26",
+                  "mg-cd2ce9"
+                ],
+                "content": {
+                  "text": "Aplicamos medidas técnicas y organizativas razonables para proteger los datos: conexión cifrada (https), acceso restringido a los envíos del formulario y filtros contra envíos automáticos. Ningún sistema es infalible; si ocurriera una vulneración que afecte sus datos y la ley lo exija, la informaremos a usted y a la autoridad en los plazos legales."
+                }
+              },
+              {
+                "id": "heading-43",
+                "kind": "heading",
+                "ruleIds": [
+                  "t-ee5226",
+                  "c-458e22",
+                  "mg-b8788a"
+                ],
+                "content": {
+                  "text": "6.6. Sus derechos",
+                  "level": 3
+                }
+              },
+              {
+                "id": "paragraph-44",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "t-8a65a8",
+                  "c-3bcd26",
+                  "mg-cd2ce9"
+                ],
+                "content": {
+                  "text": "Usted puede, en cualquier momento y de forma gratuita:"
+                }
+              },
+              {
+                "id": "list-45",
+                "kind": "list",
+                "ruleIds": [
+                  "t-8a65a8",
+                  "c-3bcd26",
+                  "mg-cd2ce9",
+                  "lista-42a9d4"
+                ],
+                "content": {
+                  "ordered": false,
+                  "items": [
+                    "Acceso: saber si tratamos datos suyos y obtener copia de ellos, con la información sobre su origen, finalidades y destinatarios.",
+                    "Rectificación: corregir datos inexactos o incompletos.",
+                    "Supresión (antes llamada «cancelación»): pedir que los eliminemos cuando ya no sean necesarios, retire su consentimiento o el tratamiento sea ilícito, salvo que la ley nos obligue a conservarlos.",
+                    "Oposición: oponerse a un tratamiento determinado, en particular al marketing directo y a la elaboración de perfiles.",
+                    "Portabilidad: recibir los datos que nos entregó en un formato estructurado y de uso común, y pedir que se transmitan a otro responsable, cuando la ley lo permita.",
+                    "Bloqueo temporal: pedir que suspendamos el tratamiento mientras se resuelve una solicitud de rectificación, supresión u oposición.",
+                    "Retirar su consentimiento cuando el tratamiento se base en él.",
+                    "No ser objeto de decisiones basadas únicamente en un tratamiento automatizado que le produzcan efectos jurídicos o le afecten significativamente."
+                  ]
+                }
+              },
+              {
+                "id": "heading-46",
+                "kind": "heading",
+                "ruleIds": [
+                  "t-ee5226",
+                  "c-458e22",
+                  "mg-b8788a"
+                ],
+                "content": {
+                  "text": "6.7. Cómo ejercerlos y a quién reclamar",
+                  "level": 3
+                }
+              },
+              {
+                "id": "paragraph-47",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "t-8a65a8",
+                  "c-3bcd26",
+                  "mg-cd2ce9"
+                ],
+                "content": {
+                  "text": "Escriba a [PENDIENTE: correo para ejercer derechos — P1], a la atención de «Protección de datos» [PENDIENTE: persona o cargo que responde — P8], indicando su nombre, un medio para responderle, cuál derecho quiere ejercer y los datos o el tratamiento a que se refiere. Podremos pedirle información adicional sólo para verificar su identidad. Responderemos dentro de 30 días corridos desde que recibamos la solicitud, plazo que la ley permite prorrogar en casos justificados, avisándole el motivo. Si denegamos su solicitud, se lo comunicaremos por escrito con las razones."
+                }
+              },
+              {
+                "id": "paragraph-48",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "t-8a65a8",
+                  "c-3bcd26",
+                  "mg-cd2ce9"
+                ],
+                "content": {
+                  "text": "Si no queda conforme con la respuesta o no la recibe, puede reclamar ante la Agencia de Protección de Datos Personales y, hasta que esa Agencia esté en funciones, ante los tribunales de justicia conforme a la ley."
+                }
+              },
+              {
+                "id": "heading-49",
+                "kind": "heading",
+                "ruleIds": [
+                  "t-ee5226",
+                  "c-458e22",
+                  "mg-b8788a"
+                ],
+                "content": {
+                  "text": "6.8. Menores de edad",
+                  "level": 3
+                }
+              },
+              {
+                "id": "paragraph-50",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "t-8a65a8",
+                  "c-3bcd26",
+                  "mg-cd2ce9"
+                ],
+                "content": {
+                  "text": "El sitio no está dirigido a menores de edad y no recogemos datos de menores a sabiendas. Si cree que un menor nos entregó datos, escríbanos y los eliminaremos."
+                }
+              },
+              {
+                "id": "heading-51",
+                "kind": "heading",
+                "ruleIds": [
+                  "t-4465e6",
+                  "c-458e22",
+                  "mg-1d770c"
+                ],
+                "content": {
+                  "text": "7. Cookies",
+                  "level": 2
+                }
+              },
+              {
+                "id": "paragraph-52",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "t-8a65a8",
+                  "c-3bcd26",
+                  "mg-cd2ce9"
+                ],
+                "content": {
+                  "text": "El sitio usa cookies y tecnologías similares. Al ingresar verá un aviso donde puede aceptar, rechazar o configurar las cookies, y rechazar es tan fácil como aceptar. Mientras usted no acepte, no se cargan las cookies de medición ni de publicidad."
+                }
+              },
+              {
+                "id": "table-53",
+                "kind": "table",
+                "ruleIds": [
+                  "t-66f881",
+                  "c-3bcd26",
+                  "tabla-18f09d"
+                ],
+                "content": {
+                  "headers": [
+                    "Tipo",
+                    "Para qué",
+                    "Quién",
+                    "Duración aproximada"
+                  ],
+                  "rows": [
+                    [
+                      "Necesarias",
+                      "Recordar su decisión sobre cookies y mantener la seguridad del formulario. Siempre activas.",
+                      "Basis",
+                      "Hasta 12 meses"
+                    ],
+                    [
+                      "Medición",
+                      "Saber cómo se usa el sitio (_ga, _ga_*)",
+                      "Google Analytics",
+                      "Hasta 2 años"
+                    ],
+                    [
+                      "Publicidad",
+                      "Medir y dirigir nuestra publicidad, incluido el remarketing (_gcl_*, _fbp y similares)",
+                      "Google Ads, Meta",
+                      "Entre 90 días y 2 años, según la cookie"
+                    ]
+                  ]
+                }
+              },
+              {
+                "id": "paragraph-54",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "t-8a65a8",
+                  "c-3bcd26",
+                  "mg-cd2ce9"
+                ],
+                "content": {
+                  "text": "Las duraciones son aproximadas y las fija cada proveedor; la lista completa y actualizada está en la ventana de preferencias del aviso."
+                }
+              },
+              {
+                "id": "paragraph-55",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "t-8a65a8",
+                  "c-3bcd26",
+                  "mg-cd2ce9"
+                ],
+                "content": {
+                  "text": "Puede cambiar o retirar su decisión cuando quiera desde «Preferencias de cookies», en el pie de cualquier página. También puede borrar o bloquear las cookies desde la configuración de su navegador."
+                }
+              },
+              {
+                "id": "heading-56",
+                "kind": "heading",
+                "ruleIds": [
+                  "t-4465e6",
+                  "c-458e22",
+                  "mg-1d770c"
+                ],
+                "content": {
+                  "text": "8. Limitación de responsabilidad",
+                  "level": 2
+                }
+              },
+              {
+                "id": "paragraph-57",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "t-8a65a8",
+                  "c-3bcd26",
+                  "mg-cd2ce9"
+                ],
+                "content": {
+                  "text": "Hacemos lo posible por mantener el sitio disponible y su información al día, pero se entrega «tal cual». En la medida que la ley lo permita, Basis no responde por:"
+                }
+              },
+              {
+                "id": "list-58",
+                "kind": "list",
+                "ruleIds": [
+                  "t-8a65a8",
+                  "c-3bcd26",
+                  "mg-cd2ce9",
+                  "lista-42a9d4"
+                ],
+                "content": {
+                  "ordered": false,
+                  "items": [
+                    "interrupciones, errores o fallas del sitio o de servicios de terceros que no controla (hosting, mapas, WhatsApp, redes de comunicación);",
+                    "decisiones que usted tome basándose sólo en la información referencial del sitio, sin una cotización ni un contrato;",
+                    "daños indirectos o lucro cesante derivados del uso del sitio;",
+                    "el contenido o las prácticas de los sitios y servicios de terceros enlazados."
+                  ]
+                }
+              },
+              {
+                "id": "paragraph-59",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "t-8a65a8",
+                  "c-3bcd26",
+                  "mg-cd2ce9"
+                ],
+                "content": {
+                  "text": "Esta limitación no se aplica a los daños causados por dolo o culpa grave de Basis, ni afecta los derechos irrenunciables que la ley otorgue a los consumidores, ni las responsabilidades que se fijen en un contrato firmado."
+                }
+              },
+              {
+                "id": "heading-60",
+                "kind": "heading",
+                "ruleIds": [
+                  "t-4465e6",
+                  "c-458e22",
+                  "mg-1d770c"
+                ],
+                "content": {
+                  "text": "9. Ley aplicable y jurisdicción",
+                  "level": 2
+                }
+              },
+              {
+                "id": "paragraph-61",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "t-8a65a8",
+                  "c-3bcd26",
+                  "mg-cd2ce9"
+                ],
+                "content": {
+                  "text": "Este documento se rige por las leyes de la República de Chile. Cualquier controversia relacionada con el uso del sitio se someterá a los tribunales ordinarios de justicia de Santiago, sin perjuicio de las reglas de competencia que la ley establezca en favor de los consumidores. Los contratos de arriendo o venta tendrán la ley y el tribunal que ellos mismos establezcan."
+                }
+              },
+              {
+                "id": "heading-62",
+                "kind": "heading",
+                "ruleIds": [
+                  "t-4465e6",
+                  "c-458e22",
+                  "mg-1d770c"
+                ],
+                "content": {
+                  "text": "10. Cambios a este documento",
+                  "level": 2
+                }
+              },
+              {
+                "id": "paragraph-63",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "t-8a65a8",
+                  "c-3bcd26",
+                  "mg-cd2ce9"
+                ],
+                "content": {
+                  "text": "Podemos modificar este documento, por ejemplo por cambios legales o del sitio. Publicaremos la versión nueva en esta página con su fecha. Si el cambio afecta cómo tratamos sus datos de forma importante, se lo avisaremos de manera visible en el sitio y, cuando la ley lo exija, pediremos de nuevo su consentimiento."
+                }
+              },
+              {
+                "id": "heading-64",
+                "kind": "heading",
+                "ruleIds": [
+                  "t-4465e6",
+                  "c-458e22",
+                  "mg-1d770c"
+                ],
+                "content": {
+                  "text": "11. Contacto y vigencia",
+                  "level": 2
+                }
+              },
+              {
+                "id": "paragraph-65",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "t-8a65a8",
+                  "c-3bcd26",
+                  "mg-cd2ce9"
+                ],
+                "content": {
+                  "text": "Inmobiliaria Basis SpA · RUT 76.933.998-1 · Av. 18 de Septiembre S/N, Hijuela 2, Fundo San Rafael, Sector Nuevo Sendero, Paine, Región Metropolitana · [PENDIENTE: correo de contacto — P1] · WhatsApp +56 9 9799 5132."
+                }
+              },
+              {
+                "id": "paragraph-66",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "t-8a65a8",
+                  "c-3bcd26",
+                  "mg-cd2ce9"
+                ],
+                "content": {
+                  "text": "Vigente desde: [PENDIENTE: fecha de publicación — P3]. Última actualización: [PENDIENTE: fecha — P3]."
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

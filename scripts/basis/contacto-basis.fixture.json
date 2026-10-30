@@ -1,0 +1,111 @@
+{
+  "name": "Contacto Basis",
+  "_formMetadata": {
+    "sinTitulo": true,
+    "botonEnviar": "Enviar mensaje",
+    "thankYou": {
+      "title": "¡Gracias por escribirnos!",
+      "body": "Recibimos tu mensaje. Te responderemos a la brevedad."
+    },
+    "notificaciones": {
+      "activo": false,
+      "para": "PENDIENTE-DESTINO@basis.invalid",
+      "asunto": "Contacto web · {{campo:nombre}} {{campo:apellidos}}",
+      "reglas": []
+    }
+  },
+  "items": [
+    {
+      "type": "GridSection",
+      "id": "fila_nombre",
+      "items": [
+        {
+          "type": "texto",
+          "id": "nombre",
+          "label": "Nombre",
+          "obligatorio": true,
+          "registrarEnDb": true,
+          "autocompletar": "given-name",
+          "layoutClasses": [
+            "col-6"
+          ]
+        },
+        {
+          "type": "texto",
+          "id": "apellidos",
+          "label": "Apellidos",
+          "obligatorio": true,
+          "registrarEnDb": true,
+          "autocompletar": "family-name",
+          "layoutClasses": [
+            "col-6"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "GridSection",
+      "id": "fila_correo",
+      "items": [
+        {
+          "type": "texto",
+          "id": "correo",
+          "label": "Ingrese su email",
+          "obligatorio": true,
+          "registrarEnDb": true,
+          "tipoEntrada": "email",
+          "autocompletar": "email",
+          "layoutClasses": [
+            "col-6"
+          ]
+        },
+        {
+          "type": "texto",
+          "id": "correo_repite",
+          "label": "Repita su email",
+          "obligatorio": true,
+          "registrarEnDb": false,
+          "tipoEntrada": "email",
+          "autocompletar": "email",
+          "confirmarCon": "correo",
+          "confirmarMensaje": "Los correos no coinciden.",
+          "layoutClasses": [
+            "col-6"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "texto",
+      "id": "telefono",
+      "label": "Teléfono",
+      "obligatorio": false,
+      "registrarEnDb": true,
+      "tipoEntrada": "tel",
+      "autocompletar": "tel"
+    },
+    {
+      "type": "boolean_check",
+      "id": "consentimiento_de_agregacion",
+      "label": "Consentimiento de agregación",
+      "obligatorio": false,
+      "registrarEnDb": true,
+      "opciones": [
+        {
+          "value": "si",
+          "label": "Acepto ser agregado en una lista de contactos y recibir novedades de Basis."
+        }
+      ]
+    },
+    {
+      "type": "texto-largo",
+      "id": "mensaje",
+      "label": "Mensaje",
+      "obligatorio": true,
+      "registrarEnDb": true,
+      "rows": 5,
+      "maxLength": 600,
+      "ayuda": "Cuéntanos en qué podemos ayudarte. ¿Tienes alguna consulta o sugerencia? Estamos aquí para escucharte."
+    }
+  ]
+}

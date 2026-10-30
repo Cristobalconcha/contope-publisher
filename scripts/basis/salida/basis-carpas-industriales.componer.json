@@ -1,0 +1,173 @@
+{
+  "titulo": "Basis carpas industriales",
+  "slug": "basis-carpas-industriales",
+  "design": {
+    "schemaVersion": 1,
+    "designId": "basis-web",
+    "expectedDesignRevision": 2,
+    "reviewState": "session",
+    "rules": [
+      {
+        "id": "mg-a343db",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "margin-block-start": "0px",
+            "margin-block-end": "0px"
+          }
+        }
+      },
+      {
+        "id": "t-4f2435",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "t-open-sans-30-500",
+          "family": "'Open Sans', sans-serif",
+          "fontSize": "30px",
+          "fontWeight": 500,
+          "lineHeight": 1,
+          "align": "start"
+        }
+      },
+      {
+        "id": "c-c1089a",
+        "kind": "color",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "c-333333",
+          "color": "#333333",
+          "apply": "text"
+        }
+      },
+      {
+        "id": "sec-61dd3a",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "padding-top": "58px",
+            "padding-bottom": "58px",
+            "padding-left": "0px",
+            "padding-right": "0px"
+          }
+        }
+      },
+      {
+        "id": "fila-26b651",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "width": "80%",
+            "max-width": "1080px",
+            "margin-inline-start": "auto",
+            "margin-inline-end": "auto"
+          }
+        }
+      }
+    ]
+  },
+  "composition": {
+    "schemaVersion": 2,
+    "nodes": [
+      {
+        "id": "section-25",
+        "kind": "section",
+        "ruleIds": [
+          "sec-61dd3a"
+        ],
+        "children": [
+          {
+            "id": "group-24",
+            "kind": "group",
+            "ruleIds": [
+              "fila-26b651"
+            ],
+            "children": [
+              {
+                "id": "heading-23",
+                "kind": "heading",
+                "ruleIds": [
+                  "t-4f2435",
+                  "c-c1089a",
+                  "mg-a343db"
+                ],
+                "content": {
+                  "text": "BASIS: Carpas Industriales",
+                  "level": 1
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

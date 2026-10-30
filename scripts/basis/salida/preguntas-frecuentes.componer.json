@@ -1,0 +1,1943 @@
+{
+  "titulo": "Preguntas frecuentes",
+  "slug": "preguntas-frecuentes",
+  "design": {
+    "schemaVersion": 1,
+    "designId": "basis-web",
+    "expectedDesignRevision": 2,
+    "reviewState": "session",
+    "rules": [
+      {
+        "id": "s-f1871f",
+        "kind": "surface",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "backgroundColor": "#898989"
+        }
+      },
+      {
+        "id": "col-542b47",
+        "kind": "layout",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "mode": "stack",
+          "gap": "0px",
+          "align": "stretch"
+        }
+      },
+      {
+        "id": "cl-04ba3c",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "padding-top": "0px",
+            "padding-right": "0px",
+            "padding-bottom": "0px",
+            "padding-left": "0px",
+            "min-width": "0px"
+          }
+        }
+      },
+      {
+        "id": "mg-a343db",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "margin-block-start": "0px",
+            "margin-block-end": "0px"
+          }
+        }
+      },
+      {
+        "id": "c-4737c4",
+        "kind": "color",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "c-ffffff",
+          "color": "#FFFFFF",
+          "apply": "text"
+        }
+      },
+      {
+        "id": "sec-79ee4b",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "padding-top": "54px",
+            "padding-bottom": "54px",
+            "padding-left": "0px",
+            "padding-right": "0px"
+          }
+        }
+      },
+      {
+        "id": "c-3bcd26",
+        "kind": "color",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "c-666666",
+          "color": "#666666",
+          "apply": "text"
+        }
+      },
+      {
+        "id": "mg-9b6f57",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "margin-block-start": "0px",
+            "margin-block-end": "10px"
+          }
+        }
+      },
+      {
+        "id": "fila-1c9785",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "width": "80%",
+            "max-width": "1080px",
+            "margin-inline-start": "auto",
+            "margin-inline-end": "auto",
+            "padding-top": "27px",
+            "padding-right": "0px",
+            "padding-bottom": "27px",
+            "padding-left": "0px",
+            "margin-block-start": "0px",
+            "margin-block-end": "0px"
+          }
+        }
+      },
+      {
+        "id": "fila-38f316",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "padding-top": "30px",
+            "padding-bottom": "30px"
+          }
+        }
+      },
+      {
+        "id": "div-d2e648",
+        "kind": "divisor",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "forma": "/wp-content/uploads/divisores/divisor-7ee5846d.svg",
+          "donde": "abajo",
+          "alto": "2.5vw",
+          "color": "#636363"
+        }
+      },
+      {
+        "id": "sec-afdf10",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "padding-top": "0px",
+            "padding-bottom": "57.6px",
+            "padding-left": "0px",
+            "padding-right": "0px"
+          }
+        }
+      },
+      {
+        "id": "sec-7feaf1",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "padding-bottom": "50px"
+          }
+        }
+      },
+      {
+        "id": "t-daab63",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "t-montserrat-50-300",
+          "family": "'Montserrat', sans-serif",
+          "fontSize": "50px",
+          "fontWeight": 300,
+          "lineHeight": 1.4,
+          "align": "center"
+        }
+      },
+      {
+        "id": "t-fa4799",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "t-montserrat-50-300",
+          "fontSize": "32px"
+        }
+      },
+      {
+        "id": "t-d728a4",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "t-open-sans-18-500",
+          "family": "'Open Sans', sans-serif",
+          "fontSize": "18px",
+          "fontWeight": 500,
+          "lineHeight": 2,
+          "align": "center"
+        }
+      },
+      {
+        "id": "anch-db926e",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "max-width": "700px",
+            "margin-inline-start": "auto",
+            "margin-inline-end": "auto"
+          }
+        }
+      },
+      {
+        "id": "anch-0f7be2",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "max-width": "none"
+          }
+        }
+      },
+      {
+        "id": "s-ce07c1",
+        "kind": "surface",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "backgroundColor": "#636363"
+        }
+      },
+      {
+        "id": "fila-ac16e0",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "width": "80%",
+            "max-width": "1080px",
+            "margin-inline-start": "auto",
+            "margin-inline-end": "auto",
+            "padding-top": "27px",
+            "padding-right": "0px",
+            "padding-bottom": "27px",
+            "padding-left": "0px",
+            "margin-block-start": "0px",
+            "margin-block-end": "0px",
+            "display": "grid",
+            "grid-template-columns": "minmax(0, 510fr) minmax(0, 510fr)",
+            "column-gap": "59.39px",
+            "align-items": "start"
+          }
+        }
+      },
+      {
+        "id": "fila-202feb",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "padding-top": "30px",
+            "padding-bottom": "30px",
+            "grid-template-columns": "minmax(0, 1fr)",
+            "column-gap": "0px",
+            "row-gap": "29px"
+          }
+        }
+      },
+      {
+        "id": "t-e1f729",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "t-montserrat-22-500",
+          "family": "'Montserrat', sans-serif",
+          "fontSize": "22px",
+          "fontWeight": 500,
+          "lineHeight": 1.4,
+          "align": "start"
+        }
+      },
+      {
+        "id": "mg-379041",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "margin-block-start": "0px",
+            "margin-block-end": "29px"
+          }
+        }
+      },
+      {
+        "id": "t-7d64ba",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "t-open-sans-14-500",
+          "family": "'Open Sans', sans-serif",
+          "fontSize": "14px",
+          "fontWeight": 500,
+          "lineHeight": 1.7,
+          "align": "start"
+        }
+      },
+      {
+        "id": "mg-6596e3",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "margin-block-start": "0px",
+            "margin-block-end": "12px"
+          }
+        }
+      },
+      {
+        "id": "lista-e12066",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "padding-inline-start": "1em"
+          }
+        }
+      },
+      {
+        "id": "plg-3077cc",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "padding-top": "0px",
+            "padding-right": "0px",
+            "padding-bottom": "0px",
+            "padding-left": "0px"
+          }
+        }
+      },
+      {
+        "id": "plg-r-f720e0",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "width": "100%",
+            "padding-top": "0px",
+            "padding-right": "40px",
+            "padding-bottom": "0px",
+            "padding-left": "0px",
+            "text-align": "start",
+            "background-color": "transparent",
+            "border-width": "0px",
+            "cursor": "pointer"
+          }
+        }
+      },
+      {
+        "id": "t-546a1b",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "t-montserrat-18-500",
+          "family": "'Montserrat', sans-serif",
+          "fontSize": "18px",
+          "fontWeight": 500,
+          "lineHeight": 1.4,
+          "align": "start"
+        }
+      },
+      {
+        "id": "plg-p-ab00da",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "padding-top": "20px"
+          }
+        }
+      },
+      {
+        "id": "c-a-06855b",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "current"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "color": "#333333"
+          }
+        }
+      },
+      {
+        "id": "acordeon-b232cb",
+        "kind": "interaction",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "behavior": "acordeon",
+          "openNodeId": "group-20"
+        }
+      },
+      {
+        "id": "pila-10a194",
+        "kind": "layout",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "mode": "stack",
+          "gap": "30px",
+          "align": "stretch"
+        }
+      },
+      {
+        "id": "mg-89f683",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "margin-block-end": "1px"
+          }
+        }
+      },
+      {
+        "id": "mg-50f1b0",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "margin-block-end": "30px"
+          }
+        }
+      },
+      {
+        "id": "img-192d0d",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "width": "100px",
+            "max-width": "100%",
+            "display": "block",
+            "margin-inline-start": "auto",
+            "margin-inline-end": "auto"
+          }
+        }
+      },
+      {
+        "id": "enl-c8a933",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "display": "block"
+          }
+        }
+      },
+      {
+        "id": "img-6ee097",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "width": "0px",
+            "max-width": "100%",
+            "display": "block",
+            "margin-inline-start": "auto",
+            "margin-inline-end": "auto"
+          }
+        }
+      },
+      {
+        "id": "acordeon-c6b48b",
+        "kind": "interaction",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "behavior": "acordeon",
+          "openNodeId": "group-61"
+        }
+      },
+      {
+        "id": "mg-b06d27",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "margin-block-start": "0px",
+            "margin-block-end": "68px"
+          }
+        }
+      },
+      {
+        "id": "mg-05b575",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "margin-block-start": "0px",
+            "margin-block-end": "-1px"
+          }
+        }
+      },
+      {
+        "id": "acordeon-5b5cf1",
+        "kind": "interaction",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "behavior": "acordeon"
+        }
+      }
+    ]
+  },
+  "composition": {
+    "schemaVersion": 2,
+    "nodes": [
+      {
+        "id": "section-16",
+        "kind": "section",
+        "ruleIds": [
+          "div-d2e648",
+          "sec-afdf10",
+          "sec-7feaf1",
+          "s-f1871f"
+        ],
+        "children": [
+          {
+            "id": "group-15",
+            "kind": "group",
+            "ruleIds": [
+              "fila-1c9785",
+              "fila-38f316"
+            ],
+            "children": [
+              {
+                "id": "group-14",
+                "kind": "group",
+                "ruleIds": [
+                  "col-542b47",
+                  "cl-04ba3c"
+                ],
+                "children": [
+                  {
+                    "id": "heading-12",
+                    "kind": "heading",
+                    "ruleIds": [
+                      "t-daab63",
+                      "t-fa4799",
+                      "c-4737c4",
+                      "mg-9b6f57",
+                      "anch-db926e",
+                      "anch-0f7be2"
+                    ],
+                    "content": {
+                      "text": "Preguntas Frecuentes",
+                      "level": 1
+                    }
+                  },
+                  {
+                    "id": "paragraph-13",
+                    "kind": "paragraph",
+                    "ruleIds": [
+                      "t-d728a4",
+                      "c-4737c4",
+                      "mg-a343db",
+                      "anch-db926e",
+                      "anch-0f7be2"
+                    ],
+                    "content": {
+                      "text": "Todo lo que necesitas saber."
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "section-91",
+        "kind": "section",
+        "ruleIds": [
+          "sec-79ee4b",
+          "s-ce07c1"
+        ],
+        "children": [
+          {
+            "id": "group-90",
+            "kind": "group",
+            "ruleIds": [
+              "fila-ac16e0",
+              "fila-202feb"
+            ],
+            "children": [
+              {
+                "id": "group-55",
+                "kind": "group",
+                "ruleIds": [
+                  "col-542b47",
+                  "cl-04ba3c"
+                ],
+                "children": [
+                  {
+                    "id": "heading-17",
+                    "kind": "heading",
+                    "ruleIds": [
+                      "t-e1f729",
+                      "c-4737c4",
+                      "mg-379041"
+                    ],
+                    "content": {
+                      "text": "Bodegas Industriales flexibles – Venta y Arriendo",
+                      "level": 3
+                    }
+                  },
+                  {
+                    "id": "group-54",
+                    "kind": "group",
+                    "ruleIds": [
+                      "acordeon-b232cb",
+                      "pila-10a194",
+                      "mg-a343db",
+                      "mg-89f683"
+                    ],
+                    "children": [
+                      {
+                        "id": "group-20",
+                        "kind": "group",
+                        "ruleIds": [],
+                        "children": [
+                          {
+                            "id": "paragraph-18",
+                            "kind": "paragraph",
+                            "ruleIds": [
+                              "mg-a343db"
+                            ],
+                            "content": {
+                              "text": "¿Qué tipo de naves industriales ofrecen?"
+                            }
+                          },
+                          {
+                            "id": "paragraph-19",
+                            "kind": "paragraph",
+                            "ruleIds": [
+                              "t-7d64ba",
+                              "c-3bcd26",
+                              "mg-a343db"
+                            ],
+                            "content": {
+                              "text": "Ofrecemos bodegas modulares con cobertura flexible, tipo galpón, hangar y otros, todas diseñadas para uso industrial y logístico. Contamos con modelos fijos, desmontables y personalizables."
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "id": "group-23",
+                        "kind": "group",
+                        "ruleIds": [],
+                        "children": [
+                          {
+                            "id": "paragraph-21",
+                            "kind": "paragraph",
+                            "ruleIds": [
+                              "mg-a343db"
+                            ],
+                            "content": {
+                              "text": "¿Las carpas pueden ser arrendadas o solo las venden?"
+                            }
+                          },
+                          {
+                            "id": "paragraph-22",
+                            "kind": "paragraph",
+                            "ruleIds": [
+                              "t-7d64ba",
+                              "c-3bcd26",
+                              "mg-a343db"
+                            ],
+                            "content": {
+                              "text": "Disponemos de ambas modalidades: arriendo a corto o largo plazo y venta directa. También ofrecemos opción de arriendo con opción de compra."
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "id": "group-26",
+                        "kind": "group",
+                        "ruleIds": [],
+                        "children": [
+                          {
+                            "id": "paragraph-24",
+                            "kind": "paragraph",
+                            "ruleIds": [
+                              "mg-a343db"
+                            ],
+                            "content": {
+                              "text": "¿Qué tamaños están disponibles?"
+                            }
+                          },
+                          {
+                            "id": "paragraph-25",
+                            "kind": "paragraph",
+                            "ruleIds": [
+                              "t-7d64ba",
+                              "c-3bcd26",
+                              "mg-a343db"
+                            ],
+                            "content": {
+                              "text": "Las medidas más comunes para uso agroindustrial son de 20 metros de ancho y 5 metros de alto de hombro. No obstante, los anchos de las naves pueden ir desde los 10 metros y hasta los 40 metros de ancho, alto al hombro de 4 a 7 metros y el largo variable, en múltiplos de cinco metros, debido a la separación estándar entre cerchas. Nuestro tamaño mínimo de venta o arriendo es de 6 cerchas (incluyendo frontones), lo que a ancho estándar de 20 metros equivale a una superficie de 500m2."
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "id": "group-29",
+                        "kind": "group",
+                        "ruleIds": [],
+                        "children": [
+                          {
+                            "id": "paragraph-27",
+                            "kind": "paragraph",
+                            "ruleIds": [
+                              "mg-a343db"
+                            ],
+                            "content": {
+                              "text": "¿Cuánto tiempo toma la instalación?"
+                            }
+                          },
+                          {
+                            "id": "paragraph-28",
+                            "kind": "paragraph",
+                            "ruleIds": [
+                              "t-7d64ba",
+                              "c-3bcd26",
+                              "mg-a343db"
+                            ],
+                            "content": {
+                              "text": "Dependiendo del tamaño y condiciones del terreno, la instalación puede tomar desde 2 días cada 500m2. Coordinamos previamente con el cliente para optimizar tiempos. Cabe destacar que el personal de instalación está plenamente calificado y certificado para las labores y todas las maquinarias para esta faena estàn incluidas en el servicio."
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "id": "group-32",
+                        "kind": "group",
+                        "ruleIds": [],
+                        "children": [
+                          {
+                            "id": "paragraph-30",
+                            "kind": "paragraph",
+                            "ruleIds": [
+                              "mg-a343db"
+                            ],
+                            "content": {
+                              "text": "¿Qué tipo de naves industriales ofrecen?"
+                            }
+                          },
+                          {
+                            "id": "paragraph-31",
+                            "kind": "paragraph",
+                            "ruleIds": [
+                              "t-7d64ba",
+                              "c-3bcd26",
+                              "mg-a343db"
+                            ],
+                            "content": {
+                              "text": "Ofrecemos bodegas modulares con cobertura flexible, tipo galpón, hangar y otros, todas diseñadas para uso industrial y logístico. Contamos con modelos fijos, desmontables y personalizables."
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "id": "group-35",
+                        "kind": "group",
+                        "ruleIds": [],
+                        "children": [
+                          {
+                            "id": "paragraph-33",
+                            "kind": "paragraph",
+                            "ruleIds": [
+                              "mg-a343db"
+                            ],
+                            "content": {
+                              "text": "¿Se necesita permiso municipal para instalar una carpa industrial?"
+                            }
+                          },
+                          {
+                            "id": "paragraph-34",
+                            "kind": "paragraph",
+                            "ruleIds": [
+                              "t-7d64ba",
+                              "c-3bcd26",
+                              "mg-a343db"
+                            ],
+                            "content": {
+                              "text": "En general, No se requiere permiso municipal, para la instalación de estas bodegas pues se entiende que tienen carácter provisorio y no cuentan con cimientos. No obstante esta normativa puede cambiar o hacerse específica en cada municipio. La ventaja es que, en caso de ser así, usted puede desinstalar estas naves y trasladarla. Respecto autorización sanitaria, los materiales estructurales y coberturas (todos lavables, más herméticos y con menores niveles de condensación que los galpones de cubiertas galvanizadas) cumplen plenamente para obtener resolución favorable de la autoridad respectiva. No obstante el usuario debe agregar elementos adicionales simples para el sello perimetral. Asesoramos a nuestros clientes en este proceso."
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "id": "group-39",
+                        "kind": "group",
+                        "ruleIds": [],
+                        "children": [
+                          {
+                            "id": "paragraph-36",
+                            "kind": "paragraph",
+                            "ruleIds": [
+                              "mg-a343db"
+                            ],
+                            "content": {
+                              "text": "¿Qué incluye el servicio de arriendo?"
+                            }
+                          },
+                          {
+                            "id": "paragraph-37",
+                            "kind": "paragraph",
+                            "ruleIds": [
+                              "t-7d64ba",
+                              "c-3bcd26",
+                              "mg-6596e3"
+                            ],
+                            "content": {
+                              "text": "El arriendo incluye:"
+                            }
+                          },
+                          {
+                            "id": "list-38",
+                            "kind": "list",
+                            "ruleIds": [
+                              "t-7d64ba",
+                              "c-3bcd26",
+                              "lista-e12066",
+                              "mg-a343db"
+                            ],
+                            "content": {
+                              "ordered": false,
+                              "items": [
+                                "Instalación y desinstalación",
+                                "Mantenimiento durante el período de uso",
+                                "Extintores",
+                                "Opcional:\n\npisos,\niluminación,\nportones sólidos y flexibles,\nanclaje reforzado y cierres perimetrales"
+                              ]
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "id": "group-42",
+                        "kind": "group",
+                        "ruleIds": [],
+                        "children": [
+                          {
+                            "id": "paragraph-40",
+                            "kind": "paragraph",
+                            "ruleIds": [
+                              "mg-a343db"
+                            ],
+                            "content": {
+                              "text": "¿Ofrecen transporte?"
+                            }
+                          },
+                          {
+                            "id": "paragraph-41",
+                            "kind": "paragraph",
+                            "ruleIds": [
+                              "t-7d64ba",
+                              "c-3bcd26",
+                              "mg-a343db"
+                            ],
+                            "content": {
+                              "text": "Sí, incluimos el transporte dentro de la región o zona pactada. Para distancias mayores, se cotiza el traslado aparte."
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "id": "group-45",
+                        "kind": "group",
+                        "ruleIds": [],
+                        "children": [
+                          {
+                            "id": "paragraph-43",
+                            "kind": "paragraph",
+                            "ruleIds": [
+                              "mg-a343db"
+                            ],
+                            "content": {
+                              "text": "¿Qué formas de pago aceptan?"
+                            }
+                          },
+                          {
+                            "id": "paragraph-44",
+                            "kind": "paragraph",
+                            "ruleIds": [
+                              "t-7d64ba",
+                              "c-3bcd26",
+                              "mg-a343db"
+                            ],
+                            "content": {
+                              "text": "Aceptamos transferencia bancaria, tarjetas de crédito/débito y pagos mediante leasing o financiamiento externo en caso de compra."
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "id": "group-53",
+                        "kind": "group",
+                        "ruleIds": [],
+                        "children": [
+                          {
+                            "id": "paragraph-46",
+                            "kind": "paragraph",
+                            "ruleIds": [
+                              "mg-a343db"
+                            ],
+                            "content": {
+                              "text": "¿Ofrecen garantía?"
+                            }
+                          },
+                          {
+                            "id": "paragraph-47",
+                            "kind": "paragraph",
+                            "ruleIds": [
+                              "t-7d64ba",
+                              "c-3bcd26",
+                              "mg-6596e3"
+                            ],
+                            "content": {
+                              "text": "Sí. Nuestras bodegas cuentan con garantía de Materiales por 6 años, y el servicio de arriendo incluye mantenimiento sin costo adicional durante el período contratado."
+                            }
+                          },
+                          {
+                            "id": "paragraph-48",
+                            "kind": "paragraph",
+                            "ruleIds": [
+                              "t-7d64ba",
+                              "c-3bcd26",
+                              "mg-6596e3"
+                            ],
+                            "content": {
+                              "text": "Garantía:"
+                            }
+                          },
+                          {
+                            "id": "paragraph-49",
+                            "kind": "paragraph",
+                            "ruleIds": [
+                              "t-7d64ba",
+                              "c-3bcd26",
+                              "mg-6596e3"
+                            ],
+                            "content": {
+                              "text": "Los materiales de estructura* y cubiertas** de nuestras bodegas cuentan con una Garantía de 6 años. Incluye esta garantía eventos de lluvia y viento con rachas o flujos ocasionales máximos de 70km/hora.\nSe excluye de esta garantía, los daños ocasionados por el uso indebido de las estructuras, anclajes, soportes y cobertores, su exposición al fuego o materiales corrosivos, su intervención con herramientas y/u objetos cortopunzantes, perforaciones, soldaduras, golpes y/o colisiones de maquinaria, de vehículos, de otras construcciones o sus partes, de personas o animales; así como catástrofes de cualquier tipo y/o eventos naturales fuera de las condiciones geoclimáticas cotidianas de la zona de emplazamiento."
+                            }
+                          },
+                          {
+                            "id": "separator-50",
+                            "kind": "separator",
+                            "ruleIds": [
+                              "mg-6596e3"
+                            ],
+                            "content": {}
+                          },
+                          {
+                            "id": "paragraph-51",
+                            "kind": "paragraph",
+                            "ruleIds": [
+                              "t-7d64ba",
+                              "c-3bcd26",
+                              "mg-6596e3"
+                            ],
+                            "content": {
+                              "text": "*Bases de Pilar, Pilares, Flanjes esquineros, Cerchas, Uniones de cumbrera, Bigas y anclajes de bigas y Arriostramientos."
+                            }
+                          },
+                          {
+                            "id": "paragraph-52",
+                            "kind": "paragraph",
+                            "ruleIds": [
+                              "t-7d64ba",
+                              "c-3bcd26",
+                              "mg-a343db"
+                            ],
+                            "content": {
+                              "text": "**Cubiertas, murallas, Cubrecerchas y Canaletas de tela de PVC."
+                            }
+                          }
+                        ]
+                      }
+                    ],
+                    "partes": {
+                      "item": [
+                        "plg-3077cc"
+                      ],
+                      "resumen": [
+                        "plg-r-f720e0",
+                        "t-546a1b",
+                        "c-3bcd26",
+                        "c-a-06855b"
+                      ],
+                      "panel": [
+                        "plg-p-ab00da"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "group-89",
+                "kind": "group",
+                "ruleIds": [
+                  "col-542b47",
+                  "cl-04ba3c"
+                ],
+                "children": [
+                  {
+                    "id": "heading-56",
+                    "kind": "heading",
+                    "ruleIds": [
+                      "t-e1f729",
+                      "c-4737c4",
+                      "mg-379041",
+                      "mg-50f1b0"
+                    ],
+                    "content": {
+                      "text": "Certificaciones\ncalidad de materiales",
+                      "level": 3
+                    }
+                  },
+                  {
+                    "id": "group-77",
+                    "kind": "group",
+                    "ruleIds": [
+                      "acordeon-c6b48b",
+                      "pila-10a194",
+                      "mg-b06d27"
+                    ],
+                    "children": [
+                      {
+                        "id": "group-61",
+                        "kind": "group",
+                        "ruleIds": [],
+                        "children": [
+                          {
+                            "id": "paragraph-57",
+                            "kind": "paragraph",
+                            "ruleIds": [
+                              "mg-a343db"
+                            ],
+                            "content": {
+                              "text": "Flame Retardant B1 (DIN 4102-1)"
+                            }
+                          },
+                          {
+                            "id": "link-59",
+                            "kind": "link",
+                            "ruleIds": [
+                              "enl-c8a933"
+                            ],
+                            "content": {
+                              "label": "",
+                              "href": "/wp-content/uploads/2025/07/Flame-retardant-B1-Europe.pdf",
+                              "target": "blank"
+                            },
+                            "children": [
+                              {
+                                "id": "image-58",
+                                "kind": "image",
+                                "ruleIds": [
+                                  "img-192d0d",
+                                  "mg-6596e3"
+                                ],
+                                "content": {
+                                  "assetUrl": "/wp-content/uploads/2025/07/aiconopdf-300x300-1.png",
+                                  "alt": ""
+                                }
+                              }
+                            ]
+                          },
+                          {
+                            "id": "paragraph-60",
+                            "kind": "paragraph",
+                            "ruleIds": [
+                              "t-7d64ba",
+                              "c-3bcd26",
+                              "mg-a343db"
+                            ],
+                            "content": {
+                              "text": "Nuestro PVC tarpaulin blanco (JFS201-1) ha sido certificado como material de baja inflamabilidad clase B1 según DIN 4102-1. Superó exitosamente las pruebas de combustión, sin goteo, llama sostenida ni propagación peligrosa del fuego."
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "id": "group-66",
+                        "kind": "group",
+                        "ruleIds": [],
+                        "children": [
+                          {
+                            "id": "paragraph-62",
+                            "kind": "paragraph",
+                            "ruleIds": [
+                              "mg-a343db"
+                            ],
+                            "content": {
+                              "text": "Envejecimiento por Luz (Xenon-arc)"
+                            }
+                          },
+                          {
+                            "id": "link-64",
+                            "kind": "link",
+                            "ruleIds": [
+                              "enl-c8a933"
+                            ],
+                            "content": {
+                              "label": "",
+                              "href": "/wp-content/uploads/2025/07/Light-ageing-test-of-PVC.pdf",
+                              "target": "blank"
+                            },
+                            "children": [
+                              {
+                                "id": "image-63",
+                                "kind": "image",
+                                "ruleIds": [
+                                  "img-6ee097",
+                                  "mg-6596e3"
+                                ],
+                                "content": {
+                                  "assetUrl": "/wp-content/uploads/2025/07/aiconopdf-300x300-1.png",
+                                  "alt": ""
+                                }
+                              }
+                            ]
+                          },
+                          {
+                            "id": "paragraph-65",
+                            "kind": "paragraph",
+                            "ruleIds": [
+                              "t-7d64ba",
+                              "c-3bcd26",
+                              "mg-a343db"
+                            ],
+                            "content": {
+                              "text": "Tras 800 horas de exposición a luz xenón (GB/T 16422.2-2022), el material no presentó grietas, decoloración ni deformaciones. Esta resistencia confirma su durabilidad ante condiciones ambientales exigentes."
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "id": "group-71",
+                        "kind": "group",
+                        "ruleIds": [],
+                        "children": [
+                          {
+                            "id": "paragraph-67",
+                            "kind": "paragraph",
+                            "ruleIds": [
+                              "mg-a343db"
+                            ],
+                            "content": {
+                              "text": "Resistencia al Agua (EN ISO 811)"
+                            }
+                          },
+                          {
+                            "id": "link-69",
+                            "kind": "link",
+                            "ruleIds": [
+                              "enl-c8a933"
+                            ],
+                            "content": {
+                              "label": "",
+                              "href": "/wp-content/uploads/2025/07/Water-resistance-of-PVC.pdf",
+                              "target": "blank"
+                            },
+                            "children": [
+                              {
+                                "id": "image-68",
+                                "kind": "image",
+                                "ruleIds": [
+                                  "img-6ee097",
+                                  "mg-6596e3"
+                                ],
+                                "content": {
+                                  "assetUrl": "/wp-content/uploads/2025/07/aiconopdf-300x300-1.png",
+                                  "alt": ""
+                                }
+                              }
+                            ]
+                          },
+                          {
+                            "id": "paragraph-70",
+                            "kind": "paragraph",
+                            "ruleIds": [
+                              "t-7d64ba",
+                              "c-3bcd26",
+                              "mg-a343db"
+                            ],
+                            "content": {
+                              "text": "El PVC tarpaulin de 750g superó la prueba de columna de agua (>2000 mmH₂O), cumpliendo con EN ISO 811:2018. Garantiza impermeabilidad superior, ideal para condiciones húmedas y uso exterior prolongado."
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "id": "group-76",
+                        "kind": "group",
+                        "ruleIds": [],
+                        "children": [
+                          {
+                            "id": "paragraph-72",
+                            "kind": "paragraph",
+                            "ruleIds": [
+                              "mg-a343db"
+                            ],
+                            "content": {
+                              "text": "Certificación Aluminio 6005/T6"
+                            }
+                          },
+                          {
+                            "id": "link-74",
+                            "kind": "link",
+                            "ruleIds": [
+                              "enl-c8a933"
+                            ],
+                            "content": {
+                              "label": "",
+                              "href": "/wp-content/uploads/2025/07/Test-report-of-203x112x4.5mm-English.pdf",
+                              "target": "blank"
+                            },
+                            "children": [
+                              {
+                                "id": "image-73",
+                                "kind": "image",
+                                "ruleIds": [
+                                  "img-6ee097",
+                                  "mg-6596e3"
+                                ],
+                                "content": {
+                                  "assetUrl": "/wp-content/uploads/2025/07/aiconopdf-300x300-1.png",
+                                  "alt": ""
+                                }
+                              }
+                            ]
+                          },
+                          {
+                            "id": "paragraph-75",
+                            "kind": "paragraph",
+                            "ruleIds": [
+                              "t-7d64ba",
+                              "c-3bcd26",
+                              "mg-a343db"
+                            ],
+                            "content": {
+                              "text": "El perfil de aluminio modelo 6005/T6 cumple con los estándares GB/T 6892-2015. Presenta una resistencia a tracción de 280 N/mm² y dureza Webster de 15 HW, garantizando alta robustez y fiabilidad estructural."
+                            }
+                          }
+                        ]
+                      }
+                    ],
+                    "partes": {
+                      "item": [
+                        "plg-3077cc"
+                      ],
+                      "resumen": [
+                        "plg-r-f720e0",
+                        "t-546a1b",
+                        "c-3bcd26",
+                        "c-a-06855b"
+                      ],
+                      "panel": [
+                        "plg-p-ab00da"
+                      ]
+                    }
+                  },
+                  {
+                    "id": "heading-78",
+                    "kind": "heading",
+                    "ruleIds": [
+                      "t-e1f729",
+                      "c-4737c4",
+                      "mg-05b575"
+                    ],
+                    "content": {
+                      "text": "Características y virtudes\nde nuestras carpas",
+                      "level": 3
+                    }
+                  },
+                  {
+                    "id": "group-88",
+                    "kind": "group",
+                    "ruleIds": [
+                      "acordeon-5b5cf1",
+                      "pila-10a194",
+                      "mg-a343db"
+                    ],
+                    "children": [
+                      {
+                        "id": "group-81",
+                        "kind": "group",
+                        "ruleIds": [],
+                        "children": [
+                          {
+                            "id": "paragraph-79",
+                            "kind": "paragraph",
+                            "ruleIds": [
+                              "mg-a343db"
+                            ],
+                            "content": {
+                              "text": "¿Qué materiales utilizan en las estructuras?"
+                            }
+                          },
+                          {
+                            "id": "paragraph-80",
+                            "kind": "paragraph",
+                            "ruleIds": [
+                              "t-7d64ba",
+                              "c-3bcd26",
+                              "mg-a343db"
+                            ],
+                            "content": {
+                              "text": "Nuestras carpas están construidas con estructuras de aleación de aluminio reforzado y algunos complementos de acero galvanizado de alta calidad. Las cubiertas son de lona de PVC de máxima resistencia (ignífuga, impermeable y con protección UV). Tanto el aluminio como el PVC de nuestras naves han sido probadas en climas como el de Chile por más de 10 años contínuos sin deterioro."
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "id": "group-84",
+                        "kind": "group",
+                        "ruleIds": [],
+                        "children": [
+                          {
+                            "id": "paragraph-82",
+                            "kind": "paragraph",
+                            "ruleIds": [
+                              "mg-a343db"
+                            ],
+                            "content": {
+                              "text": "¿Las carpas resisten condiciones climáticas adversas?"
+                            }
+                          },
+                          {
+                            "id": "paragraph-83",
+                            "kind": "paragraph",
+                            "ruleIds": [
+                              "t-7d64ba",
+                              "c-3bcd26",
+                              "mg-a343db"
+                            ],
+                            "content": {
+                              "text": "Nuestras carpas están diseñadas para resistir viento, lluvia intensa y radiación solar, de acuerdo a normas estructurales locales."
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "id": "group-87",
+                        "kind": "group",
+                        "ruleIds": [],
+                        "children": [
+                          {
+                            "id": "paragraph-85",
+                            "kind": "paragraph",
+                            "ruleIds": [
+                              "mg-a343db"
+                            ],
+                            "content": {
+                              "text": "¿Pueden personalizar las carpas con colores o logotipos?"
+                            }
+                          },
+                          {
+                            "id": "paragraph-86",
+                            "kind": "paragraph",
+                            "ruleIds": [
+                              "t-7d64ba",
+                              "c-3bcd26",
+                              "mg-a343db"
+                            ],
+                            "content": {
+                              "text": "Sí, ofrecemos opciones de personalización con colores corporativos, impresión de logotipos y de seguridad."
+                            }
+                          }
+                        ]
+                      }
+                    ],
+                    "partes": {
+                      "item": [
+                        "plg-3077cc"
+                      ],
+                      "resumen": [
+                        "plg-r-f720e0",
+                        "t-546a1b",
+                        "c-3bcd26"
+                      ],
+                      "panel": [
+                        "plg-p-ab00da"
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

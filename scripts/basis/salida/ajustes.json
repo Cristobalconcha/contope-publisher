@@ -1,0 +1,18 @@
+{
+  "whatsapp": {
+    "numero": "56997995132",
+    "mensaje": "Hola BASIS\n\nNombre:\nEmail:\nTeléfono:\n\nMensaje:\nQuisiera realizar una consulta/cotización..."
+  },
+  "iconos": [
+    "help",
+    "add_shopping_cart",
+    "warehouse",
+    "hourglass_empty"
+  ],
+  "mapa": {
+    "lat": -33.80413624737442,
+    "lng": -70.68161681668681,
+    "zoom": 17,
+    "necesitaClaveMapbox": true
+  }
+}

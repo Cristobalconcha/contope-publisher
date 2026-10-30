@@ -1,0 +1,2870 @@
+{
+  "titulo": "Inicio",
+  "slug": "inicio",
+  "design": {
+    "schemaVersion": 1,
+    "designId": "basis-web",
+    "expectedDesignRevision": 2,
+    "reviewState": "session",
+    "rules": [
+      {
+        "id": "col-542b47",
+        "kind": "layout",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "mode": "stack",
+          "gap": "0px",
+          "align": "stretch"
+        }
+      },
+      {
+        "id": "cl-04ba3c",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "padding-top": "0px",
+            "padding-right": "0px",
+            "padding-bottom": "0px",
+            "padding-left": "0px",
+            "min-width": "0px"
+          }
+        }
+      },
+      {
+        "id": "mg-a343db",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "margin-block-start": "0px",
+            "margin-block-end": "0px"
+          }
+        }
+      },
+      {
+        "id": "c-4737c4",
+        "kind": "color",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "c-ffffff",
+          "color": "#FFFFFF",
+          "apply": "text"
+        }
+      },
+      {
+        "id": "sec-d72755",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "padding-top": "54px",
+            "padding-bottom": "129.6px",
+            "padding-left": "0px",
+            "padding-right": "0px",
+            "min-height": "650px"
+          }
+        }
+      },
+      {
+        "id": "sec-7ccb0e",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "padding-top": "50px",
+            "padding-bottom": "35.37px"
+          }
+        }
+      },
+      {
+        "id": "s-828ff1",
+        "kind": "surface",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "backgroundColor": "#FFFFFF",
+          "backgroundAssetUrl": "/wp-content/uploads/2025/07/Imagen-6.jpg",
+          "backgroundSize": "cover",
+          "backgroundPosition": "50% 50%",
+          "backgroundRepeat": "no-repeat",
+          "overlayColor": "#0C71C3",
+          "overlayOpacity": 0.5
+        }
+      },
+      {
+        "id": "fila-c45543",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "border-radius": "8px",
+            "width": "80%",
+            "max-width": "1080px",
+            "margin-inline-start": "auto",
+            "margin-inline-end": "auto",
+            "padding-top": "0px",
+            "padding-right": "0px",
+            "padding-bottom": "0px",
+            "padding-left": "0px",
+            "margin-block-start": "0px",
+            "margin-block-end": "0px"
+          }
+        }
+      },
+      {
+        "id": "cl-9225d4",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "border-radius": "6px",
+            "padding-top": "40px",
+            "padding-right": "40px",
+            "padding-bottom": "24px",
+            "padding-left": "40px",
+            "min-width": "0px"
+          }
+        }
+      },
+      {
+        "id": "cl-920c9d",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "padding-top": "20px",
+            "padding-right": "20px",
+            "padding-bottom": "20px",
+            "padding-left": "20px"
+          }
+        }
+      },
+      {
+        "id": "t-eeaf66",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "t-big-shoulders--80-800",
+          "family": "'Big Shoulders Display', sans-serif",
+          "fontSize": "80px",
+          "fontWeight": 800,
+          "lineHeight": 1.2,
+          "align": "end"
+        }
+      },
+      {
+        "id": "t-699a0e",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "t-big-shoulders--80-800",
+          "fontSize": "28px"
+        }
+      },
+      {
+        "id": "mg-766004",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "margin-block-start": "0px",
+            "margin-block-end": "28px"
+          }
+        }
+      },
+      {
+        "id": "mg-e4b321",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "margin-block-end": "30px"
+          }
+        }
+      },
+      {
+        "id": "t-6246ce",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "t-roboto-20-500",
+          "family": "'Roboto', sans-serif",
+          "fontSize": "20px",
+          "fontWeight": 500,
+          "lineHeight": 1.75,
+          "align": "end"
+        }
+      },
+      {
+        "id": "t-70984a",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "t-roboto-20-500",
+          "fontSize": "14px"
+        }
+      },
+      {
+        "id": "mg-e7d2d5",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "margin-block-start": "0px",
+            "margin-block-end": "27px"
+          }
+        }
+      },
+      {
+        "id": "mg-040870",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "margin-block-end": "30px"
+          }
+        }
+      },
+      {
+        "id": "btn-504eb8",
+        "kind": "button",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "variant": "solid",
+          "tone": "primary",
+          "size": "md",
+          "width": "auto",
+          "interaction": "none"
+        }
+      },
+      {
+        "id": "t-970880",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "t-roboto-14-700",
+          "family": "'Roboto', sans-serif",
+          "fontSize": "14px",
+          "fontWeight": 700,
+          "lineHeight": 1.7,
+          "align": "end"
+        }
+      },
+      {
+        "id": "cbg-f846d3",
+        "kind": "color",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "boton-fondo-ffffff",
+          "color": "#FFFFFF",
+          "apply": "background"
+        }
+      },
+      {
+        "id": "cbt-1996f2",
+        "kind": "color",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "boton-texto-f26621",
+          "color": "#F26621",
+          "apply": "text"
+        }
+      },
+      {
+        "id": "forma-57aa11",
+        "kind": "shape",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "radius": "pill",
+          "borderStyle": "none"
+        }
+      },
+      {
+        "id": "btnp-7cb2ee",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "padding-top": "12px",
+            "padding-right": "24px",
+            "padding-bottom": "12px",
+            "padding-left": "24px",
+            "border-width": "0px",
+            "margin-inline-start": "auto",
+            "display": "block",
+            "width": "fit-content"
+          }
+        }
+      },
+      {
+        "id": "sec-f1b5a7",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "padding-top": "54px",
+            "padding-bottom": "54px",
+            "padding-left": "0px",
+            "padding-right": "0px",
+            "min-height": "804px"
+          }
+        }
+      },
+      {
+        "id": "sec-aed2a5",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "padding-top": "50px",
+            "padding-bottom": "50px"
+          }
+        }
+      },
+      {
+        "id": "s-c8f1f2",
+        "kind": "surface",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "backgroundColor": "#D8D8D8",
+          "backgroundAssetUrl": "/wp-content/uploads/2025/07/aBlanco@4x.png",
+          "backgroundSize": "55% auto",
+          "backgroundPosition": "100% 50%",
+          "backgroundRepeat": "no-repeat"
+        }
+      },
+      {
+        "id": "fila-3c232e",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "width": "80%",
+            "max-width": "1080px",
+            "margin-inline-start": "auto",
+            "margin-inline-end": "auto",
+            "padding-top": "27px",
+            "padding-right": "0px",
+            "padding-bottom": "27px",
+            "padding-left": "0px",
+            "margin-block-start": "0px",
+            "margin-block-end": "-10px"
+          }
+        }
+      },
+      {
+        "id": "fila-34a281",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "padding-top": "30px",
+            "padding-bottom": "30px"
+          }
+        }
+      },
+      {
+        "id": "t-a16ae0",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "t-big-shoulders--50-500",
+          "family": "'Big Shoulders Display', sans-serif",
+          "fontSize": "50px",
+          "fontWeight": 500,
+          "lineHeight": 1.2,
+          "align": "start"
+        }
+      },
+      {
+        "id": "t-f93544",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "t-big-shoulders--50-500",
+          "fontSize": "20px"
+        }
+      },
+      {
+        "id": "c-458e22",
+        "kind": "color",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "c-0e0c19",
+          "color": "#0E0C19",
+          "apply": "text"
+        }
+      },
+      {
+        "id": "mg-082b3c",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "margin-block-start": "0px",
+            "margin-block-end": "20px"
+          }
+        }
+      },
+      {
+        "id": "fila-15f16a",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "width": "80%",
+            "max-width": "1080px",
+            "margin-inline-start": "auto",
+            "margin-inline-end": "auto",
+            "padding-top": "27px",
+            "padding-right": "0px",
+            "padding-bottom": "27px",
+            "padding-left": "0px",
+            "margin-block-start": "0px",
+            "margin-block-end": "0px",
+            "display": "grid",
+            "grid-template-columns": "minmax(0, 320fr) minmax(0, 320fr) minmax(0, 320fr)",
+            "column-gap": "59.39px",
+            "align-items": "start"
+          }
+        }
+      },
+      {
+        "id": "fila-d79c4f",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "padding-top": "30px",
+            "padding-bottom": "30px",
+            "grid-template-columns": "minmax(0, 1fr)",
+            "column-gap": "0px",
+            "row-gap": "30px"
+          }
+        }
+      },
+      {
+        "id": "img-c46f28",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "width": "100%",
+            "height": "auto"
+          }
+        }
+      },
+      {
+        "id": "media-f157f7",
+        "kind": "media",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "aspectRatio": "4/3",
+          "fit": "cover"
+        }
+      },
+      {
+        "id": "media-492b24",
+        "kind": "media",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "aspectRatio": "89/68",
+          "fit": "cover"
+        }
+      },
+      {
+        "id": "mg-2c79cc",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "margin-block-start": "0px",
+            "margin-block-end": "30px"
+          }
+        }
+      },
+      {
+        "id": "t-ced61b",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "t-big-shoulders--28-500",
+          "family": "'Big Shoulders Display', sans-serif",
+          "fontSize": "28px",
+          "fontWeight": 500,
+          "lineHeight": 1.4,
+          "align": "start"
+        }
+      },
+      {
+        "id": "t-de8548",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "t-big-shoulders--28-500",
+          "fontSize": "14px"
+        }
+      },
+      {
+        "id": "t-658434",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "t-roboto-16-500",
+          "family": "'Roboto', sans-serif",
+          "fontSize": "16px",
+          "fontWeight": 500,
+          "lineHeight": 1.75,
+          "align": "start"
+        }
+      },
+      {
+        "id": "t-379834",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "t-roboto-16-500",
+          "fontSize": "14px"
+        }
+      },
+      {
+        "id": "c-8eff11",
+        "kind": "color",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "c-3c3a47",
+          "color": "#3C3A47",
+          "apply": "text"
+        }
+      },
+      {
+        "id": "media-5c84f6",
+        "kind": "media",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "aspectRatio": "97/73",
+          "fit": "cover"
+        }
+      },
+      {
+        "id": "mg-53c88b",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "margin-block-end": "19px"
+          }
+        }
+      },
+      {
+        "id": "sec-79ee4b",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "padding-top": "54px",
+            "padding-bottom": "54px",
+            "padding-left": "0px",
+            "padding-right": "0px"
+          }
+        }
+      },
+      {
+        "id": "sec-6069e7",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "padding-top": "50px",
+            "padding-bottom": "50px"
+          }
+        }
+      },
+      {
+        "id": "s-c8ec5e",
+        "kind": "surface",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "backgroundColor": "#FFFFFF"
+        }
+      },
+      {
+        "id": "t-424b46",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "t-big-shoulders--50-500",
+          "family": "'Big Shoulders Display', sans-serif",
+          "fontSize": "50px",
+          "fontWeight": 500,
+          "lineHeight": 1.2,
+          "align": "center"
+        }
+      },
+      {
+        "id": "t-c907f9",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "t-big-shoulders--50-500",
+          "fontSize": "20px"
+        }
+      },
+      {
+        "id": "t-5f6bb4",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "t-open-sans-24-500",
+          "family": "'Open Sans', sans-serif",
+          "fontSize": "24px",
+          "fontWeight": 500,
+          "lineHeight": 1.6,
+          "align": "center"
+        }
+      },
+      {
+        "id": "c-3bcd26",
+        "kind": "color",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "c-666666",
+          "color": "#666666",
+          "apply": "text"
+        }
+      },
+      {
+        "id": "fila-32dae4",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "background-color": "#F26621",
+            "border-radius": "6px 6px 0px 0px",
+            "width": "80%",
+            "max-width": "1080px",
+            "margin-inline-start": "auto",
+            "margin-inline-end": "auto",
+            "padding-top": "27px",
+            "padding-right": "0px",
+            "padding-bottom": "27px",
+            "padding-left": "0px",
+            "margin-block-start": "0px",
+            "margin-block-end": "0px",
+            "display": "grid",
+            "grid-template-columns": "minmax(0, 320fr) minmax(0, 320fr) minmax(0, 320fr)",
+            "column-gap": "59.39px",
+            "align-items": "stretch"
+          }
+        }
+      },
+      {
+        "id": "fila-fa0749",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "padding-top": "30px",
+            "padding-bottom": "30px",
+            "grid-template-columns": "minmax(0, 1fr)",
+            "column-gap": "0px",
+            "row-gap": "30px"
+          }
+        }
+      },
+      {
+        "id": "cl-bece33",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "background-color": "#F26621",
+            "padding-top": "20px",
+            "padding-right": "20px",
+            "padding-bottom": "20px",
+            "padding-left": "20px",
+            "min-width": "0px"
+          }
+        }
+      },
+      {
+        "id": "ico-cfbfd5",
+        "kind": "icono",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "nombre": "add_shopping_cart",
+          "donde": "antes",
+          "tamano": "40px",
+          "color": "#FFFFFF",
+          "separacion": "12px"
+        }
+      },
+      {
+        "id": "mg-9b6f57",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "margin-block-start": "0px",
+            "margin-block-end": "10px"
+          }
+        }
+      },
+      {
+        "id": "ico-6295d7",
+        "kind": "icono",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "nombre": "warehouse",
+          "donde": "antes",
+          "tamano": "40px",
+          "color": "#FFFFFF",
+          "separacion": "12px"
+        }
+      },
+      {
+        "id": "ico-06eb30",
+        "kind": "icono",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "nombre": "hourglass_empty",
+          "donde": "antes",
+          "tamano": "40px",
+          "color": "#FFFFFF",
+          "separacion": "12px"
+        }
+      },
+      {
+        "id": "fila-1c9785",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "width": "80%",
+            "max-width": "1080px",
+            "margin-inline-start": "auto",
+            "margin-inline-end": "auto",
+            "padding-top": "27px",
+            "padding-right": "0px",
+            "padding-bottom": "27px",
+            "padding-left": "0px",
+            "margin-block-start": "0px",
+            "margin-block-end": "0px"
+          }
+        }
+      },
+      {
+        "id": "fila-38f316",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "padding-top": "30px",
+            "padding-bottom": "30px"
+          }
+        }
+      },
+      {
+        "id": "t-2b89bc",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "t-roboto-18-700",
+          "family": "'Roboto', sans-serif",
+          "fontSize": "18px",
+          "fontWeight": 700,
+          "lineHeight": 1.7,
+          "align": "center"
+        }
+      },
+      {
+        "id": "cbg-e4621b",
+        "kind": "color",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "boton-fondo-898989",
+          "color": "#898989",
+          "apply": "background"
+        }
+      },
+      {
+        "id": "cbt-ec5e9f",
+        "kind": "color",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "boton-texto-ffffff",
+          "color": "#FFFFFF",
+          "apply": "text"
+        }
+      },
+      {
+        "id": "btnp-b7d60f",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "padding-top": "12px",
+            "padding-right": "74px",
+            "padding-bottom": "12px",
+            "padding-left": "74px",
+            "border-width": "0px",
+            "margin-inline-start": "auto",
+            "margin-inline-end": "auto",
+            "display": "block",
+            "width": "fit-content"
+          }
+        }
+      },
+      {
+        "id": "sec-56504b",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "padding-top": "54px",
+            "padding-bottom": "54px",
+            "padding-left": "0px",
+            "padding-right": "0px",
+            "min-height": "1510px"
+          }
+        }
+      },
+      {
+        "id": "sec-0cc10b",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "padding-top": "50px",
+            "padding-bottom": "50px"
+          }
+        }
+      },
+      {
+        "id": "s-fa75e5",
+        "kind": "surface",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "backgroundColor": "#FFFFFF",
+          "backgroundAssetUrl": "/wp-content/uploads/2025/07/Video-Aereo-Carpas-reemplazo.jpg",
+          "backgroundSize": "cover",
+          "backgroundPosition": "center",
+          "backgroundRepeat": "no-repeat"
+        }
+      },
+      {
+        "id": "fila-739852",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "background-color": "rgba(255, 255, 255, 0.58)",
+            "border-radius": "8px",
+            "width": "100%",
+            "max-width": "1080px",
+            "margin-inline-start": "auto",
+            "margin-inline-end": "auto",
+            "padding-top": "0px",
+            "padding-right": "0px",
+            "padding-bottom": "0px",
+            "padding-left": "0px",
+            "margin-block-start": "0px",
+            "margin-block-end": "0px",
+            "display": "grid",
+            "grid-template-columns": "minmax(0, 510fr) minmax(0, 510fr)",
+            "column-gap": "59.39px",
+            "align-items": "start"
+          }
+        }
+      },
+      {
+        "id": "fila-4a4ac0",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "grid-template-columns": "minmax(0, 1fr)",
+            "column-gap": "0px",
+            "row-gap": "30px"
+          }
+        }
+      },
+      {
+        "id": "t-359376",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "t-big-shoulders--42-900",
+          "family": "'Big Shoulders Display', sans-serif",
+          "fontSize": "42px",
+          "fontWeight": 900,
+          "lineHeight": 1,
+          "align": "start"
+        }
+      },
+      {
+        "id": "c-4de609",
+        "kind": "color",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "c-e02b20",
+          "color": "#E02B20",
+          "apply": "text"
+        }
+      },
+      {
+        "id": "t-829a89",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "t-open-sans-20-500",
+          "family": "'Open Sans', sans-serif",
+          "fontSize": "20px",
+          "fontWeight": 500,
+          "lineHeight": 1.7,
+          "align": "start"
+        }
+      },
+      {
+        "id": "c-c21382",
+        "kind": "color",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "c-000000",
+          "color": "#000000",
+          "apply": "text"
+        }
+      },
+      {
+        "id": "lista-e7e238",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "padding-inline-start": "1em",
+            "list-style-position": "outside"
+          }
+        }
+      },
+      {
+        "id": "media-792b82",
+        "kind": "media",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "aspectRatio": "8/13",
+          "fit": "cover"
+        }
+      },
+      {
+        "id": "media-774ff8",
+        "kind": "media",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "aspectRatio": "91/88",
+          "fit": "cover"
+        }
+      },
+      {
+        "id": "sec-d8d911",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "padding-top": "0px",
+            "padding-bottom": "0px",
+            "padding-left": "0px",
+            "padding-right": "0px"
+          }
+        }
+      },
+      {
+        "id": "s-6549ca",
+        "kind": "surface",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "backgroundColor": "#F26621",
+          "overlayColor": "#000000",
+          "overlayOpacity": 0.5
+        }
+      },
+      {
+        "id": "t-1a9c16",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "t-roboto-14-700",
+          "family": "'Roboto', sans-serif",
+          "fontSize": "14px",
+          "fontWeight": 700,
+          "lineHeight": 1.7,
+          "align": "center"
+        }
+      },
+      {
+        "id": "cbg-a0ed80",
+        "kind": "color",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "boton-fondo-f26621",
+          "color": "#F26621",
+          "apply": "background"
+        }
+      },
+      {
+        "id": "btnp-1a0b10",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "padding-top": "12px",
+            "padding-right": "24px",
+            "padding-bottom": "12px",
+            "padding-left": "24px",
+            "border-width": "0px",
+            "margin-inline-start": "auto",
+            "margin-inline-end": "auto",
+            "display": "block",
+            "width": "fit-content"
+          }
+        }
+      },
+      {
+        "id": "promo-bef25a",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "background-color": "#FFFFFF",
+            "border-radius": "6px",
+            "box-shadow": "rgba(0, 0, 0, 0.12) 0px 24px 72px -12px",
+            "padding-top": "60px",
+            "padding-right": "60px",
+            "padding-bottom": "60px",
+            "padding-left": "60px",
+            "text-align": "center"
+          }
+        }
+      },
+      {
+        "id": "promo-54fb86",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "padding-top": "20px",
+            "padding-right": "20px",
+            "padding-bottom": "20px",
+            "padding-left": "20px"
+          }
+        }
+      }
+    ]
+  },
+  "composition": {
+    "schemaVersion": 2,
+    "nodes": [
+      {
+        "id": "section-17",
+        "kind": "section",
+        "ruleIds": [
+          "sec-d72755",
+          "sec-7ccb0e",
+          "s-828ff1"
+        ],
+        "children": [
+          {
+            "id": "group-16",
+            "kind": "group",
+            "ruleIds": [
+              "fila-c45543"
+            ],
+            "children": [
+              {
+                "id": "group-15",
+                "kind": "group",
+                "ruleIds": [
+                  "col-542b47",
+                  "cl-9225d4",
+                  "cl-920c9d"
+                ],
+                "children": [
+                  {
+                    "id": "heading-12",
+                    "kind": "heading",
+                    "ruleIds": [
+                      "t-eeaf66",
+                      "t-699a0e",
+                      "c-4737c4",
+                      "mg-766004",
+                      "mg-e4b321"
+                    ],
+                    "content": {
+                      "text": "La respuesta eficiente\na su demanda de bodegaje",
+                      "level": 1
+                    }
+                  },
+                  {
+                    "id": "paragraph-13",
+                    "kind": "paragraph",
+                    "ruleIds": [
+                      "t-6246ce",
+                      "t-70984a",
+                      "c-4737c4",
+                      "mg-e7d2d5",
+                      "mg-040870"
+                    ],
+                    "content": {
+                      "text": "Descubre cómo nuestras carpas industriales inteligentes transforman el\nalmacenamiento temporal con tecnología avanzada y eficiencia inigualable."
+                    }
+                  },
+                  {
+                    "id": "button-14",
+                    "kind": "button",
+                    "ruleIds": [
+                      "btn-504eb8",
+                      "t-970880",
+                      "cbg-f846d3",
+                      "cbt-1996f2",
+                      "forma-57aa11",
+                      "btnp-7cb2ee",
+                      "mg-a343db"
+                    ],
+                    "content": {
+                      "label": "Explorar Soluciones"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "section-34",
+        "kind": "section",
+        "ruleIds": [
+          "sec-f1b5a7",
+          "sec-aed2a5",
+          "s-c8f1f2"
+        ],
+        "children": [
+          {
+            "id": "group-20",
+            "kind": "group",
+            "ruleIds": [
+              "fila-3c232e",
+              "fila-34a281"
+            ],
+            "children": [
+              {
+                "id": "group-19",
+                "kind": "group",
+                "ruleIds": [
+                  "col-542b47",
+                  "cl-04ba3c"
+                ],
+                "children": [
+                  {
+                    "id": "heading-18",
+                    "kind": "heading",
+                    "ruleIds": [
+                      "t-a16ae0",
+                      "t-f93544",
+                      "c-458e22",
+                      "mg-082b3c"
+                    ],
+                    "content": {
+                      "text": "Soluciones inteligentes",
+                      "level": 2
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "group-33",
+            "kind": "group",
+            "ruleIds": [
+              "fila-15f16a",
+              "fila-d79c4f"
+            ],
+            "children": [
+              {
+                "id": "group-24",
+                "kind": "group",
+                "ruleIds": [
+                  "col-542b47",
+                  "cl-04ba3c"
+                ],
+                "children": [
+                  {
+                    "id": "image-21",
+                    "kind": "image",
+                    "ruleIds": [
+                      "img-c46f28",
+                      "media-f157f7",
+                      "media-492b24",
+                      "mg-2c79cc"
+                    ],
+                    "content": {
+                      "assetUrl": "/wp-content/uploads/2025/07/Imagen-4.jpeg",
+                      "alt": ""
+                    }
+                  },
+                  {
+                    "id": "heading-22",
+                    "kind": "heading",
+                    "ruleIds": [
+                      "t-ced61b",
+                      "t-de8548",
+                      "c-458e22",
+                      "mg-082b3c"
+                    ],
+                    "content": {
+                      "text": "Aislación efectiva",
+                      "level": 5
+                    }
+                  },
+                  {
+                    "id": "paragraph-23",
+                    "kind": "paragraph",
+                    "ruleIds": [
+                      "t-658434",
+                      "t-379834",
+                      "c-8eff11",
+                      "mg-a343db"
+                    ],
+                    "content": {
+                      "text": "Nuestras carpas son fabricadas con materiales de última generación que les brindan la máxima protección ante la de lluvia, sol y vectores."
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "group-28",
+                "kind": "group",
+                "ruleIds": [
+                  "col-542b47",
+                  "cl-04ba3c"
+                ],
+                "children": [
+                  {
+                    "id": "image-25",
+                    "kind": "image",
+                    "ruleIds": [
+                      "img-c46f28",
+                      "media-f157f7",
+                      "media-5c84f6",
+                      "mg-2c79cc"
+                    ],
+                    "content": {
+                      "assetUrl": "/wp-content/uploads/2025/07/Cierre-lateral.jpg",
+                      "alt": ""
+                    }
+                  },
+                  {
+                    "id": "heading-26",
+                    "kind": "heading",
+                    "ruleIds": [
+                      "t-ced61b",
+                      "t-de8548",
+                      "c-458e22",
+                      "mg-082b3c",
+                      "mg-53c88b"
+                    ],
+                    "content": {
+                      "text": "Instalación Rápida",
+                      "level": 5
+                    }
+                  },
+                  {
+                    "id": "paragraph-27",
+                    "kind": "paragraph",
+                    "ruleIds": [
+                      "t-658434",
+                      "t-379834",
+                      "c-8eff11",
+                      "mg-a343db"
+                    ],
+                    "content": {
+                      "text": "Nuestro sistema modular facilita una instalación rápida y eficiente, optimizando el espacio de almacenamiento con una mínima preparación del terreno."
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "group-32",
+                "kind": "group",
+                "ruleIds": [
+                  "col-542b47",
+                  "cl-04ba3c"
+                ],
+                "children": [
+                  {
+                    "id": "image-29",
+                    "kind": "image",
+                    "ruleIds": [
+                      "img-c46f28",
+                      "media-f157f7",
+                      "media-5c84f6",
+                      "mg-2c79cc"
+                    ],
+                    "content": {
+                      "assetUrl": "/wp-content/uploads/2025/07/Estructura3.jpg",
+                      "alt": ""
+                    }
+                  },
+                  {
+                    "id": "heading-30",
+                    "kind": "heading",
+                    "ruleIds": [
+                      "t-ced61b",
+                      "t-de8548",
+                      "c-458e22",
+                      "mg-082b3c"
+                    ],
+                    "content": {
+                      "text": "Materiales de optima calidad",
+                      "level": 5
+                    }
+                  },
+                  {
+                    "id": "paragraph-31",
+                    "kind": "paragraph",
+                    "ruleIds": [
+                      "t-658434",
+                      "t-379834",
+                      "c-8eff11",
+                      "mg-a343db"
+                    ],
+                    "content": {
+                      "text": "Con materiales de alta calidad, nuestras carpas ofrecen un aislamiento superior, son ignífugas y sus estructuras de aluminio son livianas y robustas."
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "section-52",
+        "kind": "section",
+        "ruleIds": [
+          "sec-79ee4b",
+          "sec-6069e7",
+          "s-c8ec5e"
+        ],
+        "children": [
+          {
+            "id": "group-38",
+            "kind": "group",
+            "ruleIds": [
+              "fila-3c232e",
+              "fila-34a281"
+            ],
+            "children": [
+              {
+                "id": "group-37",
+                "kind": "group",
+                "ruleIds": [
+                  "col-542b47",
+                  "cl-04ba3c"
+                ],
+                "children": [
+                  {
+                    "id": "heading-35",
+                    "kind": "heading",
+                    "ruleIds": [
+                      "t-424b46",
+                      "t-c907f9",
+                      "c-458e22",
+                      "mg-082b3c"
+                    ],
+                    "content": {
+                      "text": "Opciones comerciales",
+                      "level": 2
+                    }
+                  },
+                  {
+                    "id": "paragraph-36",
+                    "kind": "paragraph",
+                    "ruleIds": [
+                      "t-5f6bb4",
+                      "c-3bcd26",
+                      "mg-a343db"
+                    ],
+                    "content": {
+                      "text": "Cuente con todas las alternativas para gestionar y financiar su Bodega Trasladable.\nHay una solución para cada situación:"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "group-48",
+            "kind": "group",
+            "ruleIds": [
+              "fila-32dae4",
+              "fila-fa0749"
+            ],
+            "children": [
+              {
+                "id": "group-41",
+                "kind": "group",
+                "ruleIds": [
+                  "col-542b47",
+                  "cl-bece33"
+                ],
+                "children": [
+                  {
+                    "id": "heading-39",
+                    "kind": "heading",
+                    "ruleIds": [
+                      "t-ced61b",
+                      "t-de8548",
+                      "c-4737c4",
+                      "ico-cfbfd5",
+                      "mg-9b6f57"
+                    ],
+                    "content": {
+                      "text": "Compra tus bodegas",
+                      "level": 4
+                    }
+                  },
+                  {
+                    "id": "paragraph-40",
+                    "kind": "paragraph",
+                    "ruleIds": [
+                      "t-658434",
+                      "t-379834",
+                      "c-4737c4",
+                      "mg-a343db"
+                    ],
+                    "content": {
+                      "text": "Para satisfacer el requerimiento de instalaciones permententes o que superen los 5 años, comprar puede ser la opción más conveniente, especialmente si agrega Servicios Opcionales y la instalación dentro del total."
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "group-44",
+                "kind": "group",
+                "ruleIds": [
+                  "col-542b47",
+                  "cl-bece33"
+                ],
+                "children": [
+                  {
+                    "id": "heading-42",
+                    "kind": "heading",
+                    "ruleIds": [
+                      "t-ced61b",
+                      "t-de8548",
+                      "c-4737c4",
+                      "ico-6295d7",
+                      "mg-9b6f57"
+                    ],
+                    "content": {
+                      "text": "Opción de Arriendo",
+                      "level": 4
+                    }
+                  },
+                  {
+                    "id": "paragraph-43",
+                    "kind": "paragraph",
+                    "ruleIds": [
+                      "t-658434",
+                      "t-379834",
+                      "c-4737c4",
+                      "mg-a343db"
+                    ],
+                    "content": {
+                      "text": "Si su operación es temporal o su requerimiento de naves es fluctuante, la decisión de arrendar podría ser la mejor opción. Dispondrá de instalación en sus dependencias y con tarifas muy competitivas, ajustadas a la duración del contrato."
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "group-47",
+                "kind": "group",
+                "ruleIds": [
+                  "col-542b47",
+                  "cl-bece33"
+                ],
+                "children": [
+                  {
+                    "id": "heading-45",
+                    "kind": "heading",
+                    "ruleIds": [
+                      "t-ced61b",
+                      "t-de8548",
+                      "c-4737c4",
+                      "ico-06eb30",
+                      "mg-9b6f57"
+                    ],
+                    "content": {
+                      "text": "Opción ACC",
+                      "level": 4
+                    }
+                  },
+                  {
+                    "id": "paragraph-46",
+                    "kind": "paragraph",
+                    "ruleIds": [
+                      "t-658434",
+                      "t-379834",
+                      "c-4737c4",
+                      "mg-a343db"
+                    ],
+                    "content": {
+                      "text": "Y si no desea inmovilizar recursos para faenas de largo plazo o permanente, el Arriendo con Compromiso de Compra (ACC) entrega un valor de arriendo intermedio que le permite adquirir la bodega arrendada al cabo de un plazo pre pactado."
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "group-51",
+            "kind": "group",
+            "ruleIds": [
+              "fila-1c9785",
+              "fila-38f316"
+            ],
+            "children": [
+              {
+                "id": "group-50",
+                "kind": "group",
+                "ruleIds": [
+                  "col-542b47",
+                  "cl-04ba3c"
+                ],
+                "children": [
+                  {
+                    "id": "button-49",
+                    "kind": "button",
+                    "ruleIds": [
+                      "btn-504eb8",
+                      "t-2b89bc",
+                      "cbg-e4621b",
+                      "cbt-ec5e9f",
+                      "forma-57aa11",
+                      "btnp-b7d60f",
+                      "mg-a343db"
+                    ],
+                    "content": {
+                      "label": "Contáctanos Hoy",
+                      "href": "https://wa.me/56997995132?text=Gracias%20por%20contactar%20a%20BASIS.%20%C2%BFQu%C3%A9%20deseas%20cotizar%3F%20Si%20lo%20prefieres%2C%20podemos%20devolverte%20la%20llamada.",
+                      "target": "blank"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "section-59",
+        "kind": "section",
+        "ruleIds": [
+          "sec-56504b",
+          "sec-0cc10b",
+          "s-fa75e5"
+        ],
+        "children": [
+          {
+            "id": "group-58",
+            "kind": "group",
+            "ruleIds": [
+              "fila-739852",
+              "fila-4a4ac0"
+            ],
+            "children": [
+              {
+                "id": "group-55",
+                "kind": "group",
+                "ruleIds": [
+                  "col-542b47",
+                  "cl-04ba3c"
+                ],
+                "children": [
+                  {
+                    "id": "heading-53",
+                    "kind": "heading",
+                    "ruleIds": [
+                      "t-359376",
+                      "c-4de609",
+                      "mg-9b6f57"
+                    ],
+                    "content": {
+                      "text": "Características",
+                      "level": 3
+                    }
+                  },
+                  {
+                    "id": "list-54",
+                    "kind": "list",
+                    "ruleIds": [
+                      "t-829a89",
+                      "c-c21382",
+                      "mg-a343db",
+                      "lista-e7e238"
+                    ],
+                    "content": {
+                      "ordered": false,
+                      "items": [
+                        {
+                          "text": "Dimensiones",
+                          "items": [
+                            "Ancho: 20 mt (Standard) opciones a pedido",
+                            "Largo: Opcional, variable en múltiplos de 5mt",
+                            "Alto Hombro: 5mt"
+                          ]
+                        },
+                        {
+                          "text": "Material estructura:",
+                          "items": [
+                            "Perfil principal 203x112x4,5mm aleación de aluminio.",
+                            "Cubierta de PVC 750g/m2*",
+                            "Murallas de PVC 650g/m2*"
+                          ]
+                        },
+                        "Materiales 100% impermeables y con retardante de fuego.",
+                        "Duración de más de 10 años en condiciones climáticas medias.",
+                        {
+                          "text": "Opcionales:",
+                          "items": [
+                            "Cortinas de acceso electricas",
+                            "Canaletas inter carpas",
+                            "Solerillas de aislación de aguas lluvias",
+                            "Luminarias Led",
+                            "Resalto contención aguas lluvia en accesos"
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "group-57",
+                "kind": "group",
+                "ruleIds": [
+                  "col-542b47",
+                  "cl-04ba3c"
+                ],
+                "children": [
+                  {
+                    "id": "image-56",
+                    "kind": "image",
+                    "ruleIds": [
+                      "img-c46f28",
+                      "media-792b82",
+                      "media-774ff8",
+                      "mg-a343db"
+                    ],
+                    "content": {
+                      "assetUrl": "/wp-content/uploads/2025/07/Interior-doble-pilar-y-canaleta.jpg",
+                      "alt": ""
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "section-66",
+        "kind": "section",
+        "ruleIds": [
+          "sec-d8d911",
+          "s-6549ca"
+        ],
+        "children": [
+          {
+            "id": "group-65",
+            "kind": "group",
+            "ruleIds": [
+              "fila-1c9785",
+              "fila-38f316"
+            ],
+            "children": [
+              {
+                "id": "group-64",
+                "kind": "group",
+                "ruleIds": [
+                  "col-542b47",
+                  "cl-04ba3c"
+                ],
+                "children": [
+                  {
+                    "id": "group-63",
+                    "kind": "group",
+                    "ruleIds": [
+                      "col-542b47",
+                      "promo-bef25a",
+                      "promo-54fb86",
+                      "mg-a343db"
+                    ],
+                    "children": [
+                      {
+                        "id": "heading-60",
+                        "kind": "heading",
+                        "ruleIds": [
+                          "t-424b46",
+                          "t-c907f9",
+                          "c-458e22",
+                          "mg-9b6f57"
+                        ],
+                        "content": {
+                          "text": "Descubre Más Sobre Nuestras Carpas",
+                          "level": 2
+                        }
+                      },
+                      {
+                        "id": "paragraph-61",
+                        "kind": "paragraph",
+                        "ruleIds": [
+                          "mg-2c79cc"
+                        ],
+                        "content": {
+                          "text": "¿Interesado en optimizar tu espacio de almacenamiento? Contáctanos para obtener más información sobre nuestras carpas industriales inteligentes y cómo pueden beneficiar a tu negocio."
+                        }
+                      },
+                      {
+                        "id": "button-62",
+                        "kind": "button",
+                        "ruleIds": [
+                          "btn-504eb8",
+                          "t-1a9c16",
+                          "cbg-a0ed80",
+                          "cbt-ec5e9f",
+                          "forma-57aa11",
+                          "btnp-1a0b10",
+                          "mg-a343db"
+                        ],
+                        "content": {
+                          "label": "Solicita Información"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
