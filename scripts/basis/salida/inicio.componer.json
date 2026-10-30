@@ -1110,6 +1110,29 @@
         }
       },
       {
+        "id": "mg-f14994",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "margin-block-end": "-1px"
+          }
+        }
+      },
+      {
         "id": "media-5c84f6",
         "kind": "media",
         "scope": {
@@ -2015,6 +2038,56 @@
         }
       },
       {
+        "id": "relmod-7f9b1c",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "padding-right": "30px",
+            "padding-left": "30px",
+            "padding-top": "30px"
+          }
+        }
+      },
+      {
+        "id": "relmod-3dc155",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "padding-right": "30px",
+            "padding-inline-start": "calc(1em + 30px)",
+            "padding-bottom": "30px"
+          }
+        }
+      },
+      {
         "id": "media-792b82",
         "kind": "media",
         "scope": {
@@ -2056,6 +2129,30 @@
         "value": {
           "aspectRatio": "91/88",
           "fit": "cover"
+        }
+      },
+      {
+        "id": "mg-978b3f",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "margin-block-start": "30px",
+            "margin-block-end": "30px"
+          }
         }
       },
       {
@@ -2293,7 +2390,7 @@
         }
       },
       {
-        "id": "promo-cd77a9",
+        "id": "promo-115fb8",
         "kind": "properties",
         "scope": {
           "breakpoint": "mobile",
@@ -2314,7 +2411,8 @@
             "padding-top": "20px",
             "padding-right": "20px",
             "padding-bottom": "20px",
-            "padding-left": "20px"
+            "padding-left": "20px",
+            "min-height": "264px"
           }
         }
       }
@@ -2493,7 +2591,8 @@
                       "t-658434",
                       "t-379834",
                       "c-8eff11",
-                      "mg-a343db"
+                      "mg-a343db",
+                      "mg-f14994"
                     ],
                     "content": {
                       "text": "Nuestras carpas son fabricadas con materiales de última generación que les brindan la máxima protección ante la de lluvia, sol y vectores."
@@ -2596,7 +2695,8 @@
                       "t-658434",
                       "t-379834",
                       "c-8eff11",
-                      "mg-a343db"
+                      "mg-a343db",
+                      "mg-f14994"
                     ],
                     "content": {
                       "text": "Con materiales de alta calidad, nuestras carpas ofrecen un aislamiento superior, son ignífugas y sus estructuras de aluminio son livianas y robustas."
@@ -2959,7 +3059,8 @@
                     "ruleIds": [
                       "t-359376",
                       "c-4de609",
-                      "mg-9b6f57"
+                      "mg-9b6f57",
+                      "relmod-7f9b1c"
                     ],
                     "content": {
                       "text": "Características",
@@ -2973,7 +3074,8 @@
                       "t-829a89",
                       "c-c21382",
                       "mg-a343db",
-                      "lista-e7e238"
+                      "lista-e7e238",
+                      "relmod-3dc155"
                     ],
                     "content": {
                       "ordered": false,
@@ -3026,7 +3128,7 @@
                       "img-c46f28",
                       "media-792b82",
                       "media-774ff8",
-                      "mg-a343db"
+                      "mg-978b3f"
                     ],
                     "content": {
                       "assetUrl": "/wp-content/uploads/2025/07/Interior-doble-pilar-y-canaleta.jpg",
@@ -3069,7 +3171,7 @@
                     "ruleIds": [
                       "col-542b47",
                       "promo-4f5a60",
-                      "promo-cd77a9",
+                      "promo-115fb8",
                       "mg-a343db"
                     ],
                     "children": [

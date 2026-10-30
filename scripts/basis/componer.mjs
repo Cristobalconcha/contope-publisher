@@ -19,7 +19,7 @@ import { fileURLToPath } from 'node:url';
 import { transcribirSitio, disenoDe, informeMarkdown } from '../divi-a-contope/transcribir.mjs';
 
 const aqui = path.dirname(fileURLToPath(import.meta.url));
-const original = process.argv[2] || 'C:/Users/Cristobal concha/Sesión Claude/entregables/basis/original';
+const original = process.argv[2] || 'C:/Users/Cristobal concha/Sesión Claude/entregables/basis/medicion-2';
 const perfil = JSON.parse(readFileSync(path.join(aqui, 'perfil.json'), 'utf8'));
 const salida = path.join(aqui, 'salida');
 mkdirSync(salida, { recursive: true });

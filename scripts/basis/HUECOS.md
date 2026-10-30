@@ -64,7 +64,7 @@ el transcriptor lo avisa como «faltante» y el perfil admite un reemplazo (`ree
 
 - Portada: velo azul plano (ver 4) y la foto de fondo un poco distinta a 393 de ancho.
 - Aviso naranja de cierre: marrón en lugar de naranja con degradado negro (ver 4).
-- «Características»: con el video original de fondo. **El texto de la columna izquierda queda pegado al borde del panel** (el original lo tiene ~27 px adentro) y la fila mide 829 px contra 866: el módulo de texto de Divi trae relleno propio (Design → Spacing) que la medición no guardó. Arreglo: que `medir-pagina.js` guarde `padding` del módulo (`estiloCaja`) y que el transcriptor lo aplique; requiere volver a medir el sitio vivo, por eso no se hizo.
+- «Características»: con el video original de fondo y el relleno del módulo (30 px) ya aplicado: el título, la foto y el panel calzan. Falta la sangría de las sublistas: el `<ul>` anidado trae la del navegador (40 px) y el original usa ~1 em; la regla `properties` sólo alcanza la lista de primer nivel (hueco: no hay forma de estilar el `<ul>` interior).
 - Pliegues de Preguntas frecuentes: sin el ícono «+» y el título del pliegue abierto no se oscurece (ver 5).
 - Contactos: mapa estático (ver 6) y formulario con otro dibujo de campos (ver 11).
 - Pie: 6 px más alto que el original (126 contra 120) y el mini mapa trae su leyenda de «Mapbox» abajo.
@@ -73,6 +73,30 @@ el transcriptor lo avisa como «faltante» y el perfil admite un reemplazo (`ree
 - La globo del mapa dice «Planta Econut / www.econut.cl»: es lo que dice el original de Basis (copia del código de Econut).
 - Banner de cookies: el original no tiene; aquí está como en Econut (pedido), con la paleta de Basis. Se oculta sólo en las capturas.
 - El texto «Gracias» del formulario no se pudo medir (nunca se envió): es uno mínimo.
+
+## Medición nueva (30-oct-2026): relleno y margen de cada módulo
+
+**Qué faltaba.** La primera medición guardaba el relleno de sección, fila y columna pero no el del módulo (Divi: Design → Spacing). Un
+módulo de texto con 30 px de relleno medía 866 px de alto y su texto empezaba 30 px más adentro; sin ese dato el transcriptor lo
+dejaba pegado al borde y 37 px más bajo. **Arreglo de fondo:** `descarga/medir-pagina.js` ahora guarda, para TODO módulo,
+`estiloCaja` (relleno, margen por lado, ancho, ancho máximo, posición) y, si lo hay, `estiloInterior` (el `.et_pb_text_inner`,
+el contenedor del blurb, etc.); de cada bloque de texto guarda además su caja y sus márgenes. El transcriptor lo consume
+(`aplicarRellenoPropio`: texto, título y blurb; imágenes: el relleno pasa a márgenes de la imagen).
+Se midió una vez Inicio, Preguntas frecuentes y Contactos a 1440 y 393 (carpeta `entregables/basis/medicion-2/`).
+
+**Un defecto de esa medición, resuelto sin repetirla.** Dos imágenes del pie (logo BASIS y crédito de diseño) tienen
+`loading="lazy"` y no se alcanzaron a cargar: salieron con caja 0×0. El transcriptor acepta una *medición complementaria*
+(`perfil.medicionComplemento`, aquí la primera) y toma de ella esos módulos por posición. `medir.mjs` ahora fuerza la carga
+de las imágenes diferidas antes de medir (sin probar: no se volvió a pedir nada al sitio).
+
+**Por qué Preguntas frecuentes medía 3671 y Contactos 1182/2334.**
+
+| página y ancho | antes | ahora | original | causa |
+|---|---|---|---|---|
+| Preguntas frecuentes 393 | 3671 | **3308** | 3305 | los pliegues se separan 10 px en celular y 30 en escritorio (margen inferior de cada pliegue, ahora con variante móvil); el pie se rompía en celular por los márgenes negativos del logo (−28 px) y por el texto de la dirección, que saltaba debajo del mini mapa |
+| Inicio 393 | 5894 | **5778** | 5776 | el aviso naranja conservaba el alto mínimo de escritorio (321) también en celular (264); el mismo pie |
+| Preguntas frecuentes 1440 | 1757 | 1757 | 1754 | — |
+| Contactos 1440 / 393 | 1182 / 2392 | 1182 / 2334 | 1354 / 2653 | **el formulario**: Orugantt Forms lo dibuja más compacto que Gravity Forms (campos más bajos, sin la etiqueta pequeña encima, botón del ancho del contenido) y su estilo sólo se toca por variables: −178 px en escritorio y −320 en celular. No es un error de transcripción sino la diferencia entre los dos motores de formularios |
 
 ## Para subirlo
 

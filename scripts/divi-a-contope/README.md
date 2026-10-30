@@ -83,3 +83,11 @@ clase Divi, con severidad `faltante` / `sin-transcribir` / `aproximado` / `ok`. 
 `pruebas/probar-animacion.mjs` (animaciones con HTML sintético) y, contra un sitio real, el circuito
 `componer → preview → apply → capturar` de `scripts/basis` más `comparar-estilos.mjs`, que busca cada texto medido en
 el sitio local y compara tamaño, interlineado, peso, familia, color y posición.
+
+## Qué guarda la medición (y por qué)
+
+Para cada módulo, `estiloCaja` (relleno y margen por lado en px, ancho, ancho máximo, posición) y `estiloInterior`
+(relleno de `.et_pb_text_inner` y similares); para cada bloque de texto, su caja y márgenes. Sin el relleno propio del
+módulo (Design → Spacing) el contenido queda pegado al borde de su columna. Las imágenes con carga diferida se fuerzan a
+cargar antes de medir; si una igual sale con caja 0×0, `perfil.medicionComplemento` apunta a otra medición de la que se
+toman esos módulos por posición.

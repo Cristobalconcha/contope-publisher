@@ -15,7 +15,7 @@
  */
 import { px, pxs, redondear, lados, esTransparente, colorRegla, leerHtml, textoDe, limpiarTexto } from './util.mjs';
 import { reglasMargen, declaracionesCaja, superficieSeccion, reglasTexto } from './estilos.mjs';
-import { transcribirModulo, razon } from './modulos.mjs';
+import { transcribirModulo, razon, aplicarRellenoPropio } from './modulos.mjs';
 import { transcribirCodigo } from './codigo.mjs';
 import { writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
@@ -28,7 +28,7 @@ const hueco = (a, b, col) => {
   if (b) return Math.max(-9999, Math.round(b.caja.y - (a.caja.y + a.caja.h)));
   if (!col) return 0;
   const resto = (col.caja.y + col.caja.h) - (a.caja.y + a.caja.h) - lados(col.estilo.relleno)[2];
-  return resto > 0 && resto < 200 ? Math.round(resto) : 0;
+  return Math.abs(resto) < 200 ? Math.round(resto) : 0;
 };
 
 const margenesVert = (margen) => {
@@ -98,6 +98,7 @@ function transcribirColumna(ctx, cD, cM, ubic, anchoD, anchoM) {
     const nodos = transcribirModulo(ctx, mD, mM, info);
     ctx.reg.inicioPendiente = null;
     if (!nodos.length) return;
+    aplicarRellenoPropio(ctx, mD, mM, nodos, u);
     // Un módulo de texto o título más angosto que su columna (Divi: Sizing → ancho máximo).
     if (['text', 'heading'].includes(mD.tipo)) {
       const [, rD, , lD] = lados(cD.estilo.relleno);

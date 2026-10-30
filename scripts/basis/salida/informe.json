@@ -1,6 +1,28 @@
 [
   {
     "pagina": "inicio",
+    "region": "pie",
+    "seccion": 6,
+    "fila": 1,
+    "columna": 0,
+    "modulo": "image",
+    "clase": "carga diferida",
+    "severidad": "ok",
+    "motivo": "imagen sin cargar al medir (1440): se toma su caja de la medición complementaria"
+  },
+  {
+    "pagina": "inicio",
+    "region": "pie",
+    "seccion": 6,
+    "fila": 1,
+    "columna": 2,
+    "modulo": "image",
+    "clase": "carga diferida",
+    "severidad": "ok",
+    "motivo": "imagen sin cargar al medir (1440): se toma su caja de la medición complementaria"
+  },
+  {
+    "pagina": "inicio",
     "region": "encabezado",
     "seccion": 0,
     "modulo": "sección",
@@ -109,6 +131,18 @@
     "clase": "et_pb_section_video",
     "severidad": "ok",
     "motivo": "video de fondo → nodo `video` ambiental detrás del contenido (cubre la sección)"
+  },
+  {
+    "pagina": "inicio",
+    "region": "contenido",
+    "seccion": 4,
+    "fila": 0,
+    "columna": 0,
+    "modulo": "text",
+    "indiceModulo": 0,
+    "clase": "relleno del módulo",
+    "severidad": "ok",
+    "motivo": "relleno propio del módulo (arriba 30, derecha 30, abajo 30, izquierda 30 px a 1440) aplicado a sus nodos"
   },
   {
     "pagina": "inicio",

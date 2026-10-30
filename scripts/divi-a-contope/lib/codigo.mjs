@@ -140,7 +140,7 @@ export function transcribirCodigo(ctx, mod, { pagina, ubicacion }) {
           const rol = (ctx.medidaD?.roles || []).find((r) => (r.ejemplos || []).some((e) => textoDireccion.startsWith(e.slice(0, 25))));
           const rolM = (ctx.medidaM?.roles || []).find((r) => (r.ejemplos || []).some((e) => textoDireccion.startsWith(e.slice(0, 25))));
           const reglasDir = rol ? reglasTexto(ctx.reg, { d: rol, m: rolM }) : [];
-          reglasDir.push(...ctx.reg.propiedades({ 'margin-block-start': '0px', 'margin-block-end': '0px' }, {}, { prefijo: 'mg' }));
+          reglasDir.push(...ctx.reg.propiedades({ 'margin-block-start': '0px', 'margin-block-end': '0px', 'flex-grow': '1', 'flex-shrink': '1', 'flex-basis': '0px', 'min-width': '0px' }, {}, { prefijo: 'mg-dir' }));
           hijos.push(ctx.nodo('paragraph', reglasDir, { text: textoDireccion }));
         }
         const caja = mod.caja || { w: 60, h: 60 };

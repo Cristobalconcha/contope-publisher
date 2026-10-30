@@ -19,7 +19,7 @@ const SITIO = (process.env.SITIO || 'http://localhost:8894').replace(/\/+$/, '')
 const env = { ...process.env, SITIO, ENDPOINT: process.env.ENDPOINT || `${SITIO}/index.php?rest_route=/contope/v1/mcp` };
 if (!env.AUTH_FILE) { console.error('falta AUTH_FILE'); process.exit(1); }
 const probar = process.argv.includes('--probar') ? ['--probar'] : [];
-const original = process.env.ORIGINAL || 'C:/Users/Cristobal concha/Sesión Claude/entregables/basis/original';
+const original = process.env.ORIGINAL || 'C:/Users/Cristobal concha/Sesión Claude/entregables/basis/medicion-2';
 const correr = (guion, args) => console.log(execFileSync('node', [guion, ...args], { cwd: aqui, env, encoding: 'utf8', maxBuffer: 1e8 }).trimEnd());
 const perfil = JSON.parse(readFileSync(path.join(aqui, 'perfil.json'), 'utf8'));
 

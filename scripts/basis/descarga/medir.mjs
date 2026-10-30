@@ -51,6 +51,9 @@ for (const pg of paginas) {
       await dormir(2500);
       await recorrerLaPagina(evaluar, 0.6);
       await dormir(1500);
+      // Las imágenes con carga diferida (loading=lazy) se fuerzan a cargar: si no, su módulo se mide colapsado (caja 0×0).
+      await evaluar("document.querySelectorAll('img[loading=lazy]').forEach((i) => { i.loading = 'eager'; })");
+      await dormir(2500);
       const datos = await evaluar(guion);
       writeFileSync(path.join(salida, 'datos', `medida-${pg.archivo}-${ancho}.json`), JSON.stringify(datos, null, 2));
       writeFileSync(path.join(salida, 'datos', `red-${pg.archivo}-${ancho}.json`), JSON.stringify([...red.values()], null, 2));

@@ -106,9 +106,13 @@ export function moduloAcordeon(ctx, d, m, { gapD, gapM, ubicacion, independiente
     }
   }
   const separacion = margenInferior(cj) || 30;
+  const cjM = cerrado.iM ? (cerrado.iM.cajaToggle || cerrado.iM.caja || null) : null;
+  const separacionM = cjM ? (margenInferior(cjM) ?? separacion) : separacion;
   const reglas = [
     ctx.reg.R('interaction', { behavior: 'acordeon', ...(independiente ? { autoclose: false } : {}), ...(abierto ? { openNodeId: abierto.id } : { startClosed: true }) }, { prefijo: 'acordeon' }),
-    ctx.reg.R('layout', { mode: 'stack', gap: pxs(separacion), align: 'stretch' }, { prefijo: 'pila' }),
+    // La separación entre pliegues es el margen inferior de cada uno, y en celular suele ser otro (10px contra 30).
+    ...ctx.reg.conAnchos('layout', { mode: 'stack', gap: pxs(separacion), align: 'stretch' },
+      separacionM !== separacion ? { mobile: { mode: 'stack', gap: pxs(separacionM) } } : {}, { prefijo: 'pila' }),
     ...reglasMargen(ctx.reg, gapD, gapM),
   ];
   const nodo = ctx.nodo('group', reglas, undefined, pliegues);

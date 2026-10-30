@@ -20,7 +20,7 @@ import path from 'node:path';
 import { abrirChrome, esperarLaPagina, recorrerLaPagina } from '../piezas/chrome.mjs';
 
 const SITIO = (process.argv[2] || 'http://localhost:8894').replace(/\/+$/, '');
-const ORIG = process.argv[3] || 'C:/Users/Cristobal concha/Sesión Claude/entregables/basis/original';
+const ORIG = process.argv[3] || 'C:/Users/Cristobal concha/Sesión Claude/entregables/basis/medicion-2';
 const SAL = process.argv[4] || 'C:/Users/Cristobal concha/Sesión Claude/entregables/basis/capturas-comparacion';
 mkdirSync(SAL, { recursive: true });
 const PAGINAS = [['inicio', '/'], ['basis-carpas-industriales', '/basis-carpas-industriales/'], ['preguntas-frecuentes', '/preguntas-frecuentes/'], ['contactos', '/contactos/'], ['terminos-y-privacidad', '/terminos-y-privacidad/']];

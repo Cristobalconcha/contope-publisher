@@ -288,7 +288,7 @@
         }
       },
       {
-        "id": "mg-42fc97",
+        "id": "mg-2c7ef1",
         "kind": "properties",
         "scope": {
           "breakpoint": "all",
@@ -307,7 +307,30 @@
         "value": {
           "declarations": {
             "margin-block-start": "-28px",
-            "margin-block-end": "0px"
+            "margin-block-end": "-32px"
+          }
+        }
+      },
+      {
+        "id": "mg-02ec35",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "margin-block-end": "-28px"
           }
         }
       },
@@ -359,6 +382,34 @@
           "fontWeight": 500,
           "lineHeight": 1.4,
           "align": "start"
+        }
+      },
+      {
+        "id": "mg-dir-81746f",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "margin-block-start": "0px",
+            "margin-block-end": "0px",
+            "flex-grow": "1",
+            "flex-shrink": "1",
+            "flex-basis": "0px",
+            "min-width": "0px"
+          }
         }
       },
       {
@@ -550,7 +601,8 @@
                     "kind": "image",
                     "ruleIds": [
                       "img-302830",
-                      "mg-42fc97"
+                      "mg-2c7ef1",
+                      "mg-02ec35"
                     ],
                     "content": {
                       "assetUrl": "/wp-content/uploads/2025/07/aRecurso-12.png",
@@ -582,7 +634,7 @@
                         "ruleIds": [
                           "t-7d73ba",
                           "c-4737c4",
-                          "mg-a343db"
+                          "mg-dir-81746f"
                         ],
                         "content": {
                           "text": "Av 18 de Septiembre sn Hijuela 2\n\nFundo San Rafael - Sector Nuevo Sendero,\n\nPaine, Región Metropolitana"

@@ -152,10 +152,23 @@ const radioDeImagen = (ctx, img, zona) => {
   return r ? r.radio : (img.radio && img.radio !== '0px' ? img.radio : null);
 };
 
+// Una imagen con carga diferida (loading=lazy) que no se alcanzó a cargar al medir sale con caja 0×0.
+// Su tamaño se recupera de la caja del MÓDULO (alto) y de las dimensiones naturales del archivo.
+const imagenConCaja = (img, mod) => {
+  if (!img || (img.caja && img.caja.w > 0 && img.caja.h > 0)) return img;
+  const [nw, nh] = String(img.natural || '').split('x').map(Number);
+  const r = mod?.estiloCaja?.relleno4 || [0, 0, 0, 0];
+  const h = (mod?.caja?.h || 0) - r[0] - r[2];
+  if (!nw || !nh || h <= 0) return img;
+  return { ...img, caja: { x: mod.caja.x + r[3], y: mod.caja.y + r[0], w: Math.round((nw * h) / nh), h }, _reconstruida: true };
+};
+
 export function moduloImagen(ctx, d, m, { col, gapD, gapM, ubicacion }) {
   const nodos = [];
-  (d.imagenes || []).forEach((img, i) => {
-    const imgM = m?.imagenes?.[i];
+  (d.imagenes || []).forEach((img0, i) => {
+    const img = imagenConCaja(img0, d);
+    const imgM = imagenConCaja(m?.imagenes?.[i], m);
+    if (img._reconstruida) ctx.avisar({ ...ubicacion, modulo: 'image', clase: 'carga diferida', severidad: 'aproximado', motivo: 'la imagen no estaba cargada al medir (loading=lazy, caja 0×0): su tamaño se reconstruye con el alto del módulo y las dimensiones naturales del archivo' });
     const url = ctx.url(img.actual || img.src, ubicacion);
     if (!url) return;
     const caja = img.caja; const cajaM = imgM?.caja;
@@ -187,7 +200,12 @@ export function moduloImagen(ctx, d, m, { col, gapD, gapM, ubicacion }) {
     }
     const radio = radioDeImagen(ctx, img, ubicacion.zona);
     if (radio) reglas.push(ctx.reg.R('properties', { declarations: { 'border-radius': radio, overflow: 'hidden' } }, { prefijo: 'rad' }));
-    reglas.push(...reglasMargen(ctx.reg, gapD, gapM));
+    // El relleno propio del módulo (Design → Spacing) deja a la imagen adentro de su caja: arriba y abajo
+    // se vuelven márgenes de la imagen (la caja externa del módulo no cambia).
+    const topD = Math.max(0, Math.round(caja.y - d.caja.y)); const botD = Math.max(0, Math.round((d.caja.y + d.caja.h) - (caja.y + caja.h)));
+    const topM = cajaM ? Math.max(0, Math.round(cajaM.y - m.caja.y)) : topD; const botM = cajaM ? Math.max(0, Math.round((m.caja.y + m.caja.h) - (cajaM.y + cajaM.h))) : botD;
+    if (topD > 1 || topM > 1) { const p = ctx.reg.inicioPendiente; ctx.reg.inicioPendiente = { d: (p?.d || 0) + topD, m: (p?.m ?? p?.d ?? 0) + topM }; }
+    reglas.push(...reglasMargen(ctx.reg, (gapD ?? 0) + botD, (gapM ?? 0) + botM));
     let nodo = ctx.nodo('image', reglas, { assetUrl: url, alt: img.alt || '' });
     const enlace = img.enlace && ctx.destino(img.enlace);
     if (enlace) {
@@ -314,7 +332,7 @@ export function moduloPromo(ctx, d, m, { gapD, gapM, ubicacion }) {
   const caja = declaracionesCaja(d.cajaPromo);
   const [t, r, b, l] = lados(d.cajaPromo?.relleno);
   Object.assign(caja, { 'padding-top': pxs(t), 'padding-right': pxs(r), 'padding-bottom': pxs(b), 'padding-left': pxs(l), 'text-align': 'center', 'min-height': pxs(d.caja.h) });
-  const cajaM = m?.cajaPromo ? (() => { const [t2, r2, b2, l2] = lados(m.cajaPromo.relleno); return { 'padding-top': pxs(t2), 'padding-right': pxs(r2), 'padding-bottom': pxs(b2), 'padding-left': pxs(l2) }; })() : {};
+  const cajaM = m?.cajaPromo ? (() => { const [t2, r2, b2, l2] = lados(m.cajaPromo.relleno); return { 'padding-top': pxs(t2), 'padding-right': pxs(r2), 'padding-bottom': pxs(b2), 'padding-left': pxs(l2), 'min-height': pxs(m.caja.h) }; })() : {};
   const reglas = [...ctx.reg.propiedades(caja, { mobile: cajaM }, { prefijo: 'promo' }), ...reglasMargen(ctx.reg, gapD, gapM)];
   return [ctx.nodo('group', [ctx.reg.R('layout', { mode: 'stack', gap: '0px', align: 'stretch' }, { prefijo: 'pila' }), ...reglas], undefined, hijos)];
 }
@@ -373,4 +391,34 @@ export function transcribirModulo(ctx, d, m, info) {
       ctx.avisar({ ...info.ubicacion, modulo: t, clase: `et_pb_${t}`, severidad: 'sin-transcribir', motivo: `módulo «${t}» sin transcriptor: ${['tabs', 'slider', 'gallery', 'map', 'number_counter', 'circle_counter', 'bar_counters', 'testimonial', 'team_member', 'pricing_tables', 'portfolio', 'blog', 'countdown_timer', 'audio', 'social_media_follow', 'search', 'sidebar', 'menu', 'fullwidth_menu', 'login', 'signup', 'icon', 'lottie', 'post_title'].includes(t) ? 'está en la lista de pendientes del transcriptor (ver README)' : 'tipo desconocido'}` });
       return [];
   }
+}
+
+/* ------------------------------------------- relleno propio de cada módulo */
+
+/**
+ * El relleno (padding) propio de un módulo de Divi —Design → Spacing— ya está DENTRO de la caja medida y
+ * decide dónde empieza su contenido. Se reparte entre los nodos que salieron del módulo: los lados
+ * izquierdo y derecho en todos, el de arriba en el primero y el de abajo en el último. Así los márgenes
+ * entre módulos (medidos de las cajas externas) no cambian.
+ * Sólo para módulos cuyo contenido son nodos de texto o de bloque (texto, título, blurb).
+ */
+export function aplicarRellenoPropio(ctx, mD, mM, nodos, ubicacion) {
+  const leer = (mod) => (mod?.estiloCaja?.relleno4 || null);
+  const rD = leer(mD);
+  if (!rD || !nodos.length) return;
+  if (!['text', 'heading', 'blurb'].includes(mD.tipo)) return;
+  const rM = leer(mM) || rD;
+  if (rD.every((v) => v < 0.5) && rM.every((v) => v < 0.5)) return;
+  const decl = (r, i, n, lista) => {
+    const d = { 'padding-right': pxs(r[1]) };
+    if (lista) d['padding-inline-start'] = `calc(1em + ${pxs(r[3])})`; else d['padding-left'] = pxs(r[3]);
+    if (i === 0) d['padding-top'] = pxs(r[0]);
+    if (i === n - 1) d['padding-bottom'] = pxs(r[2]);
+    return d;
+  };
+  nodos.forEach((nodo, i) => {
+    const lista = nodo.kind === 'list';
+    nodo.ruleIds = [...(nodo.ruleIds || []), ...ctx.reg.propiedades(decl(rD, i, nodos.length, lista), { mobile: decl(rM, i, nodos.length, lista) }, { prefijo: 'relmod' })];
+  });
+  ctx.avisar({ ...ubicacion, modulo: mD.tipo, clase: 'relleno del módulo', severidad: 'ok', motivo: `relleno propio del módulo (arriba ${rD[0]}, derecha ${rD[1]}, abajo ${rD[2]}, izquierda ${rD[3]} px a 1440) aplicado a sus nodos` });
 }

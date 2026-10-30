@@ -98,6 +98,23 @@ export function transcribirSitio({ original, perfil, paginas, anchos = [1440, 39
       get reglasMapaMini() { return perfil.reglasMapa?.mini || []; },
       get reglasMapaGrande() { return perfil.reglasMapa?.grande || []; },
     };
+    // Medición complementaria: una imagen con carga diferida que no se alcanzó a cargar al medir sale con
+    // natural 0x0 y su módulo colapsado. Si hay otra medición de la misma página (perfil.medicionComplemento),
+    // esos módulos se toman de ella, por posición.
+    if (perfil.medicionComplemento) {
+      for (const [ancho, med] of [[anchoD, medD], [anchoM, medM]]) {
+        const fc = path.join(perfil.medicionComplemento, 'datos', `medida-${slug}-${ancho}.json`);
+        if (!med || !existsSync(fc)) continue;
+        const comp = leer(fc);
+        med.secciones.forEach((sec, i) => (sec.filas || []).forEach((fila, j) => (fila.columnas || []).forEach((col, k) => (col.modulos || []).forEach((mod, n) => {
+          if (mod.tipo !== 'image' || !(mod.imagenes || []).some((im) => im.natural === '0x0')) return;
+          const alt = comp.secciones?.[i]?.filas?.[j]?.columnas?.[k]?.modulos?.[n];
+          if (!alt || alt.tipo !== 'image' || (alt.imagenes || []).some((im) => im.natural === '0x0')) return;
+          col.modulos[n] = { ...alt, estiloCaja: mod.estiloCaja || alt.estiloCaja };
+          informe.push({ pagina: slug, region: sec.region, seccion: i, fila: j, columna: k, modulo: 'image', clase: 'carga diferida', severidad: 'ok', motivo: `imagen sin cargar al medir (${ancho}): se toma su caja de la medición complementaria` });
+        }))));
+      }
+    }
     const r = transcribirMedicion(ctx, medD, medM);
     salida.paginas[slug] = { titulo: (perfil.paginas?.[slug]?.titulo) || medD.titulo, nodos: r.contenido, encabezado: r.encabezado, pie: r.pie, anchoMedido: [medD.ancho, medM?.ancho || null] };
   }

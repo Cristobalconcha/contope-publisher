@@ -8,6 +8,7 @@
   const abs = (u) => { try { return u ? new URL(u, location.href).href : ''; } catch (e) { return u || ''; } };
   const familia = (s) => (s.fontFamily || '').split(',')[0].replace(/['"]/g, '').trim();
   const tipo = (e) => { const s = cs(e); return { familia: familia(s), pila: s.fontFamily, tam: s.fontSize, peso: s.fontWeight, estilo: s.fontStyle, interlineado: s.lineHeight, espaciado: s.letterSpacing, mayus: s.textTransform, alinea: s.textAlign, color: s.color }; };
+  const lados4 = (e, p) => ['top', 'right', 'bottom', 'left'].map((l) => parseFloat(cs(e)[p + '-' + l]) || 0);
   const caja = (e) => { const s = cs(e); return { fondo: s.backgroundColor, imagenFondo: s.backgroundImage, radio: s.borderRadius, borde: s.borderTopWidth + ' ' + s.borderTopStyle + ' ' + s.borderTopColor, sombra: s.boxShadow, relleno: s.padding, margen: s.margin }; };
   const urlsDeFondo = (v) => { const r = []; const re = /url\(["']?([^"')]+)["']?\)/g; let m; while ((m = re.exec(v || ''))) r.push(abs(m[1])); return r; };
   const nombreClase = (e) => ((e.className && e.className.baseVal === undefined ? e.className : '') + '');
@@ -59,7 +60,7 @@
     if (tipoM === 'text') {
       const inner = m.querySelector('.et_pb_text_inner') || m;
       d.html = inner.innerHTML.trim();
-      d.bloques = q('h1,h2,h3,h4,h5,h6,p,li,blockquote', inner).map((x) => ({ etiqueta: x.tagName.toLowerCase(), texto: limpio(x.textContent), estilo: tipo(x) }));
+      d.bloques = q('h1,h2,h3,h4,h5,h6,p,li,blockquote', inner).map((x) => ({ etiqueta: x.tagName.toLowerCase(), texto: limpio(x.textContent), estilo: tipo(x), caja: rect(x), margen4: lados4(x, 'margin'), relleno4: lados4(x, 'padding') }));
       d.enlaces = enlaces(inner);
     } else if (tipoM === 'heading') {
       const h = m.querySelector('h1,h2,h3,h4,h5,h6,.et_pb_module_heading');
@@ -110,6 +111,14 @@
     } else {
       d.enlaces = enlaces(m).slice(0, 20); d.imagenes = imagenes(m);
     }
+    // Relleno y margen PROPIOS del módulo (Divi: Design → Spacing), por lado y en px: la caja medida los
+    // incluye, y sin ellos el texto queda pegado al borde de su columna. Se guardan para TODO módulo.
+    d.estiloCaja = Object.assign(caja(m), {
+      relleno4: lados4(m, 'padding'), margen4: lados4(m, 'margin'),
+      ancho: cs(m).width, anchoMaximo: cs(m).maxWidth, posicion: cs(m).position, boxSizing: cs(m).boxSizing,
+    });
+    const interior = m.querySelector('.et_pb_text_inner, .et_pb_blurb_container, .et_pb_promo_description, .et_pb_code_inner');
+    if (interior) d.estiloInterior = { clase: interior.className.split(/\s+/)[0], relleno4: lados4(interior, 'padding'), margen4: lados4(interior, 'margin'), caja: rect(interior) };
     return d;
   };
 

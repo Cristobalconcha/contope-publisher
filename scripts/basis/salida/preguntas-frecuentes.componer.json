@@ -126,6 +126,29 @@
         }
       },
       {
+        "id": "mg-f14994",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "margin-block-end": "-1px"
+          }
+        }
+      },
+      {
         "id": "sec-79ee4b",
         "kind": "properties",
         "scope": {
@@ -858,6 +881,28 @@
         }
       },
       {
+        "id": "pila-5922dd",
+        "kind": "layout",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "mode": "stack",
+          "gap": "10px"
+        }
+      },
+      {
         "id": "mg-89f683",
         "kind": "properties",
         "scope": {
@@ -1182,6 +1227,7 @@
                     "ruleIds": [
                       "acordeon-b232cb",
                       "pila-388a42",
+                      "pila-5922dd",
                       "mg-a343db",
                       "mg-89f683"
                     ],
@@ -1618,6 +1664,7 @@
                     "ruleIds": [
                       "acordeon-c6b48b",
                       "pila-388a42",
+                      "pila-5922dd",
                       "mg-b06d27"
                     ],
                     "children": [
@@ -1885,7 +1932,9 @@
                     "ruleIds": [
                       "acordeon-9a5bc6",
                       "pila-388a42",
-                      "mg-a343db"
+                      "pila-5922dd",
+                      "mg-a343db",
+                      "mg-f14994"
                     ],
                     "children": [
                       {
