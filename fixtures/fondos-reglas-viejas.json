@@ -1,0 +1,239 @@
+{
+    "version_del_plugin": "0.3.82",
+    "casos": [
+        {
+            "nombre": "color plano",
+            "scope": {
+                "breakpoint": "all",
+                "state": "default"
+            },
+            "value": {
+                "backgroundColor": "#0C71C3"
+            },
+            "css": ":where(.cod-rule--fondo){position:relative;}.cod-rule--fondo{background-color:#0C71C3;}",
+            "markup": "<main class=\"cod-mcp-page\" data-cod-composition=\"v2\" aria-label=\"golden-fondos\"><section class=\"cod-node cod-node--section cod-node-id-aviso cod-section cod-rule--fondo\" data-cod-node=\"aviso\"><div class=\"cod-columns cod-columns--single\"><div class=\"cod-column\"><p class=\"cod-node cod-node--paragraph cod-node-id-texto\" data-cod-node=\"texto\">Aviso</p></div></div></section></main>"
+        },
+        {
+            "nombre": "color y texto",
+            "scope": {
+                "breakpoint": "all",
+                "state": "default"
+            },
+            "value": {
+                "backgroundColor": "var(--cod-color-accent)",
+                "foregroundColor": "#ffffff"
+            },
+            "css": ":where(.cod-rule--fondo){position:relative;}.cod-rule--fondo{background-color:var(--cod-color-accent);color:#ffffff;}",
+            "markup": "<main class=\"cod-mcp-page\" data-cod-composition=\"v2\" aria-label=\"golden-fondos\"><section class=\"cod-node cod-node--section cod-node-id-aviso cod-section cod-rule--fondo\" data-cod-node=\"aviso\"><div class=\"cod-columns cod-columns--single\"><div class=\"cod-column\"><p class=\"cod-node cod-node--paragraph cod-node-id-texto\" data-cod-node=\"texto\">Aviso</p></div></div></section></main>"
+        },
+        {
+            "nombre": "imagen sola",
+            "scope": {
+                "breakpoint": "all",
+                "state": "default"
+            },
+            "value": {
+                "backgroundAssetUrl": "/wp-content/uploads/foto.jpg"
+            },
+            "css": ":where(.cod-rule--fondo){position:relative;}.cod-rule--fondo{background-image:url(\"/wp-content/uploads/foto.jpg\");background-repeat:no-repeat;background-position:center;background-size:cover;}",
+            "markup": "<main class=\"cod-mcp-page\" data-cod-composition=\"v2\" aria-label=\"golden-fondos\"><section class=\"cod-node cod-node--section cod-node-id-aviso cod-section cod-rule--fondo\" data-cod-node=\"aviso\"><div class=\"cod-columns cod-columns--single\"><div class=\"cod-column\"><p class=\"cod-node cod-node--paragraph cod-node-id-texto\" data-cod-node=\"texto\">Aviso</p></div></div></section></main>"
+        },
+        {
+            "nombre": "imagen con medidas",
+            "scope": {
+                "breakpoint": "all",
+                "state": "default"
+            },
+            "value": {
+                "backgroundAssetUrl": "/wp-content/uploads/foto.jpg",
+                "backgroundSize": "7% auto",
+                "backgroundPosition": "2% 50%",
+                "backgroundRepeat": "no-repeat"
+            },
+            "css": ":where(.cod-rule--fondo){position:relative;}.cod-rule--fondo{background-image:url(\"/wp-content/uploads/foto.jpg\");background-repeat:no-repeat;background-position:2% 50%;background-size:7% auto;}",
+            "markup": "<main class=\"cod-mcp-page\" data-cod-composition=\"v2\" aria-label=\"golden-fondos\"><section class=\"cod-node cod-node--section cod-node-id-aviso cod-section cod-rule--fondo\" data-cod-node=\"aviso\"><div class=\"cod-columns cod-columns--single\"><div class=\"cod-column\"><p class=\"cod-node cod-node--paragraph cod-node-id-texto\" data-cod-node=\"texto\">Aviso</p></div></div></section></main>"
+        },
+        {
+            "nombre": "imagen y repeat-x",
+            "scope": {
+                "breakpoint": "all",
+                "state": "default"
+            },
+            "value": {
+                "backgroundAssetUrl": "/wp-content/uploads/foto.jpg",
+                "backgroundRepeat": "repeat-x",
+                "backgroundSize": "200px"
+            },
+            "css": ":where(.cod-rule--fondo){position:relative;}.cod-rule--fondo{background-image:url(\"/wp-content/uploads/foto.jpg\");background-repeat:repeat-x;background-position:center;background-size:200px;}",
+            "markup": "<main class=\"cod-mcp-page\" data-cod-composition=\"v2\" aria-label=\"golden-fondos\"><section class=\"cod-node cod-node--section cod-node-id-aviso cod-section cod-rule--fondo\" data-cod-node=\"aviso\"><div class=\"cod-columns cod-columns--single\"><div class=\"cod-column\"><p class=\"cod-node cod-node--paragraph cod-node-id-texto\" data-cod-node=\"texto\">Aviso</p></div></div></section></main>"
+        },
+        {
+            "nombre": "color e imagen",
+            "scope": {
+                "breakpoint": "all",
+                "state": "default"
+            },
+            "value": {
+                "backgroundColor": "#f60",
+                "backgroundAssetUrl": "/wp-content/uploads/foto.jpg",
+                "backgroundPosition": "top left",
+                "backgroundSize": "contain"
+            },
+            "css": ":where(.cod-rule--fondo){position:relative;}.cod-rule--fondo{background-color:#f60;background-image:url(\"/wp-content/uploads/foto.jpg\");background-repeat:no-repeat;background-position:top left;background-size:contain;}",
+            "markup": "<main class=\"cod-mcp-page\" data-cod-composition=\"v2\" aria-label=\"golden-fondos\"><section class=\"cod-node cod-node--section cod-node-id-aviso cod-section cod-rule--fondo\" data-cod-node=\"aviso\"><div class=\"cod-columns cod-columns--single\"><div class=\"cod-column\"><p class=\"cod-node cod-node--paragraph cod-node-id-texto\" data-cod-node=\"texto\">Aviso</p></div></div></section></main>"
+        },
+        {
+            "nombre": "imagen y velo 0.6",
+            "scope": {
+                "breakpoint": "all",
+                "state": "default"
+            },
+            "value": {
+                "backgroundAssetUrl": "/wp-content/uploads/foto.jpg",
+                "overlayColor": "#000000",
+                "overlayOpacity": 0.6
+            },
+            "css": ":where(.cod-rule--fondo){position:relative;}.cod-rule--fondo{background-image:linear-gradient(color-mix(in srgb,#000000 60%,transparent),color-mix(in srgb,#000000 60%,transparent)),url(\"/wp-content/uploads/foto.jpg\");background-repeat:no-repeat,no-repeat;background-position:center,center;background-size:cover,cover;}",
+            "markup": "<main class=\"cod-mcp-page\" data-cod-composition=\"v2\" aria-label=\"golden-fondos\"><section class=\"cod-node cod-node--section cod-node-id-aviso cod-section cod-rule--fondo\" data-cod-node=\"aviso\"><div class=\"cod-columns cod-columns--single\"><div class=\"cod-column\"><p class=\"cod-node cod-node--paragraph cod-node-id-texto\" data-cod-node=\"texto\">Aviso</p></div></div></section></main>"
+        },
+        {
+            "nombre": "imagen y velo con medidas",
+            "scope": {
+                "breakpoint": "all",
+                "state": "default"
+            },
+            "value": {
+                "backgroundAssetUrl": "/wp-content/uploads/foto.jpg",
+                "overlayColor": "#000000",
+                "overlayOpacity": 0.6,
+                "backgroundSize": "7% auto",
+                "backgroundPosition": "2% 50%",
+                "backgroundRepeat": "no-repeat"
+            },
+            "css": ":where(.cod-rule--fondo){position:relative;}.cod-rule--fondo{background-image:linear-gradient(color-mix(in srgb,#000000 60%,transparent),color-mix(in srgb,#000000 60%,transparent)),url(\"/wp-content/uploads/foto.jpg\");background-repeat:no-repeat,no-repeat;background-position:50% 50%,2% 50%;background-size:cover,7% auto;}",
+            "markup": "<main class=\"cod-mcp-page\" data-cod-composition=\"v2\" aria-label=\"golden-fondos\"><section class=\"cod-node cod-node--section cod-node-id-aviso cod-section cod-rule--fondo\" data-cod-node=\"aviso\"><div class=\"cod-columns cod-columns--single\"><div class=\"cod-column\"><p class=\"cod-node cod-node--paragraph cod-node-id-texto\" data-cod-node=\"texto\">Aviso</p></div></div></section></main>"
+        },
+        {
+            "nombre": "imagen y velo opaco",
+            "scope": {
+                "breakpoint": "all",
+                "state": "default"
+            },
+            "value": {
+                "backgroundAssetUrl": "/wp-content/uploads/foto.jpg",
+                "overlayColor": "#112233"
+            },
+            "css": ":where(.cod-rule--fondo){position:relative;}.cod-rule--fondo{background-image:linear-gradient(#112233,#112233),url(\"/wp-content/uploads/foto.jpg\");background-repeat:no-repeat,no-repeat;background-position:center,center;background-size:cover,cover;}",
+            "markup": "<main class=\"cod-mcp-page\" data-cod-composition=\"v2\" aria-label=\"golden-fondos\"><section class=\"cod-node cod-node--section cod-node-id-aviso cod-section cod-rule--fondo\" data-cod-node=\"aviso\"><div class=\"cod-columns cod-columns--single\"><div class=\"cod-column\"><p class=\"cod-node cod-node--paragraph cod-node-id-texto\" data-cod-node=\"texto\">Aviso</p></div></div></section></main>"
+        },
+        {
+            "nombre": "velo sin imagen (::before)",
+            "scope": {
+                "breakpoint": "all",
+                "state": "default"
+            },
+            "value": {
+                "backgroundColor": "#222222",
+                "overlayColor": "#ffffff",
+                "overlayOpacity": 0.25
+            },
+            "css": ":where(.cod-rule--fondo){position:relative;}.cod-rule--fondo{background-color:#222222;}.cod-rule--fondo::before{content:\"\";position:absolute;inset:0;background-color:#ffffff;opacity:0.25;pointer-events:none;}.cod-rule--fondo>*{position:relative;}",
+            "markup": "<main class=\"cod-mcp-page\" data-cod-composition=\"v2\" aria-label=\"golden-fondos\"><section class=\"cod-node cod-node--section cod-node-id-aviso cod-section cod-rule--fondo\" data-cod-node=\"aviso\"><div class=\"cod-columns cod-columns--single\"><div class=\"cod-column\"><p class=\"cod-node cod-node--paragraph cod-node-id-texto\" data-cod-node=\"texto\">Aviso</p></div></div></section></main>"
+        },
+        {
+            "nombre": "velo sin imagen opaco",
+            "scope": {
+                "breakpoint": "all",
+                "state": "default"
+            },
+            "value": {
+                "overlayColor": "var(--cod-color-ink)"
+            },
+            "css": "",
+            "markup": "<main class=\"cod-mcp-page\" data-cod-composition=\"v2\" aria-label=\"golden-fondos\"><section class=\"cod-node cod-node--section cod-node-id-aviso cod-section cod-rule--fondo\" data-cod-node=\"aviso\"><div class=\"cod-columns cod-columns--single\"><div class=\"cod-column\"><p class=\"cod-node cod-node--paragraph cod-node-id-texto\" data-cod-node=\"texto\">Aviso</p></div></div></section></main>"
+        },
+        {
+            "nombre": "borde y sombra",
+            "scope": {
+                "breakpoint": "all",
+                "state": "default"
+            },
+            "value": {
+                "borderColor": "#cccccc",
+                "borderWidth": "2px",
+                "shadow": "md"
+            },
+            "css": ":where(.cod-rule--fondo){position:relative;}.cod-rule--fondo{border-color:#cccccc;border-style:solid;border-width:2px;box-shadow:0 8px 24px rgba(0,0,0,.16);}",
+            "markup": "<main class=\"cod-mcp-page\" data-cod-composition=\"v2\" aria-label=\"golden-fondos\"><section class=\"cod-node cod-node--section cod-node-id-aviso cod-section cod-rule--fondo\" data-cod-node=\"aviso\"><div class=\"cod-columns cod-columns--single\"><div class=\"cod-column\"><p class=\"cod-node cod-node--paragraph cod-node-id-texto\" data-cod-node=\"texto\">Aviso</p></div></div></section></main>"
+        },
+        {
+            "nombre": "borde con variable",
+            "scope": {
+                "breakpoint": "all",
+                "state": "default"
+            },
+            "value": {
+                "borderColor": "var(--oliva-700)",
+                "borderWidth": "1px"
+            },
+            "css": ":where(.cod-rule--fondo){position:relative;}.cod-rule--fondo{border-top-color:var(--oliva-700);border-top-style:solid;border-top-width:1px;border-right-color:var(--oliva-700);border-right-style:solid;border-right-width:1px;border-bottom-color:var(--oliva-700);border-bottom-style:solid;border-bottom-width:1px;border-left-color:var(--oliva-700);border-left-style:solid;border-left-width:1px;}",
+            "markup": "<main class=\"cod-mcp-page\" data-cod-composition=\"v2\" aria-label=\"golden-fondos\"><section class=\"cod-node cod-node--section cod-node-id-aviso cod-section cod-rule--fondo\" data-cod-node=\"aviso\"><div class=\"cod-columns cod-columns--single\"><div class=\"cod-column\"><p class=\"cod-node cod-node--paragraph cod-node-id-texto\" data-cod-node=\"texto\">Aviso</p></div></div></section></main>"
+        },
+        {
+            "nombre": "todo junto",
+            "scope": {
+                "breakpoint": "all",
+                "state": "default"
+            },
+            "value": {
+                "backgroundColor": "#eeeeee",
+                "foregroundColor": "#111111",
+                "backgroundAssetUrl": "/wp-content/uploads/foto.jpg",
+                "overlayColor": "#000000",
+                "overlayOpacity": 0.4,
+                "borderColor": "#000000",
+                "shadow": "lg"
+            },
+            "css": ":where(.cod-rule--fondo){position:relative;}.cod-rule--fondo{background-color:#eeeeee;color:#111111;background-image:linear-gradient(color-mix(in srgb,#000000 40%,transparent),color-mix(in srgb,#000000 40%,transparent)),url(\"/wp-content/uploads/foto.jpg\");background-repeat:no-repeat,no-repeat;background-position:center,center;background-size:cover,cover;border-color:#000000;border-style:solid;border-width:1px;box-shadow:0 18px 48px rgba(0,0,0,.2);}",
+            "markup": "<main class=\"cod-mcp-page\" data-cod-composition=\"v2\" aria-label=\"golden-fondos\"><section class=\"cod-node cod-node--section cod-node-id-aviso cod-section cod-rule--fondo\" data-cod-node=\"aviso\"><div class=\"cod-columns cod-columns--single\"><div class=\"cod-column\"><p class=\"cod-node cod-node--paragraph cod-node-id-texto\" data-cod-node=\"texto\">Aviso</p></div></div></section></main>"
+        },
+        {
+            "nombre": "imagen en celular",
+            "scope": {
+                "breakpoint": "mobile",
+                "state": "default"
+            },
+            "value": {
+                "backgroundAssetUrl": "/wp-content/uploads/foto.jpg",
+                "backgroundPosition": "80% 50%"
+            },
+            "css": "@media(max-width:767px){:where(.cod-rule--fondo){position:relative;}.cod-rule--fondo{background-image:url(\"/wp-content/uploads/foto.jpg\");background-repeat:no-repeat;background-position:80% 50%;background-size:cover;}}",
+            "markup": "<main class=\"cod-mcp-page\" data-cod-composition=\"v2\" aria-label=\"golden-fondos\"><section class=\"cod-node cod-node--section cod-node-id-aviso cod-section cod-rule--fondo\" data-cod-node=\"aviso\"><div class=\"cod-columns cod-columns--single\"><div class=\"cod-column\"><p class=\"cod-node cod-node--paragraph cod-node-id-texto\" data-cod-node=\"texto\">Aviso</p></div></div></section></main>"
+        },
+        {
+            "nombre": "velo en tablet",
+            "scope": {
+                "breakpoint": "tablet",
+                "state": "default"
+            },
+            "value": {
+                "overlayColor": "#000000",
+                "overlayOpacity": 0.5
+            },
+            "css": "",
+            "markup": "<main class=\"cod-mcp-page\" data-cod-composition=\"v2\" aria-label=\"golden-fondos\"><section class=\"cod-node cod-node--section cod-node-id-aviso cod-section cod-rule--fondo\" data-cod-node=\"aviso\"><div class=\"cod-columns cod-columns--single\"><div class=\"cod-column\"><p class=\"cod-node cod-node--paragraph cod-node-id-texto\" data-cod-node=\"texto\">Aviso</p></div></div></section></main>"
+        },
+        {
+            "nombre": "color con hover",
+            "scope": {
+                "breakpoint": "all",
+                "state": "hover"
+            },
+            "value": {
+                "backgroundColor": "#ff0000"
+            },
+            "css": ":where(.cod-rule--fondo:hover){position:relative;}.cod-rule--fondo:hover{background-color:#ff0000;}",
+            "markup": "<main class=\"cod-mcp-page\" data-cod-composition=\"v2\" aria-label=\"golden-fondos\"><section class=\"cod-node cod-node--section cod-node-id-aviso cod-section cod-rule--fondo\" data-cod-node=\"aviso\"><div class=\"cod-columns cod-columns--single\"><div class=\"cod-column\"><p class=\"cod-node cod-node--paragraph cod-node-id-texto\" data-cod-node=\"texto\">Aviso</p></div></div></section></main>"
+        }
+    ]
+}

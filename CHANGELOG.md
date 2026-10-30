@@ -5,7 +5,55 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
-## Sin publicar (rama basis-transcriptor) — 30 de octubre de 2026
+## 0.3.83 — 30 de octubre de 2026
+
+### El módulo de fondos: degradado, trama y máscara
+
+Pedido de Cristóbal al ver que Basis perdía sus degradados al pasar de Divi (resumido): respetar todas las características del
+archivo original; si están dentro de las posibilidades de fondo —planos, degradados, tramas, máscaras y video—, tienen que
+estar todas disponibles en el módulo de fondos.
+
+**Por qué no se podía.** La regla `surface` sólo admitía color plano, imagen y un velo de opacidad pareja. Los degradados se
+habían dejado fuera a propósito, pero por una razón equivocada: «nada de degradados» es una decisión del set de diseño de
+Santa Luisa y se había escrito en el plugin como si fuera de todos los sitios. La prohibición es de ese set, no del plugin;
+los comentarios del código y del catálogo ahora lo dicen así.
+
+La regla `surface` (el módulo de fondos) gana tres campos, todos **estructura validada y nunca CSS crudo**:
+
+- **`backgroundGradient`**: `{ type: linear|radial, angle?, shape?, at?, repeating?, stops: 2 a 8 {color, at?} }`. Con foto,
+  `gradientPlacement` (`above` por omisión, o `below`) lo pone encima o debajo; el velo plano, si lo hay, sigue siendo la
+  capa de arriba. Los colores admiten ahora también `rgba()` y `hsla()` (antes sólo `rgb()`/`hsl()`/`oklch()`).
+- **`backgroundPattern`**: una trama recoloreable `{ assetUrl, color, size?, position?, opacity? }`: una forma SVG (o PNG/WebP
+  con transparencia) de Medios, repetida y pintada del color elegido con `mask-image`.
+- **`backgroundMask`**: una forma pintada de un color sobre el fondo y bajo el contenido
+  `{ assetUrl, color, size?, position?, flip?, opacity? }`, sin repetir y por omisión a toda la caja.
+
+Capas, de abajo hacia arriba, como en Divi: color → imagen / degradado / velo → trama → máscara → contenido. Con trama o
+máscara el velo pasa a ser una capa de `background-image` para liberar los dos pseudo-elementos.
+
+**Las formas son las del divisor.** La trama y la máscara se eligen por la ruta de un SVG de Medios, igual que el divisor, y
+cualquier forma de divisor (onda, pendiente, cerros, curva, nubes…) sirve de máscara tal cual. La pregunta «¿esta ruta es una
+forma del sitio?» vive ahora en un solo lugar (`COD_Divisor::es_forma_del_sitio`) y la usan el divisor y el fondo.
+`scripts/generar-formas-divisor.mjs` ahora escribe las formas con `preserveAspectRatio="none"` (la máscara las carga por
+`url()` y sin eso el navegador no las estira a la caja: las deja centradas y proporcionales; el divisor, que las pone en
+línea, ya forzaba lo mismo y no cambia), suma la forma `esquina` y tres tramas de partida —`trama-puntos`, `trama-lineas` y
+`trama-cuadricula`, baldosas con su propio tamaño—. `scripts/instalar-formas-de-divisor.php` las da de alta en Medios por la
+misma limpieza de SVG que cualquier archivo subido. Las formas ya instaladas en un sitio (sin ese atributo) siguen sirviendo
+de divisor; como máscara conviene `size: "100% auto"` o volver a generarlas.
+
+**Video de fondo:** no es un campo de `surface`; sigue siendo el nodo `video` con `ambient: true` detrás del contenido, y el
+catálogo lo dice en la descripción de `surface`.
+
+**Compatibilidad.** Una composición que no usa los campos nuevos emite exactamente el mismo CSS y el mismo HTML que en 0.3.82
+(17 reglas de referencia comparadas byte a byte en `scripts/probar-fondos.php`; Econut y Santa Luisa no cambian).
+
+**Transcriptor Divi → ContOpe.** Dejó de aplanar los degradados en un velo: los traduce a `backgroundGradient` (ángulo,
+paradas, encima o debajo de la foto) y avisa `ok`. Lo que no cabe (puntos medios, esquinas, tamaños de radial, más de 8
+paradas) se avisa `aproximado` diciendo qué se perdió. La medición registra ahora la trama y la máscara de Divi y el
+transcriptor avisa si una sección las trae. Medido en Basis: el `background-image` computado de la portada y del aviso
+naranja es idéntico al del original.
+
+Pruebas nuevas: `scripts/probar-fondos.php` y `scripts/probar-transcriptor-fondos.mjs`.
 
 ### Saltos de línea y listas con sublistas en los nodos de texto
 
@@ -17,7 +65,7 @@ Al transcribir el sitio de Basis desde Divi aparecieron dos huecos chicos del pl
 - Un ítem de `list` puede ser `{ text, items }`: una sublista, hasta tres niveles.
 - El mini del mapa (`mapa`) llena la caja que le da la composición cuando se usa grande.
 
-El número de versión del plugin no cambia todavía: se sube al desplegar.
+Estas tres ampliaciones salen en la 0.3.83.
 
 ---
 

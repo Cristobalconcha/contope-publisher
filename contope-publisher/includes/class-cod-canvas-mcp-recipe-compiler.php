@@ -581,7 +581,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
                     'typography' => 'Jerarquía editorial: escala, medida, interlineado, tracking, transformación, énfasis y alineación.',
                     'spacing' => 'Ritmo, padding, margen, gap, sangría y sangrado.',
                     'layout' => 'Stack, columnas, grid, metro, masonry, cluster o carrusel; incluye respuesta móvil.',
-                    'surface' => 'Fondos, overlays, borde, sombra, densidad y tratamientos de superficie.',
+                    'surface' => 'El módulo de fondos y la superficie de un bloque: color plano, imagen, degradado (linear/radial), trama recoloreable, máscara con forma, velo, borde y sombra. Video de fondo: no va aquí sino como nodo video con ambient:true detrás del contenido.',
                     'shape' => 'Radio, contorno y máscara geométrica segura.',
                     'media' => 'Relación, recorte, foco, marco, overlay, caption, tratamiento hover y filtro (none|grayscale) de imagen/video.',
                     'button' => 'Variantes, tono, tamaño, ancho y respuesta de interacción de enlaces de acción.',
@@ -693,14 +693,18 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 ],
             ],
             'surface' => [
-                'atLeastOneOf' => ['backgroundColor', 'foregroundColor', 'backgroundAssetUrl', 'overlayColor', 'borderColor', 'borderWidth', 'shadow'],
+                'atLeastOneOf' => ['backgroundColor', 'foregroundColor', 'backgroundAssetUrl', 'backgroundGradient', 'backgroundPattern', 'backgroundMask', 'overlayColor', 'borderColor', 'borderWidth', 'shadow'],
                 'fields' => [
                     'backgroundAssetUrl' => 'URL HTTP(S) o raíz relativa segura; usa cod_resolve_canvas_assets para material existente',
                     'backgroundPosition' => 'una o dos componentes: palabras (left|center|right, top|center|bottom) y/o medidas (número con px em rem vh vw vmin vmax ch ex cm mm in pt pc q o %); ej. center, 2% 50%, left 20px',
                     'backgroundSize' => 'cover|contain|auto, o una o dos medidas (auto vale como componente); ej. 7% auto, 200px, 50% 100%',
                     'backgroundRepeat' => ['repeat', 'no-repeat', 'repeat-x', 'repeat-y', 'space', 'round'],
-                    'overlayColor' => 'color seguro; con backgroundAssetUrl se emite como velo plano de opacidad pareja sobre la imagen (nunca degradado)',
+                    'overlayColor' => 'color seguro; velo plano de opacidad PAREJA: con imagen, trama o máscara es una capa más del fondo (siempre la de arriba); sin ellas, un ::before. Un velo que varía no es un velo: es un backgroundGradient',
                     'overlayOpacity' => '0..1 (por omisión 1); necesita overlayColor', 'shadow' => ['none', 'sm', 'md', 'lg'],
+                    'backgroundGradient' => 'degradado como ESTRUCTURA (nunca CSS crudo): {type: linear|radial, angle?: "65deg" (sólo linear; omitido = hacia abajo), shape?: circle|ellipse y at?: posición como backgroundPosition (sólo radial), repeating?: verdadero|falso, stops: 2 a 8 paradas {color, at?}}. color: hex, rgb(), rgba(), hsl(), hsla(), oklch(), transparent, currentColor o var(--tema); at: porcentaje o longitud. Ej. {type:"linear",stops:[{color:"rgb(12, 113, 195)",at:"0%"},{color:"rgba(255, 255, 255, 0)",at:"100%"}]}. Sin imagen es la única capa de background-image (sobre backgroundColor); con imagen va encima o debajo según gradientPlacement',
+                    'gradientPlacement' => ['above', 'below'],
+                    'backgroundPattern' => 'trama recoloreable: {assetUrl, color, size?, position?, opacity?}. assetUrl es la ruta de un SVG (o PNG/WebP con transparencia) del propio sitio, de las mismas formas de Medios que se eligen para un divisor más las tramas de partida trama-puntos, trama-lineas y trama-cuadricula. Se repite como mosaico; size es el de cada baldosa (por omisión auto, el del archivo) y color es con lo que se pinta. Capa ::before sobre el fondo y bajo el contenido. Una trama a todo color se hace con backgroundAssetUrl + backgroundRepeat',
+                    'backgroundMask' => 'máscara con forma: {assetUrl, color, size?, position?, flip?, opacity?}. assetUrl igual que la trama: CUALQUIER forma de divisor (onda, pendiente, cerros, curva, nubes…) sirve; la forma se pinta de color y no se repite. size por omisión 100% 100% (llena la caja; la forma debe llevar preserveAspectRatio=none, como las generadas con scripts/generar-formas-divisor.mjs; una forma ajena sin eso se centra sin deformarse y entonces conviene size "100% auto" con position top o bottom). flip: none|horizontal|vertical|both. Capa ::after sobre la trama y bajo el contenido',
                 ],
             ],
             'shape' => [
@@ -1584,7 +1588,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
     /** @param array<string, mixed> $value */
     private function normalize_surface_rule(array $value)
     {
-        $allowed = ['backgroundColor', 'foregroundColor', 'backgroundAssetUrl', 'backgroundPosition', 'backgroundSize', 'backgroundRepeat', 'overlayColor', 'overlayOpacity', 'borderColor', 'borderWidth', 'shadow'];
+        $allowed = ['backgroundColor', 'foregroundColor', 'backgroundAssetUrl', 'backgroundPosition', 'backgroundSize', 'backgroundRepeat', 'overlayColor', 'overlayOpacity', 'backgroundGradient', 'gradientPlacement', 'backgroundPattern', 'backgroundMask', 'borderColor', 'borderWidth', 'shadow'];
         if (!$this->has_only_keys($value, $allowed) || $value === []) {
             return new WP_Error('cod_mcp_surface_rule_invalid', 'La regla surface debe declarar al menos un tratamiento.');
         }
@@ -1632,6 +1636,36 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 return new WP_Error('cod_mcp_surface_rule_invalid', 'overlayOpacity necesita overlayColor: sin color no hay velo que atenuar.');
             }
         }
+        // Degradado, trama y máscara (0.3.83): los otros tres tratamientos del
+        // módulo de fondos. Siempre estructura, nunca CSS crudo: el CSS lo
+        // construye este compilador desde campos validados uno a uno.
+        if (isset($value['backgroundGradient'])) {
+            $gradiente = $this->normalize_background_gradient($value['backgroundGradient']);
+            if (is_wp_error($gradiente)) {
+                return $gradiente;
+            }
+            $normalized['backgroundGradient'] = $gradiente;
+        }
+        if (isset($value['gradientPlacement'])) {
+            if (!is_string($value['gradientPlacement']) || !in_array($value['gradientPlacement'], ['above', 'below'], true)) {
+                return new WP_Error('cod_mcp_surface_rule_invalid', 'gradientPlacement no es válido: above (encima de la imagen, por omisión) o below (debajo).');
+            }
+            // Igual que overlayOpacity sin overlayColor: una posición sin
+            // degradado o sin imagen no ordena nada, y antes de decirlo parecía aplicada.
+            if (!isset($normalized['backgroundGradient']) || !isset($normalized['backgroundAssetUrl'])) {
+                return new WP_Error('cod_mcp_surface_rule_invalid', 'gradientPlacement necesita backgroundGradient y backgroundAssetUrl: sólo ordena el degradado respecto de la imagen.');
+            }
+            $normalized['gradientPlacement'] = $value['gradientPlacement'];
+        }
+        foreach (['backgroundPattern' => false, 'backgroundMask' => true] as $campo => $esMascara) {
+            if (isset($value[$campo])) {
+                $capa = $this->normalize_background_shape_layer($value[$campo], $campo, $esMascara);
+                if (is_wp_error($capa)) {
+                    return $capa;
+                }
+                $normalized[$campo] = $capa;
+            }
+        }
         if (isset($value['borderWidth'])) {
             if (!is_string($value['borderWidth']) || !$this->is_css_length($value['borderWidth'])) {
                 return new WP_Error('cod_mcp_surface_rule_invalid', 'borderWidth debe ser una longitud CSS segura.');
@@ -1645,6 +1679,153 @@ final class COD_Canvas_MCP_Recipe_Compiler
             $normalized['shadow'] = $value['shadow'];
         }
         return $normalized;
+    }
+
+    /**
+     * `backgroundGradient` de la regla surface: un degradado como ESTRUCTURA.
+     *
+     * { type: linear|radial, angle?: "65deg" (sólo linear), shape?: circle|ellipse y
+     *   at?: posición (sólo radial), repeating?: bool, stops: [{color, at?}] (2 a 8) }
+     *
+     * Nunca se acepta CSS crudo: el valor de `background-image` lo arma
+     * gradient_css() desde estos campos. Cada color pasa por is_css_color() —que
+     * rechaza url(), paréntesis anidados y punto y coma— y cada posición por
+     * is_css_length().
+     *
+     * Los degradados NO son una decisión del plugin: se excluyeron una vez porque
+     * el set de diseño de Santa Luisa dice «nada de degradados», y esa
+     * prohibición es de ESE set, no de todos los sitios.
+     *
+     * @param mixed $g
+     * @return array<string, mixed>|WP_Error
+     */
+    private function normalize_background_gradient($g)
+    {
+        $c = 'cod_mcp_surface_rule_invalid';
+        $claves = ['type', 'angle', 'shape', 'at', 'repeating', 'stops'];
+        if (!is_array($g) || !$this->has_only_keys($g, $claves)) {
+            return new WP_Error($c, 'backgroundGradient admite: ' . implode(', ', $claves) . '.');
+        }
+        if (!isset($g['type']) || !in_array($g['type'], ['linear', 'radial'], true)) {
+            return new WP_Error($c, 'backgroundGradient.type es obligatorio: linear o radial.');
+        }
+        $salida = ['type' => $g['type']];
+        if (isset($g['angle'])) {
+            if ($g['type'] !== 'linear') {
+                return new WP_Error($c, 'backgroundGradient.angle sólo vale en un degradado linear.');
+            }
+            if (!is_string($g['angle']) || preg_match('/^-?(?:\d+(?:\.\d+)?|\.\d+)deg$/D', $g['angle']) !== 1 || strlen($g['angle']) > 12) {
+                return new WP_Error($c, 'backgroundGradient.angle no es válido: un número con deg, por ejemplo 65deg (omitido, el degradado va hacia abajo).');
+            }
+            $salida['angle'] = $g['angle'];
+        }
+        foreach (['shape', 'at'] as $campo) {
+            if (isset($g[$campo])) {
+                if ($g['type'] !== 'radial') {
+                    return new WP_Error($c, 'backgroundGradient.' . $campo . ' sólo vale en un degradado radial.');
+                }
+            }
+        }
+        if (isset($g['shape'])) {
+            if (!in_array($g['shape'], ['circle', 'ellipse'], true)) {
+                return new WP_Error($c, 'backgroundGradient.shape no es válido: circle o ellipse.');
+            }
+            $salida['shape'] = $g['shape'];
+        }
+        if (isset($g['at'])) {
+            if (!is_string($g['at']) || !$this->is_background_position($g['at'])) {
+                return new WP_Error($c, 'backgroundGradient.at no es válido: use palabras (left, center, right, top, bottom) o medidas (0%, 20px), una o dos componentes.');
+            }
+            $salida['at'] = $g['at'];
+        }
+        if (isset($g['repeating'])) {
+            if (!is_bool($g['repeating'])) {
+                return new WP_Error($c, 'backgroundGradient.repeating debe ser verdadero o falso.');
+            }
+            $salida['repeating'] = $g['repeating'];
+        }
+        $stops = $g['stops'] ?? null;
+        if (!is_array($stops) || !$this->is_list($stops) || count($stops) < 2 || count($stops) > 8) {
+            return new WP_Error($c, 'backgroundGradient.stops es obligatorio: una lista de 2 a 8 paradas {color, at?}.');
+        }
+        $paradas = [];
+        foreach ($stops as $i => $parada) {
+            if (!is_array($parada) || !$this->has_only_keys($parada, ['color', 'at'])) {
+                return new WP_Error($c, 'backgroundGradient.stops[' . $i . '] admite: color, at.');
+            }
+            if (!isset($parada['color']) || !is_string($parada['color']) || !$this->is_css_color($parada['color'])) {
+                return new WP_Error($c, 'backgroundGradient.stops[' . $i . '].color no es un color seguro (hex, rgb(), rgba(), hsl(), hsla(), oklch(), transparent, currentColor o var(--tema)).');
+            }
+            $limpia = ['color' => $parada['color']];
+            if (isset($parada['at'])) {
+                if (!is_string($parada['at']) || !$this->is_css_length($parada['at'])) {
+                    return new WP_Error($c, 'backgroundGradient.stops[' . $i . '].at debe ser una longitud o un porcentaje, por ejemplo 40% o 120px.');
+                }
+                $limpia['at'] = $parada['at'];
+            }
+            $paradas[] = $limpia;
+        }
+        $salida['stops'] = $paradas;
+        return $salida;
+    }
+
+    /**
+     * `backgroundPattern` y `backgroundMask` de la regla surface: una forma de
+     * Medios pintada de un color.
+     *
+     * La forma es un RECURSO del sitio y se elige igual que las del divisor: por
+     * su ruta, y las que sirven de divisor (onda, pendiente, cerros…) sirven tal
+     * cual de máscara. La validación está en COD_Divisor::es_forma_del_sitio(),
+     * una sola para las tres familias.
+     *
+     * Trama: {assetUrl, color, size?, position?, opacity?}; se repite.
+     * Máscara: lo mismo más flip?; no se repite y por omisión llena la caja.
+     *
+     * @param mixed $v
+     * @return array<string, mixed>|WP_Error
+     */
+    private function normalize_background_shape_layer($v, string $campo, bool $esMascara)
+    {
+        $c = 'cod_mcp_surface_rule_invalid';
+        $claves = ['assetUrl', 'color', 'size', 'position', 'opacity'];
+        if ($esMascara) {
+            $claves[] = 'flip';
+        }
+        if (!is_array($v) || !$this->has_only_keys($v, $claves)) {
+            return new WP_Error($c, $campo . ' admite: ' . implode(', ', $claves) . '.');
+        }
+        if (!isset($v['assetUrl']) || !is_string($v['assetUrl']) || !COD_Divisor::es_forma_del_sitio($v['assetUrl'], ['svg', 'png', 'webp'])) {
+            return new WP_Error($c, $campo . '.assetUrl es obligatorio y tiene que ser la ruta de un SVG (o PNG/WebP con transparencia) del propio sitio, sin espacios ni paréntesis: la misma forma que se elige para un divisor. Súbelo a Medios y usa su ruta.');
+        }
+        if (!isset($v['color']) || !is_string($v['color']) || !$this->is_css_color($v['color'])) {
+            return new WP_Error($c, $campo . '.color es obligatorio y tiene que ser un color seguro: la forma se pinta de ese color.');
+        }
+        $salida = ['assetUrl' => $v['assetUrl'], 'color' => $v['color']];
+        if (isset($v['size'])) {
+            if (!is_string($v['size']) || !$this->is_background_size($v['size'])) {
+                return new WP_Error($c, $campo . '.size no es válido: cover, contain, auto, o una o dos medidas (24px, 100% auto).');
+            }
+            $salida['size'] = $v['size'];
+        }
+        if (isset($v['position'])) {
+            if (!is_string($v['position']) || !$this->is_background_position($v['position'])) {
+                return new WP_Error($c, $campo . '.position no es válido: use palabras (left, center, right, top, bottom) o medidas, una o dos componentes.');
+            }
+            $salida['position'] = $v['position'];
+        }
+        if (isset($v['opacity'])) {
+            if ((!is_int($v['opacity']) && !is_float($v['opacity'])) || $v['opacity'] < 0 || $v['opacity'] > 1) {
+                return new WP_Error($c, $campo . '.opacity debe estar entre 0 y 1.');
+            }
+            $salida['opacity'] = (float) $v['opacity'];
+        }
+        if ($esMascara && isset($v['flip'])) {
+            if (!is_string($v['flip']) || !in_array($v['flip'], ['none', 'horizontal', 'vertical', 'both'], true)) {
+                return new WP_Error($c, $campo . '.flip no es válido: none, horizontal, vertical o both.');
+            }
+            $salida['flip'] = $v['flip'];
+        }
+        return $salida;
     }
 
     /** @param array<string, mixed> $value */
@@ -2385,8 +2566,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
 
             if (isset($capa['forma'])) {
                 $forma = is_string($capa['forma']) ? trim($capa['forma']) : '';
-                if ($forma === '' || !$this->is_safe_link($forma) || !COD_Divisor::es_del_sitio($forma)
-                    || substr(strtolower((string) parse_url($forma, PHP_URL_PATH)), -4) !== '.svg') {
+                if (!COD_Divisor::es_forma_del_sitio($forma)) {
                     return new WP_Error($codigo, 'divisor.capas[' . $i . '].forma tiene que ser un .svg del propio sitio.');
                 }
                 $limpia['forma'] = $forma;
@@ -5886,10 +6066,15 @@ final class COD_Canvas_MCP_Recipe_Compiler
         }
         // Con imagen de fondo el velo ya salió como capa de background-image
         // (surface_css); este ::before sólo queda para superficies sin imagen.
-        if ($rule['kind'] === 'surface' && isset($value['overlayColor']) && !isset($value['backgroundAssetUrl'])) {
+        // Tampoco cuando hay trama o máscara: ésas necesitan los dos pseudo-
+        // elementos y el velo pasa a ser una capa más del fondo (surface_css).
+        if ($rule['kind'] === 'surface' && isset($value['overlayColor']) && !$this->surface_veil_is_layer($value)) {
             $rule_css .= $selector . '::before{content:"";position:absolute;inset:0;background-color:' . $value['overlayColor'] . ';opacity:'
                 . ($value['overlayOpacity'] ?? 1) . ';pointer-events:none;}'
                 . $selector . '>*{position:relative;}';
+        }
+        if ($rule['kind'] === 'surface' && (isset($value['backgroundPattern']) || isset($value['backgroundMask']))) {
+            $rule_css .= $this->surface_layers_css($selector, $value);
         }
         if ($rule['kind'] === 'button' && ($value['interaction'] ?? 'none') === 'lift') {
             $rule_css .= $selector . ':hover{transform:translateY(-2px);}';
@@ -5982,6 +6167,102 @@ final class COD_Canvas_MCP_Recipe_Compiler
         return 'color-mix(in srgb,' . $color . ' ' . ($porcentaje === '' ? '0' : $porcentaje) . '%,transparent)';
     }
 
+    /**
+     * ¿El velo plano va como capa de `background-image` (true) o como `::before` (false)?
+     *
+     * Como capa cuando hay imagen de fondo (así desde 0.3.40) o cuando hay trama o
+     * máscara, que necesitan los dos pseudo-elementos para sí. Sin nada de eso
+     * sigue siendo un `::before` y se emite exactamente igual que antes.
+     *
+     * @param array<string, mixed> $value
+     */
+    private function surface_veil_is_layer(array $value): bool
+    {
+        return isset($value['overlayColor'])
+            && (isset($value['backgroundAssetUrl']) || isset($value['backgroundPattern']) || isset($value['backgroundMask']));
+    }
+
+    /**
+     * El valor CSS de un degradado ya validado (normalize_background_gradient).
+     *
+     * Cada parte sale de un campo con lista blanca, nunca de texto libre. Los
+     * separadores internos llevan espacio ("rgb(0, 0, 0) 0%, …") para que la
+     * salida sea la misma cadena que serializa un navegador.
+     *
+     * @param array<string, mixed> $g
+     */
+    private function gradient_css(array $g): string
+    {
+        $partes = [];
+        if ($g['type'] === 'linear') {
+            if (isset($g['angle'])) {
+                $partes[] = $g['angle'];
+            }
+        } else {
+            $cabeza = trim(($g['shape'] ?? '') . (isset($g['at']) ? ' at ' . $g['at'] : ''));
+            if ($cabeza !== '') {
+                $partes[] = $cabeza;
+            }
+        }
+        foreach ($g['stops'] as $parada) {
+            $partes[] = $parada['color'] . (isset($parada['at']) ? ' ' . $parada['at'] : '');
+        }
+        return (!empty($g['repeating']) ? 'repeating-' : '') . $g['type'] . '-gradient(' . implode(', ', $partes) . ')';
+    }
+
+    /**
+     * La trama (`::before`) y la máscara (`::after`) de una superficie.
+     *
+     * Capas, de abajo hacia arriba: color de fondo → imagen/degradado/velo (todos
+     * en el background del propio elemento) → trama → máscara → contenido.
+     *
+     * Las dos son un color pintado a través de una forma: `background-color` más
+     * `mask-image`, que deja ver el color sólo donde la forma es opaca. Por eso la
+     * forma se recolorea y es la misma que sirve de divisor. Siempre en forma
+     * LARGA (mask-image, mask-size…): las abreviadas con var() se pierden al
+     * guardar en el editor (ver SHORTHAND_PROPERTIES), y se repite cada una con
+     * su prefijo -webkit- porque Chrome y Safari lo siguen pidiendo.
+     *
+     * El contenido sube a z-index 1 con :where() —especificidad cero—, de modo
+     * que un hijo que declare su propia posición o su propio z-index (un video de
+     * fondo, un divisor) conserva lo suyo.
+     *
+     * @param array<string, mixed> $value
+     */
+    private function surface_layers_css(string $selector, array $value): string
+    {
+        $css = '';
+        foreach (['backgroundPattern' => '::before', 'backgroundMask' => '::after'] as $campo => $pseudo) {
+            if (!isset($value[$campo])) {
+                continue;
+            }
+            $capa = $value[$campo];
+            $esMascara = $campo === 'backgroundMask';
+            $url = 'url("' . $capa['assetUrl'] . '")';
+            $tamano = $capa['size'] ?? ($esMascara ? '100% 100%' : 'auto');
+            $posicion = $capa['position'] ?? ($esMascara ? 'center' : '0 0');
+            $repite = $esMascara ? 'no-repeat' : 'repeat';
+            $css .= $selector . $pseudo . '{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;'
+                . 'background-color:' . $capa['color'] . ';'
+                . '-webkit-mask-image:' . $url . ';mask-image:' . $url . ';'
+                . '-webkit-mask-repeat:' . $repite . ';mask-repeat:' . $repite . ';'
+                . '-webkit-mask-size:' . $tamano . ';mask-size:' . $tamano . ';'
+                . '-webkit-mask-position:' . $posicion . ';mask-position:' . $posicion . ';';
+            if (isset($capa['opacity'])) {
+                $css .= 'opacity:' . $capa['opacity'] . ';';
+            }
+            $volteo = ['horizontal' => 'scale(-1,1)', 'vertical' => 'scale(1,-1)', 'both' => 'scale(-1,-1)'][$capa['flip'] ?? 'none'] ?? null;
+            if ($volteo !== null) {
+                $css .= 'transform:' . $volteo . ';';
+            }
+            $css .= '}';
+        }
+        if ($css !== '') {
+            $css .= ':where(' . $selector . ')>*{position:relative;z-index:1;}';
+        }
+        return $css;
+    }
+
     /** @param array<string, mixed> $value */
     private function surface_css(array $value): string
     {
@@ -6011,40 +6292,76 @@ final class COD_Canvas_MCP_Recipe_Compiler
         if (isset($value['foregroundColor'])) {
             $css .= 'color:' . $value['foregroundColor'] . ';';
         }
+        $velo_como_capa = $this->surface_veil_is_layer($value);
         if (isset($value['backgroundAssetUrl'])) {
             $posicion = $value['backgroundPosition'] ?? 'center';
             $tamano = $value['backgroundSize'] ?? 'cover';
             $repite = $value['backgroundRepeat'] ?? 'no-repeat';
-            if (isset($value['overlayColor'])) {
-                // Velo plano dentro del propio fondo: dos capas de background-image,
-                // el velo arriba y la foto abajo. Cada propiedad lleva dos valores
-                // (uno por capa) o la capa se desalinea.
-                //
-                // La capa del velo es un gradiente sin tamaño propio: debe ocupar
-                // TODA la caja. Con las palabras de siempre (cover, contain, auto;
-                // posición por palabras) repetir el valor de la foto ya da eso y se
-                // conserva byte a byte lo emitido desde 0.3.40. Con una medida
-                // (7% auto, 2% 50%) repetirla encogería o correría el velo, así que
-                // la capa del velo va fija en cover y 50% 50%, y la medida es sólo
-                // de la foto. El velo no se repite nunca.
-                //
-                // OJO, es a propósito y no se "arregla": el velo es de OPACIDAD
-                // PAREJA, el mismo color en los dos extremos de linear-gradient(),
-                // que es la única forma que da CSS de poner un color sólido como
-                // capa de background-image. En este proyecto no hay degradados:
-                // un velo uniforme no lo es, uno que varía de 0.6 a 0.9 sí. Aunque
-                // el sitio de origen (la portada de econut.cl) use 0.6 -> 0.9, acá
-                // se emite un solo valor. Copiar el original rompería la regla.
-                $velo = $this->overlay_layer_color($value['overlayColor'], (float) ($value['overlayOpacity'] ?? 1.0));
-                $posicionVelo = $this->is_object_position($posicion) ? $posicion : '50% 50%';
-                $tamanoVelo = in_array($tamano, ['cover', 'contain', 'auto'], true) ? $tamano : 'cover';
-                $css .= 'background-image:linear-gradient(' . $velo . ',' . $velo . '),url("' . $value['backgroundAssetUrl'] . '");'
-                    . 'background-repeat:no-repeat,' . $repite . ';'
-                    . 'background-position:' . $posicionVelo . ',' . $posicion . ';background-size:' . $tamanoVelo . ',' . $tamano . ';';
-            } else {
-                $css .= 'background-image:url("' . $value['backgroundAssetUrl'] . '");background-repeat:' . $repite . ';'
-                    . 'background-position:' . $posicion . ';background-size:' . $tamano . ';';
+            // Las capas de background-image, de ARRIBA hacia abajo (así las ordena
+            // CSS): velo, degradado «above», imagen, degradado «below». Cada
+            // propiedad lleva un valor por capa o la capa se desalinea.
+            //
+            // Una capa SIN tamaño propio —el velo y el degradado— debe ocupar TODA
+            // la caja. Con las palabras de siempre (cover, contain, auto; posición
+            // por palabras) repetir el valor de la foto ya da eso y se conserva
+            // byte a byte lo emitido desde 0.3.40. Con una medida (7% auto,
+            // 2% 50%) repetirla encogería o correría la capa, así que va fija en
+            // cover y 50% 50%, y la medida es sólo de la foto. Esas capas no se
+            // repiten nunca.
+            //
+            // El velo es de OPACIDAD PAREJA: el mismo color en los dos extremos de
+            // linear-gradient(), que es la única forma que da CSS de poner un color
+            // sólido como capa de background-image. Lo que varía —de 0.6 a 0.9, de
+            // azul a transparente— es un degradado de verdad y va por
+            // backgroundGradient (desde 0.3.83; antes se aplanaba en un velo).
+            $velo = $this->overlay_layer_color($value['overlayColor'] ?? '', (float) ($value['overlayOpacity'] ?? 1.0));
+            $posicionVelo = $this->is_object_position($posicion) ? $posicion : '50% 50%';
+            $tamanoVelo = in_array($tamano, ['cover', 'contain', 'auto'], true) ? $tamano : 'cover';
+            $capaLlena = static fn (string $imagen): array => ['img' => $imagen, 'rep' => 'no-repeat', 'pos' => $posicionVelo, 'size' => $tamanoVelo];
+            $capaFoto = ['img' => 'url("' . $value['backgroundAssetUrl'] . '")', 'rep' => $repite, 'pos' => $posicion, 'size' => $tamano];
+            $degradado = isset($value['backgroundGradient']) ? $capaLlena($this->gradient_css($value['backgroundGradient'])) : null;
+            $abajo = ($value['gradientPlacement'] ?? 'above') === 'below';
+            $capas = [];
+            if ($velo_como_capa) {
+                $capas[] = $capaLlena('linear-gradient(' . $velo . ',' . $velo . ')');
             }
+            if ($degradado !== null && !$abajo) {
+                $capas[] = $degradado;
+            }
+            $capas[] = $capaFoto;
+            if ($degradado !== null && $abajo) {
+                $capas[] = $degradado;
+            }
+            if (count($capas) === 1) {
+                $css .= 'background-image:' . $capaFoto['img'] . ';background-repeat:' . $repite . ';'
+                    . 'background-position:' . $posicion . ';background-size:' . $tamano . ';';
+            } else {
+                $css .= 'background-image:' . implode(',', array_column($capas, 'img')) . ';'
+                    . 'background-repeat:' . implode(',', array_column($capas, 'rep')) . ';'
+                    . 'background-position:' . implode(',', array_column($capas, 'pos')) . ';'
+                    . 'background-size:' . implode(',', array_column($capas, 'size')) . ';';
+            }
+        } else {
+            // Sin imagen no hay posición ni tamaño que alinear: las capas llenan
+            // la caja por sí solas (un degradado y un color plano no tienen
+            // tamaño propio).
+            $imagenes = [];
+            if ($velo_como_capa) {
+                $velo = $this->overlay_layer_color($value['overlayColor'], (float) ($value['overlayOpacity'] ?? 1.0));
+                $imagenes[] = 'linear-gradient(' . $velo . ',' . $velo . ')';
+            }
+            if (isset($value['backgroundGradient'])) {
+                $imagenes[] = $this->gradient_css($value['backgroundGradient']);
+            }
+            if ($imagenes !== []) {
+                $css .= 'background-image:' . implode(',', $imagenes) . ';';
+            }
+        }
+        if (isset($value['backgroundPattern']) || isset($value['backgroundMask'])) {
+            // Contexto de apilado propio: la trama y la máscara van en z-index 0
+            // por encima del fondo y por DEBAJO del contenido (z-index 1), y ese
+            // orden sólo se sostiene si no se mezclan con lo de afuera.
+            $css .= 'isolation:isolate;';
         }
         if (isset($value['borderColor']) || isset($value['borderWidth'])) {
             /**
@@ -6655,7 +6972,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
 
     private function is_css_color(string $value): bool
     {
-        return preg_match('/^(?:#[0-9a-fA-F]{3,8}|transparent|currentColor|(?:rgb|hsl|oklch)\([0-9.%\s,+-]+\))$/', $value) === 1
+        return preg_match('/^(?:#[0-9a-fA-F]{3,8}|transparent|currentColor|(?:rgba?|hsla?|oklch)\([0-9.%\s,+-]+\))$/', $value) === 1
             || $this->is_css_var_reference($value);
     }
 

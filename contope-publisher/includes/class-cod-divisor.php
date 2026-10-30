@@ -126,6 +126,12 @@ final class COD_Divisor
         // a propósito: un divisor se estira a lo ancho de la sección, y ésa es
         // justamente la deformación que se busca. (Para una pieza de diseño que
         // NO debe deformarse, ver la nota contraria en el mapa de lotes.)
+        //
+        // Las formas generadas desde 0.3.83 ya traen `preserveAspectRatio="none"`
+        // en el archivo —lo necesita la máscara, que las usa por `url()` y no
+        // en línea—. Se quita ese atributo antes de añadir el de aquí para no
+        // dejarlo duplicado.
+        $limpio = (string) preg_replace('/(<svg\b[^>]*?)\s+preserveAspectRatio="[^"]*"/i', '$1', $limpio, 1);
         $limpio = (string) preg_replace(
             '/<svg\b/i',
             '<svg preserveAspectRatio="none" focusable="false" aria-hidden="true" fill="currentColor"',
@@ -134,6 +140,36 @@ final class COD_Divisor
         );
 
         return $limpio;
+    }
+
+    /**
+     * ¿Es una ruta de una FORMA del propio sitio, usable sin riesgo?
+     *
+     * UN SOLO LUGAR. La misma pregunta —«¿esta ruta es un recurso del sitio que
+     * se puede usar como forma?»— la hacen el divisor (forma y capas), el icono
+     * y, desde 0.3.83, la trama y la máscara de la regla `surface`. Estaba
+     * escrita tres veces en el compilador; ahora vive acá, junto al resto del
+     * criterio de qué es una forma. Las formas de divisor son las mismas que
+     * sirven de máscara: Cristóbal, 30 de octubre de 2026, pidió reutilizar los
+     * mismos recursos y no crear un juego aparte.
+     *
+     * Rechaza lo que no puede ir sin riesgo dentro de un atributo HTML ni de un
+     * `url("…")` de CSS (espacios, comillas, paréntesis, llaves, punto y coma,
+     * barra invertida), la ruta sin protocolo (`//otro-servidor/x.svg`), lo que
+     * no es del propio sitio y las extensiones fuera de la lista.
+     *
+     * @param string[] $extensiones En minúscula y sin punto.
+     */
+    public static function es_forma_del_sitio(string $ruta, array $extensiones = ['svg']): bool
+    {
+        if ($ruta === '' || strpos($ruta, '//') === 0 || preg_match('/[\s\'"<>(){};\\\\]/', $ruta) === 1) {
+            return false;
+        }
+        if (!self::es_del_sitio($ruta)) {
+            return false;
+        }
+        $camino = strtolower((string) parse_url($ruta, PHP_URL_PATH));
+        return in_array(pathinfo($camino, PATHINFO_EXTENSION), $extensiones, true);
     }
 
     /** ¿Es una ruta del propio sitio? */
