@@ -72,7 +72,7 @@ export function moduloAcordeon(ctx, d, m, { gapD, gapM, ubicacion, independiente
 
   for (const { it, iM } of visibles) {
     const titulo = ctx.nodo('paragraph', reglasMargen(ctx.reg, 0, 0), { text: it.titulo });
-    const pliegue = ctx.nodo('group', [], undefined, [titulo, ...cuerpoDe(it, iM)]);
+    const pliegue = ctx.nodo('group', [ctx.reg.R('layout', { mode: 'stack', gap: '0px', align: 'stretch' }, { prefijo: 'plg-g' })], undefined, [titulo, ...cuerpoDe(it, iM)]);
     pliegues.push(pliegue);
     if (it.abierto && !abierto) abierto = pliegue;
   }
@@ -88,16 +88,16 @@ export function moduloAcordeon(ctx, d, m, { gapD, gapM, ubicacion, independiente
     Object.assign(r, { 'padding-top': pxs(t), 'padding-right': pxs(rr), 'padding-bottom': pxs(b), 'padding-left': pxs(l) });
     return r;
   };
-  const cj = cerrado.it.cajaToggle || {};
+  const cj = cerrado.it.cajaToggle || cerrado.it.caja || {};
   const partes = { item: ctx.reg.propiedades(cajaDe(cj), {}, { prefijo: 'plg' }) };
   const tipC = cerrado.it.estiloTitulo;
   partes.resumen = [
     ...ctx.reg.propiedades({ width: '100%', 'padding-top': '0px', 'padding-right': '40px', 'padding-bottom': '0px', 'padding-left': '0px', 'text-align': 'start', 'background-color': 'transparent', 'border-width': '0px', cursor: 'pointer' }, {}, { prefijo: 'plg-r' }),
     ...(tipC ? reglasTexto(ctx.reg, { d: tipC, m: cerrado.iM?.estiloTitulo }) : []),
   ];
-  partes.panel = ctx.reg.propiedades({ 'padding-top': '20px' }, {}, { prefijo: 'plg-p' });
+  partes.panel = ctx.reg.propiedades({ 'padding-top': '20px', 'margin-block-start': '0px' }, {}, { prefijo: 'plg-p' });
   if (abiertoV) {
-    const cjA = abiertoV.it.cajaToggle || {};
+    const cjA = abiertoV.it.cajaToggle || abiertoV.it.caja || {};
     const dif = Object.fromEntries(Object.entries(cajaDe(cjA)).filter(([k, v]) => cajaDe(cj)[k] !== v));
     if (Object.keys(dif).length) partes.item.push(ctx.reg.R('properties', { declarations: dif }, { state: 'current', prefijo: 'plg-a' }));
     const tipA = abiertoV.it.estiloTitulo;
@@ -107,7 +107,7 @@ export function moduloAcordeon(ctx, d, m, { gapD, gapM, ubicacion, independiente
   }
   const separacion = margenInferior(cj) || 30;
   const reglas = [
-    ctx.reg.R('interaction', { behavior: 'acordeon', ...(independiente ? { autoclose: false } : {}), ...(abierto ? { openNodeId: abierto.id } : {}) }, { prefijo: 'acordeon' }),
+    ctx.reg.R('interaction', { behavior: 'acordeon', ...(independiente ? { autoclose: false } : {}), ...(abierto ? { openNodeId: abierto.id } : { startClosed: true }) }, { prefijo: 'acordeon' }),
     ctx.reg.R('layout', { mode: 'stack', gap: pxs(separacion), align: 'stretch' }, { prefijo: 'pila' }),
     ...reglasMargen(ctx.reg, gapD, gapM),
   ];

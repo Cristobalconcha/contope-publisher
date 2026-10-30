@@ -87,8 +87,16 @@ export function reglasTexto(reg, est, { sinColor = false } = {}) {
 
 /** Margen inferior (y superior 0) de un nodo, con su variante por ancho. */
 export function reglasMargen(reg, finD, finM, { inicio = 0 } = {}) {
+  // Desfase del PRIMER módulo de una columna respecto del borde de su contenido
+  // (Divi: márgenes propios del módulo, a veces negativos). Lo deja la columna
+  // en `reg.inicioPendiente` y lo consume el primer margen que se pida.
+  let inicioM;
+  if (reg.inicioPendiente) { inicio = reg.inicioPendiente.d; inicioM = reg.inicioPendiente.m; reg.inicioPendiente = null; }
   const base = { 'margin-block-start': pxs(inicio), 'margin-block-end': pxs(finD ?? 0) };
-  const m = finM === undefined || finM === null || finM === finD ? undefined : { 'margin-block-end': pxs(finM) };
+  const mDecl = {};
+  if (finM !== undefined && finM !== null && finM !== finD) mDecl['margin-block-end'] = pxs(finM);
+  if (inicioM !== undefined && inicioM !== inicio) mDecl['margin-block-start'] = pxs(inicioM);
+  const m = Object.keys(mDecl).length ? mDecl : undefined;
   return reg.propiedades(base, m ? { mobile: m } : {}, { prefijo: 'mg' });
 }
 

@@ -314,7 +314,7 @@
         }
       },
       {
-        "id": "mg-1ba121",
+        "id": "mg-1fd017",
         "kind": "properties",
         "scope": {
           "breakpoint": "all",
@@ -332,7 +332,7 @@
         "status": "reviewed",
         "value": {
           "declarations": {
-            "margin-block-start": "0px",
+            "margin-block-start": "5px",
             "margin-block-end": "5px"
           }
         }
@@ -586,7 +586,7 @@
                     "ruleIds": [
                       "t-36ea70",
                       "c-4737c4",
-                      "mg-1ba121",
+                      "mg-1fd017",
                       "t-b24b57"
                     ],
                     "content": {

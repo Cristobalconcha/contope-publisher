@@ -288,6 +288,30 @@
         }
       },
       {
+        "id": "mg-42fc97",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "margin-block-start": "-28px",
+            "margin-block-end": "0px"
+          }
+        }
+      },
+      {
         "id": "cl-1befc2",
         "kind": "properties",
         "scope": {
@@ -497,7 +521,7 @@
     "schemaVersion": 2,
     "nodes": [
       {
-        "id": "footer-77",
+        "id": "footer-86",
         "kind": "footer",
         "ruleIds": [
           "sec-83739f",
@@ -505,7 +529,7 @@
         ],
         "children": [
           {
-            "id": "group-76",
+            "id": "group-85",
             "kind": "group",
             "ruleIds": [
               "fila-44e63a",
@@ -513,7 +537,7 @@
             ],
             "children": [
               {
-                "id": "group-68",
+                "id": "group-77",
                 "kind": "group",
                 "ruleIds": [
                   "col-542b47",
@@ -522,11 +546,11 @@
                 ],
                 "children": [
                   {
-                    "id": "image-67",
+                    "id": "image-76",
                     "kind": "image",
                     "ruleIds": [
                       "img-302830",
-                      "mg-a343db"
+                      "mg-42fc97"
                     ],
                     "content": {
                       "assetUrl": "/wp-content/uploads/2025/07/aRecurso-12.png",
@@ -536,7 +560,7 @@
                 ]
               },
               {
-                "id": "group-71",
+                "id": "group-80",
                 "kind": "group",
                 "ruleIds": [
                   "col-542b47",
@@ -545,7 +569,7 @@
                 ],
                 "children": [
                   {
-                    "id": "group-70",
+                    "id": "group-79",
                     "kind": "group",
                     "ruleIds": [
                       "mapa-ca1d42",
@@ -553,7 +577,7 @@
                     ],
                     "children": [
                       {
-                        "id": "paragraph-69",
+                        "id": "paragraph-78",
                         "kind": "paragraph",
                         "ruleIds": [
                           "t-7d73ba",
@@ -582,7 +606,7 @@
                 ]
               },
               {
-                "id": "group-75",
+                "id": "group-84",
                 "kind": "group",
                 "ruleIds": [
                   "col-542b47",
@@ -591,14 +615,14 @@
                 ],
                 "children": [
                   {
-                    "id": "group-74",
+                    "id": "group-83",
                     "kind": "group",
                     "ruleIds": [
                       "racimo-94d787"
                     ],
                     "children": [
                       {
-                        "id": "image-72",
+                        "id": "image-81",
                         "kind": "image",
                         "ruleIds": [
                           "img-666820",
@@ -610,7 +634,7 @@
                         }
                       },
                       {
-                        "id": "paragraph-73",
+                        "id": "paragraph-82",
                         "kind": "paragraph",
                         "ruleIds": [
                           "t-01952a",

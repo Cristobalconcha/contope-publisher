@@ -103,7 +103,7 @@
         }
       },
       {
-        "id": "mg-766004",
+        "id": "mg-1a56c0",
         "kind": "properties",
         "scope": {
           "breakpoint": "all",
@@ -122,12 +122,12 @@
         "value": {
           "declarations": {
             "margin-block-start": "0px",
-            "margin-block-end": "28px"
+            "margin-block-end": "38px"
           }
         }
       },
       {
-        "id": "mg-e4b321",
+        "id": "mg-cb0416",
         "kind": "properties",
         "scope": {
           "breakpoint": "mobile",
@@ -145,7 +145,7 @@
         "status": "reviewed",
         "value": {
           "declarations": {
-            "margin-block-end": "30px"
+            "margin-block-end": "40px"
           }
         }
       },
@@ -224,8 +224,8 @@
         }
       },
       {
-        "id": "mapa-ca1d42",
-        "kind": "interaction",
+        "id": "enl-c8a933",
+        "kind": "properties",
         "scope": {
           "breakpoint": "all",
           "state": "default"
@@ -241,7 +241,9 @@
         },
         "status": "reviewed",
         "value": {
-          "behavior": "mapa"
+          "declarations": {
+            "display": "block"
+          }
         }
       },
       {
@@ -417,32 +419,7 @@
         }
       },
       {
-        "id": "mapa-88f0d2",
-        "kind": "properties",
-        "scope": {
-          "breakpoint": "all",
-          "state": "default"
-        },
-        "provenance": {
-          "sources": [
-            {
-              "kind": "reference",
-              "reference": "https://basisbodegas.com",
-              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
-            }
-          ]
-        },
-        "status": "reviewed",
-        "value": {
-          "declarations": {
-            "display": "block",
-            "width": "100%",
-            "min-height": "800px"
-          }
-        }
-      },
-      {
-        "id": "mini-e17ac6",
+        "id": "mapa-img-0f7ca7",
         "kind": "properties",
         "scope": {
           "breakpoint": "all",
@@ -462,8 +439,8 @@
           "declarations": {
             "width": "100%",
             "height": "800px",
-            "border-radius": "8px",
             "object-fit": "cover",
+            "border-radius": "8px",
             "display": "block"
           }
         }
@@ -474,7 +451,7 @@
     "schemaVersion": 2,
     "nodes": [
       {
-        "id": "section-18",
+        "id": "section-19",
         "kind": "section",
         "ruleIds": [
           "sec-79ee4b",
@@ -483,7 +460,7 @@
         ],
         "children": [
           {
-            "id": "group-17",
+            "id": "group-18",
             "kind": "group",
             "ruleIds": [
               "fila-ba8c81",
@@ -506,8 +483,8 @@
                       "t-d4b7f9",
                       "t-829a8a",
                       "c-5ba4fe",
-                      "mg-766004",
-                      "mg-e4b321"
+                      "mg-1a56c0",
+                      "mg-cb0416"
                     ],
                     "content": {
                       "text": "Contactos",
@@ -528,7 +505,7 @@
                 ]
               },
               {
-                "id": "group-16",
+                "id": "group-17",
                 "kind": "group",
                 "ruleIds": [
                   "col-542b47",
@@ -537,25 +514,29 @@
                 ],
                 "children": [
                   {
-                    "id": "group-15",
-                    "kind": "group",
+                    "id": "link-16",
+                    "kind": "link",
                     "ruleIds": [
-                      "mapa-ca1d42",
-                      "mapa-88f0d2"
+                      "enl-c8a933"
                     ],
-                    "partes": {
-                      "mini": [
-                        "mini-e17ac6"
-                      ]
-                    },
                     "content": {
-                      "lat": -33.80413624737442,
-                      "lng": -70.68161681668681,
-                      "zoom": 17,
-                      "mini": "/wp-content/uploads/2025/07/Mapa-contacto-recorte.png",
-                      "etiqueta": "Abrir el mapa de ubicación",
-                      "globo": "Planta Econut, Av 18 de Septiembre sn Hijuela 2, Fundo San Rafael - Sector Nuevo Sendero,, Paine, Región Metropolitana, www.econut.cl"
-                    }
+                      "label": "",
+                      "href": "https://www.openstreetmap.org/?mlat=-33.80413624737442&mlon=-70.68161681668681#map=17/-33.80413624737442/-70.68161681668681",
+                      "target": "blank"
+                    },
+                    "children": [
+                      {
+                        "id": "image-15",
+                        "kind": "image",
+                        "ruleIds": [
+                          "mapa-img-0f7ca7"
+                        ],
+                        "content": {
+                          "assetUrl": "/wp-content/uploads/2025/07/Mapa-contacto-recorte.png",
+                          "alt": "Mapa de ubicación: Planta Econut, Av 18 de Septiembre sn Hijuela 2, Fundo San Rafael - Sector Nuevo Sendero,, Paine, Región Metropolitana, "
+                        }
+                      }
+                    ]
                   }
                 ]
               }

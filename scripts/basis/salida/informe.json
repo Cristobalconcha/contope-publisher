@@ -12,6 +12,18 @@
     "pagina": "inicio",
     "region": "encabezado",
     "seccion": 0,
+    "fila": 0,
+    "columna": 1,
+    "modulo": "text",
+    "indiceModulo": 0,
+    "clase": "desfase",
+    "severidad": "ok",
+    "motivo": "el primer módulo de la columna está desfasado 5px (escritorio) / 5px (celular) del borde de su contenido: se aplica como margen superior"
+  },
+  {
+    "pagina": "inicio",
+    "region": "encabezado",
+    "seccion": 0,
     "fila": 1,
     "columna": 0,
     "modulo": "code",
@@ -52,6 +64,42 @@
     "clase": "«Explorar Soluciones»",
     "severidad": "aproximado",
     "motivo": "el botón «Explorar Soluciones» no lleva a ninguna parte en el original (href «»): queda como botón sin destino"
+  },
+  {
+    "pagina": "inicio",
+    "region": "contenido",
+    "seccion": 3,
+    "fila": 1,
+    "columna": 0,
+    "modulo": "blurb",
+    "indiceModulo": 0,
+    "clase": "FontAwesome U+f217",
+    "severidad": "aproximado",
+    "motivo": "ícono FontAwesome U+f217 → Material Symbols «add_shopping_cart» (contorno; el original era relleno: Material no trae el estilo relleno en el set del sitio)"
+  },
+  {
+    "pagina": "inicio",
+    "region": "contenido",
+    "seccion": 3,
+    "fila": 1,
+    "columna": 1,
+    "modulo": "blurb",
+    "indiceModulo": 0,
+    "clase": "FontAwesome U+f494",
+    "severidad": "aproximado",
+    "motivo": "ícono FontAwesome U+f494 → Material Symbols «warehouse» (contorno; el original era relleno: Material no trae el estilo relleno en el set del sitio)"
+  },
+  {
+    "pagina": "inicio",
+    "region": "contenido",
+    "seccion": 3,
+    "fila": 1,
+    "columna": 2,
+    "modulo": "blurb",
+    "indiceModulo": 0,
+    "clase": "ETmodules U+e0e1",
+    "severidad": "aproximado",
+    "motivo": "ícono ETmodules U+e0e1 → Material Symbols «hourglass_empty» (contorno; el original era relleno: Material no trae el estilo relleno en el set del sitio)"
   },
   {
     "pagina": "inicio",
@@ -98,6 +146,18 @@
     "region": "pie",
     "seccion": 6,
     "fila": 1,
+    "columna": 0,
+    "modulo": "image",
+    "indiceModulo": 0,
+    "clase": "desfase",
+    "severidad": "ok",
+    "motivo": "el primer módulo de la columna está desfasado -28px (escritorio) / -28px (celular) del borde de su contenido: se aplica como margen superior"
+  },
+  {
+    "pagina": "inicio",
+    "region": "pie",
+    "seccion": 6,
+    "fila": 1,
     "columna": 1,
     "modulo": "code",
     "indiceModulo": 0,
@@ -125,6 +185,18 @@
     "clase": "et_pb_sticky_module",
     "severidad": "ok",
     "motivo": "encabezado pegajoso en Divi → regla «posicion» pegada arriba"
+  },
+  {
+    "pagina": "basis-carpas-industriales",
+    "region": "encabezado",
+    "seccion": 0,
+    "fila": 0,
+    "columna": 1,
+    "modulo": "text",
+    "indiceModulo": 0,
+    "clase": "desfase",
+    "severidad": "ok",
+    "motivo": "el primer módulo de la columna está desfasado 5px (escritorio) / 5px (celular) del borde de su contenido: se aplica como margen superior"
   },
   {
     "pagina": "basis-carpas-industriales",
@@ -159,6 +231,18 @@
     "clase": "vacía",
     "severidad": "ok",
     "motivo": "fila vacía (sin módulos y de alto ~0): se omite"
+  },
+  {
+    "pagina": "basis-carpas-industriales",
+    "region": "pie",
+    "seccion": 1,
+    "fila": 1,
+    "columna": 0,
+    "modulo": "image",
+    "indiceModulo": 0,
+    "clase": "desfase",
+    "severidad": "ok",
+    "motivo": "el primer módulo de la columna está desfasado -28px (escritorio) / -28px (celular) del borde de su contenido: se aplica como margen superior"
   },
   {
     "pagina": "basis-carpas-industriales",
@@ -208,6 +292,18 @@
     "clase": "et_pb_sticky_module",
     "severidad": "ok",
     "motivo": "encabezado pegajoso en Divi → regla «posicion» pegada arriba"
+  },
+  {
+    "pagina": "preguntas-frecuentes",
+    "region": "encabezado",
+    "seccion": 0,
+    "fila": 0,
+    "columna": 1,
+    "modulo": "text",
+    "indiceModulo": 0,
+    "clase": "desfase",
+    "severidad": "ok",
+    "motivo": "el primer módulo de la columna está desfasado 5px (escritorio) / 5px (celular) del borde de su contenido: se aplica como margen superior"
   },
   {
     "pagina": "preguntas-frecuentes",
@@ -305,6 +401,18 @@
     "region": "pie",
     "seccion": 3,
     "fila": 1,
+    "columna": 0,
+    "modulo": "image",
+    "indiceModulo": 0,
+    "clase": "desfase",
+    "severidad": "ok",
+    "motivo": "el primer módulo de la columna está desfasado -28px (escritorio) / -28px (celular) del borde de su contenido: se aplica como margen superior"
+  },
+  {
+    "pagina": "preguntas-frecuentes",
+    "region": "pie",
+    "seccion": 3,
+    "fila": 1,
     "columna": 1,
     "modulo": "code",
     "indiceModulo": 0,
@@ -332,6 +440,18 @@
     "clase": "et_pb_sticky_module",
     "severidad": "ok",
     "motivo": "encabezado pegajoso en Divi → regla «posicion» pegada arriba"
+  },
+  {
+    "pagina": "contactos",
+    "region": "encabezado",
+    "seccion": 0,
+    "fila": 0,
+    "columna": 1,
+    "modulo": "text",
+    "indiceModulo": 0,
+    "clase": "desfase",
+    "severidad": "ok",
+    "motivo": "el primer módulo de la columna está desfasado 5px (escritorio) / 5px (celular) del borde de su contenido: se aplica como margen superior"
   },
   {
     "pagina": "contactos",
@@ -391,7 +511,7 @@
     "indiceModulo": 0,
     "clase": "mapbox",
     "severidad": "aproximado",
-    "motivo": "mapa de Mapbox siempre abierto → conducta `mapa` (mini que se abre al pincharlo): ContOpe no tiene un mapa incrustado siempre abierto (hueco del plugin)"
+    "motivo": "mapa de Mapbox siempre abierto → imagen del mapa (recorte de la captura) con enlace a OpenStreetMap, porque sin clave de Mapbox el plugin no abre el mapa y ContOpe no tiene un mapa incrustado siempre abierto (hueco del plugin)"
   },
   {
     "pagina": "contactos",
@@ -402,6 +522,18 @@
     "clase": "vacía",
     "severidad": "ok",
     "motivo": "fila vacía (sin módulos y de alto ~0): se omite"
+  },
+  {
+    "pagina": "contactos",
+    "region": "pie",
+    "seccion": 2,
+    "fila": 1,
+    "columna": 0,
+    "modulo": "image",
+    "indiceModulo": 0,
+    "clase": "desfase",
+    "severidad": "ok",
+    "motivo": "el primer módulo de la columna está desfasado -28px (escritorio) / -28px (celular) del borde de su contenido: se aplica como margen superior"
   },
   {
     "pagina": "contactos",

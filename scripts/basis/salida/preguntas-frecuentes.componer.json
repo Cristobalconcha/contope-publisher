@@ -255,7 +255,7 @@
         }
       },
       {
-        "id": "div-d2e648",
+        "id": "div-850adc",
         "kind": "divisor",
         "scope": {
           "breakpoint": "all",
@@ -275,7 +275,8 @@
           "forma": "/wp-content/uploads/divisores/divisor-7ee5846d.svg",
           "donde": "abajo",
           "alto": "2.5vw",
-          "color": "#636363"
+          "color": "#636363",
+          "reserva": false
         }
       },
       {
@@ -560,7 +561,7 @@
         }
       },
       {
-        "id": "mg-379041",
+        "id": "mg-ce69c2",
         "kind": "properties",
         "scope": {
           "breakpoint": "all",
@@ -579,7 +580,7 @@
         "value": {
           "declarations": {
             "margin-block-start": "0px",
-            "margin-block-end": "29px"
+            "margin-block-end": "39px"
           }
         }
       },
@@ -657,7 +658,7 @@
         }
       },
       {
-        "id": "plg-3077cc",
+        "id": "plg-17ad59",
         "kind": "properties",
         "scope": {
           "breakpoint": "all",
@@ -675,10 +676,12 @@
         "status": "reviewed",
         "value": {
           "declarations": {
-            "padding-top": "0px",
-            "padding-right": "0px",
-            "padding-bottom": "0px",
-            "padding-left": "0px"
+            "background-color": "#F4F4F4",
+            "border-radius": "10px",
+            "padding-top": "20px",
+            "padding-right": "20px",
+            "padding-bottom": "20px",
+            "padding-left": "20px"
           }
         }
       },
@@ -740,7 +743,7 @@
         }
       },
       {
-        "id": "plg-p-ab00da",
+        "id": "plg-p-dcf0fd",
         "kind": "properties",
         "scope": {
           "breakpoint": "all",
@@ -758,7 +761,31 @@
         "status": "reviewed",
         "value": {
           "declarations": {
-            "padding-top": "20px"
+            "padding-top": "20px",
+            "margin-block-start": "0px"
+          }
+        }
+      },
+      {
+        "id": "plg-a-d5f383",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "current"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "background-color": "#FFFFFF"
           }
         }
       },
@@ -808,7 +835,7 @@
         }
       },
       {
-        "id": "pila-10a194",
+        "id": "pila-388a42",
         "kind": "layout",
         "scope": {
           "breakpoint": "all",
@@ -826,7 +853,7 @@
         "status": "reviewed",
         "value": {
           "mode": "stack",
-          "gap": "30px",
+          "gap": "29.69px",
           "align": "stretch"
         }
       },
@@ -854,7 +881,7 @@
         }
       },
       {
-        "id": "mg-50f1b0",
+        "id": "mg-c0335f",
         "kind": "properties",
         "scope": {
           "breakpoint": "mobile",
@@ -872,7 +899,7 @@
         "status": "reviewed",
         "value": {
           "declarations": {
-            "margin-block-end": "30px"
+            "margin-block-end": "40px"
           }
         }
       },
@@ -1000,7 +1027,7 @@
         }
       },
       {
-        "id": "mg-05b575",
+        "id": "mg-d37116",
         "kind": "properties",
         "scope": {
           "breakpoint": "all",
@@ -1019,12 +1046,12 @@
         "value": {
           "declarations": {
             "margin-block-start": "0px",
-            "margin-block-end": "-1px"
+            "margin-block-end": "9px"
           }
         }
       },
       {
-        "id": "acordeon-5b5cf1",
+        "id": "acordeon-9a5bc6",
         "kind": "interaction",
         "scope": {
           "breakpoint": "all",
@@ -1041,7 +1068,8 @@
         },
         "status": "reviewed",
         "value": {
-          "behavior": "acordeon"
+          "behavior": "acordeon",
+          "startClosed": true
         }
       }
     ]
@@ -1053,7 +1081,7 @@
         "id": "section-16",
         "kind": "section",
         "ruleIds": [
-          "div-d2e648",
+          "div-850adc",
           "sec-afdf10",
           "sec-7feaf1",
           "s-f1871f"
@@ -1141,7 +1169,7 @@
                     "ruleIds": [
                       "t-e1f729",
                       "c-4737c4",
-                      "mg-379041"
+                      "mg-ce69c2"
                     ],
                     "content": {
                       "text": "Bodegas Industriales flexibles – Venta y Arriendo",
@@ -1153,7 +1181,7 @@
                     "kind": "group",
                     "ruleIds": [
                       "acordeon-b232cb",
-                      "pila-10a194",
+                      "pila-388a42",
                       "mg-a343db",
                       "mg-89f683"
                     ],
@@ -1161,7 +1189,9 @@
                       {
                         "id": "group-20",
                         "kind": "group",
-                        "ruleIds": [],
+                        "ruleIds": [
+                          "col-542b47"
+                        ],
                         "children": [
                           {
                             "id": "paragraph-18",
@@ -1190,7 +1220,9 @@
                       {
                         "id": "group-23",
                         "kind": "group",
-                        "ruleIds": [],
+                        "ruleIds": [
+                          "col-542b47"
+                        ],
                         "children": [
                           {
                             "id": "paragraph-21",
@@ -1219,7 +1251,9 @@
                       {
                         "id": "group-26",
                         "kind": "group",
-                        "ruleIds": [],
+                        "ruleIds": [
+                          "col-542b47"
+                        ],
                         "children": [
                           {
                             "id": "paragraph-24",
@@ -1248,7 +1282,9 @@
                       {
                         "id": "group-29",
                         "kind": "group",
-                        "ruleIds": [],
+                        "ruleIds": [
+                          "col-542b47"
+                        ],
                         "children": [
                           {
                             "id": "paragraph-27",
@@ -1277,7 +1313,9 @@
                       {
                         "id": "group-32",
                         "kind": "group",
-                        "ruleIds": [],
+                        "ruleIds": [
+                          "col-542b47"
+                        ],
                         "children": [
                           {
                             "id": "paragraph-30",
@@ -1306,7 +1344,9 @@
                       {
                         "id": "group-35",
                         "kind": "group",
-                        "ruleIds": [],
+                        "ruleIds": [
+                          "col-542b47"
+                        ],
                         "children": [
                           {
                             "id": "paragraph-33",
@@ -1335,7 +1375,9 @@
                       {
                         "id": "group-39",
                         "kind": "group",
-                        "ruleIds": [],
+                        "ruleIds": [
+                          "col-542b47"
+                        ],
                         "children": [
                           {
                             "id": "paragraph-36",
@@ -1383,7 +1425,9 @@
                       {
                         "id": "group-42",
                         "kind": "group",
-                        "ruleIds": [],
+                        "ruleIds": [
+                          "col-542b47"
+                        ],
                         "children": [
                           {
                             "id": "paragraph-40",
@@ -1412,7 +1456,9 @@
                       {
                         "id": "group-45",
                         "kind": "group",
-                        "ruleIds": [],
+                        "ruleIds": [
+                          "col-542b47"
+                        ],
                         "children": [
                           {
                             "id": "paragraph-43",
@@ -1441,7 +1487,9 @@
                       {
                         "id": "group-53",
                         "kind": "group",
-                        "ruleIds": [],
+                        "ruleIds": [
+                          "col-542b47"
+                        ],
                         "children": [
                           {
                             "id": "paragraph-46",
@@ -1526,7 +1574,8 @@
                     ],
                     "partes": {
                       "item": [
-                        "plg-3077cc"
+                        "plg-17ad59",
+                        "plg-a-d5f383"
                       ],
                       "resumen": [
                         "plg-r-f720e0",
@@ -1535,7 +1584,7 @@
                         "c-a-06855b"
                       ],
                       "panel": [
-                        "plg-p-ab00da"
+                        "plg-p-dcf0fd"
                       ]
                     }
                   }
@@ -1555,8 +1604,8 @@
                     "ruleIds": [
                       "t-e1f729",
                       "c-4737c4",
-                      "mg-379041",
-                      "mg-50f1b0"
+                      "mg-ce69c2",
+                      "mg-c0335f"
                     ],
                     "content": {
                       "text": "Certificaciones\ncalidad de materiales",
@@ -1568,14 +1617,16 @@
                     "kind": "group",
                     "ruleIds": [
                       "acordeon-c6b48b",
-                      "pila-10a194",
+                      "pila-388a42",
                       "mg-b06d27"
                     ],
                     "children": [
                       {
                         "id": "group-61",
                         "kind": "group",
-                        "ruleIds": [],
+                        "ruleIds": [
+                          "col-542b47"
+                        ],
                         "children": [
                           {
                             "id": "paragraph-57",
@@ -1630,7 +1681,9 @@
                       {
                         "id": "group-66",
                         "kind": "group",
-                        "ruleIds": [],
+                        "ruleIds": [
+                          "col-542b47"
+                        ],
                         "children": [
                           {
                             "id": "paragraph-62",
@@ -1685,7 +1738,9 @@
                       {
                         "id": "group-71",
                         "kind": "group",
-                        "ruleIds": [],
+                        "ruleIds": [
+                          "col-542b47"
+                        ],
                         "children": [
                           {
                             "id": "paragraph-67",
@@ -1740,7 +1795,9 @@
                       {
                         "id": "group-76",
                         "kind": "group",
-                        "ruleIds": [],
+                        "ruleIds": [
+                          "col-542b47"
+                        ],
                         "children": [
                           {
                             "id": "paragraph-72",
@@ -1795,7 +1852,8 @@
                     ],
                     "partes": {
                       "item": [
-                        "plg-3077cc"
+                        "plg-17ad59",
+                        "plg-a-d5f383"
                       ],
                       "resumen": [
                         "plg-r-f720e0",
@@ -1804,7 +1862,7 @@
                         "c-a-06855b"
                       ],
                       "panel": [
-                        "plg-p-ab00da"
+                        "plg-p-dcf0fd"
                       ]
                     }
                   },
@@ -1814,7 +1872,7 @@
                     "ruleIds": [
                       "t-e1f729",
                       "c-4737c4",
-                      "mg-05b575"
+                      "mg-d37116"
                     ],
                     "content": {
                       "text": "Características y virtudes\nde nuestras carpas",
@@ -1825,15 +1883,17 @@
                     "id": "group-88",
                     "kind": "group",
                     "ruleIds": [
-                      "acordeon-5b5cf1",
-                      "pila-10a194",
+                      "acordeon-9a5bc6",
+                      "pila-388a42",
                       "mg-a343db"
                     ],
                     "children": [
                       {
                         "id": "group-81",
                         "kind": "group",
-                        "ruleIds": [],
+                        "ruleIds": [
+                          "col-542b47"
+                        ],
                         "children": [
                           {
                             "id": "paragraph-79",
@@ -1862,7 +1922,9 @@
                       {
                         "id": "group-84",
                         "kind": "group",
-                        "ruleIds": [],
+                        "ruleIds": [
+                          "col-542b47"
+                        ],
                         "children": [
                           {
                             "id": "paragraph-82",
@@ -1891,7 +1953,9 @@
                       {
                         "id": "group-87",
                         "kind": "group",
-                        "ruleIds": [],
+                        "ruleIds": [
+                          "col-542b47"
+                        ],
                         "children": [
                           {
                             "id": "paragraph-85",
@@ -1920,7 +1984,7 @@
                     ],
                     "partes": {
                       "item": [
-                        "plg-3077cc"
+                        "plg-17ad59"
                       ],
                       "resumen": [
                         "plg-r-f720e0",
@@ -1928,7 +1992,7 @@
                         "c-3bcd26"
                       ],
                       "panel": [
-                        "plg-p-ab00da"
+                        "plg-p-dcf0fd"
                       ]
                     }
                   }

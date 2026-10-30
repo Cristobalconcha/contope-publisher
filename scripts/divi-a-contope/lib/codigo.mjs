@@ -134,6 +134,7 @@ export function transcribirCodigo(ctx, mod, { pagina, ubicacion }) {
       if (!contenido.mini) {
         ctx.avisar({ pagina, ...ubicacion, modulo: 'code', clase: 'mapbox', severidad: 'sin-transcribir', motivo: 'mapa de Mapbox reconocido pero el perfil no trae `miniMapa` (la imagen del mini mapa): no se emite' });
       } else {
+        mapaBloque: {
         const hijos = [];
         if (textoDireccion) {
           const rol = (ctx.medidaD?.roles || []).find((r) => (r.ejemplos || []).some((e) => textoDireccion.startsWith(e.slice(0, 25))));
@@ -151,6 +152,18 @@ export function transcribirCodigo(ctx, mod, { pagina, ubicacion }) {
         const reglasMini = esMini
           ? ctx.reg.propiedades({ width: '60px', height: '60px', 'border-radius': '8px', 'object-fit': 'cover', display: 'block' }, {}, { prefijo: 'mini' })
           : ctx.reg.propiedades({ width: '100%', height: pxs(caja.h), 'border-radius': '8px', 'object-fit': 'cover', display: 'block' }, {}, { prefijo: 'mini' });
+        // Sin la clave pública de Mapbox el plugin deja el mini como un enlace con una imagen de
+        // 60×60 (no monta la conducta): para un mapa GRANDE eso se ve como una miniatura perdida.
+        // Con `mapaGrande: "imagen"` en el perfil, el mapa de la ficha sale como la imagen a todo
+        // el ancho de su caja, con enlace a «cómo llegar» (OpenStreetMap), y funciona sin clave.
+        if (!esMini && ctx.perfil.mapaGrande === 'imagen') {
+          const href = `https://www.openstreetmap.org/?mlat=${contenido.lat}&mlon=${contenido.lng}#map=${contenido.zoom}/${contenido.lat}/${contenido.lng}`;
+          const img = ctx.nodo('image', [...ctx.reg.propiedades({ width: '100%', height: pxs(caja.h), 'object-fit': 'cover', 'border-radius': '8px', display: 'block' }, {}, { prefijo: 'mapa-img' })], { assetUrl: contenido.mini, alt: 'Mapa de ubicación: ' + (contenido.globo || '').slice(0, 120) });
+          nodos.push(ctx.nodo('link', ctx.reg.propiedades({ display: 'block' }, {}, { prefijo: 'enl' }), { label: '', href, target: 'blank' }, [img]));
+          ctx.avisar({ ...ubicacion, modulo: 'code', clase: 'mapbox', severidad: 'aproximado', motivo: 'mapa de Mapbox siempre abierto → imagen del mapa (recorte de la captura) con enlace a OpenStreetMap, porque sin clave de Mapbox el plugin no abre el mapa y ContOpe no tiene un mapa incrustado siempre abierto (hueco del plugin)' });
+          reconocido.push('mapbox');
+          break mapaBloque;
+        }
         const grupo = ctx.nodo('group', [ctx.reg.R('interaction', { behavior: 'mapa' }, { prefijo: 'mapa' }), ...reglasGrupo], undefined, hijos);
         grupo.partes = { mini: reglasMini };
         ctx.ajustes.mapa = { lat: contenido.lat, lng: contenido.lng, zoom: contenido.zoom, necesitaClaveMapbox: true };
@@ -160,6 +173,7 @@ export function transcribirCodigo(ctx, mod, { pagina, ubicacion }) {
           motivo: esMini ? 'mini mapa de Mapbox → grupo con conducta `mapa` (necesita la clave pública de Mapbox en Configuración para abrir el grande)'
             : 'mapa de Mapbox siempre abierto → conducta `mapa` (mini que se abre al pincharlo): ContOpe no tiene un mapa incrustado siempre abierto (hueco del plugin)' });
         reconocido.push('mapbox');
+        }
       }
     }
   }

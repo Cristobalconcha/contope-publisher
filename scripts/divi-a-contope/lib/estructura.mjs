@@ -85,7 +85,18 @@ function transcribirColumna(ctx, cD, cM, ubic, anchoD, anchoM) {
       ctx.avisar({ ...u, modulo: mD.tipo, clase: 'oculto', severidad: 'aproximado', motivo: 'módulo no visible a 1440: se omite' });
       return;
     }
+    if (i === 0 && !['code', 'fullwidth_code'].includes(mD.tipo)) {
+      const topD = cD.caja.y + lados(cD.estilo.relleno)[0];
+      const topM = cM ? cM.caja.y + lados(cM.estilo.relleno)[0] : null;
+      const offD = Math.round(mD.caja.y - topD);
+      const offM = mM && topM !== null ? Math.round(mM.caja.y - topM) : offD;
+      if (Math.abs(offD) > 1 || Math.abs(offM) > 1) {
+        ctx.reg.inicioPendiente = { d: offD, m: offM };
+        ctx.avisar({ ...u, modulo: mD.tipo, clase: 'desfase', severidad: 'ok', motivo: `el primer módulo de la columna está desfasado ${offD}px (escritorio) / ${offM}px (celular) del borde de su contenido: se aplica como margen superior` });
+      }
+    }
     const nodos = transcribirModulo(ctx, mD, mM, info);
+    ctx.reg.inicioPendiente = null;
     if (!nodos.length) return;
     // Un módulo de texto o título más angosto que su columna (Divi: Sizing → ancho máximo).
     if (['text', 'heading'].includes(mD.tipo)) {
@@ -135,6 +146,7 @@ function transcribirFila(ctx, fD, fM, ubic, vw) {
     ctx.avisar({ ...ubic, modulo: 'fila', clase: 'vacía', severidad: 'ok', motivo: 'fila vacía (sin módulos y de alto ~0): se omite' });
     return [];
   }
+  ctx.fondoFila = esTransparente(fD.estilo.fondo) ? null : colorRegla(fD.estilo.fondo);
   const decl = declaracionesCaja(fD.estilo);
   const declM = {};
   const rD = fD.caja.w / vw.d; const rM = fM ? fM.caja.w / vw.m : rD;
@@ -178,6 +190,8 @@ export function transcribirSeccion(ctx, sD, sM, indice, vw) {
   const ubic = { pagina: ctx.pagina, region, seccion: indice };
   ctx.ubicacionActual = ubic;
   const anim = ctx.animacion('seccion');
+  ctx.fondoSeccion = esTransparente(sD.fondo) ? null : colorRegla(sD.fondo);
+  ctx.fondoFila = null;
   const kind = region === 'encabezado' ? 'header' : region === 'pie' ? 'footer' : 'section';
   if (sD.tipo === 'especialidad') ctx.avisar({ ...ubic, modulo: 'sección', clase: 'et_section_specialty', severidad: 'aproximado', motivo: 'sección de especialidad (columnas con filas anidadas): se transcribe como sección normal; revisar a mano' });
   if (sD.paralaje) ctx.avisar({ ...ubic, modulo: 'sección', clase: 'et_parallax_bg', severidad: 'sin-transcribir', motivo: 'fondo con paralaje: ContOpe no tiene equivalente; queda fijo' });
@@ -201,7 +215,7 @@ export function transcribirSeccion(ctx, sD, sM, indice, vw) {
     mkdirSync(path.join(ctx.perfil.carpetaUploads, 'divisores'), { recursive: true });
     writeFileSync(path.join(ctx.perfil.carpetaUploads, 'divisores', nombre), svg);
     const forma = '/wp-content/uploads/divisores/' + nombre;
-    const valor = { forma, donde: dv.cual === 'arriba' ? 'arriba' : 'abajo', alto: dv.alto, color: relleno.length === 4 ? '#' + [...relleno.slice(1)].map((c) => c + c).join('') : relleno };
+    const valor = { forma, donde: dv.cual === 'arriba' ? 'arriba' : 'abajo', alto: dv.alto, color: relleno.length === 4 ? '#' + [...relleno.slice(1)].map((c) => c + c).join('') : relleno, reserva: false };
     const proporcional = dvM && Math.abs(px(dvM.alto) / vw.m - px(dv.alto) / vw.d) < 0.002;
     if (proporcional) valor.alto = redondear(px(dv.alto) / vw.d * 100, 2) + 'vw';
     else if (dvM && dvM.alto !== dv.alto) ctx.avisar({ ...ubic, modulo: 'sección', clase: dv.clases, severidad: 'aproximado', motivo: 'el alto del divisor cambia por ancho sin ser proporcional: sólo escritorio (una sección no admite dos reglas divisor)' });

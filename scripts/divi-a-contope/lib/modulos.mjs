@@ -18,6 +18,10 @@ import { moduloAcordeon } from './acordeon.mjs';
 // del módulo no lleva aire propio: el hueco con el módulo siguiente se mide.
 const AIRE_BLOQUE = { h: () => 10, p: (est) => px(est?.tam) || 16, lista: () => 23 };
 
+// Un título de Divi trae 10px de aire propio debajo (padding-bottom) DENTRO de la caja medida:
+// si el alto sobra exactamente 10 sobre un número entero de líneas, ese aire va al margen.
+const extraAireTitulo = (c, e) => { const l = px(e?.interlineado); if (!c || !l) return 0; const n = (c.h - 10) / l; return Math.abs(n - Math.round(n)) < 0.06 && n >= 0.9 ? 10 : 0; };
+
 const estiloPorTexto = (medida, texto) => {
   const t = limpiarTexto(texto).slice(0, 40);
   if (!t) return null;
@@ -77,8 +81,9 @@ export function moduloTexto(ctx, d, m, { gapD, gapM, ubicacion }) {
     const eD = est(b.bD) || (estiloPorTexto(ctx.medidaD, b.texto || '') || null);
     const eM = est(b.bM) || null;
     const aire = b.tipo === 'h' ? AIRE_BLOQUE.h() : b.tipo === 'lista' ? AIRE_BLOQUE.lista() : AIRE_BLOQUE.p(eD);
-    const finD = ultimo ? gapD : aire;
-    const finM = ultimo ? gapM : aire;
+    const extraU = ultimo && b.tipo === 'h' && bloques.length === 1;
+    const finD = ultimo ? gapD + (extraU ? extraAireTitulo(d.caja, eD) : 0) : aire;
+    const finM = ultimo ? gapM + (extraU ? extraAireTitulo(m?.caja, eM) : 0) : aire;
     if (!eD) {
       ctx.avisar({ ...ubicacion, modulo: 'text', clase: b.tipo, severidad: 'aproximado', motivo: `no hay estilo medido para «${(b.texto || '').slice(0, 40)}»: queda con el del tema` });
     }
@@ -127,8 +132,7 @@ export function moduloTitulo(ctx, d, m, { gapD, gapM, ubicacion }) {
   // Un título de Divi trae 10px de aire propio debajo (padding-bottom) que ya está
   // dentro de la caja medida: si el alto sobra exactamente 10 sobre un número entero
   // de líneas, ese aire se suma al margen del nodo.
-  const extra = (c, e) => { const l = px(e?.interlineado); if (!c || !l) return 0; const n = (c.h - 10) / l; return Math.abs(n - Math.round(n)) < 0.06 && n >= 0.9 ? 10 : 0; };
-  reglas.push(...reglasMargen(ctx.reg, (gapD ?? 0) + extra(d.caja, d.estilo), (gapM ?? 0) + extra(m?.caja, m?.estilo)));
+  reglas.push(...reglasMargen(ctx.reg, (gapD ?? 0) + extraAireTitulo(d.caja, d.estilo), (gapM ?? 0) + extraAireTitulo(m?.caja, m?.estilo)));
   const nivel = Number((d.etiqueta || 'h2')[1]) || 2;
   return [ctx.nodo('heading', reglas, { text: limpiarTexto(d.texto), level: nivel })];
 }
@@ -243,14 +247,22 @@ export function moduloBlurb(ctx, d, m, { gapD, gapM, ubicacion }) {
   const nodos = [];
   const titulo = d.titulo;
   const reglasT = d.estiloTitulo ? reglasTexto(ctx.reg, { d: d.estiloTitulo, m: m?.estiloTitulo }) : [];
+  let iconoNodo = null;
   if (d.icono && d.icono.glifo) {
     const cp = d.icono.glifo.codePointAt(0).toString(16);
     const nombre = GLIFOS[cp];
     if (nombre) {
       (ctx.ajustes.iconos ||= []).includes(nombre) || ctx.ajustes.iconos.push(nombre);
-      reglasT.push(ctx.reg.R('icono', { nombre, donde: 'antes', tamano: d.icono.tam, color: colorRegla(d.icono.color), separacion: '12px' }, { prefijo: 'ico' }));
+      const tam = px(d.icono.tam) || 40;
+      // El ícono de Divi va a la IZQUIERDA y el título y la descripción juntos a su derecha
+      // (blurb_position_left). El ícono es un nodo aparte con la regla `icono`.
+      iconoNodo = ctx.nodo('paragraph', [
+        ctx.reg.R('icono', { nombre, donde: 'antes', tamano: pxs(tam), color: colorRegla(d.icono.color), separacion: '0px' }, { prefijo: 'ico' }),
+        ...ctx.reg.propiedades({ 'margin-block-start': '0px', 'margin-block-end': '0px', width: pxs(tam), 'flex-shrink': '0', 'line-height': pxs(tam) }, {}, { prefijo: 'ico-caja' }),
+      ], { text: ' ' });
+      ctx.avisar({ ...ubicacion, modulo: 'blurb', clase: `${d.icono.familia} U+${cp}`, severidad: 'aproximado', motivo: `ícono ${d.icono.familia} U+${cp} → Material Symbols «${nombre}» (contorno; el original era relleno: Material no trae el estilo relleno en el set del sitio)` });
     } else {
-      ctx.avisar({ ...ubicacion, modulo: 'blurb', clase: `glifo ${d.icono.familia} U+${cp}`, severidad: 'sin-transcribir', motivo: `ícono ${d.icono.familia} U+${cp} sin equivalente en la tabla de Material Symbols: el título queda sin ícono` });
+      ctx.avisar({ ...ubicacion, modulo: 'blurb', clase: `glifo ${d.icono.familia} U+${cp}`, severidad: 'sin-transcribir', motivo: `ícono ${d.icono.familia} U+${cp} sin equivalente en la tabla de Material Symbols: el blurb queda sin ícono` });
     }
   }
   const imgs = (d.imagenes || []);
@@ -258,18 +270,31 @@ export function moduloBlurb(ctx, d, m, { gapD, gapM, ubicacion }) {
     const url = ctx.url(imgs[0].actual || imgs[0].src, ubicacion);
     if (url) nodos.push(ctx.nodo('image', [...ctx.reg.propiedades({ width: pxs(imgs[0].caja.w), 'max-width': '100%' }, {}, { prefijo: 'img' }), ...reglasMargen(ctx.reg, 10, 10)], { assetUrl: url, alt: imgs[0].alt || '' }));
   }
-  const sinDesc = !d.descripcion;
+  const textos = [];
   if (titulo) {
-    reglasT.push(...reglasMargen(ctx.reg, sinDesc ? gapD : 10, sinDesc ? gapM : 10));
-    nodos.push(ctx.nodo('heading', reglasT, { text: titulo, level: Number((d.etiqueta || 'h4')[1]) || 4 }));
+    reglasT.push(...reglasMargen(ctx.reg, d.descripcion ? 10 : 0, d.descripcion ? 10 : 0));
+    textos.push(ctx.nodo('heading', reglasT, { text: titulo, level: Number((d.etiqueta || 'h4')[1]) || 4 }));
   }
   if (d.descripcion) {
     const reglasP = d.estiloDescripcion ? reglasTexto(ctx.reg, { d: d.estiloDescripcion, m: m?.estiloDescripcion }) : [];
-    reglasP.push(...reglasMargen(ctx.reg, gapD, gapM));
-    nodos.push(ctx.nodo('paragraph', reglasP, { text: limpiarTexto(d.descripcion) }));
+    reglasP.push(...reglasMargen(ctx.reg, 0, 0));
+    textos.push(ctx.nodo('paragraph', reglasP, { text: limpiarTexto(d.descripcion) }));
+  }
+  const contenedor = iconoNodo
+    ? ctx.nodo('group', [...ctx.reg.propiedades({ display: 'flex', 'align-items': 'flex-start', gap: '20px', ...reglasMargenDecl(gapD) }, { mobile: reglasMargenDecl(gapM, true) }, { prefijo: 'blurb' })], undefined, [iconoNodo,
+      ctx.nodo('group', [ctx.reg.R('layout', { mode: 'stack', gap: '0px', align: 'stretch' }, { prefijo: 'col' }), ...ctx.reg.propiedades({ 'min-width': '0px', 'flex-grow': '1', 'flex-shrink': '1', 'flex-basis': '0px' }, {}, { prefijo: 'blurb-t' })], undefined, textos)])
+    : null;
+  if (contenedor) nodos.push(contenedor);
+  else {
+    // sin ícono: el último texto lleva el hueco con el módulo siguiente
+    const ult = textos[textos.length - 1];
+    if (ult) ult.ruleIds = [...ult.ruleIds.filter((r) => !r.startsWith('mg-')), ...reglasMargen(ctx.reg, gapD, gapM)];
+    nodos.push(...textos);
   }
   return nodos;
 }
+
+const reglasMargenDecl = (fin, soloM = false) => (fin === undefined ? {} : { 'margin-block-start': '0px', 'margin-block-end': pxs(fin) });
 
 /* ----------------------------------------------------------- promo / cta */
 
@@ -288,7 +313,7 @@ export function moduloPromo(ctx, d, m, { gapD, gapM, ubicacion }) {
   if (d.boton) hijos.push(...moduloBoton(ctx, { boton: d.boton, alineacion: 'et_pb_button_alignment_center' }, m ? { boton: m.boton } : null, { gapD: 0, gapM: 0, ubicacion }));
   const caja = declaracionesCaja(d.cajaPromo);
   const [t, r, b, l] = lados(d.cajaPromo?.relleno);
-  Object.assign(caja, { 'padding-top': pxs(t), 'padding-right': pxs(r), 'padding-bottom': pxs(b), 'padding-left': pxs(l), 'text-align': 'center' });
+  Object.assign(caja, { 'padding-top': pxs(t), 'padding-right': pxs(r), 'padding-bottom': pxs(b), 'padding-left': pxs(l), 'text-align': 'center', 'min-height': pxs(d.caja.h) });
   const cajaM = m?.cajaPromo ? (() => { const [t2, r2, b2, l2] = lados(m.cajaPromo.relleno); return { 'padding-top': pxs(t2), 'padding-right': pxs(r2), 'padding-bottom': pxs(b2), 'padding-left': pxs(l2) }; })() : {};
   const reglas = [...ctx.reg.propiedades(caja, { mobile: cajaM }, { prefijo: 'promo' }), ...reglasMargen(ctx.reg, gapD, gapM)];
   return [ctx.nodo('group', [ctx.reg.R('layout', { mode: 'stack', gap: '0px', align: 'stretch' }, { prefijo: 'pila' }), ...reglas], undefined, hijos)];

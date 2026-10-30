@@ -13,6 +13,7 @@
   "plugin": { "listasAnidadas": true },
   "miniMapa": "/wp-content/uploads/2025/07/Mini-mapa.png",
   "miniMapaGrande": "/wp-content/uploads/2025/07/Mapa-contacto-recorte.png",
+  "mapaGrande": "imagen",
   "reglasMapa": { "mini": [], "grande": [] },
   "formularios": [{ "slug": "contacto-basis", "gravity": "gform_1", "nombre": "Contacto Basis", "maxLength": 600 }],
   "reemplazos": {

@@ -17,7 +17,7 @@
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { abrirChrome, esperarLaPagina, recorrerLaPagina } from '../piezas/chrome.mjs';
+import { abrirChrome, esperarLaPagina, recorrerLaPagina } from '../../piezas/chrome.mjs';
 
 const aqui = path.dirname(fileURLToPath(import.meta.url));
 const salida = process.argv[2];

@@ -870,7 +870,7 @@ CSS;
 {$r} > {$grande} > {$estado}[hidden]{display:none !important;}
 {$r} > {$grande} > {$cerrar}{position:absolute;top:.5rem;right:.5rem;z-index:2;appearance:none;}
 /* Sin guion el mini es un enlace con una imagen: la imagen respeta el radio que le ponga el diseño al mini. */
-[data-cod-behavior="mapa"] > [data-cod-mapa-rol="mini"] > img{border-radius:inherit;}
+[data-cod-behavior="mapa"] > [data-cod-mapa-rol="mini"] > img{border-radius:inherit;width:100%;height:100%;object-fit:inherit;}
 
 /* Valores por omisión, con especificidad cero: la composición los pisa con cualquier regla. */
 :where({$r} > {$mini}){display:block;flex-shrink:0;width:60px;height:60px;padding-top:0;padding-right:0;padding-bottom:0;padding-left:0;border-top-width:0;border-right-width:0;border-bottom-width:0;border-left-width:0;background-color:transparent;}

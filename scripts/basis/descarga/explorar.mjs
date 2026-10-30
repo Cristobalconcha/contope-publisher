@@ -4,7 +4,7 @@
  * Sólo lectura: no inicia sesión, no envía formularios.
  */
 import { readFileSync } from 'node:fs';
-import { abrirChrome, esperarLaPagina, recorrerLaPagina } from '../piezas/chrome.mjs';
+import { abrirChrome, esperarLaPagina, recorrerLaPagina } from '../../piezas/chrome.mjs';
 
 const [url, js, anchoArg] = process.argv.slice(2);
 const ancho = Number(anchoArg || 1440);

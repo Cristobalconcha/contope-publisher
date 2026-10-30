@@ -318,7 +318,7 @@
         }
       },
       {
-        "id": "mg-766004",
+        "id": "mg-1a56c0",
         "kind": "properties",
         "scope": {
           "breakpoint": "all",
@@ -337,12 +337,12 @@
         "value": {
           "declarations": {
             "margin-block-start": "0px",
-            "margin-block-end": "28px"
+            "margin-block-end": "38px"
           }
         }
       },
       {
-        "id": "mg-e4b321",
+        "id": "mg-cb0416",
         "kind": "properties",
         "scope": {
           "breakpoint": "mobile",
@@ -360,7 +360,7 @@
         "status": "reviewed",
         "value": {
           "declarations": {
-            "margin-block-end": "30px"
+            "margin-block-end": "40px"
           }
         }
       },
@@ -1416,7 +1416,7 @@
         }
       },
       {
-        "id": "ico-cfbfd5",
+        "id": "ico-015e74",
         "kind": "icono",
         "scope": {
           "breakpoint": "all",
@@ -1437,7 +1437,34 @@
           "donde": "antes",
           "tamano": "40px",
           "color": "#FFFFFF",
-          "separacion": "12px"
+          "separacion": "0px"
+        }
+      },
+      {
+        "id": "ico-caja-494d14",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "margin-block-start": "0px",
+            "margin-block-end": "0px",
+            "width": "40px",
+            "flex-shrink": "0",
+            "line-height": "40px"
+          }
         }
       },
       {
@@ -1465,7 +1492,60 @@
         }
       },
       {
-        "id": "ico-6295d7",
+        "id": "blurb-46f793",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "display": "flex",
+            "align-items": "flex-start",
+            "gap": "20px",
+            "margin-block-start": "0px",
+            "margin-block-end": "0px"
+          }
+        }
+      },
+      {
+        "id": "blurb-t-4a9362",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "min-width": "0px",
+            "flex-grow": "1",
+            "flex-shrink": "1",
+            "flex-basis": "0px"
+          }
+        }
+      },
+      {
+        "id": "ico-83734f",
         "kind": "icono",
         "scope": {
           "breakpoint": "all",
@@ -1486,11 +1566,11 @@
           "donde": "antes",
           "tamano": "40px",
           "color": "#FFFFFF",
-          "separacion": "12px"
+          "separacion": "0px"
         }
       },
       {
-        "id": "ico-06eb30",
+        "id": "ico-b038b7",
         "kind": "icono",
         "scope": {
           "breakpoint": "all",
@@ -1511,7 +1591,7 @@
           "donde": "antes",
           "tamano": "40px",
           "color": "#FFFFFF",
-          "separacion": "12px"
+          "separacion": "0px"
         }
       },
       {
@@ -2108,7 +2188,7 @@
         }
       },
       {
-        "id": "promo-bef25a",
+        "id": "promo-4f5a60",
         "kind": "properties",
         "scope": {
           "breakpoint": "all",
@@ -2133,12 +2213,13 @@
             "padding-right": "60px",
             "padding-bottom": "60px",
             "padding-left": "60px",
-            "text-align": "center"
+            "text-align": "center",
+            "min-height": "321px"
           }
         }
       },
       {
-        "id": "promo-54fb86",
+        "id": "promo-cd77a9",
         "kind": "properties",
         "scope": {
           "breakpoint": "mobile",
@@ -2200,8 +2281,8 @@
                       "t-eeaf66",
                       "t-699a0e",
                       "c-4737c4",
-                      "mg-766004",
-                      "mg-e4b321"
+                      "mg-1a56c0",
+                      "mg-cb0416"
                     ],
                     "content": {
                       "text": "La respuesta eficiente\na su demanda de bodegaje",
@@ -2454,7 +2535,7 @@
         ]
       },
       {
-        "id": "section-52",
+        "id": "section-61",
         "kind": "section",
         "ruleIds": [
           "sec-79ee4b",
@@ -2509,51 +2590,13 @@
             ]
           },
           {
-            "id": "group-48",
+            "id": "group-57",
             "kind": "group",
             "ruleIds": [
               "fila-32dae4",
               "fila-fa0749"
             ],
             "children": [
-              {
-                "id": "group-41",
-                "kind": "group",
-                "ruleIds": [
-                  "col-542b47",
-                  "cl-bece33"
-                ],
-                "children": [
-                  {
-                    "id": "heading-39",
-                    "kind": "heading",
-                    "ruleIds": [
-                      "t-ced61b",
-                      "t-de8548",
-                      "c-4737c4",
-                      "ico-cfbfd5",
-                      "mg-9b6f57"
-                    ],
-                    "content": {
-                      "text": "Compra tus bodegas",
-                      "level": 4
-                    }
-                  },
-                  {
-                    "id": "paragraph-40",
-                    "kind": "paragraph",
-                    "ruleIds": [
-                      "t-658434",
-                      "t-379834",
-                      "c-4737c4",
-                      "mg-a343db"
-                    ],
-                    "content": {
-                      "text": "Para satisfacer el requerimiento de instalaciones permententes o que superen los 5 años, comprar puede ser la opción más conveniente, especialmente si agrega Servicios Opcionales y la instalación dentro del total."
-                    }
-                  }
-                ]
-              },
               {
                 "id": "group-44",
                 "kind": "group",
@@ -2563,37 +2606,66 @@
                 ],
                 "children": [
                   {
-                    "id": "heading-42",
-                    "kind": "heading",
+                    "id": "group-43",
+                    "kind": "group",
                     "ruleIds": [
-                      "t-ced61b",
-                      "t-de8548",
-                      "c-4737c4",
-                      "ico-6295d7",
-                      "mg-9b6f57"
+                      "blurb-46f793"
                     ],
-                    "content": {
-                      "text": "Opción de Arriendo",
-                      "level": 4
-                    }
-                  },
-                  {
-                    "id": "paragraph-43",
-                    "kind": "paragraph",
-                    "ruleIds": [
-                      "t-658434",
-                      "t-379834",
-                      "c-4737c4",
-                      "mg-a343db"
-                    ],
-                    "content": {
-                      "text": "Si su operación es temporal o su requerimiento de naves es fluctuante, la decisión de arrendar podría ser la mejor opción. Dispondrá de instalación en sus dependencias y con tarifas muy competitivas, ajustadas a la duración del contrato."
-                    }
+                    "children": [
+                      {
+                        "id": "paragraph-39",
+                        "kind": "paragraph",
+                        "ruleIds": [
+                          "ico-015e74",
+                          "ico-caja-494d14"
+                        ],
+                        "content": {
+                          "text": " "
+                        }
+                      },
+                      {
+                        "id": "group-42",
+                        "kind": "group",
+                        "ruleIds": [
+                          "col-542b47",
+                          "blurb-t-4a9362"
+                        ],
+                        "children": [
+                          {
+                            "id": "heading-40",
+                            "kind": "heading",
+                            "ruleIds": [
+                              "t-ced61b",
+                              "t-de8548",
+                              "c-4737c4",
+                              "mg-9b6f57"
+                            ],
+                            "content": {
+                              "text": "Compra tus bodegas",
+                              "level": 4
+                            }
+                          },
+                          {
+                            "id": "paragraph-41",
+                            "kind": "paragraph",
+                            "ruleIds": [
+                              "t-658434",
+                              "t-379834",
+                              "c-4737c4",
+                              "mg-a343db"
+                            ],
+                            "content": {
+                              "text": "Para satisfacer el requerimiento de instalaciones permententes o que superen los 5 años, comprar puede ser la opción más conveniente, especialmente si agrega Servicios Opcionales y la instalación dentro del total."
+                            }
+                          }
+                        ]
+                      }
+                    ]
                   }
                 ]
               },
               {
-                "id": "group-47",
+                "id": "group-50",
                 "kind": "group",
                 "ruleIds": [
                   "col-542b47",
@@ -2601,39 +2673,135 @@
                 ],
                 "children": [
                   {
-                    "id": "heading-45",
-                    "kind": "heading",
+                    "id": "group-49",
+                    "kind": "group",
                     "ruleIds": [
-                      "t-ced61b",
-                      "t-de8548",
-                      "c-4737c4",
-                      "ico-06eb30",
-                      "mg-9b6f57"
+                      "blurb-46f793"
                     ],
-                    "content": {
-                      "text": "Opción ACC",
-                      "level": 4
-                    }
-                  },
+                    "children": [
+                      {
+                        "id": "paragraph-45",
+                        "kind": "paragraph",
+                        "ruleIds": [
+                          "ico-83734f",
+                          "ico-caja-494d14"
+                        ],
+                        "content": {
+                          "text": " "
+                        }
+                      },
+                      {
+                        "id": "group-48",
+                        "kind": "group",
+                        "ruleIds": [
+                          "col-542b47",
+                          "blurb-t-4a9362"
+                        ],
+                        "children": [
+                          {
+                            "id": "heading-46",
+                            "kind": "heading",
+                            "ruleIds": [
+                              "t-ced61b",
+                              "t-de8548",
+                              "c-4737c4",
+                              "mg-9b6f57"
+                            ],
+                            "content": {
+                              "text": "Opción de Arriendo",
+                              "level": 4
+                            }
+                          },
+                          {
+                            "id": "paragraph-47",
+                            "kind": "paragraph",
+                            "ruleIds": [
+                              "t-658434",
+                              "t-379834",
+                              "c-4737c4",
+                              "mg-a343db"
+                            ],
+                            "content": {
+                              "text": "Si su operación es temporal o su requerimiento de naves es fluctuante, la decisión de arrendar podría ser la mejor opción. Dispondrá de instalación en sus dependencias y con tarifas muy competitivas, ajustadas a la duración del contrato."
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "group-56",
+                "kind": "group",
+                "ruleIds": [
+                  "col-542b47",
+                  "cl-bece33"
+                ],
+                "children": [
                   {
-                    "id": "paragraph-46",
-                    "kind": "paragraph",
+                    "id": "group-55",
+                    "kind": "group",
                     "ruleIds": [
-                      "t-658434",
-                      "t-379834",
-                      "c-4737c4",
-                      "mg-a343db"
+                      "blurb-46f793"
                     ],
-                    "content": {
-                      "text": "Y si no desea inmovilizar recursos para faenas de largo plazo o permanente, el Arriendo con Compromiso de Compra (ACC) entrega un valor de arriendo intermedio que le permite adquirir la bodega arrendada al cabo de un plazo pre pactado."
-                    }
+                    "children": [
+                      {
+                        "id": "paragraph-51",
+                        "kind": "paragraph",
+                        "ruleIds": [
+                          "ico-b038b7",
+                          "ico-caja-494d14"
+                        ],
+                        "content": {
+                          "text": " "
+                        }
+                      },
+                      {
+                        "id": "group-54",
+                        "kind": "group",
+                        "ruleIds": [
+                          "col-542b47",
+                          "blurb-t-4a9362"
+                        ],
+                        "children": [
+                          {
+                            "id": "heading-52",
+                            "kind": "heading",
+                            "ruleIds": [
+                              "t-ced61b",
+                              "t-de8548",
+                              "c-4737c4",
+                              "mg-9b6f57"
+                            ],
+                            "content": {
+                              "text": "Opción ACC",
+                              "level": 4
+                            }
+                          },
+                          {
+                            "id": "paragraph-53",
+                            "kind": "paragraph",
+                            "ruleIds": [
+                              "t-658434",
+                              "t-379834",
+                              "c-4737c4",
+                              "mg-a343db"
+                            ],
+                            "content": {
+                              "text": "Y si no desea inmovilizar recursos para faenas de largo plazo o permanente, el Arriendo con Compromiso de Compra (ACC) entrega un valor de arriendo intermedio que le permite adquirir la bodega arrendada al cabo de un plazo pre pactado."
+                            }
+                          }
+                        ]
+                      }
+                    ]
                   }
                 ]
               }
             ]
           },
           {
-            "id": "group-51",
+            "id": "group-60",
             "kind": "group",
             "ruleIds": [
               "fila-1c9785",
@@ -2641,7 +2809,7 @@
             ],
             "children": [
               {
-                "id": "group-50",
+                "id": "group-59",
                 "kind": "group",
                 "ruleIds": [
                   "col-542b47",
@@ -2649,7 +2817,7 @@
                 ],
                 "children": [
                   {
-                    "id": "button-49",
+                    "id": "button-58",
                     "kind": "button",
                     "ruleIds": [
                       "btn-504eb8",
@@ -2673,7 +2841,7 @@
         ]
       },
       {
-        "id": "section-59",
+        "id": "section-68",
         "kind": "section",
         "ruleIds": [
           "sec-56504b",
@@ -2682,7 +2850,7 @@
         ],
         "children": [
           {
-            "id": "group-58",
+            "id": "group-67",
             "kind": "group",
             "ruleIds": [
               "fila-739852",
@@ -2690,7 +2858,7 @@
             ],
             "children": [
               {
-                "id": "group-55",
+                "id": "group-64",
                 "kind": "group",
                 "ruleIds": [
                   "col-542b47",
@@ -2698,7 +2866,7 @@
                 ],
                 "children": [
                   {
-                    "id": "heading-53",
+                    "id": "heading-62",
                     "kind": "heading",
                     "ruleIds": [
                       "t-359376",
@@ -2711,7 +2879,7 @@
                     }
                   },
                   {
-                    "id": "list-54",
+                    "id": "list-63",
                     "kind": "list",
                     "ruleIds": [
                       "t-829a89",
@@ -2756,7 +2924,7 @@
                 ]
               },
               {
-                "id": "group-57",
+                "id": "group-66",
                 "kind": "group",
                 "ruleIds": [
                   "col-542b47",
@@ -2764,7 +2932,7 @@
                 ],
                 "children": [
                   {
-                    "id": "image-56",
+                    "id": "image-65",
                     "kind": "image",
                     "ruleIds": [
                       "img-c46f28",
@@ -2784,7 +2952,7 @@
         ]
       },
       {
-        "id": "section-66",
+        "id": "section-75",
         "kind": "section",
         "ruleIds": [
           "sec-d8d911",
@@ -2792,7 +2960,7 @@
         ],
         "children": [
           {
-            "id": "group-65",
+            "id": "group-74",
             "kind": "group",
             "ruleIds": [
               "fila-1c9785",
@@ -2800,7 +2968,7 @@
             ],
             "children": [
               {
-                "id": "group-64",
+                "id": "group-73",
                 "kind": "group",
                 "ruleIds": [
                   "col-542b47",
@@ -2808,17 +2976,17 @@
                 ],
                 "children": [
                   {
-                    "id": "group-63",
+                    "id": "group-72",
                     "kind": "group",
                     "ruleIds": [
                       "col-542b47",
-                      "promo-bef25a",
-                      "promo-54fb86",
+                      "promo-4f5a60",
+                      "promo-cd77a9",
                       "mg-a343db"
                     ],
                     "children": [
                       {
-                        "id": "heading-60",
+                        "id": "heading-69",
                         "kind": "heading",
                         "ruleIds": [
                           "t-424b46",
@@ -2832,7 +3000,7 @@
                         }
                       },
                       {
-                        "id": "paragraph-61",
+                        "id": "paragraph-70",
                         "kind": "paragraph",
                         "ruleIds": [
                           "mg-2c79cc"
@@ -2842,7 +3010,7 @@
                         }
                       },
                       {
-                        "id": "button-62",
+                        "id": "button-71",
                         "kind": "button",
                         "ruleIds": [
                           "btn-504eb8",

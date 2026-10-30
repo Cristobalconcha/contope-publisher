@@ -1,0 +1,59 @@
+/*
+Theme Name: ContOpe Design — Basis
+Template: contope-canvas
+Description: Tema hijo del motor ContOpe Canvas para Basis bodegas. Aporta paleta, tipografía e identidad medidas del sitio original (Divi), sobre las reglas estructurales del padre.
+Version: 0.1.0
+Requires at least: 6.5
+Requires PHP: 8.0
+Text Domain: cod-basis
+*/
+
+/*
+ * Identidad de Basis, MEDIDA del sitio original con el navegador (estilos
+ * computados, 1440 y 393 de ancho), no leída de su hoja de estilos:
+ *
+ *   #F26621  naranja de marca (botones, bloques de opciones, logotipo)
+ *   #898989  gris de encabezado, pie y fondo de Contactos
+ *   #636363  gris oscuro (fondo de Preguntas frecuentes)
+ *   #D6D6D6  gris claro (panel de Contactos)   #D8D8D8  gris de «Soluciones»
+ *   #F4F4F4  gris casi blanco (pliegues)        #222222  negro de los botones fijos
+ *   #666666  texto de cuerpo                    #0E0C19  tinta de los títulos
+ *   #E02B20 / #DC4017  los dos rojos de los títulos «Características» y «Contactos»
+ *
+ * La identidad se declara acá y en theme.json; el lienzo la extiende, nunca al
+ * revés. QUÉ título va de qué color lo decide cada nodo con una regla de color.
+ */
+:root {
+  --basis-naranja: #f26621;
+  --basis-gris: #898989;
+  --basis-gris-oscuro: #636363;
+  --basis-gris-claro: #d6d6d6;
+  --basis-gris-suave: #d8d8d8;
+  --basis-casi-blanco: #f4f4f4;
+  --basis-negro: #222222;
+  --basis-texto: #666666;
+  --basis-tinta: #0e0c19;
+  --basis-rojo: #e02b20;
+  --basis-rojo-contacto: #dc4017;
+
+  --font-hero: 'Big Shoulders Display', 'Arial Narrow', system-ui, sans-serif;
+  --font-body: 'Open Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-boton: 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  --font-pliegue: 'Montserrat', 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* El cuerpo del original: Open Sans 14px, interlineado 1,7 y gris #666. */
+body {
+  background-color: #ffffff;
+  color: var(--basis-texto);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.7;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-hero);
+  line-height: 1.2;
+  color: inherit;
+}
