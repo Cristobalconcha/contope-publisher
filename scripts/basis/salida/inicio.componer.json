@@ -3150,7 +3150,7 @@
         }
       },
       {
-        "id": "img-c4345c",
+        "id": "img-c17b24",
         "kind": "properties",
         "scope": {
           "breakpoint": "tablet",
@@ -3170,8 +3170,7 @@
           "declarations": {
             "width": "704px",
             "max-width": "100%",
-            "margin-inline-start": "auto",
-            "margin-inline-end": "auto"
+            "margin-inline-start": "calc((100% + -734px) / 2)"
           }
         }
       },
@@ -3999,7 +3998,7 @@
                       "media-792b82",
                       "media-774ff8",
                       "mg-978b3f",
-                      "img-c4345c",
+                      "img-c17b24",
                       "media-a9a5c9"
                     ],
                     "content": {

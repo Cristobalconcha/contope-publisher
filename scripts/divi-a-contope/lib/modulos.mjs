@@ -211,15 +211,19 @@ export function moduloImagen(ctx, d, m, { col, gapD, gapM, ubicacion }) {
     // Dónde queda la foto dentro del interior de la columna, a cada ancho: llena (con el relleno propio del módulo a su izquierda), centrada,
     // pegada a la derecha o pegada a la izquierda. Se escribe SIEMPRE el margen de los dos lados para que una variante de otro ancho pueda
     // deshacer lo de escritorio (y no se emite lo que no cambia).
-    const colocar = (c, colX, interior, padI, llenaX) => {
+    const colocar = (c, colX, interior, padI, llenaX, padD = padI) => {
       if (llenaX) return { 'margin-inline-start': padI > 0 ? pxs(padI) : '0px', 'margin-inline-end': '0px' };
       const sobra = interior - c.w; const izq = c.x - (colX + padI);
-      if (sobra > 2 && Math.abs(izq - sobra / 2) < 3) return { 'margin-inline-start': 'auto', 'margin-inline-end': 'auto' };
+      if (sobra > 2 && Math.abs(izq - sobra / 2) < 3) {
+        // Centrada en el INTERIOR de la columna; si el relleno propio del módulo no es simétrico, «auto» la centraría en la columna entera.
+        if (padI === padD) return { 'margin-inline-start': 'auto', 'margin-inline-end': 'auto' };
+        return { 'margin-inline-start': `calc((100% + ${pxs(padI - padD - c.w)}) / 2)`, 'margin-inline-end': '0px' };
+      }
       if (sobra > 2 && izq > sobra - 3) return { 'margin-inline-start': 'auto', 'margin-inline-end': '0px' };
       return { 'margin-inline-start': padI > 0 ? pxs(padI) : '0px', 'margin-inline-end': '0px' };
     };
     if (llena) decl.width = llenoDe(padIzq, padDer); else { decl.width = pxs(caja.w); decl['max-width'] = '100%'; }
-    Object.assign(decl, colocar(caja, col?.d?.x ?? caja.x, interiorW, padIzq, llena));
+    Object.assign(decl, colocar(caja, col?.d?.x ?? caja.x, interiorW, padIzq, llena, padDer));
     decl.height = fit ? 'auto' : 'auto';
     if (cajaM) {
       const padIzqM = m?.estiloCaja?.relleno4?.[3] || 0; const padDerM = m?.estiloCaja?.relleno4?.[1] || 0;
@@ -227,7 +231,7 @@ export function moduloImagen(ctx, d, m, { col, gapD, gapM, ubicacion }) {
       const llenaM = cajaM.w >= interiorWM - 1;
       declM.width = llenaM ? llenoDe(padIzqM, padDerM) : pxs(cajaM.w);
       if (!llenaM) declM['max-width'] = '100%';
-      Object.assign(declM, colocar(cajaM, col?.m?.x ?? cajaM.x, interiorWM, padIzqM, llenaM));
+      Object.assign(declM, colocar(cajaM, col?.m?.x ?? cajaM.x, interiorWM, padIzqM, llenaM, padDerM));
     }
     const reglas = [...ctx.reg.propiedades(decl, { mobile: declM }, { prefijo: 'img' })];
     const aspecto = (c) => razon(c.w, c.h);

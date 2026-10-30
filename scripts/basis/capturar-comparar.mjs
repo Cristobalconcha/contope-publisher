@@ -63,12 +63,16 @@ async function capturarPagina(url, ancho, arch, registrarRed) {
   } finally { await cerrar(); }
 }
 
-for (const ancho of [1440, 768, 393]) {
+// SOLO=pagina[,pagina] y ANCHOS=1440,768 acotan la corrida (para repetir lo que falló sin rehacer todo).
+const SOLO = (process.env.SOLO || '').split(',').filter(Boolean);
+const ANCHOS = (process.env.ANCHOS || '1440,768,393').split(',').map(Number);
+for (const ancho of ANCHOS) {
   for (const [slug, ruta] of PAGINAS) {
+    if (SOLO.length && !SOLO.includes(slug)) continue;
     const arch = path.join(SAL, `local-${slug}-${ancho}.png`);
     const { alto, reqs } = await capturarPagina(SITIO + ruta, ancho, arch, true);
     for (const r of reqs.values()) {
-      if (/^data:/.test(r.url) || /cookieadmin|googletagmanager|google-analytics/.test(r.url)) continue;
+      if (/^data:/.test(r.url) || /cookieadmin|googletagmanager|google-analytics|doubleclick|googleadservices|analytics\.google|google\.com\/(rmkt|pagead|ccm)/.test(r.url)) continue;
       if (r.error || (r.estado && r.estado >= 400)) fallos.push({ pagina: slug, ancho, ...r });
     }
     console.log(`${slug} ${ancho}: ${alto}px`);
