@@ -224,6 +224,53 @@
         }
       },
       {
+        "id": "mg-d782eb",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "tablet",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "margin-block-end": "40px"
+          }
+        }
+      },
+      {
+        "id": "sec-0b4923",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "tablet",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "padding-top": "50px",
+            "padding-bottom": "50px"
+          }
+        }
+      },
+      {
         "id": "enl-c8a933",
         "kind": "properties",
         "scope": {
@@ -383,7 +430,7 @@
         }
       },
       {
-        "id": "form-8fd330",
+        "id": "form-b19630",
         "kind": "form",
         "scope": {
           "breakpoint": "all",
@@ -404,17 +451,40 @@
           "theme": {
             "texto": "#112337",
             "textoSuave": "#585E6A",
-            "fondo": "#FFFFFF",
+            "fondo": "transparent",
             "superficie": "#FFFFFF",
             "superficieAlt": "#F4F4F4",
-            "borde": "#D6D6D6",
+            "borde": "#EEEEEE",
             "bordeFuerte": "#999999",
             "principal": "#E09900",
             "principalHover": "#E09900",
             "principalContraste": "#FFFFFF",
             "tipografia": "'Open Sans', sans-serif",
-            "radio": "3px",
-            "espaciado": "16px"
+            "radio": "4px",
+            "espaciado": "16px",
+            "campoFondo": "#FFFFFF",
+            "campoTexto": "#999999",
+            "campoTamano": "15px",
+            "campoBordeAncho": "0px",
+            "campoRellenoY": "16px",
+            "campoRellenoX": "16px",
+            "sombra": "rgba(18, 25, 97, 0.08) 0px 1px 4px 0px",
+            "etiquetaTamano": "14px",
+            "etiquetaPeso": "600",
+            "etiquetaColor": "#112337",
+            "subetiquetaTamano": "14px",
+            "subetiquetaPeso": "400",
+            "subetiquetaColor": "#585E6A",
+            "ayudaTamano": "13px",
+            "contadorTamano": "13px",
+            "interlineado": "1.7",
+            "peso": "400",
+            "botonAncho": "100%",
+            "botonTamano": "18px",
+            "botonPeso": "500",
+            "botonRellenoY": "8px",
+            "botonRellenoX": "18px",
+            "botonRadio": "3px"
           }
         }
       },
@@ -444,6 +514,33 @@
             "display": "block"
           }
         }
+      },
+      {
+        "id": "fila-df20f7",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "tablet",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "padding-top": "30px",
+            "padding-bottom": "30px",
+            "grid-template-columns": "minmax(0, 1fr)",
+            "column-gap": "0px",
+            "row-gap": "30px"
+          }
+        }
       }
     ]
   },
@@ -451,24 +548,26 @@
     "schemaVersion": 2,
     "nodes": [
       {
-        "id": "section-19",
+        "id": "section-18",
         "kind": "section",
         "ruleIds": [
           "sec-79ee4b",
           "sec-6069e7",
-          "s-f1871f"
+          "s-f1871f",
+          "sec-0b4923"
         ],
         "children": [
           {
-            "id": "group-18",
+            "id": "group-17",
             "kind": "group",
             "ruleIds": [
               "fila-ba8c81",
-              "fila-00b6fc"
+              "fila-00b6fc",
+              "fila-df20f7"
             ],
             "children": [
               {
-                "id": "group-14",
+                "id": "group-13",
                 "kind": "group",
                 "ruleIds": [
                   "col-542b47",
@@ -477,14 +576,15 @@
                 ],
                 "children": [
                   {
-                    "id": "heading-12",
+                    "id": "heading-11",
                     "kind": "heading",
                     "ruleIds": [
                       "t-d4b7f9",
                       "t-829a8a",
                       "c-5ba4fe",
                       "mg-1a56c0",
-                      "mg-cb0416"
+                      "mg-cb0416",
+                      "mg-d782eb"
                     ],
                     "content": {
                       "text": "Contactos",
@@ -492,10 +592,10 @@
                     }
                   },
                   {
-                    "id": "form-13",
+                    "id": "form-12",
                     "kind": "form",
                     "ruleIds": [
-                      "form-8fd330",
+                      "form-b19630",
                       "mg-a343db"
                     ],
                     "content": {
@@ -505,7 +605,7 @@
                 ]
               },
               {
-                "id": "group-17",
+                "id": "group-16",
                 "kind": "group",
                 "ruleIds": [
                   "col-542b47",
@@ -514,7 +614,7 @@
                 ],
                 "children": [
                   {
-                    "id": "link-16",
+                    "id": "link-15",
                     "kind": "link",
                     "ruleIds": [
                       "enl-c8a933"
@@ -526,7 +626,7 @@
                     },
                     "children": [
                       {
-                        "id": "image-15",
+                        "id": "image-14",
                         "kind": "image",
                         "ruleIds": [
                           "mapa-img-0f7ca7"

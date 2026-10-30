@@ -1,28 +1,6 @@
 [
   {
     "pagina": "inicio",
-    "region": "pie",
-    "seccion": 6,
-    "fila": 1,
-    "columna": 0,
-    "modulo": "image",
-    "clase": "carga diferida",
-    "severidad": "ok",
-    "motivo": "imagen sin cargar al medir (1440): se toma su caja de la medición complementaria"
-  },
-  {
-    "pagina": "inicio",
-    "region": "pie",
-    "seccion": 6,
-    "fila": 1,
-    "columna": 2,
-    "modulo": "image",
-    "clase": "carga diferida",
-    "severidad": "ok",
-    "motivo": "imagen sin cargar al medir (1440): se toma su caja de la medición complementaria"
-  },
-  {
-    "pagina": "inicio",
     "region": "encabezado",
     "seccion": 0,
     "modulo": "sección",
@@ -51,8 +29,8 @@
     "modulo": "code",
     "indiceModulo": 0,
     "clase": "logo-wsp-sticky",
-    "severidad": "aproximado",
-    "motivo": "botón fijo de WhatsApp → nodo `whatsapp` (el ícono de ContOpe es de un solo color; el original era verde con degradado)"
+    "severidad": "ok",
+    "motivo": "botón fijo de WhatsApp → nodo `whatsapp` con iconStyle logo (la marca con su degradado verde, como el original)"
   },
   {
     "pagina": "inicio",
@@ -63,8 +41,8 @@
     "modulo": "code",
     "indiceModulo": 0,
     "clase": "logo-faq-sticky",
-    "severidad": "aproximado",
-    "motivo": "botón fijo con ícono SVG reconocido (help) → enlace con ícono de Material Symbols"
+    "severidad": "sin-transcribir",
+    "motivo": "botón fijo con un SVG que no está en la tabla de íconos conocidos"
   },
   {
     "pagina": "inicio",
@@ -96,8 +74,8 @@
     "modulo": "blurb",
     "indiceModulo": 0,
     "clase": "FontAwesome U+f217",
-    "severidad": "aproximado",
-    "motivo": "ícono FontAwesome U+f217 → Material Symbols «add_shopping_cart» (contorno; el original era relleno: Material no trae el estilo relleno en el set del sitio)"
+    "severidad": "ok",
+    "motivo": "ícono FontAwesome U+f217 → SVG del glifo original (fontawesome-f217.svg) con la regla «icono»"
   },
   {
     "pagina": "inicio",
@@ -108,8 +86,8 @@
     "modulo": "blurb",
     "indiceModulo": 0,
     "clase": "FontAwesome U+f494",
-    "severidad": "aproximado",
-    "motivo": "ícono FontAwesome U+f494 → Material Symbols «warehouse» (contorno; el original era relleno: Material no trae el estilo relleno en el set del sitio)"
+    "severidad": "ok",
+    "motivo": "ícono FontAwesome U+f494 → SVG del glifo original (fontawesome-f494.svg) con la regla «icono»"
   },
   {
     "pagina": "inicio",
@@ -120,8 +98,8 @@
     "modulo": "blurb",
     "indiceModulo": 0,
     "clase": "ETmodules U+e0e1",
-    "severidad": "aproximado",
-    "motivo": "ícono ETmodules U+e0e1 → Material Symbols «hourglass_empty» (contorno; el original era relleno: Material no trae el estilo relleno en el set del sitio)"
+    "severidad": "ok",
+    "motivo": "ícono ETmodules U+e0e1 → SVG del glifo original (etmodules-e0e1.svg) con la regla «icono»"
   },
   {
     "pagina": "inicio",
@@ -241,8 +219,8 @@
     "modulo": "code",
     "indiceModulo": 0,
     "clase": "logo-wsp-sticky",
-    "severidad": "aproximado",
-    "motivo": "botón fijo de WhatsApp → nodo `whatsapp` (el ícono de ContOpe es de un solo color; el original era verde con degradado)"
+    "severidad": "ok",
+    "motivo": "botón fijo de WhatsApp → nodo `whatsapp` con iconStyle logo (la marca con su degradado verde, como el original)"
   },
   {
     "pagina": "basis-carpas-industriales",
@@ -253,8 +231,8 @@
     "modulo": "code",
     "indiceModulo": 0,
     "clase": "logo-faq-sticky",
-    "severidad": "aproximado",
-    "motivo": "botón fijo con ícono SVG reconocido (help) → enlace con ícono de Material Symbols"
+    "severidad": "sin-transcribir",
+    "motivo": "botón fijo con un SVG que no está en la tabla de íconos conocidos"
   },
   {
     "pagina": "basis-carpas-industriales",
@@ -348,8 +326,8 @@
     "modulo": "code",
     "indiceModulo": 0,
     "clase": "logo-wsp-sticky",
-    "severidad": "aproximado",
-    "motivo": "botón fijo de WhatsApp → nodo `whatsapp` (el ícono de ContOpe es de un solo color; el original era verde con degradado)"
+    "severidad": "ok",
+    "motivo": "botón fijo de WhatsApp → nodo `whatsapp` con iconStyle logo (la marca con su degradado verde, como el original)"
   },
   {
     "pagina": "preguntas-frecuentes",
@@ -360,8 +338,8 @@
     "modulo": "code",
     "indiceModulo": 0,
     "clase": "logo-faq-sticky",
-    "severidad": "aproximado",
-    "motivo": "botón fijo con ícono SVG reconocido (help) → enlace con ícono de Material Symbols"
+    "severidad": "sin-transcribir",
+    "motivo": "botón fijo con un SVG que no está en la tabla de íconos conocidos"
   },
   {
     "pagina": "preguntas-frecuentes",
@@ -381,8 +359,8 @@
     "modulo": "accordion",
     "indiceModulo": 1,
     "clase": "et_pb_toggle",
-    "severidad": "aproximado",
-    "motivo": "10 pliegues → grupo con conducta `acordeon` (equivale a core/accordion de WordPress); el ícono «+» en círculo del original (glifo ETmodules) no se puede estilar en las partes del acordeón (hueco del plugin)"
+    "severidad": "ok",
+    "motivo": "10 pliegues → grupo con conducta `acordeon` (equivale a core/accordion de WordPress); con su ícono (showIcon + la parte icono)"
   },
   {
     "pagina": "preguntas-frecuentes",
@@ -393,8 +371,8 @@
     "modulo": "accordion",
     "indiceModulo": 1,
     "clase": "et_pb_toggle",
-    "severidad": "aproximado",
-    "motivo": "4 pliegues → grupo con conducta `acordeon` (equivale a core/accordion de WordPress); el ícono «+» en círculo del original (glifo ETmodules) no se puede estilar en las partes del acordeón (hueco del plugin)"
+    "severidad": "ok",
+    "motivo": "4 pliegues → grupo con conducta `acordeon` (equivale a core/accordion de WordPress); con su ícono (showIcon + la parte icono)"
   },
   {
     "pagina": "preguntas-frecuentes",
@@ -417,8 +395,8 @@
     "modulo": "accordion",
     "indiceModulo": 3,
     "clase": "et_pb_toggle",
-    "severidad": "aproximado",
-    "motivo": "3 pliegues → grupo con conducta `acordeon` (equivale a core/accordion de WordPress); el ícono «+» en círculo del original (glifo ETmodules) no se puede estilar en las partes del acordeón (hueco del plugin)"
+    "severidad": "ok",
+    "motivo": "3 pliegues → grupo con conducta `acordeon` (equivale a core/accordion de WordPress); con su ícono (showIcon + la parte icono)"
   },
   {
     "pagina": "preguntas-frecuentes",
@@ -496,8 +474,8 @@
     "modulo": "code",
     "indiceModulo": 0,
     "clase": "logo-wsp-sticky",
-    "severidad": "aproximado",
-    "motivo": "botón fijo de WhatsApp → nodo `whatsapp` (el ícono de ContOpe es de un solo color; el original era verde con degradado)"
+    "severidad": "ok",
+    "motivo": "botón fijo de WhatsApp → nodo `whatsapp` con iconStyle logo (la marca con su degradado verde, como el original)"
   },
   {
     "pagina": "contactos",
@@ -508,8 +486,8 @@
     "modulo": "code",
     "indiceModulo": 0,
     "clase": "logo-faq-sticky",
-    "severidad": "aproximado",
-    "motivo": "botón fijo con ícono SVG reconocido (help) → enlace con ícono de Material Symbols"
+    "severidad": "sin-transcribir",
+    "motivo": "botón fijo con un SVG que no está en la tabla de íconos conocidos"
   },
   {
     "pagina": "contactos",

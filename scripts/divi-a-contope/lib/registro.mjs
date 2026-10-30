@@ -21,6 +21,8 @@ export class Registro {
     this.razon = razon;
     this.reglas = [];
     this.porClave = new Map();
+    /** id → cómo se pidió (tipo, valor, ancho, base, prefijo, estado): permite re-escopar una variante a otro ancho. */
+    this.meta = new Map();
   }
 
   /** @returns {string} id de la regla (nueva, o la que ya existía con ese valor) */
@@ -38,6 +40,7 @@ export class Registro {
       value,
     });
     this.porClave.set(clave, id);
+    this.meta.set(id, { kind, value, bp, base, prefijo, state });
     return id;
   }
 

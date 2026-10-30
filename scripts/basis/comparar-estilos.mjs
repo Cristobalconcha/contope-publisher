@@ -15,7 +15,7 @@ import { abrirChrome, esperarLaPagina, recorrerLaPagina } from '../piezas/chrome
 const [pagina, ruta, anchoArg, sitioArg] = process.argv.slice(2);
 const ancho = Number(anchoArg || 1440);
 const SITIO = (sitioArg || 'http://localhost:8894').replace(/\/+$/, '');
-const ORIG = 'C:/Users/Cristobal concha/Sesión Claude/entregables/basis/medicion-2';
+const ORIG = 'C:/Users/Cristobal concha/Sesión Claude/entregables/basis/medicion-3';
 const med = JSON.parse(readFileSync(`${ORIG}/datos/medida-${pagina}-${ancho}.json`, 'utf8'));
 
 const esperados = [];

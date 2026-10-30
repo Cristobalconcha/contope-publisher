@@ -18,6 +18,8 @@
     {
       "type": "GridSection",
       "id": "fila_nombre",
+      "titulo": "Nombre",
+      "obligatorio": true,
       "items": [
         {
           "type": "texto",
@@ -46,6 +48,8 @@
     {
       "type": "GridSection",
       "id": "fila_correo",
+      "titulo": "Email",
+      "obligatorio": true,
       "items": [
         {
           "type": "texto",

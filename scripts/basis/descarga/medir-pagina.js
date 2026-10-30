@@ -8,6 +8,19 @@
   const abs = (u) => { try { return u ? new URL(u, location.href).href : ''; } catch (e) { return u || ''; } };
   const familia = (s) => (s.fontFamily || '').split(',')[0].replace(/['"]/g, '').trim();
   const tipo = (e) => { const s = cs(e); return { familia: familia(s), pila: s.fontFamily, tam: s.fontSize, peso: s.fontWeight, estilo: s.fontStyle, interlineado: s.lineHeight, espaciado: s.letterSpacing, mayus: s.textTransform, alinea: s.textAlign, color: s.color }; };
+  // El estilo de lo que se VE: si todo el texto de un bloque está dentro de un único <span> o <a> (Divi guarda ahí el color,
+  // el tamaño o el peso: «Divi guarda el color/tamaño de un texto en un <span style> que lo envuelve todo»), manda ése y no su <p>.
+  const hojaDeTexto = (e) => {
+    let cur = e;
+    for (let i = 0; i < 4; i++) {
+      const propio = [...cur.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim());
+      const hijos = [...cur.children].filter((c) => c.tagName !== 'BR');
+      if (propio || hijos.length !== 1 || !['SPAN', 'A'].includes(hijos[0].tagName)) break;
+      cur = hijos[0];
+    }
+    return cur;
+  };
+  const tipoTexto = (e) => tipo(hojaDeTexto(e));
   const lados4 = (e, p) => ['top', 'right', 'bottom', 'left'].map((l) => parseFloat(cs(e)[p + '-' + l]) || 0);
   const caja = (e) => { const s = cs(e); return { fondo: s.backgroundColor, imagenFondo: s.backgroundImage, radio: s.borderRadius, borde: s.borderTopWidth + ' ' + s.borderTopStyle + ' ' + s.borderTopColor, sombra: s.boxShadow, relleno: s.padding, margen: s.margin }; };
   const urlsDeFondo = (v) => { const r = []; const re = /url\(["']?([^"')]+)["']?\)/g; let m; while ((m = re.exec(v || ''))) r.push(abs(m[1])); return r; };
@@ -43,8 +56,19 @@
         descripcion: limpio((c.querySelector('.gfield_description') || {}).textContent),
       });
     }
+    // Forma del formulario (30-oct): lo que el contrato de diseño de Orugantt Forms necesita para igualarlo.
+    const unaEntrada = f.querySelector('input[type=text], input[type=email], input[type=tel]');
+    const area = f.querySelector('textarea');
+    const etiquetaGrupo = f.querySelector('legend.gfield_label, label.gfield_label');
+    const subetiqueta = f.querySelector('.gform-field-label--type-sub, .gfield_label_before_complex ~ * label, fieldset label.gform-field-label');
+    const ayuda = f.querySelector('.gfield_description');
+    const contador = f.querySelector('.ginput_counter');
+    const consentimiento = f.querySelector('.gchoice label');
+    const pie = f.querySelector('.gform_footer, .gform-footer');
+    const entradaEstilo = (x) => (x ? Object.assign({}, tipo(x), caja(x), { alto: Math.round(x.getBoundingClientRect().height), ancho: Math.round(x.getBoundingClientRect().width), relleno4: lados4(x, 'padding'), bordeAncho: cs(x).borderTopWidth, bordeColor: cs(x).borderTopColor, bordeEstilo: cs(x).borderTopStyle }) : null);
+    const forma = { entrada: entradaEstilo(unaEntrada), area: entradaEstilo(area), etiquetaGrupo: etiquetaGrupo ? Object.assign({}, tipo(etiquetaGrupo), { margenInferior: cs(etiquetaGrupo).marginBottom }) : null, subetiqueta: subetiqueta ? Object.assign({}, tipo(subetiqueta), { margenInferior: cs(subetiqueta).marginBottom }) : null, ayuda: ayuda ? Object.assign({}, tipo(ayuda), { relleno4: lados4(ayuda, 'padding'), margenInferior: cs(ayuda).marginBottom }) : null, contador: contador ? Object.assign({}, tipo(contador), { relleno4: lados4(contador, 'padding') }) : null, consentimiento: consentimiento ? Object.assign({}, tipo(consentimiento), { relleno4: lados4(consentimiento, 'padding') }) : null, pie: pie ? { relleno4: lados4(pie, 'padding'), margen4: lados4(pie, 'margin'), caja: rect(pie) } : null, campos: q('.gfield', f).map((c) => ({ caja: rect(c), margenInferior: cs(c).marginBottom })) };
     const enviar = f.querySelector('input[type=submit], button[type=submit], .gform_button');
-    return { campos, enviar: enviar ? { texto: enviar.value || limpio(enviar.textContent), estilo: Object.assign({}, tipo(enviar), caja(enviar)) } : null };
+    return { forma, campos, enviar: enviar ? { texto: enviar.value || limpio(enviar.textContent), estilo: Object.assign({}, tipo(enviar), caja(enviar), { ancho: Math.round(enviar.getBoundingClientRect().width), alto: Math.round(enviar.getBoundingClientRect().height), relleno4: lados4(enviar, 'padding'), bordeAncho: cs(enviar).borderTopWidth }) } : null };
   };
 
   const formularios = () => q('form').map((f) => Object.assign({
@@ -60,7 +84,9 @@
     if (tipoM === 'text') {
       const inner = m.querySelector('.et_pb_text_inner') || m;
       d.html = inner.innerHTML.trim();
-      d.bloques = q('h1,h2,h3,h4,h5,h6,p,li,blockquote', inner).map((x) => ({ etiqueta: x.tagName.toLowerCase(), texto: limpio(x.textContent), estilo: tipo(x), caja: rect(x), margen4: lados4(x, 'margin'), relleno4: lados4(x, 'padding') }));
+      d.bloques = q('h1,h2,h3,h4,h5,h6,p,li,blockquote', inner).map((x) => ({ etiqueta: x.tagName.toLowerCase(), texto: limpio(x.textContent), estilo: tipoTexto(x), estiloBloque: tipo(x), caja: rect(x), margen4: lados4(x, 'margin'), relleno4: lados4(x, 'padding') }));
+      // Listas (ul/ol) con su sangría y su viñeta: la del primer nivel y la de cada sublista.
+      d.listas = q('ul, ol', inner).map((l) => ({ etiqueta: l.tagName.toLowerCase(), nivel: q('ul, ol', inner).filter((o) => o !== l && o.contains(l)).length, relleno4: lados4(l, 'padding'), margen4: lados4(l, 'margin'), vineta: cs(l).listStyleType, posicionVineta: cs(l).listStylePosition, caja: rect(l) }));
       d.enlaces = enlaces(inner);
     } else if (tipoM === 'heading') {
       const h = m.querySelector('h1,h2,h3,h4,h5,h6,.et_pb_module_heading');
@@ -70,7 +96,7 @@
     } else if (tipoM === 'blurb') {
       const h = m.querySelector('.et_pb_module_header, h1,h2,h3,h4,h5,h6');
       d.titulo = h ? limpio(h.textContent) : ''; d.etiqueta = h ? h.tagName.toLowerCase() : ''; if (h) d.estiloTitulo = tipo(h);
-      const desc = m.querySelector('.et_pb_blurb_description'); d.descripcion = desc ? limpio(desc.textContent) : ''; d.descripcionHtml = desc ? desc.innerHTML.trim() : ''; if (desc) d.estiloDescripcion = tipo(desc);
+      const desc = m.querySelector('.et_pb_blurb_description'); d.descripcion = desc ? limpio(desc.textContent) : ''; d.descripcionHtml = desc ? desc.innerHTML.trim() : ''; if (desc) { const pd = desc.querySelector('p'); d.estiloDescripcion = tipoTexto(pd || desc); d.estiloDescripcionContenedor = tipo(desc); }
       d.imagenes = imagenes(m);
       const ic = m.querySelector('.et-pb-icon'); if (ic) d.icono = Object.assign({ glifo: limpio(ic.textContent) }, tipo(ic));
       d.posicionImagen = [...m.classList].filter((c) => /blurb_position|text_align/.test(c)).join(' ');
@@ -83,6 +109,7 @@
     } else if (tipoM === 'promo' || tipoM === 'cta') {
       const h = m.querySelector('h1,h2,h3,h4,h5,h6'); d.titulo = h ? limpio(h.textContent) : ''; d.etiqueta = h ? h.tagName.toLowerCase() : ''; if (h) d.estiloTitulo = tipo(h);
       const desc = m.querySelector('.et_pb_promo_description, .et_pb_cta_description'); d.descripcion = desc ? limpio(desc.textContent.replace(d.titulo, '')) : '';
+      if (desc) { const pd = desc.querySelector('p'); d.estiloDescripcion = tipoTexto(pd || desc); d.estiloDescripcionContenedor = tipo(desc); }
       const b = m.querySelector('.et_pb_button'); if (b) d.boton = { texto: limpio(b.textContent), href: b.getAttribute('href'), destino: abs(b.getAttribute('href')), estilo: Object.assign({}, tipo(b), caja(b)) };
       d.cajaPromo = caja(m);
     } else if (tipoM === 'code' || tipoM === 'fullwidth_code') {
@@ -94,8 +121,8 @@
     } else if (tipoM === 'toggle' || tipoM === 'accordion_item') {
       const t = m.querySelector('.et_pb_toggle_title'); const c = m.querySelector('.et_pb_toggle_content');
       d.titulo = t ? limpio(t.textContent) : ''; d.contenido = c ? limpio(c.textContent) : ''; d.contenidoHtml = c ? c.innerHTML.trim() : '';
-      d.abierto = m.classList.contains('et_pb_toggle_open'); if (t) d.estiloTitulo = tipo(t); if (c) d.estiloContenido = tipo(c); d.cajaToggle = caja(m);
-      const p = cs(t || m, '::before'); d.iconoToggle = { contenido: p.content, color: p.color, tam: p.fontSize, familia: familia(p) };
+      d.abierto = m.classList.contains('et_pb_toggle_open'); if (t) d.estiloTitulo = tipo(t); if (c) d.estiloContenido = tipoTexto(c.querySelector('p, li') || c); d.cajaToggle = caja(m);
+      const p = cs(t || m, '::before'); d.iconoToggle = { contenido: p.content, color: p.color, tam: p.fontSize, familia: familia(p), display: p.display, posicion: p.position, arriba: p.top, derecha: p.right, ancho: p.width, alto: p.height, margenSuperior: p.marginTop, fondo: p.backgroundColor, radio: p.borderRadius };
       d.enlaces = c ? enlaces(c) : [];
       d.imagenes = c ? imagenes(c) : [];
     } else if (tipoM === 'accordion' || tipoM === 'tabs') {
@@ -103,7 +130,7 @@
         const ti = t.querySelector('.et_pb_toggle_title'); const co = t.querySelector('.et_pb_toggle_content') || t;
         const p = ti ? cs(ti, '::before') : null;
         return { titulo: ti ? limpio(ti.textContent) : limpio(t.getAttribute('class')), contenido: limpio(co.textContent), contenidoHtml: co.innerHTML.trim(), abierto: t.classList.contains('et_pb_toggle_open'), enlaces: enlaces(co), imagenes: imagenes(co),
-          estiloTitulo: ti ? tipo(ti) : null, estiloContenido: tipo(co), caja: caja(t), tamano: rect(t), iconoToggle: p ? { contenido: p.content, color: p.color, tam: p.fontSize, familia: familia(p) } : null };
+          estiloTitulo: ti ? tipo(ti) : null, estiloContenido: tipoTexto(co.querySelector('p, li') || co), caja: caja(t), tamano: rect(t), tituloRelleno4: ti ? lados4(ti, 'padding') : null, contenidoRelleno4: lados4(co, 'padding'), margenInferior: cs(t).marginBottom, iconoToggle: p ? { contenido: p.content, color: p.color, tam: p.fontSize, familia: familia(p), display: p.display, posicion: p.position, arriba: p.top, derecha: p.right, ancho: p.width, alto: p.height, margenSuperior: p.marginTop, fondo: p.backgroundColor, radio: p.borderRadius } : null };
       });
       d.cajaAcordeon = caja(m);
     } else if (tipoM === 'gravityforms') {

@@ -13,6 +13,7 @@
  */
 import { px, pxs, lados, leerHtml, textoDe, limpiarTexto, marcasEnLinea, colorRegla } from './util.mjs';
 import { reglasTexto, reglasMargen, valorTipografia } from './estilos.mjs';
+import { svgDeGlifo, codepointDe } from './glifos.mjs';
 
 const margenInferior = (e) => lados(e?.margen)[2];
 
@@ -91,10 +92,30 @@ export function moduloAcordeon(ctx, d, m, { gapD, gapM, ubicacion, independiente
   const cj = cerrado.it.cajaToggle || cerrado.it.caja || {};
   const partes = { item: ctx.reg.propiedades(cajaDe(cj), {}, { prefijo: 'plg' }) };
   const tipC = cerrado.it.estiloTitulo;
+  // El ícono del encabezado (Divi: el ::before del título, un glifo de ETmodules). Se lleva como la parte `icono` del
+  // acordeón (0.3.84, showIcon de core/accordion-heading) con el SVG del glifo original; abierto, lo que mida el abierto.
+  const ic = cerrado.it.iconoToggle;
+  const icA = abiertoV?.it.iconoToggle;
+  let icono = null;
+  if (ic && ic.display !== 'none' && ic.contenido) {
+    const tamIc = px(ic.tam) || 16;
+    const cp = codepointDe(ic.contenido);
+    const cerradoSvg = svgDeGlifo(ctx, ic.familia, cp, tamIc);
+    let abiertoSvg = null;
+    if (icA && icA.display !== 'none') abiertoSvg = svgDeGlifo(ctx, icA.familia, codepointDe(icA.contenido), px(icA.tam) || tamIc);
+    if (cerradoSvg) {
+      icono = { cerrado: cerradoSvg, abierto: abiertoSvg, ninguno: !!icA && icA.display === 'none', color: colorRegla(ic.color), lado: Math.round(cerradoSvg.lado * cerradoSvg.escala * 100) / 100, tam: tamIc };
+    } else {
+      ctx.avisar({ ...ubicacion, modulo: d.tipo, clase: 'icono del pliegue', severidad: 'sin-transcribir', motivo: `el glifo ${ic.familia} U+${cp} del pliegue no está en datos/glifos.json: los pliegues quedan sin su ícono` });
+    }
+  }
+  // Distancia entre el título y el ícono: el título de Divi reserva 50px a la derecha (padding-right) y el ícono va pegado al borde.
+  const reservaTitulo = px(cerrado.it.estiloTitulo?.relleno4?.[1]) || (cerrado.it.tituloRelleno4 ? cerrado.it.tituloRelleno4[1] : 0) || 50;
   partes.resumen = [
-    ...ctx.reg.propiedades({ width: '100%', 'padding-top': '0px', 'padding-right': '40px', 'padding-bottom': '0px', 'padding-left': '0px', 'text-align': 'start', 'background-color': 'transparent', 'border-width': '0px', cursor: 'pointer' }, {}, { prefijo: 'plg-r' }),
+    ...ctx.reg.propiedades({ width: '100%', 'padding-top': '0px', 'padding-right': icono ? '0px' : '40px', 'padding-bottom': '0px', 'padding-left': '0px', 'text-align': 'start', 'background-color': 'transparent', 'border-width': '0px', cursor: 'pointer', ...(icono ? { gap: pxs(Math.max(0, reservaTitulo - icono.lado)) } : {}) }, {}, { prefijo: 'plg-r' }),
     ...(tipC ? reglasTexto(ctx.reg, { d: tipC, m: cerrado.iM?.estiloTitulo }) : []),
   ];
+  if (icono) partes.icono = ctx.reg.propiedades({ 'background-color': icono.color, width: pxs(icono.lado), height: pxs(icono.lado) }, {}, { prefijo: 'plg-i' });
   partes.panel = ctx.reg.propiedades({ 'padding-top': '20px', 'margin-block-start': '0px' }, {}, { prefijo: 'plg-p' });
   if (abiertoV) {
     const cjA = abiertoV.it.cajaToggle || abiertoV.it.caja || {};
@@ -109,7 +130,10 @@ export function moduloAcordeon(ctx, d, m, { gapD, gapM, ubicacion, independiente
   const cjM = cerrado.iM ? (cerrado.iM.cajaToggle || cerrado.iM.caja || null) : null;
   const separacionM = cjM ? (margenInferior(cjM) ?? separacion) : separacion;
   const reglas = [
-    ctx.reg.R('interaction', { behavior: 'acordeon', ...(independiente ? { autoclose: false } : {}), ...(abierto ? { openNodeId: abierto.id } : { startClosed: true }) }, { prefijo: 'acordeon' }),
+    ctx.reg.R('interaction', {
+      behavior: 'acordeon', ...(independiente ? { autoclose: false } : {}), ...(abierto ? { openNodeId: abierto.id } : { startClosed: true }),
+      ...(icono ? { showIcon: true, iconPosition: 'right', iconoCerrado: icono.cerrado.forma, iconoAbierto: icono.ninguno ? 'ninguno' : (icono.abierto ? icono.abierto.forma : icono.cerrado.forma) } : {}),
+    }, { prefijo: 'acordeon' }),
     // La separación entre pliegues es el margen inferior de cada uno, y en celular suele ser otro (10px contra 30).
     ...ctx.reg.conAnchos('layout', { mode: 'stack', gap: pxs(separacion), align: 'stretch' },
       separacionM !== separacion ? { mobile: { mode: 'stack', gap: pxs(separacionM) } } : {}, { prefijo: 'pila' }),
@@ -117,6 +141,6 @@ export function moduloAcordeon(ctx, d, m, { gapD, gapM, ubicacion, independiente
   ];
   const nodo = ctx.nodo('group', reglas, undefined, pliegues);
   nodo.partes = partes;
-  ctx.avisar({ ...ubicacion, modulo: d.tipo, clase: 'et_pb_toggle', severidad: 'aproximado', motivo: `${pliegues.length} pliegues → grupo con conducta \`acordeon\` (equivale a core/accordion de WordPress); el ícono «+» en círculo del original (glifo ETmodules) no se puede estilar en las partes del acordeón (hueco del plugin)` });
+  ctx.avisar({ ...ubicacion, modulo: d.tipo, clase: 'et_pb_toggle', severidad: 'ok', motivo: `${pliegues.length} pliegues → grupo con conducta \`acordeon\` (equivale a core/accordion de WordPress)${icono ? '; con su ícono (showIcon + la parte icono)' : ''}` });
   return [nodo];
 }

@@ -170,11 +170,20 @@ function transcribirFila(ctx, fD, fM, ubic, vw) {
     decl['grid-template-columns'] = cols.map((c) => `minmax(0, ${c.caja.w}fr)`).join(' ');
     decl['column-gap'] = pxs(gutter);
     decl['align-items'] = /equal_columns/.test(fD.clase || '') ? 'stretch' : 'start';
-    declM['grid-template-columns'] = 'minmax(0, 1fr)';
-    declM['column-gap'] = '0px';
     const colsM = fM?.columnas || [];
-    const sep = colsM.length > 1 ? Math.max(0, Math.round(colsM[1].caja.y - (colsM[0].caja.y + colsM[0].caja.h))) : 0;
-    declM['row-gap'] = pxs(sep);
+    // ¿Las columnas quedan una bajo otra a este ancho? Divi las apila bajo 981px, pero no siempre (columnas
+    // que se mantienen): se lee de la medición, no se supone. Sin medición, apiladas.
+    const lado = colsM.length > 1 && colsM[1].caja.y < colsM[0].caja.y + Math.max(1, colsM[0].caja.h) * 0.5;
+    if (lado) {
+      declM['grid-template-columns'] = colsM.map((c) => `minmax(0, ${c.caja.w}fr)`).join(' ');
+      const sepX = Math.max(0, Math.round(colsM[1].caja.x - (colsM[0].caja.x + colsM[0].caja.w)));
+      declM['column-gap'] = pxs(sepX);
+    } else {
+      declM['grid-template-columns'] = 'minmax(0, 1fr)';
+      declM['column-gap'] = '0px';
+      const sep = colsM.length > 1 ? Math.max(0, Math.round(colsM[1].caja.y - (colsM[0].caja.y + colsM[0].caja.h))) : 0;
+      declM['row-gap'] = pxs(sep);
+    }
   }
   const reglas = ctx.reg.propiedades(decl, { mobile: declM }, { prefijo: 'fila' });
   const hijos = cols.map((cD, i) => {

@@ -10,12 +10,16 @@ import { px, pxs, redondear, lados, leerHtml, textoDe, limpiarTexto, marcasEnLin
 import { reglasTexto, reglasMargen, declaracionesCaja, valorTipografia } from './estilos.mjs';
 import { transcribirCodigo } from './codigo.mjs';
 import { moduloAcordeon } from './acordeon.mjs';
+import { svgDeGlifo } from './glifos.mjs';
 
 /* ------------------------------------------------------------------ texto */
 
 // Medidas por omisión de Divi dentro de un módulo de texto, en este orden:
 // título → 10px de aire debajo; párrafo → 1em; lista → 23px. El último bloque
 // del módulo no lleva aire propio: el hueco con el módulo siguiente se mide.
+// La sangría medida de cada lista (escritorio / celular), para sumarle el relleno propio del módulo.
+const sangriaDeLista = new WeakMap();
+
 const AIRE_BLOQUE = { h: () => 10, p: (est) => px(est?.tam) || 16, lista: () => 23 };
 
 // Un título de Divi trae 10px de aire propio debajo (padding-bottom) DENTRO de la caja medida:
@@ -117,8 +121,28 @@ export function moduloTexto(ctx, d, m, { gapD, gapM, ubicacion }) {
       const items = anidada && !ctx.perfil.plugin?.listasAnidadas ? aplanar(b.items) : b.items;
       if (anidada && !ctx.perfil.plugin?.listasAnidadas) ctx.avisar({ ...ubicacion, modulo: 'text', clase: 'ul anidada', severidad: 'aproximado', motivo: 'lista anidada aplanada: el nodo `list` del plugin sólo admite ítems planos (hueco del plugin)' });
       // La sangría de la lista: el relleno izquierdo que Divi le da (1em).
-      const reglasLista = [...reglas, ...ctx.reg.propiedades({ 'padding-inline-start': '1em', 'list-style-position': 'outside' }, {}, { prefijo: 'lista' })];
-      nodos.push(ctx.nodo('list', reglasLista, { ordered: b.ordenada, items }));
+      // La sangría de cada nivel se LEE del navegador (30-oct: la de Divi no es «1em» de la letra de los ítems, sino
+      // la de la lista, que tiene su propio tamaño: 14px en el primer nivel y 20px en las sublistas de Basis).
+      const medidas = (med) => (med?.listas || []).filter((l) => l.etiqueta === (b.ordenada ? 'ol' : 'ul'));
+      const lD = medidas(d); const lM = medidas(m);
+      const primera = lD.find((l) => l.nivel === 0); const primeraM = lM.find((l) => l.nivel === 0);
+      const sangria = primera ? pxs(primera.relleno4[3]) : '1em';
+      const sangriaM = primeraM ? pxs(primeraM.relleno4[3]) : sangria;
+      const declLista = { 'padding-inline-start': sangria, 'list-style-position': 'outside' };
+      if (primera) declLista['padding-block-end'] = pxs(primera.relleno4[2]);
+      const declListaM = { 'padding-inline-start': sangriaM };
+      if (primeraM) declListaM['padding-block-end'] = pxs(primeraM.relleno4[2]);
+      const reglasLista = [...reglas, ...ctx.reg.propiedades(declLista, { mobile: declListaM }, { prefijo: 'lista' })];
+      const nodoLista = ctx.nodo('list', reglasLista, { ordered: b.ordenada, items });
+      sangriaDeLista.set(nodoLista, { d: sangria, m: sangriaM });
+      // Sublistas: parte `sublista` del nodo `list` (0.3.84), con la sangría medida de su nivel.
+      const subD = lD.find((l) => l.nivel >= 1); const subM = lM.find((l) => l.nivel >= 1);
+      if (anidada && subD) {
+        const declSub = { 'padding-inline-start': pxs(subD.relleno4[3]), 'padding-block-end': pxs(subD.relleno4[2]), 'margin-block-start': pxs(subD.margen4[0]), 'margin-block-end': pxs(subD.margen4[2]) };
+        const declSubM = subM ? { 'padding-inline-start': pxs(subM.relleno4[3]), 'padding-block-end': pxs(subM.relleno4[2]) } : {};
+        nodoLista.partes = { sublista: ctx.reg.propiedades(declSub, { mobile: declSubM }, { prefijo: 'sublista' }) };
+      }
+      nodos.push(nodoLista);
     }
   });
   void huboFormato;
@@ -269,9 +293,19 @@ export function moduloBlurb(ctx, d, m, { gapD, gapM, ubicacion }) {
   if (d.icono && d.icono.glifo) {
     const cp = d.icono.glifo.codePointAt(0).toString(16);
     const nombre = GLIFOS[cp];
-    if (nombre) {
+    const tam = px(d.icono.tam) || 40;
+    // 1.º: el glifo REAL de la fuente del original, como SVG de Medios (el ícono es el mismo, relleno y todo).
+    const real = svgDeGlifo(ctx, d.icono.familia, cp, tam);
+    if (real) {
+      const lado = Math.round(real.lado * real.escala * 100) / 100;       // caja cuadrada del SVG, en px
+      const anchoNodo = Math.round(real.ancho * real.escala * 100) / 100;  // lo que ocupaba el glifo en la línea
+      iconoNodo = ctx.nodo('paragraph', [
+        ctx.reg.R('icono', { forma: real.forma, donde: 'antes', tamano: pxs(lado), color: colorRegla(d.icono.color), separacion: '0px' }, { prefijo: 'ico' }),
+        ...ctx.reg.propiedades({ 'margin-block-start': '0px', 'margin-block-end': '0px', width: pxs(anchoNodo), height: pxs(tam), display: 'flex', 'align-items': 'center', 'justify-content': 'center', 'flex-shrink': '0', 'line-height': pxs(tam) }, {}, { prefijo: 'ico-caja' }),
+      ], { text: ' ' });
+      ctx.avisar({ ...ubicacion, modulo: 'blurb', clase: `${d.icono.familia} U+${cp}`, severidad: 'ok', motivo: `ícono ${d.icono.familia} U+${cp} → SVG del glifo original (${real.forma.split('/').pop()}) con la regla «icono»` });
+    } else if (nombre) {
       (ctx.ajustes.iconos ||= []).includes(nombre) || ctx.ajustes.iconos.push(nombre);
-      const tam = px(d.icono.tam) || 40;
       // El ícono de Divi va a la IZQUIERDA y el título y la descripción juntos a su derecha
       // (blurb_position_left). El ícono es un nodo aparte con la regla `icono`.
       iconoNodo = ctx.nodo('paragraph', [
@@ -321,8 +355,10 @@ export function moduloPromo(ctx, d, m, { gapD, gapM, ubicacion }) {
   const reglasT = reglasTexto(ctx.reg, { d: d.estiloTitulo, m: m?.estiloTitulo });
   reglasT.push(...reglasMargen(ctx.reg, 10, 10));
   hijos.push(ctx.nodo('heading', reglasT, { text: d.titulo, level: Number((d.etiqueta || 'h2')[1]) || 2 }));
-  const rolDesc = estiloPorTexto(ctx.medidaD, d.descripcion || '');
-  const rolDescM = estiloPorTexto(ctx.medidaM, d.descripcion || '');
+  // El estilo del párrafo se mide EN el párrafo (30-oct: la medición sólo traía el del contenedor, de otro tamaño y color, y el
+  // respaldo por texto no encontraba una descripción que arranca después del título).
+  const rolDesc = d.estiloDescripcion || estiloPorTexto(ctx.medidaD, d.descripcion || '');
+  const rolDescM = m?.estiloDescripcion || estiloPorTexto(ctx.medidaM, d.descripcion || '');
   if (d.descripcion) {
     const reglasP = rolDesc ? reglasTexto(ctx.reg, { d: rolDesc, m: rolDescM }) : [];
     reglasP.push(...reglasMargen(ctx.reg, 30, 30));
@@ -347,11 +383,34 @@ export function moduloFormulario(ctx, d, m, { gapD, gapM, ubicacion }) {
     return [];
   }
   const enviar = f?.enviar?.estilo;
+  const forma = f?.forma || null;
   const tema = {
     texto: '#112337', textoSuave: '#585E6A', fondo: '#FFFFFF', superficie: '#FFFFFF', superficieAlt: '#F4F4F4', borde: '#D6D6D6', bordeFuerte: '#999999',
     principal: enviar ? colorRegla(enviar.fondo) : '#F26621', principalHover: enviar ? colorRegla(enviar.fondo) : '#F26621', principalContraste: enviar ? colorRegla(enviar.color) : '#FFFFFF',
     tipografia: `'${(enviar?.familia) || 'Open Sans'}', sans-serif`, radio: enviar?.radio || '4px', espaciado: '16px',
   };
+  if (forma?.entrada) {
+    // El contrato ampliado de Orugantt Forms (30-oct): lo que el original MIDE en sus campos, etiquetas y botón. El formulario
+    // queda sobre el panel de la columna (fondo transparente) y sus campos blancos, como en Gravity Forms.
+    const e = forma.entrada;
+    const px0 = (v) => (v === undefined || v === null ? undefined : pxs(typeof v === 'number' ? v : px(v)));
+    Object.assign(tema, {
+      fondo: 'transparent', campoFondo: colorRegla(e.fondo), campoTexto: colorRegla(e.color), campoTamano: e.tam,
+      campoBordeAncho: e.bordeAncho, campoRellenoY: px0(e.relleno4[0]), campoRellenoX: px0(e.relleno4[1]),
+      radio: e.radio, borde: colorRegla(e.bordeColor),
+    });
+    if (e.sombra && e.sombra !== 'none') tema.sombra = e.sombra;
+    const g = forma.etiquetaGrupo; const sub = forma.subetiqueta;
+    if (g) Object.assign(tema, { etiquetaTamano: g.tam, etiquetaPeso: String(Math.round(Number(g.peso) / 100) * 100), etiquetaColor: colorRegla(g.color), texto: colorRegla(g.color) });
+    if (sub) Object.assign(tema, { subetiquetaTamano: sub.tam, subetiquetaPeso: String(Math.round(Number(sub.peso) / 100) * 100), subetiquetaColor: colorRegla(sub.color), textoSuave: colorRegla(sub.color) });
+    if (forma.ayuda) tema.ayudaTamano = forma.ayuda.tam;
+    if (forma.contador) tema.contadorTamano = forma.contador.tam;
+    // Interlineado y peso de la letra del formulario entero (Gravity: 1.7 y 400 sobre la tipografía del sitio).
+    const lh = px(e.interlineado) / px(e.tam);
+    if (lh) tema.interlineado = String(Math.round(lh * 100) / 100);
+    tema.peso = String(Math.round(Number(e.peso) / 100) * 100);
+    if (enviar) Object.assign(tema, { botonAncho: enviar.ancho >= (f.forma.entrada.ancho * 2) ? '100%' : pxs(enviar.ancho), botonTamano: enviar.tam, botonPeso: String(Math.round(Number(enviar.peso) / 100) * 100), botonRellenoY: pxs(enviar.relleno4[0]), botonRellenoX: pxs(enviar.relleno4[1]), botonRadio: enviar.radio });
+  }
   const reglas = [ctx.reg.R('form', { surface: 'none', theme: tema }, { prefijo: 'form' }), ...reglasMargen(ctx.reg, gapD, gapM)];
   ctx.avisar({ ...ubicacion, modulo: 'gravityforms', clase: f?.id || 'gform', severidad: 'ok', motivo: `formulario de Gravity Forms → formulario de Orugantt Forms «${slug}» (se genera con formulario-a-orugantt.mjs)` });
   return [ctx.nodo('form', reglas, { formSlug: slug })];
@@ -409,16 +468,16 @@ export function aplicarRellenoPropio(ctx, mD, mM, nodos, ubicacion) {
   if (!['text', 'heading', 'blurb'].includes(mD.tipo)) return;
   const rM = leer(mM) || rD;
   if (rD.every((v) => v < 0.5) && rM.every((v) => v < 0.5)) return;
-  const decl = (r, i, n, lista) => {
+  const decl = (r, i, n, lista, bp) => {
     const d = { 'padding-right': pxs(r[1]) };
-    if (lista) d['padding-inline-start'] = `calc(1em + ${pxs(r[3])})`; else d['padding-left'] = pxs(r[3]);
+    if (lista) d['padding-inline-start'] = `calc(${sangriaDeLista.get(lista)?.[bp] || '1em'} + ${pxs(r[3])})`; else d['padding-left'] = pxs(r[3]);
     if (i === 0) d['padding-top'] = pxs(r[0]);
     if (i === n - 1) d['padding-bottom'] = pxs(r[2]);
     return d;
   };
   nodos.forEach((nodo, i) => {
-    const lista = nodo.kind === 'list';
-    nodo.ruleIds = [...(nodo.ruleIds || []), ...ctx.reg.propiedades(decl(rD, i, nodos.length, lista), { mobile: decl(rM, i, nodos.length, lista) }, { prefijo: 'relmod' })];
+    const lista = nodo.kind === 'list' ? nodo : null;
+    nodo.ruleIds = [...(nodo.ruleIds || []), ...ctx.reg.propiedades(decl(rD, i, nodos.length, lista, 'd'), { mobile: decl(rM, i, nodos.length, lista, 'm') }, { prefijo: 'relmod' })];
   });
   ctx.avisar({ ...ubicacion, modulo: mD.tipo, clase: 'relleno del módulo', severidad: 'ok', motivo: `relleno propio del módulo (arriba ${rD[0]}, derecha ${rD[1]}, abajo ${rD[2]}, izquierda ${rD[3]} px a 1440) aplicado a sus nodos` });
 }

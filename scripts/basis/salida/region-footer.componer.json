@@ -288,7 +288,7 @@
         }
       },
       {
-        "id": "mg-2c7ef1",
+        "id": "mg-7be022",
         "kind": "properties",
         "scope": {
           "breakpoint": "all",
@@ -307,29 +307,6 @@
         "value": {
           "declarations": {
             "margin-block-start": "-28px",
-            "margin-block-end": "-32px"
-          }
-        }
-      },
-      {
-        "id": "mg-02ec35",
-        "kind": "properties",
-        "scope": {
-          "breakpoint": "mobile",
-          "state": "default"
-        },
-        "provenance": {
-          "sources": [
-            {
-              "kind": "reference",
-              "reference": "https://basisbodegas.com",
-              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
-            }
-          ]
-        },
-        "status": "reviewed",
-        "value": {
-          "declarations": {
             "margin-block-end": "-28px"
           }
         }
@@ -565,6 +542,31 @@
             "justify-content": "flex-start"
           }
         }
+      },
+      {
+        "id": "fila-3ad2ce",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "tablet",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "grid-template-columns": "minmax(0, 1fr)",
+            "column-gap": "0px",
+            "row-gap": "30px"
+          }
+        }
       }
     ]
   },
@@ -572,7 +574,7 @@
     "schemaVersion": 2,
     "nodes": [
       {
-        "id": "footer-87",
+        "id": "footer-86",
         "kind": "footer",
         "ruleIds": [
           "sec-83739f",
@@ -580,15 +582,16 @@
         ],
         "children": [
           {
-            "id": "group-86",
+            "id": "group-85",
             "kind": "group",
             "ruleIds": [
               "fila-44e63a",
-              "fila-175af7"
+              "fila-175af7",
+              "fila-3ad2ce"
             ],
             "children": [
               {
-                "id": "group-78",
+                "id": "group-77",
                 "kind": "group",
                 "ruleIds": [
                   "col-542b47",
@@ -597,12 +600,11 @@
                 ],
                 "children": [
                   {
-                    "id": "image-77",
+                    "id": "image-76",
                     "kind": "image",
                     "ruleIds": [
                       "img-302830",
-                      "mg-2c7ef1",
-                      "mg-02ec35"
+                      "mg-7be022"
                     ],
                     "content": {
                       "assetUrl": "/wp-content/uploads/2025/07/aRecurso-12.png",
@@ -612,7 +614,7 @@
                 ]
               },
               {
-                "id": "group-81",
+                "id": "group-80",
                 "kind": "group",
                 "ruleIds": [
                   "col-542b47",
@@ -621,7 +623,7 @@
                 ],
                 "children": [
                   {
-                    "id": "group-80",
+                    "id": "group-79",
                     "kind": "group",
                     "ruleIds": [
                       "mapa-ca1d42",
@@ -629,7 +631,7 @@
                     ],
                     "children": [
                       {
-                        "id": "paragraph-79",
+                        "id": "paragraph-78",
                         "kind": "paragraph",
                         "ruleIds": [
                           "t-7d73ba",
@@ -658,7 +660,7 @@
                 ]
               },
               {
-                "id": "group-85",
+                "id": "group-84",
                 "kind": "group",
                 "ruleIds": [
                   "col-542b47",
@@ -667,14 +669,14 @@
                 ],
                 "children": [
                   {
-                    "id": "group-84",
+                    "id": "group-83",
                     "kind": "group",
                     "ruleIds": [
                       "racimo-94d787"
                     ],
                     "children": [
                       {
-                        "id": "image-82",
+                        "id": "image-81",
                         "kind": "image",
                         "ruleIds": [
                           "img-666820",
@@ -686,7 +688,7 @@
                         }
                       },
                       {
-                        "id": "paragraph-83",
+                        "id": "paragraph-82",
                         "kind": "paragraph",
                         "ruleIds": [
                           "t-01952a",

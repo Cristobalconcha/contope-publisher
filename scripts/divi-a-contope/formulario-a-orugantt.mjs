@@ -37,7 +37,7 @@ export function fixtureDesdeGravity(form, { nombre, maxLength, avisos = [] }) {
     if (tipo === 'honeypot') { avisos.push({ campo: etiqueta, motivo: 'campo trampa (honeypot) de Gravity Forms: Orugantt Forms trae el suyo' }); continue; }
     if (tipo === 'name') {
       const a = unico('nombre'), b = unico('apellidos');
-      items.push({ type: 'GridSection', id: unico('fila_nombre'), items: [
+      items.push({ type: 'GridSection', id: unico('fila_nombre'), titulo: etiqueta || 'Nombre', obligatorio: req, items: [
         { type: 'texto', id: a, label: quitarAsterisco(e[0]?.etiqueta || 'Nombre'), obligatorio: req, registrarEnDb: true, autocompletar: 'given-name', layoutClasses: ['col-6'] },
         { type: 'texto', id: b, label: quitarAsterisco(e[1]?.etiqueta || 'Apellidos'), obligatorio: req, registrarEnDb: true, autocompletar: 'family-name', layoutClasses: ['col-6'] },
       ] });
@@ -45,7 +45,7 @@ export function fixtureDesdeGravity(form, { nombre, maxLength, avisos = [] }) {
       const a = unico('correo');
       if (e.length > 1) {
         const b = unico('correo_repite');
-        items.push({ type: 'GridSection', id: unico('fila_correo'), items: [
+        items.push({ type: 'GridSection', id: unico('fila_correo'), titulo: etiqueta || 'Email', obligatorio: req, items: [
           { type: 'texto', id: a, label: quitarAsterisco(e[0].etiqueta || 'Correo'), obligatorio: req, registrarEnDb: true, tipoEntrada: 'email', autocompletar: 'email', layoutClasses: ['col-6'] },
           { type: 'texto', id: b, label: quitarAsterisco(e[1].etiqueta || 'Repite tu correo'), obligatorio: req, registrarEnDb: false, tipoEntrada: 'email', autocompletar: 'email', confirmarCon: a, confirmarMensaje: 'Los correos no coinciden.', layoutClasses: ['col-6'] },
         ] });

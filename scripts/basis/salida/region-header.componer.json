@@ -265,7 +265,7 @@
         }
       },
       {
-        "id": "t-36ea70",
+        "id": "t-0ddbc4",
         "kind": "typography",
         "scope": {
           "breakpoint": "all",
@@ -286,7 +286,7 @@
           "family": "'Open Sans', sans-serif",
           "fontSize": "16px",
           "fontWeight": 500,
-          "lineHeight": 1.488,
+          "lineHeight": 1.7,
           "align": "end"
         }
       },
@@ -430,69 +430,7 @@
         }
       },
       {
-        "id": "fijo-233949",
-        "kind": "properties",
-        "scope": {
-          "breakpoint": "all",
-          "state": "default"
-        },
-        "provenance": {
-          "sources": [
-            {
-              "kind": "reference",
-              "reference": "https://basisbodegas.com",
-              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
-            }
-          ]
-        },
-        "status": "reviewed",
-        "value": {
-          "declarations": {
-            "position": "fixed",
-            "top": "calc(50% + 70px)",
-            "right": "0",
-            "transform": "translateY(-50%)",
-            "width": "60px",
-            "height": "60px",
-            "background-color": "#000000",
-            "box-shadow": "0 4px 10px rgba(0,0,0,0.2)",
-            "z-index": "9999",
-            "border-top-left-radius": "50%",
-            "border-top-right-radius": "0",
-            "border-bottom-right-radius": "0",
-            "border-bottom-left-radius": "50%",
-            "display": "flex",
-            "justify-content": "center",
-            "align-items": "center"
-          }
-        }
-      },
-      {
-        "id": "ico-f5bcae",
-        "kind": "icono",
-        "scope": {
-          "breakpoint": "all",
-          "state": "default"
-        },
-        "provenance": {
-          "sources": [
-            {
-              "kind": "reference",
-              "reference": "https://basisbodegas.com",
-              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
-            }
-          ]
-        },
-        "status": "reviewed",
-        "value": {
-          "nombre": "help",
-          "donde": "antes",
-          "tamano": "42px",
-          "color": "#FFFFFF"
-        }
-      },
-      {
-        "id": "fijo-h-1f1392",
+        "id": "fijo-h-5c8f20",
         "kind": "properties",
         "scope": {
           "breakpoint": "all",
@@ -510,7 +448,33 @@
         "status": "reviewed",
         "value": {
           "declarations": {
-            "background-color": "#0056b3"
+            "background-color": "rgb(87, 209, 99)"
+          }
+        }
+      },
+      {
+        "id": "fila-565d3a",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "tablet",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "padding-bottom": "30px",
+            "grid-template-columns": "minmax(0, 1fr)",
+            "column-gap": "0px",
+            "row-gap": "30px"
           }
         }
       }
@@ -520,7 +484,7 @@
     "schemaVersion": 2,
     "nodes": [
       {
-        "id": "header-11",
+        "id": "header-10",
         "kind": "header",
         "ruleIds": [
           "pegada-a2d977",
@@ -533,7 +497,8 @@
             "kind": "group",
             "ruleIds": [
               "fila-69ef95",
-              "fila-062c35"
+              "fila-062c35",
+              "fila-565d3a"
             ],
             "children": [
               {
@@ -584,7 +549,7 @@
                     "id": "link-4",
                     "kind": "link",
                     "ruleIds": [
-                      "t-36ea70",
+                      "t-0ddbc4",
                       "c-4737c4",
                       "mg-1fd017",
                       "t-b24b57"
@@ -600,14 +565,14 @@
             ]
           },
           {
-            "id": "group-10",
+            "id": "group-9",
             "kind": "group",
             "ruleIds": [
               "fila-7fce56"
             ],
             "children": [
               {
-                "id": "group-9",
+                "id": "group-8",
                 "kind": "group",
                 "ruleIds": [
                   "col-542b47",
@@ -618,30 +583,18 @@
                     "id": "whatsapp-7",
                     "kind": "whatsapp",
                     "ruleIds": [
-                      "fijo-569f55"
+                      "fijo-569f55",
+                      "fijo-h-5c8f20"
                     ],
                     "content": {
                       "message": "Hola BASIS\n\nNombre:\nEmail:\nTeléfono:\n\nMensaje:\nQuisiera realizar una consulta/cotización...",
                       "ariaLabel": "WhatsApp",
                       "size": 60,
                       "iconPadding": 9,
-                      "iconColor": "#57D163",
+                      "iconColor": "#FFFFFF",
+                      "iconStyle": "logo",
                       "backgroundColor": "#000000",
                       "borderRadius": "50% 0 0 50%"
-                    }
-                  },
-                  {
-                    "id": "link-8",
-                    "kind": "link",
-                    "ruleIds": [
-                      "fijo-233949",
-                      "ico-f5bcae",
-                      "fijo-h-1f1392"
-                    ],
-                    "content": {
-                      "label": "",
-                      "href": "/preguntas-frecuentes/",
-                      "target": "blank"
                     }
                   }
                 ]

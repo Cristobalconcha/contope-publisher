@@ -13,13 +13,10 @@
  *      → el mismo grupo `mapa` (queda cerrado hasta pincharlo: ver hueco).
  *   4. módulos con sólo `<style>` → CSS suelto: se reporta, no se aplica.
  */
-import { leerHtml, textoDe, limpiarTexto, pxs } from './util.mjs';
+import { leerHtml, textoDe, limpiarTexto, pxs, hash } from './util.mjs';
+import { writeFileSync, mkdirSync } from 'node:fs';
+import path from 'node:path';
 import { reglasTexto } from './estilos.mjs';
-
-/** Íconos SVG conocidos por el inicio de su trazado → nombre de Material Symbols. */
-const ICONOS_SVG = [
-  ['M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2z', 'help'],
-];
 
 /** Lee las declaraciones de una clase dentro de un <style> (sin anidados ni @media). */
 const reglasCss = (css) => {
@@ -80,25 +77,33 @@ export function transcribirCodigo(ctx, mod, { pagina, ubicacion }) {
       ctx.ajustes.whatsapp = { numero: wa[1], mensaje };
       const tam = Math.min(200, Math.max(24, parseInt(css.width, 10) || 60));
       const nodo = ctx.nodo('whatsapp', [...ctx.reg.propiedades(decl, {}, { prefijo: 'fijo' })],
-        { message: mensaje.slice(0, 300), ariaLabel: a.attrs['aria-label'] || 'WhatsApp', size: tam, iconPadding: Math.round(tam * 0.15), iconColor: '#57D163', backgroundColor: css['background-color'] || 'transparent', borderRadius: /^[0-9a-z%. ]+$/i.test(estilos['.' + clase]['border-radius'] || '') ? estilos['.' + clase]['border-radius'] : '999px' });
+        { message: mensaje.slice(0, 300), ariaLabel: a.attrs['aria-label'] || 'WhatsApp', size: tam, iconPadding: Math.round(tam * 0.15), iconColor: '#FFFFFF', iconStyle: 'logo', backgroundColor: css['background-color'] || 'transparent', borderRadius: /^[0-9a-z%. ]+$/i.test(estilos['.' + clase]['border-radius'] || '') ? estilos['.' + clase]['border-radius'] : '999px' });
+      if (hover && hover['background-color']) nodo.ruleIds.push(ctx.reg.R('properties', { declarations: { 'background-color': hover['background-color'] } }, { state: 'hover', prefijo: 'fijo-h' }));
       nodos.push(nodo);
-      ctx.avisar({ pagina, ...ubicacion, modulo: 'code', clase: clase, severidad: 'aproximado',
-        motivo: 'botón fijo de WhatsApp → nodo `whatsapp` (el ícono de ContOpe es de un solo color; el original era verde con degradado)' });
+      ctx.avisar({ pagina, ...ubicacion, modulo: 'code', clase: clase, severidad: 'ok',
+        motivo: 'botón fijo de WhatsApp → nodo `whatsapp` con iconStyle logo (la marca con su degradado verde, como el original)' });
       reconocido.push('whatsapp-fijo');
       continue;
     }
     const svg = todos.find((n) => n.tag === 'svg' && a.hijos.includes(n)) || a.hijos.map((h) => h).flatMap((h) => (h.hijos || [])).find((n) => n.tag === 'svg');
     const trazos = svg ? todos.filter((n) => n.tag === 'path' && n.attrs.d) : [];
-    const conocido = trazos.map((p) => ICONOS_SVG.find(([d]) => p.attrs.d.startsWith(d))).find(Boolean);
-    if (conocido) {
-      (ctx.ajustes.iconos ||= []).includes(conocido[1]) || ctx.ajustes.iconos.push(conocido[1]);
+    if (svg && trazos.length === 1 && ctx.perfil.carpetaUploads) {
+      // El dibujo del original (un solo trazado) se guarda como forma del sitio y se usa con la regla «icono»:
+      // el ícono es el mismo, relleno y todo, y toma el color del texto del enlace.
+      const viewBox = svg.attrs.viewBox || svg.attrs.viewbox || '0 0 24 24';
+      const archivo = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}"><path d="${trazos[0].attrs.d}"/></svg>\n`;
+      const nombre = 'enlace-' + hash(archivo, 8) + '.svg';
+      mkdirSync(path.join(ctx.perfil.carpetaUploads, 'iconos-divi'), { recursive: true });
+      writeFileSync(path.join(ctx.perfil.carpetaUploads, 'iconos-divi', nombre), archivo);
+      const relleno = (svg.attrs.fill || '#FFFFFF');
+      const lado = Math.round(Math.min(parseFloat(css.width) || 60, parseFloat(css.height) || 60) * 0.7);
       const reglasIcono = [...ctx.reg.propiedades(decl, {}, { prefijo: 'fijo' }),
-        ctx.reg.R('icono', { nombre: conocido[1], donde: 'antes', tamano: '42px', color: '#FFFFFF' }, { prefijo: 'ico' })];
+        ctx.reg.R('icono', { forma: '/wp-content/uploads/iconos-divi/' + nombre, donde: 'antes', tamano: lado + 'px', color: /^#[0-9a-f]{3,8}$/i.test(relleno) ? relleno : (relleno === 'white' ? '#FFFFFF' : '#FFFFFF') }, { prefijo: 'ico' })];
       if (hover && hover['background-color']) reglasIcono.push(ctx.reg.R('properties', { declarations: { 'background-color': hover['background-color'] } }, { state: 'hover', prefijo: 'fijo-h' }));
       const dest = ctx.destino(href);
       nodos.push(ctx.nodo('link', reglasIcono, { label: '', href: dest ? dest.href : '#', target: a.attrs.target === '_blank' ? 'blank' : 'self' }));
       reconocido.push('enlace-fijo-icono');
-      ctx.avisar({ pagina, ...ubicacion, modulo: 'code', clase, severidad: 'aproximado', motivo: `botón fijo con ícono SVG reconocido (${conocido[1]}) → enlace con ícono de Material Symbols` });
+      ctx.avisar({ pagina, ...ubicacion, modulo: 'code', clase, severidad: 'ok', motivo: `botón fijo con ícono SVG → enlace con la regla «icono» y el trazado original guardado como ${nombre}` });
       continue;
     }
     ctx.avisar({ pagina, ...ubicacion, modulo: 'code', clase, severidad: 'sin-transcribir', motivo: 'botón fijo con un SVG que no está en la tabla de íconos conocidos' });
@@ -166,6 +171,13 @@ export function transcribirCodigo(ctx, mod, { pagina, ubicacion }) {
         }
         const grupo = ctx.nodo('group', [ctx.reg.R('interaction', { behavior: 'mapa' }, { prefijo: 'mapa' }), ...reglasGrupo], undefined, hijos);
         grupo.partes = { mini: reglasMini };
+        // Mapa de la ficha de contacto, siempre abierto en el original (Mapbox en vivo): content.fijo (0.3.84). Con la clave
+        // de Mapbox en Configuración → Mapa es un mapa incrustado del alto de la caja original; sin ella, el mini (la imagen,
+        // ya dimensionada a esa caja) sigue siendo un enlace a «cómo llegar». No se carga ninguna clave desde acá.
+        if (!esMini && ctx.perfil.mapaGrande === 'abierto') {
+          contenido.fijo = true;
+          grupo.partes.grande = ctx.reg.propiedades({ '--cod-mapa-alto': pxs(caja.h), 'margin-top': '0px', 'margin-bottom': '0px', 'max-width': 'none', 'border-radius': '8px', 'box-shadow': '2px 2px 10px rgba(0,0,0,0.2)' }, {}, { prefijo: 'mapa-grande' });
+        }
         ctx.ajustes.mapa = { lat: contenido.lat, lng: contenido.lng, zoom: contenido.zoom, necesitaClaveMapbox: true };
         grupo.content = contenido;
         nodos.push(grupo);

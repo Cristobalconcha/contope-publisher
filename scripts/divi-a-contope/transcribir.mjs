@@ -13,7 +13,7 @@
  *
  * Uso:
  *   node transcribir.mjs --original <carpeta> --perfil <perfil.json> --salida <carpeta>
- *                        [--paginas inicio,contactos] [--anchos 1440,393]
+ *                        [--paginas inicio,contactos] [--anchos 1440,393,768]
  *
  * <carpeta> es la de la descarga: contiene datos/ y html/. Ver README.md.
  */
@@ -27,9 +27,15 @@ import { transcribirMedicion } from './lib/estructura.mjs';
 
 const arg = (n, d) => { const i = process.argv.indexOf('--' + n); return i > 0 ? process.argv[i + 1] : d; };
 
-/** El transcriptor como función, para que lo usen los guiones de cada sitio. */
+/**
+ * El transcriptor como función, para que lo usen los guiones de cada sitio.
+ *
+ * `anchos` = [escritorio, celular, tablet?]. Con el tercero (p. ej. 768) se transcribe OTRA VEZ la
+ * misma página contra esa medición y sus diferencias con escritorio pasan a reglas con scope
+ * `tablet`: ver `fusionarTablet`.
+ */
 export function transcribirSitio({ original, perfil, paginas, anchos = [1440, 393] }) {
-  const [anchoD, anchoM] = anchos;
+  const [anchoD, anchoM, anchoT] = anchos;
   const reg = new Registro({ referencia: perfil.origen || '', razon: `Transcrito de ${perfil.origen || 'el sitio original'} (Divi) por divi-a-contope: estilos computados medidos con el navegador.` });
   const informe = [];
   const ajustes = {};
@@ -68,41 +74,20 @@ export function transcribirSitio({ original, perfil, paginas, anchos = [1440, 39
     } catch { return null; }
   };
 
+  // Glifos de las fuentes de íconos del original (datos/glifos.json, ver descarga/glifos.mjs).
+  const fGlifos = path.join(original, 'datos', 'glifos.json');
+  const glifos = existsSync(fGlifos) ? leer(fGlifos) : {};
+
   for (const slug of paginas) {
     const medD = leer(path.join(original, 'datos', `medida-${slug}-${anchoD}.json`));
-    const fM = path.join(original, 'datos', `medida-${slug}-${anchoM}.json`);
-    const medM = existsSync(fM) ? leer(fM) : null;
-    const fHtml = path.join(original, 'html', `${slug}.html`);
-    const anim = { seccion: [], fila: [], columna: [], modulo: [] };
-    if (existsSync(fHtml)) {
-      for (const e of animacionesPorPosicion(leerHtml(readFileSync(fHtml, 'utf8')))) anim[e.nivel].push(e.animacion);
-    }
-    const cont = { seccion: 0, fila: 0, columna: 0, modulo: 0 };
-    let n = 0;
-    const ctx = {
-      reg, perfil, ajustes, pagina: slug, informe, medidaD: medD, medidaM: medM, ubicacionActual: {},
-      nodo(kind, ruleIds, content, children) {
-        const nodo = { id: `${kind}-${++n}`, kind, ruleIds: ruleIds || [] };
-        if (content !== undefined) nodo.content = content;
-        if (children && children.length) nodo.children = children;
-        return nodo;
-      },
-      avisar(e) { informe.push({ pagina: slug, ...e }); },
-      url(u, ubic, { silencioso = false } = {}) {
-        const l = aLocal(u) || (perfil.reemplazos?.medios?.[String(u).split('/').pop().replace(/\?.*$/, '')] || null);
-        if (!l && !silencioso) this.avisar({ ...(ubic || this.ubicacionActual), modulo: 'medio', clase: String(u).split('/').pop(), severidad: 'faltante', motivo: `el archivo ${u} no está en la descarga: el nodo queda sin ese medio` });
-        return l;
-      },
-      destino,
-      animacion(nivel) { const a = anim[nivel][cont[nivel]]; cont[nivel]++; return a || null; },
-      get reglasMapaMini() { return perfil.reglasMapa?.mini || []; },
-      get reglasMapaGrande() { return perfil.reglasMapa?.grande || []; },
-    };
+    const leerOpc = (ancho) => { const f = path.join(original, 'datos', `medida-${slug}-${ancho}.json`); return ancho && existsSync(f) ? leer(f) : null; };
+    const medM = leerOpc(anchoM);
+    const medT = anchoT ? leerOpc(anchoT) : null;
     // Medición complementaria: una imagen con carga diferida que no se alcanzó a cargar al medir sale con
     // natural 0x0 y su módulo colapsado. Si hay otra medición de la misma página (perfil.medicionComplemento),
     // esos módulos se toman de ella, por posición.
     if (perfil.medicionComplemento) {
-      for (const [ancho, med] of [[anchoD, medD], [anchoM, medM]]) {
+      for (const [ancho, med] of [[anchoD, medD], [anchoM, medM], [anchoT, medT]]) {
         const fc = path.join(perfil.medicionComplemento, 'datos', `medida-${slug}-${ancho}.json`);
         if (!med || !existsSync(fc)) continue;
         const comp = leer(fc);
@@ -115,10 +100,89 @@ export function transcribirSitio({ original, perfil, paginas, anchos = [1440, 39
         }))));
       }
     }
-    const r = transcribirMedicion(ctx, medD, medM);
-    salida.paginas[slug] = { titulo: (perfil.paginas?.[slug]?.titulo) || medD.titulo, nodos: r.contenido, encabezado: r.encabezado, pie: r.pie, anchoMedido: [medD.ancho, medM?.ancho || null] };
+    const fHtml = path.join(original, 'html', `${slug}.html`);
+    const animaciones = { seccion: [], fila: [], columna: [], modulo: [] };
+    if (existsSync(fHtml)) {
+      for (const e of animacionesPorPosicion(leerHtml(readFileSync(fHtml, 'utf8')))) animaciones[e.nivel].push(e.animacion);
+    }
+
+    /** Una pasada completa contra una medición «de celular» (393 o 768). */
+    const pasada = (medX, regX, informeX, ajustesX) => {
+      const cont = { seccion: 0, fila: 0, columna: 0, modulo: 0 };
+      let n = 0;
+      const ctx = {
+        reg: regX, perfil, ajustes: ajustesX, pagina: slug, informe: informeX, medidaD: medD, medidaM: medX, ubicacionActual: {}, glifos,
+        nodo(kind, ruleIds, content, children) {
+          const nodo = { id: `${kind}-${++n}`, kind, ruleIds: ruleIds || [] };
+          if (content !== undefined) nodo.content = content;
+          if (children && children.length) nodo.children = children;
+          return nodo;
+        },
+        avisar(e) { informeX.push({ pagina: slug, ...e }); },
+        url(u, ubic, { silencioso = false } = {}) {
+          const l = aLocal(u) || (perfil.reemplazos?.medios?.[String(u).split('/').pop().replace(/\?.*$/, '')] || null);
+          if (!l && !silencioso) this.avisar({ ...(ubic || this.ubicacionActual), modulo: 'medio', clase: String(u).split('/').pop(), severidad: 'faltante', motivo: `el archivo ${u} no está en la descarga: el nodo queda sin ese medio` });
+          return l;
+        },
+        destino,
+        animacion(nivel) { const a = animaciones[nivel][cont[nivel]]; cont[nivel]++; return a || null; },
+        get reglasMapaMini() { return perfil.reglasMapa?.mini || []; },
+        get reglasMapaGrande() { return perfil.reglasMapa?.grande || []; },
+      };
+      return transcribirMedicion(ctx, medD, medX);
+    };
+
+    const r = pasada(medM, reg, informe, ajustes);
+    if (medT) {
+      // La pasada de tablet usa un registro y un informe propios: de ella sólo se toma lo que difiere de escritorio.
+      const regT = new Registro({ referencia: perfil.origen || '', razon: reg.razon });
+      const rT = pasada(medT, regT, [], {});
+      const avisos = [];
+      for (const region of ['contenido', 'encabezado', 'pie']) fusionarTablet(r[region], rT[region], reg, regT, avisos, `${slug}/${region}`);
+      for (const a of avisos) informe.push({ pagina: slug, modulo: 'tablet', clase: 'estructura', severidad: 'aproximado', motivo: a });
+    }
+    salida.paginas[slug] = { titulo: (perfil.paginas?.[slug]?.titulo) || medD.titulo, nodos: r.contenido, encabezado: r.encabezado, pie: r.pie, anchoMedido: [medD.ancho, medM?.ancho || null, medT?.ancho || null] };
   }
   return salida;
+}
+
+/**
+ * TABLET sin tocar ninguna función de transcripción: se transcribe la página una segunda vez contra la
+ * medición de tablet (768) como si fuera «el celular»; todo lo que esa pasada guarda como variante `mobile`
+ * es, en rigor, lo que cambia a ese ancho respecto de escritorio. Acá esas variantes se re-escopan a
+ * `tablet` en el registro de la pasada principal y se agregan a los nodos que corresponden (se emparejan
+ * los árboles por posición; si no tienen la misma forma se avisa y esa rama queda con escritorio).
+ *
+ * Un solo cuidado de orden: las variantes nuevas van al FINAL del registro, después de sus bases, porque en
+ * la hoja gana la regla que viene después.
+ */
+export function fusionarTablet(nodosA, nodosB, regA, regB, avisos, donde) {
+  const aTablet = (id) => {
+    const m = regB.meta.get(id);
+    if (!m || m.bp !== 'mobile') return null;
+    return regA.R(m.kind, m.value, { bp: 'tablet', base: m.base, prefijo: m.prefijo, state: m.state });
+  };
+  const unir = (a, b, ruta) => {
+    if (a.kind !== b.kind || (a.children || []).length !== (b.children || []).length) {
+      avisos.push(`la forma del nodo ${ruta} (${a.kind}, ${(a.children || []).length} hijos) no calza con la de la pasada de tablet (${b.kind}, ${(b.children || []).length}): esa rama no lleva variantes de tablet`);
+      return;
+    }
+    const extra = (b.ruleIds || []).map(aTablet).filter(Boolean);
+    if (extra.length) a.ruleIds = [...(a.ruleIds || []), ...extra.filter((x) => !(a.ruleIds || []).includes(x))];
+    if (b.partes) {
+      a.partes ||= {};
+      for (const [parte, ids] of Object.entries(b.partes)) {
+        const ex = ids.map(aTablet).filter(Boolean);
+        if (ex.length) a.partes[parte] = [...(a.partes[parte] || []), ...ex.filter((x) => !(a.partes[parte] || []).includes(x))];
+      }
+    }
+    (a.children || []).forEach((h, i) => unir(h, b.children[i], `${ruta}/${h.kind}-${i}`));
+  };
+  if ((nodosA || []).length !== (nodosB || []).length) {
+    avisos.push(`${donde}: ${(nodosA || []).length} secciones en la pasada principal y ${(nodosB || []).length} en la de tablet: sin variantes de tablet`);
+    return;
+  }
+  nodosA.forEach((a, i) => unir(a, nodosB[i], `${donde}/${i}`));
 }
 
 /** Ids de regla que usa un árbol de nodos (ruleIds y partes). */
@@ -167,10 +231,10 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   const original = arg('original');
   const perfilArchivo = arg('perfil');
   const salidaDir = arg('salida', 'salida');
-  if (!original || !perfilArchivo) { console.error('uso: node transcribir.mjs --original <carpeta> --perfil <perfil.json> --salida <carpeta> [--paginas a,b] [--anchos 1440,393]'); process.exit(1); }
+  if (!original || !perfilArchivo) { console.error('uso: node transcribir.mjs --original <carpeta> --perfil <perfil.json> --salida <carpeta> [--paginas a,b] [--anchos 1440,393,768]'); process.exit(1); }
   const perfil = JSON.parse(readFileSync(perfilArchivo, 'utf8'));
   const paginas = (arg('paginas') || (perfil.paginasReales || []).join(',')).split(',').filter(Boolean);
-  const anchos = (arg('anchos') || '1440,393').split(',').map(Number);
+  const anchos = (arg('anchos') || '1440,393,768').split(',').map(Number);
   const r = transcribirSitio({ original, perfil, paginas, anchos });
   mkdirSync(salidaDir, { recursive: true });
   const designId = perfil.designId || 'sitio-web';
