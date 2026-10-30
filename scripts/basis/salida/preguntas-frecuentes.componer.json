@@ -498,7 +498,7 @@
         }
       },
       {
-        "id": "anch-0f7be2",
+        "id": "anch-760607",
         "kind": "properties",
         "scope": {
           "breakpoint": "mobile",
@@ -516,7 +516,9 @@
         "status": "reviewed",
         "value": {
           "declarations": {
-            "max-width": "none"
+            "max-width": "none",
+            "margin-inline-start": "0px",
+            "margin-inline-end": "0px"
           }
         }
       },
@@ -1298,7 +1300,7 @@
         }
       },
       {
-        "id": "anch-0c41a6",
+        "id": "anch-77b521",
         "kind": "properties",
         "scope": {
           "breakpoint": "tablet",
@@ -1316,7 +1318,9 @@
         "status": "reviewed",
         "value": {
           "declarations": {
-            "max-width": "none"
+            "max-width": "none",
+            "margin-inline-start": "0px",
+            "margin-inline-end": "0px"
           }
         }
       },
@@ -1434,9 +1438,9 @@
                       "c-4737c4",
                       "mg-9b6f57",
                       "anch-db926e",
-                      "anch-0f7be2",
+                      "anch-760607",
                       "t-019443",
-                      "anch-0c41a6"
+                      "anch-77b521"
                     ],
                     "content": {
                       "text": "Preguntas Frecuentes",
@@ -1451,8 +1455,8 @@
                       "c-4737c4",
                       "mg-a343db",
                       "anch-db926e",
-                      "anch-0f7be2",
-                      "anch-0c41a6"
+                      "anch-760607",
+                      "anch-77b521"
                     ],
                     "content": {
                       "text": "Todo lo que necesitas saber."

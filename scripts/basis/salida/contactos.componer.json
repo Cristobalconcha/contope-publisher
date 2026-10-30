@@ -428,7 +428,32 @@
         }
       },
       {
-        "id": "form-1069ab",
+        "id": "anch-c96c9f",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "max-width": "166px",
+            "margin-inline-start": "auto",
+            "margin-inline-end": "auto"
+          }
+        }
+      },
+      {
+        "id": "form-302508",
         "kind": "form",
         "scope": {
           "breakpoint": "all",
@@ -476,6 +501,10 @@
             "ayudaTamano": "13px",
             "contadorTamano": "13px",
             "ayudaInterlineado": "1.43",
+            "opcionTamano": "14px",
+            "opcionInterlineado": "1.43",
+            "opcionPeso": "400",
+            "opcionColor": "#112337",
             "botonSombra": "rgba(18, 25, 97, 0.08) 0px 1px 4px 0px",
             "interlineado": "1.7",
             "peso": "400",
@@ -594,6 +623,31 @@
             "row-gap": "30px"
           }
         }
+      },
+      {
+        "id": "anch-54ff3d",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "tablet",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "max-width": "506px",
+            "margin-inline-start": "auto",
+            "margin-inline-end": "auto"
+          }
+        }
       }
     ]
   },
@@ -637,7 +691,9 @@
                       "c-5ba4fe",
                       "mg-1a56c0",
                       "mg-cb0416",
-                      "mg-d782eb"
+                      "anch-c96c9f",
+                      "mg-d782eb",
+                      "anch-54ff3d"
                     ],
                     "content": {
                       "text": "Contactos",
@@ -648,7 +704,7 @@
                     "id": "form-13",
                     "kind": "form",
                     "ruleIds": [
-                      "form-1069ab",
+                      "form-302508",
                       "mg-a343db"
                     ],
                     "content": {

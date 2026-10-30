@@ -36,9 +36,9 @@ del vocabulario del plugin, validada y publicada en el catálogo. Lo que no los 
   variables nuevas del runtime de Orugantt Forms (campo, etiqueta, etiqueta chica, ayuda, contador, botón, interlineado y peso). Se sigue
   estilando **por variables, nunca por reglas sobre los campos**. El runtime que las consume está en la rama `basis-tokens` del repositorio
   de Orugantt Forms (`runtime-src/src/runtime.css`, `OFR_Design_Tokens`, y `GridSection` con `titulo`); sus valores por omisión son los
-  de siempre, así que un formulario que no las fija se ve igual.
+  de siempre, así que un formulario que no las fija se ve igual. El tope de variables por `form.theme` sube de 40 a 80 (el contrato ya pasa de 50).
 
-Pruebas: `scripts/probar-basis-0384.php` (60 comprobaciones, contra el WordPress local de Basis).
+Pruebas: `scripts/probar-basis-0384.php` (61 comprobaciones, contra el WordPress local de Basis).
 
 ---
 

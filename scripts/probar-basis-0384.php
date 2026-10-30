@@ -189,6 +189,13 @@ $ampliado = [
 ];
 $r = $formulario($ampliado);
 $comprobar('el contrato ampliado del formulario se acepta (variables nuevas)', !is_wp_error($r), $error($r));
+$todos = array_merge($ampliado, [
+    'texto' => '#112337', 'textoSuave' => '#585E6A', 'superficie' => '#FFFFFF', 'superficieAlt' => '#F4F4F4', 'borde' => '#D6D6D6', 'bordeFuerte' => '#999999',
+    'principal' => '#E09900', 'principalHover' => '#E09900', 'principalContraste' => '#FFFFFF', 'radio' => '4px', 'espaciado' => '16px',
+    'tipografia' => "'Open Sans', sans-serif", 'sombra' => 'rgba(18, 25, 97, 0.08) 0px 1px 4px 0px', 'ayudaInterlineado' => '1.43', 'opcionTamano' => '14px',
+    'opcionInterlineado' => '1.43', 'opcionPeso' => '400', 'opcionColor' => '#112337', 'botonSombra' => 'rgba(18, 25, 97, 0.08) 0px 1px 4px 0px',
+]);
+$comprobar('un tema con más de 40 variables se acepta (el contrato ya tiene más de 50; el tope era de 40)', count($todos) > 40 && !is_wp_error($formulario($todos)), count($todos) . ' variables: ' . $error($formulario($todos)));
 foreach (['--ofr-field-bg:#FFFFFF', '--ofr-label-weight:600', '--ofr-submit-width:100%', '--ofr-line-height:1.7', '--ofr-color-bg:transparent'] as $v) {
     $comprobar("emite $v", strpos($estilos($r), $v) !== false, $estilos($r));
 }

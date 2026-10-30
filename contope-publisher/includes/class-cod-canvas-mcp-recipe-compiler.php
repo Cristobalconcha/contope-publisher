@@ -6832,7 +6832,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
         if (!is_array($value) || $value === []) {
             return new WP_Error('cod_mcp_form_rule_invalid', 'theme debe declarar al menos una variable de diseño.');
         }
-        if (count($value) > 40) {
+        if (count($value) > 80) {
             return new WP_Error('cod_mcp_form_rule_invalid', 'theme declara demasiadas variables.');
         }
 

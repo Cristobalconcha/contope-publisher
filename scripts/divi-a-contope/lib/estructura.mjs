@@ -99,18 +99,24 @@ function transcribirColumna(ctx, cD, cM, ubic, anchoD, anchoM) {
     ctx.reg.inicioPendiente = null;
     if (!nodos.length) return;
     aplicarRellenoPropio(ctx, mD, mM, nodos, u);
-    // Un módulo de texto o título más angosto que su columna (Divi: Sizing → ancho máximo).
+    // Un módulo de texto o título más angosto que su columna (Divi: Sizing → ancho máximo) o corrido de su borde (márgenes propios del
+    // módulo: a 768 y 393 el título de Contactos tiene 30px a cada lado). Se mide A CADA ANCHO por separado: puede ser llena en
+    // escritorio y angosta en celular (o al revés).
     if (['text', 'heading'].includes(mD.tipo)) {
-      const [, rD, , lD] = lados(cD.estilo.relleno);
-      const interior = cD.caja.w - rD - lD;
-      if (mD.caja.w < interior - 4) {
-        const off = mD.caja.x - (cD.caja.x + lD);
-        const centrado = Math.abs(off - (interior - mD.caja.w) / 2) < 3;
-        const decl = { 'max-width': pxs(mD.caja.w), ...(centrado ? { 'margin-inline-start': 'auto', 'margin-inline-end': 'auto' } : {}) };
-        let declM = {};
-        if (mM && cM) { const [, rM, , lM] = lados(cM.estilo.relleno); if (mM.caja.w >= cM.caja.w - rM - lM - 4) declM = { 'max-width': 'none' }; else declM = { 'max-width': pxs(mM.caja.w) }; }
-        for (const n of nodos) n.ruleIds = [...(n.ruleIds || []), ...ctx.reg.propiedades(decl, { mobile: declM }, { prefijo: 'anch' })];
-      }
+      const colocar = (mod, col) => {
+        if (!mod || !col) return null;
+        const [, rr, , ll] = lados(col.estilo.relleno);
+        const interior = col.caja.w - rr - ll;
+        const off = mod.caja.x - (col.caja.x + ll);
+        if (mod.caja.w >= interior - 4 && Math.abs(off) <= 2) return null;
+        const centrado = Math.abs(off - (interior - mod.caja.w) / 2) < 3;
+        return { 'max-width': pxs(mod.caja.w), ...(centrado ? { 'margin-inline-start': 'auto', 'margin-inline-end': 'auto' } : (off > 2 ? { 'margin-inline-start': pxs(off) } : {})) };
+      };
+      const decl = colocar(mD, cD);
+      let declM = mM && cM ? colocar(mM, cM) : null;
+      // Angosto en escritorio y lleno en celular: se deshace lo de escritorio.
+      if (decl && !declM && mM && cM) declM = Object.fromEntries(Object.keys(decl).map((k) => [k, k === 'max-width' ? 'none' : '0px']));
+      if (decl || declM) for (const n of nodos) n.ruleIds = [...(n.ruleIds || []), ...ctx.reg.propiedades(decl || {}, { mobile: declM || {} }, { prefijo: 'anch' })];
     }
     if (rac) {
       (rac.nodos ||= []).push(...nodos);

@@ -63,7 +63,7 @@
     const subetiqueta = f.querySelector('.gform-field-label--type-sub, .gfield_label_before_complex ~ * label, fieldset label.gform-field-label');
     const ayuda = f.querySelector('.gfield_description');
     const contador = f.querySelector('.ginput_counter');
-    const consentimiento = f.querySelector('.gchoice label');
+    const consentimiento = f.querySelector('.ginput_container_consent label, .gchoice label');
     const pie = f.querySelector('.gform_footer, .gform-footer');
     const entradaEstilo = (x) => (x ? Object.assign({}, tipo(x), caja(x), { alto: Math.round(x.getBoundingClientRect().height), ancho: Math.round(x.getBoundingClientRect().width), relleno4: lados4(x, 'padding'), bordeAncho: cs(x).borderTopWidth, bordeColor: cs(x).borderTopColor, bordeEstilo: cs(x).borderTopStyle }) : null);
     const forma = { entrada: entradaEstilo(unaEntrada), area: entradaEstilo(area), etiquetaGrupo: etiquetaGrupo ? Object.assign({}, tipo(etiquetaGrupo), { margenInferior: cs(etiquetaGrupo).marginBottom }) : null, subetiqueta: subetiqueta ? Object.assign({}, tipo(subetiqueta), { margenInferior: cs(subetiqueta).marginBottom }) : null, ayuda: ayuda ? Object.assign({}, tipo(ayuda), { relleno4: lados4(ayuda, 'padding'), margenInferior: cs(ayuda).marginBottom }) : null, contador: contador ? Object.assign({}, tipo(contador), { relleno4: lados4(contador, 'padding') }) : null, consentimiento: consentimiento ? Object.assign({}, tipo(consentimiento), { relleno4: lados4(consentimiento, 'padding') }) : null, pie: pie ? { relleno4: lados4(pie, 'padding'), margen4: lados4(pie, 'margin'), caja: rect(pie) } : null, campos: q('.gfield', f).map((c) => ({ caja: rect(c), margenInferior: cs(c).marginBottom })) };
