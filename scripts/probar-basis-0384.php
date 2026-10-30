@@ -161,6 +161,43 @@ $sinDonde = $compilar([['id' => 'p', 'kind' => 'paragraph', 'ruleIds' => ['i'], 
 $comprobar('icono sin donde se acepta (por omisión «antes»), como dice el catálogo', !is_wp_error($sinDonde), $error($sinDonde));
 
 // ---------------------------------------------------------------------------
+echo "\n== 4b. mapa fijo (siempre abierto) y el contrato ampliado del formulario ==\n";
+$mapa = static fn (array $contenido, array $partes = []) => [[
+    'id' => 'mapa', 'kind' => 'group', 'ruleIds' => ['m'], 'partes' => $partes, 'content' => array_merge([
+        'lat' => -33.8041, 'lng' => -70.6816, 'zoom' => 17, 'mini' => '/wp-content/uploads/2025/07/Mapa-contacto-recorte.png', 'globo' => 'Planta',
+    ], $contenido),
+    'children' => [['id' => 'dir', 'kind' => 'paragraph', 'content' => ['text' => 'Dirección']]],
+]];
+$reglasMapa = [$regla('m', 'interaction', ['behavior' => 'mapa']), $regla('al', 'properties', ['declarations' => ['--cod-mapa-alto' => '800px']])];
+$r = $compilar($mapa(['fijo' => true], ['grande' => ['al']]), $reglasMapa);
+$comprobar('un mapa fijo se acepta y se declara en el marcado', !is_wp_error($r) && strpos($marcado($r), 'data-cod-mapa-fijo="1"') !== false, $error($r));
+$comprobar('…y su parte grande lleva el alto', strpos($estilos($r), '--cod-mapa-alto:800px') !== false, $estilos($r));
+$r = $compilar($mapa([]), $reglasMapa);
+$comprobar('sin fijo el mapa es el de siempre (mini que se abre)', !is_wp_error($r) && strpos($marcado($r), 'data-cod-mapa-fijo') === false, $error($r));
+$r = $compilar($mapa(['fijo' => 'sí']), $reglasMapa);
+$comprobar('fijo que no es verdadero o falso se rechaza nombrándolo', is_wp_error($r) && stripos($error($r), 'fijo') !== false, $error($r));
+$js = (string) file_get_contents(__DIR__ . '/../contope-publisher/assets/js/cod-canvas-public.js');
+$comprobar('el runtime abre el mapa fijo al montarlo, sin robar el foco', strpos($js, "getAttribute('data-cod-mapa-fijo') === '1') abrir(true)") !== false && strpos($js, 'function abrir(silencioso)') !== false);
+$comprobar('la hoja base esconde la X del mapa fijo', strpos(COD_Canvas_Page_Publisher::mapa_css('<div data-cod-behavior="mapa"></div>'), '[data-cod-mapa-fijo="1"] > .cod-mapa__grande > .cod-mapa__cerrar{display:none !important;}') !== false);
+
+$formulario = static fn (array $tema) => $compilar([['id' => 'f', 'kind' => 'form', 'ruleIds' => ['t'], 'content' => ['formSlug' => 'contacto-basis']]], [$regla('t', 'form', ['theme' => $tema])]);
+$ampliado = [
+    'campoFondo' => '#FFFFFF', 'campoTexto' => '#999999', 'campoTamano' => '15px', 'campoBordeAncho' => '0px', 'campoRellenoY' => '16px', 'campoRellenoX' => '16px',
+    'etiquetaTamano' => '14px', 'etiquetaPeso' => '600', 'etiquetaColor' => '#112337', 'subetiquetaTamano' => '14px', 'subetiquetaPeso' => '400', 'subetiquetaColor' => '#585E6A',
+    'ayudaTamano' => '13px', 'contadorTamano' => '13px', 'botonAncho' => '100%', 'botonTamano' => '18px', 'botonPeso' => '500', 'botonRellenoY' => '8px', 'botonRellenoX' => '18px', 'botonRadio' => '3px',
+    'interlineado' => '1.7', 'peso' => '400', 'fondo' => 'transparent',
+];
+$r = $formulario($ampliado);
+$comprobar('el contrato ampliado del formulario se acepta (variables nuevas)', !is_wp_error($r), $error($r));
+foreach (['--ofr-field-bg:#FFFFFF', '--ofr-label-weight:600', '--ofr-submit-width:100%', '--ofr-line-height:1.7', '--ofr-color-bg:transparent'] as $v) {
+    $comprobar("emite $v", strpos($estilos($r), $v) !== false, $estilos($r));
+}
+foreach ([['etiquetaPeso', '650'], ['etiquetaPeso', 'bold'], ['interlineado', '9'], ['interlineado', 'normal'], ['botonAncho', 'calc(100% - 4px)'], ['campoFondo', 'url(x)'], ['campoNoExiste', '1px']] as [$clave, $valor]) {
+    $mal = $formulario([$clave => $valor]);
+    $comprobar("el valor «{$valor}» de {$clave} se rechaza", is_wp_error($mal) && stripos($error($mal), $clave) !== false, $error($mal));
+}
+
+// ---------------------------------------------------------------------------
 echo "\n== 5. el runtime público y la hoja base ==\n";
 $js = (string) file_get_contents(__DIR__ . '/../contope-publisher/assets/js/cod-canvas-public.js');
 $comprobar('cod-canvas-public.js fabrica el span de la parte icono', strpos($js, "'data-cod-acordeon-rol', 'icono'") !== false && strpos($js, 'data-cod-acordeon-icono') !== false);

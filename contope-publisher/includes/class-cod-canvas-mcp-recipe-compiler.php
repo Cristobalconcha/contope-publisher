@@ -902,6 +902,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 'globoEnlaceTexto' => 'opcional, texto plano ≤150: el texto de un enlace dentro del globo. Va junto con globoEnlaceHref (los dos o ninguno)',
                 'globoEnlaceHref' => 'opcional, enlace seguro: se dibuja como un enlace de verdad (<a>), nunca como texto con corchetes',
                 'marcador' => 'opcional, URL de activo: la imagen del marcador (50px de ancho). Sin ella, el marcador por omisión de Mapbox',
+                'fijo' => 'opcional, verdadero o falso (por omisión falso): el mapa grande queda ABIERTO siempre —sin mini que pinchar ni X para cerrarlo— y llena el nodo; su alto sale de --cod-mapa-alto en la parte grande. Con clave de Mapbox es un mapa incrustado; sin ella, el mini (la imagen del sitio, que en este modo conviene dimensionar a la caja del mapa con la parte mini) sigue siendo un enlace a «cómo llegar»',
             ]],
             'heading' => ['content' => [
                 'level' => '1..6',
@@ -2153,6 +2154,29 @@ final class COD_Canvas_MCP_Recipe_Compiler
             'espacioLg' => ['token' => '--ofr-space-lg', 'type' => 'length'],
             'sombra' => ['token' => '--ofr-shadow', 'type' => 'shadow'],
             'anilloFoco' => ['token' => '--ofr-focus-ring', 'type' => 'shadow'],
+            // Contrato ampliado (Orugantt Forms, 30 de octubre de 2026): campos, etiquetas y botón.
+            'interlineado' => ['token' => '--ofr-line-height', 'type' => 'ratio'],
+            'peso' => ['token' => '--ofr-weight', 'type' => 'weight'],
+            'contadorTamano' => ['token' => '--ofr-counter-size', 'type' => 'length'],
+            'campoFondo' => ['token' => '--ofr-field-bg', 'type' => 'color'],
+            'campoTexto' => ['token' => '--ofr-field-color', 'type' => 'color'],
+            'campoTamano' => ['token' => '--ofr-field-size', 'type' => 'length'],
+            'campoBordeAncho' => ['token' => '--ofr-field-border-width', 'type' => 'length'],
+            'campoRellenoY' => ['token' => '--ofr-field-pad-y', 'type' => 'length'],
+            'campoRellenoX' => ['token' => '--ofr-field-pad-x', 'type' => 'length'],
+            'etiquetaTamano' => ['token' => '--ofr-label-size', 'type' => 'length'],
+            'etiquetaPeso' => ['token' => '--ofr-label-weight', 'type' => 'weight'],
+            'etiquetaColor' => ['token' => '--ofr-label-color', 'type' => 'color'],
+            'subetiquetaTamano' => ['token' => '--ofr-sublabel-size', 'type' => 'length'],
+            'subetiquetaPeso' => ['token' => '--ofr-sublabel-weight', 'type' => 'weight'],
+            'subetiquetaColor' => ['token' => '--ofr-sublabel-color', 'type' => 'color'],
+            'ayudaTamano' => ['token' => '--ofr-help-size', 'type' => 'length'],
+            'botonAncho' => ['token' => '--ofr-submit-width', 'type' => 'length'],
+            'botonTamano' => ['token' => '--ofr-submit-size', 'type' => 'length'],
+            'botonPeso' => ['token' => '--ofr-submit-weight', 'type' => 'weight'],
+            'botonRellenoY' => ['token' => '--ofr-submit-pad-y', 'type' => 'length'],
+            'botonRellenoX' => ['token' => '--ofr-submit-pad-x', 'type' => 'length'],
+            'botonRadio' => ['token' => '--ofr-submit-radius', 'type' => 'length'],
         ];
     }
 
@@ -3383,7 +3407,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
         if (!is_array($content) || $content === []) {
             return $invalido('mapa requiere content con lat, lng, mini y globo (y opcionalmente zoom, etiqueta, globoEnlaceTexto, globoEnlaceHref, marcador).');
         }
-        $permitidos = ['lat', 'lng', 'zoom', 'mini', 'etiqueta', 'globo', 'globoEnlaceTexto', 'globoEnlaceHref', 'marcador'];
+        $permitidos = ['lat', 'lng', 'zoom', 'mini', 'etiqueta', 'globo', 'globoEnlaceTexto', 'globoEnlaceHref', 'marcador', 'fijo'];
         foreach (array_keys($content) as $clave) {
             if (!in_array($clave, $permitidos, true)) {
                 return $invalido('mapa no admite el campo «' . COD_Redes_Sociales::mostrable((string) $clave) . '». Admite: ' . implode(', ', $permitidos) . '.');
@@ -3403,6 +3427,9 @@ final class COD_Canvas_MCP_Recipe_Compiler
         }
         if (!isset($content['mini']) || !is_string($content['mini']) || !$this->is_safe_asset_url($content['mini'])) {
             return $invalido('mini debe ser la URL de una imagen del sitio (la del mini mapa, generada con scripts/generar-mini-mapa.mjs).');
+        }
+        if (isset($content['fijo']) && !is_bool($content['fijo'])) {
+            return $invalido('fijo es verdadero o falso (el mapa grande queda abierto siempre, sin mini ni X).');
         }
         if (isset($content['marcador']) && (!is_string($content['marcador']) || !$this->is_safe_asset_url($content['marcador']))) {
             return $invalido('marcador debe ser la URL de una imagen del sitio.');
@@ -3438,6 +3465,9 @@ final class COD_Canvas_MCP_Recipe_Compiler
         }
         if (isset($content['marcador'])) {
             $normalizado['marcador'] = $content['marcador'];
+        }
+        if (!empty($content['fijo'])) {
+            $normalizado['fijo'] = true;
         }
         return $normalizado;
     }
@@ -4966,6 +4996,10 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 }
                 if (isset($datos['marcador'])) {
                     $attributes['data-cod-mapa-marcador'] = (string) $datos['marcador'];
+                }
+                // Mapa siempre abierto (la ficha de contacto de Basis): el runtime lo abre al montarlo y no ofrece cerrarlo.
+                if (!empty($datos['fijo'])) {
+                    $attributes['data-cod-mapa-fijo'] = '1';
                 }
                 if (COD_Mapa::clave() === null) {
                     $this->omitted_nodes[] = [
@@ -6822,6 +6856,14 @@ final class COD_Canvas_MCP_Recipe_Compiler
                     break;
                 case 'font':
                     $valido = $this->is_css_font_family($bruto);
+                    break;
+                case 'ratio':
+                    // Interlineado como razón sin unidad: 0.8 a 3.
+                    $valido = preg_match('/^(?:[0-2](?:\.[0-9]{1,3})?|3(?:\.0{1,3})?)$/', $bruto) === 1 && (float) $bruto >= 0.8 && (float) $bruto <= 3.0;
+                    break;
+                case 'weight':
+                    // Peso de la letra: 100 a 900 en pasos de cien (el contrato lo declara así para las etiquetas y el botón).
+                    $valido = preg_match('/^[1-9]00$/', $bruto) === 1;
                     break;
                 case 'shadow':
                     // Sombra y anillo de foco: se acepta una lista corta de

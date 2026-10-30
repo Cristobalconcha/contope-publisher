@@ -27,7 +27,18 @@ del vocabulario del plugin, validada y publicada en el catálogo. Lo que no los 
   `fondo`; además marcaba `donde` como requerido cuando el validador lo asume `antes`. Ahora el catálogo sale de la misma constante que
   valida (`COD_Icono::DONDE`) y declara `forma` o `nombre` (exactamente una) como lo que sí se exige.
 
-Pruebas: `scripts/probar-basis-0384.php` (41 comprobaciones, contra el WordPress local de Basis).
+- **Mapa: `content.fijo` (siempre abierto).** El mapa de la ficha de contacto de Basis es un Mapbox incrustado de 379 × 800, no un mini
+  que se abre al pincharlo. Con `fijo: true` el runtime abre el mapa grande al montarlo (sin robar el foco ni desplazar la página), la hoja
+  esconde la X y el mini, y su alto sale de `--cod-mapa-alto` en la parte `grande`. Sin clave de Mapbox no cambia nada: el mini (la imagen,
+  que en este modo se dimensiona a la caja del mapa con la parte `mini`) sigue siendo un enlace a «cómo llegar». La clave la pone quien
+  publica; este cambio no carga ninguna.
+- **Formulario: el contrato de variables se amplía** (tipos nuevos `weight` y `ratio`). El compilador acepta en `form.theme` las 22
+  variables nuevas del runtime de Orugantt Forms (campo, etiqueta, etiqueta chica, ayuda, contador, botón, interlineado y peso). Se sigue
+  estilando **por variables, nunca por reglas sobre los campos**. El runtime que las consume está en la rama `basis-tokens` del repositorio
+  de Orugantt Forms (`runtime-src/src/runtime.css`, `OFR_Design_Tokens`, y `GridSection` con `titulo`); sus valores por omisión son los
+  de siempre, así que un formulario que no las fija se ve igual.
+
+Pruebas: `scripts/probar-basis-0384.php` (60 comprobaciones, contra el WordPress local de Basis).
 
 ---
 

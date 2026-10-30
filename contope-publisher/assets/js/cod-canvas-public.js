@@ -3047,7 +3047,8 @@
         }
       }
 
-      function abrir() {
+      // `silencioso`: el mapa fijo se abre solo al montarse; no le roba el foco ni desplaza la página.
+      function abrir(silencioso) {
         if (abierto) return;
         abierto = true;
         generacion += 1;
@@ -3057,8 +3058,10 @@
         grande.hidden = false;
         grande.setAttribute('aria-busy', 'true');
         decir('Cargando el mapa…', true);
-        enfocar(cerrarBoton);
-        irAlMapa();
+        if (silencioso !== true) {
+          enfocar(cerrarBoton);
+          irAlMapa();
+        }
         cargarMapbox(win, doc, function (gl) { dibujar(gl, miGeneracion); }, function () {
           if (abierto && miGeneracion === generacion) fallar('No se pudo cargar el mapa.');
         });
@@ -3102,6 +3105,8 @@
       root.classList.add('cod-mapa');
       root.setAttribute('data-cod-mapa-estado', 'cerrado');
       root.setAttribute('data-cod-mapa-listo', '1');
+      // Mapa fijo (content.fijo): abierto siempre, sin mini que pinchar ni X (la hoja los esconde).
+      if (root.getAttribute('data-cod-mapa-fijo') === '1') abrir(true);
       deshacer.push(function () {
         root.classList.remove('cod-mapa');
         root.removeAttribute('data-cod-mapa-estado');

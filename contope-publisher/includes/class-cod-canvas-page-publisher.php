@@ -875,6 +875,8 @@ CSS;
 {$r} > {$grande} > {$estado}{position:absolute;top:0;right:0;bottom:0;left:0;z-index:1;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
 {$r} > {$grande} > {$estado}[hidden]{display:none !important;}
 {$r} > {$grande} > {$cerrar}{position:absolute;top:.5rem;right:.5rem;z-index:2;appearance:none;}
+/* Mapa fijo: no hay nada que cerrar. */
+{$r}[data-cod-mapa-fijo="1"] > {$grande} > {$cerrar}{display:none !important;}
 /* Sin guion el mini es un enlace con una imagen: la imagen respeta el radio que le ponga el diseño al mini. */
 [data-cod-behavior="mapa"] > [data-cod-mapa-rol="mini"] > img{border-radius:inherit;width:100%;height:100%;object-fit:inherit;}
 
