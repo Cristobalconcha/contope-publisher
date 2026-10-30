@@ -1805,8 +1805,8 @@
         }
       },
       {
-        "id": "s-fa75e5",
-        "kind": "surface",
+        "id": "sec-video-5482e2",
+        "kind": "properties",
         "scope": {
           "breakpoint": "all",
           "state": "default"
@@ -1822,11 +1822,11 @@
         },
         "status": "reviewed",
         "value": {
-          "backgroundColor": "#FFFFFF",
-          "backgroundAssetUrl": "/wp-content/uploads/2025/07/Video-Aereo-Carpas-reemplazo.jpg",
-          "backgroundSize": "cover",
-          "backgroundPosition": "center",
-          "backgroundRepeat": "no-repeat"
+          "declarations": {
+            "position": "relative",
+            "isolation": "isolate",
+            "overflow": "hidden"
+          }
         }
       },
       {
@@ -2055,6 +2055,80 @@
         "status": "reviewed",
         "value": {
           "aspectRatio": "91/88",
+          "fit": "cover"
+        }
+      },
+      {
+        "id": "video-fondo-12268a",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "position": "absolute",
+            "inset-block-start": "0px",
+            "inset-inline-start": "0px",
+            "width": "100%",
+            "height": "100%",
+            "object-fit": "cover",
+            "z-index": "-1",
+            "pointer-events": "none"
+          }
+        }
+      },
+      {
+        "id": "media-fondo-ed15e9",
+        "kind": "media",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "aspectRatio": "41/43",
+          "fit": "cover"
+        }
+      },
+      {
+        "id": "media-fondo-af239e",
+        "kind": "media",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "aspectRatio": "19/73",
           "fit": "cover"
         }
       },
@@ -2841,14 +2915,28 @@
         ]
       },
       {
-        "id": "section-68",
+        "id": "section-69",
         "kind": "section",
         "ruleIds": [
           "sec-56504b",
           "sec-0cc10b",
-          "s-fa75e5"
+          "sec-video-5482e2",
+          "s-c8ec5e"
         ],
         "children": [
+          {
+            "id": "video-68",
+            "kind": "video",
+            "ruleIds": [
+              "video-fondo-12268a",
+              "media-fondo-ed15e9",
+              "media-fondo-af239e"
+            ],
+            "content": {
+              "sourceUrl": "/wp-content/uploads/2025/07/Video-Aereo-Carpas.mp4",
+              "ambient": true
+            }
+          },
           {
             "id": "group-67",
             "kind": "group",
@@ -2952,7 +3040,7 @@
         ]
       },
       {
-        "id": "section-75",
+        "id": "section-76",
         "kind": "section",
         "ruleIds": [
           "sec-d8d911",
@@ -2960,7 +3048,7 @@
         ],
         "children": [
           {
-            "id": "group-74",
+            "id": "group-75",
             "kind": "group",
             "ruleIds": [
               "fila-1c9785",
@@ -2968,7 +3056,7 @@
             ],
             "children": [
               {
-                "id": "group-73",
+                "id": "group-74",
                 "kind": "group",
                 "ruleIds": [
                   "col-542b47",
@@ -2976,7 +3064,7 @@
                 ],
                 "children": [
                   {
-                    "id": "group-72",
+                    "id": "group-73",
                     "kind": "group",
                     "ruleIds": [
                       "col-542b47",
@@ -2986,7 +3074,7 @@
                     ],
                     "children": [
                       {
-                        "id": "heading-69",
+                        "id": "heading-70",
                         "kind": "heading",
                         "ruleIds": [
                           "t-424b46",
@@ -3000,7 +3088,7 @@
                         }
                       },
                       {
-                        "id": "paragraph-70",
+                        "id": "paragraph-71",
                         "kind": "paragraph",
                         "ruleIds": [
                           "mg-2c79cc"
@@ -3010,7 +3098,7 @@
                         }
                       },
                       {
-                        "id": "button-71",
+                        "id": "button-72",
                         "kind": "button",
                         "ruleIds": [
                           "btn-504eb8",

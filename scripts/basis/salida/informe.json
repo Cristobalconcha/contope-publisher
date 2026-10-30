@@ -107,8 +107,8 @@
     "seccion": 4,
     "modulo": "sección",
     "clase": "et_pb_section_video",
-    "severidad": "faltante",
-    "motivo": "video de fondo Video-Aereo-Carpas.mp4 no disponible en la descarga; se usa la imagen de reemplazo del perfil"
+    "severidad": "ok",
+    "motivo": "video de fondo → nodo `video` ambiental detrás del contenido (cubre la sección)"
   },
   {
     "pagina": "inicio",

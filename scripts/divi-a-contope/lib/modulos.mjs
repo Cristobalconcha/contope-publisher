@@ -140,7 +140,7 @@ export function moduloTitulo(ctx, d, m, { gapD, gapM, ubicacion }) {
 /* --------------------------------------------------------------- imagen */
 
 // La regla media sólo acepta p/q de uno o dos dígitos: se busca la fracción más cercana.
-const razon = (w, h) => {
+export const razon = (w, h) => {
   let mejor = [1, 1], err = Infinity;
   for (let q = 1; q <= 99; q++) { const p = Math.round((w / h) * q); if (p < 1 || p > 99) continue; const e = Math.abs(p / q - w / h); if (e < err - 1e-9) { err = e; mejor = [p, q]; } }
   return mejor[0] + "/" + mejor[1];

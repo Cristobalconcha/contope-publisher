@@ -75,7 +75,7 @@ clase Divi, con severidad `faltante` / `sin-transcribir` / `aproximado` / `ok`. 
 - **Formato en línea** (negrita, enlaces dentro de un párrafo): el nodo de texto es plano; se avisa. Sólo un bloque
   que es *entero* un enlace pasa a `link`.
 - **Código a mano** no reconocido (HTML/JS/CSS pegado en un módulo de código): se reporta con un resumen.
-- **Video de fondo:** el nodo se omite y se avisa; si el perfil trae una imagen de reemplazo, se usa como fondo.
+- **Video de fondo:** si el archivo está en el sitio, va como nodo `video` ambiental detrás del contenido (sección aislada, `media` con la proporción de la sección y recorte cover); si falta, se avisa como «faltante» y se usa la imagen de reemplazo del perfil.
 - **Ícono «+» de los pliegues**, **mapa siempre abierto**, **degradados**: huecos del plugin (ver `scripts/basis/HUECOS.md`).
 
 ## Cómo se prueba

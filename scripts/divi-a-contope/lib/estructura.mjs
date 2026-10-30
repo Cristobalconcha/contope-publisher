@@ -15,7 +15,7 @@
  */
 import { px, pxs, redondear, lados, esTransparente, colorRegla, leerHtml, textoDe, limpiarTexto } from './util.mjs';
 import { reglasMargen, declaracionesCaja, superficieSeccion, reglasTexto } from './estilos.mjs';
-import { transcribirModulo } from './modulos.mjs';
+import { transcribirModulo, razon } from './modulos.mjs';
 import { transcribirCodigo } from './codigo.mjs';
 import { writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
@@ -248,6 +248,7 @@ export function transcribirSeccion(ctx, sD, sM, indice, vw) {
   // Video de fondo: si el archivo está en el sitio local se usa; si no, se
   // avisa y el fondo queda con la imagen de reemplazo del perfil (si la hay).
   let sinImagen = false;
+  let videoFondo = null;
   if (sD.conVideoFondo && sD.videoFondo) {
     const fuente = (sD.videoFondo.fuentes || [])[0];
     const local = fuente && ctx.url(fuente, ubic, { silencioso: true });
@@ -255,7 +256,14 @@ export function transcribirSeccion(ctx, sD, sM, indice, vw) {
       const rep = ctx.perfil.reemplazos?.fondos?.[`${ubic.pagina}:${indice}`];
       ctx.avisar({ ...ubic, modulo: 'sección', clase: 'et_pb_section_video', severidad: 'faltante', motivo: `video de fondo ${fuente ? fuente.split('/').pop() : ''} no disponible en la descarga${rep ? '; se usa la imagen de reemplazo del perfil' : ''}` });
       if (rep) { sD = { ...sD, urlsFondo: [rep.url], tamanoFondo: rep.tamano || 'cover', posicionFondo: rep.posicion || 'center', repiteFondo: 'no-repeat' }; }
-    } else ctx.avisar({ ...ubic, modulo: 'sección', clase: 'et_pb_section_video', severidad: 'aproximado', motivo: 'video de fondo: la regla de ContOpe para video ambiental de fondo aún no se compone desde Divi; se omite el video' });
+    } else {
+      // El video SÍ está en el sitio: va como nodo `video` ambiental (sin controles, en bucle, mudo)
+      // detrás del contenido. La sección crea su propio contexto de apilado (isolation) para que el
+      // z-index negativo del video quede sobre el fondo de la sección y bajo sus filas.
+      videoFondo = { src: local, poster: ctx.url(sD.videoFondo.poster || '', ubic, { silencioso: true }) };
+      ids.push(...ctx.reg.propiedades({ position: 'relative', isolation: 'isolate', overflow: 'hidden' }, {}, { prefijo: 'sec-video' }));
+      ctx.avisar({ ...ubic, modulo: 'sección', clase: 'et_pb_section_video', severidad: 'ok', motivo: 'video de fondo → nodo `video` ambiental detrás del contenido (cubre la sección)' });
+    }
   }
   const sup = superficieSeccion(ctx.reg, sD, { urlLocal: (u) => ctx.url(u, ubic), sinImagen });
   ids.push(...sup.ids);
@@ -268,6 +276,15 @@ export function transcribirSeccion(ctx, sD, sM, indice, vw) {
     ctx.ubicacionActual = u;
     hijos.push(...transcribirFila(ctx, fD, fM, u, vw));
   });
+  if (videoFondo) {
+    const reglasVideo = ctx.reg.propiedades({ position: 'absolute', 'inset-block-start': '0px', 'inset-inline-start': '0px', width: '100%', height: '100%', 'object-fit': 'cover', 'z-index': '-1', 'pointer-events': 'none' }, {}, { prefijo: 'video-fondo' });
+    // El <video> interior se dimensiona con la regla `media` (no con `properties`, que cae sobre el marco):
+    // misma proporción que la sección y recorte «cover», como el video de fondo de Divi.
+    const rD = razon(sD.caja.w, sD.caja.h);
+    const rM = sM ? razon(sM.caja.w, sM.caja.h) : rD;
+    reglasVideo.push(...ctx.reg.conAnchos('media', { aspectRatio: rD, fit: 'cover' }, rM !== rD ? { mobile: { aspectRatio: rM, fit: 'cover' } } : {}, { prefijo: 'media-fondo' }));
+    hijos.unshift(ctx.nodo('video', reglasVideo, { sourceUrl: videoFondo.src, ...(videoFondo.poster ? { posterUrl: videoFondo.poster } : {}), ambient: true }));
+  }
   const nodo = ctx.nodo(kind, conMovimiento(ctx, anim, ids), undefined, hijos);
   if (ctx.perfil.marcadores?.[`${ctx.pagina}:${indice}`]) nodo.marker = ctx.perfil.marcadores[`${ctx.pagina}:${indice}`];
   return nodo;

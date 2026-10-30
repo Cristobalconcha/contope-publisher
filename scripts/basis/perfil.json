@@ -2,26 +2,49 @@
   "origen": "https://basisbodegas.com",
   "designId": "basis-web",
   "carpetaUploads": "C:/Users/Cristobal concha/wp-local-basis/wordpress/wp-content/uploads",
-  "paginasReales": ["inicio", "basis-carpas-industriales", "preguntas-frecuentes", "contactos"],
+  "paginasReales": [
+    "inicio",
+    "basis-carpas-industriales",
+    "preguntas-frecuentes",
+    "contactos"
+  ],
   "paginas": {
-    "inicio": { "titulo": "Inicio" },
-    "basis-carpas-industriales": { "titulo": "Basis carpas industriales" },
-    "preguntas-frecuentes": { "titulo": "Preguntas frecuentes" },
-    "contactos": { "titulo": "Contactos" }
+    "inicio": {
+      "titulo": "Inicio"
+    },
+    "basis-carpas-industriales": {
+      "titulo": "Basis carpas industriales"
+    },
+    "preguntas-frecuentes": {
+      "titulo": "Preguntas frecuentes"
+    },
+    "contactos": {
+      "titulo": "Contactos"
+    }
   },
-  "rutas": { "/": "/" },
-  "plugin": { "listasAnidadas": true },
+  "rutas": {
+    "/": "/"
+  },
+  "plugin": {
+    "listasAnidadas": true
+  },
   "miniMapa": "/wp-content/uploads/2025/07/Mini-mapa.png",
   "miniMapaGrande": "/wp-content/uploads/2025/07/Mapa-contacto-recorte.png",
   "mapaGrande": "imagen",
-  "reglasMapa": { "mini": [], "grande": [] },
-  "formularios": [{ "slug": "contacto-basis", "gravity": "gform_1", "nombre": "Contacto Basis", "maxLength": 600 }],
-  "reemplazos": {
-    "medios": {
-      "aRecurso-12.png": "/wp-content/uploads/2025/07/aRecurso-12.png"
-    },
-    "fondos": {
-      "inicio:4": { "url": "https://basisbodegas.com/wp-content/uploads/2025/07/Video-Aereo-Carpas-reemplazo.jpg", "tamano": "cover", "posicion": "center" }
+  "reglasMapa": {
+    "mini": [],
+    "grande": []
+  },
+  "formularios": [
+    {
+      "slug": "contacto-basis",
+      "gravity": "gform_1",
+      "nombre": "Contacto Basis",
+      "maxLength": 600
     }
+  ],
+  "reemplazos": {
+    "medios": {},
+    "fondos": {}
   }
 }

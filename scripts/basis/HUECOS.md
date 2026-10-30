@@ -43,27 +43,28 @@ Sin resolver (anotados, no rodeados):
     queda como una tarjeta blanca dentro del panel y el botón no se estira.
 12. **Tablet.** Sólo se midió escritorio (1440) y celular (393).
 
-## Medios: lo que se recuperó y lo que es reemplazo
+## Medios
 
-El hosting estaba caído y la descarga quedó a medias (3 de 39 medios). Se rescató **de la caché del Chrome sin ventana que
-hizo la descarga** (`%TEMP%\pz-*`; ver `Sesión Claude/entregables/basis/original/medios-cache/`):
+Al principio el hosting estaba caído y la descarga quedó a medias; ese día se rescató lo posible de la caché del Chrome sin
+ventana y se armaron reemplazos con recortes de las capturas. **Ya llegaron los 39 originales** (`original/medios/`, 0 errores) y
+se reemplazó todo en `uploads/2025/07/`:
 
-| medio | origen |
+| medio | estado |
 |---|---|
-| Imagen-4, Cierre-lateral, Estructura3, Imagen-6, Interior-doble-pilar, aBlanco@4x, Header-logo, Altfx-2-Calado, aiconopdf | **originales, íntegros** (tamaño completo) |
-| aRecurso-12.png (logo BASIS del pie), mapa de Contactos | **recorte de la captura a 1440** (131×60 y 379×800, a 1×): quedan algo blandos |
-| Video-Aereo-Carpas.mp4 (video de fondo de «Características») | **NO se pudo recuperar** (la caché sólo guardó 1 MB, 0,27 s): el fondo es una imagen armada con las bandas limpias de la captura |
-| mini mapa del pie | el de Econut (mismo lugar, mismo estilo, 120×120) |
-| tipografías (Big Shoulders Display, Open Sans, Roboto, Montserrat) | los archivos de la descarga, variables, subconjunto latino |
+| fotos, logos, dibujo de fondo, íconos, PDF, favicon | originales íntegros (incluye `aRecurso-12.png`, el logo BASIS del pie, que antes era un recorte) |
+| Video-Aereo-Carpas.mp4 (fondo de «Características») | **original, 34 MB**: vuelve a ser VIDEO (nodo `video` ambiental, sin controles, en bucle y mudo, detrás del contenido; `media` con la proporción de la sección y recorte «cover») |
+| mapa de Contactos | **sigue siendo un recorte de la captura**: en el original es un mapa de Mapbox en vivo, no hay archivo que recuperar |
+| mini mapa del pie | el de Econut (mismo lugar y estilo); en el original también lo dibuja Mapbox en vivo |
+| tipografías | archivos de la descarga (variables, subconjunto latino) |
 
-Antes de subir: volver a bajar de `basisbodegas.com` los originales que hoy son recorte o reemplazo
-(`node scripts/basis/descarga/descargar-medios.mjs`, retoma lo que falta) y recomponer: no hay que tocar nada más.
+Desaparecieron del perfil los reemplazos de `aRecurso-12.png` y del fondo de «Características». Si algún día un medio vuelve a faltar,
+el transcriptor lo avisa como «faltante» y el perfil admite un reemplazo (`reemplazos.medios` / `reemplazos.fondos`).
 
 ## Diferencias visibles que quedan contra el original
 
 - Portada: velo azul plano (ver 4) y la foto de fondo un poco distinta a 393 de ancho.
 - Aviso naranja de cierre: marrón en lugar de naranja con degradado negro (ver 4).
-- «Características»: la banda de fondo es una imagen de reemplazo en vez del video.
+- «Características»: con el video original de fondo. **El texto de la columna izquierda queda pegado al borde del panel** (el original lo tiene ~27 px adentro) y la fila mide 829 px contra 866: el módulo de texto de Divi trae relleno propio (Design → Spacing) que la medición no guardó. Arreglo: que `medir-pagina.js` guarde `padding` del módulo (`estiloCaja`) y que el transcriptor lo aplique; requiere volver a medir el sitio vivo, por eso no se hizo.
 - Pliegues de Preguntas frecuentes: sin el ícono «+» y el título del pliegue abierto no se oscurece (ver 5).
 - Contactos: mapa estático (ver 6) y formulario con otro dibujo de campos (ver 11).
 - Pie: 6 px más alto que el original (126 contra 120) y el mini mapa trae su leyenda de «Mapbox» abajo.
@@ -73,7 +74,7 @@ Antes de subir: volver a bajar de `basisbodegas.com` los originales que hoy son 
 - Banner de cookies: el original no tiene; aquí está como en Econut (pedido), con la paleta de Basis. Se oculta sólo en las capturas.
 - El texto «Gracias» del formulario no se pudo medir (nunca se envió): es uno mínimo.
 
-## Para subirlo (cuando vuelva el hosting)
+## Para subirlo
 
 1. Subdominio de prueba en el hosting (p. ej. `nuevo.basisbodegas.com`) con WordPress, plugin ContOpe 0.3.82+ (con las dos
    ampliaciones de esta rama), Orugantt Forms, CookieAdmin y los temas `contope-canvas` y `contope-basis`.
