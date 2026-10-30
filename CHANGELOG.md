@@ -5,6 +5,32 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.84 — 30 de octubre de 2026
+
+Cuatro huecos que apareció al dejar Basis idéntico a su original (Divi). Ninguno se rodeó con CSS a mano: cada uno es una ampliación
+del vocabulario del plugin, validada y publicada en el catálogo. Lo que no los pide sale **idéntico a 0.3.83**.
+
+- **Listas: partes `sublista` e `item`.** Una lista sangra distinto en cada nivel (en Basis, 14 px el primer nivel y 20 px las
+  sublistas) y una regla sobre el nodo sólo alcanzaba el `<ul>` de primer nivel. Ahora el nodo `list` declara dos partes, como la
+  imagen o la galería: `sublista` (las listas anidadas) e `item` (cada `<li>`).
+- **Acordeón: ícono en el encabezado, igual que core/accordion-heading.** La regla `interaction` del acordeón admite `showIcon`
+  (verdadero o falso) e `iconPosition` (`right` o `left`) con los mismos nombres que el bloque de WordPress, más `iconoCerrado` e
+  `iconoAbierto`: la ruta de un SVG de Medios para cada estado (el abierto también admite `"ninguno"`). El runtime fabrica un
+  `<span>` (parte nueva `icono`) dentro del botón y le pone el estado; su color es el `background-color` de la parte, su tamaño el
+  `width` y `height`, y el dibujo se pinta con una máscara. Sin dibujo propio lleva un «+» que pasa a «−». Una regla `properties` no
+  puede escribir `url(`, así que el dibujo no viaja por ahí: lo escribe el compilador a partir de la ruta ya validada (sólo SVG del propio
+  sitio, como `icono.forma`).
+- **WhatsApp: `iconStyle: "logo"`.** El nodo `whatsapp` dibujaba el ícono en un solo color. Con `logo` dibuja la marca con su degradado
+  verde (#57d163 → #23b33a), el contorno y el teléfono del color de `iconColor`. Para eso el sanitizador del lienzo admite `linearGradient` y
+  `stop` (sólo lo mínimo para un degradado lineal; un `<script>` dentro del SVG sigue rechazándose).
+- **Catálogo contra validador.** `cod_get_capabilities` publicaba `icono.donde` como `antes | despues | fondo` y el validador rechazaba
+  `fondo`; además marcaba `donde` como requerido cuando el validador lo asume `antes`. Ahora el catálogo sale de la misma constante que
+  valida (`COD_Icono::DONDE`) y declara `forma` o `nombre` (exactamente una) como lo que sí se exige.
+
+Pruebas: `scripts/probar-basis-0384.php` (41 comprobaciones, contra el WordPress local de Basis).
+
+---
+
 ## 0.3.83 — 30 de octubre de 2026
 
 ### El módulo de fondos: degradado, trama y máscara

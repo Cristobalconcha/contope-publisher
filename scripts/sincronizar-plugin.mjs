@@ -10,6 +10,7 @@
  * Son dos instalaciones distintas y no hay que confundirlas:
  *   santaluisa → wp-local         · puerto 8890
  *   econut     → wp-local-econut  · puerto 8891
+ *   basis      → wp-local-basis   · puerto 8894
  *
  * Esto copia el plugin y nada más. Para poner el local de Santa Luisa como
  * espejo del sitio publicado (documentos e imágenes incluidos) está
@@ -26,6 +27,7 @@ import { fileURLToPath } from 'node:url';
 const DESTINOS = {
   santaluisa: { carpeta: 'wp-local', puerto: 8890 },
   econut: { carpeta: 'wp-local-econut', puerto: 8891 },
+  basis: { carpeta: 'wp-local-basis', puerto: 8894 },
 };
 
 const argv = process.argv.slice(2);

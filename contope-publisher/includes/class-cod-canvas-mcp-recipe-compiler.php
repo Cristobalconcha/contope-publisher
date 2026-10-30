@@ -213,6 +213,11 @@ final class COD_Canvas_MCP_Recipe_Compiler
                     'elegido' => ':is([data-cod-acordeon-visible="true"], .is-open .wp-block-accordion-panel)',
                     'descripcion' => 'el contenido que se despliega (el resto de los hijos del pliegue)',
                 ],
+                'icono' => [
+                    'selector' => ':is([data-cod-acordeon-rol="icono"], .wp-block-accordion-heading__toggle-icon)',
+                    'elegido' => ':is([data-cod-acordeon-estado="abierto"], .is-open)',
+                    'descripcion' => 'el ícono del encabezado de cada pliegue (sólo con showIcon: true en la regla interaction; lo fabrica el runtime, igual que el toggle-icon de core/accordion-heading). Es una caja que se dibuja con una máscara: su color es el background-color, su tamaño width y height; el dibujo de cada estado sale de iconoCerrado e iconoAbierto. Con scope.state="current" se estila el del pliegue abierto',
+                ],
             ],
         ],
         'cuadrantes' => [
@@ -338,6 +343,28 @@ final class COD_Canvas_MCP_Recipe_Compiler
                     'selector' => 'figcaption',
                     'elegido' => null,
                     'descripcion' => 'el pie de la imagen, cuando tiene caption',
+                ],
+            ],
+        ],
+        /*
+         * LA LISTA TIENE DOS PARTES (0.3.84). Una lista de Divi o de WordPress sangra
+         * distinto en cada nivel: la de primer nivel con 14px y las sublistas con 20px
+         * (Basis, medido el 30 de octubre de 2026). Una regla sobre el nodo alcanza
+         * sólo el <ul> de primer nivel; los anidados son elementos internos que el
+         * nodo no es, y sin esta parte la única salida era volver al CSS a mano.
+         */
+        'list' => [
+            'atributoRol' => '',
+            'partes' => [
+                'item' => [
+                    'selector' => 'li',
+                    'elegido' => null,
+                    'descripcion' => 'cada ítem de la lista, de cualquier nivel (el <li>)',
+                ],
+                'sublista' => [
+                    'selector' => ':is(ul, ol)',
+                    'elegido' => null,
+                    'descripcion' => 'las listas anidadas (de segundo y tercer nivel), no la de primer nivel: su sangría, su viñeta y su separación son distintas de las de la lista que las contiene',
                 ],
             ],
         ],
@@ -764,6 +791,11 @@ final class COD_Canvas_MCP_Recipe_Compiler
                     'threshold' => '0..4000', 'targetId' => 'requerido por nav-toggle', 'toggleClass' => 'clase segura',
                     'panelId' => 'nav-toggle: el nodo que aparece y desaparece (el menú). Con él, el plugin pone el mostrar/ocultar y la composición sólo el aspecto.',
                     'mode' => ['single', 'track'], 'visible' => '1..8', 'visibleMobile' => '1..8',
+                    'autoclose' => 'acordeon: verdadero por omisión', 'openNodeId' => 'acordeon: el pliegue que nace abierto', 'startClosed' => 'acordeon: todo cerrado al cargar',
+                    'showIcon' => 'acordeon: true agrega el ícono al encabezado de cada pliegue (parte icono), como core/accordion-heading',
+                    'iconPosition' => 'acordeon: right | left (por omisión right)',
+                    'iconoCerrado' => 'acordeon: ruta de un SVG de Medios para el pliegue cerrado (por omisión un «+»)',
+                    'iconoAbierto' => 'acordeon: ruta de un SVG de Medios para el pliegue abierto, o "ninguno" (por omisión un «−»)',
                 ],
                 'constraints' => [
                     'carousel-basic sólo en gallery', 'lightbox sólo en gallery', 'nav-toggle requiere targetId presente en la composición',
@@ -772,7 +804,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
                     'pestanas sólo en un nodo group con 2 a 8 hijos; cada hijo es una pestaña: su PRIMER hijo es la etiqueta (lo que se pincha: un título, un número, un texto) y el RESTO es el panel de contenido. Al cargar queda activa la primera; al pinchar una etiqueta se muestra su panel y se ocultan los demás, sin que el alto salte de golpe. El runtime pone las etiquetas en una lista de botones reales (role="tablist" / role="tab"; flechas izquierda y derecha, Inicio y Fin) y convierte a cada hijo en su panel (role="tabpanel"). Para estilar el estado, la composición usa los atributos que emite el runtime: [data-cod-pestanas-rol="etiqueta"][data-cod-pestanas-estado="activa"|"inactiva"] y [data-cod-pestanas-rol="panel"][data-cod-pestanas-visible="true"|"false"]. Sin colores ni tipografía: eso lo ponen las reglas de diseño del sitio. Si la forma interna no calza (algún hijo con menos de 2 hijos propios) el runtime no toca nada y el contenido queda apilado.',
                     'wa-mensaje: una ventana para redactar el mensaje antes de abrir WhatsApp. El nodo que la declara ES la ventana, y no reemplaza los enlaces de WhatsApp: los INTERCEPTA, así que cada botón conserva el mensaje propio que ya viaja en su enlace y el número sale de ahí mismo (no hay un segundo lugar donde configurarlo). Si el JavaScript no corre, los enlaces siguen abriendo WhatsApp directo: se pierde la ventana, no el contacto. Apunta a nodos de la misma composición: sendNodeId (obligatorio, el botón de enviar; sin él el runtime no monta nada), fieldNodeId (el hueco donde se fabrica el campo de texto), closeNodeId y consentNodeId. El campo y la casilla NO viajan en el documento —el sanitizador bloquea textarea e input a propósito— sino que los crea el runtime dentro de esos huecos, así que quien diseña decide dónde van y cómo se ven. triggerSelector por omisión es a[href*="wa.me/"]; placeholder, fieldLabel y consentText son los textos.',
                     'acordeon sólo en un nodo group con 1 a 40 hijos; cada hijo es un pliegue: su PRIMER hijo es lo que se pincha (la pregunta, el título del artículo) y el RESTO es lo que se despliega. Misma forma que pestanas, para que se entienda y se edite igual; lo que cambia es que va en vertical y que puede quedar todo cerrado. Se abre DE A UNO: abrir un pliegue cierra el anterior, que es lo que se espera de unas preguntas frecuentes y lo que hacía el sitio original con <details name>. Al cargar queda abierto el primero. El runtime convierte lo que se pincha en un button real (aria-expanded, aria-controls; flechas arriba y abajo, Inicio y Fin) y el resto en una región con role="region". Para estilar el estado, la composición usa las partes item, resumen y panel, y scope.state="current" para el pliegue abierto. Sin colores ni tipografía: eso lo ponen las reglas de diseño del sitio. Si la forma interna no calza, el runtime no toca nada y el contenido queda apilado y legible, que es como se ve también dentro del editor.',
-                    'acordeon admite autoclose (verdadero por omisión: abrir uno cierra el anterior, como el autoclose del bloque core/accordion de WordPress), openNodeId (cuál pliegue nace abierto; por omisión el primero) y startClosed (empieza todo cerrado). No admite threshold, targetId, toggleClass, mode, visible ni visibleMobile.',
+                    'acordeon admite autoclose (verdadero por omisión: abrir uno cierra el anterior, como el autoclose del bloque core/accordion de WordPress), openNodeId (cuál pliegue nace abierto; por omisión el primero) y startClosed (empieza todo cerrado). showIcon: true agrega un ícono al encabezado de cada pliegue, como showIcon e iconPosition de core/accordion-heading: el runtime fabrica un span (parte icono) a la derecha o a la izquierda del título; su color es el background-color de la parte, su tamaño width y height, y su dibujo sale de iconoCerrado e iconoAbierto (SVG de Medios, o iconoAbierto "ninguno"); sin ellos lleva un «+» y un «−». No admite threshold, targetId, toggleClass, mode, visible ni visibleMobile.',
                     'pestanas no admite threshold, targetId, toggleClass, mode, visible ni visibleMobile',
                     'marquesina sólo en un nodo group con 2 a 24 hijos; cada hijo es una pieza de una fila que se desplaza sola, de derecha a izquierda y en bucle continuo, sin controles (logos de certificación, sellos, una frase de cinta). El runtime mete las piezas en una pista y agrega una copia del juego (marcada aria-hidden y sin ids) para que el bucle cierre sin salto; si hay pocas piezas para llenar el ancho, repite el juego las veces que haga falta. La pista se mueve con CSS puro (@keyframes y translateX(-50%)): sin librerías ni JavaScript por cuadro. Con prefers-reduced-motion: reduce el movimiento se detiene y las piezas quedan quietas y a la vista, sin copias. Cuántas piezas se ven a la vez, la separación y la velocidad NO son parámetros de la regla interaction: se escriben con una regla properties sobre el nodo, que admite scope.breakpoint, así que el número cambia por ancho como cualquier otra regla: --cod-marquesina-visibles (piezas a la vez; por omisión 4), --cod-marquesina-separacion (espacio entre piezas; por omisión 0px) y --cod-marquesina-duracion-pieza (cuánto tarda en pasar una pieza; por omisión 8s, un desplazamiento lento y continuo). Para estilar la pista o cada pieza se usan las partes pista y pieza del nodo. Sin colores ni tipografía: eso lo ponen las reglas de diseño del sitio. Si el grupo no calza el runtime no toca nada y las piezas quedan apiladas.',
                     'marquesina no admite threshold, targetId, toggleClass, mode, visible ni visibleMobile (las piezas visibles se declaran con la variable --cod-marquesina-visibles, no con visible)',
@@ -822,14 +854,14 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 ],
             ],
             'icono' => [
-                'required' => ['donde'],
+                'atLeastOneOf' => ['forma', 'nombre'],
                 'fields' => [
                     'forma' => 'URL de un SVG propio',
                     'nombre' => 'nombre de un icono de Material Symbols; se resuelve y se cachea en el sitio',
-                    'donde' => 'antes | despues | fondo',
+                    'donde' => implode(' | ', COD_Icono::DONDE),
                     'tamano' => 'longitud', 'color' => 'color seguro', 'separacion' => 'longitud',
                 ],
-                'notes' => 'Un icono dentro del texto del nodo, por nombre de Material Symbols o por forma propia. Nunca se deforma: a diferencia de divisor, no lleva preserveAspectRatio="none".',
+                'notes' => 'Un icono dentro del texto del nodo, por nombre de Material Symbols o por forma propia. Nunca se deforma: a diferencia de divisor, no lleva preserveAspectRatio="none". Lleva forma O nombre (exactamente una); donde es opcional y por omisión es antes.',
             ],
             'properties' => [
                 'required' => ['declarations'],
@@ -919,6 +951,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 'size' => 'opcional, 24..200 (px), por defecto 56',
                 'iconPadding' => 'opcional, 0..80 (px), por defecto 14',
                 'iconColor' => 'opcional, color CSS seguro, por defecto #ffffff',
+                'iconStyle' => 'opcional: mono (por defecto, un solo color) | logo (la marca con su degradado verde; iconColor pinta el contorno y el teléfono)',
                 'backgroundColor' => 'opcional, color CSS seguro, por defecto #25D366',
                 'borderRadius' => 'opcional, longitud CSS segura (ej. 999px para pill, 8px para casi-cuadrado), por defecto 999px',
             ]],
@@ -972,7 +1005,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
         if (is_wp_error($anchor_value)) {
             return $anchor_value;
         }
-        $whatsapp_input = array_intersect_key($style, array_flip(['size', 'iconPadding', 'iconColor', 'backgroundColor', 'borderRadius']));
+        $whatsapp_input = array_intersect_key($style, array_flip(['size', 'iconPadding', 'iconColor', 'backgroundColor', 'borderRadius', 'iconStyle']));
         $normalized = $this->normalize_whatsapp_content(array_merge($whatsapp_input, ['message' => $message]));
         if (is_wp_error($normalized)) {
             return $normalized;
@@ -2216,7 +2249,11 @@ final class COD_Canvas_MCP_Recipe_Compiler
             // abierto (openByDefault, acá por id de nodo). Lo hizo notar
             // Cristóbal el 4 de octubre de 2026: «no modificar el plugin para
             // perder una característica».
-            'autoclose', 'openNodeId', 'startClosed'];
+            'autoclose', 'openNodeId', 'startClosed',
+            // acordeon, 0.3.84: el ícono del encabezado de cada pliegue, igual que showIcon e
+            // iconPosition de core/accordion-heading. iconoCerrado e iconoAbierto son el dibujo
+            // (un SVG de Medios) de cada estado; el color y el tamaño los pone la parte `icono`.
+            'showIcon', 'iconPosition', 'iconoCerrado', 'iconoAbierto'];
         // Un parámetro que ninguna interacción conoce se rechaza NOMBRÁNDOLO:
         // «interaction.behavior no es un comportamiento disponible» no le dice a
         // quien lo escribió que el problema era la clave inventada.
@@ -2251,7 +2288,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
             }
             $normalized['targetId'] = $value['targetId'];
         }
-        foreach (['autoclose', 'startClosed'] as $campo) {
+        foreach (['autoclose', 'startClosed', 'showIcon'] as $campo) {
             if (!isset($value[$campo])) {
                 continue;
             }
@@ -2259,6 +2296,34 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 return new WP_Error('cod_mcp_interaction_rule_invalid', $campo . ' es verdadero o falso.');
             }
             $normalized[$campo] = $value[$campo];
+        }
+        if (isset($value['iconPosition'])) {
+            if (!is_string($value['iconPosition']) || !in_array($value['iconPosition'], ['right', 'left'], true)) {
+                return new WP_Error('cod_mcp_interaction_rule_invalid', 'iconPosition admite: right, left (como core/accordion-heading).');
+            }
+            $normalized['iconPosition'] = $value['iconPosition'];
+        }
+        foreach (['iconoCerrado', 'iconoAbierto'] as $campo) {
+            if (!isset($value[$campo])) {
+                continue;
+            }
+            // El dibujo de cada estado: un SVG del propio sitio, igual que icono.forma. En el estado
+            // abierto además se admite "ninguno" (sin ícono mientras el pliegue está abierto).
+            if ($campo === 'iconoAbierto' && $value[$campo] === 'ninguno') {
+                $normalized[$campo] = 'ninguno';
+                continue;
+            }
+            if (!is_string($value[$campo]) || trim($value[$campo]) === '' || !$this->is_safe_link($value[$campo]) || !COD_Divisor::es_del_sitio($value[$campo])
+                || substr(strtolower((string) parse_url($value[$campo], PHP_URL_PATH)), -4) !== '.svg') {
+                return new WP_Error('cod_mcp_interaction_rule_invalid', $campo . ' tiene que ser la ruta de un SVG del propio sitio (Medios)' . ($campo === 'iconoAbierto' ? ' o "ninguno"' : '') . '.');
+            }
+            $normalized[$campo] = trim($value[$campo]);
+        }
+        if ((isset($normalized['iconPosition']) || isset($normalized['iconoCerrado']) || isset($normalized['iconoAbierto'])) && empty($normalized['showIcon'])) {
+            return new WP_Error('cod_mcp_interaction_rule_invalid', 'iconPosition, iconoCerrado e iconoAbierto sólo se entienden con showIcon: true.');
+        }
+        if (!empty($normalized['showIcon']) && $normalized['behavior'] !== 'acordeon') {
+            return new WP_Error('cod_mcp_interaction_rule_invalid', 'showIcon es del acordeon (el ícono del encabezado de cada pliegue).');
         }
         if (isset($value['openNodeId'])) {
             if (!is_string($value['openNodeId']) || !$this->is_stable_id($value['openNodeId'])) {
@@ -3926,7 +3991,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
      */
     private function normalize_whatsapp_content(array $content)
     {
-        $allowed = ['message', 'ariaLabel', 'size', 'iconPadding', 'iconColor', 'backgroundColor', 'borderRadius'];
+        $allowed = ['message', 'ariaLabel', 'size', 'iconPadding', 'iconColor', 'backgroundColor', 'borderRadius', 'iconStyle'];
         if (!$this->has_only_keys($content, $allowed) || !isset($content['message'])
             || !$this->is_plain_text($content['message'], 300)
             || (isset($content['ariaLabel']) && !$this->is_plain_text($content['ariaLabel'], 150))) {
@@ -3950,8 +4015,13 @@ final class COD_Canvas_MCP_Recipe_Compiler
         if (!is_string($border_radius) || !$this->is_safe_css_length_list($border_radius)) {
             return new WP_Error('cod_mcp_whatsapp_invalid', 'borderRadius debe ser una longitud CSS segura (p. ej. 999px, 12px, 50%).');
         }
+        $icon_style = $content['iconStyle'] ?? 'mono';
+        if (!is_string($icon_style) || !in_array($icon_style, ['mono', 'logo'], true)) {
+            return new WP_Error('cod_mcp_whatsapp_invalid', 'iconStyle admite: mono (un solo color, el de iconColor) o logo (la marca de WhatsApp con su degradado verde; iconColor pinta el contorno y el teléfono).');
+        }
         return [
             'message' => $content['message'],
+            'iconStyle' => $icon_style,
             'ariaLabel' => isset($content['ariaLabel']) && $content['ariaLabel'] !== '' ? $content['ariaLabel'] : 'Contactar por WhatsApp',
             'size' => $size,
             'iconPadding' => $icon_padding,
@@ -4179,6 +4249,8 @@ final class COD_Canvas_MCP_Recipe_Compiler
         $styles .= $this->parts_css($composition['nodes'], $design['ruleIndex']);
         // La mecanica del menu replegable, cuando nav-toggle nombra su panel.
         $styles .= $this->nav_panel_css($composition['nodes'], $design['ruleIndex']);
+        // El dibujo del ícono de cada pliegue del acordeón, cuando la regla lo pide.
+        $styles .= $this->acordeon_icono_css($composition['nodes'], $design['ruleIndex']);
         // Y la que le permite a una region quedarse pegada al bajar.
         $styles .= $this->region_sticky_css($composition['nodes'], $design['ruleIndex']);
 
@@ -4769,6 +4841,11 @@ final class COD_Canvas_MCP_Recipe_Compiler
                  */
                 $attributes['data-cod-acordeon-autoclose'] =
                     (!isset($interaction['autoclose']) || $interaction['autoclose']) ? '1' : '0';
+                // showIcon / iconPosition de core/accordion-heading: el runtime fabrica el
+                // <span> del ícono dentro del botón (parte `icono`), a la derecha o a la izquierda.
+                if (!empty($interaction['showIcon'])) {
+                    $attributes['data-cod-acordeon-icono'] = ($interaction['iconPosition'] ?? 'right') === 'left' ? 'izquierda' : 'derecha';
+                }
                 if (!empty($interaction['startClosed'])) {
                     $attributes['data-cod-acordeon-abre'] = 'ninguno';
                 } elseif (isset($interaction['openNodeId'])) {
@@ -5421,6 +5498,9 @@ final class COD_Canvas_MCP_Recipe_Compiler
         $size = (int) $content['size'];
         $icon_padding = (int) $content['iconPadding'];
         $icon_box = max(8, $size - $icon_padding * 2);
+        if (($content['iconStyle'] ?? 'mono') === 'logo') {
+            $icon = $this->whatsapp_logo_svg($node_id, $icon_box);
+        }
         // box-shadow queda fuera: wp_kses rechaza su valor multi-token dentro
         // de un atributo style inline (no es el nombre de la propiedad, es el
         // parser de valores). Cosmético, no crítico para la función del CTA.
@@ -5439,6 +5519,25 @@ final class COD_Canvas_MCP_Recipe_Compiler
         return '<a ' . $attrs . ' data-cod-whatsapp-message="' . esc_attr($content['message'])
             . '" href="' . esc_url($href) . '" target="_blank" rel="noopener noreferrer" aria-label="'
             . esc_attr($content['ariaLabel']) . '">' . $icon . '</a>';
+    }
+
+    /**
+     * La marca de WhatsApp con su degradado verde (iconStyle: logo), en SVG en línea.
+     *
+     * Tres capas: el contorno blanco de la burbuja con su cola, la burbuja verde con degradado
+     * vertical (#57d163 → #23b33a) y el teléfono blanco. El blanco es el iconColor del nodo. El
+     * identificador del degradado lleva el id del nodo para que dos botones en una página no
+     * compartan el mismo.
+     */
+    private function whatsapp_logo_svg(string $node_id, int $caja): string
+    {
+        $id = 'cod-wa-' . preg_replace('/[^A-Za-z0-9_-]/', '', $node_id);
+        return '<svg viewBox="0 0 175.216 175.552" width="' . $caja . '" height="' . $caja . '" aria-hidden="true" focusable="false">'
+            . '<defs><linearGradient id="' . $id . '" x1="85.915" x2="86.535" y1="32.567" y2="137.092" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#57d163"/><stop offset="1" stop-color="#23b33a"/></linearGradient></defs>'
+            . '<path fill="currentColor" d="m12.966 161.238 10.439-38.114a73.42 73.42 0 0 1-9.821-36.772c.017-40.556 33.021-73.55 73.578-73.55 19.681.01 38.154 7.669 52.047 21.572s21.537 32.383 21.53 52.037c-.018 40.553-33.027 73.553-73.578 73.553h-.032c-12.313-.005-24.412-3.094-35.159-8.954z"/>'
+            . '<path fill="url(#' . $id . ')" d="M87.184 25.227c-33.733 0-61.166 27.423-61.178 61.13a60.98 60.98 0 0 0 9.349 32.535l1.455 2.313-6.179 22.558 23.146-6.069 2.235 1.324c9.387 5.571 20.15 8.517 31.126 8.523h.023c33.707 0 61.14-27.426 61.153-61.135a60.75 60.75 0 0 0-17.895-43.251 60.75 60.75 0 0 0-43.235-17.928z"/>'
+            . '<path fill="currentColor" fill-rule="evenodd" d="M68.772 55.603c-1.378-3.061-2.828-3.123-4.137-3.176l-3.524-.043c-1.226 0-3.218.46-4.902 2.3s-6.435 6.287-6.435 15.332 6.588 17.785 7.506 19.013 12.718 20.381 31.405 27.75c15.529 6.124 18.689 4.906 22.061 4.6s10.877-4.447 12.408-8.74 1.532-7.971 1.073-8.74-1.685-1.226-3.525-2.146-10.877-5.367-12.562-5.981-2.91-.919-4.137.921-4.746 5.979-5.819 7.206-2.144 1.381-3.984.462-7.76-2.861-14.784-9.124c-5.465-4.873-9.154-10.891-10.228-12.73s-.114-2.835.808-3.751c.825-.824 1.838-2.147 2.759-3.22s1.224-1.84 1.836-3.065.307-2.301-.153-3.22-4.032-10.011-5.666-13.647"/>'
+            . '</svg>';
     }
 
     /**
@@ -5783,6 +5882,51 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 $css .= '.cod-canvas-region:has(' . $suyo . '){display:contents;}'
                     . '.cod-mcp-page:has(> ' . $suyo . '){display:contents;}';
                 break;
+            }
+        }
+        return $css;
+    }
+
+    /**
+     * El dibujo del ícono del acordeón (iconoCerrado / iconoAbierto), 0.3.84.
+     *
+     * Una máscara por estado sobre la parte `icono`: la forma es el SVG de Medios y el color es el
+     * background-color de la parte, así que cambiar el color o el tamaño no toca el dibujo. La
+     * dirección va como url() acá, escrita por el compilador, y no por una regla `properties` (que
+     * no admite url( a propósito). «ninguno» esconde el ícono mientras el pliegue está abierto.
+     *
+     * @param array<int, array<string, mixed>> $nodes
+     * @param array<string, array<string, mixed>> $rule_index
+     */
+    private function acordeon_icono_css(array $nodes, array $rule_index): string
+    {
+        $css = '';
+        $mascara = static function (string $ruta): string {
+            $u = str_replace(['"', '\\', "\n", "\r", ')', '('], '', esc_url_raw($ruta));
+            return '-webkit-mask-image:url("' . $u . '");mask-image:url("' . $u . '");';
+        };
+        foreach ($nodes as $node) {
+            foreach (($node['ruleIds'] ?? []) as $rule_id) {
+                $rule = $rule_index[$rule_id] ?? null;
+                if (!is_array($rule) || ($rule['kind'] ?? '') !== 'interaction') {
+                    continue;
+                }
+                $valor = $rule['value'] ?? [];
+                if (($valor['behavior'] ?? '') !== 'acordeon' || empty($valor['showIcon'])) {
+                    continue;
+                }
+                $ancla = '[data-cod-node="' . esc_attr((string) $node['id']) . '"] [data-cod-acordeon-rol="icono"]';
+                if (!empty($valor['iconoCerrado'])) {
+                    $css .= $ancla . '{' . $mascara((string) $valor['iconoCerrado']) . '}';
+                }
+                if (($valor['iconoAbierto'] ?? '') === 'ninguno') {
+                    $css .= $ancla . '[data-cod-acordeon-estado="abierto"]{visibility:hidden;}';
+                } elseif (!empty($valor['iconoAbierto'])) {
+                    $css .= $ancla . '[data-cod-acordeon-estado="abierto"]{' . $mascara((string) $valor['iconoAbierto']) . '}';
+                }
+            }
+            if (isset($node['children']) && is_array($node['children'])) {
+                $css .= $this->acordeon_icono_css($node['children'], $rule_index);
             }
         }
         return $css;
@@ -6849,7 +6993,8 @@ final class COD_Canvas_MCP_Recipe_Compiler
             'bloque' => 'core/accordion',
             'partes' => [
                 'item' => 'core/accordion-item (openByDefault)',
-                'resumen' => 'core/accordion-heading (title, level, showIcon, iconPosition)',
+                'resumen' => 'core/accordion-heading (title, level)',
+                'icono' => 'core/accordion-heading (showIcon, iconPosition): la regla interaction los lleva con los mismos nombres',
                 'panel' => 'core/accordion-panel',
             ],
             'notas' => 'Misma estructura accesible: botón con aria-expanded y aria-controls, panel con aria-labelledby, estado abierto en el ítem, y autoclose con el mismo valor por omisión. Una página puede traer el acordeón como bloques de Gutenberg y recibir igual el formato del lienzo: las partes alcanzan tanto nuestros atributos data-cod-acordeon-* como las clases wp-block-accordion-*.',

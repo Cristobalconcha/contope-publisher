@@ -74,6 +74,8 @@ final class COD_Canvas_Document_Sanitizer
         'td',
         'iframe',
         'defs',
+        'lineargradient',
+        'stop',
         'symbol',
         'use',
         'text',
@@ -549,6 +551,9 @@ final class COD_Canvas_Document_Sanitizer
             'polygon' => ['points' => true, 'fill' => true, 'stroke' => true],
             'g' => ['fill' => true, 'fill-rule' => true, 'clip-rule' => true, 'stroke' => true, 'transform' => true],
             'defs' => [],
+            // El degradado del logo de WhatsApp (iconStyle: logo): sólo lo mínimo para un degradado lineal.
+            'lineargradient' => ['id' => true, 'x1' => true, 'y1' => true, 'x2' => true, 'y2' => true, 'gradientunits' => true],
+            'stop' => ['offset' => true, 'stop-color' => true, 'stop-opacity' => true],
             'symbol' => ['viewbox' => true, 'fill' => true],
             'use' => ['href' => true, 'xlink:href' => true, 'x' => true, 'y' => true, 'width' => true, 'height' => true, 'fill' => true, 'transform' => true],
             'text' => ['x' => true, 'y' => true, 'dx' => true, 'dy' => true, 'font-family' => true, 'font-weight' => true, 'font-size' => true, 'font-style' => true, 'fill' => true, 'text-anchor' => true, 'letter-spacing' => true, 'transform' => true],

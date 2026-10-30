@@ -718,6 +718,12 @@ CSS;
 /* Por omisión, con especificidad cero: la composición los pisa con cualquier regla. */
 :where({$r} [data-cod-acordeon-rol="resumen"]){display:block;width:100%;box-sizing:border-box;margin:0;padding-top:0;padding-right:0;padding-bottom:0;padding-left:0;border-top-width:0;border-right-width:0;border-bottom-width:0;border-left-width:0;border-top-style:none;border-right-style:none;border-bottom-style:none;border-left-style:none;background-color:transparent;color:inherit;font:inherit;text-align:start;cursor:pointer;}
 :where({$r} [data-cod-acordeon-rol="resumen"]:focus-visible){outline-width:2px;outline-style:solid;outline-color:currentColor;outline-offset:2px;}
+
+/* El ícono del encabezado (showIcon): una caja que se dibuja con una máscara, así que su color es su background-color. Por omisión un «+» que pasa a «−». */
+:where({$r}[data-cod-acordeon-icono] [data-cod-acordeon-rol="resumen"]){display:flex;align-items:center;gap:.75em;}
+:where({$r}[data-cod-acordeon-icono] [data-cod-acordeon-rol="resumen"] > :not([data-cod-acordeon-rol="icono"])){flex:1 1 auto;min-width:0;}
+:where({$r} [data-cod-acordeon-rol="icono"]){display:inline-block;flex:0 0 auto;width:1em;height:1em;background-color:currentColor;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:center;mask-position:center;-webkit-mask-size:contain;mask-size:contain;-webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M11 5h2v14h-2zM5 11h14v2H5z'/%3E%3C/svg%3E");mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M11 5h2v14h-2zM5 11h14v2H5z'/%3E%3C/svg%3E");}
+:where({$r} [data-cod-acordeon-rol="icono"][data-cod-acordeon-estado="abierto"]){-webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 11h14v2H5z'/%3E%3C/svg%3E");mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 11h14v2H5z'/%3E%3C/svg%3E");}
 CSS;
     }
     public static function wa_mensaje_css(?string $html = null): string

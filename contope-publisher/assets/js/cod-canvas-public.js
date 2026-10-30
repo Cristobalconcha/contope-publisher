@@ -2021,7 +2021,15 @@
         var numero = contadorAcordeon;
         var botones = [];
         var paneles = [];
+        var iconos = [];
         var deshacer = [];
+
+        // El ícono lleva el mismo estado que su botón: lo lee la parte `icono` (scope.state="current").
+        function sincronizarIconos() {
+            for (var i = 0; i < botones.length; i++) {
+                if (iconos[i]) iconos[i].setAttribute('data-cod-acordeon-estado', botones[i].getAttribute('data-cod-acordeon-estado') || 'cerrado');
+            }
+        }
 
         formas.forEach(function (forma, n) {
             var idPanel = 'cod-acordeon-' + numero + '-panel-' + n;
@@ -2038,6 +2046,20 @@
             boton.setAttribute('aria-controls', idPanel);
             forma.item.insertBefore(boton, forma.resumen);
             boton.appendChild(forma.resumen);
+
+            // El ícono del encabezado (showIcon / iconPosition de core/accordion-heading). Es un span
+            // vacío que se dibuja con una máscara; el compilador emite el dibujo de cada estado y la
+            // composición le pone color y tamaño por la parte `icono`.
+            var posIcono = root.getAttribute('data-cod-acordeon-icono');
+            if (posIcono) {
+                var icono = doc.createElement('span');
+                icono.className = 'cod-acordeon__icono';
+                icono.setAttribute('data-cod-acordeon-rol', 'icono');
+                icono.setAttribute('data-cod-acordeon-estado', 'cerrado');
+                icono.setAttribute('aria-hidden', 'true');
+                if (posIcono === 'izquierda') boton.insertBefore(icono, forma.resumen); else boton.appendChild(icono);
+                iconos[n] = icono;
+            }
 
             // El panel envuelve al resto. role="region" para que un lector de
             // pantalla lo anuncie como una zona con nombre: el del botón.
@@ -2066,6 +2088,7 @@
                 paneles[i].setAttribute('data-cod-acordeon-visible', abierto ? 'true' : 'false');
                 paneles[i].parentNode.setAttribute('data-cod-acordeon-estado', abierto ? 'abierto' : 'cerrado');
             }
+            sincronizarIconos();
         }
 
         function cerrarTodo() {
@@ -2087,6 +2110,7 @@
             botones[n].setAttribute('data-cod-acordeon-estado', abierto ? 'cerrado' : 'abierto');
             paneles[n].setAttribute('data-cod-acordeon-visible', abierto ? 'false' : 'true');
             paneles[n].parentNode.setAttribute('data-cod-acordeon-estado', abierto ? 'cerrado' : 'abierto');
+            sincronizarIconos();
         }
 
         botones.forEach(function (boton, n) {
