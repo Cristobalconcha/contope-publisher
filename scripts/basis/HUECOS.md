@@ -104,7 +104,65 @@ Ver la tabla de la última corrida de `comparar-vivo.mjs` (abajo). Lo que no es 
 
 ## Qué queda (última corrida)
 
-<<TABLA>>
+Corrida del 30-oct-2026 (original en vivo, local en `wp-local-basis`, plugin 0.3.84), con `comparar-vivo.mjs todas todos`. «Cajas» son sobre todo
+emparejamientos imposibles (el `header`/`footer` de ContOpe contra las `et_pb_section` de Divi, los controles internos de Mapbox, los campos de
+Gravity contra los de Orugantt, el divisor de la sección que Divi dibuja con fondo SVG y ContOpe con un SVG en línea); las láminas confirman que no se ven.
+
+| página | ancho | alto original / local | diferencias | textos con diferencia | textos que faltan o sobran | imágenes | cajas |
+|---|---|---|---|---|---|---|---|
+| inicio | 1440 | 4347 / 4352 (+5) | **12** | 3 | 1 | 0 | 8 |
+| inicio | 768 | 5827 / 5804 (-23) | **16** | 6 | 1 | 0 | 9 |
+| inicio | 393 | 5776 / 5770 (-6) | **14** | 4 | 1 | 1 | 8 |
+| basis-carpas-industriales | 1440 | 950 / 950 (+0) | **14** | 2 | 5 | 0 | 7 |
+| basis-carpas-industriales | 768 | 950 / 950 (+0) | **16** | 4 | 5 | 0 | 7 |
+| basis-carpas-industriales | 393 | 852 / 852 (+0) | **17** | 4 | 5 | 1 | 7 |
+| preguntas-frecuentes | 1440 | 1754 / 1753 (-1) | **7** | 2 | 0 | 0 | 5 |
+| preguntas-frecuentes | 768 | 2661 / 2649 (-12) | **9** | 4 | 0 | 0 | 5 |
+| preguntas-frecuentes | 393 | 3305 / 3293 (-12) | **9** | 4 | 0 | 1 | 4 |
+| contactos | 1440 | 1354 / 1285 (-69) | **26** | 5 | 7 | 0 | 14 |
+| contactos | 768 | 2313 / 2241 (-72) | **27** | 6 | 7 | 0 | 14 |
+| contactos | 393 | 2653 / 2568 (-85) | **28** | 6 | 7 | 1 | 14 |
+
+Diferencias de texto e imagen (sin las de cajas, que son sobre todo emparejamientos imposibles de implementación), agrupadas:
+
+- «Cuente con todas las alternativas para gesti» (p/p): x -8 — inicio 1440, inicio 768
+- «Av 18 de Septiembre sn Hijuela 2 Fundo San R» (p/div): y +15 (antes +5) — inicio 1440, inicio 768, basis-carpas-industriales 1440, basis-carpas-industriales 768, preguntas-frecuentes 1440, preguntas-frecuentes 768, contactos 1440, contactos 768
+- «Diseño y desarrollo» (p/p): x -10 · y +5 (antes +15) — inicio 1440, inicio 768, inicio 393, basis-carpas-industriales 1440, basis-carpas-industriales 768, basis-carpas-industriales 393, preguntas-frecuentes 1440, preguntas-frecuentes 768, preguntas-frecuentes 393, contactos 1440, contactos 768, contactos 393
+- falta en el local: «Reproductor de vídeo» — inicio 1440, inicio 768, inicio 393
+- «Cotizaciones / Contactos» (a/a): y +14 (antes 0) — inicio 768, inicio 393, basis-carpas-industriales 768, basis-carpas-industriales 393, preguntas-frecuentes 768, preguntas-frecuentes 393, contactos 768, contactos 393
+- «La respuesta eficiente a su demanda de bodeg» (h1/h1): y 0 (antes +14) — inicio 768, inicio 393
+- «Descubre Más Sobre Nuestras Carpas» (h2/h2): y -13 (antes -4) — inicio 768
+- «Av 18 de Septiembre sn Hijuela 2 Fundo San R» (p/div): x +7 · y +14 (antes +4) — inicio 393, basis-carpas-industriales 393, preguntas-frecuentes 393, contactos 393
+- imagen Altfx-2-Calado.png: x -95 — inicio 393, basis-carpas-industriales 393, preguntas-frecuentes 393, contactos 393
+- falta en el local: «Buscar» — basis-carpas-industriales 1440, basis-carpas-industriales 768, basis-carpas-industriales 393
+- falta en el local: «Recent Posts» — basis-carpas-industriales 1440, basis-carpas-industriales 768, basis-carpas-industriales 393
+- falta en el local: «Hello world!» — basis-carpas-industriales 1440, basis-carpas-industriales 768, basis-carpas-industriales 393
+- falta en el local: «Recent Comments» — basis-carpas-industriales 1440, basis-carpas-industriales 768, basis-carpas-industriales 393
+- falta en el local: «No hay comentarios que mostrar.» — basis-carpas-industriales 1440, basis-carpas-industriales 768, basis-carpas-industriales 393
+- «BASIS: Carpas Industriales» (h1/h1): y 0 (antes +14) — basis-carpas-industriales 768, basis-carpas-industriales 393
+- «Preguntas Frecuentes» (h1/h1): y 0 (antes +14) — preguntas-frecuentes 768, preguntas-frecuentes 393
+
+Lo que queda, agrupado (de verdad visible o de verdad distinto):
+
+- **Contactos, alto −69 / −72 / −85 px (≈5%).** El formulario de Orugantt Forms es más compacto que el de Gravity en cuatro cosas que el contrato de
+  variables todavía no expresa: (1) la casilla de consentimiento: Gravity la dibuja con 24 px de relleno a la izquierda y el texto cae en 3 renglones
+  (59 px) contra 2 (39 px) aquí; (2) la descripción tiene 10 px de relleno arriba y abajo y 8 px de margen; (3) el contador mide 39 px (relleno de 10);
+  (4) el pie del formulario lleva 16 px de relleno y 6 de margen. Cada una es una variable más del contrato (`ayudaRelleno`, `contadorRelleno`,
+  `pieRelleno`, `opcionRelleno`); no se agregaron para no seguir ampliando el runtime de otro repositorio sin que Cristóbal lo mire primero.
+  El texto del contador («0/600» a la derecha contra «0 de 600 caracteres máximos» a la izquierda) es del runtime (ver C).
+- **Inicio, alto +5 / −23 / −6 px; pie +5 px.** Las posiciones verticales de la dirección y del crédito del pie quedan 5 a 15 px más abajo
+  (el mini mapa y su dirección se alinean al centro en el original y al borde superior aquí) y el título del aviso naranja 13 px más arriba a 768.
+  No se alcanzó a medir por qué; es lo único de Inicio que se ve si uno mira con regla.
+- **Dirección del pie a 393 (x +7) y crédito a 393 (la imagen del crédito queda 95 px más a la izquierda):** a 393 el original apila el texto
+  y la imagen del crédito de otra forma; el transcriptor ordena los módulos que se pisan por su posición a escritorio.
+- **«Cuente con todas las alternativas…» (x −8 / −6):** el párrafo de «Opciones comerciales» queda 8 px a la izquierda; sin explicar.
+- **Encabezado a 768 y 393:** el enlace «Cotizaciones / Contactos» queda recortado en los dos sitios (la comparación lo ve 14 px más abajo en el local;
+  no se ve en pantalla).
+- **«Reproductor de vídeo»:** texto de accesibilidad de MediaElement (el reproductor de Divi); el video de fondo local no lo necesita.
+- **Página `basis-carpas-industriales`:** el buscador, «Recent Posts», «Hello world!», «Recent Comments» y su texto faltan (hueco A).
+- **Contactos, «*» y «Enviar mensaje»:** la comparación los lista «sobra» porque el original dibuja el asterisco en otro elemento y su botón es un
+  `<input>` (su texto está en `value`); están en las dos páginas.
+
 
 ## Medios
 
