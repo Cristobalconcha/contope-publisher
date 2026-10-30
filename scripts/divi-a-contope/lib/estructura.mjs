@@ -109,6 +109,12 @@ function transcribirColumna(ctx, cD, cM, ubic, anchoD, anchoM) {
         const interior = col.caja.w - rr - ll;
         const off = mod.caja.x - (col.caja.x + ll);
         if (mod.caja.w >= interior - 4 && Math.abs(off) <= 2) return null;
+        // Sin ancho máximo propio (anchoMaximo «none»): el módulo es más angosto porque Divi le puso MÁRGENES (a 768 y 393 el título de Contactos
+        // tiene 30px a cada lado) y su caja se estira hasta ellos. Se escriben esos márgenes, no un ancho: «auto» lo encogería a su texto.
+        if (mod.estiloCaja && mod.estiloCaja.anchoMaximo === 'none') {
+          const fin = Math.max(0, Math.round(interior - off - mod.caja.w));
+          if (off > 2 || fin > 2) return { 'margin-inline-start': pxs(Math.max(0, off)), 'margin-inline-end': pxs(fin) };
+        }
         const centrado = Math.abs(off - (interior - mod.caja.w) / 2) < 3;
         return { 'max-width': pxs(mod.caja.w), ...(centrado ? { 'margin-inline-start': 'auto', 'margin-inline-end': 'auto' } : (off > 2 ? { 'margin-inline-start': pxs(off) } : {})) };
       };
@@ -119,7 +125,7 @@ function transcribirColumna(ctx, cD, cM, ubic, anchoD, anchoM) {
       if (decl || declM) for (const n of nodos) n.ruleIds = [...(n.ruleIds || []), ...ctx.reg.propiedades(decl || {}, { mobile: declM || {} }, { prefijo: 'anch' })];
     }
     if (rac) {
-      (rac.nodos ||= []).push(...nodos);
+      (rac.partes ||= []).push({ x: mD.caja.x, nodos });  // el orden visual (por su posición a escritorio), no el del código: Divi los pisa y los acomoda de lado
       if (ultimoRac) {
         const primero = mods[rac.idx[0]]; const ultimo = mods[i];
         const derecha = (ultimo.caja.x + ultimo.caja.w) >= cD.caja.x + cD.caja.w - 2 && ultimo.caja.w < cD.caja.w - 4;
@@ -127,7 +133,7 @@ function transcribirColumna(ctx, cD, cM, ubic, anchoD, anchoM) {
         const declR = { display: 'flex', 'flex-wrap': 'wrap', 'align-items': 'center', gap: '20px', 'justify-content': derecha ? 'flex-end' : 'flex-start' };
         const declRM = cM && enFilaM ? { 'flex-direction': 'column', 'align-items': derecha ? 'flex-end' : 'flex-start', gap: '0px' } : {};
         ctx.avisar({ ...u, modulo: 'columna', clase: 'módulos superpuestos', severidad: 'aproximado', motivo: `${rac.idx.length} módulos con cajas que se pisan (lado a lado en el original): se agrupan en una fila con separación de 20px (inferida)` });
-        hijos.push(ctx.nodo('group', [...ctx.reg.propiedades(declR, { mobile: declRM }, { prefijo: 'racimo' })], undefined, rac.nodos));
+        hijos.push(ctx.nodo('group', [...ctx.reg.propiedades(declR, { mobile: declRM }, { prefijo: 'racimo' })], undefined, rac.partes.slice().sort((a, b) => a.x - b.x).flatMap((p) => p.nodos)));
       }
       return;
     }

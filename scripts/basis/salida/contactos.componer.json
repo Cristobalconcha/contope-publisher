@@ -428,7 +428,7 @@
         }
       },
       {
-        "id": "anch-c96c9f",
+        "id": "anch-f184a0",
         "kind": "properties",
         "scope": {
           "breakpoint": "mobile",
@@ -446,9 +446,8 @@
         "status": "reviewed",
         "value": {
           "declarations": {
-            "max-width": "166px",
-            "margin-inline-start": "auto",
-            "margin-inline-end": "auto"
+            "margin-inline-start": "30px",
+            "margin-inline-end": "30px"
           }
         }
       },
@@ -625,7 +624,7 @@
         }
       },
       {
-        "id": "anch-54ff3d",
+        "id": "anch-1fa110",
         "kind": "properties",
         "scope": {
           "breakpoint": "tablet",
@@ -643,9 +642,8 @@
         "status": "reviewed",
         "value": {
           "declarations": {
-            "max-width": "506px",
-            "margin-inline-start": "auto",
-            "margin-inline-end": "auto"
+            "margin-inline-start": "30px",
+            "margin-inline-end": "30px"
           }
         }
       }
@@ -691,9 +689,9 @@
                       "c-5ba4fe",
                       "mg-1a56c0",
                       "mg-cb0416",
-                      "anch-c96c9f",
+                      "anch-f184a0",
                       "mg-d782eb",
-                      "anch-54ff3d"
+                      "anch-1fa110"
                     ],
                     "content": {
                       "text": "Contactos",

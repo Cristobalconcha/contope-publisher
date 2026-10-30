@@ -702,6 +702,18 @@
                     ],
                     "children": [
                       {
+                        "id": "paragraph-83",
+                        "kind": "paragraph",
+                        "ruleIds": [
+                          "t-01952a",
+                          "c-4737c4",
+                          "mg-a343db"
+                        ],
+                        "content": {
+                          "text": "Diseño y\ndesarrollo"
+                        }
+                      },
+                      {
                         "id": "image-82",
                         "kind": "image",
                         "ruleIds": [
@@ -712,18 +724,6 @@
                         "content": {
                           "assetUrl": "/wp-content/uploads/2025/07/Altfx-2-Calado.png",
                           "alt": ""
-                        }
-                      },
-                      {
-                        "id": "paragraph-83",
-                        "kind": "paragraph",
-                        "ruleIds": [
-                          "t-01952a",
-                          "c-4737c4",
-                          "mg-a343db"
-                        ],
-                        "content": {
-                          "text": "Diseño y\ndesarrollo"
                         }
                       }
                     ]
