@@ -72,8 +72,8 @@
     "seccion": 1,
     "modulo": "sección",
     "clase": "degradado",
-    "severidad": "aproximado",
-    "motivo": "degradado «linear-gradient(rgb(12, 113, 195) 0%, rgba(255, 255, 255, 0) 100%)» aplanado en un velo plano #0C71C3 al 50% (el set de diseño no usa degradados)"
+    "severidad": "ok",
+    "motivo": "degradado linear → backgroundGradient (2 paradas, encima de la foto)"
   },
   {
     "pagina": "inicio",
@@ -150,8 +150,8 @@
     "seccion": 5,
     "modulo": "sección",
     "clase": "degradado",
-    "severidad": "aproximado",
-    "motivo": "degradado «linear-gradient(65deg, rgb(0, 0, 0) 0%, rgba(255, 255, 255, 0) 100%)» aplanado en un velo plano #000000 al 50% (el set de diseño no usa degradados)"
+    "severidad": "ok",
+    "motivo": "degradado linear → backgroundGradient (2 paradas, 65deg)"
   },
   {
     "pagina": "inicio",

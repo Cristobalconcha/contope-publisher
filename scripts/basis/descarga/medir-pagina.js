@@ -134,6 +134,10 @@
       relleno: c.padding, pegajosa: cl.includes('et_pb_sticky_module') || c.position === 'sticky' || c.position === 'fixed',
       paralaje: !!s.querySelector('.et_parallax_bg'), conVideoFondo: cl.includes('et_pb_section_video'),
     };
+    // Trama y máscara de fondo de Divi (Design → Background): son elementos hijos de la sección; sólo importa el que tiene imagen.
+    const fondoExtra = (sel) => { const e = s.querySelector(':scope > ' + sel); if (!e) return null; const x = cs(e); const img = x.backgroundImage !== 'none' ? x.backgroundImage : (x.maskImage && x.maskImage !== 'none' ? x.maskImage : (x.webkitMaskImage || 'none')); return { imagen: img.slice(0, 400), color: x.backgroundColor, tamano: x.backgroundSize, posicion: x.backgroundPosition, repite: x.backgroundRepeat, opacidad: x.opacity }; };
+    sec.fondoTrama = fondoExtra('.et_pb_background_pattern');
+    sec.fondoMascara = fondoExtra('.et_pb_background_mask');
     const vf = s.querySelector('.et_pb_section_video_bg video');
     if (vf) sec.videoFondo = { fuentes: q('source', vf).map((x) => abs(x.src)).concat(vf.src ? [abs(vf.src)] : []), autoplay: vf.autoplay, bucle: vf.loop, silenciado: vf.muted, poster: abs(vf.poster), caja: rect(vf), objectFit: cs(vf).objectFit };
     sec.divisores = q(':scope > .et_pb_top_inside_divider, :scope > .et_pb_bottom_inside_divider', s).map((d) => ({ cual: d.classList.contains('et_pb_top_inside_divider') ? 'arriba' : 'abajo', clases: [...d.classList].join(' '), alto: cs(d).height, fondo: cs(d).backgroundImage, fondoColor: cs(d).backgroundColor }));

@@ -1,6 +1,6 @@
 # Basis · informe del transcriptor Divi → ContOpe
 
-faltante: 0 · sin-transcribir: 2 · aproximado: 23 · ok: 28
+faltante: 0 · sin-transcribir: 2 · aproximado: 21 · ok: 30
 
 «faltante» = un archivo que el original usa y no está en la descarga · «sin-transcribir» = un módulo o patrón que el transcriptor no supo convertir · «aproximado» = se convirtió con una diferencia conocida · «ok» = informativo.
 
@@ -13,12 +13,10 @@ faltante: 0 · sin-transcribir: 2 · aproximado: 23 · ok: 28
 
 - inicio › encabezado › sección 0 › fila 1 › col 0 › code › logo-wsp-sticky: botón fijo de WhatsApp → nodo `whatsapp` (el ícono de ContOpe es de un solo color; el original era verde con degradado)
 - inicio › encabezado › sección 0 › fila 1 › col 0 › code › logo-faq-sticky: botón fijo con ícono SVG reconocido (help) → enlace con ícono de Material Symbols
-- inicio › contenido › sección 1 › sección › degradado: degradado «linear-gradient(rgb(12, 113, 195) 0%, rgba(255, 255, 255, 0) 100%)» aplanado en un velo plano #0C71C3 al 50% (el set de diseño no usa degradados)
 - inicio › contenido › sección 1 › fila 0 › col 0 › button › «Explorar Soluciones»: el botón «Explorar Soluciones» no lleva a ninguna parte en el original (href «»): queda como botón sin destino
 - inicio › contenido › sección 3 › fila 1 › col 0 › blurb › FontAwesome U+f217: ícono FontAwesome U+f217 → Material Symbols «add_shopping_cart» (contorno; el original era relleno: Material no trae el estilo relleno en el set del sitio)
 - inicio › contenido › sección 3 › fila 1 › col 1 › blurb › FontAwesome U+f494: ícono FontAwesome U+f494 → Material Symbols «warehouse» (contorno; el original era relleno: Material no trae el estilo relleno en el set del sitio)
 - inicio › contenido › sección 3 › fila 1 › col 2 › blurb › ETmodules U+e0e1: ícono ETmodules U+e0e1 → Material Symbols «hourglass_empty» (contorno; el original era relleno: Material no trae el estilo relleno en el set del sitio)
-- inicio › contenido › sección 5 › sección › degradado: degradado «linear-gradient(65deg, rgb(0, 0, 0) 0%, rgba(255, 255, 255, 0) 100%)» aplanado en un velo plano #000000 al 50% (el set de diseño no usa degradados)
 - inicio › contenido › sección 5 › fila 0 › col 0 › button › «Solicita Información»: el botón «Solicita Información» no lleva a ninguna parte en el original (href «#»): queda como botón sin destino
 - inicio › pie › sección 6 › fila 1 › col 2 › columna › módulos superpuestos: 2 módulos con cajas que se pisan (lado a lado en el original): se agrupan en una fila con separación de 20px (inferida)
 - basis-carpas-industriales › encabezado › sección 0 › fila 1 › col 0 › code › logo-wsp-sticky: botón fijo de WhatsApp → nodo `whatsapp` (el ícono de ContOpe es de un solo color; el original era verde con degradado)
@@ -41,8 +39,10 @@ faltante: 0 · sin-transcribir: 2 · aproximado: 23 · ok: 28
 - inicio › pie › sección 6 › fila 1 › col 2 › image › carga diferida: imagen sin cargar al medir (1440): se toma su caja de la medición complementaria
 - inicio › encabezado › sección 0 › sección › et_pb_sticky_module: encabezado pegajoso en Divi → regla «posicion» pegada arriba
 - inicio › encabezado › sección 0 › fila 0 › col 1 › text › desfase: el primer módulo de la columna está desfasado 5px (escritorio) / 5px (celular) del borde de su contenido: se aplica como margen superior
+- inicio › contenido › sección 1 › sección › degradado: degradado linear → backgroundGradient (2 paradas, encima de la foto)
 - inicio › contenido › sección 4 › sección › et_pb_section_video: video de fondo → nodo `video` ambiental detrás del contenido (cubre la sección)
 - inicio › contenido › sección 4 › fila 0 › col 0 › text › relleno del módulo: relleno propio del módulo (arriba 30, derecha 30, abajo 30, izquierda 30 px a 1440) aplicado a sus nodos
+- inicio › contenido › sección 5 › sección › degradado: degradado linear → backgroundGradient (2 paradas, 65deg)
 - inicio › pie › sección 6 › fila 0 › fila › vacía: fila vacía (sin módulos y de alto ~0): se omite
 - inicio › pie › sección 6 › fila 1 › col 0 › image › desfase: el primer módulo de la columna está desfasado -28px (escritorio) / -28px (celular) del borde de su contenido: se aplica como margen superior
 - inicio › pie › sección 6 › fila 1 › col 1 › code › mapbox: mini mapa de Mapbox → grupo con conducta `mapa` (necesita la clave pública de Mapbox en Configuración para abrir el grande)

@@ -268,7 +268,8 @@ export function transcribirSeccion(ctx, sD, sM, indice, vw) {
   }
   const sup = superficieSeccion(ctx.reg, sD, { urlLocal: (u) => ctx.url(u, ubic), sinImagen });
   ids.push(...sup.ids);
-  for (const n of sup.notas) ctx.avisar({ ...ubic, modulo: 'sección', clase: 'degradado', severidad: 'aproximado', motivo: n });
+  for (const n of sup.notas) ctx.avisar({ ...ubic, modulo: 'sección', clase: 'degradado', severidad: n.severidad, motivo: n.motivo });
+  avisarTramaYMascara(ctx, sD, ubic);
   const hijos = [];
   (sD.filas || []).forEach((fD, j) => {
     const fM = sM?.filas?.[j] || null;
@@ -289,6 +290,24 @@ export function transcribirSeccion(ctx, sD, sM, indice, vw) {
   const nodo = ctx.nodo(kind, conMovimiento(ctx, anim, ids), undefined, hijos);
   if (ctx.perfil.marcadores?.[`${ctx.pagina}:${indice}`]) nodo.marker = ctx.perfil.marcadores[`${ctx.pagina}:${indice}`];
   return nodo;
+}
+
+/**
+ * Trama y máscara de fondo de Divi (et_pb_background_pattern y et_pb_background_mask).
+ * Divi deja el elemento aunque no se use, así que sólo cuenta el que tiene una imagen
+ * de verdad. El dibujo de Divi viene incrustado (un SVG dentro del CSS) y no es un
+ * recurso de Medios, así que NO se traduce solo: se avisa con el camino exacto, que es
+ * elegir una forma del sitio para backgroundPattern o backgroundMask (las mismas del divisor).
+ */
+function avisarTramaYMascara(ctx, sD, ubic) {
+  for (const [clave, nombre, campo] of [['fondoTrama', 'trama', 'backgroundPattern'], ['fondoMascara', 'máscara', 'backgroundMask']]) {
+    const e = sD[clave];
+    if (!e || !e.imagen || e.imagen === 'none') continue;
+    ctx.avisar({
+      ...ubic, modulo: 'sección', clase: `et_pb_background_${clave === 'fondoTrama' ? 'pattern' : 'mask'}`, severidad: 'aproximado',
+      motivo: `la sección tiene ${nombre} de fondo de Divi (${String(e.imagen).slice(0, 60)}…) sin equivalente automático: componerla con ${campo} eligiendo una forma de Medios y el color ${e.color || ''}`,
+    });
+  }
 }
 
 export function transcribirMedicion(ctx, medD, medM) {

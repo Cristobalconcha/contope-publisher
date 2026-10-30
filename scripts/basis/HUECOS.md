@@ -5,7 +5,7 @@ Nada de esto se rodeó con CSS a mano: cada punto es un hueco del plugin o una d
 
 ## Huecos del plugin (lo que el catálogo de ContOpe no alcanza)
 
-Resueltos en esta rama, con su prueba (`scripts/probar-lista-anidada.php`, 12 comprobaciones, TODO OK):
+Resueltos en esta rama, con sus pruebas (`scripts/probar-lista-anidada.php` y `scripts/probar-fondos.php`, TODO OK):
 
 1. **Saltos de línea en títulos, párrafos e ítems.** El nodo de texto escapaba todo y un `<br>` del original se perdía
    (el título de la portada se parte a propósito en «eficiente / a su demanda»). Ahora un salto de línea del texto plano se
@@ -16,13 +16,22 @@ Resueltos en esta rama, con su prueba (`scripts/probar-lista-anidada.php`, 12 co
    `width/height:100%` a la imagen del mini. *Ojo:* sin clave de Mapbox el plugin ni siquiera monta la conducta, así que
    esto sólo se nota con clave (ver 6).
 
+4. **Fondos: degradado, trama y máscara (RESUELTO, plugin 0.3.83).** El original usa dos degradados: la portada (azul →
+   transparente sobre la foto) y el aviso naranja (negro → transparente a 65°). El plugin los excluía porque «nada de
+   degradados» es una decisión del set de diseño de Santa Luisa y se había escrito en el plugin como si fuera de todos; eso
+   se corrigió. La regla `surface` (el módulo de fondos) ahora lleva `backgroundGradient` (lineal o radial, ángulo,
+   2 a 8 paradas, encima o debajo de la foto con `gradientPlacement`), `backgroundPattern` (trama recoloreable) y
+   `backgroundMask` (máscara con forma), además de color plano, imagen y velo. El video de fondo sigue siendo el nodo `video`
+   ambiental. El transcriptor traduce los degradados a esa estructura (ya no los aplana) y avisa `aproximado` sólo de lo que
+   no cabe. Medido en el sitio local: el `background-image` computado de la portada y del aviso es idéntico al del original
+   (`scripts/basis/capturar-fondos.mjs` → `fondos-medidas.json`). Prueba: `scripts/probar-fondos.php` y
+   `scripts/probar-transcriptor-fondos.mjs`. El original de Basis **no usa** trama ni máscara de Divi (las clases existen en
+   su CSS pero ningún elemento las lleva); la medición ahora las registra por si otro sitio sí (`fondoTrama`, `fondoMascara`)
+   y el transcriptor avisa cuando una sección las tiene, sin traducirlas solas (su dibujo es un SVG incrustado, no un recurso).
+   Las formas de la máscara y de la trama son las **mismas** de Medios que se eligen para un divisor.
+
 Sin resolver (anotados, no rodeados):
 
-4. **Degradados de fondo.** El original usa dos: la portada (azul → transparente sobre la foto) y el aviso naranja
-   (negro → transparente a 65°). El set de diseño no usa degradados, así que se aplanan en un velo de opacidad pareja
-   (50%). Diferencia visible: la portada queda más azul abajo y el bloque naranja final sale marrón en vez de naranja con
-   un borde oscuro. Un interruptor en el perfil (`degradados: conservar`) los pasaría por la regla `properties`
-   (`background-image` está permitido); no se activó porque Cristóbal fijó «nada de degradados». **Decisión suya.**
 5. **Ícono de los pliegues.** Divi pone un «+» gris en un círculo (glifo ETmodules) en cada pliegue; las partes del
    acordeón no admiten la regla `icono`, así que los pliegues salen sin ese ícono. También se probó que el color del
    título del pliegue abierto (#333 contra #666 cerrado) no cambia con `state: current` sobre la parte `resumen`.
@@ -62,8 +71,8 @@ el transcriptor lo avisa como «faltante» y el perfil admite un reemplazo (`ree
 
 ## Diferencias visibles que quedan contra el original
 
-- Portada: velo azul plano (ver 4) y la foto de fondo un poco distinta a 393 de ancho.
-- Aviso naranja de cierre: marrón en lugar de naranja con degradado negro (ver 4).
+- Portada: el degradado ya es el del original (ver 4). Queda una diferencia que NO se explicó: en la captura de página completa del original la foto termina antes del fondo de la sección (hacia el 84% de la altura a 1440 y el 77% a 393) y debajo se ve sólo el degradado sobre blanco; el estilo computado del original dice `cover` y la foto local la cubre entera. Puede ser un artefacto de esa captura; no se pudo comprobar porque el hosting original no responde. También a 393 la foto se recorta un poco distinto.
+- Aviso naranja de cierre: ya con su degradado negro → transparente a 65° sobre el naranja, igual que el original (ver 4). El original declara `background-size: cover` y aquí queda `auto`: sin imagen no cambia nada, la capa llena la caja.
 - «Características»: con el video original de fondo y el relleno del módulo (30 px) ya aplicado: el título, la foto y el panel calzan. Falta la sangría de las sublistas: el `<ul>` anidado trae la del navegador (40 px) y el original usa ~1 em; la regla `properties` sólo alcanza la lista de primer nivel (hueco: no hay forma de estilar el `<ul>` interior).
 - Pliegues de Preguntas frecuentes: sin el ícono «+» y el título del pliegue abierto no se oscurece (ver 5).
 - Contactos: mapa estático (ver 6) y formulario con otro dibujo de campos (ver 11).
@@ -100,9 +109,9 @@ de las imágenes diferidas antes de medir (sin probar: no se volvió a pedir nad
 
 ## Para subirlo
 
-1. Subdominio de prueba en el hosting (p. ej. `nuevo.basisbodegas.com`) con WordPress, plugin ContOpe 0.3.82+ (con las dos
-   ampliaciones de esta rama), Orugantt Forms, CookieAdmin y los temas `contope-canvas` y `contope-basis`.
-2. Copiar `uploads/2025/07/*` y `uploads/divisores/*`; bajar de nuevo los originales marcados arriba.
+1. Subdominio de prueba en el hosting (p. ej. `nuevo.basisbodegas.com`) con WordPress, plugin ContOpe 0.3.83+ (trae el módulo de fondos y
+   las dos ampliaciones chicas de esta rama), Orugantt Forms, CookieAdmin y los temas `contope-canvas` y `contope-basis`.
+2. Copiar `uploads/2025/07/*` y `uploads/divisores/*` y `uploads/formas/*` (las formas de máscara y trama, que instala `scripts/instalar-formas-de-divisor.php`); bajar de nuevo los originales marcados arriba.
 3. `SITIO=… AUTH_FILE=… node scripts/basis/aplicar.mjs` (todo por el canal MCP y REST; no sube ningún guion).
 4. Poner la clave de Mapbox, la casilla real de destino del formulario `contacto-basis` (hoy apagado, con
    `PENDIENTE-DESTINO@basis.invalid`) y SMTP; revisar los `[PENDIENTE: …]` del texto legal (P1, P2, P3, P6, P10).

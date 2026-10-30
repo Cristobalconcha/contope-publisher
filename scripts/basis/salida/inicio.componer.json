@@ -156,7 +156,7 @@
         }
       },
       {
-        "id": "s-828ff1",
+        "id": "s-c9b66f",
         "kind": "surface",
         "scope": {
           "breakpoint": "all",
@@ -178,8 +178,19 @@
           "backgroundSize": "cover",
           "backgroundPosition": "50% 50%",
           "backgroundRepeat": "no-repeat",
-          "overlayColor": "#0C71C3",
-          "overlayOpacity": 0.5
+          "backgroundGradient": {
+            "type": "linear",
+            "stops": [
+              {
+                "color": "rgb(12, 113, 195)",
+                "at": "0%"
+              },
+              {
+                "color": "rgba(255, 255, 255, 0)",
+                "at": "100%"
+              }
+            ]
+          }
         }
       },
       {
@@ -2256,7 +2267,7 @@
         }
       },
       {
-        "id": "s-6549ca",
+        "id": "s-1697e9",
         "kind": "surface",
         "scope": {
           "breakpoint": "all",
@@ -2274,8 +2285,20 @@
         "status": "reviewed",
         "value": {
           "backgroundColor": "#F26621",
-          "overlayColor": "#000000",
-          "overlayOpacity": 0.5
+          "backgroundGradient": {
+            "type": "linear",
+            "angle": "65deg",
+            "stops": [
+              {
+                "color": "rgb(0, 0, 0)",
+                "at": "0%"
+              },
+              {
+                "color": "rgba(255, 255, 255, 0)",
+                "at": "100%"
+              }
+            ]
+          }
         }
       },
       {
@@ -2427,7 +2450,7 @@
         "ruleIds": [
           "sec-d72755",
           "sec-7ccb0e",
-          "s-828ff1"
+          "s-c9b66f"
         ],
         "children": [
           {
@@ -3146,7 +3169,7 @@
         "kind": "section",
         "ruleIds": [
           "sec-d8d911",
-          "s-6549ca"
+          "s-1697e9"
         ],
         "children": [
           {

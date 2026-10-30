@@ -41,7 +41,7 @@ WhatsApp, íconos que hay que traer, mapa). Como biblioteca: `transcribirSitio()
 
 | Divi | ContOpe |
 |---|---|
-| sección (fondo, imagen de fondo, relleno, alto/min-alto) | `section` (`header` / `footer` si viene del constructor de temas) + `surface` + `properties` |
+| sección (fondo, imagen de fondo, degradado, relleno, alto/min-alto) | `section` (`header` / `footer` si viene del constructor de temas) + `surface` (color, imagen, `backgroundGradient`) + `properties` |
 | fila, columnas (anchos, separación, relleno, fondo, radio, sombra) | grupo con rejilla; columnas desiguales por `grid-template-columns`; en celular una columna |
 | divisor de sección (SVG en línea) | regla `divisor` (el SVG se guarda como archivo del sitio) |
 | encabezado «pegajoso» | regla `posicion` pegada |
@@ -71,12 +71,13 @@ clase Divi, con severidad `faltante` / `sin-transcribir` / `aproximado` / `ok`. 
   (`pruebas/probar-animacion.mjs`); Basis no anima nada.
 - **Tablet:** sólo se mide y transcribe escritorio y celular. Las reglas por ancho tienen el hueco para `tablet`
   (`Registro.conAnchos`) pero el transcriptor no lo alimenta: haría falta una tercera medición (p. ej. 768).
-- **Degradados:** se aplanan en un velo de opacidad pareja (el set de diseño no usa degradados) y se avisa.
+- **Degradados:** se traducen a `backgroundGradient` (ángulo, paradas, encima o debajo de la foto) y salen `ok`. Se avisa `aproximado` de lo que no cabe: puntos medios, tamaños de radial distintos del predeterminado, esquinas (`to top right`), más de 8 paradas, más de un degradado en la sección. Código: `lib/fondos.mjs`.
+- **Trama y máscara de fondo de Divi** (`et_pb_background_pattern` / `_mask`): la medición las registra (`fondoTrama`, `fondoMascara`) y se avisa si una sección las trae con imagen; no se traducen solas porque su dibujo viene incrustado y no es un recurso de Medios. Se componen con `backgroundPattern` / `backgroundMask` de la regla `surface`, eligiendo una forma de Medios (las mismas del divisor).
 - **Formato en línea** (negrita, enlaces dentro de un párrafo): el nodo de texto es plano; se avisa. Sólo un bloque
   que es *entero* un enlace pasa a `link`.
 - **Código a mano** no reconocido (HTML/JS/CSS pegado en un módulo de código): se reporta con un resumen.
 - **Video de fondo:** si el archivo está en el sitio, va como nodo `video` ambiental detrás del contenido (sección aislada, `media` con la proporción de la sección y recorte cover); si falta, se avisa como «faltante» y se usa la imagen de reemplazo del perfil.
-- **Ícono «+» de los pliegues**, **mapa siempre abierto**, **degradados**: huecos del plugin (ver `scripts/basis/HUECOS.md`).
+- **Ícono «+» de los pliegues**, **mapa siempre abierto**: huecos del plugin (ver `scripts/basis/HUECOS.md`).
 
 ## Cómo se prueba
 

@@ -6,6 +6,7 @@
  * valor cambia, su variante por ancho. Nada se escribe como CSS suelto.
  */
 import { px, pxs, lados, hex, colorRegla, esTransparente, leerColor, sinComillas, alineacion, redondear } from './util.mjs';
+import { capasDeFondo, traducirDegradado } from './fondos.mjs';
 
 const SERIF = /^(bodoni|georgia|times|playfair|lora|merriweather|garamond|libre baskerville|cormorant|dm serif|pt serif|source serif|crimson)/i;
 const MONO = /^(courier|consolas|menlo|monaco|fira code|source code|roboto mono|jetbrains)/i;
@@ -124,42 +125,52 @@ export function declaracionesCaja(e) {
 }
 
 /**
- * Superficie de una sección: color, imagen de fondo (tamaño, posición, repetición)
- * y velo. Un degradado NO se transcribe tal cual (el set de diseño no usa
- * degradados): se aplana en un velo de opacidad pareja y se avisa.
- * @returns {{ids: string[], notas: string[]}}
+ * Superficie de una sección: color, imagen de fondo (tamaño, posición, repetición),
+ * degradado y velo. El degradado se traduce a `backgroundGradient` (estructura:
+ * ángulo, paradas, posición, encima o debajo de la imagen) y sale con severidad
+ * `ok`; sólo lo que no cabe en esa estructura queda como nota `aproximado`.
+ * @returns {{ids: string[], notas: {severidad: 'ok'|'aproximado', motivo: string}[]}}
  */
 export function superficieSeccion(reg, sec, { urlLocal, sinImagen = false } = {}) {
   const notas = [];
   const v = {};
   if (!esTransparente(sec.fondo)) v.backgroundColor = colorRegla(sec.fondo);
-  const fondo = String(sec.imagenFondo || 'none');
-  const grad = fondo.match(/(linear|radial)-gradient\(([^]*?)\)(?=,\s*url|$)/);
+  const capas = capasDeFondo(sec.imagenFondo);
   const urls = sec.urlsFondo || [];
+  const partes = (s) => String(s || '').split(/,\s*(?![^()]*\))/);
+  // Las capas de imagen (url) y de degradado, cada una con su lugar en la lista:
+  // el tamaño, la posición y la repetición medidos vienen UNO POR CAPA y en el
+  // mismo orden, así que la imagen se busca por su índice y no como «la última».
+  const indiceImagen = capas.map((c, i) => (c.tipo === 'imagen' ? i : -1)).filter((i) => i >= 0).pop();
   if (urls.length && !sinImagen) {
     const loc = urlLocal(urls[urls.length - 1]);
     if (loc) {
       v.backgroundAssetUrl = loc;
-      const partes = (s) => String(s || '').split(/,\s*(?![^()]*\))/);
-      const tam = partes(sec.tamanoFondo).slice(-1)[0];
-      const pos = partes(sec.posicionFondo).slice(-1)[0];
-      const rep = partes(sec.repiteFondo).slice(-1)[0];
+      const de = (s) => { const p = partes(s); return indiceImagen !== undefined && p.length === capas.length ? p[indiceImagen] : p.slice(-1)[0]; };
+      const tam = de(sec.tamanoFondo);
+      const pos = de(sec.posicionFondo);
+      const rep = de(sec.repiteFondo);
       if (tam) v.backgroundSize = tam;
       if (pos) v.backgroundPosition = pos;
       if (rep && ['repeat', 'no-repeat', 'repeat-x', 'repeat-y', 'space', 'round'].includes(rep)) v.backgroundRepeat = rep;
     }
   }
-  if (grad) {
-    // Se aplana: color medio del degradado con su opacidad promedio.
-    const cols = [...grad[2].matchAll(/rgba?\([^)]+\)/g)].map((m) => leerColor(m[0])).filter(Boolean);
-    if (cols.length) {
-      const opacos = cols.filter((c) => c.a > 0);
-      const base = opacos[0] || cols[0];
-      const prom = redondear(cols.reduce((s, c) => s + c.a, 0) / cols.length, 2);
-      v.overlayColor = hex(base);
-      v.overlayOpacity = prom;
-      notas.push(`degradado «${grad[0].slice(0, 70)}» aplanado en un velo plano ${hex(base)} al ${Math.round(prom * 100)}% (el set de diseño no usa degradados)`);
+  const degradados = capas.map((c, i) => ({ ...c, i })).filter((c) => c.tipo === 'degradado');
+  if (degradados.length) {
+    const d = degradados[0];
+    const { valor, perdidas } = traducirDegradado(d.texto);
+    if (degradados.length > 1) {
+      perdidas.push(`la sección tiene ${degradados.length} degradados: el módulo de fondos lleva uno; se transcribió el de más arriba`);
     }
+    if (valor) {
+      v.backgroundGradient = valor;
+      // Con foto, en qué lado de ella está: la lista va de arriba hacia abajo, así
+      // que un degradado ANTES de la foto está encima. `above` es el valor por
+      // omisión del plugin: sólo se escribe lo que cambia.
+      if (v.backgroundAssetUrl && indiceImagen !== undefined && d.i > indiceImagen) v.gradientPlacement = 'below';
+      notas.push({ severidad: 'ok', motivo: `degradado ${valor.type} → backgroundGradient (${valor.stops.length} paradas${valor.angle ? `, ${valor.angle}` : ''}${v.gradientPlacement ? ', debajo de la foto' : v.backgroundAssetUrl ? ', encima de la foto' : ''})` });
+    }
+    for (const p of perdidas) notas.push({ severidad: 'aproximado', motivo: `degradado «${d.texto.slice(0, 70)}»: ${p}` });
   }
   const ids = Object.keys(v).length ? [reg.R('surface', v, { prefijo: 's' })] : [];
   return { ids, notas };
