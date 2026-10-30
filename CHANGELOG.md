@@ -10,12 +10,12 @@ de quien lo escribe. Lo más nuevo, arriba.
 ### Saltos de línea y listas con sublistas en los nodos de texto
 
 Al transcribir el sitio de Basis desde Divi aparecieron dos huecos chicos del plugin, resueltos con su prueba
-():
+(`scripts/probar-lista-anidada.php`):
 
 - Un salto de línea dentro del texto de un título, un párrafo o un ítem de lista ahora se dibuja como salto de línea
   (antes se perdía y la línea corría de largo). El HTML dentro del texto sigue escapado.
-- Un ítem de  puede ser : una sublista, hasta tres niveles.
-- El mini del mapa () llena la caja que le da la composición cuando se usa grande.
+- Un ítem de `list` puede ser `{ text, items }`: una sublista, hasta tres niveles.
+- El mini del mapa (`mapa`) llena la caja que le da la composición cuando se usa grande.
 
 El número de versión del plugin no cambia todavía: se sube al desplegar.
 
