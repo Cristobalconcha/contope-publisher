@@ -1123,29 +1123,6 @@
         }
       },
       {
-        "id": "mg-f14994",
-        "kind": "properties",
-        "scope": {
-          "breakpoint": "mobile",
-          "state": "default"
-        },
-        "provenance": {
-          "sources": [
-            {
-              "kind": "reference",
-              "reference": "https://basisbodegas.com",
-              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
-            }
-          ]
-        },
-        "status": "reviewed",
-        "value": {
-          "declarations": {
-            "margin-block-end": "-1px"
-          }
-        }
-      },
-      {
         "id": "media-5c84f6",
         "kind": "media",
         "scope": {
@@ -2170,7 +2147,7 @@
         }
       },
       {
-        "id": "relmod-c19445",
+        "id": "relmod-96588f",
         "kind": "properties",
         "scope": {
           "breakpoint": "all",
@@ -2190,7 +2167,7 @@
           "declarations": {
             "padding-right": "30px",
             "padding-inline-start": "calc(14px + 30px)",
-            "padding-bottom": "30px"
+            "padding-block-end": "calc(14px + 30px)"
           }
         }
       },
@@ -2363,7 +2340,7 @@
         }
       },
       {
-        "id": "sec-d8d911",
+        "id": "sec-6421f0",
         "kind": "properties",
         "scope": {
           "breakpoint": "all",
@@ -2384,7 +2361,8 @@
             "padding-top": "0px",
             "padding-bottom": "0px",
             "padding-left": "0px",
-            "padding-right": "0px"
+            "padding-right": "0px",
+            "margin-block-start": "-5px"
           }
         }
       },
@@ -2913,29 +2891,6 @@
         }
       },
       {
-        "id": "mg-cb92a3",
-        "kind": "properties",
-        "scope": {
-          "breakpoint": "tablet",
-          "state": "default"
-        },
-        "provenance": {
-          "sources": [
-            {
-              "kind": "reference",
-              "reference": "https://basisbodegas.com",
-              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
-            }
-          ]
-        },
-        "status": "reviewed",
-        "value": {
-          "declarations": {
-            "margin-block-end": "-1px"
-          }
-        }
-      },
-      {
         "id": "sec-0b4923",
         "kind": "properties",
         "scope": {
@@ -3001,29 +2956,6 @@
         "value": {
           "declarations": {
             "margin-block-end": "19px"
-          }
-        }
-      },
-      {
-        "id": "mg-487610",
-        "kind": "properties",
-        "scope": {
-          "breakpoint": "tablet",
-          "state": "default"
-        },
-        "provenance": {
-          "sources": [
-            {
-              "kind": "reference",
-              "reference": "https://basisbodegas.com",
-              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
-            }
-          ]
-        },
-        "status": "reviewed",
-        "value": {
-          "declarations": {
-            "margin-block-end": "1px"
           }
         }
       },
@@ -3433,7 +3365,6 @@
                       "t-379834",
                       "c-8eff11",
                       "mg-a343db",
-                      "mg-f14994",
                       "t-5b2c2b"
                     ],
                     "content": {
@@ -3488,8 +3419,7 @@
                       "t-379834",
                       "c-8eff11",
                       "mg-a343db",
-                      "t-5b2c2b",
-                      "mg-cb92a3"
+                      "t-5b2c2b"
                     ],
                     "content": {
                       "text": "Nuestro sistema modular facilita una instalación rápida y eficiente, optimizando el espacio de almacenamiento con una mínima preparación del terreno."
@@ -3542,9 +3472,7 @@
                       "t-379834",
                       "c-8eff11",
                       "mg-a343db",
-                      "mg-f14994",
-                      "t-5b2c2b",
-                      "mg-cb92a3"
+                      "t-5b2c2b"
                     ],
                     "content": {
                       "text": "Con materiales de alta calidad, nuestras carpas ofrecen un aislamiento superior, son ignífugas y sus estructuras de aluminio son livianas y robustas."
@@ -3605,8 +3533,7 @@
                     "ruleIds": [
                       "t-5f6bb4",
                       "c-3bcd26",
-                      "mg-a343db",
-                      "mg-487610"
+                      "mg-a343db"
                     ],
                     "content": {
                       "text": "Cuente con todas las alternativas para gestionar y financiar su Bodega Trasladable.\nHay una solución para cada situación:"
@@ -3939,7 +3866,7 @@
                       "c-c21382",
                       "mg-a343db",
                       "lista-cbecaf",
-                      "relmod-c19445"
+                      "relmod-96588f"
                     ],
                     "content": {
                       "ordered": false,
@@ -4016,7 +3943,7 @@
         "id": "section-76",
         "kind": "section",
         "ruleIds": [
-          "sec-d8d911",
+          "sec-6421f0",
           "s-1697e9"
         ],
         "children": [

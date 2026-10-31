@@ -126,29 +126,6 @@
         }
       },
       {
-        "id": "mg-f14994",
-        "kind": "properties",
-        "scope": {
-          "breakpoint": "mobile",
-          "state": "default"
-        },
-        "provenance": {
-          "sources": [
-            {
-              "kind": "reference",
-              "reference": "https://basisbodegas.com",
-              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
-            }
-          ]
-        },
-        "status": "reviewed",
-        "value": {
-          "declarations": {
-            "margin-block-end": "-1px"
-          }
-        }
-      },
-      {
         "id": "sec-79ee4b",
         "kind": "properties",
         "scope": {
@@ -274,29 +251,6 @@
           "declarations": {
             "padding-top": "30px",
             "padding-bottom": "30px"
-          }
-        }
-      },
-      {
-        "id": "mg-cb92a3",
-        "kind": "properties",
-        "scope": {
-          "breakpoint": "tablet",
-          "state": "default"
-        },
-        "provenance": {
-          "sources": [
-            {
-              "kind": "reference",
-              "reference": "https://basisbodegas.com",
-              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
-            }
-          ]
-        },
-        "status": "reviewed",
-        "value": {
-          "declarations": {
-            "margin-block-end": "-1px"
           }
         }
       },
@@ -1008,29 +962,6 @@
         }
       },
       {
-        "id": "mg-89f683",
-        "kind": "properties",
-        "scope": {
-          "breakpoint": "mobile",
-          "state": "default"
-        },
-        "provenance": {
-          "sources": [
-            {
-              "kind": "reference",
-              "reference": "https://basisbodegas.com",
-              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
-            }
-          ]
-        },
-        "status": "reviewed",
-        "value": {
-          "declarations": {
-            "margin-block-end": "1px"
-          }
-        }
-      },
-      {
         "id": "mg-c0335f",
         "kind": "properties",
         "scope": {
@@ -1515,9 +1446,7 @@
                       "pila-388a42",
                       "pila-5922dd",
                       "mg-a343db",
-                      "mg-89f683",
-                      "pila-a21a27",
-                      "mg-cb92a3"
+                      "pila-a21a27"
                     ],
                     "children": [
                       {
@@ -2234,9 +2163,7 @@
                       "pila-388a42",
                       "pila-5922dd",
                       "mg-a343db",
-                      "mg-f14994",
-                      "pila-a21a27",
-                      "mg-cb92a3"
+                      "pila-a21a27"
                     ],
                     "children": [
                       {

@@ -613,7 +613,8 @@
                         "id": "image-1",
                         "kind": "image",
                         "ruleIds": [
-                          "img-8eea2d"
+                          "img-8eea2d",
+                          "mg-a343db"
                         ],
                         "content": {
                           "assetUrl": "/wp-content/uploads/2025/07/Header-logo.png",

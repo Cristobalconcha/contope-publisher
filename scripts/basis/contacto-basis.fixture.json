@@ -121,6 +121,7 @@
       "registrarEnDb": true,
       "rows": 10,
       "maxLength": 600,
+      "contadorFormato": "0 de {max} caracteres máximos",
       "ayuda": "Cuéntanos en qué podemos ayudarte. ¿Tienes alguna consulta o sugerencia? Estamos aquí para escucharte.",
       "ayudaArriba": true
     }

@@ -127,6 +127,15 @@
     "region": "contenido",
     "seccion": 5,
     "modulo": "sección",
+    "clase": "margen",
+    "severidad": "ok",
+    "motivo": "la sección no empieza donde termina la anterior: margen superior de -5px (escritorio) / -5px (celular)"
+  },
+  {
+    "pagina": "inicio",
+    "region": "contenido",
+    "seccion": 5,
+    "modulo": "sección",
     "clase": "degradado",
     "severidad": "ok",
     "motivo": "degradado linear → backgroundGradient (2 paradas, 65deg)"
@@ -176,6 +185,18 @@
     "clase": "mapbox",
     "severidad": "ok",
     "motivo": "mini mapa de Mapbox → grupo con conducta `mapa` (necesita la clave pública de Mapbox en Configuración para abrir el grande)"
+  },
+  {
+    "pagina": "inicio",
+    "region": "pie",
+    "seccion": 6,
+    "fila": 1,
+    "columna": 1,
+    "modulo": "code",
+    "indiceModulo": 0,
+    "clase": "desfase",
+    "severidad": "ok",
+    "motivo": "el módulo de código que empieza la columna lleva márgenes propios: arriba -10px (escritorio) / -10px (celular), abajo 20px / 20px"
   },
   {
     "pagina": "inicio",
@@ -273,6 +294,18 @@
     "region": "pie",
     "seccion": 1,
     "fila": 1,
+    "columna": 1,
+    "modulo": "code",
+    "indiceModulo": 0,
+    "clase": "desfase",
+    "severidad": "ok",
+    "motivo": "el módulo de código que empieza la columna lleva márgenes propios: arriba -10px (escritorio) / -10px (celular), abajo 20px / 20px"
+  },
+  {
+    "pagina": "basis-carpas-industriales",
+    "region": "pie",
+    "seccion": 1,
+    "fila": 1,
     "columna": 2,
     "modulo": "columna",
     "indiceModulo": 1,
@@ -295,6 +328,15 @@
     "clase": "#sidebar",
     "severidad": "sin-transcribir",
     "motivo": "barra lateral del tema de Divi (buscador, entradas recientes, comentarios recientes): son widgets de WordPress, no contenido de la página; se omiten"
+  },
+  {
+    "pagina": "basis-carpas-industriales",
+    "region": "contenido",
+    "seccion": 0,
+    "modulo": "contenido plano",
+    "clase": "#sidebar",
+    "severidad": "ok",
+    "motivo": "la barra lateral se transcribe como bloques nativos de WordPress (core/search, core/latest-posts, core/latest-comments) dentro de la composición; los dibuja WordPress con los datos del momento"
   },
   {
     "pagina": "preguntas-frecuentes",
@@ -437,6 +479,18 @@
     "region": "pie",
     "seccion": 3,
     "fila": 1,
+    "columna": 1,
+    "modulo": "code",
+    "indiceModulo": 0,
+    "clase": "desfase",
+    "severidad": "ok",
+    "motivo": "el módulo de código que empieza la columna lleva márgenes propios: arriba -10px (escritorio) / -10px (celular), abajo 20px / 20px"
+  },
+  {
+    "pagina": "preguntas-frecuentes",
+    "region": "pie",
+    "seccion": 3,
+    "fila": 1,
     "columna": 2,
     "modulo": "columna",
     "indiceModulo": 1,
@@ -558,6 +612,18 @@
     "clase": "mapbox",
     "severidad": "ok",
     "motivo": "mini mapa de Mapbox → grupo con conducta `mapa` (necesita la clave pública de Mapbox en Configuración para abrir el grande)"
+  },
+  {
+    "pagina": "contactos",
+    "region": "pie",
+    "seccion": 2,
+    "fila": 1,
+    "columna": 1,
+    "modulo": "code",
+    "indiceModulo": 0,
+    "clase": "desfase",
+    "severidad": "ok",
+    "motivo": "el módulo de código que empieza la columna lleva márgenes propios: arriba -10px (escritorio) / -10px (celular), abajo 20px / 20px"
   },
   {
     "pagina": "contactos",
