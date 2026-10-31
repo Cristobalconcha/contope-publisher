@@ -1,7 +1,7 @@
 # Basis sobre ContOpe: huecos, diferencias y pendientes
 
-Primera reconstrucción local el 30-oct-2026 (WordPress en `wp-local-basis`, puerto 8894); segunda pasada el mismo día para dejarla
-**visualmente idéntica al original** en escritorio (1440), tablet (768) y celular (393). Nada de esto se rodeó con CSS a mano: cada
+Primera reconstrucción local el 30-oct-2026 (WordPress en `wp-local-basis`, puerto 8894); segunda y tercera pasada el mismo día para dejarla
+**visualmente idéntica al original** en escritorio (1440), tablet (768) y celular (393) (la tercera cerró los cuatro puntos que quedaban: Contactos, la barra lateral, el pie y las diferencias restantes). Nada de esto se rodeó con CSS a mano: cada
 punto es un hueco del plugin que se amplió (con prueba y en el catálogo), una diferencia que se explica, o una decisión de Cristóbal.
 
 ## Cómo se mide la identidad
@@ -19,6 +19,11 @@ al 84% y comparar contra ellas inventaba una diferencia que no existe; ver el pu
 `node scripts/basis/auditoria-sitio.mjs` prueba el comportamiento en celular de verdad (agente y toque de teléfono): desborde lateral,
 imágenes y video, cada pliegue (abre, cierra, autoclose, ícono), botones fijos dentro de la pantalla, formulario (campos que caben y se
 escriben), encabezado pegado y errores de consola.
+
+**Mediciones complementarias.** `descarga/medir.mjs` mide el sitio entero; dos cosas se miden aparte y se guardan DENTRO de los `medida-<pagina>-<ancho>.json`
+(sin tocar lo demás): `descarga/medir-formulario.mjs` (`forma.extra`: rellenos, márgenes, separaciones y casilla del formulario de Gravity) y
+`descarga/medir-barra-lateral.mjs` (`contenidoPlano.lateral`: la barra lateral del tema). Si se vuelve a correr `medir.mjs`, hay que volver a correr
+esas dos. `sincronizar-local.mjs` lleva el plugin, el tema y el runtime de Orugantt Forms a `wp-local-basis` (nunca a producción).
 
 ## Resuelto en esta pasada (plugin 0.3.84 y transcriptor)
 
@@ -69,100 +74,123 @@ escriben), encabezado pegado y errores de consola.
     siendo un enlace a «cómo llegar». La clave NO se buscó ni se cargó: la pone quien publica.
 12. **Tablet y celular de verdad.** `auditoria-sitio.mjs` pasa en las cinco páginas a 1440, 768 y 393.
 
+## Resuelto en la tercera pasada (plugin 0.3.85, Orugantt Forms `basis-tokens` y transcriptor)
+
+13. **Contactos: el formulario mide lo mismo que el de Gravity (899 px a 1440 y a 768, 1248 a 393, contra −69 / −72 / −85 de antes).** El
+    contrato de variables de Orugantt Forms se amplió por segunda vez (sigue en el clon `orugantt-forms-basis`, rama `basis-tokens`; el
+    repositorio que usa Santa Luisa no se tocó). Variables nuevas: relleno y margen de la ayuda (`ayudaRellenoY`, `ayudaSeparacion`), del
+    contador (`contadorRellenoY`, `contadorSeparacion`, `contadorInterlineado`, `contadorAlineacion`) y del pie (`pieRellenoY`,
+    `pieSeparacion`); separación entre un título de grupo y sus campos y entre una etiqueta y su campo; relleno superior de la etiqueta (la de
+    una casilla lleva el suyo); separación vertical entre ayuda, cuadro y contador (`controlSeparacion`); separación entre columnas de una
+    fila, de un grupo con título y entre filas al apilarse (`rejilla*`); y la **casilla propia** (`casillaApariencia: none`, tamaño, fondo,
+    marca, márgenes, sangría y separación con su texto, alineación vertical): el cuadrado liso de 18 px gris de Gravity, no el del navegador.
+    Para los valores de lista cerrada hay un tipo nuevo, `keyword`, con su lista en `values`. La separación que Gravity pone como relleno y
+    margen de cada parte se escribe igual; la automática del runtime entre ayuda, cuadro y contador queda en cero para ese diseño. Todo se
+    MIDE en vivo (`scripts/basis/descarga/medir-formulario.mjs` guarda `forma.extra` en la medición) y nada se escribe a mano.
+    **El contador** dice ahora «0 de 600 caracteres máximos», a la izquierda: el texto es la propiedad `contadorFormato` del campo
+    («{n} de {max} caracteres máximos»; sin ella, «{n}/{max}») y la alineación es la variable `contadorAlineacion`. El parche contra `main` del
+    repositorio de Orugantt Forms está al día en `docs/orugantt-forms-contrato-ampliado-2026-10-30.patch` (verificado: aplica limpio).
+14. **La barra lateral de `basis-carpas-industriales` (buscador, entradas y comentarios recientes) son los bloques NATIVOS de WordPress.**
+    Gutenberg ya tiene esa familia (`core/search`, `core/latest-posts`, `core/latest-comments`), así que ContOpe se CORRESPONDE con ella en
+    vez de imitarla. Lo que faltaba era una forma de decir «aquí va ese bloque» dentro de una composición: **nodo nuevo `block`** (0.3.85),
+    `content: { name, attrs }`. El compilador deja un marcador que conserva su caja (la que recibe las reglas) y al mostrar la página
+    WordPress dibuja adentro con los datos de ese momento: la entrada nueva aparece sola, nada se copia (lo comprueba la prueba creando y
+    borrando una entrada). Lista permitida cerrada (bloques dinámicos) ampliable con el filtro `cod_canvas_bloques_permitidos`; atributos como
+    pares simples que WordPress valida contra el esquema del propio bloque. La forma sale de las reglas del nodo y de **partes** que alcanzan
+    lo que dibuja WordPress por dentro (`etiqueta`, `envoltura`, `entrada`, `boton`, `lista`, `item`, `enlace`, `fecha`, `vacio`: clases de
+    Gutenberg). La composición es el contenedor de Divi (80 %, máx. 1080), la columna del título (79,125 % con su línea vertical gris, que
+    en Divi es un seudoelemento del contenedor y aquí es el borde de esa columna) y la barra lateral (20,875 %, apilada debajo del título a
+    768 y 393); los textos «Recent Posts» y «Recent Comments» son los títulos de los widgets del original, tal cual. `scripts/basis/descarga/medir-barra-lateral.mjs`
+    mide la barra del original (cajas y estilos computados, tres anchos) y `lib/barra-lateral.mjs` la transcribe. El local necesitó dos
+    cosas de datos, no de diseño: el idioma del sitio en español (el texto «No hay comentarios que mostrar.» lo pone WordPress según el idioma;
+    se copiaron los archivos `es_ES` de `wp-local`, ya descargados) y sin el comentario de ejemplo que trae WordPress.
+15. **Tipografía: Open Sans no tiene peso 500 en el original.** Medido: el original sólo declara Open Sans en 300, 400, 600, 700 y 800, así que
+    TODO texto de peso 500 se dibuja con la cara de 400 (en la página sólo se carga «Open Sans 400»). El tema local declaraba el archivo variable
+    en rango (300 a 800) y dibujaba un 500 verdadero: 1,7 % más ancho y más pesado en cada texto del cuerpo (por eso «Cuente con todas las
+    alternativas…» salía 8 px a la izquierda y «Hello world!» 1,5 px más ancho). El tema `contope-basis` declara ahora esas caras por peso (y
+    Roboto en 100, 300, 400, 500, 700 y 900, como el original): el mismo archivo, declarado como lo hace el original. La composición conserva el
+    peso medido (500).
+16. **Pie e Inicio: causas medidas.** (a) El módulo de código que abre la columna de la dirección lleva margen superior de −10 px y un
+    «aire» de 20 px debajo (un `<div>` vacío con ese margen): el transcriptor excluía a los módulos de código del desfase del primer módulo; ahora
+    los aplica. (b) Los módulos que se pisan se agrupan en una fila: el crédito («Diseño y desarrollo» + logo) se acomodaba a la izquierda cuando
+    es la imagen la que está pegada al borde derecho, y el logo traía un margen automático además del `gap`. (c) El mini mapa y la dirección:
+    el `<div>` de Mapbox del original se encoge de 60 a 52,8 px a 393; aquí la dirección tenía ancho forzado y el mapa no cedía. (d) La sección
+    «Descubre más» sube 5 px sobre la del video (margen superior de −5 px de la sección, no medido antes): el transcriptor deduce ahora el
+    margen de cada sección de la caja de la anterior. (e) El título del aviso naranja a 768 (−13 px): venía de la lista de «Características»,
+    cuyo relleno de abajo se pisaba con el del módulo (`padding-block-end` y `padding-bottom` son lo mismo; ahora se suman: 14 + 30). (f) Un
+    «resto» de ±1 px sobre el último módulo de una columna es ruido del redondeo de las cajas medidas (un texto de 52,5 medido como 53), no un
+    margen: dejaba cada columna apilada 1 px más corta. (g) El logo enlazado del encabezado a 393 y 768 salía 14 px más alto (el `<figure>`
+    traía el margen de la hoja base cuando su margen pasa al enlace): ahora lleva margen cero explícito.
+
+**Resultado de la comparación nodo a nodo contra el vivo (30-oct-2026, tercera pasada): cero textos con diferencia, cero imágenes con diferencia
+en las cinco páginas × tres anchos.** Lo que queda son cajas sin pareja (ver más abajo) y diferencias de alto de ±3 px.
+
 ## Huecos del plugin que quedan abiertos
 
-A. **Los widgets de la página `basis-carpas-industriales` (buscador, «Recent Posts», «Recent Comments»).** El original es una página de
-   WordPress con la barra lateral del tema Divi, que lleva bloques nativos de core (`wp-block-search`, últimas entradas, últimos
-   comentarios). Son contenido DINÁMICO de WordPress, no de la página, y ContOpe no tiene todavía la correspondencia con esas familias de
-   Gutenberg (`core/search`, `core/latest-posts`, `core/latest-comments`; regla de arquitectura: tomar la familia de Gutenberg y darle
-   formato). No se imitaron con texto fijo: una lista de entradas copiada a mano envejece desde el primer día y un buscador que no busca
-   engaña. Lo que sí se transcribió es el título, el encabezado y el pie. Es el único módulo del original que quedó sin transcribir.
 B. **Texto en línea** (negrita, cursiva o enlaces *dentro* de un párrafo): los nodos de texto son planos. En Basis sólo había un enlace que
    ocupa todo su bloque y se transcribe como `link`.
-C. **Contador de caracteres y orden de la ayuda.** Orugantt Forms escribe «0/600» a la derecha del cuadro; Gravity escribe «0 de 600
-   caracteres máximos» a la izquierda. Es el texto y la posición de un componente del runtime de formularios, no del diseño.
-D. **Casilla de consentimiento:** se dibuja con la del navegador (que Orugantt estila con `accent-color`); la de Gravity es una casilla
-   gris propia.
 E. **Entre 981 y 1023 px** el plugin aplica lo de tablet (corta tablet en 768–1023) donde Divi ya muestra escritorio (corta en 980). No
    se midió ahí porque el encargo era 768; los anchos de prueba no caen en ese tramo.
 
+Cerrados en esta pasada (ya no son huecos): A (los widgets de la barra lateral: nodo `block`), C (texto y alineación del contador) y D
+(la casilla de consentimiento: casilla propia).
+
 ## Diferencias visibles que quedan contra el original
 
-Ver la tabla de la última corrida de `comparar-vivo.mjs` (abajo). Lo que no es un defecto del sitio local:
+Ninguna en lo que se ve, medida nodo a nodo. Lo que no es un defecto del sitio local:
 
 - **Botones «Explorar Soluciones» y «Solicita Información»:** no llevan a ninguna parte en el original (`href` vacío y `#`). Se respetó.
 - **«Planta Econut / www.econut.cl»** en el globo del mapa: es lo que dice el original de Basis (copia del código de Econut).
 - **Banner de cookies:** el original no tiene; aquí está como en Econut (pedido), con la paleta de Basis. Se oculta sólo en las capturas.
 - **«Reproductor de vídeo»:** texto de accesibilidad de MediaElement (el reproductor de Divi) que el video de fondo local no necesita.
-- **Mapa y mini mapa:** el original dibuja los dos con Mapbox en vivo; sin clave quedan como imagen (ver 11).
-- **El encabezado a 393/768 mide 80 px con `overflow: hidden`** en los dos sitios: el enlace «Cotizaciones / Contactos» queda recortado
-  en los dos (la comparación lo ve 14 px más abajo en el local; no se ve en pantalla).
-- **Cajas que la comparación no puede emparejar** (el encabezado y el pie como `et_pb_section` contra `header`/`footer`, los
-  controles internos de Mapbox, el divisor de la sección de Preguntas que Divi dibuja con fondo SVG y ContOpe con un SVG en línea): son
-  de implementación, no de lo que se ve; las láminas lo confirman.
+- **Mapa y mini mapa:** el original dibuja los dos con Mapbox en vivo; sin clave quedan como imagen (ver 11). Su etiqueta «Econut» (el
+  rótulo del marcador del mapa en vivo) es parte de ese dibujo.
+- **Encabezado a 393/768:** 80 px con `overflow: hidden` en los dos sitios; el enlace «Cotizaciones / Contactos» queda recortado en los dos
+  y no se ve. Ya no se desplaza 14 px (la causa era el margen del logo, 16g).
+- **Altos de página:** a 768, Inicio mide 5824 contra 5827 (−3; la sección de las tres columnas mide 1853,8 contra 1855,7 y la siguiente
+  1080,4 contra 1081,4: el redondeo de las cajas medidas, no un margen); a 393, ±1 a ±2 px en Preguntas y Contactos. Ningún texto cambia de lugar.
 - **El texto «Gracias»** del formulario no se pudo medir (nunca se envió): es uno mínimo.
+
+### Emparejamientos imposibles entre Divi y ContOpe (no son defectos)
+
+La comparación empareja por texto y por posición; estas cajas no tienen pareja porque son de implementación, y las láminas confirman que no
+se ven. Ejemplos concretos, con el sitio y el ancho donde salen:
+
+| caja del original | por qué no tiene pareja | ejemplo |
+|---|---|---|
+| `et_pb_section_0_tb_header` / `_tb_footer` («fondo blanco ≠ gris») | Divi pinta el gris en una fila interna y deja la sección blanca; ContOpe pinta el `header` / `footer` entero | todas las páginas, 3 anchos |
+| `et_pb_row_0_tb_header`, `et_pb_row_0`, `et_pb_text_6` | contenedores de Divi que ContOpe no emite (su fila es un grupo sin fondo, borde ni sombra que medir) | `inicio 1440`: la fila de la portada, de 1080 × 439 |
+| `mapboxgl-*`, `div.pin`, `div.label`, `mejs-container` | los dibuja Mapbox o MediaElement al cargar la página; no existen en el HTML | `contactos 1440`: el globo «Econut» en (1021, 618) |
+| `div.et_pb_module ds_gravity_forms_for_divi` | el módulo del formulario de Gravity envuelve al `.gform_wrapper`; el local lo pinta Orugantt Forms con otro DOM (ya mide 899 px, igual) | `contactos`, 3 anchos |
+| `input.gform_button` («borde `rgb(224,153,0)` ≠ transparente») | el original dibuja el borde del botón transparente sobre su fondo; el local lo dibuja del mismo color: se ve igual | `contactos`, 3 anchos |
+| `et_pb_bottom_inside_divider` («fondo gris ≠ transparente · imagen —≠ url(svg)») | el divisor de la sección de Preguntas es un fondo SVG de Divi; en ContOpe es un SVG en línea de la regla `divisor` | `preguntas-frecuentes 1440` y `768` |
+| `*` y «Enviar mensaje» «sobran» en el local | el original dibuja el asterisco en otro elemento y su botón es un `<input>` (el texto está en `value`) | `contactos`, 3 anchos |
 
 ## Qué queda (última corrida)
 
-Corrida del 30-oct-2026 (original en vivo, local en `wp-local-basis`, plugin 0.3.84), con `comparar-vivo.mjs todas todos`. «Cajas» son sobre todo
-emparejamientos imposibles (el `header`/`footer` de ContOpe contra las `et_pb_section` de Divi, los controles internos de Mapbox, los campos de
-Gravity contra los de Orugantt, el divisor de la sección que Divi dibuja con fondo SVG y ContOpe con un SVG en línea); las láminas confirman que no se ven.
+Corrida del 30-oct-2026 (original en vivo, local en `wp-local-basis`, plugin 0.3.85), con `comparar-vivo.mjs todas todos`. «Cajas» son
+emparejamientos imposibles (tabla de arriba).
 
 | página | ancho | alto original / local | diferencias | textos con diferencia | textos que faltan o sobran | imágenes | cajas |
 |---|---|---|---|---|---|---|---|
-| inicio | 1440 | 4347 / 4352 (+5) | **12** | 3 | 1 | 0 | 8 |
-| inicio | 768 | 5827 / 5804 (-23) | **16** | 6 | 1 | 0 | 9 |
-| inicio | 393 | 5776 / 5770 (-6) | **14** | 4 | 1 | 1 | 8 |
-| basis-carpas-industriales | 1440 | 950 / 950 (+0) | **14** | 2 | 5 | 0 | 7 |
-| basis-carpas-industriales | 768 | 950 / 950 (+0) | **16** | 4 | 5 | 0 | 7 |
-| basis-carpas-industriales | 393 | 852 / 852 (+0) | **17** | 4 | 5 | 1 | 7 |
-| preguntas-frecuentes | 1440 | 1754 / 1753 (-1) | **7** | 2 | 0 | 0 | 5 |
-| preguntas-frecuentes | 768 | 2661 / 2649 (-12) | **9** | 4 | 0 | 0 | 5 |
-| preguntas-frecuentes | 393 | 3305 / 3293 (-12) | **9** | 4 | 0 | 1 | 4 |
-| contactos | 1440 | 1354 / 1285 (-69) | **26** | 5 | 7 | 0 | 14 |
-| contactos | 768 | 2313 / 2241 (-72) | **27** | 6 | 7 | 0 | 14 |
-| contactos | 393 | 2653 / 2568 (-85) | **28** | 6 | 7 | 1 | 14 |
+| inicio | 1440 | 4347 / 4347 (0) | **8** | 0 | 1 | 0 | 7 |
+| inicio | 768 | 5827 / 5824 (−3) | **8** | 0 | 1 | 0 | 7 |
+| inicio | 393 | 5776 / 5777 (+1) | **8** | 0 | 1 | 0 | 7 |
+| basis-carpas-industriales | 1440 | 950 / 950 (0) | **4** | 0 | 0 | 0 | 4 |
+| basis-carpas-industriales | 768 | 950 / 950 (0) | **4** | 0 | 0 | 0 | 4 |
+| basis-carpas-industriales | 393 | 852 / 852 (0) | **4** | 0 | 0 | 0 | 4 |
+| preguntas-frecuentes | 1440 | 1754 / 1753 (−1) | **5** | 0 | 0 | 0 | 5 |
+| preguntas-frecuentes | 768 | 2661 / 2661 (0) | **5** | 0 | 0 | 0 | 5 |
+| preguntas-frecuentes | 393 | 3305 / 3303 (−2) | **4** | 0 | 0 | 0 | 4 |
+| contactos | 1440 | 1354 / 1354 (0) | **18** | 0 | 5 | 0 | 13 |
+| contactos | 768 | 2313 / 2313 (0) | **18** | 0 | 5 | 0 | 13 |
+| contactos | 393 | 2653 / 2654 (+1) | **18** | 0 | 5 | 0 | 13 |
 
-Diferencias de texto e imagen (sin las de cajas, que son sobre todo emparejamientos imposibles de implementación), agrupadas:
+Antes de esta pasada (segunda pasada, misma fecha): 12 / 16 / 14 diferencias en Inicio, 14 / 16 / 17 en Basis carpas, 7 / 9 / 9 en Preguntas y
+26 / 27 / 28 en Contactos, con altos de −69 / −72 / −85 px en Contactos y 5 a 15 px de desfase en el pie.
 
-- «Cuente con todas las alternativas para gesti» (p/p): x -8 — inicio 1440, inicio 768
-- «Av 18 de Septiembre sn Hijuela 2 Fundo San R» (p/div): y +15 (antes +5) — inicio 1440, inicio 768, basis-carpas-industriales 1440, basis-carpas-industriales 768, preguntas-frecuentes 1440, preguntas-frecuentes 768, contactos 1440, contactos 768
-- «Diseño y desarrollo» (p/p): x -10 · y +5 (antes +15) — inicio 1440, inicio 768, inicio 393, basis-carpas-industriales 1440, basis-carpas-industriales 768, basis-carpas-industriales 393, preguntas-frecuentes 1440, preguntas-frecuentes 768, preguntas-frecuentes 393, contactos 1440, contactos 768, contactos 393
-- falta en el local: «Reproductor de vídeo» — inicio 1440, inicio 768, inicio 393
-- «Cotizaciones / Contactos» (a/a): y +14 (antes 0) — inicio 768, inicio 393, basis-carpas-industriales 768, basis-carpas-industriales 393, preguntas-frecuentes 768, preguntas-frecuentes 393, contactos 768, contactos 393
-- «La respuesta eficiente a su demanda de bodeg» (h1/h1): y 0 (antes +14) — inicio 768, inicio 393
-- «Descubre Más Sobre Nuestras Carpas» (h2/h2): y -13 (antes -4) — inicio 768
-- «Av 18 de Septiembre sn Hijuela 2 Fundo San R» (p/div): x +7 · y +14 (antes +4) — inicio 393, basis-carpas-industriales 393, preguntas-frecuentes 393, contactos 393
-- imagen Altfx-2-Calado.png: x -95 — inicio 393, basis-carpas-industriales 393, preguntas-frecuentes 393, contactos 393
-- falta en el local: «Buscar» — basis-carpas-industriales 1440, basis-carpas-industriales 768, basis-carpas-industriales 393
-- falta en el local: «Recent Posts» — basis-carpas-industriales 1440, basis-carpas-industriales 768, basis-carpas-industriales 393
-- falta en el local: «Hello world!» — basis-carpas-industriales 1440, basis-carpas-industriales 768, basis-carpas-industriales 393
-- falta en el local: «Recent Comments» — basis-carpas-industriales 1440, basis-carpas-industriales 768, basis-carpas-industriales 393
-- falta en el local: «No hay comentarios que mostrar.» — basis-carpas-industriales 1440, basis-carpas-industriales 768, basis-carpas-industriales 393
-- «BASIS: Carpas Industriales» (h1/h1): y 0 (antes +14) — basis-carpas-industriales 768, basis-carpas-industriales 393
-- «Preguntas Frecuentes» (h1/h1): y 0 (antes +14) — preguntas-frecuentes 768, preguntas-frecuentes 393
-
-Lo que queda, agrupado (de verdad visible o de verdad distinto):
-
-- **Contactos, alto −69 / −72 / −85 px (≈5%).** El formulario de Orugantt Forms es más compacto que el de Gravity en cuatro cosas que el contrato de
-  variables todavía no expresa: (1) la casilla de consentimiento: Gravity la dibuja con 24 px de relleno a la izquierda y el texto cae en 3 renglones
-  (59 px) contra 2 (39 px) aquí; (2) la descripción tiene 10 px de relleno arriba y abajo y 8 px de margen; (3) el contador mide 39 px (relleno de 10);
-  (4) el pie del formulario lleva 16 px de relleno y 6 de margen. Cada una es una variable más del contrato (`ayudaRelleno`, `contadorRelleno`,
-  `pieRelleno`, `opcionRelleno`); no se agregaron para no seguir ampliando el runtime de otro repositorio sin que Cristóbal lo mire primero.
-  El texto del contador («0/600» a la derecha contra «0 de 600 caracteres máximos» a la izquierda) es del runtime (ver C).
-- **Inicio, alto +5 / −23 / −6 px; pie +5 px.** Las posiciones verticales de la dirección y del crédito del pie quedan 5 a 15 px más abajo
-  (el mini mapa y su dirección se alinean al centro en el original y al borde superior aquí) y el título del aviso naranja 13 px más arriba a 768.
-  No se alcanzó a medir por qué; es lo único de Inicio que se ve si uno mira con regla.
-- **Dirección del pie a 393 (x +7) y crédito a 393 (la imagen del crédito queda 95 px más a la izquierda):** a 393 el original apila el texto
-  y la imagen del crédito de otra forma; el transcriptor ordena los módulos que se pisan por su posición a escritorio.
-- **«Cuente con todas las alternativas…» (x −8 / −6):** el párrafo de «Opciones comerciales» queda 8 px a la izquierda; sin explicar.
-- **Encabezado a 768 y 393:** el enlace «Cotizaciones / Contactos» queda recortado en los dos sitios (la comparación lo ve 14 px más abajo en el local;
-  no se ve en pantalla).
-- **«Reproductor de vídeo»:** texto de accesibilidad de MediaElement (el reproductor de Divi); el video de fondo local no lo necesita.
-- **Página `basis-carpas-industriales`:** el buscador, «Recent Posts», «Hello world!», «Recent Comments» y su texto faltan (hueco A).
-- **Contactos, «*» y «Enviar mensaje»:** la comparación los lista «sobra» porque el original dibuja el asterisco en otro elemento y su botón es un
-  `<input>` (su texto está en `value`); están en las dos páginas.
-
+Lo que sigue en las columnas «faltan o sobran»: Inicio, «Reproductor de vídeo» (MediaElement); Contactos, «Econut» (rótulo del mapa en vivo) y,
+del lado del local, `*` ×3 y «Enviar mensaje» (el original los dibuja en otro elemento).
 
 ## Medios
 
@@ -172,8 +200,10 @@ en `uploads/iconos-divi/` y las formas del divisor en `uploads/divisores/` y `up
 
 ## Para subirlo
 
-1. Subdominio de prueba (p. ej. `nuevo.basisbodegas.com`) con WordPress, plugin ContOpe **0.3.84**, **Orugantt Forms con el runtime de la rama
-   `basis-tokens`** (ver 5), CookieAdmin y los temas `contope-canvas` y `contope-basis`.
+1. Subdominio de prueba (p. ej. `nuevo.basisbodegas.com`) con WordPress, plugin ContOpe **0.3.85**, **Orugantt Forms con el runtime de la rama
+   `basis-tokens`** (ver 5 y 13; el parche contra `main` está en `docs/`), CookieAdmin y los temas `contope-canvas` y `contope-basis`.
+1b. El sitio de destino en **español** (los textos de los bloques de WordPress, como «No hay comentarios que mostrar.», salen del idioma del
+   sitio) y con sus entradas reales: el buscador y las listas de la barra lateral de `basis-carpas-industriales` las dibuja WordPress con lo que haya.
 2. Copiar `uploads/2025/07/*`, `uploads/divisores/*`, `uploads/formas/*` (`scripts/instalar-formas-de-divisor.php`) y `uploads/iconos-divi/*`.
 3. `SITIO=… AUTH_FILE=… node scripts/basis/aplicar.mjs` (todo por el canal MCP y REST; no sube ningún guion).
 4. Poner la clave de Mapbox (Configuración → Mapa: con ella el mapa de Contactos es el de verdad), la casilla real de destino del

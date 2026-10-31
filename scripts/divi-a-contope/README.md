@@ -84,6 +84,11 @@ clase Divi, con severidad `faltante` / `sin-transcribir` / `aproximado` / `ok`. 
 - **Video de fondo:** si el archivo está en el sitio, va como nodo `video` ambiental detrás del contenido (sección aislada, `media` con la proporción de la sección y recorte cover); si falta, se avisa como «faltante» y se usa la imagen de reemplazo del perfil.
 - **Ícono de los pliegues:** resuelto en 0.3.84 (`showIcon` + parte `icono`). **Mapa siempre abierto:** `content.fijo` (0.3.84); necesita la clave de Mapbox para ser un mapa en vivo (ver `scripts/basis/HUECOS.md`).
 
+- **Barra lateral del tema** (buscador, entradas y comentarios recientes de una página que no usa el constructor): resuelta en 0.3.85 con nodos
+  `block` (bloques nativos de WordPress que dibuja el propio WordPress); necesita la medición `descarga/medir-barra-lateral.mjs` (`lib/barra-lateral.mjs`).
+- **Formulario de Gravity Forms:** va a Orugantt Forms por su contrato de diseño (rellenos, separaciones, casilla propia, contador); necesita la
+  medición `descarga/medir-formulario.mjs` (`forma.extra`). Ver `scripts/basis/HUECOS.md`.
+
 ## Cómo se prueba
 
 `pruebas/probar-animacion.mjs` (animaciones con HTML sintético) y, contra un sitio real, el circuito
