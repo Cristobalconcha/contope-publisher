@@ -1951,7 +1951,7 @@
         "status": "reviewed",
         "value": {
           "declarations": {
-            "background-color": "rgba(255, 255, 255, 0.82)",
+            "background-color": "rgba(255, 255, 255, 0.88)",
             "border-radius": "8px",
             "width": "100%",
             "max-width": "1080px",
@@ -3527,6 +3527,29 @@
           ]
         },
         "status": "reviewed"
+      },
+      {
+        "id": "bas-video-velo",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "value": {
+          "declarations": {
+            "backdrop-filter": "blur(6px)"
+          }
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "scripts/basis/correcciones.json",
+              "rationale": "desenfoque leve del video detrás del recuadro: se nota el movimiento pero no compite con el texto"
+            }
+          ]
+        },
+        "status": "reviewed"
       }
     ]
   },
@@ -4209,7 +4232,8 @@
             "ruleIds": [
               "fila-739852",
               "fila-4a4ac0",
-              "fila-fd60e0"
+              "fila-fd60e0",
+              "bas-video-velo"
             ],
             "children": [
               {

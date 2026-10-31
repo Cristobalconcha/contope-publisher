@@ -54,10 +54,10 @@
   "declaraciones": [
     {
       "pagina": "inicio",
-      "_porque": "el recuadro blanco sobre el video de Características (58% en el original) deja el texto ilegible; Cristóbal, 31-oct",
+      "_porque": "el recuadro blanco sobre el video de Características (58% en el original) deja el texto ilegible; 82% aún molestaba con el video en movimiento (Cristóbal, 31-oct)",
       "propiedad": "background-color",
       "valor": "rgba(255, 255, 255, 0.58)",
-      "nuevo": "rgba(255, 255, 255, 0.82)"
+      "nuevo": "rgba(255, 255, 255, 0.88)"
     }
   ],
   "reglasNuevas": [
@@ -257,6 +257,21 @@
           "font-weight": "700"
         }
       }
+    },
+    {
+      "pagina": "inicio",
+      "_porque": "desenfoque leve del video detrás del recuadro: se nota el movimiento pero no compite con el texto",
+      "id": "bas-video-velo",
+      "kind": "properties",
+      "scope": {
+        "breakpoint": "all",
+        "state": "default"
+      },
+      "value": {
+        "declarations": {
+          "backdrop-filter": "blur(6px)"
+        }
+      }
     }
   ],
   "agregarReglas": [
@@ -280,6 +295,14 @@
       "grupoConTexto": "Características",
       "reglas": [
         "bas-centro-vertical"
+      ]
+    },
+    {
+      "pagina": "inicio",
+      "grupoConTexto": null,
+      "filaConTexto": "Características",
+      "reglas": [
+        "bas-video-velo"
       ]
     }
   ],

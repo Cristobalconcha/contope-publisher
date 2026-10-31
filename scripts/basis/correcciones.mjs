@@ -67,6 +67,8 @@ export function aplicarCorrecciones(slug, nodos, correcciones) {
     // sóloFotos: imágenes de foto (jpg/webp), no íconos ni dibujos en png/svg.
     if (c.kind) recorrer(nodos, (n) => { if (n.kind === c.kind && (!c.soloFotos || /.(jpe?g|webp)$/i.test(n.content?.assetUrl || ''))) sumar(n); });
     if (c.seccionConTexto) for (const sec of nodos) { let t = false; recorrer([sec], (n) => { if (textoDe(n) === c.seccionConTexto) t = true; }); if (t && sec.kind === 'section') { sumar(sec); break; } }
+    // filaConTexto: el recuadro (fila) que contiene la columna con ese texto.
+    if (c.filaConTexto) recorrer(nodos, (n) => { if (n.kind === 'group' && (n.children || []).some((col) => col.kind === 'group' && (col.children || []).some((h) => textoDe(h) === c.filaConTexto))) sumar(n); });
     if (c.grupoConTexto) recorrer(nodos, (n) => { if (n.kind === 'group' && (n.children || []).some((h) => textoDe(h) === c.grupoConTexto)) sumar(n); });
     if (c.pagina === '*' && !veces) continue; // la página no tiene ese tipo de nodo
     exigir(veces > 0, `reglas ${c.reglas.join(', ')} → ${veces} nodo(s)`);
