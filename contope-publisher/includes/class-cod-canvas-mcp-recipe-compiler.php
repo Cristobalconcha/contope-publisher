@@ -5591,7 +5591,11 @@ final class COD_Canvas_MCP_Recipe_Compiler
             ];
             return '';
         }
-        $href = 'https://wa.me/' . $number . '?text=' . rawurlencode($content['message']);
+        // El mensaje se codifica y se pega DESPUÉS de esc_url(): esc_url() borra %0A y %0D
+        // de cualquier URL (defensa contra inyección de cabeceras), y con ellos los saltos
+        // de línea del mensaje ("Hola\n\nNombre:" llegaba como "HolaNombre:"). rawurlencode()
+        // sólo deja letras, números y %XX, así que lo que se agrega no puede romper el atributo.
+        $href = esc_url('https://wa.me/' . $number) . '?text=' . rawurlencode(str_replace(["\r\n", "\r"], "\n", $content['message']));
         $icon = '<svg viewBox="0 0 32 32" width="28" height="28" aria-hidden="true" focusable="false">'
             . '<path fill="currentColor" d="M16 3C9 3 3.3 8.6 3.3 15.5c0 2.4.7 4.7 1.9 6.7L3 29l7-2.1c1.9 1 4 1.6 6 1.6 7 0 12.7-5.6 12.7-12.5S23 3 16 3zm0 22.7c-1.9 0-3.7-.5-5.3-1.4l-.4-.2-4.2 1.2 1.2-4-.3-.4a10.2 10.2 0 0 1-1.6-5.4C5.4 9.7 10.1 5 16 5s10.6 4.7 10.6 10.5S21.9 25.7 16 25.7zm5.8-7.9c-.3-.2-1.9-.9-2.2-1s-.5-.2-.7.2-.8 1-1 1.2-.4.2-.7.1a8.7 8.7 0 0 1-2.6-1.6 9.7 9.7 0 0 1-1.8-2.2c-.2-.3 0-.5.1-.7l.5-.6.3-.5a.6.6 0 0 0 0-.5c-.1-.2-.7-1.7-1-2.3s-.5-.5-.7-.5h-.6a1.2 1.2 0 0 0-.8.4 3.6 3.6 0 0 0-1.1 2.7c0 1.6 1.2 3.1 1.3 3.3.2.2 2.3 3.6 5.7 5a19.6 19.6 0 0 0 1.9.7 4.6 4.6 0 0 0 2.1.1c.6-.1 1.9-.8 2.2-1.5s.3-1.4.2-1.5-.3-.2-.6-.4z"/>'
             . '</svg>';
@@ -5623,7 +5627,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
         // $attrs (de la regla anchor, si hay) más lo estático de acá.
         $attrs = $this->append_inline_style($attrs, $visual_style);
         return '<a ' . $attrs . ' data-cod-whatsapp-message="' . esc_attr($content['message'])
-            . '" href="' . esc_url($href) . '" target="_blank" rel="noopener noreferrer" aria-label="'
+            . '" href="' . $href . '" target="_blank" rel="noopener noreferrer" aria-label="'
             . esc_attr($content['ariaLabel']) . '">' . $icon . '</a>';
     }
 
