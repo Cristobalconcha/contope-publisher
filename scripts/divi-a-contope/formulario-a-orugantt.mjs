@@ -35,6 +35,12 @@ const filasDe = (form) => {
 
 export function fixtureDesdeGravity(form, { nombre, maxLength, avisos = [] }) {
   const items = [];
+  // El texto del contador de caracteres que el original mide («0 de 600 caracteres máximos») pasa a formato del campo:
+  // «{n} de {max} caracteres máximos». Sin medición, el del runtime («{n}/{max}»).
+  const textoContador = String(form.forma?.extra?.contadorTexto || '');
+  const contadorFormato = maxLength && textoContador.includes(String(maxLength))
+    ? textoContador.replace(String(maxLength), '{max}').replace(/0/, '{n}')
+    : '';
   const usados = new Set();
   const unico = (b) => { let x = b, i = 2; while (usados.has(x)) x = `${b}_${i++}`; usados.add(x); return x; };
   for (const [indice, c] of form.campos.entries()) {
@@ -66,7 +72,7 @@ export function fixtureDesdeGravity(form, { nombre, maxLength, avisos = [] }) {
       items.push({ type: 'texto', id: unico(id(etiqueta)), label: etiqueta, obligatorio: req, registrarEnDb: true });
     } else if (tipo === 'textarea') {
       // En Gravity la descripción va ARRIBA del campo (entre la etiqueta y el cuadro): `ayudaArriba`.
-      items.push({ type: 'texto-largo', id: unico(id(etiqueta) || 'mensaje'), label: etiqueta, obligatorio: req, registrarEnDb: true, rows: filasDe(form), ...(maxLength ? { maxLength } : {}), ...(c.descripcion ? { ayuda: c.descripcion, ayudaArriba: true } : {}) });
+      items.push({ type: 'texto-largo', id: unico(id(etiqueta) || 'mensaje'), label: etiqueta, obligatorio: req, registrarEnDb: true, rows: filasDe(form), ...(maxLength ? { maxLength } : {}), ...(maxLength && contadorFormato ? { contadorFormato } : {}), ...(c.descripcion ? { ayuda: c.descripcion, ayudaArriba: true } : {}) });
     } else if (tipo === 'consent' || tipo === 'checkbox') {
       items.push({ type: 'boolean_check', id: unico(id(etiqueta) || 'acepta'), label: etiqueta, obligatorio: req, registrarEnDb: true, opciones: [{ value: 'si', label: e[0]?.etiqueta || etiqueta }] });
     } else if (tipo === 'select' || tipo === 'radio') {

@@ -134,7 +134,7 @@ export function moduloTexto(ctx, d, m, { gapD, gapM, ubicacion }) {
       if (primeraM) declListaM['padding-block-end'] = pxs(primeraM.relleno4[2]);
       const reglasLista = [...reglas, ...ctx.reg.propiedades(declLista, { mobile: declListaM }, { prefijo: 'lista' })];
       const nodoLista = ctx.nodo('list', reglasLista, { ordered: b.ordenada, items });
-      sangriaDeLista.set(nodoLista, { d: sangria, m: sangriaM });
+      sangriaDeLista.set(nodoLista, { d: sangria, m: sangriaM, finD: primera ? pxs(primera.relleno4[2]) : '0px', finM: primeraM ? pxs(primeraM.relleno4[2]) : (primera ? pxs(primera.relleno4[2]) : '0px') });
       // Sublistas: parte `sublista` del nodo `list` (0.3.84), con la sangría medida de su nivel.
       const subD = lD.find((l) => l.nivel >= 1); const subM = lM.find((l) => l.nivel >= 1);
       if (anidada && subD) {
@@ -253,7 +253,9 @@ export function moduloImagen(ctx, d, m, { col, gapD, gapM, ubicacion }) {
     const enlace = img.enlace && ctx.destino(img.enlace);
     if (enlace) {
       const reglasEnl = [...ctx.reg.propiedades({ display: 'block', width: decl.width === '100%' ? '100%' : pxs(caja.w), 'max-width': '100%' }, {}, { prefijo: 'enl' })];
-      nodo.ruleIds = nodo.ruleIds.filter((r) => !r.startsWith('mg-'));
+      // El margen de la imagen pasa al ENLACE que la envuelve; la imagen queda con margen cero explícito (sin él, el <figure> trae el margen de
+      // abajo de la hoja base y el enlace salía 14 px más alto que el módulo: el logo del encabezado a 393 y 768).
+      nodo.ruleIds = [...nodo.ruleIds.filter((r) => !r.startsWith('mg-')), ...ctx.reg.propiedades({ 'margin-block-start': '0px', 'margin-block-end': '0px' }, {}, { prefijo: 'mg-img' })];
       const link = ctx.nodo('link', [...reglasEnl, ...reglasMargen(ctx.reg, gapD, gapM)], { label: '', href: enlace.href, target: enlace.blank ? 'blank' : 'self' }, [nodo]);
       nodo = link;
     }
@@ -433,6 +435,30 @@ export function moduloFormulario(ctx, d, m, { gapD, gapM, ubicacion }) {
     const lh = px(e.interlineado) / px(e.tam);
     if (lh) tema.interlineado = String(Math.round(lh * 100) / 100);
     tema.peso = String(Math.round(Number(e.peso) / 100) * 100);
+    // Segunda parte del contrato (30-oct): los rellenos, márgenes y separaciones entre las partes del formulario y la casilla propia,
+    // medidos en vivo (descarga/medir-formulario.mjs). Gravity pone el espacio como relleno y margen de cada parte; el runtime lo
+    // expresa igual, así que la separación automática entre ayuda, cuadro y contador (controlSeparacion) queda en cero.
+    const x = forma.extra;
+    if (x) {
+      const aMs = (v) => (Number.isFinite(Number(v)) ? pxs(Number(v)) : undefined);
+      const poner = (o) => { for (const [k, v] of Object.entries(o)) if (v !== undefined) tema[k] = v; };
+      poner({
+        grupoTituloSeparacion: aMs(x.grupoTituloSeparacion), etiquetaSeparacion: aMs(x.etiquetaSeparacion), etiquetaRellenoSuperior: aMs(x.etiquetaRellenoSuperior),
+        opcionEtiquetaRellenoSuperior: aMs(x.opcionEtiquetaRellenoSuperior), controlSeparacion: '0px',
+        ayudaRellenoY: forma.ayuda ? aMs(forma.ayuda.relleno4[0]) : undefined, ayudaSeparacion: aMs(x.ayudaSeparacion),
+        contadorRellenoY: forma.contador ? aMs(forma.contador.relleno4[0]) : undefined, contadorSeparacion: aMs(x.contadorSeparacion),
+        contadorInterlineado: forma.contador ? String(Math.round((px(forma.contador.interlineado) / px(forma.contador.tam)) * 100) / 100) : undefined,
+        contadorAlineacion: x.contadorAlinea === 'right' || x.contadorAlinea === 'end' ? 'right' : x.contadorAlinea === 'center' ? 'center' : 'left',
+        pieRellenoY: forma.pie ? aMs(forma.pie.relleno4[0]) : undefined, pieSeparacion: aMs(x.pieMargenSuperior),
+        rejillaSeparacion: aMs(x.rejillaSeparacion), rejillaFilaSeparacion: aMs(x.rejillaFilaSeparacion), rejillaSubSeparacion: aMs(x.rejillaSubSeparacion), opcionesRellenoY: aMs(x.opcionesRellenoY),
+      });
+      const c = x.casilla;
+      if (c) poner({
+        casillaApariencia: 'none', casillaTamano: aMs(c.tamano), casillaFondo: colorRegla(c.fondo), casillaMargenSuperior: '0px', casillaMargenLateral: '0px',
+        casillaMarca: x.casillaMarca?.color ? colorRegla(x.casillaMarca.color) : undefined,
+        opcionSangria: aMs(x.opcionSangria), opcionSeparacion: aMs(c.relleno - c.tamano - c.izquierda), opcionAlineacion: c.centrada ? 'center' : 'flex-start',
+      });
+    }
     if (enviar) Object.assign(tema, { botonAncho: enviar.ancho >= (f.forma.entrada.ancho * 2) ? '100%' : pxs(enviar.ancho), botonTamano: enviar.tam, botonPeso: String(Math.round(Number(enviar.peso) / 100) * 100), botonRellenoY: pxs(enviar.relleno4[0]), botonRellenoX: pxs(enviar.relleno4[1]), botonRadio: enviar.radio });
   }
   const reglas = [ctx.reg.R('form', { surface: 'none', theme: tema }, { prefijo: 'form' }), ...reglasMargen(ctx.reg, gapD, gapM)];
@@ -496,7 +522,9 @@ export function aplicarRellenoPropio(ctx, mD, mM, nodos, ubicacion) {
     const d = { 'padding-right': pxs(r[1]) };
     if (lista) d['padding-inline-start'] = `calc(${sangriaDeLista.get(lista)?.[bp] || '1em'} + ${pxs(r[3])})`; else d['padding-left'] = pxs(r[3]);
     if (i === 0) d['padding-top'] = pxs(r[0]);
-    if (i === n - 1) d['padding-bottom'] = pxs(r[2]);
+    // El relleno de abajo del módulo se SUMA al de la propia lista (Divi: la lista trae 14 px abajo y el módulo 30 más): son la misma propiedad
+    // (padding-block-end y padding-bottom), así que una escrita después pisaba a la otra y la lista salía 14 px más corta.
+    if (i === n - 1) { if (lista) d['padding-block-end'] = `calc(${sangriaDeLista.get(lista)?.[bp === 'm' ? 'finM' : 'finD'] || '0px'} + ${pxs(r[2])})`; else d['padding-bottom'] = pxs(r[2]); }
     return d;
   };
   nodos.forEach((nodo, i) => {

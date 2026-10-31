@@ -17,6 +17,7 @@ import { px, pxs, redondear, lados, esTransparente, colorRegla, leerHtml, textoD
 import { reglasMargen, declaracionesCaja, superficieSeccion, reglasTexto } from './estilos.mjs';
 import { transcribirModulo, razon, aplicarRellenoPropio } from './modulos.mjs';
 import { transcribirCodigo } from './codigo.mjs';
+import { barraLateral } from './barra-lateral.mjs';
 import { writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { hash } from './util.mjs';
@@ -28,7 +29,9 @@ const hueco = (a, b, col) => {
   if (b) return Math.max(-9999, Math.round(b.caja.y - (a.caja.y + a.caja.h)));
   if (!col) return 0;
   const resto = (col.caja.y + col.caja.h) - (a.caja.y + a.caja.h) - lados(col.estilo.relleno)[2];
-  return Math.abs(resto) < 200 ? Math.round(resto) : 0;
+  // Las cajas medidas se redondean al píxel: un «resto» de ±1 sobre el último módulo es ruido de ese redondeo (un texto de 52,5 px medido como 53),
+  // no un margen. Se tomaba como -1 px y cada columna apilada salía 1 px más corta que el original.
+  return Math.abs(resto) < 200 && Math.abs(resto) > 1.5 ? Math.round(resto) : 0;
 };
 
 const margenesVert = (margen) => {
@@ -98,6 +101,26 @@ function transcribirColumna(ctx, cD, cM, ubic, anchoD, anchoM) {
     const nodos = transcribirModulo(ctx, mD, mM, info);
     ctx.reg.inicioPendiente = null;
     if (!nodos.length) return;
+    // El módulo de código con el que EMPIEZA una columna también puede traer márgenes propios (Divi: el de la dirección del pie lleva
+    // margen superior de -10 px): se aplica a su primer nodo, que es el que se ve (los de posición fija no cuentan).
+    if (i === 0 && ['code', 'fullwidth_code'].includes(mD.tipo) && mD.visible && nodos[0].kind === 'group') {
+      const topD = cD.caja.y + lados(cD.estilo.relleno)[0];
+      const topM = cM ? cM.caja.y + lados(cM.estilo.relleno)[0] : null;
+      const offD = Math.round(mD.caja.y - topD);
+      const offM = mM && topM !== null ? Math.round(mM.caja.y - topM) : offD;
+      // Divi deja ADEMÁS el aire de abajo del módulo de código (un <div> vacío con margen de 20 px al final): la columna mide lo que mide el módulo
+      // más ese margen. Se lleva como margen inferior, que es el hueco medido hasta el borde de la columna.
+      const finD = mods.length === 1 ? info.gapD : 0;
+      const finM = mods.length === 1 ? info.gapM : 0;
+      if (Math.abs(offD) > 1 || Math.abs(offM) > 1 || finD > 1 || finM > 1) {
+        const base = { 'margin-block-start': pxs(offD), 'margin-block-end': pxs(finD) };
+        const mob = {};
+        if (offM !== offD) mob['margin-block-start'] = pxs(offM);
+        if (finM !== finD) mob['margin-block-end'] = pxs(finM);
+        nodos[0].ruleIds = [...nodos[0].ruleIds, ...ctx.reg.propiedades(base, Object.keys(mob).length ? { mobile: mob } : {}, { prefijo: 'mg-cod' })];
+        ctx.avisar({ ...u, modulo: mD.tipo, clase: 'desfase', severidad: 'ok', motivo: `el módulo de código que empieza la columna lleva márgenes propios: arriba ${offD}px (escritorio) / ${offM}px (celular), abajo ${finD}px / ${finM}px` });
+      }
+    }
     aplicarRellenoPropio(ctx, mD, mM, nodos, u);
     // Un módulo de texto o título más angosto que su columna (Divi: Sizing → ancho máximo) o corrido de su borde (márgenes propios del
     // módulo: a 768 y 393 el título de Contactos tiene 30px a cada lado). Se mide A CADA ANCHO por separado: puede ser llena en
@@ -128,11 +151,20 @@ function transcribirColumna(ctx, cD, cM, ubic, anchoD, anchoM) {
       (rac.partes ||= []).push({ x: mD.caja.x, nodos });  // el orden visual (por su posición a escritorio), no el del código: Divi los pisa y los acomoda de lado
       if (ultimoRac) {
         const primero = mods[rac.idx[0]]; const ultimo = mods[i];
-        const derecha = (ultimo.caja.x + ultimo.caja.w) >= cD.caja.x + cD.caja.w - 2 && ultimo.caja.w < cD.caja.w - 4;
+        // «A la derecha»: el último módulo pegado al borde derecho y más angosto que la columna, o —cuando el último llena la columna y sólo
+        // acomoda su texto a la derecha, como el crédito del pie— cualquier módulo del grupo más angosto que la columna pegado a ese borde.
+        const alBordeDerecho = (k) => { const q = mods[k]; return (q.caja.x + q.caja.w) >= cD.caja.x + cD.caja.w - 2 && q.caja.w < cD.caja.w - 4; };
+        const derecha = alBordeDerecho(rac.idx[rac.idx.length - 1]) || rac.idx.some(alBordeDerecho);
         const enFilaM = rac.idx.every((k, j2) => j2 === 0 || !cM?.modulos?.[k] || !pisa(cM.modulos[rac.idx[j2 - 1]], cM.modulos[k]));
         const declR = { display: 'flex', 'flex-wrap': 'wrap', 'align-items': 'center', gap: '20px', 'justify-content': derecha ? 'flex-end' : 'flex-start' };
         const declRM = cM && enFilaM ? { 'flex-direction': 'column', 'align-items': derecha ? 'flex-end' : 'flex-start', gap: '0px' } : {};
         ctx.avisar({ ...u, modulo: 'columna', clase: 'módulos superpuestos', severidad: 'aproximado', motivo: `${rac.idx.length} módulos con cajas que se pisan (lado a lado en el original): se agrupan en una fila con separación de 20px (inferida)` });
+        // Dentro de la fila, la separación entre los módulos la pone el `gap` de 20 px: el margen automático o de 20 px que una imagen traía para
+        // arrimarse a su borde dentro de SU módulo (Divi: relleno izquierdo del módulo) sobraría y la apartaba 10 px más del texto.
+        const ceroMargen = ctx.reg.R('properties', { declarations: { 'margin-inline-start': '0px' } }, { prefijo: 'racimo-i' });
+        const ceroMargenM = ctx.reg.R('properties', { declarations: { 'margin-inline-start': '0px' } }, { bp: 'mobile', base: ceroMargen, prefijo: 'racimo-i' });
+        const ceroMargenT = ctx.reg.R('properties', { declarations: { 'margin-inline-start': '0px' } }, { bp: 'tablet', base: ceroMargen, prefijo: 'racimo-i' });
+        for (const p of rac.partes) for (const n of p.nodos) if (n.kind === 'image') n.ruleIds = [...(n.ruleIds || []), ceroMargen, ceroMargenT, ceroMargenM];
         hijos.push(ctx.nodo('group', [...ctx.reg.propiedades(declR, { mobile: declRM }, { prefijo: 'racimo' })], undefined, rac.partes.slice().sort((a, b) => a.x - b.x).flatMap((p) => p.nodos)));
       }
       return;
@@ -207,7 +239,7 @@ function transcribirFila(ctx, fD, fM, ubic, vw) {
   return [ctx.nodo('group', conMovimiento(ctx, anim, reglas), undefined, hijos)];
 }
 
-export function transcribirSeccion(ctx, sD, sM, indice, vw) {
+export function transcribirSeccion(ctx, sD, sM, indice, vw, previa = null) {
   const region = sD.region;
   const ubic = { pagina: ctx.pagina, region, seccion: indice };
   ctx.ubicacionActual = ubic;
@@ -266,6 +298,15 @@ export function transcribirSeccion(ctx, sD, sM, indice, vw) {
   };
   alto(sD, decl);
   if (sM) alto(sM, declM);
+  if (previa) {
+    const mgD = Math.round(sD.caja.y - (previa.d.caja.y + previa.d.caja.h));
+    const mgM = sM && previa.m ? Math.round(sM.caja.y - (previa.m.caja.y + previa.m.caja.h)) : mgD;
+    if (Math.abs(mgD) >= 1 || Math.abs(mgM) >= 1) {
+      decl['margin-block-start'] = pxs(mgD);
+      if (mgM !== mgD) declM['margin-block-start'] = pxs(mgM);
+      ctx.avisar({ ...ubic, modulo: 'sección', clase: 'margen', severidad: 'ok', motivo: `la sección no empieza donde termina la anterior: margen superior de ${mgD}px (escritorio) / ${mgM}px (celular)` });
+    }
+  }
   ids.push(...ctx.reg.propiedades(decl, { mobile: declM }, { prefijo: 'sec' }));
   // Video de fondo: si el archivo está en el sitio local se usa; si no, se
   // avisa y el fondo queda con la imagen de reemplazo del perfil (si la hay).
@@ -339,7 +380,11 @@ export function transcribirMedicion(ctx, medD, medM) {
   if (medM && !hayMovil) ctx.avisar({ pagina: ctx.pagina, modulo: 'página', clase: 'estructura', severidad: 'aproximado', motivo: `a 393 de ancho hay ${medM.secciones.length} secciones y a 1440 hay ${medD.secciones.length}: sólo escritorio` });
   medD.secciones.forEach((sD, i) => {
     const sM = hayMovil ? medM.secciones[i] : null;
-    res[sD.region].push(transcribirSeccion(ctx, sD, sM, i, vw));
+    // La sección anterior de la MISMA región: su borde de abajo decide el margen superior de ésta (Divi: margen propio de la sección, a
+    // veces negativo; la sección «Descubre más» de Basis sube 5 px sobre la del video).
+    const pD = i > 0 && medD.secciones[i - 1].region === sD.region ? medD.secciones[i - 1] : null;
+    const pM = pD && hayMovil ? medM.secciones[i - 1] : null;
+    res[sD.region].push(transcribirSeccion(ctx, sD, sM, i, vw, pD ? { d: pD, m: pM } : null));
   });
   if (medD.contenidoPlano && !res.contenido.length) {
     ctx.avisar({ pagina: ctx.pagina, modulo: 'página', clase: 'contenido plano', severidad: 'ok', motivo: 'la página no usa el constructor de Divi: su contenido es el del editor de WordPress' });
@@ -375,6 +420,20 @@ export function transcribirContenidoPlano(ctx, medD, medM) {
   const lateral = buscar(arbol, (n) => n.attrs.id === 'sidebar')[0];
   if (lateral) ctx.avisar({ ...ubic, modulo: 'contenido plano', clase: '#sidebar', severidad: 'sin-transcribir', motivo: 'barra lateral del tema de Divi (buscador, entradas recientes, comentarios recientes): son widgets de WordPress, no contenido de la página; se omiten' });
   if (!hijos.length) return [];
+  // La barra lateral: bloques NATIVOS de WordPress (buscador, entradas y comentarios recientes) en un nodo `block` cada uno, con la forma
+  // medida. Requiere la medición de la barra (descarga/medir-barra-lateral.mjs); sin ella queda sólo el aviso de arriba.
+  const lat = lateral ? barraLateral(ctx, medD, medM) : null;
+  if (lat) {
+    ctx.avisar({ ...ubic, modulo: 'contenido plano', clase: '#sidebar', severidad: 'ok', motivo: 'la barra lateral se transcribe como bloques nativos de WordPress (core/search, core/latest-posts, core/latest-comments) dentro de la composición; los dibuja WordPress con los datos del momento' });
+    const izquierda = ctx.nodo('group', lat.izquierdaIds, undefined, hijos);
+    const sec = ctx.reg.propiedades({ 'padding-top': '58px', 'padding-bottom': '0px', 'padding-left': '0px', 'padding-right': '0px' }, {}, { prefijo: 'sec' });
+    const fila = [...ctx.reg.propiedades({ width: '80%', 'max-width': '1080px', 'margin-inline-start': 'auto', 'margin-inline-end': 'auto' }, {}, { prefijo: 'fila' }), ...lat.filaIds];
+    // El título de la página lleva su relleno y su margen de abajo (el original los tiene; sin contenido debajo no se notaban).
+    const tituloNodo = hijos[0];
+    const margenCero = reglasMargen(ctx.reg, 0, 0);
+    tituloNodo.ruleIds = [...tituloNodo.ruleIds.filter((id) => !margenCero.includes(id)), ...ctx.reg.propiedades(lat.titulo, {}, { prefijo: 'lat-h1' })];
+    return [ctx.nodo('section', sec, undefined, [ctx.nodo('group', fila, undefined, [izquierda, lat.lateral])])];
+  }
   const ids = [...ctx.reg.propiedades({ 'padding-top': '58px', 'padding-bottom': '58px', 'padding-left': '0px', 'padding-right': '0px' }, {}, { prefijo: 'sec' }),
     ...ctx.reg.propiedades({ width: '80%', 'max-width': '1080px', 'margin-inline-start': 'auto', 'margin-inline-end': 'auto' }, {}, { prefijo: 'fila' })];
   const caja = ctx.nodo('group', ids.slice(1), undefined, hijos);

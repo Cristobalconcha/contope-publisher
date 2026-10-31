@@ -147,17 +147,20 @@ export function transcribirCodigo(ctx, mod, { pagina, ubicacion }) {
           const rol = (ctx.medidaD?.roles || []).find((r) => (r.ejemplos || []).some((e) => textoDireccion.startsWith(e.slice(0, 25))));
           const rolM = (ctx.medidaM?.roles || []).find((r) => (r.ejemplos || []).some((e) => textoDireccion.startsWith(e.slice(0, 25))));
           const reglasDir = rol ? reglasTexto(ctx.reg, { d: rol, m: rolM }) : [];
-          reglasDir.push(...ctx.reg.propiedades({ 'margin-block-start': '0px', 'margin-block-end': '0px', 'flex-grow': '1', 'flex-shrink': '1', 'flex-basis': '0px', 'min-width': '0px' }, {}, { prefijo: 'mg-dir' }));
+          // Ancho NATURAL de la dirección (como el <div> flex del original: 235 px a escritorio) que cede cuando falta sitio, junto con el mini mapa:
+          // a 393 el mapa se encoge de 60 a 52,8 y el texto de 235 a 206,6, en proporción a su tamaño.
+          reglasDir.push(...ctx.reg.propiedades({ 'margin-block-start': '0px', 'margin-block-end': '0px', 'flex-grow': '0', 'flex-shrink': '1', 'flex-basis': 'auto', 'min-width': '0px' }, {}, { prefijo: 'mg-dir' }));
           hijos.push(ctx.nodo('paragraph', reglasDir, { text: textoDireccion }));
         }
         const caja = mod.caja || { w: 60, h: 60 };
         const reglasGrupo = esMini
           // Mini mapa: la imagen y la dirección escrita lado a lado; el mapa grande se despliega debajo.
-          ? ctx.reg.propiedades({ display: 'flex', 'flex-wrap': 'wrap', 'align-items': 'center', gap: '15px', 'justify-content': 'center' }, {}, { prefijo: 'mapa' })
+          ? ctx.reg.propiedades({ display: 'flex', 'flex-wrap': 'nowrap', 'align-items': 'center', gap: '15px', 'justify-content': 'flex-start' }, {}, { prefijo: 'mapa' })
           // Mapa de la ficha de contacto: la imagen llena la caja que ocupaba el mapa del original.
           : ctx.reg.propiedades({ display: 'block', width: '100%', 'min-height': pxs(caja.h) }, {}, { prefijo: 'mapa' });
         const reglasMini = esMini
-          ? ctx.reg.propiedades({ width: '60px', height: '60px', 'border-radius': '8px', 'object-fit': 'cover', display: 'block' }, {}, { prefijo: 'mini' })
+          // Con la dirección al lado, el mini mapa CEDE ancho (el <div> de Mapbox del original se encoge: 52,8 × 60 a 393 px): flex-shrink 1 y min-width 0.
+          ? ctx.reg.propiedades({ width: '60px', height: '60px', 'border-radius': '8px', 'object-fit': 'cover', display: 'block', 'flex-shrink': '1', 'min-width': '0px' }, {}, { prefijo: 'mini' })
           : ctx.reg.propiedades({ width: '100%', height: pxs(caja.h), 'border-radius': '8px', 'object-fit': 'cover', display: 'block' }, {}, { prefijo: 'mini' });
         // Sin la clave pública de Mapbox el plugin deja el mini como un enlace con una imagen de
         // 60×60 (no monta la conducta): para un mapa GRANDE eso se ve como una miniatura perdida.
