@@ -123,7 +123,8 @@ $comprobar('showIcon en otro behavior se rechaza', is_wp_error($r) && stripos($e
 // ---------------------------------------------------------------------------
 echo "\n== 3. whatsapp: iconStyle logo ==\n";
 $wa = static fn (array $contenido) => [['id' => 'wa', 'kind' => 'whatsapp', 'ruleIds' => [], 'content' => array_merge(['message' => 'Hola'], $contenido)]];
-update_option('cod_whatsapp_number', '56900000000');
+// Con filtro y no con update_option: la prueba no puede dejar un número falso guardado en el sitio donde corre.
+add_filter('pre_option_cod_whatsapp_number', static fn () => '56900000000');
 $mono = $compilar($wa([]), []);
 $comprobar('el de siempre: un solo color y sin degradado', !is_wp_error($mono) && strpos($marcado($mono), 'linearGradient') === false && strpos($marcado($mono), 'fill="currentColor"') !== false, $error($mono));
 $logo = $compilar($wa(['iconStyle' => 'logo', 'iconColor' => '#ffffff', 'backgroundColor' => '#000000', 'size' => 60, 'iconPadding' => 9]), []);
