@@ -1,8 +1,35 @@
+diff --git a/README.md b/README.md
+index e733163..b907e9e 100644
+--- a/README.md
++++ b/README.md
+@@ -47,10 +47,18 @@ el pie de un sitio. El constructor no la toca.
+ - `includes/class-ofr-notifications.php` — aviso por correo con plantilla HTML
+   y etiquetas de campo. Es un **aviso**, no el registro: la respuesta se
+   guarda primero y si el correo falla, el dato ya está a salvo.
+-- `includes/class-ofr-design-tokens.php` — el contrato de diseño: las 29
+-  variables del runtime. El editor de páginas fija valores; el runtime decide
+-  dónde se aplican. Nunca reglas sobre los campos, que atarían el diseño a una
+-  estructura interna que puede cambiar.
++- `includes/class-ofr-design-tokens.php` — el contrato de diseño: las variables
++  del runtime (29 al principio; el 30-oct-2026 se ampliaron a más de 80 al llevar
++  a Basis un formulario con otro modelo de cajas: campos, etiquetas, botón,
++  rellenos, márgenes, separaciones, casilla propia y contador). El editor de
++  páginas fija valores; el runtime decide dónde se aplican. Nunca reglas sobre
++  los campos, que atarían el diseño a una estructura interna que puede cambiar.
++  Un valor de una lista cerrada (alineación del contador, apariencia de la
++  casilla) es de tipo `keyword` y declara sus `values`. El **texto** del
++  contador no es una variable sino una propiedad del campo, `contadorFormato`
++  («{n} de {max} caracteres máximos»; sin ella, «{n}/{max}»). Pruebas:
++  `pruebas/probar-contrato-de-diseno.php` (el contrato y la hoja compilada no se
++  desalinean) y `pruebas/probar-contador-formato.mjs`.
+ - `includes/class-ofr-constructor-rest.php` / `class-ofr-constructor-admin.php`
+   — el constructor de Orugantt corriendo dentro del escritorio de WordPress.
+ 
 diff --git a/includes/class-ofr-design-tokens.php b/includes/class-ofr-design-tokens.php
-index 386826f..3ee1166 100644
+index 386826f..3aecea2 100644
 --- a/includes/class-ofr-design-tokens.php
 +++ b/includes/class-ofr-design-tokens.php
-@@ -75,6 +75,37 @@ final class OFR_Design_Tokens
+@@ -75,6 +75,65 @@ final class OFR_Design_Tokens
              'espacioLg' => ['token' => '--ofr-space-lg', 'label' => 'Espaciado grande', 'type' => 'length', 'group' => 'Forma'],
              'sombra' => ['token' => '--ofr-shadow', 'label' => 'Sombra', 'type' => 'shadow', 'group' => 'Forma'],
              'anilloFoco' => ['token' => '--ofr-focus-ring', 'label' => 'Anillo de foco', 'type' => 'shadow', 'group' => 'Forma'],
@@ -37,22 +64,174 @@ index 386826f..3ee1166 100644
 +            'botonRellenoY' => ['token' => '--ofr-submit-pad-y', 'label' => 'Botón: relleno vertical', 'type' => 'length', 'group' => 'Botón'],
 +            'botonRellenoX' => ['token' => '--ofr-submit-pad-x', 'label' => 'Botón: relleno horizontal', 'type' => 'length', 'group' => 'Botón'],
 +            'botonRadio' => ['token' => '--ofr-submit-radius', 'label' => 'Botón: radio de las esquinas', 'type' => 'length', 'group' => 'Botón'],
++            // Contrato ampliado, segunda parte (30 de octubre de 2026): los rellenos, márgenes y separaciones entre las partes del
++            // formulario, la casilla propia y el contador (su alineación; su texto es la propiedad `contadorFormato` del campo).
++            // `keyword` es un tipo nuevo: un valor de una lista cerrada, que va en `values`.
++            'grupoTituloSeparacion' => ['token' => '--ofr-group-title-gap', 'label' => 'Título de grupo: separación con lo de abajo', 'type' => 'length', 'group' => 'Etiquetas'],
++            'etiquetaSeparacion' => ['token' => '--ofr-label-gap', 'label' => 'Etiqueta: separación con su campo', 'type' => 'length', 'group' => 'Etiquetas'],
++            'etiquetaRellenoSuperior' => ['token' => '--ofr-label-pad-top', 'label' => 'Etiqueta: relleno superior', 'type' => 'length', 'group' => 'Etiquetas'],
++            'opcionEtiquetaRellenoSuperior' => ['token' => '--ofr-option-label-pad-top', 'label' => 'Etiqueta de una casilla: relleno superior', 'type' => 'length', 'group' => 'Campos'],
++            'controlSeparacion' => ['token' => '--ofr-control-gap', 'label' => 'Campo: separación entre ayuda, cuadro y contador', 'type' => 'length', 'group' => 'Campos'],
++            'ayudaRellenoY' => ['token' => '--ofr-help-pad-y', 'label' => 'Texto de ayuda: relleno vertical', 'type' => 'length', 'group' => 'Etiquetas'],
++            'ayudaSeparacion' => ['token' => '--ofr-help-margin', 'label' => 'Texto de ayuda: margen hacia el cuadro', 'type' => 'length', 'group' => 'Etiquetas'],
++            'contadorRellenoY' => ['token' => '--ofr-counter-pad-y', 'label' => 'Contador: relleno vertical', 'type' => 'length', 'group' => 'Campos'],
++            'contadorSeparacion' => ['token' => '--ofr-counter-margin', 'label' => 'Contador: margen superior', 'type' => 'length', 'group' => 'Campos'],
++            'contadorInterlineado' => ['token' => '--ofr-counter-line', 'label' => 'Contador: interlineado', 'type' => 'ratio', 'group' => 'Campos'],
++            'contadorAlineacion' => ['token' => '--ofr-counter-align', 'label' => 'Contador: alineación', 'type' => 'keyword', 'values' => ['left', 'right', 'center'], 'group' => 'Campos'],
++            'pieRellenoY' => ['token' => '--ofr-footer-pad-y', 'label' => 'Pie del formulario: relleno vertical', 'type' => 'length', 'group' => 'Botón'],
++            'pieSeparacion' => ['token' => '--ofr-footer-gap', 'label' => 'Pie del formulario: margen superior', 'type' => 'length', 'group' => 'Botón'],
++            'casillaApariencia' => ['token' => '--ofr-check-appearance', 'label' => 'Casilla: apariencia (auto = la del navegador, none = propia)', 'type' => 'keyword', 'values' => ['auto', 'none'], 'group' => 'Campos'],
++            'casillaTamano' => ['token' => '--ofr-check-size', 'label' => 'Casilla: tamaño', 'type' => 'length', 'group' => 'Campos'],
++            'casillaFondo' => ['token' => '--ofr-check-bg', 'label' => 'Casilla propia: fondo', 'type' => 'color', 'group' => 'Campos'],
++            'casillaMarca' => ['token' => '--ofr-check-mark', 'label' => 'Casilla propia: color de la marca', 'type' => 'color', 'group' => 'Campos'],
++            'casillaMargenSuperior' => ['token' => '--ofr-check-margin-top', 'label' => 'Casilla: margen superior', 'type' => 'length', 'group' => 'Campos'],
++            'opcionSangria' => ['token' => '--ofr-option-indent', 'label' => 'Casillas y opciones: sangría a la izquierda', 'type' => 'length', 'group' => 'Campos'],
++            'opcionSeparacion' => ['token' => '--ofr-option-gap', 'label' => 'Casillas y opciones: separación entre casilla y texto', 'type' => 'length', 'group' => 'Campos'],
++            'opcionesRellenoY' => ['token' => '--ofr-options-pad-y', 'label' => 'Casillas y opciones: relleno vertical del conjunto', 'type' => 'length', 'group' => 'Campos'],
++            'rejillaSeparacion' => ['token' => '--ofr-grid-gap', 'label' => 'Filas con columnas: separación entre columnas', 'type' => 'length', 'group' => 'Forma'],
++            'rejillaFilaSeparacion' => ['token' => '--ofr-grid-row-gap', 'label' => 'Filas con columnas: separación vertical (cuando se apilan)', 'type' => 'length', 'group' => 'Forma'],
++            'rejillaSubSeparacion' => ['token' => '--ofr-grid-sub-gap', 'label' => 'Grupo con título: separación entre sus columnas', 'type' => 'length', 'group' => 'Forma'],
++            'opcionAlineacion' => ['token' => '--ofr-option-align', 'label' => 'Casillas y opciones: alineación vertical de la casilla', 'type' => 'keyword', 'values' => ['flex-start', 'center', 'flex-end'], 'group' => 'Campos'],
          ];
  
          /**
+diff --git a/pruebas/probar-contador-formato.mjs b/pruebas/probar-contador-formato.mjs
+new file mode 100644
+index 0000000..951e025
+--- /dev/null
++++ b/pruebas/probar-contador-formato.mjs
+@@ -0,0 +1,21 @@
++/**
++ * El texto del contador de caracteres (contadorFormato de un campo, Orugantt Forms, contrato ampliado del 30-oct-2026).
++ *
++ *   node --experimental-strip-types pruebas/probar-contador-formato.mjs
++ */
++import { textoDelContador } from '../runtime-src/src/contador.ts';
++
++let fallas = 0;
++const c = (caso, obtenido, esperado) => {
++  const ok = obtenido === esperado;
++  if (!ok) fallas++;
++  console.log((ok ? '  ok     ' : '  FALLA  ') + caso + (ok ? '' : `   obtuvo «${obtenido}», esperaba «${esperado}»`));
++};
++c('sin formato: el de siempre', textoDelContador(undefined, 0, 600), '0/600');
++c('formato vacío: el de siempre', textoDelContador('   ', 12, 600), '12/600');
++c('formato que no es texto: el de siempre', textoDelContador(42, 3, 10), '3/10');
++c('«{n} de {max} caracteres máximos»', textoDelContador('{n} de {max} caracteres máximos', 0, 600), '0 de 600 caracteres máximos');
++c('el formato puede repetir o invertir los números', textoDelContador('quedan {max} de {max}; escritos {n}', 5, 20), 'quedan 20 de 20; escritos 5');
++c('un formato sin marcas se deja tal cual', textoDelContador('sin número', 5, 20), 'sin número');
++console.log(fallas === 0 ? '\nTODO OK' : `\n${fallas} FALLARON`);
++process.exit(fallas === 0 ? 0 : 1);
+diff --git a/pruebas/probar-contrato-de-diseno.php b/pruebas/probar-contrato-de-diseno.php
+new file mode 100644
+index 0000000..85e6c8f
+--- /dev/null
++++ b/pruebas/probar-contrato-de-diseno.php
+@@ -0,0 +1,63 @@
++<?php
++/**
++ * El contrato de diseño del runtime (OFR_Design_Tokens) y su hoja de estilos no se desalinean.
++ *
++ * Contra un WordPress con el plugin activo y el runtime compilado (assets/dist):
++ *
++ *   OFR_WP_LOAD=C:/ruta/wp-load.php php pruebas/probar-contrato-de-diseno.php
++ *   (o: wp eval-file wp-content/plugins/orugantt-forms/pruebas/probar-contrato-de-diseno.php)
++ *
++ * Comprueba que cada variable del contrato: (1) es una variable `--ofr-*` única, (2) la usa la hoja compilada con var(), (3) si es
++ * de tipo `keyword`, declara su lista cerrada de valores, y que las variables de la segunda parte del contrato (30-oct-2026) están.
++ */
++if (!defined('ABSPATH')) {
++    define('WP_USE_THEMES', false);
++    require getenv('OFR_WP_LOAD') ?: dirname(__DIR__, 4) . '/wp-load.php';
++}
++
++$fallas = 0;
++$c = static function (string $caso, bool $ok, string $detalle = '') use (&$fallas): void {
++    echo ($ok ? '  ok     ' : '  FALLA  ') . $caso . (!$ok && $detalle !== '' ? "   $detalle" : '') . "
++";
++    if (!$ok) {
++        $fallas++;
++    }
++};
++
++$tokens = OFR_Design_Tokens::advanced();
++$css = (string) file_get_contents(dirname(__DIR__) . '/assets/dist/orugantt-forms-runtime.css');
++$c('el runtime compilado existe', $css !== '');
++
++$vistos = [];
++$sinUso = [];
++$repetidos = [];
++foreach ($tokens as $clave => $def) {
++    $t = (string) $def['token'];
++    if (isset($vistos[$t]) && $vistos[$t] !== 'surfaceAlt' && $clave !== 'surfaceAlt') {
++        $repetidos[] = $t;
++    }
++    $vistos[$t] = $clave;
++    if (strpos($css, 'var(' . $t) === false) {
++        $sinUso[] = $clave . ' (' . $t . ')';
++    }
++}
++$c('ninguna variable del contrato se repite', $repetidos === [], implode(', ', $repetidos));
++$c('cada variable del contrato la usa la hoja compilada', $sinUso === [], implode(', ', $sinUso));
++
++$sinValores = [];
++foreach ($tokens as $clave => $def) {
++    if ($def['type'] === 'keyword' && (empty($def['values']) || !is_array($def['values']))) {
++        $sinValores[] = $clave;
++    }
++}
++$c('toda variable keyword declara su lista cerrada de valores', $sinValores === [], implode(', ', $sinValores));
++
++foreach (['ayudaRellenoY', 'ayudaSeparacion', 'contadorRellenoY', 'contadorInterlineado', 'contadorAlineacion', 'pieRellenoY', 'pieSeparacion', 'casillaApariencia', 'casillaTamano', 'casillaFondo', 'opcionSangria', 'opcionSeparacion', 'grupoTituloSeparacion', 'etiquetaSeparacion', 'rejillaSeparacion', 'rejillaFilaSeparacion'] as $clave) {
++    $c("el contrato trae $clave", isset($tokens[$clave]));
++}
++$c('contadorAlineacion admite izquierda, derecha y centro', ($tokens['contadorAlineacion']['values'] ?? []) === ['left', 'right', 'center']);
++
++echo "
++" . ($fallas === 0 ? 'TODO OK' : "$fallas FALLARON") . "
++";
++exit($fallas === 0 ? 0 : 1);
 diff --git a/runtime-src/src/Field.tsx b/runtime-src/src/Field.tsx
-index 3dbdb5a..6e9de88 100644
+index 3dbdb5a..d4fac96 100644
 --- a/runtime-src/src/Field.tsx
 +++ b/runtime-src/src/Field.tsx
-@@ -167,13 +167,14 @@ export function Field(props: FieldRenderProps): JSX.Element {
+@@ -5,6 +5,7 @@
+ 
+ import type { CSSProperties } from 'react';
+ import { AccordionItem, FieldRenderProps, OruOptionEntry } from './types';
++import { textoDelContador } from './contador';
+ 
+ export const LIMITED_TYPES: readonly string[] = [
+     'lookup_db',
+@@ -89,14 +90,16 @@ export function isFieldValueEmpty(item: AccordionItem, value: any): boolean {
+ const HELP_TEXT = (item: AccordionItem): string =>
+     String(item.helpText || item.ayuda || '').trim();
+ 
+-function HelpText({ item }: { item: AccordionItem }): JSX.Element | null {
++function HelpText({ item, arriba }: { item: AccordionItem; arriba?: boolean }): JSX.Element | null {
+     const help = HELP_TEXT(item);
+     if (!help) {
+         return null;
+     }
+-    return <p className="ofr-help">{help}</p>;
++    return <p className={arriba === true ? 'ofr-help ofr-help--arriba' : 'ofr-help'}>{help}</p>;
+ }
+ 
++
++
+ function LimitedNotice({ item }: { item: AccordionItem }): JSX.Element {
+     return (
+         <div className="ofr-limited" role="note">
+@@ -167,13 +170,14 @@ export function Field(props: FieldRenderProps): JSX.Element {
                  </label>
              )}
              <div className="ofr-control">
-+                {item.ayudaArriba === true && <HelpText item={item} />}
++                {item.ayudaArriba === true && <HelpText item={item} arriba />}
                  {input}
                  {typeof item.maxLength === 'number' && item.maxLength > 0 && (type === 'texto' || type === 'texto-largo') && (
                      <p className="ofr-counter" aria-hidden="true">
-                         {String(value ?? '').length}/{item.maxLength}
+-                        {String(value ?? '').length}/{item.maxLength}
++                        {textoDelContador(item.contadorFormato, String(value ?? '').length, item.maxLength)}
                      </p>
                  )}
 -                <HelpText item={item} />
@@ -101,11 +280,27 @@ index 58478d0..60147c7 100644
  }
  
  export function FormRuntime(props: FormRuntimeProps): JSX.Element {
+diff --git a/runtime-src/src/contador.ts b/runtime-src/src/contador.ts
+new file mode 100644
+index 0000000..20e4f28
+--- /dev/null
++++ b/runtime-src/src/contador.ts
+@@ -0,0 +1,10 @@
++/**
++ * Texto del contador de caracteres de un campo con largo máximo.
++ *
++ * `contadorFormato` (propiedad del campo) lleva `{n}` (los caracteres que hay) y `{max}` (el tope): «{n} de {max} caracteres
++ * máximos». Sin formato, el de siempre: «{n}/{max}». Va en su propio archivo, sin dependencias, para poder probarlo solo.
++ */
++export function textoDelContador(formato: unknown, n: number, max: number): string {
++    const base = typeof formato === 'string' && formato.trim() !== '' ? formato : '{n}/{max}';
++    return base.split('{n}').join(String(n)).split('{max}').join(String(max));
++}
 diff --git a/runtime-src/src/runtime.css b/runtime-src/src/runtime.css
-index e32c859..da4eb06 100644
+index e32c859..ccd12b9 100644
 --- a/runtime-src/src/runtime.css
 +++ b/runtime-src/src/runtime.css
-@@ -32,10 +32,42 @@
+@@ -32,10 +32,66 @@
      --ofr-focus-ring: 3px solid rgba(37, 99, 235, 0.35);
      --ofr-shadow: 0 1px 2px rgba(16, 24, 40, 0.06);
  
@@ -140,6 +335,30 @@ index e32c859..da4eb06 100644
 +    --ofr-submit-pad-x: 22px;
 +    --ofr-submit-radius: var(--ofr-radius);
 +
++    /* Contrato ampliado, segunda parte (30 de octubre de 2026, Basis): los rellenos, márgenes y separaciones que un diseño
++       con otro modelo de cajas (el de Gravity Forms) pone entre las partes del formulario. Por omisión valen lo de siempre. */
++    --ofr-group-title-gap: var(--ofr-space-xs);
++    --ofr-label-gap: var(--ofr-space-xs);
++    --ofr-label-pad-top: 6px;
++    --ofr-option-label-pad-top: var(--ofr-label-pad-top);
++    --ofr-control-gap: var(--ofr-space-xs);
++    --ofr-help-pad-y: 0px;
++    --ofr-help-margin: 0px;
++    --ofr-counter-pad-y: 0px;
++    --ofr-counter-margin: 4px;
++    --ofr-counter-line: inherit;
++    --ofr-counter-align: right;
++    --ofr-footer-pad-y: 0px;
++    --ofr-footer-gap: var(--ofr-space-lg);
++    --ofr-check-size: 16px;
++    --ofr-option-indent: 0px;
++    --ofr-option-gap: var(--ofr-space-sm);
++    --ofr-option-align: flex-start;
++    --ofr-options-pad-y: 2px;
++    --ofr-grid-gap: 12px;
++    --ofr-grid-sub-gap: var(--ofr-grid-gap);
++    --ofr-grid-row-gap: var(--ofr-grid-gap);
++
      box-sizing: border-box;
      font-family: var(--ofr-font);
      font-size: 15px;
@@ -149,7 +368,17 @@ index e32c859..da4eb06 100644
      color: var(--ofr-color-text);
      background: var(--ofr-color-bg);
      max-width: 100%;
-@@ -98,9 +130,12 @@
+@@ -89,7 +145,8 @@
+     flex-direction: column;
+     align-items: flex-start;
+     gap: var(--ofr-space-sm);
+-    margin-top: var(--ofr-space-lg);
++    margin-top: var(--ofr-footer-gap);
++    padding: var(--ofr-footer-pad-y) 0;
+ }
+ 
+ .ofr-submit {
+@@ -98,9 +155,12 @@
      background: var(--ofr-color-primary);
      color: var(--ofr-color-primary-contrast);
      font: inherit;
@@ -165,20 +394,44 @@ index e32c859..da4eb06 100644
      cursor: pointer;
  }
  
-@@ -202,9 +237,9 @@
+@@ -191,7 +251,7 @@
+ .ofr-field {
+     display: flex;
+     flex-direction: column;
+-    gap: var(--ofr-space-xs);
++    gap: var(--ofr-label-gap);
+ }
+ 
+ .ofr-field--label-left {
+@@ -202,10 +262,14 @@
  }
  
  .ofr-label {
 -    font-weight: 600;
 -    font-size: 0.9rem;
 -    color: var(--ofr-color-text);
+-    padding-top: 6px;
 +    font-weight: var(--ofr-label-weight);
 +    font-size: var(--ofr-label-size);
 +    color: var(--ofr-label-color);
-     padding-top: 6px;
++    padding-top: var(--ofr-label-pad-top);
++}
++
++.ofr-field--boolean_check > .ofr-label {
++    padding-top: var(--ofr-option-label-pad-top);
  }
  
-@@ -230,11 +265,12 @@
+ .ofr-required-mark {
+@@ -216,7 +280,7 @@
+ .ofr-control {
+     display: flex;
+     flex-direction: column;
+-    gap: var(--ofr-space-xs);
++    gap: var(--ofr-control-gap);
+     min-width: 0;
+ }
+ 
+@@ -230,11 +294,12 @@
      width: 100%;
      max-width: 100%;
      font: inherit;
@@ -195,13 +448,23 @@ index e32c859..da4eb06 100644
      box-shadow: var(--ofr-shadow);
  }
  
-@@ -288,7 +324,37 @@
+@@ -288,7 +353,47 @@
  .ofr-help {
      margin: 0;
      color: var(--ofr-color-text-muted);
 -    font-size: 0.8125rem;
 +    font-size: var(--ofr-help-size);
 +    line-height: var(--ofr-help-line);
++    padding: var(--ofr-help-pad-y) 0;
++}
++
++/* La ayuda ARRIBA del cuadro (ayudaArriba) lleva su separación debajo; la que va abajo, arriba. */
++.ofr-help--arriba {
++    margin-bottom: var(--ofr-help-margin);
++}
++
++.ofr-control > .ofr-help:not(.ofr-help--arriba) {
++    margin-top: var(--ofr-help-margin);
 +}
 +
 +/* ---------- Grupo de campos con título (GridSection con `titulo`) ----------
@@ -216,7 +479,7 @@ index e32c859..da4eb06 100644
 +
 +.ofr-group-title {
 +    padding: 0;
-+    margin-bottom: var(--ofr-space-xs);
++    margin-bottom: var(--ofr-group-title-gap);
 +    font-weight: var(--ofr-label-weight);
 +    font-size: var(--ofr-label-size);
 +    color: var(--ofr-label-color);
@@ -234,18 +497,62 @@ index e32c859..da4eb06 100644
  }
  
  /* ---------- Opciones (checkbox / radio) ---------- */
-@@ -304,7 +370,9 @@
+@@ -297,25 +402,48 @@
      display: flex;
-     align-items: flex-start;
+     flex-direction: column;
      gap: var(--ofr-space-sm);
+-    padding: 2px 0;
++    padding: var(--ofr-options-pad-y) 0;
+ }
+ 
+ .ofr-option {
+     display: flex;
+-    align-items: flex-start;
+-    gap: var(--ofr-space-sm);
 -    font-size: 0.9375rem;
++    align-items: var(--ofr-option-align);
++    gap: var(--ofr-option-gap);
++    margin-left: var(--ofr-option-indent);
 +    font-size: var(--ofr-option-size);
 +    line-height: var(--ofr-option-line);
 +    font-weight: var(--ofr-option-weight);
  }
  
  .ofr-option input[type="checkbox"],
-@@ -323,7 +391,7 @@
+ .ofr-option input[type="radio"] {
+-    width: 16px;
+-    height: 16px;
++    width: var(--ofr-check-size);
++    height: var(--ofr-check-size);
+     margin-top: 3px;
+     accent-color: var(--ofr-color-primary);
+     flex-shrink: 0;
+ }
+ 
++/* Casilla PROPIA (casillaApariencia: none): un cuadrado liso del tamaño y color que el diseño pida, con su marca al activarse.
++   Con la apariencia nativa (lo de siempre) nada de esto aplica. */
++.ofr-option input[type="checkbox"] {
++    appearance: var(--ofr-check-appearance, auto);
++    -webkit-appearance: var(--ofr-check-appearance, auto);
++    background: var(--ofr-check-bg, revert);
++    border-radius: var(--ofr-check-radius, revert);
++    margin-top: var(--ofr-check-margin-top, 3px);
++    display: grid;
++    place-content: center;
++}
++
++.ofr-option input[type="checkbox"]:checked::before {
++    content: "";
++    width: 70%;
++    height: 70%;
++    background: var(--ofr-check-mark, transparent);
++    clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
++}
++
+ .ofr-option input:focus-visible {
+     outline: var(--ofr-focus-ring);
+     outline-offset: 1px;
+@@ -323,7 +451,7 @@
  
  .ofr-option label {
      cursor: pointer;
@@ -254,12 +561,30 @@ index e32c859..da4eb06 100644
  }
  
  /* ---------- Bloques de contenido ---------- */
-@@ -607,7 +675,7 @@
+@@ -549,10 +677,16 @@
+ .ofr-grid {
+     display: grid;
+     grid-template-columns: repeat(12, 1fr);
+-    gap: 12px;
++    column-gap: var(--ofr-grid-gap);
++    row-gap: var(--ofr-grid-row-gap);
+     width: 100%;
+ }
+ 
++/* Las celdas de un grupo con título («Nombre*» con «Nombre» y «Apellidos») pueden ir más juntas que las filas del formulario. */
++.ofr-grid--sub {
++    column-gap: var(--ofr-grid-sub-gap);
++}
++
+ .ofr-grid-cell {
+     min-width: 0;
+ }
+@@ -607,7 +741,7 @@
  .ofr-thankyou-body{margin:0;color:var(--ofr-color-text-muted);max-width:46ch;}
  
  /* Contador de caracteres de un campo con largo máximo y nota bajo el botón. */
 -.ofr-counter{margin:4px 0 0;font-size:0.75rem;color:var(--ofr-color-text-muted);text-align:right;}
-+.ofr-counter{margin:4px 0 0;font-size:var(--ofr-counter-size);color:var(--ofr-color-text-muted);text-align:right;}
++.ofr-counter{margin:var(--ofr-counter-margin) 0 0;padding:var(--ofr-counter-pad-y) 0;font-size:var(--ofr-counter-size);line-height:var(--ofr-counter-line);color:var(--ofr-color-text-muted);text-align:var(--ofr-counter-align);}
  .ofr-form-note{margin:var(--ofr-space-sm) 0 0;font-size:0.8125rem;color:var(--ofr-color-text-muted);}
  .ofr-form-note a{color:inherit;text-decoration:underline;text-underline-offset:2px;}
  
