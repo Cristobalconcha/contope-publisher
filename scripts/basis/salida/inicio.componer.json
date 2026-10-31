@@ -3234,9 +3234,10 @@
         },
         "value": {
           "declarations": {
-            "border-width": "2px",
-            "border-style": "solid",
-            "border-color": "#FFFFFF"
+            "outline-width": "2px",
+            "outline-style": "solid",
+            "outline-color": "#FFFFFF",
+            "outline-offset": "4px"
           }
         },
         "provenance": {
@@ -3244,7 +3245,7 @@
             {
               "kind": "reference",
               "reference": "scripts/basis/correcciones.json",
-              "rationale": "fotos con borde blanco de 2px, como el galpón en wireframe de la franja gris (Cristóbal, 31-oct)"
+              "rationale": "línea blanca de 2px separada 4px de la foto, con la misma punta redondeada: un marco con aire, como el galpón en wireframe de la franja gris (Cristóbal, 31-oct)"
             }
           ]
         },

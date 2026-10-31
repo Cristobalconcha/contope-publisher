@@ -79,7 +79,7 @@ for (const ancho of [1440, 768, 393]) {
       // 3. acordeones (cada grupo es un acordeón aparte: la página de preguntas tiene dos columnas, cada una con el suyo)
       const pliegues = await evaluar(`document.querySelectorAll('[data-cod-acordeon-rol="resumen"]').length`);
       if (pliegues) {
-        const estado = (n) => evaluar(`(() => { const b = document.querySelectorAll('[data-cod-acordeon-rol="resumen"]')[${n}]; const p = document.getElementById(b.getAttribute('aria-controls')); const raiz = b.closest('[data-cod-behavior="acordeon"]'); const i = b.querySelector('[data-cod-acordeon-rol="icono"]'); const ri = i ? getComputedStyle(i) : null; const rp = p.getBoundingClientRect(); const hermanos = [...raiz.querySelectorAll('[data-cod-acordeon-rol="resumen"]')]; return { abierto: b.getAttribute('aria-expanded') === 'true', panelVisible: rp.height > 0 && getComputedStyle(p).display !== 'none', abiertosEnSuGrupo: hermanos.filter((h) => h.getAttribute('aria-expanded') === 'true').length, icono: i ? { estado: i.getAttribute('data-cod-acordeon-estado'), visible: ri.visibility !== 'hidden' && i.getBoundingClientRect().width > 0 } : null }; })()`);
+        const estado = (n) => evaluar(`(() => { const b = document.querySelectorAll('[data-cod-acordeon-rol="resumen"]')[${n}]; const p = document.getElementById(b.getAttribute('aria-controls')); const raiz = b.closest('[data-cod-behavior="acordeon"]'); const i = b.querySelector('[data-cod-acordeon-rol="icono"]'); const ri = i ? getComputedStyle(i) : null; const rp = p.getBoundingClientRect(); const hermanos = [...raiz.querySelectorAll('[data-cod-acordeon-rol="resumen"]')]; return { abierto: b.getAttribute('aria-expanded') === 'true', panelVisible: rp.height > 0 && getComputedStyle(p).display !== 'none', abiertosEnSuGrupo: hermanos.filter((h) => h.getAttribute('aria-expanded') === 'true').length, unoSolo: raiz.getAttribute('data-cod-acordeon-autoclose') !== '0', icono: i ? { estado: i.getAttribute('data-cod-acordeon-estado'), visible: ri.visibility !== 'hidden' && i.getBoundingClientRect().width > 0, dibujo: (ri.webkitMaskImage || ri.maskImage || '') + '|' + getComputedStyle(i, '::before').content + '|' + getComputedStyle(i, '::after').transform } : null }; })()`);
         const total = Math.min(pliegues, 8);
         caso.notas.push(`${pliegues} pliegues`);
         let iconosAbiertoVisibles = 0; let iconosCerradoVisibles = 0;
@@ -95,8 +95,9 @@ for (const ancho of [1440, 768, 393]) {
             if (e.abierto) caso.problemas.push(`el pliegue ${n} (abierto) no se cierra al tocarlo`);
           } else {
             if (!e.abierto || !e.panelVisible) caso.problemas.push(`el pliegue ${n} no se abre al tocarlo (abierto ${e.abierto}, panel visible ${e.panelVisible})`);
-            if (e.abiertosEnSuGrupo > 1) caso.problemas.push(`abrir el pliegue ${n} dejó ${e.abiertosEnSuGrupo} abiertos en su acordeón (debe cerrar el anterior)`);
-            if (e.icono && e.icono.visible) iconosAbiertoVisibles++;
+            if (e.unoSolo && e.abiertosEnSuGrupo > 1) caso.problemas.push(`abrir el pliegue ${n} dejó ${e.abiertosEnSuGrupo} abiertos en su acordeón (debe cerrar el anterior)`);
+            // El ícono abierto tiene que mostrar el cambio: o se esconde (como en el original de Divi) o cambia de dibujo (+ → −).
+            if (e.icono && e.icono.visible && antes.icono && e.icono.dibujo === antes.icono.dibujo) iconosAbiertoVisibles++;
             c = await centroDe('[data-cod-acordeon-rol="resumen"]', n);
             await tocar(c.x, c.y);
             e = await estado(n);
@@ -105,7 +106,7 @@ for (const ancho of [1440, 768, 393]) {
           }
         }
         caso.notas.push(`ícono: visible en ${iconosCerradoVisibles} pliegue(s) cerrado(s) y en ${iconosAbiertoVisibles} abierto(s) (el original lo esconde abierto)`);
-        if (iconosAbiertoVisibles) caso.problemas.push(`el ícono sigue visible en ${iconosAbiertoVisibles} pliegue(s) abierto(s)`);
+        if (iconosAbiertoVisibles) caso.problemas.push(`el ícono no cambia al abrir en ${iconosAbiertoVisibles} pliegue(s) (ni se esconde ni pasa de + a −)`);
       }
 
       // 4. botones fijos
