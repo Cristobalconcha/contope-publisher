@@ -13,14 +13,15 @@ import { writeFileSync, copyFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 
 const PHP = 'C:/Users/Cristobal concha/wp-local/php/php.exe';
+// Corre contra el local de Basis (banco de pruebas), NUNCA contra wp-local: ése es el espejo de Santa Luisa y tiene que quedar igual a producción (CLAUDE.md regla 12). El 30-oct esta prueba lo dejó en una versión que producción no tiene.
 // contope-publisher.php hace require_once de cada clase nueva del plugin (0.3.85: el renderizador de bloques nativos): si se copia el archivo principal sin ellas, el WordPress local no carga.
 for (const f of ['includes/class-cod-theme-definitions.php', 'includes/class-cod-settings-admin.php', 'includes/class-cod-canvas-bloque-renderer.php', 'contope-publisher.php']) {
-  copyFileSync('contope-publisher/' + f, 'C:/Users/Cristobal concha/wp-local/wordpress/wp-content/plugins/contope-publisher/' + f);
+  copyFileSync('contope-publisher/' + f, 'C:/Users/Cristobal concha/wp-local-basis/wordpress/wp-content/plugins/contope-publisher/' + f);
 }
 
 const guion = `<?php
 define('WP_USE_THEMES', false);
-require __DIR__ . '/../../wp-local/wordpress/wp-load.php';
+require __DIR__ . '/../../wp-local-basis/wordpress/wp-load.php';
 $opcion = COD_Theme_Definitions::OPTION_KEY;
 $antes = get_option($opcion, '');
 $subidas = wp_get_upload_dir();
