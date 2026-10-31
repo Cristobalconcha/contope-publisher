@@ -18,7 +18,7 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { transcribirSitio, disenoDe, informeMarkdown } from '../divi-a-contope/transcribir.mjs';
-import { aplicarCorrecciones } from './correcciones.mjs';
+import { aplicarCorrecciones, corregirReglas } from './correcciones.mjs';
 
 const aqui = path.dirname(fileURLToPath(import.meta.url));
 const original = process.argv[2] || 'C:/Users/Cristobal concha/Sesión Claude/entregables/basis/medicion-3';
@@ -30,7 +30,9 @@ const r = transcribirSitio({ original, perfil, paginas: perfil.paginasReales, an
 const correcciones = JSON.parse(readFileSync(path.join(aqui, 'correcciones.json'), 'utf8'));
 for (const [slug, p] of Object.entries(r.paginas)) {
   for (const h of aplicarCorrecciones(slug, p.nodos, correcciones)) console.log(`  corrección ${slug}: ${h}`);
-  writeFileSync(path.join(salida, `${slug}.componer.json`), JSON.stringify({ titulo: p.titulo, slug, design: disenoDe(r.reg, p.nodos, perfil.designId), composition: { schemaVersion: 2, nodes: p.nodos } }, null, 2));
+  const design = disenoDe(r.reg, p.nodos, perfil.designId);
+  for (const h of corregirReglas(slug, design, correcciones, p.nodos)) console.log(`  corrección ${slug}: ${h}`);
+  writeFileSync(path.join(salida, `${slug}.componer.json`), JSON.stringify({ titulo: p.titulo, slug, design, composition: { schemaVersion: 2, nodes: p.nodos } }, null, 2));
   console.log(`${slug}: ${p.nodos.length} secciones`);
 }
 // Encabezado y pie son globales: salen de la primera página (en Divi son una plantilla única).

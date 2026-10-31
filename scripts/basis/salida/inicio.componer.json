@@ -980,6 +980,30 @@
         }
       },
       {
+        "id": "rad-eb76db",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "border-radius": "6px",
+            "overflow": "hidden"
+          }
+        }
+      },
+      {
         "id": "mg-2c79cc",
         "kind": "properties",
         "scope": {
@@ -1927,7 +1951,7 @@
         "status": "reviewed",
         "value": {
           "declarations": {
-            "background-color": "rgba(255, 255, 255, 0.58)",
+            "background-color": "rgba(255, 255, 255, 0.82)",
             "border-radius": "8px",
             "width": "100%",
             "max-width": "1080px",
@@ -2239,6 +2263,30 @@
         "value": {
           "aspectRatio": "91/88",
           "fit": "cover"
+        }
+      },
+      {
+        "id": "rad-b105a8",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "border-radius": "8px",
+            "overflow": "hidden"
+          }
         }
       },
       {
@@ -3176,6 +3224,308 @@
           "role": "t-roboto-18-500",
           "fontSize": "16px"
         }
+      },
+      {
+        "id": "bas-foto-borde",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "value": {
+          "declarations": {
+            "border-width": "2px",
+            "border-style": "solid",
+            "border-color": "#FFFFFF"
+          }
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "scripts/basis/correcciones.json",
+              "rationale": "fotos con borde blanco de 2px, como el galpón en wireframe de la franja gris (Cristóbal, 31-oct)"
+            }
+          ]
+        },
+        "status": "reviewed"
+      },
+      {
+        "id": "bas-video-centro",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "value": {
+          "declarations": {
+            "display": "flex",
+            "flex-direction": "column",
+            "justify-content": "center"
+          }
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "scripts/basis/correcciones.json",
+              "rationale": "el recuadro de Características centrado en el alto de la sección del video"
+            }
+          ]
+        },
+        "status": "reviewed"
+      },
+      {
+        "id": "bas-centro-vertical",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "value": {
+          "declarations": {
+            "align-self": "center"
+          }
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "scripts/basis/correcciones.json",
+              "rationale": "Rediseño pedido por el cliente sobre el original."
+            }
+          ]
+        },
+        "status": "reviewed"
+      },
+      {
+        "id": "bas-acordeon",
+        "kind": "interaction",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "value": {
+          "behavior": "acordeon",
+          "autoclose": false,
+          "startClosed": true,
+          "showIcon": true,
+          "iconPosition": "right"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "scripts/basis/correcciones.json",
+              "rationale": "Rediseño pedido por el cliente sobre el original."
+            }
+          ]
+        },
+        "status": "reviewed"
+      },
+      {
+        "id": "bas-acordeon-pila",
+        "kind": "layout",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "value": {
+          "mode": "stack",
+          "gap": "0px",
+          "align": "stretch"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "scripts/basis/correcciones.json",
+              "rationale": "Rediseño pedido por el cliente sobre el original."
+            }
+          ]
+        },
+        "status": "reviewed"
+      },
+      {
+        "id": "bas-acordeon-margen",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "value": {
+          "declarations": {
+            "margin-block-start": "4px",
+            "margin-block-end": "0px",
+            "padding-right": "30px",
+            "padding-left": "30px",
+            "padding-bottom": "30px"
+          }
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "scripts/basis/correcciones.json",
+              "rationale": "Rediseño pedido por el cliente sobre el original."
+            }
+          ]
+        },
+        "status": "reviewed"
+      },
+      {
+        "id": "bas-plg-item",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "value": {
+          "declarations": {
+            "border-bottom-width": "1px",
+            "border-bottom-style": "solid",
+            "border-bottom-color": "rgba(0, 0, 0, 0.15)",
+            "padding-top": "8px",
+            "padding-bottom": "8px"
+          }
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "scripts/basis/correcciones.json",
+              "rationale": "Rediseño pedido por el cliente sobre el original."
+            }
+          ]
+        },
+        "status": "reviewed"
+      },
+      {
+        "id": "bas-plg-resumen",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "value": {
+          "declarations": {
+            "width": "100%",
+            "padding-top": "0px",
+            "padding-right": "0px",
+            "padding-bottom": "0px",
+            "padding-left": "0px",
+            "text-align": "start",
+            "background-color": "transparent",
+            "border-width": "0px",
+            "cursor": "pointer",
+            "gap": "12px"
+          }
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "scripts/basis/correcciones.json",
+              "rationale": "Rediseño pedido por el cliente sobre el original."
+            }
+          ]
+        },
+        "status": "reviewed"
+      },
+      {
+        "id": "bas-plg-icono",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "value": {
+          "declarations": {
+            "background-color": "#E02B20",
+            "width": "14px",
+            "height": "14px"
+          }
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "scripts/basis/correcciones.json",
+              "rationale": "Rediseño pedido por el cliente sobre el original."
+            }
+          ]
+        },
+        "status": "reviewed"
+      },
+      {
+        "id": "bas-plg-panel",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "value": {
+          "declarations": {
+            "padding-top": "4px",
+            "margin-block-start": "0px"
+          }
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "scripts/basis/correcciones.json",
+              "rationale": "Rediseño pedido por el cliente sobre el original."
+            }
+          ]
+        },
+        "status": "reviewed"
+      },
+      {
+        "id": "bas-lista-sin-cola",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "value": {
+          "declarations": {
+            "padding-block-end": "14px"
+          }
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "scripts/basis/correcciones.json",
+              "rationale": "Rediseño pedido por el cliente sobre el original."
+            }
+          ]
+        },
+        "status": "reviewed"
+      },
+      {
+        "id": "bas-plg-titulo",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "value": {
+          "declarations": {
+            "font-weight": "700"
+          }
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "scripts/basis/correcciones.json",
+              "rationale": "Rediseño pedido por el cliente sobre el original."
+            }
+          ]
+        },
+        "status": "reviewed"
       }
     ]
   },
@@ -3210,7 +3560,7 @@
                 ],
                 "children": [
                   {
-                    "id": "paragraph-correccion-2",
+                    "id": "paragraph-correccion-4",
                     "kind": "paragraph",
                     "ruleIds": [
                       "t-6246ce",
@@ -3271,7 +3621,8 @@
                       "mg-a343db"
                     ],
                     "content": {
-                      "label": "Explorar Soluciones"
+                      "label": "Explorar Soluciones",
+                      "href": "#soluciones"
                     }
                   }
                 ]
@@ -3350,8 +3701,10 @@
                       "img-b3967c",
                       "media-f157f7",
                       "media-492b24",
+                      "rad-eb76db",
                       "mg-2c79cc",
-                      "media-f4a0fa"
+                      "media-f4a0fa",
+                      "bas-foto-borde"
                     ],
                     "content": {
                       "assetUrl": "/wp-content/uploads/2025/07/Imagen-4.jpeg",
@@ -3404,7 +3757,9 @@
                       "img-b3967c",
                       "media-f157f7",
                       "media-5c84f6",
-                      "mg-2c79cc"
+                      "rad-eb76db",
+                      "mg-2c79cc",
+                      "bas-foto-borde"
                     ],
                     "content": {
                       "assetUrl": "/wp-content/uploads/2025/07/Cierre-lateral.jpg",
@@ -3458,7 +3813,9 @@
                       "img-b3967c",
                       "media-f157f7",
                       "media-5c84f6",
-                      "mg-2c79cc"
+                      "rad-eb76db",
+                      "mg-2c79cc",
+                      "bas-foto-borde"
                     ],
                     "content": {
                       "assetUrl": "/wp-content/uploads/2025/07/Estructura3.jpg",
@@ -3498,7 +3855,8 @@
               }
             ]
           }
-        ]
+        ],
+        "marker": "soluciones"
       },
       {
         "id": "section-61",
@@ -3826,7 +4184,8 @@
           "sec-0cc10b",
           "sec-video-5482e2",
           "s-c8ec5e",
-          "sec-9dedc1"
+          "sec-9dedc1",
+          "bas-video-centro"
         ],
         "children": [
           {
@@ -3857,7 +4216,8 @@
                 "kind": "group",
                 "ruleIds": [
                   "col-542b47",
-                  "cl-04ba3c"
+                  "cl-04ba3c",
+                  "bas-centro-vertical"
                 ],
                 "children": [
                   {
@@ -3875,53 +4235,166 @@
                     }
                   },
                   {
-                    "id": "list-63",
+                    "id": "list-63-sueltos",
                     "kind": "list",
                     "ruleIds": [
                       "t-829a89",
                       "c-c21382",
                       "mg-a343db",
                       "lista-cbecaf",
-                      "relmod-96588f"
+                      "relmod-96588f",
+                      "bas-lista-sin-cola"
                     ],
                     "content": {
                       "ordered": false,
                       "items": [
-                        {
-                          "text": "Dimensiones",
-                          "items": [
-                            "Ancho: 20 mt (Standard) opciones a pedido",
-                            "Largo: Opcional, variable en múltiplos de 5mt",
-                            "Alto Hombro: 5mt"
-                          ]
-                        },
-                        {
-                          "text": "Material estructura:",
-                          "items": [
-                            "Perfil principal 203x112x4,5mm aleación de aluminio.",
-                            "Cubierta de PVC 750g/m2*",
-                            "Murallas de PVC 650g/m2*"
-                          ]
-                        },
                         "Materiales 100% impermeables y con retardante de fuego.",
-                        "Duración de más de 10 años en condiciones climáticas medias.",
-                        {
-                          "text": "Opcionales:",
-                          "items": [
-                            "Cortinas de acceso electricas",
-                            "Canaletas inter carpas",
-                            "Solerillas de aislación de aguas lluvias",
-                            "Luminarias Led",
-                            "Resalto contención aguas lluvia en accesos"
-                          ]
-                        }
-                      ]
-                    },
-                    "partes": {
-                      "sublista": [
-                        "sublista-d40040"
+                        "Duración de más de 10 años en condiciones climáticas medias."
                       ]
                     }
+                  },
+                  {
+                    "id": "group-rd-list-63",
+                    "kind": "group",
+                    "ruleIds": [
+                      "bas-acordeon",
+                      "bas-acordeon-pila",
+                      "bas-acordeon-margen"
+                    ],
+                    "partes": {
+                      "item": [
+                        "bas-plg-item"
+                      ],
+                      "resumen": [
+                        "bas-plg-resumen",
+                        "t-829a89",
+                        "c-c21382"
+                      ],
+                      "icono": [
+                        "bas-plg-icono"
+                      ],
+                      "panel": [
+                        "bas-plg-panel"
+                      ]
+                    },
+                    "children": [
+                      {
+                        "id": "group-rd-list-63-0",
+                        "kind": "group",
+                        "ruleIds": [
+                          "col-542b47"
+                        ],
+                        "children": [
+                          {
+                            "id": "paragraph-rd-list-63-0",
+                            "kind": "paragraph",
+                            "ruleIds": [
+                              "mg-a343db",
+                              "bas-plg-titulo"
+                            ],
+                            "content": {
+                              "text": "Dimensiones"
+                            }
+                          },
+                          {
+                            "id": "list-rd-list-63-0",
+                            "kind": "list",
+                            "ruleIds": [
+                              "t-829a89",
+                              "c-c21382",
+                              "sublista-d40040",
+                              "mg-a343db"
+                            ],
+                            "content": {
+                              "ordered": false,
+                              "items": [
+                                "Ancho: 20 mt (Standard) opciones a pedido",
+                                "Largo: Opcional, variable en múltiplos de 5mt",
+                                "Alto Hombro: 5mt"
+                              ]
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "id": "group-rd-list-63-1",
+                        "kind": "group",
+                        "ruleIds": [
+                          "col-542b47"
+                        ],
+                        "children": [
+                          {
+                            "id": "paragraph-rd-list-63-1",
+                            "kind": "paragraph",
+                            "ruleIds": [
+                              "mg-a343db",
+                              "bas-plg-titulo"
+                            ],
+                            "content": {
+                              "text": "Material estructura"
+                            }
+                          },
+                          {
+                            "id": "list-rd-list-63-1",
+                            "kind": "list",
+                            "ruleIds": [
+                              "t-829a89",
+                              "c-c21382",
+                              "sublista-d40040",
+                              "mg-a343db"
+                            ],
+                            "content": {
+                              "ordered": false,
+                              "items": [
+                                "Perfil principal 203x112x4,5mm aleación de aluminio.",
+                                "Cubierta de PVC 750g/m2*",
+                                "Murallas de PVC 650g/m2*"
+                              ]
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "id": "group-rd-list-63-2",
+                        "kind": "group",
+                        "ruleIds": [
+                          "col-542b47"
+                        ],
+                        "children": [
+                          {
+                            "id": "paragraph-rd-list-63-2",
+                            "kind": "paragraph",
+                            "ruleIds": [
+                              "mg-a343db",
+                              "bas-plg-titulo"
+                            ],
+                            "content": {
+                              "text": "Opcionales"
+                            }
+                          },
+                          {
+                            "id": "list-rd-list-63-2",
+                            "kind": "list",
+                            "ruleIds": [
+                              "t-829a89",
+                              "c-c21382",
+                              "sublista-d40040",
+                              "mg-a343db"
+                            ],
+                            "content": {
+                              "ordered": false,
+                              "items": [
+                                "Cortinas de acceso electricas",
+                                "Canaletas inter carpas",
+                                "Solerillas de aislación de aguas lluvias",
+                                "Luminarias Led",
+                                "Resalto contención aguas lluvia en accesos"
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    ]
                   }
                 ]
               },
@@ -3940,9 +4413,11 @@
                       "img-4adfac",
                       "media-792b82",
                       "media-774ff8",
+                      "rad-b105a8",
                       "mg-978b3f",
                       "img-c17b24",
-                      "media-a9a5c9"
+                      "media-a9a5c9",
+                      "bas-foto-borde"
                     ],
                     "content": {
                       "assetUrl": "/wp-content/uploads/2025/07/Interior-doble-pilar-y-canaleta.jpg",

@@ -56,6 +56,9 @@ const EXTRAER = `(() => {
   };
   const textos = [];
   const imagenes = [];
+  // Puntas que se VEN en una foto: su propio border-radius o el de un contenedor cercano que la recorta (overflow distinto de visible).
+  // Sin esto una foto con puntas redondeadas en el original y rectas en el local pasaba como «igual» (pasó en Econut y en Basis).
+  const puntasDe = (img) => { let e = img; for (let k = 0; k < 4 && e; k++, e = e.parentElement) { const c = getComputedStyle(e); if (c.borderTopLeftRadius !== '0px' && (e === img || c.overflow !== 'visible')) return c.borderTopLeftRadius; } return '0px'; };
   const cajas = [];
   for (const el of document.querySelectorAll('body *')) {
     if (fuera(el)) continue;
@@ -70,7 +73,7 @@ const EXTRAER = `(() => {
         subrayado: s.textDecorationLine, op: s.opacity, caja: cajaDeTexto(el) || rect(r),
       });
     }
-    if (el.tagName === 'IMG') imagenes.push({ archivo: (el.currentSrc || el.src || '').split('/').pop().split('?')[0].replace(/-[0-9]+x[0-9]+(?=.[a-z0-9]+$)/i, ''), alt: el.alt, caja: rect(r), ajuste: s.objectFit });
+    if (el.tagName === 'IMG') imagenes.push({ archivo: (el.currentSrc || el.src || '').split('/').pop().split('?')[0].replace(/-[0-9]+x[0-9]+(?=.[a-z0-9]+$)/i, ''), alt: el.alt, caja: rect(r), ajuste: s.objectFit, puntas: puntasDe(el) });
     const fondo = s.backgroundColor !== 'rgba(0, 0, 0, 0)' || s.backgroundImage !== 'none';
     const borde = parseFloat(s.borderTopWidth) > 0 || parseFloat(s.borderBottomWidth) > 0 || parseFloat(s.borderLeftWidth) > 0;
     if ((fondo || borde || s.boxShadow !== 'none') && r.width >= 12 && r.height >= 12 && el.tagName !== 'IMG' && el.tagName !== 'BODY' && el.tagName !== 'HTML') {
@@ -153,6 +156,7 @@ function compararImagenes(o, l) {
     usados.add(i); const u = l[i]; const d = [];
     if (Math.abs(u.caja.w - im.caja.w) > 4 || Math.abs(u.caja.h - im.caja.h) > 4) d.push(`tamaño ${u.caja.w}×${u.caja.h}≠${im.caja.w}×${im.caja.h}`);
     if (Math.abs(u.caja.x - im.caja.x) > 4) d.push(`x ${u.caja.x - im.caja.x}`);
+    if (u.puntas !== im.puntas) d.push(`puntas ${u.puntas}≠${im.puntas}`);
     if (d.length) dif.push({ archivo: im.archivo, problema: d.join(' · ') });
   }
   return dif;

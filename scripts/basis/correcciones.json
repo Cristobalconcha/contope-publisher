@@ -1,17 +1,319 @@
 {
-  "_nota": "Cambios pedidos por el cliente sobre el contenido del sitio original (Martín, 31-oct-2026). El transcriptor copia el original tal cual; esto se aplica encima, al componer. Cada cambio falla en voz alta si ya no encuentra lo que busca.",
+  "_nota": "Cambios pedidos por el cliente sobre el contenido del sitio original (Martín y Cristóbal, 31-oct-2026). El transcriptor copia el original tal cual; esto se aplica encima, al componer. Cada cambio falla en voz alta si ya no encuentra lo que busca.",
   "textos": [
-    { "pagina": "inicio", "buscar": "permententes", "reemplazar": "permanentes" },
-    { "pagina": "preguntas-frecuentes", "buscar": "estàn", "reemplazar": "están" },
-    { "pagina": "preguntas-frecuentes", "buscar": "Bigas y anclajes de bigas", "reemplazar": "Vigas y anclajes de vigas" }
+    {
+      "pagina": "inicio",
+      "buscar": "permententes",
+      "reemplazar": "permanentes"
+    },
+    {
+      "pagina": "preguntas-frecuentes",
+      "buscar": "estàn",
+      "reemplazar": "están"
+    },
+    {
+      "pagina": "preguntas-frecuentes",
+      "buscar": "Bigas y anclajes de bigas",
+      "reemplazar": "Vigas y anclajes de vigas"
+    }
   ],
   "enlaces": [
-    { "pagina": "inicio", "boton": "Solicita Información", "href": "/contactos/" }
+    {
+      "pagina": "inicio",
+      "boton": "Solicita Información",
+      "href": "/contactos/"
+    },
+    {
+      "pagina": "inicio",
+      "boton": "Explorar Soluciones",
+      "href": "#soluciones"
+    }
   ],
   "quitarDuplicados": [
-    { "pagina": "preguntas-frecuentes", "pregunta": "¿Qué tipo de naves industriales ofrecen?" }
+    {
+      "pagina": "preguntas-frecuentes",
+      "pregunta": "¿Qué tipo de naves industriales ofrecen?"
+    }
   ],
   "agregarAntes": [
-    { "pagina": "inicio", "antesDe": "La respuesta eficiente\na su demanda de bodegaje", "copiarReglasDe": "Descubre cómo nuestras carpas industriales", "kind": "paragraph", "texto": "De la agroindustria para la agroindustria" }
+    {
+      "pagina": "inicio",
+      "antesDe": "La respuesta eficiente\na su demanda de bodegaje",
+      "copiarReglasDe": "Descubre cómo nuestras carpas industriales",
+      "kind": "paragraph",
+      "texto": "De la agroindustria para la agroindustria"
+    }
+  ],
+  "marcas": [
+    {
+      "pagina": "inicio",
+      "seccionConTexto": "Soluciones inteligentes",
+      "marca": "soluciones"
+    }
+  ],
+  "declaraciones": [
+    {
+      "pagina": "inicio",
+      "_porque": "el recuadro blanco sobre el video de Características (58% en el original) deja el texto ilegible; Cristóbal, 31-oct",
+      "propiedad": "background-color",
+      "valor": "rgba(255, 255, 255, 0.58)",
+      "nuevo": "rgba(255, 255, 255, 0.82)"
+    }
+  ],
+  "reglasNuevas": [
+    {
+      "pagina": "*",
+      "_porque": "fotos con borde blanco de 2px, como el galpón en wireframe de la franja gris (Cristóbal, 31-oct)",
+      "id": "bas-foto-borde",
+      "kind": "properties",
+      "scope": {
+        "breakpoint": "all",
+        "state": "default"
+      },
+      "value": {
+        "declarations": {
+          "border-width": "2px",
+          "border-style": "solid",
+          "border-color": "#FFFFFF"
+        }
+      }
+    },
+    {
+      "pagina": "inicio",
+      "_porque": "el recuadro de Características centrado en el alto de la sección del video",
+      "id": "bas-video-centro",
+      "kind": "properties",
+      "scope": {
+        "breakpoint": "all",
+        "state": "default"
+      },
+      "value": {
+        "declarations": {
+          "display": "flex",
+          "flex-direction": "column",
+          "justify-content": "center"
+        }
+      }
+    },
+    {
+      "pagina": "inicio",
+      "id": "bas-centro-vertical",
+      "kind": "properties",
+      "scope": {
+        "breakpoint": "all",
+        "state": "default"
+      },
+      "value": {
+        "declarations": {
+          "align-self": "center"
+        }
+      }
+    },
+    {
+      "pagina": "inicio",
+      "id": "bas-acordeon",
+      "kind": "interaction",
+      "scope": {
+        "breakpoint": "all",
+        "state": "default"
+      },
+      "value": {
+        "behavior": "acordeon",
+        "autoclose": false,
+        "startClosed": true,
+        "showIcon": true,
+        "iconPosition": "right"
+      }
+    },
+    {
+      "pagina": "inicio",
+      "id": "bas-acordeon-pila",
+      "kind": "layout",
+      "scope": {
+        "breakpoint": "all",
+        "state": "default"
+      },
+      "value": {
+        "mode": "stack",
+        "gap": "0px",
+        "align": "stretch"
+      }
+    },
+    {
+      "pagina": "inicio",
+      "id": "bas-acordeon-margen",
+      "kind": "properties",
+      "scope": {
+        "breakpoint": "all",
+        "state": "default"
+      },
+      "value": {
+        "declarations": {
+          "margin-block-start": "4px",
+          "margin-block-end": "0px",
+          "padding-right": "30px",
+          "padding-left": "30px",
+          "padding-bottom": "30px"
+        }
+      }
+    },
+    {
+      "pagina": "inicio",
+      "id": "bas-plg-item",
+      "kind": "properties",
+      "scope": {
+        "breakpoint": "all",
+        "state": "default"
+      },
+      "value": {
+        "declarations": {
+          "border-bottom-width": "1px",
+          "border-bottom-style": "solid",
+          "border-bottom-color": "rgba(0, 0, 0, 0.15)",
+          "padding-top": "8px",
+          "padding-bottom": "8px"
+        }
+      }
+    },
+    {
+      "pagina": "inicio",
+      "id": "bas-plg-resumen",
+      "kind": "properties",
+      "scope": {
+        "breakpoint": "all",
+        "state": "default"
+      },
+      "value": {
+        "declarations": {
+          "width": "100%",
+          "padding-top": "0px",
+          "padding-right": "0px",
+          "padding-bottom": "0px",
+          "padding-left": "0px",
+          "text-align": "start",
+          "background-color": "transparent",
+          "border-width": "0px",
+          "cursor": "pointer",
+          "gap": "12px"
+        }
+      }
+    },
+    {
+      "pagina": "inicio",
+      "id": "bas-plg-icono",
+      "kind": "properties",
+      "scope": {
+        "breakpoint": "all",
+        "state": "default"
+      },
+      "value": {
+        "declarations": {
+          "background-color": "#E02B20",
+          "width": "14px",
+          "height": "14px"
+        }
+      }
+    },
+    {
+      "pagina": "inicio",
+      "id": "bas-plg-panel",
+      "kind": "properties",
+      "scope": {
+        "breakpoint": "all",
+        "state": "default"
+      },
+      "value": {
+        "declarations": {
+          "padding-top": "4px",
+          "margin-block-start": "0px"
+        }
+      }
+    },
+    {
+      "pagina": "inicio",
+      "id": "bas-lista-sin-cola",
+      "kind": "properties",
+      "scope": {
+        "breakpoint": "all",
+        "state": "default"
+      },
+      "value": {
+        "declarations": {
+          "padding-block-end": "14px"
+        }
+      }
+    },
+    {
+      "pagina": "inicio",
+      "id": "bas-plg-titulo",
+      "kind": "properties",
+      "scope": {
+        "breakpoint": "all",
+        "state": "default"
+      },
+      "value": {
+        "declarations": {
+          "font-weight": "700"
+        }
+      }
+    }
+  ],
+  "agregarReglas": [
+    {
+      "pagina": "*",
+      "kind": "image",
+      "reglas": [
+        "bas-foto-borde"
+      ],
+      "soloFotos": true
+    },
+    {
+      "pagina": "inicio",
+      "seccionConTexto": "Características",
+      "reglas": [
+        "bas-video-centro"
+      ]
+    },
+    {
+      "pagina": "inicio",
+      "grupoConTexto": "Características",
+      "reglas": [
+        "bas-centro-vertical"
+      ]
+    }
+  ],
+  "listaAAcordeon": [
+    {
+      "pagina": "inicio",
+      "primerItem": "Dimensiones",
+      "acordeon": [
+        "bas-acordeon",
+        "bas-acordeon-pila",
+        "bas-acordeon-margen"
+      ],
+      "partes": {
+        "item": [
+          "bas-plg-item"
+        ],
+        "resumen": [
+          "bas-plg-resumen",
+          "t-829a89",
+          "c-c21382"
+        ],
+        "icono": [
+          "bas-plg-icono"
+        ],
+        "panel": [
+          "bas-plg-panel"
+        ]
+      },
+      "sueltosArriba": true,
+      "reglasSueltos": [
+        "bas-lista-sin-cola"
+      ],
+      "reglasTitulo": [
+        "bas-plg-titulo"
+      ]
+    }
   ]
 }

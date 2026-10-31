@@ -241,7 +241,8 @@ export function moduloImagen(ctx, d, m, { col, gapD, gapM, ubicacion }) {
       if (camb.mobile && camb.mobile.aspectRatio === vD.aspectRatio) delete camb.mobile;
       reglas.push(...ctx.reg.conAnchos('media', vD, camb, { prefijo: 'media' }));
     }
-    const radio = radioDeImagen(ctx, img, ubicacion.zona);
+    // La ubicación trae la REGIÓN (contenido, encabezado, pie): es la misma «zona» con que la medición anota los radios.
+    const radio = radioDeImagen(ctx, img, ubicacion.zona || ubicacion.region);
     if (radio) reglas.push(ctx.reg.R('properties', { declarations: { 'border-radius': radio, overflow: 'hidden' } }, { prefijo: 'rad' }));
     // El relleno propio del módulo (Design → Spacing) deja a la imagen adentro de su caja: arriba y abajo
     // se vuelven márgenes de la imagen (la caja externa del módulo no cambia).
