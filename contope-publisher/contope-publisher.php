@@ -2,7 +2,7 @@
 /**
  * Plugin Name: ContOpe Publisher
  * Description: Importa proyectos ContOpe Design como páginas Gutenberg nativas y editables.
- * Version: 0.3.84
+ * Version: 0.3.85
  * Requires at least: 6.5
  * Requires PHP: 8.0
  * Author: Cristóbal Concha
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('COD_PUBLISHER_VERSION', '0.3.84');
+define('COD_PUBLISHER_VERSION', '0.3.85');
 define('COD_PUBLISHER_FILE', __FILE__);
 define('COD_PUBLISHER_DIR', plugin_dir_path(__FILE__));
 
@@ -30,6 +30,7 @@ require_once COD_PUBLISHER_DIR . 'includes/class-cod-canvas-asset-resolver.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-template-region-resolver.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-dynamic-token-resolver.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-canvas-shortcode-renderer.php';
+require_once COD_PUBLISHER_DIR . 'includes/class-cod-canvas-bloque-renderer.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-modulo.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-canvas-page-publisher.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-canvas-editor-admin.php';

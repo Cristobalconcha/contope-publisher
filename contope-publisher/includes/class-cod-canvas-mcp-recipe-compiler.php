@@ -117,6 +117,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
         'whatsapp',
         'social',
         'shortcode',
+        'block',
     ];
 
     /** @var array<int, string> */
@@ -366,6 +367,26 @@ final class COD_Canvas_MCP_Recipe_Compiler
                     'elegido' => null,
                     'descripcion' => 'las listas anidadas (de segundo y tercer nivel), no la de primer nivel: su sangría, su viñeta y su separación son distintas de las de la lista que las contiene',
                 ],
+            ],
+        ],
+        /*
+         * EL BLOQUE NATIVO (0.3.85). Lo que dibuja WordPress adentro —el buscador, la lista de entradas— son elementos
+         * internos con las clases del propio bloque (core/search, core/latest-posts…): ningún nodo de la composición los
+         * representa, así que sin estas partes la forma de un widget de WordPress volvía a ser CSS a mano. Los selectores
+         * son clases de Gutenberg, que son su contrato público y no cambian de una versión a otra.
+         */
+        'block' => [
+            'atributoRol' => '',
+            'partes' => [
+                'etiqueta' => ['selector' => '.wp-block-search__label', 'elegido' => null, 'descripcion' => 'core/search: la etiqueta del buscador'],
+                'envoltura' => ['selector' => '.wp-block-search__inside-wrapper', 'elegido' => null, 'descripcion' => 'core/search: la caja que reúne el campo y el botón'],
+                'entrada' => ['selector' => '.wp-block-search__input', 'elegido' => null, 'descripcion' => 'core/search: el campo de texto'],
+                'boton' => ['selector' => '.wp-block-search__button', 'elegido' => null, 'descripcion' => 'core/search: el botón de buscar'],
+                'lista' => ['selector' => ':is(ul, ol)', 'elegido' => null, 'descripcion' => 'las listas del bloque (entradas recientes, archivos, categorías, páginas)'],
+                'item' => ['selector' => 'li', 'elegido' => null, 'descripcion' => 'cada ítem de esas listas'],
+                'enlace' => ['selector' => 'a', 'elegido' => null, 'descripcion' => 'cada enlace del bloque (título de entrada, categoría, archivo)'],
+                'fecha' => ['selector' => ':is(time, .wp-block-latest-posts__post-date, .wp-block-latest-comments__comment-date)', 'elegido' => null, 'descripcion' => 'la fecha de una entrada o de un comentario'],
+                'vacio' => ['selector' => '.no-comments', 'elegido' => null, 'descripcion' => 'core/latest-comments: el texto «No hay comentarios que mostrar.» cuando no los hay'],
             ],
         ],
         'gallery' => [
@@ -939,6 +960,10 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 'tag' => 'nombre del shortcode, de la lista permitida del sitio (hoy: instagram-feed). No ejecuta cualquiera: fuera de esa lista no se renderiza.',
                 'atts' => 'opcional, objeto de pares simples (texto) que se pasan al shortcode; por ejemplo {"feed":"1"}',
             ]],
+            'block' => ['content' => [
+                'name' => 'nombre de un bloque DINÁMICO de WordPress, de la lista permitida del sitio (hoy: core/search, core/latest-posts, core/latest-comments, core/archives, core/categories, core/tag-cloud, core/calendar, core/page-list). Gutenberg ya tiene esa familia: el nodo sólo la CORRESPONDE y la dibuja WordPress al mostrar la página, con los datos de ese momento; no se imita con texto fijo.',
+                'attrs' => 'opcional, objeto de hasta 30 pares simples (texto, número o booleano) con los atributos del bloque; por ejemplo {"buttonText":"Buscar"} o {"postsToShow":3}. WordPress descarta los que el bloque no reconoce.',
+            ], 'notes' => 'La forma la ponen las reglas de diseño sobre el nodo y sobre sus partes (etiqueta, entrada, boton, lista, item, enlace…); el nodo conserva su caja y WordPress dibuja adentro.'],
             'dynamic' => ['content' => ['token' => 'post_title|post_excerpt|featured_image|permalink|acf:*|acf_image:*', 'fallback' => 'opcional']],
             'separator' => ['content' => 'Objeto vacío'],
             'chart' => ['content' => ['type' => ['bar', 'line'], 'labels' => '1..48 textos', 'values' => '1..48 números', 'color' => 'opcional']],
@@ -2071,6 +2096,10 @@ final class COD_Canvas_MCP_Recipe_Compiler
             foreach (OFR_Design_Tokens::advanced() as $clave => $def) {
                 if (is_array($def) && isset($def['token'], $def['type'])) {
                     $desde_runtime[(string) $clave] = ['token' => (string) $def['token'], 'type' => (string) $def['type']];
+                    // `keyword`: un valor de una lista cerrada que el runtime declara en `values`.
+                    if (isset($def['values']) && is_array($def['values'])) {
+                        $desde_runtime[(string) $clave]['values'] = array_values(array_map('strval', $def['values']));
+                    }
                 }
             }
             if ($desde_runtime !== []) {
@@ -2183,6 +2212,33 @@ final class COD_Canvas_MCP_Recipe_Compiler
             'botonRellenoY' => ['token' => '--ofr-submit-pad-y', 'type' => 'length'],
             'botonRellenoX' => ['token' => '--ofr-submit-pad-x', 'type' => 'length'],
             'botonRadio' => ['token' => '--ofr-submit-radius', 'type' => 'length'],
+            // Contrato ampliado, segunda parte (30 de octubre de 2026): rellenos, separaciones, casilla propia y contador.
+            'grupoTituloSeparacion' => ['token' => '--ofr-group-title-gap', 'type' => 'length'],
+            'etiquetaSeparacion' => ['token' => '--ofr-label-gap', 'type' => 'length'],
+            'etiquetaRellenoSuperior' => ['token' => '--ofr-label-pad-top', 'type' => 'length'],
+            'opcionEtiquetaRellenoSuperior' => ['token' => '--ofr-option-label-pad-top', 'type' => 'length'],
+            'controlSeparacion' => ['token' => '--ofr-control-gap', 'type' => 'length'],
+            'ayudaRellenoY' => ['token' => '--ofr-help-pad-y', 'type' => 'length'],
+            'ayudaSeparacion' => ['token' => '--ofr-help-margin', 'type' => 'length'],
+            'contadorRellenoY' => ['token' => '--ofr-counter-pad-y', 'type' => 'length'],
+            'contadorSeparacion' => ['token' => '--ofr-counter-margin', 'type' => 'length'],
+            'contadorInterlineado' => ['token' => '--ofr-counter-line', 'type' => 'ratio'],
+            'contadorAlineacion' => ['token' => '--ofr-counter-align', 'type' => 'keyword', 'values' => ['left', 'right', 'center']],
+            'pieRellenoY' => ['token' => '--ofr-footer-pad-y', 'type' => 'length'],
+            'pieSeparacion' => ['token' => '--ofr-footer-gap', 'type' => 'length'],
+            'casillaApariencia' => ['token' => '--ofr-check-appearance', 'type' => 'keyword', 'values' => ['auto', 'none']],
+            'casillaTamano' => ['token' => '--ofr-check-size', 'type' => 'length'],
+            'casillaFondo' => ['token' => '--ofr-check-bg', 'type' => 'color'],
+            'casillaMarca' => ['token' => '--ofr-check-mark', 'type' => 'color'],
+            'casillaMargenSuperior' => ['token' => '--ofr-check-margin-top', 'type' => 'length'],
+            'casillaMargenLateral' => ['token' => '--ofr-check-margin-x', 'type' => 'length'],
+            'opcionSangria' => ['token' => '--ofr-option-indent', 'type' => 'length'],
+            'opcionSeparacion' => ['token' => '--ofr-option-gap', 'type' => 'length'],
+            'opcionesRellenoY' => ['token' => '--ofr-options-pad-y', 'type' => 'length'],
+            'rejillaSeparacion' => ['token' => '--ofr-grid-gap', 'type' => 'length'],
+            'rejillaFilaSeparacion' => ['token' => '--ofr-grid-row-gap', 'type' => 'length'],
+            'rejillaSubSeparacion' => ['token' => '--ofr-grid-sub-gap', 'type' => 'length'],
+            'opcionAlineacion' => ['token' => '--ofr-option-align', 'type' => 'keyword', 'values' => ['flex-start', 'center', 'flex-end']],
         ];
     }
 
@@ -3786,6 +3842,9 @@ final class COD_Canvas_MCP_Recipe_Compiler
                     }
                 }
                 return ['tag' => strtolower($content['tag']), 'atts' => $atts];
+            case 'block':
+                // Un bloque NATIVO de Gutenberg que dibuja WordPress al mostrar la página (ver COD_Canvas_Bloque_Renderer).
+                return COD_Canvas_Bloque_Renderer::normalizar($content);
             case 'dynamic':
                 return $this->normalize_dynamic_content($content);
             case 'separator':
@@ -4417,6 +4476,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
             'gallery' => 'cod-dynamic-group',
             'form' => 'cod-orugantt-form',
             'shortcode' => 'cod-shortcode',
+            'block' => 'cod-bloque',
             'button' => 'cod-button',
         ][$node['kind']] ?? '';
         if ($canvas_class !== '') {
@@ -4611,6 +4671,12 @@ final class COD_Canvas_MCP_Recipe_Compiler
                     : ' data-cod-shortcode-atts="' . esc_attr((string) wp_json_encode($node['content']['atts'])) . '"';
                 return '<div ' . $attrs . ' data-cod-shortcode="' . esc_attr($node['content']['tag']) . '"'
                     . $atts_json . '></div>';
+            case 'block':
+                // Marcador vacío que CONSERVA su caja (la que recibe las reglas de diseño): al publicar se rellena con la salida del bloque.
+                $atts_bloque = $node['content']['attrs'] === []
+                    ? ''
+                    : ' data-cod-bloque-atts="' . esc_attr((string) wp_json_encode($node['content']['attrs'])) . '"';
+                return '<div ' . $attrs . ' data-cod-bloque="' . esc_attr($node['content']['name']) . '"' . $atts_bloque . '></div>';
             case 'dynamic':
                 return $this->render_dynamic($node['content'], $attrs);
             case 'separator':
@@ -6870,6 +6936,10 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 case 'weight':
                     // Peso de la letra: 100 a 900 en pasos de cien (el contrato lo declara así para las etiquetas y el botón).
                     $valido = preg_match('/^[1-9]00$/', $bruto) === 1;
+                    break;
+                case 'keyword':
+                    // Un valor de una lista cerrada que declara el contrato (alineaciones, apariencia de la casilla).
+                    $valido = in_array($bruto, $contrato[$clave]['values'] ?? [], true);
                     break;
                 case 'shadow':
                     // Sombra y anillo de foco: se acepta una lista corta de

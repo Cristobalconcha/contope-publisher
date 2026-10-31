@@ -5,6 +5,28 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.85 — 30 de octubre de 2026
+
+Dos ampliaciones que apareció al cerrar las últimas diferencias de Basis contra su original. Lo que no las pide sale **idéntico a 0.3.84**.
+
+- **Nodo `block`: un bloque nativo de Gutenberg dentro de la composición.** WordPress ya trae el buscador (`core/search`), las últimas
+  entradas (`core/latest-posts`), los últimos comentarios (`core/latest-comments`) y otros; ContOpe no los duplica, se CORRESPONDE con
+  ellos. Un nodo `block` con `content: { name, attrs }` queda en la composición como un marcador que conserva su caja (la que recibe las
+  reglas de diseño) y, al mostrar la página, **WordPress dibuja adentro** el bloque con los datos de ese momento: una entrada nueva aparece
+  sola, no hay nada copiado a mano. La lista de bloques permitidos es cerrada (los dinámicos: buscador, últimas entradas, últimos comentarios,
+  archivos, categorías, nube de etiquetas, calendario, lista de páginas) y se amplía con el filtro `cod_canvas_bloques_permitidos`; los atributos
+  son pares simples (texto, número, booleano) que WordPress valida contra el esquema del propio bloque. La forma sale de las reglas del
+  nodo y de **partes nuevas** que alcanzan lo que dibuja WordPress por dentro: `etiqueta`, `envoltura`, `entrada`, `boton`, `lista`, `item`, `enlace`,
+  `fecha` y `vacio` (son clases de Gutenberg, su contrato público). Clase nueva `COD_Canvas_Bloque_Renderer`; prueba `scripts/probar-basis-0385.php`.
+- **Contrato de diseño del formulario, segunda parte.** El runtime de Orugantt Forms (rama `basis-tokens`) suma las variables que faltaban para
+  igualar un formulario de Gravity Forms: los rellenos y márgenes de la ayuda, del contador y del pie, la separación entre un título de grupo y sus
+  campos, entre una etiqueta y su campo y entre columnas (y filas al apilarse), la **casilla propia** (cuadrado liso del tamaño y color que pida el
+  diseño, con su marca) y la alineación y el interlineado del contador. Para las listas cerradas hay un tipo nuevo, `keyword`, que declara sus
+  `values`. El texto del contador («0 de 600 caracteres máximos» en vez de «0/600») es una propiedad del campo (`contadorFormato`), no una variable.
+  El compilador acepta todo esto en `form.theme`; con la lista del runtime ausente usa la de respaldo, que una prueba compara contra el runtime.
+
+---
+
 ## 0.3.84 — 30 de octubre de 2026
 
 Cuatro huecos que apareció al dejar Basis idéntico a su original (Divi). Ninguno se rodeó con CSS a mano: cada uno es una ampliación

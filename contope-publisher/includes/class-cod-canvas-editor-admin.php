@@ -519,7 +519,7 @@ final class COD_Canvas_Editor_Admin
             // como se verá publicado (va al <style data-cod-site-css>): tipografías
             // y el giro de imágenes, para que girar en el inspector se vea al
             // instante y no recién al publicar.
-            'siteFontCss' => COD_Canvas_Page_Publisher::site_font_css() . COD_Canvas_Page_Publisher::rotation_css() . COD_Canvas_Page_Publisher::carousel_rows_css() . COD_Canvas_Page_Publisher::shortcode_marker_css(),
+            'siteFontCss' => COD_Canvas_Page_Publisher::site_font_css() . COD_Canvas_Page_Publisher::rotation_css() . COD_Canvas_Page_Publisher::carousel_rows_css() . COD_Canvas_Page_Publisher::shortcode_marker_css() . COD_Canvas_Page_Publisher::bloque_marker_css(),
             // El núcleo primero, igual que en la página publicada: si el lienzo
             // no lo recibe, muestra un color y el sitio otro.
             'themeDefinitionsCss' => COD_Design_Core::css() . COD_Theme_Definitions::css(),

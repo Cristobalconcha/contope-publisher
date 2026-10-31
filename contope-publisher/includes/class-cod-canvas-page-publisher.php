@@ -157,6 +157,16 @@ final class COD_Canvas_Page_Publisher
             . '[data-cod-shortcode]::before{content:"⧉ " attr(data-cod-shortcode);}';
     }
 
+    /** Rótulo del marcador de un bloque nativo DENTRO DEL EDITOR (publicado, el marcador se rellena con lo que dibuja WordPress). */
+    public static function bloque_marker_css(): string
+    {
+        return '[data-cod-bloque]:empty{display:flex;align-items:center;justify-content:center;'
+            . 'min-height:48px;padding:8px;border:1px dashed rgb(201,154,46);border-radius:8px;'
+            . 'background:rgba(255,243,214,.5);color:rgb(138,90,0);'
+            . 'font-family:system-ui,sans-serif;font-size:12px;font-weight:600;letter-spacing:.04em;}'
+            . '[data-cod-bloque]:empty::before{content:"⧉ bloque " attr(data-cod-bloque);}';
+    }
+
     public static function carousel_rows_css(): string
     {
         $css = '';
@@ -1895,6 +1905,10 @@ CSS;
         // atributos. Solo actúa sobre nodos marcados y de una lista permitida
         // (ver COD_Canvas_Shortcode_Renderer); nunca sobre el texto del diseño.
         $markup = (new COD_Canvas_Shortcode_Renderer())->render($markup);
+
+        // Los bloques nativos de Gutenberg (nodo block) se dibujan igual, por último: WordPress pone adentro del marcador lo que el bloque
+        // produce con los datos de ESTE momento (las entradas, los comentarios recientes). Ver COD_Canvas_Bloque_Renderer.
+        $markup = (new COD_Canvas_Bloque_Renderer())->render($markup);
 
         return $markup;
     }
