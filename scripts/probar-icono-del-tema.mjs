@@ -13,7 +13,8 @@ import { writeFileSync, copyFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 
 const PHP = 'C:/Users/Cristobal concha/wp-local/php/php.exe';
-for (const f of ['includes/class-cod-theme-definitions.php', 'includes/class-cod-settings-admin.php', 'contope-publisher.php']) {
+// contope-publisher.php hace require_once de cada clase nueva del plugin (0.3.85: el renderizador de bloques nativos): si se copia el archivo principal sin ellas, el WordPress local no carga.
+for (const f of ['includes/class-cod-theme-definitions.php', 'includes/class-cod-settings-admin.php', 'includes/class-cod-canvas-bloque-renderer.php', 'contope-publisher.php']) {
   copyFileSync('contope-publisher/' + f, 'C:/Users/Cristobal concha/wp-local/wordpress/wp-content/plugins/contope-publisher/' + f);
 }
 

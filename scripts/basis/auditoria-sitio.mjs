@@ -132,6 +132,26 @@ for (const ancho of [1440, 768, 393]) {
         caso.notas.push(`formulario: ${form.n} campos`);
       }
 
+      // 5b. bloques nativos de WordPress (nodo block: la barra lateral): dibujados, dentro del ancho, y el buscador escribe y apunta al sitio
+      const bloques = await evaluar(`(() => [...document.querySelectorAll('[data-cod-bloque]')].map((b) => { const r = b.getBoundingClientRect(); const f = b.querySelector('form[role=search]'); const i = f && f.querySelector('input[type=search]'); const bt = f && f.querySelector('button'); const ri = i && i.getBoundingClientRect(); const rb = bt && bt.getBoundingClientRect(); return { nombre: b.getAttribute('data-cod-bloque'), vacio: b.innerHTML.trim() === '' || /ocd:/.test(b.innerHTML), w: Math.round(r.width), h: Math.round(r.height), dentro: r.left >= -1 && r.right <= innerWidth + 1, busca: f ? { accion: f.getAttribute('action'), campo: i ? i.getAttribute('name') : null, campoVisible: !!ri && ri.width > 40 && ri.height > 24, botonVisible: !!rb && rb.width > 20 && rb.height > 20, botonDentro: !!rb && rb.right <= innerWidth + 1 } : null, enlaces: [...b.querySelectorAll('a')].map((a) => a.getAttribute('href')).filter(Boolean).length }; }))()`);
+      for (const b of bloques) {
+        if (b.vacio) caso.problemas.push(`el bloque ${b.nombre} salió vacío (WordPress no lo dibujó)`);
+        if (!b.dentro) caso.problemas.push(`el bloque ${b.nombre} se sale de la pantalla`);
+        if (b.busca) {
+          if (b.busca.campo !== 's') caso.problemas.push('el buscador no envía el campo «s» de WordPress');
+          if (!b.busca.campoVisible || !b.busca.botonVisible || !b.busca.botonDentro) caso.problemas.push('el buscador no se ve completo (campo o botón)');
+          const c = await centroDe('[data-cod-bloque="core/search"] input[type=search]', 0);
+          if (c) {
+            await tocar(c.x, c.y);
+            await cdp('Input.insertText', { text: 'bodega' });
+            const v = await evaluar(`document.querySelector('[data-cod-bloque="core/search"] input[type=search]').value`);
+            if (v !== 'bodega') caso.problemas.push(`no se puede escribir en el buscador (quedó «${v}»)`);
+            await evaluar(`document.querySelector('[data-cod-bloque="core/search"] input[type=search]').value = ''`);
+          }
+        }
+        caso.notas.push(`bloque ${b.nombre}: ${b.w}×${b.h}, ${b.enlaces} enlace(s)${b.busca ? ', buscador con acción ' + b.busca.accion : ''}`);
+      }
+
       // 6. encabezado pegajoso
       await evaluar('scrollTo(0, 800)'); await dormir(500);
       const cab = await evaluar(`(() => { const h = document.querySelector('header'); if (!h) return null; const r = h.getBoundingClientRect(); return { y: Math.round(r.top), h: Math.round(r.height), pos: getComputedStyle(h).position }; })()`);
