@@ -1568,38 +1568,7 @@
                               "mg-a343db"
                             ],
                             "content": {
-                              "text": "Dependiendo del tamaño y condiciones del terreno, la instalación puede tomar desde 2 días cada 500m2. Coordinamos previamente con el cliente para optimizar tiempos. Cabe destacar que el personal de instalación está plenamente calificado y certificado para las labores y todas las maquinarias para esta faena estàn incluidas en el servicio."
-                            }
-                          }
-                        ]
-                      },
-                      {
-                        "id": "group-32",
-                        "kind": "group",
-                        "ruleIds": [
-                          "col-542b47"
-                        ],
-                        "children": [
-                          {
-                            "id": "paragraph-30",
-                            "kind": "paragraph",
-                            "ruleIds": [
-                              "mg-a343db"
-                            ],
-                            "content": {
-                              "text": "¿Qué tipo de naves industriales ofrecen?"
-                            }
-                          },
-                          {
-                            "id": "paragraph-31",
-                            "kind": "paragraph",
-                            "ruleIds": [
-                              "t-98669e",
-                              "c-3bcd26",
-                              "mg-a343db"
-                            ],
-                            "content": {
-                              "text": "Ofrecemos bodegas modulares con cobertura flexible, tipo galpón, hangar y otros, todas diseñadas para uso industrial y logístico. Contamos con modelos fijos, desmontables y personalizables."
+                              "text": "Dependiendo del tamaño y condiciones del terreno, la instalación puede tomar desde 2 días cada 500m2. Coordinamos previamente con el cliente para optimizar tiempos. Cabe destacar que el personal de instalación está plenamente calificado y certificado para las labores y todas las maquinarias para esta faena están incluidas en el servicio."
                             }
                           }
                         ]
@@ -1817,7 +1786,7 @@
                               "mg-a343db"
                             ],
                             "content": {
-                              "text": "*Bases de Pilar, Pilares, Flanjes esquineros, Cerchas, Uniones de cumbrera, Bigas y anclajes de bigas y Arriostramientos."
+                              "text": "*Bases de Pilar, Pilares, Flanjes esquineros, Cerchas, Uniones de cumbrera, Vigas y anclajes de vigas y Arriostramientos."
                             }
                           },
                           {

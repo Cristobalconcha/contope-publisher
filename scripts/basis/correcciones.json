@@ -1,0 +1,17 @@
+{
+  "_nota": "Cambios pedidos por el cliente sobre el contenido del sitio original (Martín, 31-oct-2026). El transcriptor copia el original tal cual; esto se aplica encima, al componer. Cada cambio falla en voz alta si ya no encuentra lo que busca.",
+  "textos": [
+    { "pagina": "inicio", "buscar": "permententes", "reemplazar": "permanentes" },
+    { "pagina": "preguntas-frecuentes", "buscar": "estàn", "reemplazar": "están" },
+    { "pagina": "preguntas-frecuentes", "buscar": "Bigas y anclajes de bigas", "reemplazar": "Vigas y anclajes de vigas" }
+  ],
+  "enlaces": [
+    { "pagina": "inicio", "boton": "Solicita Información", "href": "/contactos/" }
+  ],
+  "quitarDuplicados": [
+    { "pagina": "preguntas-frecuentes", "pregunta": "¿Qué tipo de naves industriales ofrecen?" }
+  ],
+  "agregarAntes": [
+    { "pagina": "inicio", "antesDe": "La respuesta eficiente\na su demanda de bodegaje", "copiarReglasDe": "Descubre cómo nuestras carpas industriales", "kind": "paragraph", "texto": "De la agroindustria para la agroindustria" }
+  ]
+}

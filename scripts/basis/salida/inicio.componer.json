@@ -3210,6 +3210,22 @@
                 ],
                 "children": [
                   {
+                    "id": "paragraph-correccion-2",
+                    "kind": "paragraph",
+                    "ruleIds": [
+                      "t-6246ce",
+                      "t-70984a",
+                      "c-4737c4",
+                      "mg-e7d2d5",
+                      "mg-040870",
+                      "t-0f3e2e",
+                      "mg-db04a0"
+                    ],
+                    "content": {
+                      "text": "De la agroindustria para la agroindustria"
+                    }
+                  },
+                  {
                     "id": "heading-12",
                     "kind": "heading",
                     "ruleIds": [
@@ -3612,7 +3628,7 @@
                               "t-5b2c2b"
                             ],
                             "content": {
-                              "text": "Para satisfacer el requerimiento de instalaciones permententes o que superen los 5 años, comprar puede ser la opción más conveniente, especialmente si agrega Servicios Opcionales y la instalación dentro del total."
+                              "text": "Para satisfacer el requerimiento de instalaciones permanentes o que superen los 5 años, comprar puede ser la opción más conveniente, especialmente si agrega Servicios Opcionales y la instalación dentro del total."
                             }
                           }
                         ]
@@ -4017,7 +4033,8 @@
                           "mg-a343db"
                         ],
                         "content": {
-                          "label": "Solicita Información"
+                          "label": "Solicita Información",
+                          "href": "/contactos/"
                         }
                       }
                     ]

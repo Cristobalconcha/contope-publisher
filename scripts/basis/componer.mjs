@@ -4,7 +4,8 @@
  * No hay nada compuesto a mano acá: TODO sale del transcriptor Divi → ContOpe
  * (scripts/divi-a-contope) leyendo las mediciones del sitio original. Lo que es
  * decisión de este sitio vive en `perfil.json` (medios de reemplazo, formulario,
- * mapa, rutas).
+ * mapa, rutas). Los cambios de contenido que pide el cliente (ortografía, enlaces,
+ * textos nuevos) van en `correcciones.json` y se aplican encima.
  *
  *   node componer.mjs [carpeta-original]
  *
@@ -17,6 +18,7 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { transcribirSitio, disenoDe, informeMarkdown } from '../divi-a-contope/transcribir.mjs';
+import { aplicarCorrecciones } from './correcciones.mjs';
 
 const aqui = path.dirname(fileURLToPath(import.meta.url));
 const original = process.argv[2] || 'C:/Users/Cristobal concha/Sesión Claude/entregables/basis/medicion-3';
@@ -25,7 +27,9 @@ const salida = path.join(aqui, 'salida');
 mkdirSync(salida, { recursive: true });
 
 const r = transcribirSitio({ original, perfil, paginas: perfil.paginasReales, anchos: [1440, 393, 768] });
+const correcciones = JSON.parse(readFileSync(path.join(aqui, 'correcciones.json'), 'utf8'));
 for (const [slug, p] of Object.entries(r.paginas)) {
+  for (const h of aplicarCorrecciones(slug, p.nodos, correcciones)) console.log(`  corrección ${slug}: ${h}`);
   writeFileSync(path.join(salida, `${slug}.componer.json`), JSON.stringify({ titulo: p.titulo, slug, design: disenoDe(r.reg, p.nodos, perfil.designId), composition: { schemaVersion: 2, nodes: p.nodos } }, null, 2));
   console.log(`${slug}: ${p.nodos.length} secciones`);
 }
