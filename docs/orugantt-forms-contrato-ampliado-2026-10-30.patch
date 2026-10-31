@@ -26,10 +26,10 @@ index e733163..b907e9e 100644
    — el constructor de Orugantt corriendo dentro del escritorio de WordPress.
  
 diff --git a/includes/class-ofr-design-tokens.php b/includes/class-ofr-design-tokens.php
-index 386826f..3aecea2 100644
+index 386826f..5a90269 100644
 --- a/includes/class-ofr-design-tokens.php
 +++ b/includes/class-ofr-design-tokens.php
-@@ -75,6 +75,65 @@ final class OFR_Design_Tokens
+@@ -75,6 +75,66 @@ final class OFR_Design_Tokens
              'espacioLg' => ['token' => '--ofr-space-lg', 'label' => 'Espaciado grande', 'type' => 'length', 'group' => 'Forma'],
              'sombra' => ['token' => '--ofr-shadow', 'label' => 'Sombra', 'type' => 'shadow', 'group' => 'Forma'],
              'anilloFoco' => ['token' => '--ofr-focus-ring', 'label' => 'Anillo de foco', 'type' => 'shadow', 'group' => 'Forma'],
@@ -85,6 +85,7 @@ index 386826f..3aecea2 100644
 +            'casillaFondo' => ['token' => '--ofr-check-bg', 'label' => 'Casilla propia: fondo', 'type' => 'color', 'group' => 'Campos'],
 +            'casillaMarca' => ['token' => '--ofr-check-mark', 'label' => 'Casilla propia: color de la marca', 'type' => 'color', 'group' => 'Campos'],
 +            'casillaMargenSuperior' => ['token' => '--ofr-check-margin-top', 'label' => 'Casilla: margen superior', 'type' => 'length', 'group' => 'Campos'],
++            'casillaMargenLateral' => ['token' => '--ofr-check-margin-x', 'label' => 'Casilla: margen a los lados', 'type' => 'length', 'group' => 'Campos'],
 +            'opcionSangria' => ['token' => '--ofr-option-indent', 'label' => 'Casillas y opciones: sangría a la izquierda', 'type' => 'length', 'group' => 'Campos'],
 +            'opcionSeparacion' => ['token' => '--ofr-option-gap', 'label' => 'Casillas y opciones: separación entre casilla y texto', 'type' => 'length', 'group' => 'Campos'],
 +            'opcionesRellenoY' => ['token' => '--ofr-options-pad-y', 'label' => 'Casillas y opciones: relleno vertical del conjunto', 'type' => 'length', 'group' => 'Campos'],
@@ -297,7 +298,7 @@ index 0000000..20e4f28
 +    return base.split('{n}').join(String(n)).split('{max}').join(String(max));
 +}
 diff --git a/runtime-src/src/runtime.css b/runtime-src/src/runtime.css
-index e32c859..ccd12b9 100644
+index e32c859..efac8e5 100644
 --- a/runtime-src/src/runtime.css
 +++ b/runtime-src/src/runtime.css
 @@ -32,10 +32,66 @@
@@ -497,7 +498,7 @@ index e32c859..ccd12b9 100644
  }
  
  /* ---------- Opciones (checkbox / radio) ---------- */
-@@ -297,25 +402,48 @@
+@@ -297,25 +402,51 @@
      display: flex;
      flex-direction: column;
      gap: var(--ofr-space-sm);
@@ -537,6 +538,9 @@ index e32c859..ccd12b9 100644
 +    background: var(--ofr-check-bg, revert);
 +    border-radius: var(--ofr-check-radius, revert);
 +    margin-top: var(--ofr-check-margin-top, 3px);
++    margin-bottom: var(--ofr-check-margin-top, 3px);
++    margin-left: var(--ofr-check-margin-x, 4px);
++    margin-right: var(--ofr-check-margin-x, 3px);
 +    display: grid;
 +    place-content: center;
 +}
@@ -552,7 +556,7 @@ index e32c859..ccd12b9 100644
  .ofr-option input:focus-visible {
      outline: var(--ofr-focus-ring);
      outline-offset: 1px;
-@@ -323,7 +451,7 @@
+@@ -323,7 +454,7 @@
  
  .ofr-option label {
      cursor: pointer;
@@ -561,7 +565,7 @@ index e32c859..ccd12b9 100644
  }
  
  /* ---------- Bloques de contenido ---------- */
-@@ -549,10 +677,16 @@
+@@ -549,10 +680,16 @@
  .ofr-grid {
      display: grid;
      grid-template-columns: repeat(12, 1fr);
@@ -579,7 +583,7 @@ index e32c859..ccd12b9 100644
  .ofr-grid-cell {
      min-width: 0;
  }
-@@ -607,7 +741,7 @@
+@@ -607,7 +744,7 @@
  .ofr-thankyou-body{margin:0;color:var(--ofr-color-text-muted);max-width:46ch;}
  
  /* Contador de caracteres de un campo con largo máximo y nota bajo el botón. */
