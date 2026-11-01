@@ -3,14 +3,15 @@
    Adaptado del de Santa Luisa, donde esta hoja bajó el banner del 42,7% al
    12,7% de la pantalla de un teléfono. Un aviso que tapa media pantalla no se
    lee, se cierra — y un cierre apurado no es consentimiento informado.
-   Los colores son los de Basis, declarados abajo porque el tema no publica
-   variables con estos nombres.
+   Los colores son los del set de Basis: estas variables sólo les ponen el
+   nombre que usa esta hoja; el valor sale de la paleta del theme.json y de las
+   definiciones de estilo (ContOpe → Configuración), no se copia acá.
    --------------------------------------------------------------------------- */
 
 :root {
-  --cod-basis-gris: #636363;
-  --cod-basis-naranja: #f26621;
-  --cod-basis-claro: #d6d6d6;
+  --cod-basis-gris: var(--wp--preset--color--gris-oscuro);
+  --cod-basis-naranja: var(--cod-color-accent);
+  --cod-basis-claro: var(--wp--preset--color--gris-claro);
 }
 
 /* Nota heredada del modelo:
@@ -29,7 +30,7 @@
 .cookieadmin_consent_inside {
   padding: 13px 15px 12px;
   border-radius: 12px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.14);
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--wp--preset--color--ink) 14%, transparent);
 }
 
 #cookieadmin_notice_title {

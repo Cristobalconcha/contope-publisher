@@ -8,7 +8,7 @@
     "reviewState": "session",
     "rules": [
       {
-        "id": "s-f1871f",
+        "id": "s-0a8f53",
         "kind": "surface",
         "scope": {
           "breakpoint": "all",
@@ -25,7 +25,7 @@
         },
         "status": "reviewed",
         "value": {
-          "backgroundColor": "#898989"
+          "backgroundColor": "var(--wp--preset--color--gris)"
         }
       },
       {
@@ -292,7 +292,7 @@
         }
       },
       {
-        "id": "fila-ba8c81",
+        "id": "fila-49b1cd",
         "kind": "properties",
         "scope": {
           "breakpoint": "all",
@@ -310,7 +310,7 @@
         "status": "reviewed",
         "value": {
           "declarations": {
-            "background-color": "#D6D6D6",
+            "background-color": "var(--wp--preset--color--gris-claro)",
             "border-radius": "8px",
             "width": "80%",
             "max-width": "1080px",
@@ -330,7 +330,7 @@
         }
       },
       {
-        "id": "fila-00b6fc",
+        "id": "fila-228a4e",
         "kind": "properties",
         "scope": {
           "breakpoint": "mobile",
@@ -357,7 +357,7 @@
         }
       },
       {
-        "id": "t-d4b7f9",
+        "id": "t-7d8da3",
         "kind": "typography",
         "scope": {
           "breakpoint": "all",
@@ -375,7 +375,7 @@
         "status": "reviewed",
         "value": {
           "role": "t-big-shoulders--55-500",
-          "family": "'Big Shoulders Display', sans-serif",
+          "family": "var(--cod-font-heading)",
           "fontSize": "55px",
           "fontWeight": 500,
           "lineHeight": 1,
@@ -383,7 +383,7 @@
         }
       },
       {
-        "id": "t-829a8a",
+        "id": "t-5d929b",
         "kind": "typography",
         "scope": {
           "breakpoint": "mobile",
@@ -405,7 +405,7 @@
         }
       },
       {
-        "id": "c-5ba4fe",
+        "id": "c-74f309",
         "kind": "color",
         "scope": {
           "breakpoint": "all",
@@ -422,8 +422,8 @@
         },
         "status": "reviewed",
         "value": {
-          "role": "c-dc4017",
-          "color": "#DC4017",
+          "role": "c-rojo-contacto",
+          "color": "var(--wp--preset--color--rojo-contacto)",
           "apply": "text"
         }
       },
@@ -452,7 +452,7 @@
         }
       },
       {
-        "id": "form-3e560a",
+        "id": "form-cb5dbc",
         "kind": "form",
         "scope": {
           "breakpoint": "all",
@@ -471,40 +471,40 @@
         "value": {
           "surface": "none",
           "theme": {
-            "texto": "#112337",
-            "textoSuave": "#585E6A",
+            "texto": "var(--wp--preset--color--dark)",
+            "textoSuave": "var(--wp--preset--color--gris-oscuro)",
             "fondo": "transparent",
-            "superficie": "#FFFFFF",
-            "superficieAlt": "#F4F4F4",
-            "borde": "#EEEEEE",
-            "bordeFuerte": "#999999",
-            "principal": "#E09900",
-            "principalHover": "#E09900",
-            "principalContraste": "#FFFFFF",
-            "tipografia": "'Open Sans', sans-serif",
+            "superficie": "var(--cod-color-surface)",
+            "superficieAlt": "var(--wp--preset--color--casi-blanco)",
+            "borde": "var(--wp--preset--color--casi-blanco)",
+            "bordeFuerte": "var(--wp--preset--color--gris)",
+            "principal": "var(--cod-color-accent)",
+            "principalHover": "var(--cod-color-accent)",
+            "principalContraste": "var(--cod-color-surface)",
+            "tipografia": "var(--cod-font-body)",
             "radio": "4px",
             "espaciado": "16px",
-            "campoFondo": "#FFFFFF",
-            "campoTexto": "#999999",
+            "campoFondo": "var(--cod-color-surface)",
+            "campoTexto": "var(--wp--preset--color--gris)",
             "campoTamano": "15px",
             "campoBordeAncho": "0px",
             "campoRellenoY": "16px",
             "campoRellenoX": "16px",
-            "sombra": "rgba(18, 25, 97, 0.08) 0px 1px 4px 0px",
+            "sombra": "color-mix(in srgb, var(--wp--preset--color--dark) 8%, transparent) 0px 1px 4px 0px",
             "etiquetaTamano": "14px",
             "etiquetaPeso": "600",
-            "etiquetaColor": "#112337",
+            "etiquetaColor": "var(--wp--preset--color--dark)",
             "subetiquetaTamano": "14px",
             "subetiquetaPeso": "400",
-            "subetiquetaColor": "#585E6A",
+            "subetiquetaColor": "var(--wp--preset--color--gris-oscuro)",
             "ayudaTamano": "13px",
             "contadorTamano": "13px",
             "ayudaInterlineado": "1.43",
             "opcionTamano": "14px",
             "opcionInterlineado": "1.43",
             "opcionPeso": "400",
-            "opcionColor": "#112337",
-            "botonSombra": "rgba(18, 25, 97, 0.08) 0px 1px 4px 0px",
+            "opcionColor": "var(--wp--preset--color--dark)",
+            "botonSombra": "color-mix(in srgb, var(--wp--preset--color--dark) 8%, transparent) 0px 1px 4px 0px",
             "interlineado": "1.7",
             "peso": "400",
             "grupoTituloSeparacion": "10px",
@@ -526,10 +526,10 @@
             "opcionesRellenoY": "1.23px",
             "casillaApariencia": "none",
             "casillaTamano": "18px",
-            "casillaFondo": "#EEEEEE",
+            "casillaFondo": "var(--wp--preset--color--casi-blanco)",
             "casillaMargenSuperior": "0px",
             "casillaMargenLateral": "0px",
-            "casillaMarca": "#112337",
+            "casillaMarca": "var(--wp--preset--color--dark)",
             "opcionSangria": "12px",
             "opcionSeparacion": "6px",
             "opcionAlineacion": "center",
@@ -595,7 +595,7 @@
         }
       },
       {
-        "id": "mapa-grande-7f6d74",
+        "id": "mapa-grande-1c1113",
         "kind": "properties",
         "scope": {
           "breakpoint": "all",
@@ -618,12 +618,12 @@
             "margin-bottom": "0px",
             "max-width": "none",
             "border-radius": "8px",
-            "box-shadow": "2px 2px 10px rgba(0,0,0,0.2)"
+            "box-shadow": "2px 2px 10px color-mix(in srgb, var(--wp--preset--color--ink) 20%, transparent)"
           }
         }
       },
       {
-        "id": "fila-df20f7",
+        "id": "fila-c0e52e",
         "kind": "properties",
         "scope": {
           "breakpoint": "tablet",
@@ -684,7 +684,7 @@
         "ruleIds": [
           "sec-79ee4b",
           "sec-6069e7",
-          "s-f1871f",
+          "s-0a8f53",
           "sec-0b4923"
         ],
         "children": [
@@ -692,9 +692,9 @@
             "id": "group-17",
             "kind": "group",
             "ruleIds": [
-              "fila-ba8c81",
-              "fila-00b6fc",
-              "fila-df20f7"
+              "fila-49b1cd",
+              "fila-228a4e",
+              "fila-c0e52e"
             ],
             "children": [
               {
@@ -710,9 +710,9 @@
                     "id": "heading-12",
                     "kind": "heading",
                     "ruleIds": [
-                      "t-d4b7f9",
-                      "t-829a8a",
-                      "c-5ba4fe",
+                      "t-7d8da3",
+                      "t-5d929b",
+                      "c-74f309",
                       "mg-1a56c0",
                       "mg-cb0416",
                       "anch-f184a0",
@@ -728,7 +728,7 @@
                     "id": "form-13",
                     "kind": "form",
                     "ruleIds": [
-                      "form-3e560a",
+                      "form-cb5dbc",
                       "mg-a343db"
                     ],
                     "content": {
@@ -758,7 +758,7 @@
                         "mini-e17ac6"
                       ],
                       "grande": [
-                        "mapa-grande-7f6d74"
+                        "mapa-grande-1c1113"
                       ]
                     },
                     "content": {

@@ -14,21 +14,41 @@
  *   - los botones fijos: dentro de la pantalla, del tamaño de un dedo (≥ 44 px) y sin tapar el contenido principal;
  *   - el formulario: sus campos caben en el ancho, son visibles y se pueden enfocar y escribir;
  *   - el encabezado: pegado arriba y sin cubrir el título al bajar;
- *   - los errores de la consola.
+ *   - los errores de la consola;
+ *   - que el SET DE DISEÑO gobierne el sitio (gobierno-del-set.mjs, por HTTP, una vez por página): sin colores ni
+ *     font-family literales en la hoja del diseño, núcleo del set sin roles «sin declarar», variables de las
+ *     definiciones de estilo emitidas y favicon que sale de las definiciones. Cada una cuenta como PROBLEMA.
+ *
+ *   node auditoria-sitio.mjs [SITIO] [carpeta-salida] [--solo-gobierno]
+ *   (con AUTH_FILE también le pregunta al plugin por `COD_Design_Core::faltantes()`)
+ *
  * Sólo lee el sitio local y no envía el formulario.
  */
 import { writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { abrirChrome, esperarLaPagina, recorrerLaPagina } from '../piezas/chrome.mjs';
+import { auditarGobierno } from './gobierno-del-set.mjs';
 
-const SITIO = (process.argv[2] || 'http://localhost:8894').replace(/\/+$/, '');
-const SAL = process.argv[3] || 'C:/Users/Cristobal concha/Sesión Claude/entregables/basis/capturas-comparacion';
+const posicionales = process.argv.slice(2).filter((a) => !a.startsWith('--'));
+const SOLO_GOBIERNO = process.argv.includes('--solo-gobierno');
+const SITIO = (posicionales[0] || 'http://localhost:8894').replace(/\/+$/, '');
+const SAL = posicionales[1] || 'C:/Users/Cristobal concha/Sesión Claude/entregables/basis/capturas-comparacion';
 mkdirSync(SAL, { recursive: true });
 const PAGINAS = [['inicio', '/'], ['basis-carpas-industriales', '/basis-carpas-industriales/'], ['preguntas-frecuentes', '/preguntas-frecuentes/'], ['contactos', '/contactos/'], ['terminos-y-privacidad', '/terminos-y-privacidad/']];
 const resultados = [];
 let fallas = 0;
 
-for (const ancho of [1440, 768, 393]) {
+// El set gobierna el sitio: una vez por página (no depende del ancho). Cada hallazgo es un PROBLEMA, no un aviso.
+const gobierno = await auditarGobierno({ sitio: SITIO, rutas: PAGINAS.map((p) => p[1]) });
+for (const g of gobierno) {
+  const slug = PAGINAS.find((p) => p[1] === g.ruta)?.[0] || g.ruta;
+  fallas += g.problemas.length;
+  resultados.push({ pagina: slug, ancho: 'gobierno', problemas: g.problemas, notas: g.notas });
+  console.log(`${g.problemas.length ? 'FALLA' : 'ok   '} ${slug} @gobierno-del-set${g.problemas.length ? '\n   - ' + g.problemas.join('\n   - ') : ''}`);
+}
+if (gobierno.nota) console.log(`   (${gobierno.nota})`);
+
+for (const ancho of SOLO_GOBIERNO ? [] : [1440, 768, 393]) {
   const movil = ancho < 768;
   for (const [slug, ruta] of PAGINAS) {
     const { cdp, evaluar, dormir, cerrar, alEvento } = await abrirChrome({ ancho, alto: movil ? 852 : 950, escala: movil ? 2 : 1, movil });

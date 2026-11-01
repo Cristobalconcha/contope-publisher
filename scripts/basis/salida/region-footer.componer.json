@@ -6,7 +6,7 @@
     "reviewState": "session",
     "rules": [
       {
-        "id": "s-f1871f",
+        "id": "s-0a8f53",
         "kind": "surface",
         "scope": {
           "breakpoint": "all",
@@ -23,7 +23,7 @@
         },
         "status": "reviewed",
         "value": {
-          "backgroundColor": "#898989"
+          "backgroundColor": "var(--wp--preset--color--gris)"
         }
       },
       {
@@ -101,7 +101,7 @@
         }
       },
       {
-        "id": "c-4737c4",
+        "id": "c-bd95c9",
         "kind": "color",
         "scope": {
           "breakpoint": "all",
@@ -118,8 +118,8 @@
         },
         "status": "reviewed",
         "value": {
-          "role": "c-ffffff",
-          "color": "#FFFFFF",
+          "role": "c-background",
+          "color": "var(--cod-color-surface)",
           "apply": "text"
         }
       },
@@ -338,7 +338,7 @@
         }
       },
       {
-        "id": "t-7d73ba",
+        "id": "t-4995fe",
         "kind": "typography",
         "scope": {
           "breakpoint": "all",
@@ -356,7 +356,7 @@
         "status": "reviewed",
         "value": {
           "role": "t-open-sans-12-500",
-          "family": "'Open Sans', sans-serif",
+          "family": "var(--cod-font-body)",
           "fontSize": "12px",
           "fontWeight": 500,
           "lineHeight": 1.4,
@@ -543,7 +543,7 @@
         }
       },
       {
-        "id": "t-01952a",
+        "id": "t-cecbd9",
         "kind": "typography",
         "scope": {
           "breakpoint": "all",
@@ -561,7 +561,7 @@
         "status": "reviewed",
         "value": {
           "role": "t-open-sans-14-500",
-          "family": "'Open Sans', sans-serif",
+          "family": "var(--cod-font-body)",
           "fontSize": "14px",
           "fontWeight": 500,
           "lineHeight": 1.2,
@@ -699,7 +699,7 @@
         "kind": "footer",
         "ruleIds": [
           "sec-83739f",
-          "s-f1871f"
+          "s-0a8f53"
         ],
         "children": [
           {
@@ -756,8 +756,8 @@
                         "id": "paragraph-79",
                         "kind": "paragraph",
                         "ruleIds": [
-                          "t-7d73ba",
-                          "c-4737c4",
+                          "t-4995fe",
+                          "c-bd95c9",
                           "mg-dir-23e5f2"
                         ],
                         "content": {
@@ -801,8 +801,8 @@
                         "id": "paragraph-83",
                         "kind": "paragraph",
                         "ruleIds": [
-                          "t-01952a",
-                          "c-4737c4",
+                          "t-cecbd9",
+                          "c-bd95c9",
                           "mg-a343db"
                         ],
                         "content": {

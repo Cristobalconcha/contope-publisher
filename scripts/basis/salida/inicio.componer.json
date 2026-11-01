@@ -82,7 +82,7 @@
         }
       },
       {
-        "id": "c-4737c4",
+        "id": "c-bd95c9",
         "kind": "color",
         "scope": {
           "breakpoint": "all",
@@ -99,8 +99,8 @@
         },
         "status": "reviewed",
         "value": {
-          "role": "c-ffffff",
-          "color": "#FFFFFF",
+          "role": "c-background",
+          "color": "var(--cod-color-surface)",
           "apply": "text"
         }
       },
@@ -156,7 +156,7 @@
         }
       },
       {
-        "id": "s-c9b66f",
+        "id": "s-d049cc",
         "kind": "surface",
         "scope": {
           "breakpoint": "all",
@@ -173,7 +173,7 @@
         },
         "status": "reviewed",
         "value": {
-          "backgroundColor": "#FFFFFF",
+          "backgroundColor": "var(--cod-color-surface)",
           "backgroundAssetUrl": "/wp-content/uploads/2025/07/Imagen-6.jpg",
           "backgroundSize": "cover",
           "backgroundPosition": "50% 50%",
@@ -182,11 +182,11 @@
             "type": "linear",
             "stops": [
               {
-                "color": "rgb(12, 113, 195)",
+                "color": "var(--cod-color-ink)",
                 "at": "0%"
               },
               {
-                "color": "rgba(255, 255, 255, 0)",
+                "color": "transparent",
                 "at": "100%"
               }
             ]
@@ -281,7 +281,7 @@
         }
       },
       {
-        "id": "t-eeaf66",
+        "id": "t-08b89e",
         "kind": "typography",
         "scope": {
           "breakpoint": "all",
@@ -299,7 +299,7 @@
         "status": "reviewed",
         "value": {
           "role": "t-big-shoulders--80-800",
-          "family": "'Big Shoulders Display', sans-serif",
+          "family": "var(--cod-font-heading)",
           "fontSize": "80px",
           "fontWeight": 800,
           "lineHeight": 1.2,
@@ -307,7 +307,7 @@
         }
       },
       {
-        "id": "t-699a0e",
+        "id": "t-a3b80c",
         "kind": "typography",
         "scope": {
           "breakpoint": "mobile",
@@ -376,7 +376,7 @@
         }
       },
       {
-        "id": "t-6246ce",
+        "id": "t-49835f",
         "kind": "typography",
         "scope": {
           "breakpoint": "all",
@@ -394,7 +394,7 @@
         "status": "reviewed",
         "value": {
           "role": "t-roboto-20-500",
-          "family": "'Roboto', sans-serif",
+          "family": "var(--wp--preset--font-family--boton)",
           "fontSize": "20px",
           "fontWeight": 500,
           "lineHeight": 1.75,
@@ -402,7 +402,7 @@
         }
       },
       {
-        "id": "t-70984a",
+        "id": "t-9a5079",
         "kind": "typography",
         "scope": {
           "breakpoint": "mobile",
@@ -496,7 +496,7 @@
         }
       },
       {
-        "id": "t-970880",
+        "id": "t-426453",
         "kind": "typography",
         "scope": {
           "breakpoint": "all",
@@ -514,7 +514,7 @@
         "status": "reviewed",
         "value": {
           "role": "t-roboto-14-700",
-          "family": "'Roboto', sans-serif",
+          "family": "var(--wp--preset--font-family--boton)",
           "fontSize": "14px",
           "fontWeight": 700,
           "lineHeight": 1.7,
@@ -522,7 +522,7 @@
         }
       },
       {
-        "id": "cbg-f846d3",
+        "id": "cbg-f3f4eb",
         "kind": "color",
         "scope": {
           "breakpoint": "all",
@@ -539,13 +539,13 @@
         },
         "status": "reviewed",
         "value": {
-          "role": "boton-fondo-ffffff",
-          "color": "#FFFFFF",
+          "role": "boton-fondo-background",
+          "color": "var(--cod-color-surface)",
           "apply": "background"
         }
       },
       {
-        "id": "cbt-1996f2",
+        "id": "cbt-222992",
         "kind": "color",
         "scope": {
           "breakpoint": "all",
@@ -562,8 +562,8 @@
         },
         "status": "reviewed",
         "value": {
-          "role": "boton-texto-f26621",
-          "color": "#F26621",
+          "role": "boton-texto-accent",
+          "color": "var(--cod-color-accent)",
           "apply": "text"
         }
       },
@@ -671,7 +671,7 @@
         }
       },
       {
-        "id": "s-c8f1f2",
+        "id": "s-1c1ab1",
         "kind": "surface",
         "scope": {
           "breakpoint": "all",
@@ -688,7 +688,7 @@
         },
         "status": "reviewed",
         "value": {
-          "backgroundColor": "#D8D8D8",
+          "backgroundColor": "var(--wp--preset--color--gris-suave)",
           "backgroundAssetUrl": "/wp-content/uploads/2025/07/aBlanco@4x.png",
           "backgroundSize": "55% auto",
           "backgroundPosition": "100% 50%",
@@ -752,7 +752,7 @@
         }
       },
       {
-        "id": "t-a16ae0",
+        "id": "t-57fefe",
         "kind": "typography",
         "scope": {
           "breakpoint": "all",
@@ -770,7 +770,7 @@
         "status": "reviewed",
         "value": {
           "role": "t-big-shoulders--50-500",
-          "family": "'Big Shoulders Display', sans-serif",
+          "family": "var(--cod-font-heading)",
           "fontSize": "50px",
           "fontWeight": 500,
           "lineHeight": 1.2,
@@ -778,7 +778,7 @@
         }
       },
       {
-        "id": "t-f93544",
+        "id": "t-241528",
         "kind": "typography",
         "scope": {
           "breakpoint": "mobile",
@@ -800,7 +800,7 @@
         }
       },
       {
-        "id": "c-458e22",
+        "id": "c-04d728",
         "kind": "color",
         "scope": {
           "breakpoint": "all",
@@ -817,8 +817,8 @@
         },
         "status": "reviewed",
         "value": {
-          "role": "c-0e0c19",
-          "color": "#0E0C19",
+          "role": "c-ink",
+          "color": "var(--wp--preset--color--ink)",
           "apply": "text"
         }
       },
@@ -1028,7 +1028,7 @@
         }
       },
       {
-        "id": "t-ced61b",
+        "id": "t-83637f",
         "kind": "typography",
         "scope": {
           "breakpoint": "all",
@@ -1046,7 +1046,7 @@
         "status": "reviewed",
         "value": {
           "role": "t-big-shoulders--28-500",
-          "family": "'Big Shoulders Display', sans-serif",
+          "family": "var(--cod-font-heading)",
           "fontSize": "28px",
           "fontWeight": 500,
           "lineHeight": 1.4,
@@ -1054,7 +1054,7 @@
         }
       },
       {
-        "id": "t-de8548",
+        "id": "t-3aa7fc",
         "kind": "typography",
         "scope": {
           "breakpoint": "mobile",
@@ -1076,7 +1076,7 @@
         }
       },
       {
-        "id": "t-658434",
+        "id": "t-a74bbd",
         "kind": "typography",
         "scope": {
           "breakpoint": "all",
@@ -1094,7 +1094,7 @@
         "status": "reviewed",
         "value": {
           "role": "t-roboto-16-500",
-          "family": "'Roboto', sans-serif",
+          "family": "var(--wp--preset--font-family--boton)",
           "fontSize": "16px",
           "fontWeight": 500,
           "lineHeight": 1.75,
@@ -1102,7 +1102,7 @@
         }
       },
       {
-        "id": "t-379834",
+        "id": "t-925ea8",
         "kind": "typography",
         "scope": {
           "breakpoint": "mobile",
@@ -1124,7 +1124,7 @@
         }
       },
       {
-        "id": "c-8eff11",
+        "id": "c-ce010c",
         "kind": "color",
         "scope": {
           "breakpoint": "all",
@@ -1141,8 +1141,8 @@
         },
         "status": "reviewed",
         "value": {
-          "role": "c-3c3a47",
-          "color": "#3C3A47",
+          "role": "c-dark",
+          "color": "var(--wp--preset--color--dark)",
           "apply": "text"
         }
       },
@@ -1242,7 +1242,7 @@
         }
       },
       {
-        "id": "s-c8ec5e",
+        "id": "s-2e5cac",
         "kind": "surface",
         "scope": {
           "breakpoint": "all",
@@ -1259,11 +1259,11 @@
         },
         "status": "reviewed",
         "value": {
-          "backgroundColor": "#FFFFFF"
+          "backgroundColor": "var(--cod-color-surface)"
         }
       },
       {
-        "id": "t-424b46",
+        "id": "t-e857f3",
         "kind": "typography",
         "scope": {
           "breakpoint": "all",
@@ -1281,7 +1281,7 @@
         "status": "reviewed",
         "value": {
           "role": "t-big-shoulders--50-500",
-          "family": "'Big Shoulders Display', sans-serif",
+          "family": "var(--cod-font-heading)",
           "fontSize": "50px",
           "fontWeight": 500,
           "lineHeight": 1.2,
@@ -1289,7 +1289,7 @@
         }
       },
       {
-        "id": "t-c907f9",
+        "id": "t-51496b",
         "kind": "typography",
         "scope": {
           "breakpoint": "mobile",
@@ -1311,7 +1311,7 @@
         }
       },
       {
-        "id": "t-5f6bb4",
+        "id": "t-f9d294",
         "kind": "typography",
         "scope": {
           "breakpoint": "all",
@@ -1329,7 +1329,7 @@
         "status": "reviewed",
         "value": {
           "role": "t-open-sans-24-500",
-          "family": "'Open Sans', sans-serif",
+          "family": "var(--cod-font-body)",
           "fontSize": "24px",
           "fontWeight": 500,
           "lineHeight": 1.6,
@@ -1337,7 +1337,7 @@
         }
       },
       {
-        "id": "c-3bcd26",
+        "id": "c-a194aa",
         "kind": "color",
         "scope": {
           "breakpoint": "all",
@@ -1354,13 +1354,13 @@
         },
         "status": "reviewed",
         "value": {
-          "role": "c-666666",
-          "color": "#666666",
+          "role": "c-text",
+          "color": "var(--cod-color-ink)",
           "apply": "text"
         }
       },
       {
-        "id": "fila-32dae4",
+        "id": "fila-a57b20",
         "kind": "properties",
         "scope": {
           "breakpoint": "all",
@@ -1378,7 +1378,7 @@
         "status": "reviewed",
         "value": {
           "declarations": {
-            "background-color": "#F26621",
+            "background-color": "var(--cod-color-accent)",
             "border-radius": "6px 6px 0px 0px",
             "width": "80%",
             "max-width": "1080px",
@@ -1398,7 +1398,7 @@
         }
       },
       {
-        "id": "fila-fa0749",
+        "id": "fila-984861",
         "kind": "properties",
         "scope": {
           "breakpoint": "mobile",
@@ -1425,7 +1425,7 @@
         }
       },
       {
-        "id": "cl-bece33",
+        "id": "cl-4d9c5e",
         "kind": "properties",
         "scope": {
           "breakpoint": "all",
@@ -1443,7 +1443,7 @@
         "status": "reviewed",
         "value": {
           "declarations": {
-            "background-color": "#F26621",
+            "background-color": "var(--cod-color-accent)",
             "padding-top": "20px",
             "padding-right": "20px",
             "padding-bottom": "20px",
@@ -1453,7 +1453,7 @@
         }
       },
       {
-        "id": "ico-3f6359",
+        "id": "ico-2074fb",
         "kind": "icono",
         "scope": {
           "breakpoint": "all",
@@ -1473,7 +1473,7 @@
           "forma": "/wp-content/uploads/iconos-divi/fontawesome-f217.svg",
           "donde": "antes",
           "tamano": "45px",
-          "color": "#FFFFFF",
+          "color": "var(--cod-color-surface)",
           "separacion": "0px"
         }
       },
@@ -1586,7 +1586,7 @@
         }
       },
       {
-        "id": "ico-da524d",
+        "id": "ico-b1399d",
         "kind": "icono",
         "scope": {
           "breakpoint": "all",
@@ -1606,7 +1606,7 @@
           "forma": "/wp-content/uploads/iconos-divi/fontawesome-f494.svg",
           "donde": "antes",
           "tamano": "50px",
-          "color": "#FFFFFF",
+          "color": "var(--cod-color-surface)",
           "separacion": "0px"
         }
       },
@@ -1642,7 +1642,7 @@
         }
       },
       {
-        "id": "ico-157fa9",
+        "id": "ico-2f819b",
         "kind": "icono",
         "scope": {
           "breakpoint": "all",
@@ -1662,7 +1662,7 @@
           "forma": "/wp-content/uploads/iconos-divi/etmodules-e0e1.svg",
           "donde": "antes",
           "tamano": "40px",
-          "color": "#FFFFFF",
+          "color": "var(--cod-color-surface)",
           "separacion": "0px"
         }
       },
@@ -1754,7 +1754,7 @@
         }
       },
       {
-        "id": "t-2b89bc",
+        "id": "t-a303f3",
         "kind": "typography",
         "scope": {
           "breakpoint": "all",
@@ -1772,7 +1772,7 @@
         "status": "reviewed",
         "value": {
           "role": "t-roboto-18-700",
-          "family": "'Roboto', sans-serif",
+          "family": "var(--wp--preset--font-family--boton)",
           "fontSize": "18px",
           "fontWeight": 700,
           "lineHeight": 1.7,
@@ -1780,7 +1780,7 @@
         }
       },
       {
-        "id": "cbg-e4621b",
+        "id": "cbg-f4aaba",
         "kind": "color",
         "scope": {
           "breakpoint": "all",
@@ -1797,13 +1797,13 @@
         },
         "status": "reviewed",
         "value": {
-          "role": "boton-fondo-898989",
-          "color": "#898989",
+          "role": "boton-fondo-gris",
+          "color": "var(--wp--preset--color--gris)",
           "apply": "background"
         }
       },
       {
-        "id": "cbt-ec5e9f",
+        "id": "cbt-c32fcf",
         "kind": "color",
         "scope": {
           "breakpoint": "all",
@@ -1820,8 +1820,8 @@
         },
         "status": "reviewed",
         "value": {
-          "role": "boton-texto-ffffff",
-          "color": "#FFFFFF",
+          "role": "boton-texto-background",
+          "color": "var(--cod-color-surface)",
           "apply": "text"
         }
       },
@@ -1933,7 +1933,7 @@
         }
       },
       {
-        "id": "fila-739852",
+        "id": "fila-0f6cb9",
         "kind": "properties",
         "scope": {
           "breakpoint": "all",
@@ -1951,7 +1951,7 @@
         "status": "reviewed",
         "value": {
           "declarations": {
-            "background-color": "rgba(255, 255, 255, 0.88)",
+            "background-color": "color-mix(in srgb, var(--cod-color-surface) 88%, transparent)",
             "border-radius": "8px",
             "width": "100%",
             "max-width": "1080px",
@@ -1971,7 +1971,7 @@
         }
       },
       {
-        "id": "fila-4a4ac0",
+        "id": "fila-27ca73",
         "kind": "properties",
         "scope": {
           "breakpoint": "mobile",
@@ -1996,7 +1996,7 @@
         }
       },
       {
-        "id": "t-359376",
+        "id": "t-ee0248",
         "kind": "typography",
         "scope": {
           "breakpoint": "all",
@@ -2014,7 +2014,7 @@
         "status": "reviewed",
         "value": {
           "role": "t-big-shoulders--42-900",
-          "family": "'Big Shoulders Display', sans-serif",
+          "family": "var(--cod-font-heading)",
           "fontSize": "42px",
           "fontWeight": 900,
           "lineHeight": 1,
@@ -2022,7 +2022,7 @@
         }
       },
       {
-        "id": "c-4de609",
+        "id": "c-8b6dc3",
         "kind": "color",
         "scope": {
           "breakpoint": "all",
@@ -2039,13 +2039,13 @@
         },
         "status": "reviewed",
         "value": {
-          "role": "c-e02b20",
-          "color": "#E02B20",
+          "role": "c-rojo",
+          "color": "var(--wp--preset--color--rojo)",
           "apply": "text"
         }
       },
       {
-        "id": "t-829a89",
+        "id": "t-9d2fb9",
         "kind": "typography",
         "scope": {
           "breakpoint": "all",
@@ -2063,34 +2063,11 @@
         "status": "reviewed",
         "value": {
           "role": "t-open-sans-20-500",
-          "family": "'Open Sans', sans-serif",
+          "family": "var(--cod-font-body)",
           "fontSize": "20px",
           "fontWeight": 500,
           "lineHeight": 1.7,
           "align": "start"
-        }
-      },
-      {
-        "id": "c-c21382",
-        "kind": "color",
-        "scope": {
-          "breakpoint": "all",
-          "state": "default"
-        },
-        "provenance": {
-          "sources": [
-            {
-              "kind": "reference",
-              "reference": "https://basisbodegas.com",
-              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
-            }
-          ]
-        },
-        "status": "reviewed",
-        "value": {
-          "role": "c-000000",
-          "color": "#000000",
-          "apply": "text"
         }
       },
       {
@@ -2415,7 +2392,7 @@
         }
       },
       {
-        "id": "s-1697e9",
+        "id": "s-5bc5f8",
         "kind": "surface",
         "scope": {
           "breakpoint": "all",
@@ -2432,17 +2409,17 @@
         },
         "status": "reviewed",
         "value": {
-          "backgroundColor": "#F26621",
+          "backgroundColor": "var(--cod-color-accent)",
           "backgroundGradient": {
             "type": "linear",
             "angle": "65deg",
             "stops": [
               {
-                "color": "rgb(0, 0, 0)",
+                "color": "var(--wp--preset--color--ink)",
                 "at": "0%"
               },
               {
-                "color": "rgba(255, 255, 255, 0)",
+                "color": "transparent",
                 "at": "100%"
               }
             ]
@@ -2450,7 +2427,7 @@
         }
       },
       {
-        "id": "t-2b48ef",
+        "id": "t-16b670",
         "kind": "typography",
         "scope": {
           "breakpoint": "all",
@@ -2468,7 +2445,7 @@
         "status": "reviewed",
         "value": {
           "role": "t-roboto-18-500",
-          "family": "'Roboto', sans-serif",
+          "family": "var(--wp--preset--font-family--boton)",
           "fontSize": "18px",
           "fontWeight": 500,
           "lineHeight": 1.75,
@@ -2476,7 +2453,7 @@
         }
       },
       {
-        "id": "t-f3d33d",
+        "id": "t-b9297b",
         "kind": "typography",
         "scope": {
           "breakpoint": "mobile",
@@ -2498,7 +2475,7 @@
         }
       },
       {
-        "id": "t-1a9c16",
+        "id": "t-f17b6f",
         "kind": "typography",
         "scope": {
           "breakpoint": "all",
@@ -2516,7 +2493,7 @@
         "status": "reviewed",
         "value": {
           "role": "t-roboto-14-700",
-          "family": "'Roboto', sans-serif",
+          "family": "var(--wp--preset--font-family--boton)",
           "fontSize": "14px",
           "fontWeight": 700,
           "lineHeight": 1.7,
@@ -2524,7 +2501,7 @@
         }
       },
       {
-        "id": "cbg-a0ed80",
+        "id": "cbg-71c14c",
         "kind": "color",
         "scope": {
           "breakpoint": "all",
@@ -2541,8 +2518,8 @@
         },
         "status": "reviewed",
         "value": {
-          "role": "boton-fondo-f26621",
-          "color": "#F26621",
+          "role": "boton-fondo-accent",
+          "color": "var(--cod-color-accent)",
           "apply": "background"
         }
       },
@@ -2578,7 +2555,7 @@
         }
       },
       {
-        "id": "promo-4f5a60",
+        "id": "promo-d4a870",
         "kind": "properties",
         "scope": {
           "breakpoint": "all",
@@ -2596,9 +2573,9 @@
         "status": "reviewed",
         "value": {
           "declarations": {
-            "background-color": "#FFFFFF",
+            "background-color": "var(--cod-color-surface)",
             "border-radius": "6px",
-            "box-shadow": "rgba(0, 0, 0, 0.12) 0px 24px 72px -12px",
+            "box-shadow": "color-mix(in srgb, var(--wp--preset--color--ink) 12%, transparent) 0px 24px 72px -12px",
             "padding-top": "60px",
             "padding-right": "60px",
             "padding-bottom": "60px",
@@ -2609,7 +2586,7 @@
         }
       },
       {
-        "id": "promo-115fb8",
+        "id": "promo-c0f627",
         "kind": "properties",
         "scope": {
           "breakpoint": "mobile",
@@ -2686,7 +2663,7 @@
         }
       },
       {
-        "id": "t-c54ed1",
+        "id": "t-ccddab",
         "kind": "typography",
         "scope": {
           "breakpoint": "tablet",
@@ -2731,7 +2708,7 @@
         }
       },
       {
-        "id": "t-0f3e2e",
+        "id": "t-e75e91",
         "kind": "typography",
         "scope": {
           "breakpoint": "tablet",
@@ -2824,7 +2801,7 @@
         }
       },
       {
-        "id": "t-29474c",
+        "id": "t-580fdb",
         "kind": "typography",
         "scope": {
           "breakpoint": "tablet",
@@ -2895,7 +2872,7 @@
         }
       },
       {
-        "id": "t-2bac12",
+        "id": "t-84f46c",
         "kind": "typography",
         "scope": {
           "breakpoint": "tablet",
@@ -2917,7 +2894,7 @@
         }
       },
       {
-        "id": "t-5b2c2b",
+        "id": "t-5e31a1",
         "kind": "typography",
         "scope": {
           "breakpoint": "tablet",
@@ -2963,7 +2940,7 @@
         }
       },
       {
-        "id": "t-8fd5d2",
+        "id": "t-86301e",
         "kind": "typography",
         "scope": {
           "breakpoint": "tablet",
@@ -3008,7 +2985,7 @@
         }
       },
       {
-        "id": "fila-e90844",
+        "id": "fila-3d2e4e",
         "kind": "properties",
         "scope": {
           "breakpoint": "tablet",
@@ -3105,7 +3082,7 @@
         }
       },
       {
-        "id": "fila-fd60e0",
+        "id": "fila-80d6e3",
         "kind": "properties",
         "scope": {
           "breakpoint": "tablet",
@@ -3177,7 +3154,7 @@
         }
       },
       {
-        "id": "promo-8004f4",
+        "id": "promo-df953b",
         "kind": "properties",
         "scope": {
           "breakpoint": "tablet",
@@ -3204,7 +3181,7 @@
         }
       },
       {
-        "id": "t-7322e4",
+        "id": "t-547921",
         "kind": "typography",
         "scope": {
           "breakpoint": "tablet",
@@ -3236,7 +3213,7 @@
           "declarations": {
             "outline-width": "2px",
             "outline-style": "solid",
-            "outline-color": "#FFFFFF",
+            "outline-color": "var(--cod-color-surface)",
             "outline-offset": "4px"
           }
         },
@@ -3385,7 +3362,7 @@
           "declarations": {
             "border-bottom-width": "1px",
             "border-bottom-style": "solid",
-            "border-bottom-color": "rgba(0, 0, 0, 0.15)",
+            "border-bottom-color": "color-mix(in srgb, var(--wp--preset--color--ink) 15%, transparent)",
             "padding-top": "8px",
             "padding-bottom": "8px"
           }
@@ -3396,6 +3373,55 @@
               "kind": "reference",
               "reference": "scripts/basis/correcciones.json",
               "rationale": "Rediseño pedido por el cliente sobre el original."
+            }
+          ]
+        },
+        "status": "reviewed"
+      },
+      {
+        "id": "bas-plg-resumen-tipo",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "value": {
+          "role": "plg-resumen",
+          "family": "var(--cod-font-body)",
+          "fontSize": "20px",
+          "fontWeight": 500,
+          "lineHeight": 1.7,
+          "align": "start"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "scripts/basis/correcciones.json",
+              "rationale": "título de cada pliegue del acordeón de Dimensiones (Open Sans 20px/500 del original). Antes se llamaba por el id con hash de la regla que el transcriptor generaba (t-829a89): al traducir el sitio al set cambió el hash y la corrección se rompió. Una regla con nombre no depende del hash."
+            }
+          ]
+        },
+        "status": "reviewed"
+      },
+      {
+        "id": "bas-plg-resumen-color",
+        "kind": "color",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "value": {
+          "role": "plg-resumen",
+          "color": "var(--wp--preset--color--ink)",
+          "apply": "text"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "scripts/basis/correcciones.json",
+              "rationale": "color del título de cada pliegue del acordeón de Dimensiones (negro del original; ver bas-plg-resumen-tipo)."
             }
           ]
         },
@@ -3442,7 +3468,7 @@
         },
         "value": {
           "declarations": {
-            "background-color": "#E02B20",
+            "background-color": "var(--wp--preset--color--rojo)",
             "width": "14px",
             "height": "14px"
           }
@@ -3562,7 +3588,7 @@
         "ruleIds": [
           "sec-d72755",
           "sec-7ccb0e",
-          "s-c9b66f",
+          "s-d049cc",
           "sec-5dc33a"
         ],
         "children": [
@@ -3587,12 +3613,12 @@
                     "id": "paragraph-correccion-4",
                     "kind": "paragraph",
                     "ruleIds": [
-                      "t-6246ce",
-                      "t-70984a",
-                      "c-4737c4",
+                      "t-49835f",
+                      "t-9a5079",
+                      "c-bd95c9",
                       "mg-e7d2d5",
                       "mg-040870",
-                      "t-0f3e2e",
+                      "t-e75e91",
                       "mg-db04a0"
                     ],
                     "content": {
@@ -3603,12 +3629,12 @@
                     "id": "heading-12",
                     "kind": "heading",
                     "ruleIds": [
-                      "t-eeaf66",
-                      "t-699a0e",
-                      "c-4737c4",
+                      "t-08b89e",
+                      "t-a3b80c",
+                      "c-bd95c9",
                       "mg-1a56c0",
                       "mg-cb0416",
-                      "t-c54ed1",
+                      "t-ccddab",
                       "mg-d782eb"
                     ],
                     "content": {
@@ -3620,12 +3646,12 @@
                     "id": "paragraph-13",
                     "kind": "paragraph",
                     "ruleIds": [
-                      "t-6246ce",
-                      "t-70984a",
-                      "c-4737c4",
+                      "t-49835f",
+                      "t-9a5079",
+                      "c-bd95c9",
                       "mg-e7d2d5",
                       "mg-040870",
-                      "t-0f3e2e",
+                      "t-e75e91",
                       "mg-db04a0"
                     ],
                     "content": {
@@ -3637,9 +3663,9 @@
                     "kind": "button",
                     "ruleIds": [
                       "btn-504eb8",
-                      "t-970880",
-                      "cbg-f846d3",
-                      "cbt-1996f2",
+                      "t-426453",
+                      "cbg-f3f4eb",
+                      "cbt-222992",
                       "forma-57aa11",
                       "btnp-7cb2ee",
                       "mg-a343db"
@@ -3661,7 +3687,7 @@
         "ruleIds": [
           "sec-f1b5a7",
           "sec-aed2a5",
-          "s-c8f1f2",
+          "s-1c1ab1",
           "sec-30869c"
         ],
         "children": [
@@ -3686,11 +3712,11 @@
                     "id": "heading-18",
                     "kind": "heading",
                     "ruleIds": [
-                      "t-a16ae0",
-                      "t-f93544",
-                      "c-458e22",
+                      "t-57fefe",
+                      "t-241528",
+                      "c-04d728",
                       "mg-082b3c",
-                      "t-29474c"
+                      "t-580fdb"
                     ],
                     "content": {
                       "text": "Soluciones inteligentes",
@@ -3739,11 +3765,11 @@
                     "id": "heading-22",
                     "kind": "heading",
                     "ruleIds": [
-                      "t-ced61b",
-                      "t-de8548",
-                      "c-458e22",
+                      "t-83637f",
+                      "t-3aa7fc",
+                      "c-04d728",
                       "mg-082b3c",
-                      "t-2bac12"
+                      "t-84f46c"
                     ],
                     "content": {
                       "text": "Aislación efectiva",
@@ -3754,11 +3780,11 @@
                     "id": "paragraph-23",
                     "kind": "paragraph",
                     "ruleIds": [
-                      "t-658434",
-                      "t-379834",
-                      "c-8eff11",
+                      "t-a74bbd",
+                      "t-925ea8",
+                      "c-ce010c",
                       "mg-a343db",
-                      "t-5b2c2b"
+                      "t-5e31a1"
                     ],
                     "content": {
                       "text": "Nuestras carpas son fabricadas con materiales de última generación que les brindan la máxima protección ante la de lluvia, sol y vectores."
@@ -3794,12 +3820,12 @@
                     "id": "heading-26",
                     "kind": "heading",
                     "ruleIds": [
-                      "t-ced61b",
-                      "t-de8548",
-                      "c-458e22",
+                      "t-83637f",
+                      "t-3aa7fc",
+                      "c-04d728",
                       "mg-082b3c",
                       "mg-53c88b",
-                      "t-2bac12"
+                      "t-84f46c"
                     ],
                     "content": {
                       "text": "Instalación Rápida",
@@ -3810,11 +3836,11 @@
                     "id": "paragraph-27",
                     "kind": "paragraph",
                     "ruleIds": [
-                      "t-658434",
-                      "t-379834",
-                      "c-8eff11",
+                      "t-a74bbd",
+                      "t-925ea8",
+                      "c-ce010c",
                       "mg-a343db",
-                      "t-5b2c2b"
+                      "t-5e31a1"
                     ],
                     "content": {
                       "text": "Nuestro sistema modular facilita una instalación rápida y eficiente, optimizando el espacio de almacenamiento con una mínima preparación del terreno."
@@ -3850,11 +3876,11 @@
                     "id": "heading-30",
                     "kind": "heading",
                     "ruleIds": [
-                      "t-ced61b",
-                      "t-de8548",
-                      "c-458e22",
+                      "t-83637f",
+                      "t-3aa7fc",
+                      "c-04d728",
                       "mg-082b3c",
-                      "t-2bac12"
+                      "t-84f46c"
                     ],
                     "content": {
                       "text": "Materiales de optima calidad",
@@ -3865,11 +3891,11 @@
                     "id": "paragraph-31",
                     "kind": "paragraph",
                     "ruleIds": [
-                      "t-658434",
-                      "t-379834",
-                      "c-8eff11",
+                      "t-a74bbd",
+                      "t-925ea8",
+                      "c-ce010c",
                       "mg-a343db",
-                      "t-5b2c2b"
+                      "t-5e31a1"
                     ],
                     "content": {
                       "text": "Con materiales de alta calidad, nuestras carpas ofrecen un aislamiento superior, son ignífugas y sus estructuras de aluminio son livianas y robustas."
@@ -3888,7 +3914,7 @@
         "ruleIds": [
           "sec-79ee4b",
           "sec-6069e7",
-          "s-c8ec5e",
+          "s-2e5cac",
           "sec-0b4923"
         ],
         "children": [
@@ -3913,11 +3939,11 @@
                     "id": "heading-35",
                     "kind": "heading",
                     "ruleIds": [
-                      "t-424b46",
-                      "t-c907f9",
-                      "c-458e22",
+                      "t-e857f3",
+                      "t-51496b",
+                      "c-04d728",
                       "mg-082b3c",
-                      "t-8fd5d2",
+                      "t-86301e",
                       "mg-280220"
                     ],
                     "content": {
@@ -3929,8 +3955,8 @@
                     "id": "paragraph-36",
                     "kind": "paragraph",
                     "ruleIds": [
-                      "t-5f6bb4",
-                      "c-3bcd26",
+                      "t-f9d294",
+                      "c-a194aa",
                       "mg-a343db"
                     ],
                     "content": {
@@ -3945,9 +3971,9 @@
             "id": "group-57",
             "kind": "group",
             "ruleIds": [
-              "fila-32dae4",
-              "fila-fa0749",
-              "fila-e90844"
+              "fila-a57b20",
+              "fila-984861",
+              "fila-3d2e4e"
             ],
             "children": [
               {
@@ -3955,7 +3981,7 @@
                 "kind": "group",
                 "ruleIds": [
                   "col-542b47",
-                  "cl-bece33"
+                  "cl-4d9c5e"
                 ],
                 "children": [
                   {
@@ -3969,7 +3995,7 @@
                         "id": "paragraph-39",
                         "kind": "paragraph",
                         "ruleIds": [
-                          "ico-3f6359",
+                          "ico-2074fb",
                           "ico-caja-c803bf"
                         ],
                         "content": {
@@ -3988,11 +4014,11 @@
                             "id": "heading-40",
                             "kind": "heading",
                             "ruleIds": [
-                              "t-ced61b",
-                              "t-de8548",
-                              "c-4737c4",
+                              "t-83637f",
+                              "t-3aa7fc",
+                              "c-bd95c9",
                               "mg-9b6f57",
-                              "t-2bac12"
+                              "t-84f46c"
                             ],
                             "content": {
                               "text": "Compra tus bodegas",
@@ -4003,11 +4029,11 @@
                             "id": "paragraph-41",
                             "kind": "paragraph",
                             "ruleIds": [
-                              "t-658434",
-                              "t-379834",
-                              "c-4737c4",
+                              "t-a74bbd",
+                              "t-925ea8",
+                              "c-bd95c9",
                               "mg-a343db",
-                              "t-5b2c2b"
+                              "t-5e31a1"
                             ],
                             "content": {
                               "text": "Para satisfacer el requerimiento de instalaciones permanentes o que superen los 5 años, comprar puede ser la opción más conveniente, especialmente si agrega Servicios Opcionales y la instalación dentro del total."
@@ -4024,7 +4050,7 @@
                 "kind": "group",
                 "ruleIds": [
                   "col-542b47",
-                  "cl-bece33"
+                  "cl-4d9c5e"
                 ],
                 "children": [
                   {
@@ -4038,7 +4064,7 @@
                         "id": "paragraph-45",
                         "kind": "paragraph",
                         "ruleIds": [
-                          "ico-da524d",
+                          "ico-b1399d",
                           "ico-caja-e26014"
                         ],
                         "content": {
@@ -4057,11 +4083,11 @@
                             "id": "heading-46",
                             "kind": "heading",
                             "ruleIds": [
-                              "t-ced61b",
-                              "t-de8548",
-                              "c-4737c4",
+                              "t-83637f",
+                              "t-3aa7fc",
+                              "c-bd95c9",
                               "mg-9b6f57",
-                              "t-2bac12"
+                              "t-84f46c"
                             ],
                             "content": {
                               "text": "Opción de Arriendo",
@@ -4072,11 +4098,11 @@
                             "id": "paragraph-47",
                             "kind": "paragraph",
                             "ruleIds": [
-                              "t-658434",
-                              "t-379834",
-                              "c-4737c4",
+                              "t-a74bbd",
+                              "t-925ea8",
+                              "c-bd95c9",
                               "mg-a343db",
-                              "t-5b2c2b"
+                              "t-5e31a1"
                             ],
                             "content": {
                               "text": "Si su operación es temporal o su requerimiento de naves es fluctuante, la decisión de arrendar podría ser la mejor opción. Dispondrá de instalación en sus dependencias y con tarifas muy competitivas, ajustadas a la duración del contrato."
@@ -4093,7 +4119,7 @@
                 "kind": "group",
                 "ruleIds": [
                   "col-542b47",
-                  "cl-bece33"
+                  "cl-4d9c5e"
                 ],
                 "children": [
                   {
@@ -4107,7 +4133,7 @@
                         "id": "paragraph-51",
                         "kind": "paragraph",
                         "ruleIds": [
-                          "ico-157fa9",
+                          "ico-2f819b",
                           "ico-caja-913cff"
                         ],
                         "content": {
@@ -4126,11 +4152,11 @@
                             "id": "heading-52",
                             "kind": "heading",
                             "ruleIds": [
-                              "t-ced61b",
-                              "t-de8548",
-                              "c-4737c4",
+                              "t-83637f",
+                              "t-3aa7fc",
+                              "c-bd95c9",
                               "mg-9b6f57",
-                              "t-2bac12"
+                              "t-84f46c"
                             ],
                             "content": {
                               "text": "Opción ACC",
@@ -4141,11 +4167,11 @@
                             "id": "paragraph-53",
                             "kind": "paragraph",
                             "ruleIds": [
-                              "t-658434",
-                              "t-379834",
-                              "c-4737c4",
+                              "t-a74bbd",
+                              "t-925ea8",
+                              "c-bd95c9",
                               "mg-a343db",
-                              "t-5b2c2b"
+                              "t-5e31a1"
                             ],
                             "content": {
                               "text": "Y si no desea inmovilizar recursos para faenas de largo plazo o permanente, el Arriendo con Compromiso de Compra (ACC) entrega un valor de arriendo intermedio que le permite adquirir la bodega arrendada al cabo de un plazo pre pactado."
@@ -4181,9 +4207,9 @@
                     "kind": "button",
                     "ruleIds": [
                       "btn-504eb8",
-                      "t-2b89bc",
-                      "cbg-e4621b",
-                      "cbt-ec5e9f",
+                      "t-a303f3",
+                      "cbg-f4aaba",
+                      "cbt-c32fcf",
                       "forma-57aa11",
                       "btnp-b7d60f",
                       "mg-a343db"
@@ -4207,7 +4233,7 @@
           "sec-56504b",
           "sec-0cc10b",
           "sec-video-5482e2",
-          "s-c8ec5e",
+          "s-2e5cac",
           "sec-9dedc1",
           "bas-video-centro"
         ],
@@ -4230,9 +4256,9 @@
             "id": "group-67",
             "kind": "group",
             "ruleIds": [
-              "fila-739852",
-              "fila-4a4ac0",
-              "fila-fd60e0",
+              "fila-0f6cb9",
+              "fila-27ca73",
+              "fila-80d6e3",
               "bas-video-velo"
             ],
             "children": [
@@ -4249,8 +4275,8 @@
                     "id": "heading-62",
                     "kind": "heading",
                     "ruleIds": [
-                      "t-359376",
-                      "c-4de609",
+                      "t-ee0248",
+                      "c-8b6dc3",
                       "mg-9b6f57",
                       "relmod-7f9b1c"
                     ],
@@ -4263,8 +4289,8 @@
                     "id": "list-63-sueltos",
                     "kind": "list",
                     "ruleIds": [
-                      "t-829a89",
-                      "c-c21382",
+                      "t-9d2fb9",
+                      "c-04d728",
                       "mg-a343db",
                       "lista-cbecaf",
                       "relmod-96588f",
@@ -4291,9 +4317,9 @@
                         "bas-plg-item"
                       ],
                       "resumen": [
-                        "bas-plg-resumen",
-                        "t-829a89",
-                        "c-c21382"
+                        "bas-plg-resumen-tipo",
+                        "bas-plg-resumen-color",
+                        "bas-plg-resumen"
                       ],
                       "icono": [
                         "bas-plg-icono"
@@ -4325,8 +4351,8 @@
                             "id": "list-rd-list-63-0",
                             "kind": "list",
                             "ruleIds": [
-                              "t-829a89",
-                              "c-c21382",
+                              "t-9d2fb9",
+                              "c-04d728",
                               "sublista-d40040",
                               "mg-a343db"
                             ],
@@ -4363,8 +4389,8 @@
                             "id": "list-rd-list-63-1",
                             "kind": "list",
                             "ruleIds": [
-                              "t-829a89",
-                              "c-c21382",
+                              "t-9d2fb9",
+                              "c-04d728",
                               "sublista-d40040",
                               "mg-a343db"
                             ],
@@ -4401,8 +4427,8 @@
                             "id": "list-rd-list-63-2",
                             "kind": "list",
                             "ruleIds": [
-                              "t-829a89",
-                              "c-c21382",
+                              "t-9d2fb9",
+                              "c-04d728",
                               "sublista-d40040",
                               "mg-a343db"
                             ],
@@ -4460,7 +4486,7 @@
         "kind": "section",
         "ruleIds": [
           "sec-6421f0",
-          "s-1697e9"
+          "s-5bc5f8"
         ],
         "children": [
           {
@@ -4485,21 +4511,21 @@
                     "kind": "group",
                     "ruleIds": [
                       "col-542b47",
-                      "promo-4f5a60",
-                      "promo-115fb8",
+                      "promo-d4a870",
+                      "promo-c0f627",
                       "mg-a343db",
-                      "promo-8004f4"
+                      "promo-df953b"
                     ],
                     "children": [
                       {
                         "id": "heading-70",
                         "kind": "heading",
                         "ruleIds": [
-                          "t-424b46",
-                          "t-c907f9",
-                          "c-458e22",
+                          "t-e857f3",
+                          "t-51496b",
+                          "c-04d728",
                           "mg-9b6f57",
-                          "t-8fd5d2"
+                          "t-86301e"
                         ],
                         "content": {
                           "text": "Descubre Más Sobre Nuestras Carpas",
@@ -4510,11 +4536,11 @@
                         "id": "paragraph-71",
                         "kind": "paragraph",
                         "ruleIds": [
-                          "t-2b48ef",
-                          "t-f3d33d",
-                          "c-8eff11",
+                          "t-16b670",
+                          "t-b9297b",
+                          "c-ce010c",
                           "mg-082b3c",
-                          "t-7322e4"
+                          "t-547921"
                         ],
                         "content": {
                           "text": "¿Interesado en optimizar tu espacio de almacenamiento? Contáctanos para obtener más información sobre nuestras carpas industriales inteligentes y cómo pueden beneficiar a tu negocio."
@@ -4525,9 +4551,9 @@
                         "kind": "button",
                         "ruleIds": [
                           "btn-504eb8",
-                          "t-1a9c16",
-                          "cbg-a0ed80",
-                          "cbt-ec5e9f",
+                          "t-f17b6f",
+                          "cbg-71c14c",
+                          "cbt-c32fcf",
                           "forma-57aa11",
                           "btnp-1a0b10",
                           "mg-a343db"

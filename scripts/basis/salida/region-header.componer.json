@@ -58,7 +58,7 @@
         }
       },
       {
-        "id": "s-f1871f",
+        "id": "s-0a8f53",
         "kind": "surface",
         "scope": {
           "breakpoint": "all",
@@ -75,7 +75,7 @@
         },
         "status": "reviewed",
         "value": {
-          "backgroundColor": "#898989"
+          "backgroundColor": "var(--wp--preset--color--gris)"
         }
       },
       {
@@ -267,7 +267,7 @@
         }
       },
       {
-        "id": "t-0ddbc4",
+        "id": "t-419c0b",
         "kind": "typography",
         "scope": {
           "breakpoint": "all",
@@ -285,7 +285,7 @@
         "status": "reviewed",
         "value": {
           "role": "t-open-sans-16-500",
-          "family": "'Open Sans', sans-serif",
+          "family": "var(--cod-font-body)",
           "fontSize": "16px",
           "fontWeight": 500,
           "lineHeight": 1.7,
@@ -293,7 +293,7 @@
         }
       },
       {
-        "id": "c-4737c4",
+        "id": "c-bd95c9",
         "kind": "color",
         "scope": {
           "breakpoint": "all",
@@ -310,8 +310,8 @@
         },
         "status": "reviewed",
         "value": {
-          "role": "c-ffffff",
-          "color": "#FFFFFF",
+          "role": "c-background",
+          "color": "var(--cod-color-surface)",
           "apply": "text"
         }
       },
@@ -394,7 +394,7 @@
         }
       },
       {
-        "id": "fijo-569f55",
+        "id": "fijo-6f93d7",
         "kind": "properties",
         "scope": {
           "breakpoint": "all",
@@ -418,8 +418,8 @@
             "transform": "translateY(-50%)",
             "width": "60px",
             "height": "60px",
-            "background-color": "#000000",
-            "box-shadow": "0 4px 10px rgba(0,0,0,0.2)",
+            "background-color": "var(--wp--preset--color--ink)",
+            "box-shadow": "0 4px 10px color-mix(in srgb, var(--wp--preset--color--ink) 20%, transparent)",
             "z-index": "9999",
             "border-top-left-radius": "50%",
             "border-top-right-radius": "0",
@@ -432,7 +432,7 @@
         }
       },
       {
-        "id": "fijo-h-5c8f20",
+        "id": "fijo-h-8cf27c",
         "kind": "properties",
         "scope": {
           "breakpoint": "all",
@@ -450,12 +450,12 @@
         "status": "reviewed",
         "value": {
           "declarations": {
-            "background-color": "rgb(87, 209, 99)"
+            "background-color": "var(--wp--preset--color--gris-claro)"
           }
         }
       },
       {
-        "id": "fijo-233949",
+        "id": "fijo-b8801a",
         "kind": "properties",
         "scope": {
           "breakpoint": "all",
@@ -479,8 +479,8 @@
             "transform": "translateY(-50%)",
             "width": "60px",
             "height": "60px",
-            "background-color": "#000000",
-            "box-shadow": "0 4px 10px rgba(0,0,0,0.2)",
+            "background-color": "var(--wp--preset--color--ink)",
+            "box-shadow": "0 4px 10px color-mix(in srgb, var(--wp--preset--color--ink) 20%, transparent)",
             "z-index": "9999",
             "border-top-left-radius": "50%",
             "border-top-right-radius": "0",
@@ -493,7 +493,7 @@
         }
       },
       {
-        "id": "ico-d3385f",
+        "id": "ico-867d82",
         "kind": "icono",
         "scope": {
           "breakpoint": "all",
@@ -513,11 +513,11 @@
           "forma": "/wp-content/uploads/iconos-divi/enlace-af329f38.svg",
           "donde": "antes",
           "tamano": "42px",
-          "color": "#FFFFFF"
+          "color": "var(--cod-color-surface)"
         }
       },
       {
-        "id": "fijo-h-1f1392",
+        "id": "fijo-h-2401d9",
         "kind": "properties",
         "scope": {
           "breakpoint": "all",
@@ -535,7 +535,7 @@
         "status": "reviewed",
         "value": {
           "declarations": {
-            "background-color": "#0056b3"
+            "background-color": "var(--wp--preset--color--gris-oscuro)"
           }
         }
       },
@@ -576,7 +576,7 @@
         "ruleIds": [
           "pegada-a2d977",
           "sec-1076dc",
-          "s-f1871f"
+          "s-0a8f53"
         ],
         "children": [
           {
@@ -637,8 +637,8 @@
                     "id": "link-4",
                     "kind": "link",
                     "ruleIds": [
-                      "t-0ddbc4",
-                      "c-4737c4",
+                      "t-419c0b",
+                      "c-bd95c9",
                       "mg-1fd017",
                       "t-b24b57"
                     ],
@@ -671,17 +671,17 @@
                     "id": "whatsapp-7",
                     "kind": "whatsapp",
                     "ruleIds": [
-                      "fijo-569f55",
-                      "fijo-h-5c8f20"
+                      "fijo-6f93d7",
+                      "fijo-h-8cf27c"
                     ],
                     "content": {
                       "message": "Hola BASIS\n\nNombre:\nEmail:\nTeléfono:\n\nMensaje:\nQuisiera realizar una consulta/cotización...",
                       "ariaLabel": "WhatsApp",
                       "size": 60,
                       "iconPadding": 9,
-                      "iconColor": "#FFFFFF",
+                      "iconColor": "var(--cod-color-surface)",
                       "iconStyle": "logo",
-                      "backgroundColor": "#000000",
+                      "backgroundColor": "var(--wp--preset--color--ink)",
                       "borderRadius": "50% 0 0 50%"
                     }
                   },
@@ -689,9 +689,9 @@
                     "id": "link-8",
                     "kind": "link",
                     "ruleIds": [
-                      "fijo-233949",
-                      "ico-d3385f",
-                      "fijo-h-1f1392"
+                      "fijo-b8801a",
+                      "ico-867d82",
+                      "fijo-h-2401d9"
                     ],
                     "content": {
                       "label": "",

@@ -178,6 +178,39 @@
     },
     {
       "pagina": "inicio",
+      "_porque": "título de cada pliegue del acordeón de Dimensiones (Open Sans 20px/500 del original). Antes se llamaba por el id con hash de la regla que el transcriptor generaba (t-829a89): al traducir el sitio al set cambió el hash y la corrección se rompió. Una regla con nombre no depende del hash.",
+      "id": "bas-plg-resumen-tipo",
+      "kind": "typography",
+      "scope": {
+        "breakpoint": "all",
+        "state": "default"
+      },
+      "value": {
+        "role": "plg-resumen",
+        "family": "'Open Sans', sans-serif",
+        "fontSize": "20px",
+        "fontWeight": 500,
+        "lineHeight": 1.7,
+        "align": "start"
+      }
+    },
+    {
+      "pagina": "inicio",
+      "_porque": "color del título de cada pliegue del acordeón de Dimensiones (negro del original; ver bas-plg-resumen-tipo).",
+      "id": "bas-plg-resumen-color",
+      "kind": "color",
+      "scope": {
+        "breakpoint": "all",
+        "state": "default"
+      },
+      "value": {
+        "role": "plg-resumen",
+        "color": "#000000",
+        "apply": "text"
+      }
+    },
+    {
+      "pagina": "inicio",
       "id": "bas-plg-resumen",
       "kind": "properties",
       "scope": {
@@ -320,9 +353,9 @@
           "bas-plg-item"
         ],
         "resumen": [
-          "bas-plg-resumen",
-          "t-829a89",
-          "c-c21382"
+          "bas-plg-resumen-tipo",
+          "bas-plg-resumen-color",
+          "bas-plg-resumen"
         ],
         "icono": [
           "bas-plg-icono"

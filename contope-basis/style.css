@@ -9,6 +9,13 @@ Text Domain: cod-basis
 */
 
 /*
+ * EL SET MANDA. Los valores de la identidad viven en UN solo lugar: la paleta y
+ * las familias del theme.json, y las definiciones de estilo de ContOpe
+ * (Configuración → Definiciones de estilo del tema, que se declaran con
+ * scripts/basis/definiciones-del-set.php). Esta hoja NO los copia: sólo les da
+ * los nombres que usan el resto de las hojas del tema, apuntando al set. Cambiar
+ * un color o una tipografía en el set cambia el sitio entero.
+ *
  * Identidad de Basis, MEDIDA del sitio original con el navegador (estilos
  * computados, 1440 y 393 de ancho), no leída de su hoja de estilos:
  *
@@ -24,27 +31,27 @@ Text Domain: cod-basis
  * revés. QUÉ título va de qué color lo decide cada nodo con una regla de color.
  */
 :root {
-  --basis-naranja: #f26621;
-  --basis-gris: #898989;
-  --basis-gris-oscuro: #636363;
-  --basis-gris-claro: #d6d6d6;
-  --basis-gris-suave: #d8d8d8;
-  --basis-casi-blanco: #f4f4f4;
-  --basis-negro: #222222;
-  --basis-texto: #666666;
-  --basis-tinta: #0e0c19;
-  --basis-rojo: #e02b20;
-  --basis-rojo-contacto: #dc4017;
+  --basis-naranja: var(--cod-color-accent);
+  --basis-gris: var(--wp--preset--color--gris);
+  --basis-gris-oscuro: var(--wp--preset--color--gris-oscuro);
+  --basis-gris-claro: var(--wp--preset--color--gris-claro);
+  --basis-gris-suave: var(--wp--preset--color--gris-suave);
+  --basis-casi-blanco: var(--wp--preset--color--casi-blanco);
+  --basis-negro: var(--wp--preset--color--dark);
+  --basis-texto: var(--cod-color-ink);
+  --basis-tinta: var(--wp--preset--color--ink);
+  --basis-rojo: var(--wp--preset--color--rojo);
+  --basis-rojo-contacto: var(--wp--preset--color--rojo-contacto);
 
-  --font-hero: 'Big Shoulders Display', 'Arial Narrow', system-ui, sans-serif;
-  --font-body: 'Open Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-boton: 'Roboto', 'Helvetica Neue', Arial, sans-serif;
-  --font-pliegue: 'Montserrat', 'Helvetica Neue', Arial, sans-serif;
+  --font-hero: var(--cod-font-heading);
+  --font-body: var(--cod-font-body);
+  --font-boton: var(--wp--preset--font-family--boton);
+  --font-pliegue: var(--cod-font-accent);
 }
 
 /* El cuerpo del original: Open Sans 14px, interlineado 1,7 y gris #666. */
 body {
-  background-color: #ffffff;
+  background-color: var(--cod-color-surface);
   color: var(--basis-texto);
   font-family: var(--font-body);
   font-size: 14px;

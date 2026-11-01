@@ -101,24 +101,29 @@ export function aplicarCorrecciones(slug, nodos, correcciones) {
 }
 
 /** Cambia el valor de una declaración en las reglas de diseño de la página (estilo pedido por el cliente, no del original). */
-export function corregirReglas(slug, design, correcciones, nodos = []) {
+export function corregirReglas(slug, design, correcciones, nodos = [], tokens = null) {
+  // Lo que pide el cliente también pasa por el set: un color escrito en correcciones.json se traduce igual que uno medido.
+  const T = tokens?.silencioso || null;
   const hechos = [];
   const usadas = new Set(JSON.stringify(nodos).match(/"bas-[a-z-]+"/g)?.map((x) => x.slice(1, -1)) || []);
   const modelo = (design.rules || [])[0];
   for (const r of (correcciones.reglasNuevas || []).filter((c) => c.pagina === slug || c.pagina === '*')) {
     if (r.pagina === '*' && !usadas.has(r.id)) continue;
-    const { pagina, _porque, ...regla } = r;
+    const { pagina, _porque, ...regla0 } = r;
+    const regla = T ? { ...regla0, value: T.regla(regla0.kind, regla0.value) } : regla0;
     design.rules.push({ ...regla, provenance: { sources: [{ kind: 'reference', reference: 'scripts/basis/correcciones.json', rationale: _porque || 'Rediseño pedido por el cliente sobre el original.' }] }, status: modelo?.status || 'reviewed' });
     hechos.push(`regla nueva ${r.id}`);
   }
   for (const c of (correcciones.declaraciones || []).filter((c) => c.pagina === slug)) {
     let veces = 0;
+    const buscado = T ? T.color(c.valor) : c.valor;
+    const nuevo = T ? T.color(c.nuevo) : c.nuevo;
     for (const r of design.rules || []) {
       const d = r.value?.declarations;
-      if (d && d[c.propiedad] === c.valor) { d[c.propiedad] = c.nuevo; veces++; }
+      if (d && d[c.propiedad] === buscado) { d[c.propiedad] = nuevo; veces++; }
     }
     if (!veces) throw new Error(`corrección sin objetivo en ${slug}: ${c.propiedad} ${c.valor}`);
-    hechos.push(`${c.propiedad} ${c.valor} → ${c.nuevo} (${veces} regla${veces > 1 ? 's' : ''})`);
+    hechos.push(`${c.propiedad} ${buscado} → ${nuevo} (${veces} regla${veces > 1 ? 's' : ''})`);
   }
   return hechos;
 }

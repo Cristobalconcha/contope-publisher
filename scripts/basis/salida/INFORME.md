@@ -69,3 +69,41 @@ faltante: 0 · sin-transcribir: 2 · aproximado: 7 · ok: 48
 - contactos › pie › sección 2 › fila 1 › col 0 › image › desfase: el primer módulo de la columna está desfasado -28px (escritorio) / -28px (celular) del borde de su contenido: se aplica como margen superior
 - contactos › pie › sección 2 › fila 1 › col 1 › code › mapbox: mini mapa de Mapbox → grupo con conducta `mapa` (necesita la clave pública de Mapbox en Configuración para abrir el grande)
 - contactos › pie › sección 2 › fila 1 › col 1 › code › desfase: el módulo de código que empieza la columna lleva márgenes propios: arriba -10px (escritorio) / -10px (celular), abajo 20px / 20px
+
+## Traducción al set de diseño
+
+Colores que calzaron EXACTO con la paleta: 11 (117 usos).
+
+### Colores acercados a la paleta (8)
+
+| original | token | slug | distancia (OKLab×100) | usos | dónde |
+|---|---|---|---|---|---|
+| #333333 | `var(--wp--preset--color--dark)` | dark | 6.9 | 5 | basis-carpas-industriales › color, basis-carpas-industriales › properties, preguntas-frecuentes › properties |
+| #999999 | `var(--wp--preset--color--gris)` | gris | 5.3 | 2 | contactos › form |
+| #112337 | `var(--wp--preset--color--dark)` | dark | 4.5 | 4 | contactos › form |
+| #E2E2E2 | `var(--wp--preset--color--gris-suave)` | gris-suave | 3.1 | 1 | basis-carpas-industriales › properties |
+| #CCCCCC | `var(--wp--preset--color--gris-claro)` | gris-claro | 3.1 | 3 | preguntas-frecuentes › properties |
+| #585E6A | `var(--wp--preset--color--gris-oscuro)` | gris-oscuro | 2.8 | 2 | contactos › form |
+| #EEEEEE | `var(--wp--preset--color--casi-blanco)` | casi-blanco | 1.8 | 2 | contactos › form |
+| #DDDDDD | `var(--wp--preset--color--gris-suave)` | gris-suave | 1.5 | 9 | basis-carpas-industriales › properties |
+
+### Fuera del set (7): más lejos de 8 del color más cercano; se tradujeron igual, MARCADOS
+
+| original | token | slug | distancia | usos | dónde |
+|---|---|---|---|---|---|
+| #57D163 | `var(--wp--preset--color--gris-claro)` | gris-claro | 21.6 | 4 | basis-carpas-industriales › properties, contactos › properties, inicio › properties, preguntas-frecuentes › properties |
+| #0056B3 | `var(--wp--preset--color--gris-oscuro)` | gris-oscuro | 16.7 | 4 | basis-carpas-industriales › properties, contactos › properties, inicio › properties, preguntas-frecuentes › properties |
+| #000000 | `var(--wp--preset--color--ink)` | ink | 16.6 | 24 | basis-carpas-industriales › properties, contactos › properties, inicio › color, inicio › properties |
+| #0C71C3 | `var(--cod-color-ink)` | text | 15.5 | 1 | inicio › surface |
+| #121961 | `var(--wp--preset--color--dark)` | dark | 12.6 | 2 | contactos › form |
+| #E09900 | `var(--cod-color-accent)` | accent | 11.8 | 2 | contactos › form |
+| #3C3A47 | `var(--wp--preset--color--dark)` | dark | 10.6 | 4 | inicio › color |
+
+### Tipografías
+
+| familia | variable | usos | dónde |
+|---|---|---|---|
+| Open Sans | `var(--cod-font-body)` | 48 | basis-carpas-industriales › properties, basis-carpas-industriales › typography, contactos › form, contactos › typography, inicio › typography |
+| Big Shoulders Display | `var(--cod-font-heading)` | 12 | contactos › typography, inicio › typography |
+| Roboto | `var(--wp--preset--font-family--boton)` | 11 | inicio › typography |
+| Montserrat | `var(--cod-font-accent)` | 7 | preguntas-frecuentes › typography |

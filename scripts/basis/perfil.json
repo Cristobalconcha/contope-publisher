@@ -47,5 +47,24 @@
     "medios": {},
     "fondos": {}
   },
-  "medicionComplemento": "C:/Users/Cristobal concha/Sesión Claude/entregables/basis/original"
+  "medicionComplemento": "C:/Users/Cristobal concha/Sesión Claude/entregables/basis/original",
+  "tokens": {
+    "_nota": "El SET DE DISEÑO de Basis: nada del sitio lleva un color ni una tipografía literal, todo se traduce a estas variables (divi-a-contope/lib/tokens.mjs). La paleta y las familias salen del theme.json del tema; acá sólo se decide qué variable representa a cada cosa.",
+    "tema": "../../contope-basis/theme.json",
+    "colores": {
+      "_roles": "Los colores que las DEFINICIONES DE ESTILO del tema gobiernan van por la variable del núcleo (COD_Design_Core): accent, el fondo (surface) y el texto (ink). El resto de la paleta, por su variable de WordPress (--wp--preset--color--<slug>).",
+      "roles": {
+        "accent": "var(--cod-color-accent)",
+        "background": "var(--cod-color-surface)",
+        "text": "var(--cod-color-ink)"
+      },
+      "distanciaMaxima": 8
+    },
+    "familias": {
+      "_nota": "Big Shoulders Display, Open Sans y Montserrat tienen un rol en las definiciones (Títulos, Cuerpo, Acento). Roboto no tiene rol: va por su variable del theme.json (--wp--preset--font-family--boton).",
+      "Big Shoulders Display": "var(--cod-font-heading)",
+      "Open Sans": "var(--cod-font-body)",
+      "Montserrat": "var(--cod-font-accent)"
+    }
+  }
 }

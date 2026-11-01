@@ -8,7 +8,30 @@
     "reviewState": "session",
     "rules": [
       {
-        "id": "t-4f2435",
+        "id": "c-ce010c",
+        "kind": "color",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "c-dark",
+          "color": "var(--wp--preset--color--dark)",
+          "apply": "text"
+        }
+      },
+      {
+        "id": "t-0c7147",
         "kind": "typography",
         "scope": {
           "breakpoint": "all",
@@ -26,34 +49,11 @@
         "status": "reviewed",
         "value": {
           "role": "t-open-sans-30-500",
-          "family": "'Open Sans', sans-serif",
+          "family": "var(--cod-font-body)",
           "fontSize": "30px",
           "fontWeight": 500,
           "lineHeight": 1,
           "align": "start"
-        }
-      },
-      {
-        "id": "c-c1089a",
-        "kind": "color",
-        "scope": {
-          "breakpoint": "all",
-          "state": "default"
-        },
-        "provenance": {
-          "sources": [
-            {
-              "kind": "reference",
-              "reference": "https://basisbodegas.com",
-              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
-            }
-          ]
-        },
-        "status": "reviewed",
-        "value": {
-          "role": "c-333333",
-          "color": "#333333",
-          "apply": "text"
         }
       },
       {
@@ -104,7 +104,7 @@
         }
       },
       {
-        "id": "busq-e-ce53ca",
+        "id": "busq-e-faa569",
         "kind": "properties",
         "scope": {
           "breakpoint": "all",
@@ -122,11 +122,11 @@
         "status": "reviewed",
         "value": {
           "declarations": {
-            "font-family": "'Open Sans', sans-serif",
+            "font-family": "var(--cod-font-body)",
             "font-size": "14px",
             "font-weight": "500",
             "line-height": "normal",
-            "color": "#666666",
+            "color": "var(--cod-color-ink)",
             "width": "100%",
             "padding-top": "9.8px",
             "padding-right": "9.8px",
@@ -134,26 +134,26 @@
             "padding-left": "9.8px",
             "border-top-width": "1px",
             "border-top-style": "solid",
-            "border-top-color": "#DDDDDD",
+            "border-top-color": "var(--wp--preset--color--gris-suave)",
             "border-right-width": "1px",
             "border-right-style": "solid",
-            "border-right-color": "#DDDDDD",
+            "border-right-color": "var(--wp--preset--color--gris-suave)",
             "border-bottom-width": "1px",
             "border-bottom-style": "solid",
-            "border-bottom-color": "#DDDDDD",
+            "border-bottom-color": "var(--wp--preset--color--gris-suave)",
             "border-left-width": "1px",
             "border-left-style": "solid",
-            "border-left-color": "#DDDDDD",
+            "border-left-color": "var(--wp--preset--color--gris-suave)",
             "border-top-left-radius": "3px",
             "border-top-right-radius": "3px",
             "border-bottom-right-radius": "3px",
             "border-bottom-left-radius": "3px",
-            "background-color": "#FFFFFF"
+            "background-color": "var(--cod-color-surface)"
           }
         }
       },
       {
-        "id": "busq-b-c27acd",
+        "id": "busq-b-1965fb",
         "kind": "properties",
         "scope": {
           "breakpoint": "all",
@@ -171,11 +171,11 @@
         "status": "reviewed",
         "value": {
           "declarations": {
-            "font-family": "'Open Sans', sans-serif",
+            "font-family": "var(--cod-font-body)",
             "font-size": "14px",
             "font-weight": "500",
             "line-height": "normal",
-            "color": "#666666",
+            "color": "var(--cod-color-ink)",
             "position": "absolute",
             "top": "0px",
             "right": "0px",
@@ -185,21 +185,21 @@
             "padding-left": "9.8px",
             "border-top-width": "1px",
             "border-top-style": "solid",
-            "border-top-color": "#DDDDDD",
+            "border-top-color": "var(--wp--preset--color--gris-suave)",
             "border-right-width": "1px",
             "border-right-style": "solid",
-            "border-right-color": "#DDDDDD",
+            "border-right-color": "var(--wp--preset--color--gris-suave)",
             "border-bottom-width": "1px",
             "border-bottom-style": "solid",
-            "border-bottom-color": "#DDDDDD",
+            "border-bottom-color": "var(--wp--preset--color--gris-suave)",
             "border-left-width": "1px",
             "border-left-style": "solid",
-            "border-left-color": "#DDDDDD",
+            "border-left-color": "var(--wp--preset--color--gris-suave)",
             "border-top-left-radius": "0px",
             "border-top-right-radius": "3px",
             "border-bottom-right-radius": "3px",
             "border-bottom-left-radius": "0px",
-            "background-color": "#DDDDDD"
+            "background-color": "var(--wp--preset--color--gris-suave)"
           }
         }
       },
@@ -228,7 +228,7 @@
         }
       },
       {
-        "id": "lat-l-d9a000",
+        "id": "lat-l-de71b1",
         "kind": "properties",
         "scope": {
           "breakpoint": "all",
@@ -250,16 +250,16 @@
             "padding-left": "0px",
             "margin-block-start": "0px",
             "margin-block-end": "0px",
-            "font-family": "'Open Sans', sans-serif",
+            "font-family": "var(--cod-font-body)",
             "font-size": "14px",
             "font-weight": "500",
             "line-height": "1.7",
-            "color": "#666666"
+            "color": "var(--cod-color-ink)"
           }
         }
       },
       {
-        "id": "lat-i-fc0ccd",
+        "id": "lat-i-c9a127",
         "kind": "properties",
         "scope": {
           "breakpoint": "all",
@@ -277,17 +277,17 @@
         "status": "reviewed",
         "value": {
           "declarations": {
-            "font-family": "'Open Sans', sans-serif",
+            "font-family": "var(--cod-font-body)",
             "font-size": "14px",
             "font-weight": "500",
             "line-height": "1.7",
-            "color": "#666666",
+            "color": "var(--cod-color-ink)",
             "margin-block-end": "7px"
           }
         }
       },
       {
-        "id": "lat-a-b0b260",
+        "id": "lat-a-7196d8",
         "kind": "properties",
         "scope": {
           "breakpoint": "all",
@@ -305,17 +305,17 @@
         "status": "reviewed",
         "value": {
           "declarations": {
-            "font-family": "'Open Sans', sans-serif",
+            "font-family": "var(--cod-font-body)",
             "font-size": "14px",
             "font-weight": "500",
             "line-height": "1.7",
-            "color": "#666666",
+            "color": "var(--cod-color-ink)",
             "text-decoration-line": "none"
           }
         }
       },
       {
-        "id": "lat-t-37662f",
+        "id": "lat-t-7e6be0",
         "kind": "properties",
         "scope": {
           "breakpoint": "all",
@@ -333,11 +333,11 @@
         "status": "reviewed",
         "value": {
           "declarations": {
-            "font-family": "'Open Sans', sans-serif",
+            "font-family": "var(--cod-font-body)",
             "font-size": "26px",
             "font-weight": "500",
             "line-height": "1",
-            "color": "#333333",
+            "color": "var(--wp--preset--color--dark)",
             "padding-block-end": "10px",
             "margin-block-start": "0px",
             "margin-block-end": "0px"
@@ -369,7 +369,7 @@
         }
       },
       {
-        "id": "lat-v-e8c0ed",
+        "id": "lat-v-7be4ca",
         "kind": "properties",
         "scope": {
           "breakpoint": "all",
@@ -387,16 +387,16 @@
         "status": "reviewed",
         "value": {
           "declarations": {
-            "font-family": "'Open Sans', sans-serif",
+            "font-family": "var(--cod-font-body)",
             "font-size": "14px",
             "font-weight": "500",
             "line-height": "1.8",
-            "color": "#666666"
+            "color": "var(--cod-color-ink)"
           }
         }
       },
       {
-        "id": "lat-izq-1d943d",
+        "id": "lat-izq-272ff6",
         "kind": "properties",
         "scope": {
           "breakpoint": "all",
@@ -420,7 +420,7 @@
             "padding-bottom": "23px",
             "border-right-width": "1px",
             "border-right-style": "solid",
-            "border-right-color": "#E2E2E2",
+            "border-right-color": "var(--wp--preset--color--gris-suave)",
             "margin-top": "-58px",
             "padding-top": "58px",
             "flex-shrink": "0"
@@ -428,7 +428,7 @@
         }
       },
       {
-        "id": "lat-izq-76e520",
+        "id": "lat-izq-66bc7c",
         "kind": "properties",
         "scope": {
           "breakpoint": "mobile",
@@ -457,7 +457,7 @@
         }
       },
       {
-        "id": "lat-0a4da0",
+        "id": "lat-218d85",
         "kind": "properties",
         "scope": {
           "breakpoint": "all",
@@ -483,16 +483,16 @@
             "padding-left": "30px",
             "flex-shrink": "0",
             "min-width": "0px",
-            "font-family": "'Open Sans', sans-serif",
+            "font-family": "var(--cod-font-body)",
             "font-size": "14px",
             "font-weight": "500",
             "line-height": "1.7",
-            "color": "#666666"
+            "color": "var(--cod-color-ink)"
           }
         }
       },
       {
-        "id": "lat-b875b9",
+        "id": "lat-a047ed",
         "kind": "properties",
         "scope": {
           "breakpoint": "mobile",
@@ -665,7 +665,7 @@
         }
       },
       {
-        "id": "lat-izq-df1163",
+        "id": "lat-izq-98ce14",
         "kind": "properties",
         "scope": {
           "breakpoint": "tablet",
@@ -694,7 +694,7 @@
         }
       },
       {
-        "id": "lat-3370f4",
+        "id": "lat-6481c1",
         "kind": "properties",
         "scope": {
           "breakpoint": "tablet",
@@ -743,17 +743,17 @@
                 "id": "group-32",
                 "kind": "group",
                 "ruleIds": [
-                  "lat-izq-1d943d",
-                  "lat-izq-76e520",
-                  "lat-izq-df1163"
+                  "lat-izq-272ff6",
+                  "lat-izq-66bc7c",
+                  "lat-izq-98ce14"
                 ],
                 "children": [
                   {
                     "id": "heading-23",
                     "kind": "heading",
                     "ruleIds": [
-                      "t-4f2435",
-                      "c-c1089a",
+                      "t-0c7147",
+                      "c-ce010c",
                       "lat-h1-0e402c"
                     ],
                     "content": {
@@ -767,9 +767,9 @@
                 "id": "group-31",
                 "kind": "group",
                 "ruleIds": [
-                  "lat-0a4da0",
-                  "lat-b875b9",
-                  "lat-3370f4"
+                  "lat-218d85",
+                  "lat-a047ed",
+                  "lat-6481c1"
                 ],
                 "children": [
                   {
@@ -793,10 +793,10 @@
                         "properties-45e683"
                       ],
                       "entrada": [
-                        "busq-e-ce53ca"
+                        "busq-e-faa569"
                       ],
                       "boton": [
-                        "busq-b-c27acd"
+                        "busq-b-1965fb"
                       ]
                     }
                   },
@@ -811,7 +811,7 @@
                         "id": "heading-25",
                         "kind": "heading",
                         "ruleIds": [
-                          "lat-t-37662f"
+                          "lat-t-7e6be0"
                         ],
                         "content": {
                           "text": "Recent Posts",
@@ -828,13 +828,13 @@
                         },
                         "partes": {
                           "lista": [
-                            "lat-l-d9a000"
+                            "lat-l-de71b1"
                           ],
                           "item": [
-                            "lat-i-fc0ccd"
+                            "lat-i-c9a127"
                           ],
                           "enlace": [
-                            "lat-a-b0b260"
+                            "lat-a-7196d8"
                           ]
                         }
                       }
@@ -851,7 +851,7 @@
                         "id": "heading-28",
                         "kind": "heading",
                         "ruleIds": [
-                          "lat-t-37662f"
+                          "lat-t-7e6be0"
                         ],
                         "content": {
                           "text": "Recent Comments",
@@ -868,7 +868,7 @@
                         },
                         "partes": {
                           "vacio": [
-                            "lat-v-e8c0ed"
+                            "lat-v-7be4ca"
                           ]
                         }
                       }

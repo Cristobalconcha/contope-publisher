@@ -135,6 +135,16 @@ E. **Entre 981 y 1023 px** el plugin aplica lo de tablet (corta tablet en 768–
 Cerrados en esta pasada (ya no son huecos): A (los widgets de la barra lateral: nodo `block`), C (texto y alineación del contador) y D
 (la casilla de consentimiento: casilla propia).
 
+## El sitio está gobernado por el set (1-nov-2026)
+
+Ningún color ni tipografía literal en la hoja del diseño: el transcriptor traduce cada valor al set (`perfil.json` › `tokens`; ver el README del transcriptor) y las definiciones de estilo del tema se declaran con `php scripts/basis/definiciones-del-set.php`. `auditoria-sitio.mjs` lo comprueba (`gobierno-del-set.mjs`) y lo cuenta como problema si deja de cumplirse. Lo que eso cambió a la vista, listado en `salida/INFORME.md` › «Traducción al set de diseño»:
+
+- **Las tipografías no cambian**: las cuatro (Big Shoulders Display, Open Sans, Roboto, Montserrat) son del set; cero diferencias tipográficas contra el original.
+- **Colores que se acercaron al de la paleta** (diferencias de 1 a 8 en OKLab×100: #DDDDDD, #CCCCCC, #EEEEEE, #E2E2E2, #333333, #999999, #112337, #585E6A). Casi no se notan.
+- **FUERA DEL SET, DECISIÓN DEL DUEÑO.** Seis colores del original no tienen un color parecido en la paleta y se tradujeron al más cercano, que cambia lo que se ve:
+  el **azul del velo de la portada** (#0C71C3, degradado sobre la foto de «La respuesta eficiente…») queda como un velo **gris** (--cod-color-ink, #666666); el **verde de WhatsApp al pasar el mouse** (#57D163) y el **azul del botón de ayuda al pasar el mouse** (#0056B3) quedan grises;
+  el **ámbar del botón «Enviar» del formulario** (#E09900) queda naranja de marca; el tinte azulado de sus sombras (#121961) y un gris violáceo del texto de varios párrafos de la portada (#3C3A47) quedan en el negro del set (#222222). Si el azul de la portada es parte de la marca, se agrega a la paleta del `theme.json` (p. ej. `azul`), se vuelve a correr `node componer.mjs && node aplicar.mjs` y la traducción lo toma exacto.
+
 ## Diferencias visibles que quedan contra el original
 
 Ninguna en lo que se ve, medida nodo a nodo. Lo que no es un defecto del sitio local:
@@ -206,6 +216,7 @@ en `uploads/iconos-divi/` y las formas del divisor en `uploads/divisores/` y `up
    sitio) y con sus entradas reales: el buscador y las listas de la barra lateral de `basis-carpas-industriales` las dibuja WordPress con lo que haya.
 2. Copiar `uploads/2025/07/*`, `uploads/divisores/*`, `uploads/formas/*` (`scripts/instalar-formas-de-divisor.php`) y `uploads/iconos-divi/*`.
 3. `SITIO=… AUTH_FILE=… node scripts/basis/aplicar.mjs` (todo por el canal MCP y REST; no sube ningún guion).
+3b. **Antes de aplicar, declarar las definiciones de estilo del tema** (ContOpe → Configuración → «Definiciones de estilo del tema»: ícono, modo claro, paleta, Títulos = Big Shoulders Display, Cuerpo = Open Sans, Acento = Montserrat, ancho máximo 1080 px, movimiento). Sin ellas las variables `--cod-*` que usa el diseño quedan sin resolver y el sitio se ve sin color ni tipografía; `definiciones-del-set.php` las deja en el local con los valores exactos (léanse de ahí). El plugin del destino tiene que ser el de este repositorio (color-mix y familias de Google).
 4. Poner la clave de Mapbox (Configuración → Mapa: con ella el mapa de Contactos es el de verdad), la casilla real de destino del
    formulario `contacto-basis` (hoy apagado, con `PENDIENTE-DESTINO@basis.invalid`) y SMTP; revisar los `[PENDIENTE: …]` del texto legal.
 5. Comparar: `node scripts/basis/comparar-vivo.mjs todas todos http://<subdominio>`, `capturar-comparar.mjs <subdominio>` y `auditoria-sitio.mjs <subdominio>`.

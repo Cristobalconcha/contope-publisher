@@ -8,7 +8,7 @@
     "reviewState": "session",
     "rules": [
       {
-        "id": "s-f1871f",
+        "id": "s-0a8f53",
         "kind": "surface",
         "scope": {
           "breakpoint": "all",
@@ -25,7 +25,7 @@
         },
         "status": "reviewed",
         "value": {
-          "backgroundColor": "#898989"
+          "backgroundColor": "var(--wp--preset--color--gris)"
         }
       },
       {
@@ -103,7 +103,7 @@
         }
       },
       {
-        "id": "c-4737c4",
+        "id": "c-bd95c9",
         "kind": "color",
         "scope": {
           "breakpoint": "all",
@@ -120,8 +120,8 @@
         },
         "status": "reviewed",
         "value": {
-          "role": "c-ffffff",
-          "color": "#FFFFFF",
+          "role": "c-background",
+          "color": "var(--cod-color-surface)",
           "apply": "text"
         }
       },
@@ -152,7 +152,7 @@
         }
       },
       {
-        "id": "c-3bcd26",
+        "id": "c-a194aa",
         "kind": "color",
         "scope": {
           "breakpoint": "all",
@@ -169,8 +169,8 @@
         },
         "status": "reviewed",
         "value": {
-          "role": "c-666666",
-          "color": "#666666",
+          "role": "c-text",
+          "color": "var(--cod-color-ink)",
           "apply": "text"
         }
       },
@@ -279,7 +279,7 @@
         }
       },
       {
-        "id": "div-850adc",
+        "id": "div-e62986",
         "kind": "divisor",
         "scope": {
           "breakpoint": "all",
@@ -299,7 +299,7 @@
           "forma": "/wp-content/uploads/divisores/divisor-7ee5846d.svg",
           "donde": "abajo",
           "alto": "2.5vw",
-          "color": "#636363",
+          "color": "var(--wp--preset--color--gris-oscuro)",
           "reserva": false
         }
       },
@@ -353,7 +353,7 @@
         }
       },
       {
-        "id": "t-daab63",
+        "id": "t-19b2f9",
         "kind": "typography",
         "scope": {
           "breakpoint": "all",
@@ -371,7 +371,7 @@
         "status": "reviewed",
         "value": {
           "role": "t-montserrat-50-300",
-          "family": "'Montserrat', sans-serif",
+          "family": "var(--cod-font-accent)",
           "fontSize": "50px",
           "fontWeight": 300,
           "lineHeight": 1.4,
@@ -379,7 +379,7 @@
         }
       },
       {
-        "id": "t-fa4799",
+        "id": "t-b21528",
         "kind": "typography",
         "scope": {
           "breakpoint": "mobile",
@@ -401,7 +401,7 @@
         }
       },
       {
-        "id": "t-d728a4",
+        "id": "t-15d222",
         "kind": "typography",
         "scope": {
           "breakpoint": "all",
@@ -419,7 +419,7 @@
         "status": "reviewed",
         "value": {
           "role": "t-open-sans-18-500",
-          "family": "'Open Sans', sans-serif",
+          "family": "var(--cod-font-body)",
           "fontSize": "18px",
           "fontWeight": 500,
           "lineHeight": 2,
@@ -477,7 +477,7 @@
         }
       },
       {
-        "id": "s-ce07c1",
+        "id": "s-19f36a",
         "kind": "surface",
         "scope": {
           "breakpoint": "all",
@@ -494,7 +494,7 @@
         },
         "status": "reviewed",
         "value": {
-          "backgroundColor": "#636363"
+          "backgroundColor": "var(--wp--preset--color--gris-oscuro)"
         }
       },
       {
@@ -561,7 +561,7 @@
         }
       },
       {
-        "id": "t-e1f729",
+        "id": "t-75ed6b",
         "kind": "typography",
         "scope": {
           "breakpoint": "all",
@@ -579,7 +579,7 @@
         "status": "reviewed",
         "value": {
           "role": "t-montserrat-22-500",
-          "family": "'Montserrat', sans-serif",
+          "family": "var(--cod-font-accent)",
           "fontSize": "22px",
           "fontWeight": 500,
           "lineHeight": 1.4,
@@ -611,7 +611,7 @@
         }
       },
       {
-        "id": "t-98669e",
+        "id": "t-75615c",
         "kind": "typography",
         "scope": {
           "breakpoint": "all",
@@ -629,7 +629,7 @@
         "status": "reviewed",
         "value": {
           "role": "t-open-sans-14-400",
-          "family": "'Open Sans', sans-serif",
+          "family": "var(--cod-font-body)",
           "fontSize": "14px",
           "fontWeight": 400,
           "lineHeight": 1.7,
@@ -684,7 +684,7 @@
         }
       },
       {
-        "id": "t-7d64ba",
+        "id": "t-032bbb",
         "kind": "typography",
         "scope": {
           "breakpoint": "all",
@@ -702,7 +702,7 @@
         "status": "reviewed",
         "value": {
           "role": "t-open-sans-14-500",
-          "family": "'Open Sans', sans-serif",
+          "family": "var(--cod-font-body)",
           "fontSize": "14px",
           "fontWeight": 500,
           "lineHeight": 1.7,
@@ -710,7 +710,7 @@
         }
       },
       {
-        "id": "plg-17ad59",
+        "id": "plg-d00f7f",
         "kind": "properties",
         "scope": {
           "breakpoint": "all",
@@ -728,7 +728,7 @@
         "status": "reviewed",
         "value": {
           "declarations": {
-            "background-color": "#F4F4F4",
+            "background-color": "var(--wp--preset--color--casi-blanco)",
             "border-radius": "10px",
             "padding-top": "20px",
             "padding-right": "20px",
@@ -770,7 +770,7 @@
         }
       },
       {
-        "id": "t-546a1b",
+        "id": "t-7f85c7",
         "kind": "typography",
         "scope": {
           "breakpoint": "all",
@@ -788,7 +788,7 @@
         "status": "reviewed",
         "value": {
           "role": "t-montserrat-18-500",
-          "family": "'Montserrat', sans-serif",
+          "family": "var(--cod-font-accent)",
           "fontSize": "18px",
           "fontWeight": 500,
           "lineHeight": 1.4,
@@ -796,7 +796,7 @@
         }
       },
       {
-        "id": "plg-i-6d900f",
+        "id": "plg-i-159da1",
         "kind": "properties",
         "scope": {
           "breakpoint": "all",
@@ -814,7 +814,7 @@
         "status": "reviewed",
         "value": {
           "declarations": {
-            "background-color": "#CCCCCC",
+            "background-color": "var(--wp--preset--color--gris-claro)",
             "width": "16px",
             "height": "16px"
           }
@@ -845,7 +845,7 @@
         }
       },
       {
-        "id": "plg-a-d5f383",
+        "id": "plg-a-6fc280",
         "kind": "properties",
         "scope": {
           "breakpoint": "all",
@@ -863,12 +863,12 @@
         "status": "reviewed",
         "value": {
           "declarations": {
-            "background-color": "#FFFFFF"
+            "background-color": "var(--cod-color-surface)"
           }
         }
       },
       {
-        "id": "c-a-06855b",
+        "id": "c-a-a792f0",
         "kind": "properties",
         "scope": {
           "breakpoint": "all",
@@ -886,7 +886,7 @@
         "status": "reviewed",
         "value": {
           "declarations": {
-            "color": "#333333"
+            "color": "var(--wp--preset--color--dark)"
           }
         }
       },
@@ -1209,7 +1209,7 @@
         }
       },
       {
-        "id": "t-019443",
+        "id": "t-1e6d28",
         "kind": "typography",
         "scope": {
           "breakpoint": "tablet",
@@ -1336,10 +1336,10 @@
         "id": "section-16",
         "kind": "section",
         "ruleIds": [
-          "div-850adc",
+          "div-e62986",
           "sec-afdf10",
           "sec-7feaf1",
-          "s-f1871f",
+          "s-0a8f53",
           "sec-e1a3f5"
         ],
         "children": [
@@ -1364,13 +1364,13 @@
                     "id": "heading-12",
                     "kind": "heading",
                     "ruleIds": [
-                      "t-daab63",
-                      "t-fa4799",
-                      "c-4737c4",
+                      "t-19b2f9",
+                      "t-b21528",
+                      "c-bd95c9",
                       "mg-9b6f57",
                       "anch-db926e",
                       "anch-760607",
-                      "t-019443",
+                      "t-1e6d28",
                       "anch-77b521"
                     ],
                     "content": {
@@ -1382,8 +1382,8 @@
                     "id": "paragraph-13",
                     "kind": "paragraph",
                     "ruleIds": [
-                      "t-d728a4",
-                      "c-4737c4",
+                      "t-15d222",
+                      "c-bd95c9",
                       "mg-a343db",
                       "anch-db926e",
                       "anch-760607",
@@ -1404,7 +1404,7 @@
         "kind": "section",
         "ruleIds": [
           "sec-79ee4b",
-          "s-ce07c1"
+          "s-19f36a"
         ],
         "children": [
           {
@@ -1428,8 +1428,8 @@
                     "id": "heading-17",
                     "kind": "heading",
                     "ruleIds": [
-                      "t-e1f729",
-                      "c-4737c4",
+                      "t-75ed6b",
+                      "c-bd95c9",
                       "mg-ce69c2",
                       "mg-59ca86"
                     ],
@@ -1470,8 +1470,8 @@
                             "id": "paragraph-19",
                             "kind": "paragraph",
                             "ruleIds": [
-                              "t-98669e",
-                              "c-3bcd26",
+                              "t-75615c",
+                              "c-a194aa",
                               "mg-a343db"
                             ],
                             "content": {
@@ -1501,8 +1501,8 @@
                             "id": "paragraph-22",
                             "kind": "paragraph",
                             "ruleIds": [
-                              "t-98669e",
-                              "c-3bcd26",
+                              "t-75615c",
+                              "c-a194aa",
                               "mg-a343db"
                             ],
                             "content": {
@@ -1532,8 +1532,8 @@
                             "id": "paragraph-25",
                             "kind": "paragraph",
                             "ruleIds": [
-                              "t-98669e",
-                              "c-3bcd26",
+                              "t-75615c",
+                              "c-a194aa",
                               "mg-a343db"
                             ],
                             "content": {
@@ -1563,8 +1563,8 @@
                             "id": "paragraph-28",
                             "kind": "paragraph",
                             "ruleIds": [
-                              "t-98669e",
-                              "c-3bcd26",
+                              "t-75615c",
+                              "c-a194aa",
                               "mg-a343db"
                             ],
                             "content": {
@@ -1594,8 +1594,8 @@
                             "id": "paragraph-34",
                             "kind": "paragraph",
                             "ruleIds": [
-                              "t-98669e",
-                              "c-3bcd26",
+                              "t-75615c",
+                              "c-a194aa",
                               "mg-a343db"
                             ],
                             "content": {
@@ -1625,8 +1625,8 @@
                             "id": "paragraph-37",
                             "kind": "paragraph",
                             "ruleIds": [
-                              "t-98669e",
-                              "c-3bcd26",
+                              "t-75615c",
+                              "c-a194aa",
                               "mg-a343db"
                             ],
                             "content": {
@@ -1637,8 +1637,8 @@
                             "id": "list-38",
                             "kind": "list",
                             "ruleIds": [
-                              "t-98669e",
-                              "c-3bcd26",
+                              "t-75615c",
+                              "c-a194aa",
                               "lista-e12066",
                               "mg-a343db"
                             ],
@@ -1675,8 +1675,8 @@
                             "id": "paragraph-41",
                             "kind": "paragraph",
                             "ruleIds": [
-                              "t-98669e",
-                              "c-3bcd26",
+                              "t-75615c",
+                              "c-a194aa",
                               "mg-a343db"
                             ],
                             "content": {
@@ -1706,8 +1706,8 @@
                             "id": "paragraph-44",
                             "kind": "paragraph",
                             "ruleIds": [
-                              "t-7d64ba",
-                              "c-3bcd26",
+                              "t-032bbb",
+                              "c-a194aa",
                               "mg-a343db"
                             ],
                             "content": {
@@ -1737,8 +1737,8 @@
                             "id": "paragraph-47",
                             "kind": "paragraph",
                             "ruleIds": [
-                              "t-7d64ba",
-                              "c-3bcd26",
+                              "t-032bbb",
+                              "c-a194aa",
                               "mg-a343db"
                             ],
                             "content": {
@@ -1749,8 +1749,8 @@
                             "id": "paragraph-48",
                             "kind": "paragraph",
                             "ruleIds": [
-                              "t-7d64ba",
-                              "c-3bcd26",
+                              "t-032bbb",
+                              "c-a194aa",
                               "mg-a343db"
                             ],
                             "content": {
@@ -1761,8 +1761,8 @@
                             "id": "paragraph-49",
                             "kind": "paragraph",
                             "ruleIds": [
-                              "t-7d64ba",
-                              "c-3bcd26",
+                              "t-032bbb",
+                              "c-a194aa",
                               "mg-a343db"
                             ],
                             "content": {
@@ -1781,8 +1781,8 @@
                             "id": "paragraph-51",
                             "kind": "paragraph",
                             "ruleIds": [
-                              "t-7d64ba",
-                              "c-3bcd26",
+                              "t-032bbb",
+                              "c-a194aa",
                               "mg-a343db"
                             ],
                             "content": {
@@ -1793,8 +1793,8 @@
                             "id": "paragraph-52",
                             "kind": "paragraph",
                             "ruleIds": [
-                              "t-7d64ba",
-                              "c-3bcd26",
+                              "t-032bbb",
+                              "c-a194aa",
                               "mg-a343db"
                             ],
                             "content": {
@@ -1806,17 +1806,17 @@
                     ],
                     "partes": {
                       "item": [
-                        "plg-17ad59",
-                        "plg-a-d5f383"
+                        "plg-d00f7f",
+                        "plg-a-6fc280"
                       ],
                       "resumen": [
                         "plg-r-66a91c",
-                        "t-546a1b",
-                        "c-3bcd26",
-                        "c-a-06855b"
+                        "t-7f85c7",
+                        "c-a194aa",
+                        "c-a-a792f0"
                       ],
                       "icono": [
-                        "plg-i-6d900f"
+                        "plg-i-159da1"
                       ],
                       "panel": [
                         "plg-p-dcf0fd"
@@ -1837,8 +1837,8 @@
                     "id": "heading-56",
                     "kind": "heading",
                     "ruleIds": [
-                      "t-e1f729",
-                      "c-4737c4",
+                      "t-75ed6b",
+                      "c-bd95c9",
                       "mg-ce69c2",
                       "mg-c0335f",
                       "mg-59ca86"
@@ -1907,8 +1907,8 @@
                             "id": "paragraph-60",
                             "kind": "paragraph",
                             "ruleIds": [
-                              "t-7d64ba",
-                              "c-3bcd26",
+                              "t-032bbb",
+                              "c-a194aa",
                               "mg-a343db"
                             ],
                             "content": {
@@ -1965,8 +1965,8 @@
                             "id": "paragraph-65",
                             "kind": "paragraph",
                             "ruleIds": [
-                              "t-7d64ba",
-                              "c-3bcd26",
+                              "t-032bbb",
+                              "c-a194aa",
                               "mg-a343db"
                             ],
                             "content": {
@@ -2023,8 +2023,8 @@
                             "id": "paragraph-70",
                             "kind": "paragraph",
                             "ruleIds": [
-                              "t-7d64ba",
-                              "c-3bcd26",
+                              "t-032bbb",
+                              "c-a194aa",
                               "mg-a343db"
                             ],
                             "content": {
@@ -2081,8 +2081,8 @@
                             "id": "paragraph-75",
                             "kind": "paragraph",
                             "ruleIds": [
-                              "t-7d64ba",
-                              "c-3bcd26",
+                              "t-032bbb",
+                              "c-a194aa",
                               "mg-a343db"
                             ],
                             "content": {
@@ -2094,17 +2094,17 @@
                     ],
                     "partes": {
                       "item": [
-                        "plg-17ad59",
-                        "plg-a-d5f383"
+                        "plg-d00f7f",
+                        "plg-a-6fc280"
                       ],
                       "resumen": [
                         "plg-r-66a91c",
-                        "t-546a1b",
-                        "c-3bcd26",
-                        "c-a-06855b"
+                        "t-7f85c7",
+                        "c-a194aa",
+                        "c-a-a792f0"
                       ],
                       "icono": [
-                        "plg-i-6d900f"
+                        "plg-i-159da1"
                       ],
                       "panel": [
                         "plg-p-dcf0fd"
@@ -2115,8 +2115,8 @@
                     "id": "heading-78",
                     "kind": "heading",
                     "ruleIds": [
-                      "t-e1f729",
-                      "c-4737c4",
+                      "t-75ed6b",
+                      "c-bd95c9",
                       "mg-d37116"
                     ],
                     "content": {
@@ -2156,8 +2156,8 @@
                             "id": "paragraph-80",
                             "kind": "paragraph",
                             "ruleIds": [
-                              "t-98669e",
-                              "c-3bcd26",
+                              "t-75615c",
+                              "c-a194aa",
                               "mg-a343db"
                             ],
                             "content": {
@@ -2187,8 +2187,8 @@
                             "id": "paragraph-83",
                             "kind": "paragraph",
                             "ruleIds": [
-                              "t-7d64ba",
-                              "c-3bcd26",
+                              "t-032bbb",
+                              "c-a194aa",
                               "mg-a343db"
                             ],
                             "content": {
@@ -2218,8 +2218,8 @@
                             "id": "paragraph-86",
                             "kind": "paragraph",
                             "ruleIds": [
-                              "t-98669e",
-                              "c-3bcd26",
+                              "t-75615c",
+                              "c-a194aa",
                               "mg-a343db"
                             ],
                             "content": {
@@ -2231,15 +2231,15 @@
                     ],
                     "partes": {
                       "item": [
-                        "plg-17ad59"
+                        "plg-d00f7f"
                       ],
                       "resumen": [
                         "plg-r-66a91c",
-                        "t-546a1b",
-                        "c-3bcd26"
+                        "t-7f85c7",
+                        "c-a194aa"
                       ],
                       "icono": [
-                        "plg-i-6d900f"
+                        "plg-i-159da1"
                       ],
                       "panel": [
                         "plg-p-dcf0fd"

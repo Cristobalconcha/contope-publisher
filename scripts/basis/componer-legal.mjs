@@ -20,6 +20,7 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Registro } from '../divi-a-contope/lib/registro.mjs';
+import { traductorDePerfil } from '../divi-a-contope/lib/tokens.mjs';
 
 const aqui = path.dirname(fileURLToPath(import.meta.url));
 const FUENTE = process.argv[2] || 'C:/Users/Cristobal concha/Sesión Claude/entregables/basis/basis-terminos-BORRADOR.md';
@@ -30,7 +31,11 @@ const marca = md.indexOf('DESDE AQUÍ, TEXTO PUBLICABLE');
 if (marca < 0) throw new Error('no encuentro la marca «DESDE AQUÍ, TEXTO PUBLICABLE» en el borrador');
 const texto = md.slice(md.indexOf('\n', marca) + 1).replace(/^\s*-->\s*$/m, '');
 
-const reg = new Registro({ referencia: 'basis-terminos-BORRADOR.md', razon: 'Texto del borrador legal de Basis, en revisión; tipografía y colores del sitio medido.' });
+// El mismo set de diseño que el resto del sitio (perfil.tokens): esta página tampoco lleva colores ni tipografías literales.
+const perfil = JSON.parse(readFileSync(path.join(aqui, 'perfil.json'), 'utf8'));
+const tokens = traductorDePerfil(perfil, aqui, (base, rel) => path.resolve(base, rel));
+if (tokens) tokens.pagina = 'terminos-y-privacidad';
+const reg = new Registro({ tokens, referencia: 'basis-terminos-BORRADOR.md', razon: 'Texto del borrador legal de Basis, en revisión; tipografía y colores del sitio medido.' });
 let n = 0;
 const nodo = (kind, ruleIds, content, children) => { const x = { id: `${kind}-${++n}`, kind, ruleIds }; if (content !== undefined) x.content = content; if (children) x.children = children; return x; };
 const limpio = (t) => t.replace(/\*\*([^*]+)\*\*/g, '$1').replace(/\*([^*]+)\*/g, '$1').replace(/`([^`]+)`/g, '$1').replace(/\[([^\]]+)\]\((?!#)[^)]*\)/g, '$1').replace(/\s+/g, ' ').trim();
