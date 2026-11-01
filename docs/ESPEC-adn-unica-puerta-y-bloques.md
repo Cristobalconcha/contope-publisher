@@ -1,7 +1,13 @@
 # ESPEC — El ADN como única puerta del diseño, y el contenido como bloques de WordPress
 
-Estado: **especificación para decisión. No se implementó nada.** Fecha: 2026-11-01. Rama: `basis-transcriptor`
-(sobre `b7b0478`, `d4860a0`, `bc19101`). Plugin medido: `contope-publisher` 0.3.85.
+Estado: **especificación para decisión, versión corregida tras la auditoría hostil de Aymara (01-nov-2026). No se
+implementó nada.** Fecha: 2026-11-01. Rama: `basis-transcriptor` (sobre `b7b0478`, `d4860a0`, `bc19101`). Plugin
+medido: `contope-publisher` 0.3.85.
+
+**Se valida contra: Publisher `9b08f88` (esta rama) y Core `6115353` (master de GitHub).** La primera versión se escribió
+contra la copia local del Core en `c3a96f3` (19-sep, nueve commits atrás); los archivos citados aquí son idénticos en
+ambas. Los `archivo:línea` agregados en esta versión se verificaron leyendo esas dos versiones (los heredados de la
+primera versión no se volvieron a medir salvo que el texto lo diga); si cualquiera de las dos cambia, hay que releerlos. El detalle de cada hallazgo de la auditoría está en `docs/CORRECCIONES-auditoria-aymara-2026-11-01.md`.
 
 Lo que mandó el dueño (Cristóbal), textual, y de lo que cuelga todo este documento:
 
@@ -16,22 +22,58 @@ familia de Gutenberg, no la duplica.
 
 ---
 
+## Cambios tras la auditoría del 01-nov
+
+La auditoría de Aymara dio 14 hallazgos (12 confirmados, 2 parciales, 0 falsos). Aquí queda dónde se corrigió cada
+uno; las correcciones están **dentro** del texto, no en un anexo. [D] = decidido con criterio conservador y reversible;
+[C] = pregunta para Cristóbal (Q3).
+
+| # | Hallazgo (resumen) | Dónde quedó corregido |
+|---|---|---|
+| H1 | Bloquear «publicar» no protege nada: lo aplicado ya es lo servido | 2.3, **3.5** (el rechazo va en la escritura; documento de ensayo), 4.3, 4.4 (`ADN_PROPOSED_ON_PUBLIC`), F4 (P4.7, P4.10) |
+| H2 | Se puede redefinir una variable gobernada con una `--*` | **4.1** (clase `declaracion-de-variable`, nombres reservados), 4.4 (`ADN_VAR_RESERVED`), F4 (P4.9) |
+| H3 | `projectData` y atributos SVG quedaban fuera del barrido | **4.1** (qué se inspecciona), 4.3, 4.4, F4 (P4.4b) |
+| H4 | El inventario de referencias miraba un registro que se borra | **3.6** (integridad sobre lo servido; la hoja no pierde documentos parchados), F1 (P1.7), F3 (P3.3) |
+| H5 | La atomicidad no estaba resuelta | **3.3** (proyecciones por revisión, puntero único, bloqueo global), 3.6, F1 (P1.5, P1.6), F2 (P2.4) |
+| H6 | El Core no tiene sombras ni variantes con datos | 2.1, 4.1, 6.2, 6.5, **9.1 (Q3)**, F4b y F8 **bloqueadas por Q3** |
+| H7 | Validar la forma no valida las dependencias | **3.2** (regla R6), 3.5 (estado efectivo), 4.4, F1 (P1.8) |
+| H8 | El regreso a Desktop pierde información | 2.2, 5.2, **5.4**, F5 (P5.7), **F6 reestimada como trabajo del Core** (P6.1-P6.3) |
+| H9 | Exportar/importar devuelve la página al lienzo | 2.3, 3.4, **F1b** (lector nuevo; P1b.1-P1b.3) |
+| H10 | La frase «`standalone_template` sólo si hay shortcode» es falsa | **6.3**, 6.6, 7.2, F11 (discriminador; P11.3) |
+| H11 | Apagar el plugin rompe también `theme.json` | **3.6** (hojas del tema consumen `--wp--*`), 7.1, 7.2, F2 (P2.6), F8 (P8.2) |
+| H12 | Pruebas que quedan verdes sin probar | 2.6, **F0b** (P0.2-P0.5), F9 (P9.1-P9.3); revisadas **todas** las P* |
+| H13 | La paridad 100 % PHP/TS es imposible como estaba escrita | **3.2** (tres capas), Anexo A, F0 (P0.1), F1 (P1.1, P1.4) |
+| H14 | Una pendiente `value: {}` haría caer el import | **3.2** (R2), F1 (P1.9) |
+
+Cambios de plan: **F4b y F8 quedan bloqueadas por Q3; F6 se reestima como trabajo del Core; se agrega F0b**
+(instrumentos de prueba). Antes de cualquier fase de construcción se cierran los cinco contratos (qué ve el público y
+cómo se activa; datos tipados y dependencias; inspección completa de las entradas; ida y vuelta sin pérdidas;
+migración, reversa y pruebas que fallen de verdad). Esta versión vuelve a auditoría de Aymara (disponible hasta el
+20-nov) antes de construir.
+
+---
+
 ## 0. Resumen: las decisiones centrales
 
 1. **El ADN es un archivo `design-contract.json` (o el `design/model.json` portable) y es la única fuente de
    valores de diseño.** El plugin lo valida, lo guarda con revisión y de él **deriva** todo lo demás: variables
    `--wp--preset--*`, `--wp--custom--*`, los alias `--cod-*` del núcleo, el `theme.json` y la opción
    `cod_theme_definitions`. Nadie edita una proyección a mano.
-2. **Validación en PHP, portada 1:1 desde `parseDesignContract` / `parsePortableDesignModel`**, más un corpus de
-   casos compartido que corre en TypeScript y en PHP para detectar deriva. Justificación en 3.2 (el hosting no
-   tiene Node; un JSON Schema no expresa las invariantes).
+2. **Validación en PHP, en tres capas** (3.2): (1) compatibilidad del parser, portada desde `parseDesignContract` /
+   `parsePortableDesignModel` con **paridad exacta**, incluida la igualdad de `DESIGN.md`, que **sí se porta**; (2)
+   validación semántica del Core, también con paridad exacta; (3) política del destino (R1, R2, R6), con
+   divergencias **deliberadas** y su resultado escrito. Un corpus compartido (`core/` y `destino/`) corre en
+   TypeScript y en PHP. Justificación en 3.2 (el hosting no tiene Node; un JSON Schema no expresa las invariantes).
 3. **Seis herramientas MCP nuevas para el ADN** (`cod_adn_get`, `cod_adn_preview_import`, `cod_adn_apply_import`,
    `cod_adn_audit`, `cod_adn_set_mode`, `cod_adn_export`; más tres de contenido, en 6.4) y una pantalla de wp-admin para subir el ADN donde no hay
    MCP (Basis en producción **no tiene credencial MCP**).
 4. **La compuerta** rechaza, en el MCP, todo valor de diseño literal de nueve clases (color, familia, tamaño de
-   letra, peso/interlineado/tracking, espaciado, radio, grosor de borde, sombra, movimiento) y el ancho de caja
-   (`max-width` absoluto). Un valor se referencia **por variable** (`var(--wp--preset--color--accent)`); el id de
-   la definición se recupera del registro y viaja en la evidencia del `preview`.
+   letra, peso/interlineado/tracking, espaciado, radio, grosor de borde, sombra, movimiento), el ancho de caja
+   (`max-width` absoluto) y, además, toda **declaración de una variable reservada** (clase `declaracion-de-variable`:
+   las del registro, `--wp--preset--*`, `--wp--custom--*`, `--wp--style--*` y `--cod-*`). Inspecciona lo que realmente
+   se sirve: CSS, `style=""`, atributos de presentación SVG y `projectData` (4.1). Un valor se referencia **por
+   variable** (`var(--wp--preset--color--accent)`); el id de la definición se recupera del registro y viaja en la
+   evidencia del `preview`.
 5. **Cuatro modos por sitio**: `off` → `observe` → `ratchet` → `enforce`. Santa Luisa y Econut parten en `off`; un
    sitio sólo sube de modo con números (`cod_adn_audit`), y `ratchet` impide **agregar** deuda sin obligar a
    saldar la heredada.
@@ -41,21 +83,33 @@ familia de Gutenberg, no la duplica.
    `observation`, definiciones `proposed` / `deterministic-extraction` y evidencia trazable. Emite el **contrato
    desnudo** (no el envoltorio portable), porque `provenance.producer` del envoltorio sólo admite
    `'contope-design-desktop'` y el extractor no puede declararse Desktop.
-8. **Desktop hoy NO puede importar un ADN ajeno** (buscado y confirmado, 2.2). Hace falta una función chica
-   (fase 6). Mientras tanto hay una vía provisoria, trazada, para que el dueño confirme.
+8. **Desktop hoy NO puede importar un ADN ajeno** (buscado y confirmado, 2.2) y su exportación **pierde
+   información** al volver (procedencia medida, estado `proposed`, observaciones). Abrir un ADN ajeno y devolverlo sin
+   pérdidas **es trabajo del Core**, no «una función chica»: la fase 6 se reestima (5.4). Mientras tanto hay una vía
+   provisoria, trazada, para que el dueño confirme.
 9. **Contenido = bloques de WordPress puros en `post_content`**, con presets por slug y variaciones de estilo
    declaradas en el ADN. **Ningún valor de diseño dentro de un bloque.** El mapa nodo→bloque está en 6.2; sólo
-   faltan tres bloques propios (`contope/formulario`, `contope/mapa`, `contope/whatsapp`).
+   faltan tres bloques propios (`contope/formulario`, `contope/mapa`, `contope/whatsapp`). Las variaciones que
+   necesitan datos (sombras, diferencia por variante) están **bloqueadas por Q3**: hoy el Core no las puede expresar
+   (2.1).
 10. **Lo que apareció midiendo y cambia el plan:** colores y familias de Basis ya están gobernados (0 literales),
     pero **la escala no**: 262 espaciados, 26 valores tipográficos, 23 radios y 11 grosores literales en reglas
     `properties`, más 49 tamaños de letra en reglas `typography`. Y el plugin lleva **valores de diseño dentro de
     su propio código** (sombras `sm/md/lg`, rellenos de botón, defaults de WhatsApp) que saltan cualquier compuerta
     sobre las reglas.
-11. **La tensión que sólo el dueño resuelve** (9, Q1): `dim2.req02` del Core enumera **9 roles tipográficos**
-    y Basis mide **14 tamaños de letra** en **20 combinaciones** familia-peso-tamaño. O se abre la lista en el Core, o
-    Basis se normaliza y cambia de tamaño en algunos títulos.
+11. **Las tensiones que sólo el dueño resuelve** (9.1): **Q1**, `dim2.req02` del Core enumera **9 roles tipográficos**
+    y Basis mide **14 tamaños de letra** en **20 combinaciones** familia-peso-tamaño (o se abre la lista en el Core, o
+    Basis se normaliza y cambia de tamaño en algunos títulos); y **Q3**, el Core no tiene escala de sombras ni
+    diferencia de variantes con datos (o se abren esos requisitos, o Basis deja ese hueco declarado).
 12. **Orden de subida a producción:** plugin (sin efecto visible) → tema con `theme.json` generado (misma paleta)
     → ADN → páginas al final. Cada paso reversible; en ningún momento el sitio depende de algo que aún no subió.
+13. **El rechazo de propuestas va en la escritura, no en «publicar»** (H1): en `enforce`, preview/apply/patch/write
+    rechazan toda referencia a una definición `proposed` si el documento está publicado, es una región o aporta a una
+    hoja compartida; las propuestas sólo viven en un documento de ensayo (3.5).
+14. **La atomicidad se logra con un puntero único** (H5): las proyecciones se guardan por revisión y lo único que se
+    lee en tiempo de ejecución es `cod_adn_activa`; moverlo es la única escritura que cambia lo visible (3.3).
+15. **Las pruebas de aceptación deben poder fallar** (H12): cada una declara su control (lo que la haría fallar) y
+    ninguna pasa si no encuentra lo que busca (8).
 
 ---
 
@@ -69,6 +123,9 @@ familia de Gutenberg, no la duplica.
 | **Registro** | La tabla `variable CSS → {definitionId, ruta dentro del payload, valor, estado, autoridad}`. Es lo que la compuerta consulta. |
 | **Compuerta** | La verificación del MCP de que un valor de diseño referencia el registro. |
 | **Heredada / nueva** | Deuda de literales ya presente en un documento (heredada) frente a la que agrega una operación (nueva). |
+| **Estado efectivo** | El estado de una definición **como se usa**: el mínimo entre su estado y el de todas sus dependencias (R6, 3.2). Un rol `confirmed` que apunta a una paleta `proposed` es, para todo efecto, `proposed`. |
+| **Servido** | Lo que recibe un visitante: HTML y CSS de páginas, de regiones y de la hoja compartida (`cod_disenos_hojas`). La integridad referencial y las pruebas de efecto público se miden sobre esto, no sobre un registro intermedio. |
+| **Documento de ensayo** | Documento cuya composición usa `designId` = `<designId>-ensayo`. Tiene hoja propia que ninguna página pública carga; es el único lugar donde puede vivir una referencia a una definición `proposed` (3.5). |
 
 ---
 
@@ -80,10 +137,12 @@ Lo que sigue sale de leer código y correr guiones (anexo C). Donde dice "no enc
 
 | Hecho | Dónde | Consecuencia |
 |---|---|---|
-| `parseDesignContract` valida identidad, fuentes únicas, `'user'` reservado, definiciones únicas, referencias de evidencia/procedencia/restricciones, tareas de desarrollo con invariantes y `projections.designMd`. `value` es `unknown`. | `packages/core/src/design-contract.ts:244-333` | Lo que el contrato no valida (la **forma del payload** de cada requisito) hay que validarlo en el destino (3.2, reglas R2). |
-| `parsePortableDesignModel` exige **claves exactas** y que `designMd.content` sea **idéntico byte a byte** a `renderDesignContractDesignMd(contract)`. `provenance.producer` sólo puede ser `'contope-design-desktop'`; `transport` exige URNs `urn:ocd:package:*` / `urn:ocd:project:*`. | `design-contract-portable.ts:204-254`, `:128-144`, `:105-126` | Portar la igualdad de `DESIGN.md` a PHP obligaría a portar el renderizador entero (257 líneas con orden y JSON estables). Y un extractor **no puede** emitir el envoltorio sin falsear el productor. |
+| `parseDesignContract` valida identidad, fuentes únicas, `'user'` reservado, definiciones únicas, referencias de evidencia/procedencia/restricciones, tareas de desarrollo con invariantes y `projections.designMd`. `value` es `unknown`. | `packages/core/src/design-contract.ts:244-333` | Lo que el contrato no valida —la **forma del payload** de cada requisito (R2) y las **dependencias** entre definiciones (R6)— hay que validarlo en el destino (3.2). |
+| `parsePortableDesignModel` exige **claves exactas** y que `designMd.content` sea **idéntico byte a byte** a `renderDesignContractDesignMd(contract)`. `provenance.producer` sólo puede ser `'contope-design-desktop'`; `transport` exige URNs `urn:ocd:package:*` / `urn:ocd:project:*`. | `design-contract-portable.ts:204-254` (la igualdad, `:233-237`; su prueba, `design-contract-portable.test.ts:132-137`), `:128-144`, `:105-126` | Portar la igualdad de `DESIGN.md` obliga a portar el renderizador entero (`design-contract-design-md.ts`, 257 líneas con orden y JSON estables). **Se decide portarlo** (3.2, capa 1): si no, el plugin aceptaría envoltorios que el Core rechaza. Y un extractor **no puede** emitir el envoltorio sin falsear el productor. |
 | Nadie llama a `createPortableDesignPackageContribution` fuera de su propio módulo. | `grep` en `ContOpeDesign-Core` (sólo definición y pruebas) | **Hoy ningún emisor produce `design/model.json`.** Desktop exporta `design-contract.json` + `DESIGN.md` (`packages/desktop/src/dominio/capsula.ts: proyectarCapsula`). |
-| Los payloads de cada requisito están tipados: `dim1.req01` → `{institucionales:[{name,value}], neutros:[…]}`; `dim1.req02` → `roleColors`; `dim2.req01` → `familias:[{name,stack,idiomas,licencia}]`; `dim2.req02` → `roleStyles` con `role ∈ CORE_ROLES_9`; `dim2.req07` → correspondencia con el **almacén plano** de WordPress; `dim3.req01` → `{unidad, escala:[{step,value}]}`; `dim3.req02` → `roleSpacing`; `dim4.req02` → `formas[].radioValor`; `dim8.req03` → `escala:[{nombre,duracion}]`; `dim9.req03` → `variantes`. | `requirement-manifest/manifest-v0-dim{1,2,3,4,8,9}.ts` | El ADN **ya tiene dónde poner** paleta, familias, escala de espacio, radios, duraciones y variantes. Faltan por leer antes de fijar el mapeo: `dim4.req03/req04` (borde, profundidad), `dim8.req02/req04` (roles y trayectoria de movimiento), los requisitos de contenedores/retícula de `dim3`. |
+| Los payloads de cada requisito están tipados: `dim1.req01` → `{institucionales:[{name,value}], neutros:[…]}`; `dim1.req02` → `roleColors`; `dim2.req01` → `familias:[{name,stack,idiomas,licencia}]`; `dim2.req02` → `roleStyles` con `role ∈ CORE_ROLES_9`; `dim2.req07` → correspondencia con el **almacén plano** de WordPress; `dim3.req01` → `{unidad, escala:[{step,value}]}`; `dim3.req02` → `roleSpacing`; `dim4.req02` → `formas[].radioValor`; `dim8.req03` → `escala:[{nombre,duracion}]`. | `requirement-manifest/manifest-v0-dim{1,2,3,4,8,9}.ts` | El ADN **ya tiene dónde poner** paleta, familias, escala de espacio, radios y duraciones. Faltan por leer antes de fijar el mapeo: `dim4.req03`, `dim8.req02/04` y los requisitos de contenedores/retícula de `dim3`. |
+| **El Core NO puede expresar sombras con valores ni variantes con datos** (medido en `6115353`). `dim4.req04` (profundidad) sólo trae `{rol, nivel, stacking, oclusion}` y su propio `mappingNotes` lo llama «BRECHA DECLARADA»; `dim4.req05` es política de efectos, no una escala. En `dim9.req03`, `diferencia` es **texto** y `arquetipo` es una lista abstracta, no una familia de bloque. | `manifest-v0-dim4.ts:384-423` y `:436-474`; `manifest-v0-dim9.ts:345` | **Q3 (9.1).** F4b (presets de sombra) y F8 (variaciones de bloque) quedan **bloqueadas** hasta que el Core tenga (a) una escala de sombras tipada `{nombre, x, y, desenfoque, expansión, color→ref}` y (b) una diferencia por variante tipada `propiedad → valor|ref`, más la correspondencia arquetipo → familia de bloque. Mientras tanto, una sombra o variante pedida da `ADN_NAME_UNRESOLVED`: **nunca** se interpreta prosa ni se inventa un valor en el adaptador. |
+| Las referencias entre definiciones (`{refReqId, refPath}`) se validan sólo en su **forma** (`payload.ts:71-80`) y por existencia de **una entrada** con ese requisito (`design-set/adapter.ts:81-94`); `resolveRefValue` recorre la ruta sin mirar el estado (`adapter.ts:136-177`). `refReqId` nombra un **requisito**, no una definición: con `.def1` y `.def2` es ambiguo. | `requirement-manifest/payload.ts:71-80`; `design-set/adapter.ts:81-94`, `:136-177` | Hace falta una regla del destino (**R6**, 3.2) que resuelva dependencias, estado y ambigüedad. |
 
 ### 2.2 ¿Puede Desktop importar un `design/model.json` ajeno? **No.**
 
@@ -99,6 +158,18 @@ Lo que sí existe y sirve de puente: los extractores de Desktop (`dominio/extrac
 producen `Candidato{requirementId, fragmento}` para `dim1.req01`, `dim2.req01` y `dim3.req01` (los **fundamentos**).
 Eso permite una vía alternativa (5.6), pero **no** conserva procedencia ni roles.
 
+**Y lo que se pierde en la ida y vuelta**, aun si Desktop aprendiera a abrir un ADN (verificado en Core `6115353`):
+
+- `persistence.ts:91-93` rechaza dos entradas con el mismo `requirementId` (`findDuplicateEntries`): un set con `.def1`
+  y `.def2` del mismo requisito no se puede cargar.
+- Al exportar, `capsula.ts:98` y `:109` rehacen la procedencia (se pierden el `locator` y el `excerpt` medidos), `:163`
+  marca toda fuente como `observation` y `design-contract.ts:493` deja `constraintDefinitionIds: []`.
+- Una propuesta sin aprobar con `resolutionPath: 'insumo'` vuelve como `fact` → `deterministic-extraction` /
+  `observed` (`capsula.ts:92-96`, `design-contract.ts:351,375-381`): **se pierde el estado `proposed`**. Las definiciones
+  `obs.*` no entran al patrón de importación (5.4) y desaparecen.
+- Las pendientes de Desktop salen con `value: {}` (`capsula.ts:103,127`) y `design-contract.ts:485` siempre escribe `value`;
+  el caso «ausente» no ocurre: llega `{}` (R2, 3.2).
+
 ### 2.3 El plugin
 
 | Hecho | Dónde | Consecuencia |
@@ -113,7 +184,15 @@ Eso permite una vía alternativa (5.6), pero **no** conserva procedencia ni role
 | El nodo `block` de la composición (0.3.85) sólo admite **bloques dinámicos de una lista cerrada** (`core/search`, `latest-posts`, `latest-comments`, `archives`, `categories`, `tag-cloud`, `calendar`, `page-list`); se dibuja con `render_block()` en un `<div data-cod-bloque>`. **No es contenido en bloques.** | `class-cod-canvas-bloque-renderer.php` | No se reutiliza como vía de contenido. |
 | `COD_Block_Serializer` produce bloques desde un vocabulario **distinto** (`section/group/columns/column/heading/paragraph/list/details/video/separator/spacer/buttons/button/image`) y sin presets. Es el importador del paquete v0. | `class-cod-block-serializer.php` | Precedente de qué markup escribir; no se puede reutilizar tal cual. |
 | `scripts/econut/legal-a-bloques.php` convirtió la página legal a bloques escribiendo `{"style":{"color":{"background":"#dbd4c0"}}}`: **un literal dentro del bloque**. | línea 70 | Es exactamente lo que no debe repetirse. |
-| El paquete `.ocdsite` v1 ya prevé `entrypoints.designModel` (`design/model.json`), pero **ningún código del plugin lo lee**. | `docs/package-format-v1.md:99,307`; `schemas/manifest-v1.schema.json:135`; `grep designModel` en `*.php` (sin resultados) | Hay un punto de entrada natural para el ADN en el importador de paquetes (fase 1b). |
+| El paquete `.ocdsite` v1 ya prevé `entrypoints.designModel` (`design/model.json`), pero **ningún código del plugin lo lee**. Además, el exportador elige las páginas por `_cod_canvas_document_id` y **no lleva `post_content`**; el importador escribe **siempre** el shortcode `[contope_canvas …]`, exige `schemaVersion === 1` + `pages/documents`, y el otro importador (`COD_Package_Validator`) exige `schemaVersion: 0`. El manifiesto de la carpeta de ejemplo usa `formatVersion`/`entrypoints`, esquema que ningún PHP lee. | `docs/package-format-v1.md:99,307`; `schemas/manifest-v1.schema.json:135`; `class-cod-site-package-exporter.php:112-138`; `class-cod-site-package-importer.php:54-58,216-224`; `class-cod-package-validator.php:33`; `grep designModel` en `*.php` (sin resultados) | Hay un punto de entrada natural para el ADN, pero **no existe un lector** del manifiesto con `entrypoints`: F1b lo construye (no «lo conecta»). Y exportar/importar hoy **devuelve una página en bloques al lienzo** (H9). |
+| `apply_canvas_composition` guarda sobre las **mismas meta** que lee `render_shortcode`: **no hay revisión publicada separada**. Las regiones (encabezado, pie) se resuelven en vivo al servir. Publicar una página ya pública devuelve `alreadyPublished` sin revisar nada. | `class-cod-canvas-mcp-service.php:395-458`; `class-cod-canvas-page-publisher.php:1707-1738`, `:1731`, `:1790-1799`, `:1179-1185` | **Bloquear «publicar» no protege nada** (H1): lo que se aplica ya es lo que se sirve. El rechazo va en la escritura (3.5). |
+| La hoja compartida junta los documentos de **todas** las páginas con `post_status => 'any'`: una propuesta en un **borrador** con el mismo `designId` entra a la hoja que cargan las páginas públicas. | `class-cod-diseno-hoja.php:193-197` (`regenerar`: `:86-135`) | Un borrador no es un lugar seguro para una propuesta (3.5, documento de ensayo). |
+| `normalize_properties_rule` acepta cualquier propiedad `--[a-z0-9-]+` con valor libre (salvo `{};<>\@`, `url(`…). Igual por `cod_patch_css` y `cod_write_canvas_document`. | `class-cod-canvas-mcp-recipe-compiler.php:3073-3121` | Una clasificación por nombre de propiedad no ve una `--*`: se podía **redefinir una variable gobernada** (H2; 4.1). |
+| `write_canvas_document` guarda `projectData`, HTML y CSS por separado; `sanitize_project_data` no mira estilos; el editor carga `projectData` como **fuente del CSS**, así que un literal escondido ahí reaparece al guardar desde el editor. La lista blanca de atributos SVG admite `fill`, `stroke`, `stop-color` y, en `text`/`tspan`, `font-family`, `font-size`, `font-weight`, `letter-spacing`. | `class-cod-canvas-mcp-service.php:1296-1320`; `class-cod-canvas-document-sanitizer.php:257-296`, `:545-560`; `assets/js/cod-editor-core.js:1645-1664` | `projectData` y los atributos de presentación SVG quedaban **fuera del barrido** (H3; 4.1). |
+| `repository->save()` **vacía** `META_COMPOSITION` (`update_post_meta(…, '')`) y lo llaman todos los parches MCP (geo, WhatsApp, `patch_css`, `write`, `grapes_edit_node`, `sync_project_data`, `patch_html`), el editor, el publicador y el importador. `COD_Diseno_Hoja::regenerar` sólo incluye documentos **con composición**. | `class-cod-canvas-document-repository.php:413-417`; `class-cod-diseno-hoja.php:103-106` | Un inventario de referencias que mire el registro de composiciones mira algo que se borra, y un documento parchado **deja de aportar reglas a la hoja** (defecto existente). H4; 3.6. |
+| `COD_Theme_Definitions::get()` lee la opción **en vivo**; la usan `COD_Design_Core`, la pantalla de Configuración y el emisor de `:root`. El bloqueo sólo es **por documento**; en escrituras crudas la revisión se compara en `target()` **antes** del bloqueo y `save()` no la recompara. | `class-cod-theme-definitions.php:193-212`; `class-cod-design-core.php:294`; `class-cod-settings-admin.php:160`; `class-cod-canvas-document-repository.php:630-680`; `class-cod-canvas-mcp-service.php:1552-1605` | El orden «CPT → proyecciones → puntero» deja ver una proyección nueva con el puntero viejo, y hay carreras import/apply (H5; 3.3). |
+| La plantilla se elige por el **metadato** `_cod_canvas_document_id`, no por el shortcode; `templates/canvas-document.php` imprime sólo `the_content()`. Que la plantilla se elija «sólo si hay shortcode» fue una **propuesta de agosto** (`wp-local/PLAN-gutenberg-migracion-fases.md:78,249`, fuera de este repositorio) que **nunca se construyó**. | `class-cod-canvas-page-publisher.php:1916-1927`; `templates/canvas-document.php:12-19` | Mientras el contenido vaya dentro de `wp:contope/lienzo`, `blocks/cod-lienzo/render.php` llama a `salida_con_regiones()` y la página conserva encabezado y pie. El fallo aparece al **quitar el envoltorio con el metadato puesto** o al pasar encabezado/pie a partes del tema (H10; 6.3). |
+| `contope-basis/style.css:33-56` y `cookies.css:13` usan `--cod-color-*` y `--cod-font-*`, que **sólo define el plugin** (`COD_Design_Core`, `COD_Theme_Definitions::css()`, inyectado en `render_shortcode`). Con el plugin apagado esas propiedades quedan sin valor y, con la misma especificidad, **anulan también** el fondo, el texto y la fuente que da `theme.json`. `cookies.css` además declara sus propias `--cod-basis-*`. | `contope-basis/style.css:34,41,46-49,54`; `contope-basis/cookies.css:13,136-157`; `class-cod-design-core.php:77-83`; `class-cod-theme-definitions.php:297-315`; `class-cod-canvas-page-publisher.php:1690` | «Respaldo al apagar el plugin» era falso para las hojas del tema (H11; 3.6). |
 
 ### 2.4 Basis: dónde está el sitio
 
@@ -143,6 +222,17 @@ Guion de una pasada sobre `scripts/basis/salida/*.componer.json` (reproducible; 
 Lectura: el trabajo de gobierno de color y familia está hecho; **lo que le falta al ADN es la escala** (espacio,
 tamaños, radios, bordes), que es justo donde el Core es más estricto (9 roles tipográficos).
 
+### 2.6 Los instrumentos de prueba actuales pasan en verde sin probar (H12)
+
+| Instrumento | Qué hace hoy | Por qué no sirve como aceptación |
+|---|---|---|
+| `scripts/basis/auditoria-sitio.mjs` | Recorre páginas × anchos. | Revisa acordeones **sólo si** hay `[data-cod-acordeon-rol]` (`:100-101`), el formulario **sólo si** hay `.ofr-form` (`:141-142`) y los bloques **sólo si** hay `[data-cod-bloque]` (`:157`). Con bloques nativos de WordPress hay 0 coincidencias y el chequeo se **salta en silencio**. |
+| `scripts/basis/comparar-vivo.mjs` | Compara textos, cajas e imágenes contra el sitio. | Cubre 4 páginas (falta términos); el «original» es `basisbodegas.com`, que **ya es ContOpe** y que F10 cambia; las tolerancias son 4-6 px y 10 % (`:140-183`), no ±0-3; y **siempre termina con código 0** (sin `process.exit`). |
+| `scripts/santaluisa/auditoria-sitio.cjs` y `paridad-espejo-produccion.mjs` | Regresiones propias de Santa Luisa. | Sirven, pero sólo cubren Santa Luisa; **probar sólo Basis no prueba que Santa Luisa y Econut sigan iguales** (regla 12 de `CLAUDE.md`). |
+
+Se corrige en F0b. Y todas las pruebas de aceptación de 8 se revisaron con un criterio: **¿puede fallar?** Cada una
+trae su control (lo que la haría fallar) o un piso numérico (un conteo mínimo) para que no pase en vacío.
+
 ---
 
 ## 3. El ADN como única puerta
@@ -152,7 +242,7 @@ tamaños, radios, bordes), que es justo donde el Core es más estricto (9 roles 
 | Formato | Quién lo produce | Aceptado |
 |---|---|---|
 | **A. Contrato desnudo** — `DesignContractV1` (`design-contract.json`) | Desktop (hoy), el extractor | **Sí. Es el formato principal.** |
-| **B. Envoltorio portable** — `contope/design-model` (`design/model.json`) | Desktop (cuando exporte el paquete), `.ocdsite` | **Sí**, validado con las claves exactas de `parsePortableDesignModel`; el plugin guarda y usa sólo `contract`. |
+| **B. Envoltorio portable** — `contope/design-model` (`design/model.json`) | Desktop (cuando exporte el paquete), `.ocdsite` | **Sí**, validado con las claves exactas de `parsePortableDesignModel` **y la igualdad de `DESIGN.md`**; el plugin guarda y usa sólo `contract`. |
 | `DESIGN.md` suelto | cualquiera | **No.** Es proyección; "nunca se promueve Markdown suelto a definición" (skill `leer-contrato-de-diseno`). |
 | `designRuleSet` | MCP | No es ADN: sigue siendo la **entrada de composición**, no la fuente de valores. |
 
@@ -166,30 +256,73 @@ tamaños, radios, bordes), que es justo donde el Core es más estricto (9 roles 
 |---|---|---|---|
 | ¿Corre donde está el sitio? | sí | **sí** | **no** (el hosting no tiene Node: `cod_read_canvas_document` ya documenta ese límite) |
 | ¿Expresa unicidad de ids, integridad referencial y las invariantes de `developmentTasks`? | no (y el repo ya tuvo que escribir comprobaciones a mano junto a `manifest-v1.schema.json`) | **sí** | sí |
-| Costo | schema + comprobaciones igual | ≈ 330 líneas PHP; el dominio es chico y estable | 0 |
+| Costo | schema + comprobaciones igual | ≈ 330 líneas PHP para los parsers **más ≈ 260 del renderizador de `DESIGN.md`**; el dominio es chico y estable | 0 |
 | Riesgo | deriva silenciosa | **deriva controlada por el corpus** | depende de que haya Node |
+
+**Tres capas, cada una con su expectativa (H13).** Una sola cifra «100 % de paridad» era imposible: el Core produce
+contratos que una política más estricta del destino rechaza (por ejemplo restricciones legales activas, que salen
+`confirmed` con `deterministic-extraction`: `design-contract.ts:350-373`, prueba `:456-463`). Por eso se separan:
+
+| Capa | Qué es | Expectativa |
+|---|---|---|
+| **1. Compatibilidad del parser** | `COD_ADN_Validator` reproduce `parseDesignContract` y `parsePortableDesignModel` (lista exacta en el Anexo A), **incluida la igualdad de `designMd.content`**: se PORTA `renderDesignContractDesignMd`. | **Paridad exacta** con el Core: mismo válido/inválido y misma razón de rechazo. |
+| **2. Validación semántica del Core** | Las invariantes que el Core aplica fuera de los parsers (unicidad, referencias, tareas, estado/autoridad de las proyecciones del Core). | **Paridad exacta.** |
+| **3. Política del destino** | R1, R2, R6 (más R3-R5). **No existen en el Core**; se declaran como tales. | **Divergencias deliberadas**, cada una con su resultado escrito en el corpus `destino/`. |
+
+La barrera de Node sigue existiendo como segunda verificación, pero ya no es la única que comprueba la igualdad de
+`DESIGN.md`.
 
 Componentes:
 
-1. **`COD_ADN_Validator`** (PHP). Reproduce 1:1 las reglas de `parseDesignContract` y de `parsePortableDesignModel`
-   (lista exacta en el anexo A). **Una diferencia deliberada**: no recalcula `designMd.content`; verifica
-   `designMd.path === 'design/DESIGN.md'`, `designMd.revision === contract.design.revision` y que `content` sea texto.
-   `DESIGN.md` es proyección y el plugin no lo usa. La igualdad byte a byte la sigue exigiendo la barrera de Node.
-2. **Reglas del destino** (no existen en el Core; se declaran como tales, no se hacen pasar por él):
-   - **R1.** `state: confirmed` exige `authority ∈ {human-confirmed, approved-guideline}`. Sin una persona o una guía
-     aprobada detrás no hay confirmación (skill: "confirmado por una persona > guía aprobada > …").
-   - **R2.** Para cada requisito que la web consume, el `value` debe tener la **forma de su payloadSchema**
-     (hoy: `dim1.req01/02`, `dim2.req01/02/07`, `dim3.req01/02`, `dim4.req02`, `dim8.req03`, `dim9.req03`). Un
-     `value` ausente = "declarada y sin resolver", **no es error** (skill). Un `value` con forma incorrecta sí.
+1. **`COD_ADN_Validator`** (PHP): capas 1 y 2 más el motor de la capa 3. Sin diferencias deliberadas en las capas 1 y 2.
+2. **Reglas del destino (capa 3)** — no existen en el Core:
+   - **R1.** Una definición `confirmed` debe tener `authority ∈ {human-confirmed, approved-guideline}`; sin una
+     persona o una guía aprobada detrás no hay confirmación (skill: «confirmado por una persona > guía aprobada >
+     …»). **Excepción (H13):** se admite `deterministic-extraction` para una **restricción confirmada** (lo legal, de
+     privacidad o editorial no lo confirma una persona del proyecto), porque el Core así las produce. *Cómo se
+     reconoce:* el contrato v1 **no trae marca de restricción** (restricción y hecho salen ambos
+     `confirmed`/`deterministic-extraction`), así que la excepción se aplica a una definición `confirmed` +
+     `deterministic-extraction` con `reviewedAt` presente **que no alimenta ninguna variable** (R4: se guarda, no se
+     emite), que es donde caen las restricciones. Si la definición **sí** alimenta una variable, exige autoridad humana
+     o pauta aprobada. Sin `reviewedAt`, se rechaza. [D, lectura conservadora; si el Core agrega la marca, la regla
+     pasa a leerla.]
+   - **R2.** Para cada requisito que la web consume, el `value` debe tener la **forma de su payloadSchema** (hoy:
+     `dim1.req01/02`, `dim2.req01/02/07`, `dim3.req01/02`, `dim4.req02`, `dim8.req03`; `dim9.req03` queda fuera
+     mientras dure Q3). **`value` ausente o `{}` = «declarada y sin resolver»** (H14): igual que una definición
+     apuntada por una `developmentTask` abierta, se **guarda**, **no se emite** y va a `ignored[]`. Desktop genera las
+     pendientes con `value: {}` y `design-contract.ts:485` siempre escribe `value`: el caso «ausente» nunca ocurre,
+     llega `{}`, que no cumple los campos obligatorios, y con import atómico haría caer el contrato entero. R2
+     rechaza la forma incorrecta **sólo** en una definición `confirmed` (falla el import) o en una `proposed` que se
+     vaya a emitir (falla esa definición: no se emite, queda en `ignored[]` con la ruta).
    - **R3.** Los *slugs* derivados de nombres dentro de una misma clase son únicos (colisión → `-2`, `-3` y se avisa).
    - **R4.** Una definición cuyo requisito la web no proyecta se **guarda** y se lista en `ignored[]`; nunca se
      descarta ni se emite.
    - **R5.** Tamaño máximo 1 MB, 2000 definiciones, profundidad de `value` ≤ 12. El ADN es entrada no confiable.
-3. **Corpus compartido** `fixtures/adn/{valid,invalid}/*.json`: se genera desde Core con
-   `scripts/exportar-corpus-adn.ts` (nuevo, en `ContOpeDesign-Core`) a partir de los casos de
-   `design-contract.test.ts` (828 líneas) y `design-contract-portable.test.ts`; cada `return null` de los dos
-   parsers tiene al menos un caso inválido. Lo corren `packages/core` (TS) y `scripts/probar-adn-validador.php`
-   (PHP, dentro de `npm run pruebas`). **Aceptación:** coincidencia 100 % válido/inválido.
+   - **R6 (nueva, H7). Las dependencias se resuelven, no sólo se miran.** El Core valida la *forma* de un `ref`
+     (`{refReqId, refPath}`) y que exista una entrada con ese requisito, pero no el estado ni la ambigüedad. En el
+     destino, toda referencia dentro de `value` debe resolver **en el mismo contrato**:
+       1. el requisito referido existe y `refPath` llega a un valor del **tipo esperado** (el de su payloadSchema);
+       2. **sin ciclos** (detección por recorrido; un ciclo es `ADN_REF_UNRESOLVED` con el recorrido en `details`);
+       3. el **estado efectivo** de una definición es el **mínimo** entre su estado y el de todas sus dependencias, con
+          el orden `confirmed > proposed > (observed, rejected, inexistente)`: una dependencia rechazada, observada o
+          inexistente **bloquea** (`ADN_REF_STATE`); una `proposed` **contagia** (un rol `confirmed` que apunta a una
+          paleta `proposed` se trata como `proposed`: no se emite sin `emitirPropuestas` y vive donde vive una
+          propuesta, 3.5);
+       4. `refReqId` nombra un **requisito**, no una definición: si el requisito tiene **más de una definición**
+          (`.def1` y `.def2`), la referencia es **ambigua** y se rechaza (`ADN_REF_AMBIGUOUS`).
+     Resultado según el estado de quien refiere: `confirmed` con referencia rota → falla el import; `proposed` →
+     no se emite y queda en `ignored[]` con el código. Es regla del **destino**, no del Core.
+3. **Corpus compartido** `fixtures/adn/core/*.json` y `fixtures/adn/destino/*.json`:
+   - `core/` (capas 1 y 2) se genera desde el Core con `scripts/exportar-corpus-adn.ts` (nuevo, en `ContOpeDesign-Core`)
+     a partir de los casos de `design-contract.test.ts` y `design-contract-portable.test.ts`; cada `return null` de los
+     dos parsers tiene al menos un caso inválido y cada caso declara qué rama cubre (`cubre`). **Incluye los casos
+     incómodos** (restricciones legales activas, `DESIGN.md` alterado a mano): ninguno se saca del corpus.
+   - `destino/` (capa 3) lo escribimos nosotros: cada archivo declara el resultado esperado de R1, R2, R6 (incluye
+     las pendientes con `value: {}`, referencias ambiguas, cíclicas y a propuestas).
+   - Lo corren `packages/core` (TS, sólo `core/`) y `scripts/probar-adn-validador.php` (PHP, dentro de `npm run
+     pruebas`). **Aceptación (P1.1):** coincidencia 100 % en `core/` (capas 1 y 2) y cumplimiento de lo escrito en
+     `destino/` (capa 3); con piso: el guion falla si el corpus no tiene casos válidos o inválidos, o si ejecutó
+     menos casos que los que hay en disco.
 4. **Barrera de Node** `scripts/adn/validar-adn.mjs`: si `../ContOpeDesign-Core` está, llama los parsers reales
    (estricto, con la igualdad de `DESIGN.md`); si no, avisa que sólo hubo validación PHP.
 
@@ -211,9 +344,29 @@ Componentes:
     → `ADN_STALE_BASE`;
   - **no hay "volver atrás" del puntero:** se reimporta el contenido viejo como revisión nueva (así lo haría
     Desktop: siempre `revision + 1`). Así `expectedDesignRevision` nunca retrocede.
-- **Atomicidad.** validar → construir proyección en memoria → verificar integridad referencial contra los
-  documentos guardados (3.6) → escribir el CPT → actualizar proyecciones → mover el puntero. Si algo falla, el
-  puntero no se mueve y las proyecciones previas siguen.
+- **Atomicidad (H5).** El orden «validar → CPT → proyecciones → puntero» no bastaba: `COD_Theme_Definitions::get()`
+  lee la opción en vivo y la usan `COD_Design_Core`, la pantalla de Configuración y el emisor de `:root`, así que un
+  lector veía una proyección nueva con el puntero viejo. Se corrige así:
+  1. **Proyecciones guardadas por revisión**: `cod_adn_proj_r<N>` (opción sin *autoload*) con el registro, el
+     `theme.json` generado y los valores del almacén plano. Mientras se escriben, nadie las lee.
+  2. **El puntero `cod_adn_activa` es lo único que se lee en tiempo de ejecución.** Todo consumidor (el filtro
+     `wp_theme_json_data_theme`, `COD_Design_Core`, `COD_Theme_Definitions::get()`, el emisor de `:root`, la compuerta)
+     resuelve «la proyección vigente» a través del puntero. **Moverlo es la única escritura que cambia lo visible.**
+  3. `cod_theme_definitions` pasa a ser **proyección derivada**, leída por el puntero. Su escritura directa queda
+     **prohibida** fuera de la proyección (P2.4).
+  4. Orden del import: validar → proyectar en memoria → integridad referencial contra lo servido (3.6) → tomar el
+     bloqueo global (exclusivo) → **recomparar `expectedCurrentRevision` dentro del bloqueo** → escribir el CPT →
+     escribir `cod_adn_proj_r<N>` → mover el puntero → soltar. Si algo falla antes del puntero, lo visible sigue
+     siendo la revisión anterior **entera** (P1.5).
+- **Bloqueo global de diseño (H5).** Hoy el bloqueo es sólo por documento (`acquire_document_lock`,
+  `class-cod-canvas-document-repository.php:630-680`) y hay una carrera real: el `compile` valida contra r2, entra el
+  import de r3, y `apply` guarda lo validado contra r2. Se agrega un bloqueo de diseño con semántica
+  lector/escritor, construido sobre el mismo mutex de `add_option` que ya usa el repositorio: **el import lo toma
+  exclusivo y cada escritura de documento lo toma compartido** (`ADN_BUSY` si el import está en curso o si hay
+  escrituras en curso al intentar importar). Dentro del bloqueo, y **justo antes de guardar**, se recomparan
+  `expectedDesignRevision` **y** la revisión del documento, en **todas** las vías. Hoy, en las escrituras crudas, la
+  revisión se compara en `target()` (`class-cod-canvas-mcp-service.php:1552-1605`) **antes** del bloqueo y
+  `repository->save()` no la recompara: ese hueco se cierra en `save()`, no en cada herramienta.
 - **Qué cambia en la composición.** `design.expectedDesignRevision` debe ser igual a la revisión activa
   (`ADN_REVISION_STALE`, que dice cuál es la activa y manda a refrescar con `cod_adn_get`). En `off` sigue libre.
 
@@ -225,8 +378,8 @@ Todas con `manage_options`; las de lectura con las anotaciones `readOnlyHint` ya
 |---|---|---|
 | `cod_adn_get` | no | Resumen: `{activo, designId, revision, digest, modo, fuente, importadoEn, conteos{confirmed,proposed,observed,rejected}, proyeccion{themeJson, themeDefinitions}, ignoradas[]}`; `incluir: ["definiciones","registro","auditoria"]` agrega el detalle. |
 | `cod_adn_preview_import` | no | Recibe `{model, expectedCurrentRevision, emitirPropuestas}`. Devuelve validación con códigos, `diff` (agregadas/quitadas/cambiadas/**renombradas**), `rompe[]` (variables que se quitan y qué documentos/reglas las usan), `previewId` (sha256 de digest + revisión base + opciones) y el resumen de proyección. |
-| `cod_adn_apply_import` | sí | Igual argumento + `previewId` exacto. Atómico (3.3). Un import con `rompe[]` no vacío se rechaza (`ADN_REF_BROKEN`) salvo `permitirRuptura: true`, que sólo acepta wp-admin, no el MCP. |
-| `cod_adn_audit` | no | Escanea documentos y composiciones guardadas y devuelve literales **por clase** (conteo, valores distintos, los N más frecuentes), variables desconocidas, y por documento. Es la línea base y el instrumento de ratchet. |
+| `cod_adn_apply_import` | sí | Igual argumento + `previewId` exacto. Atómico (3.3). Un import con `rompe[]` no vacío se rechaza (`ADN_REF_BROKEN`) salvo `permitirRuptura: true`, que sólo acepta wp-admin, no el MCP. `rompe[]` incluye las variables que se **quitan, se renombran o degradan a propuesta/rechazada** y están en uso en lo servido (3.6). |
+| `cod_adn_audit` | no | Escanea **lo servido** (documentos, regiones, `projectData`, bloques de `post_content`, partes del tema) y devuelve literales **por clase** (conteo, valores distintos, los N más frecuentes, **origen**: heredado / `mcp` / `editor`), variables desconocidas, declaraciones de variables reservadas, **referencias a propuestas en lo público** y el detalle por documento. Es la línea base y el instrumento de ratchet. |
 | `cod_adn_set_mode` | sí | Sólo hacia **más estricto** (`observe → ratchet → enforce`). Bajar el modo se hace en wp-admin (decisión humana). |
 | `cod_adn_export` | no | `formato: "contract" | "tokens-w3c" | "theme-json"`. El primero cierra el ciclo con Desktop; el último es el artefacto que se commitea en el tema (3.6). |
 
@@ -239,18 +392,55 @@ conexión viva con Desktop) y se agrega `importsPortableModel: true`. `designCor
 (nonce + `manage_options`), cambiar el modo en ambos sentidos, ver el estado de la proyección. Es la vía de
 **producción**, donde no hay MCP.
 
-**Paquetes `.ocdsite`:** `COD_Site_Package_Importer` pasa `entrypoints.designModel` al mismo `apply` (fase 1b),
-de modo que "la transferencia sin conexión y la conexión en vivo se refieren a la misma identidad de diseño".
+**Paquetes `.ocdsite` (F1b):** hay que **construir un lector nuevo** del manifiesto `formatVersion`/`entrypoints` (ningún
+PHP lo lee hoy), que convive con el esquema `pages/documents` de `COD_Site_Package_Importer`. Ese lector pasa
+`entrypoints.designModel` al mismo `apply`, de modo que «la transferencia sin conexión y la conexión en vivo se
+refieren a la misma identidad de diseño». Exportador e importador además distinguen **página Canvas** de **página en
+bloques**, transportan `post_content` y medios completos y rechazan sobrescribir una página en bloques con el
+shortcode (H9).
 
 ### 3.5 Qué se emite según estado y autoridad
 
 | `state` | `authority` | ¿Se emite variable? | ¿Una regla puede referenciarla? | Efecto |
 |---|---|---|---|---|
-| `confirmed` | `human-confirmed` / `approved-guideline` | **Sí** | **Sí** | Las reglas quedan `reviewed`. **Es lo único que permite publicar.** |
+| `confirmed` | `human-confirmed` / `approved-guideline` | **Sí** | **Sí** | Las reglas quedan `reviewed`. **Es lo único que puede estar en lo público.** |
+| `confirmed` | `deterministic-extraction` | Sólo si pasa R1 (restricción con `reviewedAt` que no alimenta variables) | Según R1 | Si alimenta una variable: **import rechazado** (R1). |
 | `confirmed` | otra | — | — | **Import rechazado** (R1). |
-| `proposed` | cualquiera | Sólo si el import trae `emitirPropuestas: true` (por defecto **false** en producción) | Sí, **marcada**: la regla queda `status: proposed`, el sobre `reviewState: session` | `cod_publish_canvas_page` se rechaza con `ADN_PUBLISH_BLOCKED_PROPOSED` listando las definiciones. |
+| `proposed` | cualquiera | Sólo si el import trae `emitirPropuestas: true` (por defecto **false** en producción) | Sí, **marcada** y **sólo en un documento de ensayo** (abajo) | La regla queda `status: proposed`, el sobre `reviewState: session`. En un documento que no es de ensayo: `ADN_PROPOSED_ON_PUBLIC` listando las definiciones. |
 | `observed` | — | **Nunca** | No | Evidencia. Aparece en `cod_adn_audit` y en el informe de ajuste del transcriptor. |
 | `rejected` | — | **Nunca** | `ADN_VAR_REJECTED` (nombra la definición y la revisión) | Evita que una variable quitada reaparezca por costumbre. |
+
+**Estado efectivo.** Lo que cuenta es el estado efectivo de R6 (el mínimo con sus dependencias), no el declarado: un rol
+`confirmed` que apunta a una paleta `proposed` se trata como `proposed`.
+
+**Dónde se rechaza una propuesta: en la escritura, no en «publicar» (H1).** La versión anterior de esta espec rechazaba
+`cod_publish_canvas_page`. Eso no protege nada, por tres hechos verificados (2.3): (1) `apply_canvas_composition`
+guarda sobre las mismas meta que lee `render_shortcode`, sin revisión publicada separada; (2) las regiones se resuelven
+en vivo; (3) publicar una página ya pública devuelve `alreadyPublished` sin revisar, y la hoja compartida junta
+documentos de páginas en cualquier `post_status`. La regla es otra:
+
+- En `enforce` (en `ratchet` rechaza lo nuevo; en `observe` informa; en `off` nada), `preview`, `apply`,
+  `cod_patch_css`, `cod_patch_html`, `cod_write_canvas_document`, `cod_grapes_edit_node` y
+  `cod_activate_section_whatsapp` **rechazan toda referencia a una definición con estado efectivo `proposed`**
+  (`ADN_PROPOSED_ON_PUBLIC`) cuando el documento objetivo:
+  1. está **publicado**; o
+  2. es una **región** (encabezado, pie, cuerpo) o el documento de estilos compartidos (`pageId 0`); o
+  3. **aporta a una hoja compartida**: su composición usa el `designId` del ADN activo. Es la razón del tercer caso:
+     `COD_Diseno_Hoja::regenerar` incluye todo documento con ese `designId` aunque su página sea un borrador
+     (`class-cod-diseno-hoja.php:193-197`).
+- **Documento de ensayo:** una composición con `designId` = `<designId>-ensayo` (por ejemplo `basis-web-ensayo`) tiene
+  su **hoja propia**, que ninguna página pública carga; el compilador resuelve el registro del ADN base. Es el
+  **único lugar donde puede vivir una propuesta**. Para pasar a producción se confirma la definición (revisión nueva
+  del ADN) y se recompone con el `designId` real. La convención del sufijo es una decisión de esta espec [D] y se
+  somete a la próxima auditoría.
+- `cod_publish_canvas_page` sobre un documento con referencias `proposed` se rechaza con el mismo código: queda como
+  **segunda barrera**, no como la primera.
+- Si un import posterior **degrada** una definición en uso a `proposed`, el import se rechaza (`rompe[]`, 3.6): lo
+  público no puede quedar apoyado en una propuesta.
+- La edición humana en wp-admin no pasa por la compuerta; `cod_adn_audit` lista «propuestas en lo público».
+- **Alternativa descartada por ahora:** una «revisión publicada» separada de la de trabajo (el visitante vería siempre la
+  última publicada y las escrituras serían un borrador). Es más grande, no hace falta para cerrar el hueco y se puede
+  agregar después sin deshacer lo anterior.
 
 **Conflicto en una misma clase** (dos definiciones compiten por un mismo rol): gana la de mayor autoridad
 (`human-confirmed > approved-guideline > deterministic-extraction > model-proposal`); empate → `ADN_SLOT_CONFLICT`
@@ -259,14 +449,19 @@ con ambas, sin elegir. Se aplica el orden del skill, sin excepciones.
 ### 3.6 Derivación: una sola fuente
 
 ```
-ADN activo (CPT cod_adn, puntero cod_adn_activa)
+ADN activo (CPT cod_adn, un post por revisión)
         │
         ▼
-COD_ADN_Projection::build()  ──►  registro (variable → definición)          ◄── consulta la compuerta
+COD_ADN_Projection::build()  ──►  cod_adn_proj_r<N>  (registro, theme.json, valores planos; se escribe SIN que nadie lo lea)
+                                         │
+                       puntero cod_adn_activa  ◄── ÚNICA escritura que cambia lo visible
+                                         │
+        ┌────────────────────────────────┴───────────────────────────────────────────┐
+        ├─► registro (variable → definición)  ◄── consulta la compuerta
         ├─► theme.json (fragmento v3) ──► filtro wp_theme_json_data_theme ──► WordPress imprime --wp--preset--*
-        │                          └─► cod_adn_export(theme-json) ──► se commitea en el tema (respaldo si se apaga el plugin)
-        ├─► :root{--cod-color-accent: var(--wp--preset--color--…); …}  (alias de COD_Design_Core)
-        ├─► cod_theme_definitions (opción) ──► emisores existentes y pantalla de Configuración (sólo lectura)
+        │                          └─► cod_adn_export(theme-json) ──► se commitea y se sube con el tema (respaldo si se apaga el plugin)
+        ├─► :root{--cod-color-accent: var(--wp--preset--color--…); …}  (alias de COD_Design_Core, sólo con el plugin activo)
+        ├─► cod_theme_definitions (opción) = proyección derivada, leída por el puntero
         └─► informe: ignoradas[], roles del núcleo sin definición
 ```
 
@@ -274,15 +469,20 @@ COD_ADN_Projection::build()  ──►  registro (variable → definición)     
 
 | Destino | Hoy | Con ADN activo |
 |---|---|---|
-| `theme.json` (paleta, familias, tamaños, espacios) | a mano en el tema | **generado** desde `theme.base.json` (estructura sin valores de diseño) + proyección; lleva `settings.custom.adn = {designId, revision, digest}` |
-| `cod_theme_definitions` | a mano / `definiciones-del-set.php` | **sobreescrito** por la proyección en cada import; la pantalla muestra los campos gobernados en sólo lectura ("Gobernado por ADN `basis-web` r3") y `COD_Theme_Definitions` rechaza editarlos |
+| `theme.json` (paleta, familias, tamaños, espacios) | a mano en el tema | **generado** desde `theme.base.json` (estructura sin valores de diseño) + proyección; lleva `settings.custom.adn = {designId, revision, digest}`. **Se regenera con cada revisión activada del ADN**: uno viejo no es respaldo |
+| `cod_theme_definitions` | a mano / `definiciones-del-set.php` | **proyección derivada**, leída a través del puntero `cod_adn_activa` (no se sobreescribe en vivo); la pantalla muestra los campos gobernados en sólo lectura («Gobernado por ADN `basis-web` r3») y **toda escritura directa distinta de la proyección falla** (P2.4) |
 | `COD_Design_Core::estado()` | definiciones > `theme.json` | **sólo ADN** (origen `adn`). No consulta el `theme.json` como segunda fuente: un `theme.json` viejo no puede volver a taparle un hueco al ADN (el defecto del issue #9) |
 | `--cod-color-accent`, `--cod-font-*`, `--cod-motion-*` | `:root` desde definiciones | **alias** de variables del registro; mismos nombres, así nada del sitio se rompe |
+| Hojas del tema (`contope-basis/style.css`, `cookies.css`) | consumen `--cod-color-*` / `--cod-font-*`, que sólo define el plugin (anulan a `theme.json` si el plugin se apaga) | **consumen directamente `--wp--preset--*` / `--wp--custom--*`**; si hace falta un alias, lo declara el propio tema en su `theme.json` generado, no el plugin. Las variables propias del tema se llaman `--basis-*` (no `--cod-*`, prefijo reservado: 4.1). Se mide: `grep -c "var(--cod-" contope-basis/*.css` = 0 (hoy 12 líneas; P2.6) |
 
-**Respaldo si el plugin se apaga.** El `theme.json` del tema es un artefacto generado (`cod_adn_export`) y se
+**Respaldo si el plugin se apaga (H11).** El `theme.json` del tema es un artefacto generado (`cod_adn_export`) y se
 commitea; el filtro en tiempo de ejecución es un *no-op* cuando el `digest` del archivo coincide con el del ADN, y
 superpone sólo cuando el ADN va por delante (`cod_adn_get.proyeccion.themeJson`: `sincronizado` | `adelantado` |
-`ausente`). No son dos autoridades: el archivo es una salida del ADN con sello.
+`ausente`; en `adelantado` wp-admin avisa que el respaldo está viejo). No son dos autoridades: el archivo es una salida
+del ADN con sello. **Pero el respaldo sólo existe si las hojas del tema lo usan**: hoy `style.css` y `cookies.css`
+leen `--cod-*`, que sólo define el plugin, y con la misma especificidad **anulan** el fondo, el texto y la fuente de
+`theme.json`. Por eso las hojas del tema consumen `--wp--preset--*` / `--wp--custom--*` directamente (tabla de arriba)
+y la subida a producción sube el `theme.json` regenerado con **cada** revisión activada del ADN (7.2).
 
 **Familias de variables** (nombres deterministas: *slug* de `name`, con `_` y acentos normalizados):
 
@@ -297,9 +497,9 @@ superpone sólo cuando el ADN va por delante (`cod_adn_get.proyeccion.themeJson`
 | espacio por rol | `--wp--custom--spacing--{intra,inter,entre-secciones}` | `settings.custom`, `styles.spacing.blockGap` | `dim3.req02` |
 | ancho de caja | `--wp--style--global--content-size` / `wide-size` | `settings.layout` | requisito de contenedores de `dim3` (por identificar en fase 2) |
 | radio | `--wp--custom--radius--<rol>` | `settings.custom.radius` | `dim4.req02` (`radioValor`) |
-| sombra | `--wp--preset--shadow--<slug>` | `settings.shadow.presets` | `dim4.req04` (por leer) |
+| sombra | `--wp--preset--shadow--<slug>` | `settings.shadow.presets` | **sin origen hoy — bloqueada por Q3.** El Core no tiene escala de sombras tipada: `dim4.req04` es profundidad (rol/nivel/stacking/oclusión) y `dim4.req05` es política de efectos (2.1) |
 | movimiento | `--wp--custom--motion--<nombre>`; `--cod-motion-enter/response` como alias | `settings.custom.motion` | `dim8.req03` + roles de `dim8.req02` (por leer) |
-| variante de bloque | clase `is-style-<slug>` | `styles.blocks.<bloque>.variations` | `dim9.req03` |
+| variante de bloque | clase `is-style-<slug>` | `styles.blocks.<bloque>.variations` | `dim9.req03` — **bloqueada por Q3** mientras `diferencia` sea texto (2.1) |
 
 **Dos hallazgos de nombres, que se resuelven con una tabla fija y no con otro vocabulario:**
 (1) el plugin llama `surface` al **fondo de la página** (`--cod-color-surface = color_bg`), el Core llama
@@ -308,10 +508,27 @@ documenta la tabla. (2) El Core tiene correspondencia explícita con el almacén
 (`dim2.req07`) pero **no** para color; hasta que el Core agregue su equivalente (pedido a registrar), la tabla de
 color vive en `COD_ADN_Projection::MAPA_PLANO_COLOR` y se prueba contra Basis.
 
-**Integridad referencial al importar.** Antes de mover el puntero se recorren las composiciones guardadas
-(`META_COMPOSITION`) y se listan las variables que usan; si la revisión nueva **quita o renombra** una que está en
-uso, el import se rechaza con la lista `{variable, documentId, ruleId}`. Un *slug* cambia cuando cambia el `name`:
-por eso el diff separa "renombradas" de "quitadas".
+**Integridad referencial al importar (H4).** Antes de mover el puntero se recorre **lo efectivamente servido**, no el
+registro de composiciones: `repository->save()` **vacía** `META_COMPOSITION` en cada guardado
+(`class-cod-canvas-document-repository.php:413-417`) y lo llaman todos los parches MCP, el editor, el publicador y el
+importador, así que una variable podía estar en uso y no figurar en el inventario. Se recorren:
+
+1. el CSS guardado y los `style=""` de **todos** los documentos y regiones (sin depender de `META_COMPOSITION`);
+2. los `styles` de `projectData`;
+3. los `attrs` y las clases `is-style-*` de los bloques en `post_content` de **todas** las páginas y estados
+   (`publish`, `draft`, `pending`, `private`, `future`);
+4. las partes del tema (`parts/*.html`, plantillas);
+5. las hojas generadas (`cod_disenos_hojas`).
+
+Si la revisión nueva **quita, renombra o degrada a propuesta/rechazada** una variable que está en uso en cualquiera de
+esos cinco lugares, el import se rechaza con la lista `{variable, origen, documentId|archivo, regla|ruta}`. Un *slug*
+cambia cuando cambia el `name`: por eso el diff separa «renombradas» de «quitadas».
+
+**Defecto existente que se arregla aparte (independiente de la compuerta):** `COD_Diseno_Hoja::regenerar` sólo incluye
+documentos que tienen composición (`class-cod-diseno-hoja.php:103-106`); un documento parchado con `cod_patch_css`
+(que vacía la composición) **deja de aportar reglas a la hoja** y la página pierde estilos sin ningún error. El
+`designId` del documento se guarda en un meta propio (`_cod_canvas_design_id`, nombre propuesto) que `save()` no borra,
+y `regenerar` filtra por él (P3.3).
 
 ### 3.7 Seguridad
 
@@ -339,9 +556,10 @@ la leen la compuerta y `cod_get_capabilities`: quien construya ve qué campos es
 | `espaciado` | `padding-*`, `margin-*`, `gap`, `row-gap`, `column-gap`, `scroll-margin-*`, `inset*` de separación | `spacing.*`, `layout.gap/minColumnWidth`, `gallery.gap`, `icono.tamano/separacion`, medidas de `form.theme` | `var(--wp--preset--spacing--…)`, `var(--wp--custom--spacing--…)`, `0`, `auto`; negativos como `calc(-1 * var(--…))` | `dim3.req01/02` |
 | `radio` | `border-*-radius` | `shape.radius`, `form.theme` (radios) | `var(--wp--custom--radius--…)`, `0`; `pill`/`circle` resuelven por el ADN | `dim4.req02` |
 | `borde-grosor` | `border-*-width`, `outline-width` | `shape.borderWidth`, `surface.borderWidth` | `var(--wp--custom--border--…)`, `0` | `dim4.req03` (por leer) |
-| `sombra` | `box-shadow`, `text-shadow`, `filter: drop-shadow()` | `surface.shadow` (`sm/md/lg`) | `var(--wp--preset--shadow--…)`, `none` | `dim4.req04` (por leer) |
+| `sombra` | `box-shadow`, `text-shadow`, `filter: drop-shadow()` | `surface.shadow` (`sm/md/lg`) | `var(--wp--preset--shadow--…)`, `none` | **ninguno hoy — bloqueada por Q3** (2.1). Hasta entonces: `ADN_NAME_UNRESOLVED` / `ADN_NO_DEFINITION`; no se inventa un valor |
 | `movimiento` | `transition-*`, `animation-*` (duración, curva, retraso) | `motion.{duration,delay,easing}` | `var(--wp--custom--motion--…)`, `0s` | `dim8.req02/03` |
 | `ancho-de-caja` | `max-width` con unidad **absoluta** | `layout.maxWidth` | `var(--wp--style--global--content-size/wide-size)`, `none`, `100%`, `fit-content` | contenedores de `dim3` (por identificar) |
+| `declaracion-de-variable` | cualquier propiedad personalizada `--*` (en regla, `@media`, selector o `style=""`) | declaraciones de `properties`, `cod_patch_css`, `cod_write_canvas_document`, `style` de `cod_grapes_edit_node` y de WhatsApp | **sólo** variables locales no reservadas; las reservadas se rechazan (`ADN_VAR_RESERVED`) | el registro de la proyección |
 
 **Fuera de alcance, y por qué** (no es olvido; queda medido en `cod_adn_audit` bajo `sinRequisito`, para que el Core
 los incorpore si corresponde):
@@ -353,6 +571,38 @@ los incorpore si corresponde):
 | `url()`, rutas de medios | Son activos, no valores. Los resuelve `cod_resolve_canvas_assets`. |
 | Cromo del motor (`lightbox` rgba(0,0,0,.86), placeholder de video pendiente, logo de WhatsApp de terceros) | No es el diseño del sitio. Se inventaría y se mueve a variables del motor en la fase 4b; mientras, el audit del plugin lo lista. |
 | Edición humana en el editor Canvas / Gutenberg del wp-admin | La regla del dueño es sobre el **MCP**. La edición humana no se bloquea; `cod_adn_audit` la mide. Revisable. |
+
+**Variables: reservadas y locales (H2).** `normalize_properties_rule` acepta cualquier `--[a-z0-9-]+` con valor libre
+(`class-cod-canvas-mcp-recipe-compiler.php:3073-3121`), y lo mismo hacen `cod_patch_css` y `cod_write_canvas_document`:
+una regla que redefine `--wp--preset--color--accent` cambia el color de todo el sitio sin que ninguna clase por *nombre
+de propiedad* lo vea. Por eso hay una clase propia:
+
+- **Nombres reservados**: los del registro y los prefijos `--wp--preset--`, `--wp--custom--`, `--wp--style--` y
+  `--cod-*`. **Sólo los escribe la proyección del ADN.** Declararlos por cualquier camino, en cualquier ámbito
+  (regla, `@media`, selector, `style=""`), es `ADN_VAR_RESERVED`. (El motor del plugin emite sus propias `--cod-*`
+  —`--cod-icono-*`, `--cod-divisor-*`, `--cod-motion-delay`— desde campos semánticos validados; eso es salida del motor,
+  no entrada, y queda fuera de la compuerta.)
+- Una `--*` **local** (no reservada) **hereda la clase de su valor**: `--x: #123456` es un literal de color y es
+  violación; `--x: 8px` usada en `padding` es violación de espaciado.
+- Una variable local usada en `var()` debe estar en el registro **o declararse en la misma regla**.
+- Se inspeccionan también los **fallbacks**: `var(--a, #123)` lleva un literal de color dentro.
+- **Aceptación de fondo:** no basta con que el nombre exista; lo que se comprueba es el **valor calculado en el
+  navegador** (`getComputedStyle`) de las variables gobernadas y de `body`, que debe ser igual al del ADN (P4.9).
+
+**Qué se inspecciona (H3).** El delta de literales se calcula sobre **todo lo que se sirve**, no sólo sobre el CSS:
+
+| Superficie | Cómo entra | Clase que se aplica |
+|---|---|---|
+| CSS del documento | `cod_patch_css`, `cod_write_canvas_document`, compilador | por propiedad (tabla de arriba) |
+| `style=""` en el HTML | `cod_patch_html`, `grapes_edit_node` (`mutation.style`, `mutation.attributes["style"]`), WhatsApp | por propiedad |
+| **Atributos de presentación SVG** | `fill`, `stroke`, `stop-color`; en `text`/`tspan`: `font-family`, `font-size`, `font-weight`, `letter-spacing` (lista blanca de `class-cod-canvas-document-sanitizer.php:545-560`) | `fill`/`stroke`/`stop-color` → `color`; `font-family` → `familia`; `font-size` → `tamano`; `font-weight`/`letter-spacing` → `tipografia-fina` |
+| **`styles` de `projectData`** | `cod_write_canvas_document` guarda `projectData`, HTML y CSS por separado (`class-cod-canvas-mcp-service.php:1296-1320`); `sanitize_project_data` no mira estilos; el editor carga `projectData` como **fuente del CSS** (`assets/js/cod-editor-core.js:1645-1664`) | por propiedad, como el CSS |
+
+Dos reglas más: (1) en `cod_write_canvas_document` **el CSS derivado de `projectData` debe coincidir con el CSS
+enviado**; si no, rechazo (`ADN_PROJECT_DATA_MISMATCH`): así un literal escondido en `projectData` no reaparece al
+guardar desde el editor. (2) La excepción de **edición humana** en el editor **no blanquea** valores que entró antes el
+MCP: se marca el **origen** de cada literal por documento (`heredado` | `mcp` | `editor`, meta `_cod_adn_origen`, nombre propuesto) y un
+guardado del editor no cambia el origen de los que ya estaban; `cod_adn_audit` los reporta por origen.
 
 ### 4.2 Cómo se referencia una definición
 
@@ -377,14 +627,21 @@ el registro** y `calc(-1 * var(--x))` para los campos que admiten negativos.
 ### 4.3 Dónde se engancha (un solo punto por camino, no cheques sueltos)
 
 Nueva clase **`COD_ADN_Gate`** con tres operaciones: `clasificar(propiedad|campo)`, `revisar(valor, clase)` y
-`barrer(reglas)` / `delta(antes, despues)`.
+`barrer(reglas)` / `delta(antes, despues)`. Cada camino pasa por **cuatro comprobaciones**, en este orden: (1) literales
+de las nueve clases (+ancho de caja) sobre todo lo que se sirve (4.1); (2) variables reservadas (`ADN_VAR_RESERVED`);
+(3) variables desconocidas o rechazadas; (4) referencias a definiciones con estado efectivo `proposed` en un documento
+que no es de ensayo (`ADN_PROPOSED_ON_PUBLIC`, 3.5).
 
 | Camino | Enganche |
 |---|---|
 | `cod_preview_canvas_composition` y `cod_apply_canvas_composition` | en `COD_Canvas_MCP_Recipe_Compiler::compile()`, **después de `normalize_design()`** y antes de renderizar. Preview y apply pasan por el mismo `compile()`, así que no se pueden desalinear. |
-| `cod_patch_css`, `cod_patch_html`, `cod_write_canvas_document`, `cod_grapes_edit_node` (`mutation.style`, `mutation.attributes["style"]`), `cod_activate_section_whatsapp(style)` | antes de `repository->save()`: `delta(documentoActual, documentoNuevo)` — se extraen las declaraciones del CSS y de los `style=""`; **cada literal de una clase gobernada que no estaba antes** es violación. Un `replace` que cambia un `var()` del registro por `#F26621` se rechaza. |
-| Valores nombrados del motor (`shadow: md`, `button.size`, `tone`) | se resuelven **por el ADN sin valor de respaldo** (fase 4b): si el ADN no declara la sombra `md`, el nombre falla con `ADN_NAME_UNRESOLVED` en vez de pintar `rgba(0,0,0,.16)`. |
+| `cod_patch_css`, `cod_patch_html`, `cod_write_canvas_document`, `cod_grapes_edit_node` (`mutation.style`, `mutation.attributes["style"]`), `cod_activate_section_whatsapp(style)` | antes de `repository->save()`: `delta(documentoActual, documentoNuevo)` sobre **CSS + `style=""` + atributos de presentación SVG + `styles` de `projectData`**; **cada literal de una clase gobernada que no estaba antes** es violación. Un `replace` que cambia un `var()` del registro por `#F26621` se rechaza. `cod_write_canvas_document` además exige que el CSS derivado de `projectData` coincida con el CSS enviado. |
+| Valores nombrados del motor (`shadow: md`, `button.size`, `tone`) | se resuelven **por el ADN sin valor de respaldo** (F4b): si el ADN no declara la sombra `md`, el nombre falla con `ADN_NAME_UNRESOLVED` en vez de pintar `rgba(0,0,0,.16)`. **Bloqueado por Q3 en lo que toca a sombras.** |
 | Contenido en bloques (6.4) | `COD_Block_Content::compile()`: los `attrs` de cada bloque pasan por el mismo `COD_ADN_Gate` (`style.color.*`, `style.typography.*`, `style.spacing.*`, `style.border.*`, `style.shadow`). |
+
+**Por qué todo va en la escritura y no en un paso posterior.** Lo que se aplica ya es lo que se sirve (2.3): no hay una
+revisión «publicada» separada que proteger después. Por eso los cuatro chequeos corren en `preview`, `apply` y en cada
+parche, antes de guardar.
 
 ### 4.4 Mensajes de error (qué dicen y qué sugieren)
 
@@ -403,11 +660,26 @@ Ejemplo (color exacto):
 Ejemplo (sin con qué reemplazar):
 
 > `ADN_NO_DEFINITION` — `box-shadow: 0 8px 24px rgba(0,0,0,.16)`. El ADN `basis-web` r3 no declara escala de
-> sombras (`dim4.req04`), así que no hay variable que referenciar. Declara la profundidad en el ADN y reimporta.
+> sombras, así que no hay variable que referenciar. (Hoy el Core no puede expresarla: es la pregunta Q3. Mientras
+> tanto la sombra queda como hueco declarado; no se inventa un valor.)
 
-Códigos (anexo B): `ADN_LITERAL_{COLOR,FONT,SIZE,FINE,SPACING,RADIUS,BORDER,SHADOW,MOTION,MEASURE}`,
-`ADN_VAR_UNKNOWN`, `ADN_VAR_REJECTED`, `ADN_NO_DEFINITION`, `ADN_NAME_UNRESOLVED`, `ADN_REVISION_STALE`,
-`ADN_MISSING`, `ADN_PUBLISH_BLOCKED_PROPOSED`, y los de import.
+Ejemplo (variable reservada):
+
+> `ADN_VAR_RESERVED` — `design.rules[bas-p-7].value.declarations["--wp--preset--color--accent"]` = `#000`. Los nombres
+> `--wp--preset--*`, `--wp--custom--*`, `--wp--style--*`, `--cod-*` y los del registro los escribe sólo la proyección
+> del ADN `basis-web` r3; no se redefinen desde una regla. Si necesitas otro color, el camino es una revisión del ADN.
+
+Ejemplo (propuesta en lo público):
+
+> `ADN_PROPOSED_ON_PUBLIC` — la regla `bas-c-4` referencia `var(--wp--preset--color--naranja-2)`, de la definición
+> `dim1.req01.def1 › institucionales[3]` (estado efectivo `proposed`: depende de la paleta propuesta). El documento
+> destino `pagina-inicio` está publicado. Las propuestas sólo viven en un documento de ensayo
+> (`designId` `basis-web-ensayo`); para publicarla, confirma la definición en una revisión nueva del ADN.
+
+Códigos (Anexo B): `ADN_LITERAL_{COLOR,FONT,SIZE,FINE,SPACING,RADIUS,BORDER,SHADOW,MOTION,MEASURE}`,
+`ADN_VAR_UNKNOWN`, `ADN_VAR_REJECTED`, `ADN_VAR_RESERVED`, `ADN_PROJECT_DATA_MISMATCH`, `ADN_NO_DEFINITION`,
+`ADN_NAME_UNRESOLVED`, `ADN_REF_UNRESOLVED`, `ADN_REF_STATE`, `ADN_REF_AMBIGUOUS`, `ADN_PROPOSED_ON_PUBLIC`,
+`ADN_REVISION_STALE`, `ADN_MISSING`, `ADN_BUSY`, y los de import.
 
 ### 4.5 Los cuatro modos
 
@@ -419,6 +691,11 @@ Códigos (anexo B): `ADN_LITERAL_{COLOR,FONT,SIZE,FINE,SPACING,RADIUS,BORDER,SHA
 | `enforce` | rechaza **todo** literal de las clases gobernadas en la operación | Estado objetivo. Para entrar: `cod_adn_audit.total === 0` (o lo aceptado explícitamente por el dueño y registrado). |
 
 Se guarda en `cod_adn_activa.modo`. Primer import exitoso: `off → observe`. `cod_adn_set_mode` sólo endurece.
+
+Cómo se aplican las clases nuevas en cada modo: en `observe` las variables reservadas y las propuestas en lo público se
+**informan**; en `ratchet` se rechazan las **nuevas** (las existentes son heredadas y se cuentan); en `enforce` se
+rechaza todo. Antes de subir de modo, `cod_adn_audit` lista las declaraciones de variables reservadas que ya tiene el
+sitio (incluidas `--cod-*` propias de su CSS): ésa es la deuda a saldar, no una sorpresa de `enforce`.
 
 ### 4.6 Sitios ya hechos (Santa Luisa, Econut)
 
@@ -461,10 +738,15 @@ Opcionales: `--formato portable` (sólo con Core presente: lo emitiría Desktop,
 - `sources[]`: `src-medicion-<designId>-<fecha>` (`purpose: observation`, `technicalKind: site-measurement`,
   `locator` = origen, `path` = carpeta de medición); `src-tema-json` si se usó. `importedAt` = fecha de la
   medición (no del reloj: el resultado es determinista).
-- `definitions[]`: ids `<requirementId>.defN` (la misma forma que escribe Desktop, así Desktop puede revertirla a
-  `DesignSetEntryV0`), `state: proposed`, `authority: deterministic-extraction`, `evidenceSourceIds` no vacío,
-  `provenance[]` con `locator` (`inicio › contenido:h2`) y `excerpt` (el valor medido tal cual, p. ej.
-  `rgb(242, 102, 33) · 19 caracteres`).
+- `definitions[]`: **una sola definición efectiva por requisito**, con id `<requirementId>.def1` (la misma forma que
+  escribe Desktop, así Desktop puede revertirla a `DesignSetEntryV0`), `state: proposed`,
+  `authority: deterministic-extraction`, `evidenceSourceIds` no vacío, `provenance[]` con `locator` (`inicio ›
+  contenido:h2`) y `excerpt` (el valor medido tal cual, p. ej. `rgb(242, 102, 33) · 19 caracteres`). Por qué una sola:
+  `persistence.ts:91-93` rechaza dos entradas con el mismo `requirementId`, y R6 declara ambigua una referencia a un
+  requisito con varias definiciones (3.2). Las **alternativas** (otro agrupamiento posible) y las **observaciones**
+  (`obs.*`) se emiten **aparte**, como definiciones `observed` con prefijo propio (`alt.<requirementId>.<n>`,
+  `obs.<nombre>`) que **no coinciden** con el patrón de entradas del set (5.4) y que nunca se emiten. El prefijo es una
+  convención de esta espec, a fijar con el Core en F6.
 - Todo lo que no tenga evidencia **no se declara**: se lista en el informe como `rolesSinEvidencia`. Sin
   `developmentTasks` (el skill: un aspecto abierto no se convierte en tarea por inferencia).
 
@@ -507,15 +789,25 @@ Algoritmo determinista, sin modelo:
 
 El extractor jamás emite `confirmed`. Para pasar de `proposed` a `confirmed` hace falta una persona. Dos vías:
 
-- **Vía A (la correcta): Desktop.** Fase 6: "Abrir ADN" en `packages/desktop` — lee `design-contract.json` (o
-  `design/model.json`), arma un `Sistema` con `capsulaAnterior` = el contrato (para que continúe el linaje:
-  mismo `design.id`, `revision + 1`), y por cada definición con id `^(dim\d+\.req\d+)\.def\d+$` crea una
-  `DesignSetEntryV0` (`requirementId`, `effectiveDefinitionId`, `payload = value`, `resolutionPath: 'insumo'`,
-  `cicloDeVida: 'propuesta'`, `provenance.fuente: 'referente'`) y reconstruye `insumos[]` desde `sources[]`. La
-  persona ve los candidatos con **muestra visual** (color, especimen), confirma o corrige, y Desktop exporta con
-  `proyectarCapsula` el contrato en `revision + 1`. Trabajo estimado: una función de dominio con pruebas
-  (`dominio/importar-adn.ts`) y un botón en `Inicio`. Es lo que cumple "la fuente del ADN es otra, pero el ADN
-  sigue siéndolo".
+- **Vía A (la correcta): Desktop.** Fase 6, **trabajo del Core** (`packages/desktop` y `packages/core`), no «un botón y
+  una función» (H8). Desktop lee `design-contract.json` (o `design/model.json`), arma un `Sistema` con
+  `capsulaAnterior` = el contrato (para que continúe el linaje: mismo `design.id`, `revision + 1`), y por cada
+  definición con id `^(dim\d+\.req\d+)\.def\d+$` crea una `DesignSetEntryV0` (`requirementId`, `effectiveDefinitionId`,
+  `payload = value`, `resolutionPath: 'insumo'`, `cicloDeVida: 'propuesta'`, `provenance.fuente: 'referente'`) y
+  reconstruye `insumos[]` desde `sources[]`. La persona ve los candidatos con **muestra visual** (color, especimen),
+  confirma o corrige, y Desktop exporta con `proyectarCapsula` el contrato en `revision + 1`. Es lo que cumple «la
+  fuente del ADN es otra, pero el ADN sigue siéndolo». Para que sea cierto hay que arreglar la **vuelta**, que hoy
+  pierde información (2.2):
+  - la **importación conserva** procedencia original (`locator`, `excerpt`), `purpose` de cada fuente,
+    `constraintDefinitionIds`, el estado `proposed` (hoy una propuesta con `resolutionPath: 'insumo'` vuelve como
+    `fact` → `deterministic-extraction`/`observed`, `capsula.ts:92-96`, `design-contract.ts:351,375-381`) y las
+    definiciones `alt.*` y `obs.*`, que hoy no entran al patrón y desaparecen;
+  - la **exportación las reemite** tal cual (hoy `capsula.ts:98,109` rehace la procedencia, `:163` marca toda fuente
+    `observation` y `design-contract.ts:493` fija `constraintDefinitionIds: []`);
+  - la **fusión aplica sólo lo que la persona cambió**; el resto se copia intacto;
+  - ningún requisito entra dos veces al set (`persistence.ts:91-93`): por eso el extractor emite una sola definición
+    efectiva por requisito (5.2).
+  Se estima como una fase propia del Core, con sus pruebas (F6) y su propia auditoría.
 - **Vía B (provisoria, sólo mientras A no exista): hoja de revisión + sello.** El extractor genera una hoja HTML
   de revisión con **muestras** (swatches, especímenes, escalones dibujados — nada de listas de hex, que el dueño
   rechazó: «no voy a poner un color que es un código, necesito mostrarlo»). Cuando el dueño lo dice en el chat, un
@@ -562,6 +854,12 @@ roles, radios y variantes; la parte web es una proyección más.
 5. **Si una declaración no tiene atributo nativo ni variación**, el compilador falla con `ADN_NO_VARIATION` y dice
    qué variante falta. No se cae a CSS en línea.
 
+   **Hoy el punto 4(b) está bloqueado (Q3).** Una variación de estilo con datos (relleno, radio, sombra, familia de un
+   botón) necesita que el ADN diga `propiedad → valor|ref` por variante. En `dim9.req03` la `diferencia` es **texto**
+   y `arquetipo` es una lista abstracta (`manifest-v0-dim9.ts:345`; 2.1), así que el Core no puede expresarla. Mientras
+   Q3 siga abierta una variación pedida da `ADN_NAME_UNRESOLVED` (o `ADN_NO_VARIATION`): nunca se interpreta prosa ni
+   se inventa el valor en el adaptador.
+
 ### 6.2 Mapa nodo / módulo → bloque (las 5 páginas y las 2 regiones de Basis)
 
 Conteos de nodos tomados de `scripts/basis/salida/*.componer.json`.
@@ -595,6 +893,12 @@ Conteos de nodos tomados de `scripts/basis/salida/*.componer.json`.
 Ya existen y **no se usan** en Basis: `contope/lienzo`, `contope/cuadrantes` + `contope/cuadrante`. Existe y **se
 deprecia** (no se borra): `ocd/heading` — su propio archivo lo llama POC y duplica `core/heading`.
 
+**Qué filas dependen de Q3.** Toda fila de la tabla cuyo «Dónde vive la forma» diga *variación* (`core/group`
+`is-style-seccion-*`, `core/cover`, `core/button`, `core/image` `is-style-foto-linea`, `core/separator`,
+`core/accordion`, el `divisor`) necesita variantes **con datos** en el ADN y queda **bloqueada por Q3**. Lo que no
+depende de Q3 y puede avanzar: los presets por *slug* (`backgroundColor`, `textColor`, `fontSize`, `style.spacing.*`),
+los estilos globales de `theme.json` (`styles.elements`, `styles.blocks`) y la geometría nativa.
+
 ### 6.3 Qué queda en `post_content` y qué se ve sin el plugin
 
 ```
@@ -605,11 +909,30 @@ deprecia** (no se borra): `ocd/heading` — su propio archivo lo llama POC y dup
 <!-- /wp:contope/lienzo -->
 ```
 
-| Situación | Resultado esperado (se mide en fase 8) |
+| Situación | Resultado esperado (se mide en F8 y F11) |
 |---|---|
 | Plugin activo | Igual a hoy: ADN → `theme.json` + hoja → regiones + módulos. |
-| **Plugin desactivado** | Los bloques core se dibujan; los presets y las variaciones **siguen estilados** porque viven en el `theme.json` generado y commiteado del tema. Se pierden: regiones del lienzo (hasta la fase 11), mapa, formulario y WhatsApp flotante. **Textos e imágenes, en orden y legibles.** Por verificar: que WordPress dibuje los hijos de un `wp:contope/lienzo` no registrado (hipótesis con prueba P8.2; si falla, se elimina el envoltorio antes). |
+| **Plugin desactivado** | Los bloques core se dibujan; los presets **siguen estilados** porque viven en el `theme.json` generado y commiteado del tema **y las hojas del tema leen directamente `--wp--*`** (3.6, H11); las variaciones también, cuando Q3 permita declararlas. Se pierden: regiones del lienzo (hasta F11), mapa, formulario y WhatsApp flotante. **Textos e imágenes, en orden y legibles; estilos calculados de `body` y de los títulos iguales a los del ADN.** Por verificar: que WordPress dibuje los hijos de un `wp:contope/lienzo` no registrado (hipótesis con prueba P8.2; si falla, se elimina el envoltorio antes). |
 | **Cambio de tema** a uno de bloques estándar | Textos, imágenes, listas, tablas y pliegues se conservan y se ordenan. La apariencia depende del `theme.json` del tema nuevo. No se pide fidelidad visual. |
+
+**Qué plantilla elige WordPress, y qué decía mal la versión anterior (H10).** La versión anterior sostenía que el plugin
+elige la plantilla «sólo si hay shortcode». Es falso: `standalone_template()` mira el **metadato**
+`_cod_canvas_document_id` (`class-cod-canvas-page-publisher.php:1916-1927`) y devuelve `templates/canvas-document.php`,
+que imprime sólo `the_content()` (`templates/canvas-document.php:12-19`). «Sólo si hay shortcode» fue una propuesta de
+agosto (`wp-local/PLAN-gutenberg-migracion-fases.md:78,249`) que **nunca se construyó**. Lo que sí es cierto:
+
+- Mientras el contenido vaya **dentro de `wp:contope/lienzo`**, el `render.php` de ese bloque
+  (`blocks/cod-lienzo/render.php`) llama a `salida_con_regiones()` y la página **conserva encabezado y pie**. Migrar el
+  contenido a bloques (F9, F10) no los pierde.
+- El fallo aparece (a) al **quitar el envoltorio con el metadato puesto** (la plantilla Canvas imprime el
+  `the_content()` pelado) y (b) al **pasar encabezado y pie a partes del tema** (no llegarían por esa plantilla).
+
+**Corrección [D]:** se construye de verdad el discriminador —página en bloques → plantilla de página del tema (padre
+`contope-canvas`: `templates/page.html` y `parts/header.html`/`footer.html`); página con sólo `[contope_canvas …]` →
+plantilla Canvas— y se migran el metadato y la plantilla **con reversa explícita** (restaurar el metadato y el
+`post_content` envuelto). Es requisito de F11 y se prueba con encabezado, pie y navegación **con el plugin activo,
+apagado y con cambio de tema** (P11.1, P11.3). Ojo: `scripts/econut/legal-a-bloques.php:165` lee `_cod_document_id`,
+otro metadato; no usarlo como molde.
 
 ### 6.4 Herramientas de contenido
 
@@ -637,17 +960,18 @@ El transcriptor ya produce reglas con `var()` (tras `b7b0478`). Para bloques, ca
 | `color`/`background-color` = `var(--wp--preset--color--X)` | `textColor` / `backgroundColor` = `X` |
 | `font-size` = `var(--wp--preset--font-size--X)` | `fontSize` = `X` |
 | `padding-*`/`margin-*`/`gap` = `var(--wp--preset--spacing--N)` | `style.spacing.*` = `var:preset|spacing|N` |
-| `border-radius`, `box-shadow`, `outline-*`, `backdrop-filter`, `text-transform`… sin atributo nativo | **variación** declarada en el ADN (`dim9.req03`, `heredaDe`, `diferencia`); el bloque lleva `is-style-<x>` |
+| `border-radius`, `box-shadow`, `outline-*`, `backdrop-filter`, `text-transform`… sin atributo nativo | **variación** declarada en el ADN (`dim9.req03`, `heredaDe`, `diferencia`); el bloque lleva `is-style-<x>`. **Bloqueado por Q3** mientras `diferencia` sea texto: hoy esa fila da `ADN_NO_VARIATION`; no se inventa la variación |
 | geometría (anchos, columnas, `min-height`, `position`) | atributos nativos (`width` de `core/column`, `minHeight` de `core/cover`, `layout`) |
 
 ### 6.6 Relación con el plan de fases de agosto
 
-(`wp-local/PLAN-gutenberg-migracion-fases.md`, `PLAN-arquitectura-bloques-gutenberg.md`)
+(`C:\Users\Cristobal concha\wp-local\PLAN-gutenberg-migracion-fases.md` y `PLAN-arquitectura-bloques-gutenberg.md`, fuera de este
+repositorio; hay copia del primero en el vault de Contope)
 
 | Fase de agosto | Qué pasa |
 |---|---|
 | Política "gradual, una sola fuente por página, el discriminador es `post_content`" (§1, §4) | **Se conserva.** |
-| F0 registro y whitelist, F3 publicador híbrido (`standalone_template` sólo si hay shortcode) | **Se reusa**; `ocd/` → `contope/`. |
+| F0 registro y whitelist, F3 publicador híbrido (`standalone_template` sólo si hay shortcode) | **Se reusa** el registro y la lista blanca (`ocd/` → `contope/`). **La parte «`standalone_template` sólo si hay shortcode» se corrige: nunca se construyó** (era propuesta de agosto, líneas 78 y 249 del plan); hoy la plantilla se elige por el metadato `_cod_canvas_document_id` (`class-cod-canvas-page-publisher.php:1916-1927`). Se construye de verdad en F11 (6.3). |
 | F1 `ocd/heading` con `ocdEnhancements` (CSS y `style` en píxeles dentro del bloque) | **Se descarta.** `core/heading` basta, y los valores de diseño **no viven en el bloque** sino en el ADN. El campo `ocdEnhancements.style/css/grid` contradice la decisión actual. Se conserva la idea de `behavior` **sólo** para runtime sin bloque equivalente. |
 | F2 puente GrapesJS ↔ bloques | **No hace falta para el MCP** (escribe bloques directo). Queda fuera de alcance. |
 | F4 hojas `ocd/paragraph|button|list…` | **Se descarta:** son `core/*`. |
@@ -675,8 +999,10 @@ el sello del `theme.json` y el hash de `post_content` de las cinco páginas.
 4. **Plugin 0.4.0** local (validador, almacén, proyección, compuerta en `observe`). Import de r2.
 5. **Prueba de equivalencia (P2.1):** la paleta (12 slugs/hex), las 4 familias y `contentSize` proyectados son
    idénticos a los del `theme.json` actual. `definiciones-del-set.php` se retira; `perfil.json › tokens` se retira.
-6. **Tema:** `contope-basis/theme.base.json` (estructura sin valores) + `cod_adn_export(theme-json)` →
-   `theme.json`. Comparación visual: 0 diferencias de color y familia.
+6. **Tema:** `contope-basis/theme.base.json` (estructura sin valores) + `cod_adn_export(theme-json)` → `theme.json`.
+   Las hojas del tema pasan a leer `--wp--preset--*` / `--wp--custom--*` (sin `--cod-*`; las variables propias, `--basis-*`).
+   Comparación visual: 0 diferencias de color y familia; con el plugin desactivado, `body` y títulos calculan lo mismo
+   (P2.6, P8.2).
 7. **Recomponer** las 5 páginas y 2 regiones con el registro del ADN (el transcriptor lee el registro en lugar de
    `tokens`). Compuerta en `enforce` local. El informe de ajuste lista cada valor que cayó en un escalón.
 8. **Bloques:** el transcriptor emite `*.bloques.json`; se aplican a **copias** (`<slug>-bloques`, borrador) y
@@ -692,12 +1018,13 @@ Orden y por qué ninguno deja el sitio sin estilos:
 |---|---|---|---|---|
 | 0 | Precondiciones | verificar `wp core version` ≥ el que trae `core/accordion` y `core/tabs`; respaldo de base | — | — |
 | 1 | **Plugin 0.4.0** | Administrador de archivos, «Overwrite», chmod 0644 | Sin ADN → modo `off` → **comportamiento idéntico al 0.3.85** (P2.5). Cero cambio visual. | subir el 0.3.85 |
-| 2 | **Tema con `theme.json` generado** | zip del tema | La paleta/familias son **las mismas** (P2.1); el sello `adn` es sólo metadato. Si se subió antes que el ADN, sigue estilado. | zip anterior |
+| 2 | **Tema con `theme.json` generado** | zip del tema; se vuelve a subir con **cada** revisión activada del ADN | La paleta/familias son **las mismas** (P2.1); las hojas del tema leen `--wp--*` (no `--cod-*`), así que con el plugin apagado el sitio mantiene fondo, texto y fuente. El sello `adn` es sólo metadato. Si se subió antes que el ADN, sigue estilado. | zip anterior |
 | 3 | **ADN r2** | pantalla de wp-admin «Diseño (ADN)» (misma validación y diff); alternativa: filas SQL del CPT `cod_adn` y de `cod_adn_activa` por el método de diferencias | La proyección sobrescribe `cod_theme_definitions` con valores **iguales**; se verifica `themeJson: sincronizado` y `themeDefinitions: sincronizado`. Si la proyección dejara sin valor un rol que hoy tiene valor, el import se aborta. | reimportar r1 como r3 |
 | 4 | Modo `observe` | wp-admin | Informa, no rechaza. | `off` |
 | 5 | **Regiones** (encabezado, pie) recompuestas | SQL por filas (postmeta del documento + `cod_disenos_hojas`) | Mismas reglas, mismo CSS resuelto | filas anteriores |
-| 6 | **Páginas** en bloques, **una por una**, la más simple primero (términos → FAQ → carpas → contactos → inicio) | SQL de `wp_posts.post_content` | Cada una se compara en vivo antes de pasar a la siguiente | restaurar `post_content` (shortcode) |
+| 6 | **Páginas** en bloques, **una por una**, la más simple primero (términos → FAQ → carpas → contactos → inicio), **dentro de `wp:contope/lienzo`** (conservan encabezado y pie por `render.php`; el metadato `_cod_canvas_document_id` no se toca todavía) | SQL de `wp_posts.post_content` | Cada una se compara en vivo antes de pasar a la siguiente | restaurar `post_content` (shortcode) |
 | 7 | `ratchet` → `enforce` cuando `cod_adn_audit` es 0 | wp-admin | — | bajar el modo |
+| 8 | **Discriminador de plantilla y envoltorio** (F11): encabezado/pie como partes del tema, plantilla del tema para páginas en bloques, se quita `wp:contope/lienzo` | plugin + SQL | Antes de quitar el envoltorio, encabezado, pie y navegación se comprueban con el plugin activo, apagado y con cambio de tema (P11.1) | restaurar el metadato y el `post_content` envuelto |
 
 Ningún paso depende de uno posterior: (a) el tema siempre lleva la paleta; (b) el plugin nuevo sin ADN no cambia
 nada; (c) el ADN llega con valores iguales; (d) las páginas se cambian al final. Y un import **no puede quitar una
@@ -707,25 +1034,308 @@ variable en uso** (3.6).
 
 ## 8. Fases
 
-Cada fase es chica, termina en algo que se puede correr y tiene una prueba de aceptación **medible**.
+Cada fase es chica, termina en algo que se puede correr y tiene pruebas de aceptación **medibles que pueden fallar**.
+Regla general (H12): una prueba que pasa si no encuentra lo que busca no vale. Por eso cada prueba trae su **control**
+(lo que la haría fallar y que se ejecuta para demostrar que el instrumento detecta) o un **piso** (conteo mínimo de lo
+comprobado), y las que dependen de la compuerta verifican en la propia evidencia que la compuerta estaba activa.
 
-| Fase | Contenido | Prueba de aceptación |
+| Fase | Estado | Depende de |
 |---|---|---|
-| **F0 — Corpus y decisiones** | `scripts/exportar-corpus-adn.ts` en Core; registrar los pedidos al Core (Q1, correspondencia de color con el almacén plano). | P0.1 el corpus tiene ≥ 1 caso inválido por cada `return null` de los dos parsers (se cuenta por inspección). |
-| **F1 — Validador y almacén** | `COD_ADN_Validator`, CPT, puntero, `cod_adn_get`, `preview_import`, `apply_import`, pantalla de wp-admin, capacidades honestas. | P1.1 PHP y TS coinciden 100 % en el corpus. P1.2 import de Basis r1 → `revision: 1` y `digest` = sha256 del JSON canónico. P1.3 mismo archivo → `unchanged`; misma revisión → `ADN_REVISION_NOT_NEWER`; otro `design.id` → `ADN_DESIGN_ID_MISMATCH`. P1.4 `confirmed` con `deterministic-extraction` → rechazado (R1). |
-| **F1b — Paquete `.ocdsite`** | el importador pasa `entrypoints.designModel` al mismo `apply`. | P1b.1 el fixture `fixtures/package-v1/valid/desktop-interchange` deja un ADN activo con su `design.id`. |
-| **F2 — Proyección única** | `COD_ADN_Projection`, filtro `wp_theme_json_data_theme`, escritura de `cod_theme_definitions`, `COD_Design_Core` lee sólo ADN, Configuración de sólo lectura, `cod_adn_export`. | P2.1 con un ADN derivado del `theme.json` actual de Basis, `wp_get_global_settings()` da la **misma** paleta (12 slugs) y las mismas 4 familias (diff vacío). P2.2 `COD_Design_Core::faltantes() == []`. P2.3 cambiar `accent` en el ADN (r+1) cambia `--cod-color-accent`, `--wp--preset--color--accent`, el color del botón del `theme.json` y `color_accent` **en un solo import**, sin editar otro archivo. P2.4 Configuración rechaza editar `color_accent`. P2.5 sin ADN, la salida del plugin es **idéntica byte a byte** a la 0.3.85 en las 5 páginas. |
-| **F3 — Auditoría y modo `observe`** | `COD_ADN_Gate` (sólo medir), `cod_adn_audit`, `adnGate` en la evidencia. | P3.1 sobre el local de Basis, el audit reproduce el guion de la sección 2.5 (espaciado 262/48, tipografía 26/8, radio 23/6, borde 11/2, color 0, familia 0). P3.2 en `observe`, aplicar una composición con un literal **no** se rechaza y aparece en la evidencia. |
-| **F4 — Compuerta `ratchet` / `enforce` en todos los caminos** | `is_css_length` acepta variables del registro; enganches de 4.3; mensajes de 4.4; `cod_adn_set_mode`. | P4.1 `color:"#F26621"` → `ADN_LITERAL_COLOR` con la sugerencia `var(--wp--preset--color--accent)`. P4.2 `properties{padding-top:"9.8px"}` → `ADN_LITERAL_SPACING` con los dos escalones vecinos. P4.3 `cod_patch_css` que cambia un `var()` por `#F26621` → rechazado. P4.4 `cod_write_canvas_document` con +1 literal → rechazado. P4.5 `ratchet`: reaplicar hoy las 7 composiciones de Basis sin cambios pasa con `nuevas: 0`; agregar un literal falla. P4.6 `var(--no-existe)` → `ADN_VAR_UNKNOWN`. P4.7 una regla que referencia una definición `proposed` fuerza `status: proposed` y `cod_publish_canvas_page` se rechaza. P4.8 `expectedDesignRevision` distinto de la activa → `ADN_REVISION_STALE`. |
-| **F4b — Valores del motor** | resolver `shadow sm/md/lg`, `button.size`, `tone`, zebra, caja de formulario y defaults de WhatsApp **por el ADN, sin respaldo**; inventario del cromo del motor. | P4b.1 `grep` de `rgba(`/`#hex`/`rem`/`px` dentro de `button_css`, `surface_css`, `table_css`, `form_css`, `media_css` no encuentra valores de diseño de sitio (la lista de excepciones del motor está escrita y justificada). P4b.2 sin sombras en el ADN, `shadow: "md"` → `ADN_NAME_UNRESOLVED`, no pinta nada. |
-| **F5 — Extractor** | `scripts/adn/medicion-a-adn.mjs`, informe, hoja de revisión. | P5.1 dos corridas dan el mismo SHA-256. P5.2 el resultado pasa `parseDesignContract` (barrera de Node) y el validador PHP. P5.3 **cobertura**: cada uno de los 31 colores medidos aparece en la paleta propuesta **o** en `obs.colores-de-uso-puntual`; 0 perdidos; ídem los 14 tamaños de letra. P5.4 la paleta tiene entre 11 y 16 colores (los 11 exactos ya adoptados más los de uso real). P5.5 el 100 % de las definiciones tiene `evidenceSourceIds` no vacío y ≥ 1 `provenance` con `locator`. P5.6 ninguna definición sale `confirmed` ni con autoridad distinta de `deterministic-extraction`. |
-| **F6 — Desktop abre un ADN** (repo Core) | `dominio/importar-adn.ts` y botón en `Inicio`. | P6.1 abrir el `contract.json` del extractor muestra las propuestas con muestra visual; confirmar tres definiciones y exportar produce `revision + 1` con el mismo `design.id` que `parseDesignContract` **y** el validador PHP aceptan. P6.2 `typecheck` y pruebas del Core en verde. |
-| **F7 — Transcriptor sobre el ADN** | `componer.mjs` lee el registro (`cod_adn_get` o archivo) en vez de `perfil.json › tokens`; informe de ajuste. | P7.1 con la compuerta en `enforce` local, `aplicar.mjs` pasa en las 5 páginas y 2 regiones sin violaciones. P7.2 `comparar-vivo.mjs`: 0 diferencias de familia y color; diferencias de tamaño y espaciado **sólo** las del informe de ajuste (lista cerrada, sin otras). |
-| **F8 — Contenido en bloques** | `COD_Block_Content`, tres herramientas, bloques `contope/formulario|mapa|whatsapp`, registro de variaciones desde el ADN. | P8.1 el contenido generado de las 5 páginas es válido en `@wordpress/block-library` de la versión de destino (100 %). P8.2 **plugin desactivado**: `inicio` entrega la **misma secuencia** de textos e imágenes que la composición (comparación de secuencias), sin errores PHP. P8.3 con un tema de bloques estándar activo: misma secuencia de textos/imágenes/listas/tablas. P8.4 `core/paragraph` con `style.color.text:"#FF0000"` → `ADN_LITERAL_COLOR`; con `textColor:"accent"` → aceptado. P8.5 una variación declarada en el ADN aparece en el selector de estilos del editor y se guarda como `is-style-<x>`. |
-| **F9 — Basis en bloques (local)** | 7.1 pasos 7-9. | P9.1 `comparar-vivo` contra el original en 1440/768/393: mismos resultados que el baseline (0 diferencias de texto e imagen, altos ±0-3 px). P9.2 `auditoria-sitio.mjs` 5×3 sin problemas. |
-| **F10 — Producción** | 7.2. | P10.1 en cada paso del cuadro: verificación visual y `auditoria-sitio.mjs` en vivo sin problemas. P10.2 guion de paridad de Basis (nuevo, con el molde de `scripts/santaluisa/paridad-espejo-produccion.mjs`): mismo `digest`, `revision`, modo y hashes de `post_content`. |
-| **F11 — Cromo y otros sitios** | encabezado/pie como plantillas de parte; eliminar el envoltorio `contope/lienzo`; extractor sobre el `theme.json` de Santa Luisa y de Econut → `observe`. | P11.1 sin plugin, Basis mantiene encabezado y pie. P11.2 el `cod_adn_audit` de cada sitio queda registrado con su línea base. |
+| F0 — Corpus y decisiones | lista para empezar | — |
+| F0b — Instrumentos de prueba que fallan | lista para empezar | — |
+| F1 — Validador, almacén, atomicidad | | F0 |
+| F1b — Paquete `.ocdsite` | | F1 |
+| F2 — Proyección única | | F1 |
+| F3 — Auditoría y modo `observe` | | F1, F2, F0b |
+| F4 — Compuerta `ratchet` / `enforce` | | F3 |
+| **F4b — Valores del motor** | **BLOQUEADA por Q3** (sombras) | F4, Q3 |
+| F5 — Extractor | | F1 |
+| **F6 — Ida y vuelta con Desktop** | **reestimada: trabajo del Core** | F5 |
+| F7 — Transcriptor sobre el ADN | | F4, F5 |
+| **F8 — Contenido en bloques** | **BLOQUEADA por Q3** (variaciones de bloque) | F4, F7, Q3 |
+| F9 — Basis en bloques (local) | | F8, F0b |
+| F10 — Producción | | F9 |
+| F11 — Cromo, discriminador y otros sitios | | F10 |
 
+### F0 — Corpus y decisiones
+
+`scripts/exportar-corpus-adn.ts` en Core (corpus `fixtures/adn/core/` y `fixtures/adn/destino/`, 3.2); registrar los
+pedidos al Core (Q1, Q3, correspondencia de color con el almacén plano).
+
+- **P0.1** `scripts/adn/cobertura-corpus.mjs` lista cada `return null` de `parseDesignContract` y de
+  `parsePortableDesignModel` (por archivo:línea, leídos del fuente) y exige que **algún caso del corpus declare
+  `cubre: <archivo:línea>`**. Falla (código ≠ 0) si queda una rama sin caso, si un `cubre` apunta a una línea que no
+  existe o si el corpus está vacío. *Control:* quitar un caso `core/` debe hacerlo fallar.
+
+### F0b — Instrumentos de prueba que fallan (H12)
+
+Antes de usar `auditoria-sitio.mjs` y `comparar-vivo.mjs` como aceptación hay que arreglarlos (2.6).
+
+- **P0.2** `auditoria-sitio.mjs --inventario <archivo>`: el archivo dice, por página, cuántos acordeones, formularios,
+  bloques nativos, mapas y galerías **se esperan**; **0 donde se espera > 0 es FALLO**, y lo hallado ≠ lo esperado
+  también. *Control:* correrlo contra una página sin acordeones con un inventario que espera 2 → debe terminar con
+  código 1.
+- **P0.3** Selectores de **bloques nativos** además de los propios (`.wp-block-accordion*`, `.wp-block-search`,
+  `.wp-block-tabs*`, `.wp-block-details`…) y pruebas **funcionales**: abrir/cerrar un acordeón, buscar con el
+  buscador, enviar el formulario (en local, con un envío de prueba). *Control:* un acordeón con el panel roto debe
+  fallar la apertura.
+- **P0.4** `comparar-vivo.mjs` contra una **referencia original CONGELADA del Divi**
+  (`entregables/basis/original/`, no `basisbodegas.com`, que ya es ContOpe y que F10 cambia), **5 páginas** (se agrega
+  términos) × **3 anchos** (1440/768/393), con las **tolerancias escritas** en un archivo (±0-3 px de alto; no 4-6 px
+  ni 10 %) y **respetadas por el guion**: sale con código ≠ 0 si algo queda fuera de criterio. *Control:* una página
+  con 20 px de relleno agregados a propósito debe hacerlo salir con 1.
+- **P0.5** Las regresiones propias de **Santa Luisa y Econut** (`scripts/santaluisa/auditoria-sitio.cjs`,
+  `paridad-espejo-produccion.mjs`) corren en cada fase que toca el plugin (F1-F4b) contra una **línea base guardada**
+  de cada sitio (HTML+CSS servidos de las páginas clave); cualquier diferencia es fallo. Probar sólo Basis no prueba
+  que ellos sigan iguales.
+
+### F1 — Validador, almacén, atomicidad
+
+`COD_ADN_Validator` (tres capas), CPT por revisión, puntero, bloqueo global de diseño, `cod_adn_get`, `preview_import`,
+`apply_import`, pantalla de wp-admin, capacidades honestas, integridad referencial sobre lo servido.
+
+- **P1.1** PHP y TS coinciden **100 %** en `core/` (capas 1 y 2): mismo válido/inválido **y misma razón de rechazo**
+  en cada caso; en `destino/` (capa 3) cada caso cumple el resultado escrito. Incluye el caso de `designMd.content`
+  alterado a mano → rechazo en PHP y en TS. *Piso:* falla si hay 0 casos válidos o 0 inválidos, o si se ejecutaron
+  menos casos que los que hay en disco.
+- **P1.2** Import de Basis r1 → `revision: 1` y `digest` = sha256 del JSON canónico (el valor esperado se calcula
+  fuera del plugin, con `sha256sum` sobre el archivo canonizado por el guion de prueba).
+- **P1.3** Mismo archivo → `unchanged`; misma revisión con otro contenido → `ADN_REVISION_NOT_NEWER`; otro `design.id`
+  → `ADN_DESIGN_ID_MISMATCH`.
+- **P1.4** R1: `confirmed` + `deterministic-extraction` en una definición **que alimenta una variable** → rechazado;
+  en una **restricción** (no consumida) **con `reviewedAt`** → aceptado y listado en `ignored[]`; sin `reviewedAt` →
+  rechazado; `confirmed` + `model-proposal` → rechazado. *Incluye un contrato real producido por
+  `projectDesignContract` del Core con una restricción legal activa:* debe aceptarse (el plugin no rechaza lo que el
+  Core produce).
+- **P1.5** Atomicidad (H5): con un **fallo inyectado** (a) tras escribir el CPT, (b) tras escribir
+  `cod_adn_proj_r<N>`, (c) justo antes de mover el puntero, `cod_adn_get` y el HTML+CSS servidos de las 5 páginas son
+  **los de la revisión anterior** (hash igual) y no queda puntero a medias. *Control:* sin inyección el import pasa y
+  los hashes **cambian** (la prueba demuestra que sabe ver un cambio).
+- **P1.6** Concurrencia (H5), con dos procesos PHP sincronizados por un archivo de barrera: (a) un `apply` que
+  compiló contra r2 y llega después de que entró r3 → **rechazado** (`expectedDesignRevision` se recompara dentro del
+  bloqueo); (b) un import mientras hay una escritura en curso → `ADN_BUSY`, y a la inversa; (c) dos escrituras
+  **crudas** (`cod_write_canvas_document`) con la misma revisión base → la segunda falla (la revisión se recompara en
+  `save()`). La prueba **falla si ambas escrituras tienen éxito**.
+- **P1.7** Integridad referencial sobre lo servido (H4): composición con una variable → `cod_patch_css` legítimo (que
+  vacía `META_COMPOSITION`) → import que quita la variable = **rechazado** (`ADN_REF_BROKEN`) con
+  `{variable, origen, documentId}`. Se repite con la variable usada **sólo** en (a) un `style=""`, (b) `styles` de
+  `projectData`, (c) un `attr` de un bloque en `post_content` de una página **borrador**, (d) una parte del tema, (e) la
+  hoja generada. Cada caso rechaza. *Control:* sin uso, el import pasa. Y un import que **degrada a `proposed`** una
+  variable usada en una página publicada → rechazado.
+- **P1.8** R6 (H7): `refReqId` inexistente → `ADN_REF_UNRESOLVED`; `refPath` que no llega o de tipo incorrecto →
+  `ADN_REF_UNRESOLVED`; ciclo → `ADN_REF_UNRESOLVED`; rol `confirmed` apuntando a una paleta `proposed` → estado
+  efectivo `proposed` (no se emite sin `emitirPropuestas`); apuntando a una `rejected` → `ADN_REF_STATE`; requisito con
+  `.def1` y `.def2` → `ADN_REF_AMBIGUOUS`. *Control:* la misma referencia bien formada y confirmada pasa.
+- **P1.9** R2 / pendientes (H14): una pendiente de color y una de tipografía con `value: {}` (como las genera Desktop,
+  `capsula.ts:127`) → el import **pasa**, se conservan en `ignored[]`, `cod_adn_get` no las cuenta como emitidas ni
+  como resueltas y la paleta proyectada **no cambia**; una `confirmed` con `{}` → import rechazado
+  (`ADN_PAYLOAD_SHAPE`); una `proposed` con forma incorrecta y `emitirPropuestas: true` → esa definición no se emite,
+  las demás sí.
+
+### F1b — Paquete `.ocdsite`
+
+Un **lector nuevo** del manifiesto `formatVersion`/`entrypoints` (no existe hoy), que convive con `pages/documents`;
+exportador e importador distinguen **página Canvas** de **página en bloques**, transportan `post_content` y medios
+completos y rechazan sobrescribir una página en bloques con el shortcode (H9). Se completa
+`fixtures/package-v1/valid/desktop-interchange/` con un `design/model.json` real (hoy la carpeta sólo trae
+`manifest.json` y `case.json`: el entrypoint apunta a un archivo que no está).
+
+- **P1b.1** Con el fixture completado (un `design/model.json` generado desde un ADN de prueba que pasa
+  `parsePortableDesignModel`), importar deja un ADN activo con su `design.id`. *Control:* el fixture **sin** el archivo
+  hace fallar la prueba.
+- **P1b.2** Migrar una página a bloques → editarla en Gutenberg (cambiar un texto, agregar un bloque) → exportar →
+  importar en un sitio limpio → `post_content` **idéntico byte a byte** y medios con el mismo hash.
+- **P1b.3** Importar un paquete cuya página está en bloques sobre un sitio donde esa página ya está en bloques **con
+  ediciones** → no se sobrescribe con el shortcode: rechazo con error explícito, `post_content` intacto (hash igual).
+
+### F2 — Proyección única
+
+`COD_ADN_Projection` (por revisión), filtro `wp_theme_json_data_theme`, `cod_theme_definitions` derivada,
+`COD_Design_Core` lee sólo ADN, Configuración de sólo lectura, `cod_adn_export`, hojas del tema sobre `--wp--*`.
+
+- **P2.1** Con un ADN derivado del `theme.json` actual de Basis, `wp_get_global_settings()` da la **misma** paleta (los
+  12 slugs con su hex) y las mismas 4 familias, comparado contra la **copia congelada** de `contope-basis/theme.json`
+  de `b7b0478` (no contra el regenerado). *Piso:* falla si se compararon menos de 12 colores o menos de 4 familias, o
+  si falta cualquiera de los dos archivos.
+- **P2.2** `COD_Design_Core::faltantes() == []` **y** `estado()` devuelve el número esperado de roles, todos con
+  origen `adn` (así no pasa en vacío).
+- **P2.3** Cambiar `accent` en el ADN (r+1) cambia `--cod-color-accent`, `--wp--preset--color--accent`, el color del
+  botón del `theme.json` y `color_accent` **en un solo import**, sin editar otro archivo. Se mide con el valor
+  **calculado en el navegador** antes y después. *Control:* sin el import, el valor calculado no cambia.
+- **P2.4** Toda ruta de escritura de `cod_theme_definitions` distinta de la proyección **falla**: el formulario de
+  Configuración, `update_option` directo desde el código del plugin y `COD_Theme_Definitions` guardando campos
+  gobernados.
+- **P2.5** Sin ADN, la salida del plugin (HTML+CSS servidos) es **idéntica byte a byte** a la de 0.3.85 en las 5
+  páginas, contra una **línea base capturada ANTES** de tocar el plugin (se normalizan sólo nonces y fechas; la lista
+  de normalizaciones está escrita). Falla si falta la línea base.
+- **P2.6** (H11) `grep -c "var(--cod-" contope-basis/*.css` = **0** (hoy 12 líneas) y ninguna hoja del tema declara
+  `--cod-*` (las propias pasan a `--basis-*`). *Control:* la misma búsqueda sobre `b7b0478` debe dar 12; si da 0, el
+  grep está mal.
+
+### F3 — Auditoría y modo `observe`
+
+`COD_ADN_Gate` (sólo medir), `cod_adn_audit`, `adnGate` en la evidencia, hoja que no pierde documentos parchados.
+
+- **P3.1** Sobre el local de Basis, el audit reproduce el guion de 2.5 con **estos números exactos**: espaciado
+  262/48, tipografía 26/8, radio 23/6, borde 11/2, color 0, familia 0 (total ≠ 0). Falla si alguno difiere.
+- **P3.2** En `observe`, aplicar una composición con un literal **no** se rechaza, aparece en la evidencia
+  (`adnGate.violaciones` con la regla) y la evidencia dice `modo: observe`. *Control:* en `enforce` la misma operación
+  se rechaza.
+- **P3.3** (H4) Hoja de diseño: composición con reglas → `cod_patch_css` (que vacía la composición) → regenerar → la hoja
+  **sigue conteniendo** todas las reglas del documento parchado (reglas antes ⊆ reglas después). *Control documentado:*
+  sin el arreglo del `designId` en meta propio, la regla desaparece.
+
+### F4 — Compuerta `ratchet` / `enforce` en todos los caminos
+
+`is_css_length` acepta variables del registro; enganches de 4.3; mensajes de 4.4; `cod_adn_set_mode`; clases
+`declaracion-de-variable` y rechazo de propuestas en la escritura.
+
+- **P4.1** `color:"#F26621"` → `ADN_LITERAL_COLOR` con la sugerencia `var(--wp--preset--color--accent)`.
+- **P4.2** `properties{padding-top:"9.8px"}` → `ADN_LITERAL_SPACING` con los dos escalones vecinos.
+- **P4.3** `cod_patch_css` que cambia un `var()` por `#F26621` → rechazado.
+- **P4.4** `cod_write_canvas_document` con +1 literal en el CSS → rechazado.
+- **P4.4b** (H3) Literal **sólo en `projectData`** (en `styles`, sin tocar el CSS enviado) → rechazado; literal en un
+  atributo SVG (`fill="#F26621"`, `stop-color`, `font-size` en un `text`) → rechazado; CSS enviado ≠ CSS derivado de
+  `projectData` → `ADN_PROJECT_DATA_MISMATCH`; ciclo **MCP → editor (headless) → guardado → servido** sin literal
+  nuevo (el audit antes y después es igual). *Control:* en `off` esos mismos literales pasan.
+- **P4.5** `ratchet`: reaplicar las 7 composiciones de Basis sin cambios pasa con `nuevas: 0` **y con `heredadas`
+  iguales a lo medido en P3.1 (≠ 0)**; agregar un literal falla. Si `heredadas` da 0 la prueba falla (estaría
+  ciega).
+- **P4.6** `var(--no-existe)` → `ADN_VAR_UNKNOWN`.
+- **P4.7** (H1, reescrita) En `enforce`, `preview`, `apply`, `cod_patch_css`, `cod_write_canvas_document` y
+  `cod_grapes_edit_node` **rechazan** con `ADN_PROPOSED_ON_PUBLIC` una referencia a una variable de definición
+  `proposed` (incluida la contagiada por R6) cuando el documento objetivo es: (a) una **página publicada**, (b) una
+  **región**, (c) una **página borrador con el `designId` del ADN** (hoja compartida). Son 3 objetivos × 5 caminos = 15
+  casos y cada uno debe fallar con ese código. En un **documento de ensayo** (`<designId>-ensayo`) la misma referencia
+  se **acepta**. `cod_publish_canvas_page` sobre un documento con propuestas también se rechaza (segunda barrera).
+- **P4.8** `expectedDesignRevision` distinto de la activa → `ADN_REVISION_STALE`.
+- **P4.9** (H2) Variables reservadas: por cada camino (`apply` con `properties`, `cod_patch_css` dentro de `@media`,
+  `cod_write_canvas_document`, `cod_grapes_edit_node` con `mutation.style`, `cod_activate_section_whatsapp`) y por
+  cada nombre reservado (uno del registro, `--wp--preset--color--accent`, `--wp--custom--radius--x`,
+  `--wp--style--global--content-size`, `--cod-color-accent`) → `ADN_VAR_RESERVED`; `--x:#123456` local →
+  `ADN_LITERAL_COLOR`; `var(--a,#123)` con fallback literal → `ADN_LITERAL_COLOR`; `--x:8px` local usada en `padding`
+  → `ADN_LITERAL_SPACING`. **Aceptación de fondo:** tras todo el ciclo, el valor **calculado** en el navegador de
+  `--wp--preset--color--accent` en `:root` y del `color` de `body` es **igual al del ADN**. *Control:* con la compuerta
+  en `off`, la redefinición cambia el calculado y la prueba lo detecta.
+- **P4.10** (H1) **Efecto cero en lo público:** para los tres objetivos de P4.7 (página pública, región y borrador que
+  comparte hoja), el hash del HTML y CSS **servidos** (GET real, normalizando nonces) **y del archivo de la hoja**
+  (`cod_disenos_hojas`) antes y después de intentar aplicar una propuesta es **idéntico**. Falla si cualquiera de los
+  tres cambia. *Control:* aplicada en un documento de ensayo, los tres hashes públicos tampoco cambian y el hash del
+  ensayo sí.
+- **P4.11** Los mismos casos se corren en `observe`, `ratchet` y `enforce`; en `ratchet` la deuda heredada pasa y la
+  nueva no, para las clases nuevas también (variable reservada preexistente = heredada).
+
+### F4b — Valores del motor — **BLOQUEADA por Q3**
+
+Resolver `shadow sm/md/lg`, `button.size`, `tone`, zebra, caja de formulario y defaults de WhatsApp **por el ADN, sin
+respaldo**; inventario del cromo del motor. **Bloqueada** porque el Core no tiene escala de sombras con valores (2.1,
+Q3): hasta entonces una sombra pedida da `ADN_NAME_UNRESOLVED`, y no se interpreta prosa ni se inventa un valor en el
+adaptador. Lo que no toca sombras (relleno de botón, zebra, defaults de WhatsApp) no depende de Q3: si Cristóbal
+responde Q3 con «dejar fuera», F4b avanza sin sombras.
+
+- **P4b.1** `grep` de `rgba(`/`#hex`/`rem`/`px` dentro de `button_css`, `surface_css`, `table_css`, `form_css`,
+  `media_css` no encuentra valores de diseño de sitio (la lista de excepciones del motor está escrita y justificada).
+  *Control positivo:* el mismo grep sobre 0.3.85 debe encontrar **al menos** los valores conocidos (sombras
+  `.12/.16/.2`, rellenos `.5rem .8rem`/`.75rem 1.25rem`/`1rem 1.6rem`, `transition .2s`, zebra `.05`, caja
+  `0 8px 24px`, pie de imagen `.62`, `#25D366`/`#ffffff`); si encuentra menos, el grep está mal y la prueba falla.
+- **P4b.2** Sin sombras en el ADN, `shadow: "md"` → `ADN_NAME_UNRESOLVED` **y** el CSS servido del nodo no contiene
+  `box-shadow`.
+
+### F5 — Extractor
+
+`scripts/adn/medicion-a-adn.mjs`, informe, hoja de revisión.
+
+- **P5.1** Dos corridas dan el mismo SHA-256 **y** el archivo tiene ≥ 11 colores (dos corridas vacías no pasan).
+- **P5.2** El resultado pasa `parseDesignContract` (barrera de Node) y el validador PHP en sus tres capas.
+- **P5.3** **Cobertura:** un script **independiente** cuenta los valores en la medición (31 colores, 14 tamaños de
+  letra; si cuenta otra cosa, falla); cada uno aparece en la paleta propuesta **o** en `obs.colores-de-uso-puntual`;
+  0 perdidos; ídem los 14 tamaños. *Control:* borrar un valor del resultado debe hacer fallar la prueba.
+- **P5.4** La paleta tiene entre 11 y 16 colores (los 11 exactos ya adoptados más los de uso real).
+- **P5.5** El 100 % de las definiciones (≥ 1, y el número coincide con el del informe) tiene `evidenceSourceIds` no
+  vacío y ≥ 1 `provenance` con `locator`.
+- **P5.6** Ninguna definición sale `confirmed` ni con autoridad distinta de `deterministic-extraction` (sobre un
+  conjunto no vacío de definiciones).
+- **P5.7** (H8) **Una definición efectiva por requisito:** ningún requisito tiene dos definiciones con el patrón
+  `^(dim\d+\.req\d+)\.def\d+$`; las alternativas y `obs.*` usan prefijo propio.
+
+### F6 — Ida y vuelta con Desktop (repo Core) — **reestimada: trabajo del Core**
+
+No es «un botón y una función» (H8): toca `dominio/capsula.ts`, `design-set/persistence.ts` y `design-contract.ts`.
+Contenido: `dominio/importar-adn.ts` y botón en `Inicio`; importación que conserva procedencia original (`locator`,
+`excerpt`), `purpose`, `constraintDefinitionIds`, estado `proposed` y las `alt.*`/`obs.*`; exportación que las
+reemite; fusión que aplica sólo lo que la persona cambió. Se estima como fase propia con su auditoría.
+
+- **P6.1** **Ida y vuelta sin tocar:** importar el `contract.json` del extractor → exportar sin tocar nada →
+  **comparación campo a campo idéntica** (`sources` con `purpose`/`locator`/`path`, `provenance` con
+  `locator`/`excerpt`, `constraintDefinitionIds`, estados y `obs.*`). Falla si cualquier campo difiere o si cambia el
+  número de definiciones.
+- **P6.2** Confirmar tres definiciones y exportar produce `revision + 1` con el mismo `design.id` que
+  `parseDesignContract` **y** el validador PHP aceptan, y **sólo esas tres cambian** (el diff del resto es vacío).
+- **P6.3** Una propuesta sin aprobar (`resolutionPath: 'insumo'`) vuelve como `proposed`, no como `confirmed` ni
+  `observed`.
+- **P6.4** `typecheck` y pruebas del Core en verde.
+
+### F7 — Transcriptor sobre el ADN
+
+`componer.mjs` lee el registro (`cod_adn_get` o archivo) en vez de `perfil.json › tokens`; informe de ajuste.
+
+- **P7.1** Con la compuerta en `enforce` local, `aplicar.mjs` pasa en las 5 páginas y 2 regiones sin violaciones, y la
+  **evidencia de cada respuesta** trae `adnGate.modo === "enforce"` y `revisadas > 0` (si no, la prueba falla: la
+  compuerta no estuvo). *Control:* inyectar un literal en una composición debe hacerla fallar.
+- **P7.2** `comparar-vivo.mjs` (ya arreglado, P0.4): 0 diferencias de familia y color; diferencias de tamaño y
+  espaciado **sólo** las del informe de ajuste (lista cerrada, sin otras).
+
+### F8 — Contenido en bloques — **BLOQUEADA por Q3**
+
+`COD_Block_Content`, tres herramientas, bloques `contope/formulario|mapa|whatsapp`, registro de variaciones desde el
+ADN. **Bloqueada** en lo que usa variaciones de estilo con datos (2.1, 6.2, Q3); lo que no depende de Q3 (presets por
+slug, estilos globales de `theme.json`, geometría nativa) puede construirse antes.
+
+- **P8.1** El contenido generado de las 5 páginas es válido en `@wordpress/block-library` de la versión de destino
+  (100 %). *Piso:* se validan ≥ N bloques (N = los de las 5 páginas) y **cada tipo de bloque de 6.2** aparece al
+  menos una vez; si el conteo es menor, falla.
+- **P8.2** (H11) **Plugin desactivado:** `inicio` entrega la **misma secuencia** de textos e imágenes que la
+  composición (no vacía; el conteo coincide con el esperado), sin errores PHP; los **estilos calculados** de `body` y
+  de los títulos (color, `font-family`, `font-size`) son iguales a los del ADN; la legibilidad se comprueba (contraste
+  texto/fondo calculado ≥ 4,5:1); y `grep -c "var(--cod-" contope-basis/*.css` = 0 (P2.6). *Control:* la misma
+  medición con las hojas de `b7b0478` debe mostrar `body` sin valor (esto es lo que se corrige).
+- **P8.3** Con un tema de bloques estándar activo: misma secuencia de textos/imágenes/listas/tablas.
+- **P8.4** `core/paragraph` con `style.color.text:"#FF0000"` → `ADN_LITERAL_COLOR`; con `textColor:"accent"` → aceptado.
+- **P8.5** *(bloqueada por Q3)* Una variación declarada en el ADN aparece en el selector de estilos del editor y se
+  guarda como `is-style-<x>`.
+
+### F9 — Basis en bloques (local)
+
+7.1 pasos 7-9.
+
+- **P9.1** `comparar-vivo` (P0.4) contra la **referencia congelada** en 1440/768/393, 5 páginas: 0 diferencias de
+  texto e imagen y altos ±0-3 px, **código de salida 0**; con una alteración deliberada, 1.
+- **P9.2** `auditoria-sitio.mjs --inventario` (P0.2) 5×3: lo hallado = lo esperado, **sin saltos silenciosos** (0
+  coincidencias donde se espera > 0 es fallo).
+- **P9.3** Regresiones de Santa Luisa y Econut (P0.5) iguales a su línea base.
+
+### F10 — Producción
+
+7.2.
+
+- **P10.1** En cada paso del cuadro: verificación visual y `auditoria-sitio.mjs --inventario` en vivo sin problemas;
+  más las regresiones de P0.5.
+- **P10.2** Guion de paridad de Basis (nuevo, con el molde de `scripts/santaluisa/paridad-espejo-produccion.mjs`):
+  mismo `digest`, `revision`, modo y hashes de `post_content`. Falla si alguno difiere o si el guion no pudo leer
+  alguno de los dos lados.
+
+### F11 — Cromo, discriminador de plantilla y otros sitios
+
+Encabezado/pie como partes del tema; **discriminador de plantilla construido de verdad** (6.3, H10); eliminar el
+envoltorio `contope/lienzo`; extractor sobre el `theme.json` de Santa Luisa y de Econut → `observe`.
+
+- **P11.1** Encabezado, pie y navegación presentes **con el plugin activo, apagado y con cambio de tema**: en cada una
+  de las tres situaciones, el selector del encabezado y el del pie existen, la navegación tiene ≥ 3 enlaces con los
+  destinos esperados y el texto del pie coincide con el esperado. Falla si falta cualquiera.
+- **P11.2** El `cod_adn_audit` de cada sitio queda registrado con su línea base (archivo con fecha y totales por clase).
+- **P11.3** Discriminador: una página en bloques sale con la plantilla del tema (no `canvas-document.php`); una página
+  con sólo `[contope_canvas …]` sale con la plantilla Canvas; migrar el metadato y volver (reversa) deja `post_content` y
+  metadato idénticos a los de partida (hash).
 ---
 
 ## 9. Riesgos y preguntas abiertas
@@ -743,9 +1353,23 @@ cambio de manifiesto en versión menor; **(b)** normalizar Basis a 9 roles: vari
 **Recomendación: (a)**, porque la migración se pidió "visualmente idéntica al original" y la armonización (b) es
 una decisión de diseño que se hace después, en Desktop, con muestras a la vista, no por un umbral del extractor.
 
-**Q2. Cómo confirma el dueño mientras Desktop no abra un ADN.** Vía A (esperar la fase 6) o vía B provisoria
-(hoja de revisión + sello que ejecuto cuando tú lo digas en el chat, con huella). **Recomendación:** hacer las
-dos: la fase 6 en paralelo, y la B sólo para Basis, con la hoja y su sha256 guardados como evidencia.
+**Q2. Cómo confirma el dueño mientras Desktop no abra un ADN sin pérdidas.** Vía A (esperar F6, que ahora es trabajo
+del Core y no una función chica) o vía B provisoria (hoja de revisión + sello que ejecuto cuando tú lo digas en el
+chat, con huella). **Recomendación:** hacer las dos: F6 en paralelo, y la B sólo para Basis, con la hoja y su sha256
+guardados como evidencia. Dado el tamaño de F6, la B probablemente sea la vía real para Basis.
+
+**Q3 (nueva, H6). Sombras y variantes con datos en el Core.** Hoy el Core **no puede expresar** (a) una escala de
+sombras con valores (`dim4.req04` es profundidad; `dim4.req05`, política de efectos) ni (b) una diferencia por variante
+con datos (`dim9.req03.diferencia` es texto; `arquetipo`, una lista abstracta). Tocan la taxonomía del set de diseño,
+que es tuya. Opciones: **(a)** abrir en el Core dos requisitos: una escala de sombras tipada
+`{nombre, x, y, desenfoque, expansión, color→ref}` y una diferencia por variante tipada `propiedad → valor|ref`, más
+la correspondencia arquetipo → familia de bloque; **(b)** dejar fuera de Basis las sombras y variantes con datos,
+como **hueco declarado** en el informe de ajuste, y avanzar sin ellas. Mientras no se decida: **F4b y F8 quedan
+bloqueadas**, y una sombra o variante pedida da `ADN_NAME_UNRESOLVED`. **Recomendación:** no frenar F0-F7, que no
+dependen de Q3, y decidir antes de F8.
+
+**Pendiente heredado (sin número): los 7 colores fuera del set.** Siete colores de Basis no tienen equivalente en la
+paleta (2.5). Siguen abiertos; el extractor los lleva a `obs.colores-de-uso-puntual` y no se emiten.
 
 ### 9.2 Decisiones técnicas ya tomadas (con su razón)
 
@@ -760,6 +1384,12 @@ dos: la fase 6 en paralelo, y la B sólo para Basis, con la hoja y su sha256 gua
 | El ADN en CPT + opción, no en archivos | Viaja con el método de subida SQL y conserva historial. |
 | El `theme.json` es artefacto generado y commiteado + filtro de respaldo | La apariencia de bloques core sobrevive al plugin apagado. |
 | Íconos propios del sitio = activos del ADN | Evita volver a `url()` suelto en un bloque. Requisito de `dim5` por confirmar. |
+| Un `proposed` sólo vive en un documento de ensayo; el rechazo va en la **escritura** (H1) | Lo aplicado ya es lo servido: no hay revisión publicada separada y la hoja junta borradores. Bloquear «publicar» no protegía nada. |
+| Proyecciones por revisión + puntero único + bloqueo global (H5) | Es lo único que hace que lo visible cambie en una sola escritura y que las carreras import/apply no pasen. |
+| Validación en tres capas, con DESIGN.md portado (H13) | La paridad «100 %» no existía; separar paridad (capas 1-2) de política (capa 3) deja cada expectativa honesta. |
+| Variables reservadas y clase `declaracion-de-variable` (H2) | Sin ella, una `--*` redefine una variable gobernada sin que ninguna clase por propiedad la vea. |
+| La integridad referencial recorre lo servido (H4) | `META_COMPOSITION` se vacía en cada `save()`. |
+| Las hojas del tema leen `--wp--*` (H11) | Con `--cod-*` el respaldo del `theme.json` era falso. |
 
 ### 9.3 Riesgos
 
@@ -771,9 +1401,15 @@ dos: la fase 6 en paralelo, y la B sólo para Basis, con la hoja y su sha256 gua
 | Los *slugs* derivados de nombres cambian al renombrar | El diff separa "renombradas" y el import se rechaza si rompe referencias. |
 | Una escala de espacio de ~2 docenas de escalones no es un "sistema" | Es el costo explícito de la fidelidad; la armonización posterior la reduce con muestras. |
 | Un `value` con forma no prevista por el plugin | R2 lo rechaza con la ruta; R4 guarda sin emitir lo que la web no consume. |
-| Hay requisitos que no leí aún (`dim4.req03/04`, `dim8.req02/04`, contenedores de `dim3`) | La fase 2 empieza leyéndolos; el mapeo de sombra, borde, movimiento y ancho queda como borrador hasta entonces. |
+| Hay requisitos que no leí aún (`dim4.req03`, `dim8.req02/04`, contenedores de `dim3`) | La fase 2 empieza leyéndolos; el mapeo de borde, movimiento y ancho queda como borrador hasta entonces. (`dim4.req04` y `req05` ya se leyeron: no tienen valores de sombra, Q3.) |
 | Cromo del motor con valores propios (`lightbox`, placeholder) | Inventario en F4b; fuera de la compuerta con la razón escrita. |
 | La edición humana en el wp-admin reintroduce literales | `cod_adn_audit` la mide; una notificación de admin lista las nuevas. |
+| El Core no tiene sombras ni variantes con datos (H6) | Q3; F4b y F8 bloqueadas; `ADN_NAME_UNRESOLVED` y hueco declarado, nunca un valor inventado. |
+| El contrato v1 no distingue restricción de hecho (R1) | R1 aplica la excepción a `confirmed`+`deterministic-extraction` con `reviewedAt` que no alimenta variables; si el Core agrega la marca, la regla la lee. |
+| La convención `<designId>-ensayo` es de esta espec, no del Core | Se somete a la próxima auditoría; reversible (basta otro criterio para «documento de ensayo» sin tocar la regla de fondo). |
+| El `contope-canvas` padre usa `var(--cod-border-color, rgba(0,0,0,.12))` con fallback literal (`style.css:22,40,45`) | Con el plugin apagado cae al literal sin romperse, pero es un valor de diseño fuera del ADN: se anota para el inventario de F2/F11; el padre es del motor. |
+| F6 es trabajo del Core y puede tardar (H8) | La vía B (hoja + sello) sigue disponible para Basis; F6 no frena F1-F5. |
+| Instrumentos de prueba que pasan en verde sin probar (H12) | F0b, y cada prueba trae control o piso. |
 
 ---
 
@@ -798,17 +1434,24 @@ transport, provenance, contract, designMd`; `schemaVersion === 1`, `kind === 'co
 `transport` = `{package:{id ~ /^urn:ocd:package:[A-Za-z0-9._-]+$/, revision ≤ 128}, project:{id ~
 /^urn:ocd:project:[A-Za-z0-9._-]+$/, name ≤ 200}}`; `provenance` = `{producer:'contope-design-desktop',
 producerVersion ≤ 40 ~ VERSION_RE, exportedAt RFC 3339}`; `design` duplicado igual a `contract.design`;
-`designMd` = `{path:'design/DESIGN.md', revision === contract.design.revision, content}` (la igualdad del
-contenido **no** se porta, 3.2).
+`designMd` = `{path:'design/DESIGN.md', revision === contract.design.revision, content}` con
+`content === renderDesignContractDesignMd(contract)` (**la igualdad se porta**, 3.2: se porta el renderizador de
+`design-contract-design-md.ts`, 257 líneas, con orden y JSON estables).
+
+Las **reglas del destino** (capa 3) no están en este anexo: R1-R6 viven en 3.2 porque no existen en el Core.
 
 ## Anexo B — Códigos de error nuevos
 
 Import: `ADN_INVALID`, `ADN_DESIGN_ID_MISMATCH`, `ADN_REVISION_NOT_NEWER`, `ADN_STALE_BASE`,
-`ADN_CONFIRMED_WITHOUT_HUMAN`, `ADN_PAYLOAD_SHAPE`, `ADN_SLOT_CONFLICT`, `ADN_REF_BROKEN`, `ADN_TOO_LARGE`.
+`ADN_CONFIRMED_WITHOUT_HUMAN`, `ADN_PAYLOAD_SHAPE`, `ADN_SLOT_CONFLICT`, `ADN_REF_BROKEN`, `ADN_TOO_LARGE`, `ADN_BUSY`.
+Dependencias (R6): `ADN_REF_UNRESOLVED`, `ADN_REF_STATE`, `ADN_REF_AMBIGUOUS`.
 Compuerta: `ADN_LITERAL_COLOR|FONT|SIZE|FINE|SPACING|RADIUS|BORDER|SHADOW|MOTION|MEASURE`, `ADN_VAR_UNKNOWN`,
-`ADN_VAR_REJECTED`, `ADN_NO_DEFINITION`, `ADN_NAME_UNRESOLVED`, `ADN_NO_VARIATION`. Revisión y publicación:
-`ADN_MISSING`, `ADN_REVISION_STALE`, `ADN_PUBLISH_BLOCKED_PROPOSED`. Todos viajan por el `tool_error` existente
-(`code`, `message`, `details`).
+`ADN_VAR_REJECTED`, `ADN_VAR_RESERVED`, `ADN_PROJECT_DATA_MISMATCH`, `ADN_NO_DEFINITION`, `ADN_NAME_UNRESOLVED`,
+`ADN_NO_VARIATION`. Revisión y publicación: `ADN_MISSING`, `ADN_REVISION_STALE`, `ADN_PROPOSED_ON_PUBLIC`
+(reemplaza a `ADN_PUBLISH_BLOCKED_PROPOSED`: el rechazo ya no está sólo en publicar, 3.5). Todos viajan por el
+`tool_error` existente (`code`, `message`, `details`). Los nombres `ADN_BUSY`, `ADN_PROJECT_DATA_MISMATCH` y
+`ADN_PROPOSED_ON_PUBLIC` los pone esta espec; los de dependencias (`ADN_REF_*`) y `ADN_VAR_RESERVED` vienen de la
+auditoría.
 
 ## Anexo C — Qué comprobé y cómo (para reproducirlo)
 
@@ -823,8 +1466,18 @@ Compuerta: `ADN_LITERAL_COLOR|FONT|SIZE|FINE|SPACING|RADIUS|BORDER|SHADOW|MOTION
 | Bloques disponibles y atributos | `wp-local-basis/wordpress/wp-includes/blocks/*/block.json` (WordPress 7.1.4) |
 | Reglas y nodos de Basis | guion de una pasada sobre `scripts/basis/salida/*.componer.json` (por nodo: `kind`; por regla: `kind`; por declaración `properties`: clase por nombre de propiedad, sin `var()` y distinta de `0|auto|none|inherit|initial|normal`) |
 | Colores y tamaños medidos | `entregables/basis/original/secciones.json` (31 colores distintos), `IDENTIDAD.md` (33 entradas de rol, 20 combinaciones, 14 tamaños), `scripts/basis/salida/tokens.json` (11 exactos, 15 aproximados, 7 fuera del set) |
+| Lo servido: aplicar = guardar, regiones en vivo, hoja con `post_status => 'any'` | lectura de `class-cod-canvas-mcp-service.php:395-458`, `class-cod-canvas-page-publisher.php:1179-1185,1707-1799`, `class-cod-diseno-hoja.php:86-135,193-197` |
+| Propiedades `--*` aceptadas por el compilador | `class-cod-canvas-mcp-recipe-compiler.php:3073-3121` (`preg_match('/^--[a-z0-9-]+$/'…)`) |
+| `save()` vacía `META_COMPOSITION`; quién lo llama | `class-cod-canvas-document-repository.php:413-417`; `grep -n "->save(" contope-publisher/includes/*.php` |
+| Bloqueo sólo por documento; revisión comparada antes del bloqueo | `class-cod-canvas-document-repository.php:630-680`; `class-cod-canvas-mcp-service.php:1552-1605` |
+| Exportador/importador de paquetes y sus esquemas | `class-cod-site-package-exporter.php:112-138`; `class-cod-site-package-importer.php:54-58,216-224`; `class-cod-package-validator.php:33`; `fixtures/package-v1/valid/desktop-interchange/` (sólo `manifest.json` y `case.json`) |
+| Plantilla por metadato | `class-cod-canvas-page-publisher.php:1916-1927`; `templates/canvas-document.php`; `blocks/cod-lienzo/render.php` |
+| Hojas del tema con `--cod-*` | `grep -n "var(--cod-" contope-basis/*.css` (12 líneas); `contope-canvas/style.css` con fallback literal |
+| El Core: sin sombras tipadas, refs sin estado, ida y vuelta | `manifest-v0-dim4.ts:384-423,436-474`; `manifest-v0-dim9.ts:345`; `requirement-manifest/payload.ts:71-80`; `design-set/adapter.ts:81-94,136-177`; `design-set/persistence.ts:91-93`; `desktop/src/dominio/capsula.ts:92-127,163`; `core/src/design-contract.ts:350-381,485,493` (Core `6115353`) |
+| Instrumentos de prueba actuales | `scripts/basis/auditoria-sitio.mjs:100-101,141-142,157`; `scripts/basis/comparar-vivo.mjs:22-26,140-183` y ausencia de `process.exit` |
 
-**Lo que no verifiqué y queda declarado:** la versión de WordPress de producción; el contenido de `dim4.req03/04`,
+**Lo que no verifiqué y queda declarado:** la versión de WordPress de producción; el contenido de `dim4.req03`,
 `dim8.req02/04` y los requisitos de contenedores de `dim3`; si `core/icon` admite SVG propios; si WordPress dibuja
-los hijos de un bloque no registrado (`contope/lienzo` con el plugin apagado); si Desktop tolera varias definiciones
-por requisito (`.def1`, `.def2`) en una revisión importada.
+los hijos de un bloque no registrado (`contope/lienzo` con el plugin apagado). **Lo que sí quedó verificado tras la
+auditoría:** Desktop **no** tolera varias definiciones por requisito (`persistence.ts:91-93` las rechaza), de ahí la
+regla de una definición efectiva por requisito (5.2).
