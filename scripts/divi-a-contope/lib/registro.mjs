@@ -12,11 +12,17 @@
  * DESPUÉS de su propia base, o gana la de escritorio. Si una regla móvil se
  * compartiera entre dos bases distintas, una de ellas quedaría detrás de su
  * base.
+ *
+ * TOKENS. Si el registro trae un traductor de tokens (lib/tokens.mjs), el valor de
+ * cada regla se traduce al set de diseño ANTES de calcular su clave y su id: ningún
+ * color ni tipografía literal llega a la regla, y dos valores que caen en el mismo
+ * token comparten regla.
  */
 import { hash } from './util.mjs';
 
 export class Registro {
-  constructor({ referencia, razon = 'Medido del sitio original con el navegador (estilos computados).' } = {}) {
+  constructor({ referencia, razon = 'Medido del sitio original con el navegador (estilos computados).', tokens = null } = {}) {
+    this.tokens = tokens;
     this.referencia = referencia || '';
     this.razon = razon;
     this.reglas = [];
@@ -27,6 +33,7 @@ export class Registro {
 
   /** @returns {string} id de la regla (nueva, o la que ya existía con ese valor) */
   R(kind, value, { bp = 'all', base = '', prefijo = '', state = 'default' } = {}) {
+    if (this.tokens) value = this.tokens.regla(kind, value);
     const clave = JSON.stringify([kind, value, bp, base, state]);
     const previo = this.porClave.get(clave);
     if (previo) return previo;

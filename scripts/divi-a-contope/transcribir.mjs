@@ -24,6 +24,7 @@ import { Registro } from './lib/registro.mjs';
 import { leerHtml } from './lib/util.mjs';
 import { animacionesPorPosicion } from './lib/animacion.mjs';
 import { transcribirMedicion } from './lib/estructura.mjs';
+import { traductorDePerfil, informeDeTokens } from './lib/tokens.mjs';
 
 const arg = (n, d) => { const i = process.argv.indexOf('--' + n); return i > 0 ? process.argv[i + 1] : d; };
 
@@ -34,12 +35,14 @@ const arg = (n, d) => { const i = process.argv.indexOf('--' + n); return i > 0 ?
  * misma página contra esa medición y sus diferencias con escritorio pasan a reglas con scope
  * `tablet`: ver `fusionarTablet`.
  */
-export function transcribirSitio({ original, perfil, paginas, anchos = [1440, 393] }) {
+export function transcribirSitio({ original, perfil, paginas, anchos = [1440, 393], carpetaPerfil = process.cwd() }) {
   const [anchoD, anchoM, anchoT] = anchos;
-  const reg = new Registro({ referencia: perfil.origen || '', razon: `Transcrito de ${perfil.origen || 'el sitio original'} (Divi) por divi-a-contope: estilos computados medidos con el navegador.` });
+  // El set de diseño del sitio (perfil.tokens): si el perfil lo declara, ningún color ni tipografía llega literal a las reglas.
+  const tokens = traductorDePerfil(perfil, carpetaPerfil, (base, rel) => path.resolve(base, rel));
+  const reg = new Registro({ tokens, referencia: perfil.origen || '', razon: `Transcrito de ${perfil.origen || 'el sitio original'} (Divi) por divi-a-contope: estilos computados medidos con el navegador.` });
   const informe = [];
   const ajustes = {};
-  const salida = { paginas: {}, regiones: null, informe, ajustes, reg };
+  const salida = { paginas: {}, regiones: null, informe, ajustes, reg, tokens };
   const leer = (f) => JSON.parse(readFileSync(f, 'utf8'));
 
   // URL original → URL del sitio nuevo, sólo si el archivo está de verdad en el uploads local.
@@ -79,6 +82,7 @@ export function transcribirSitio({ original, perfil, paginas, anchos = [1440, 39
   const glifos = existsSync(fGlifos) ? leer(fGlifos) : {};
 
   for (const slug of paginas) {
+    if (tokens) tokens.pagina = slug;
     const medD = leer(path.join(original, 'datos', `medida-${slug}-${anchoD}.json`));
     const leerOpc = (ancho) => { const f = path.join(original, 'datos', `medida-${slug}-${ancho}.json`); return ancho && existsSync(f) ? leer(f) : null; };
     const medM = leerOpc(anchoM);
@@ -135,7 +139,7 @@ export function transcribirSitio({ original, perfil, paginas, anchos = [1440, 39
     const r = pasada(medM, reg, informe, ajustes);
     if (medT) {
       // La pasada de tablet usa un registro y un informe propios: de ella sólo se toma lo que difiere de escritorio.
-      const regT = new Registro({ referencia: perfil.origen || '', razon: reg.razon });
+      const regT = new Registro({ tokens: tokens?.silencioso || null, referencia: perfil.origen || '', razon: reg.razon });
       const rT = pasada(medT, regT, [], {});
       const avisos = [];
       for (const region of ['contenido', 'encabezado', 'pie']) fusionarTablet(r[region], rT[region], reg, regT, avisos, `${slug}/${region}`);
@@ -235,7 +239,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   const perfil = JSON.parse(readFileSync(perfilArchivo, 'utf8'));
   const paginas = (arg('paginas') || (perfil.paginasReales || []).join(',')).split(',').filter(Boolean);
   const anchos = (arg('anchos') || '1440,393,768').split(',').map(Number);
-  const r = transcribirSitio({ original, perfil, paginas, anchos });
+  const r = transcribirSitio({ original, perfil, paginas, anchos, carpetaPerfil: path.dirname(path.resolve(perfilArchivo)) });
   mkdirSync(salidaDir, { recursive: true });
   const designId = perfil.designId || 'sitio-web';
   for (const [slug, p] of Object.entries(r.paginas)) {
@@ -248,7 +252,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     writeFileSync(path.join(salidaDir, 'region-footer.componer.json'), JSON.stringify({ design: disenoDe(r.reg, primera.pie, designId), composition: { schemaVersion: 2, nodes: primera.pie } }, null, 2));
   }
   writeFileSync(path.join(salidaDir, 'informe.json'), JSON.stringify(r.informe, null, 2));
-  writeFileSync(path.join(salidaDir, 'INFORME.md'), informeMarkdown(r.informe));
+  writeFileSync(path.join(salidaDir, 'INFORME.md'), informeMarkdown(r.informe) + (r.tokens ? '\n' + informeDeTokens(r.tokens.informe()) + '\n' : ''));
   writeFileSync(path.join(salidaDir, 'ajustes.json'), JSON.stringify(r.ajustes, null, 2));
   console.log(`reglas: ${r.reg.reglas.length} · avisos: ${r.informe.length}`);
 }

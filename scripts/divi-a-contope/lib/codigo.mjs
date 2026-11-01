@@ -77,7 +77,7 @@ export function transcribirCodigo(ctx, mod, { pagina, ubicacion }) {
       ctx.ajustes.whatsapp = { numero: wa[1], mensaje };
       const tam = Math.min(200, Math.max(24, parseInt(css.width, 10) || 60));
       const nodo = ctx.nodo('whatsapp', [...ctx.reg.propiedades(decl, {}, { prefijo: 'fijo' })],
-        { message: mensaje.slice(0, 300), ariaLabel: a.attrs['aria-label'] || 'WhatsApp', size: tam, iconPadding: Math.round(tam * 0.15), iconColor: '#FFFFFF', iconStyle: 'logo', backgroundColor: css['background-color'] || 'transparent', borderRadius: /^[0-9a-z%. ]+$/i.test(estilos['.' + clase]['border-radius'] || '') ? estilos['.' + clase]['border-radius'] : '999px' });
+        { message: mensaje.slice(0, 300), ariaLabel: a.attrs['aria-label'] || 'WhatsApp', size: tam, iconPadding: Math.round(tam * 0.15), iconColor: ctx.reg.tokens ? ctx.reg.tokens.color('#FFFFFF') : '#FFFFFF', iconStyle: 'logo', backgroundColor: ctx.reg.tokens ? ctx.reg.tokens.color(css['background-color'] || 'transparent') : (css['background-color'] || 'transparent'), borderRadius: /^[0-9a-z%. ]+$/i.test(estilos['.' + clase]['border-radius'] || '') ? estilos['.' + clase]['border-radius'] : '999px' });
       if (hover && hover['background-color']) nodo.ruleIds.push(ctx.reg.R('properties', { declarations: { 'background-color': hover['background-color'] } }, { state: 'hover', prefijo: 'fijo-h' }));
       nodos.push(nodo);
       ctx.avisar({ pagina, ...ubicacion, modulo: 'code', clase: clase, severidad: 'ok',

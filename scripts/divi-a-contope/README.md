@@ -64,6 +64,28 @@ WhatsApp, íconos que hay que traer, mapa). Como biblioteca: `transcribirSitio()
 | lista con sublistas | `list` con la sangría de cada nivel medida y la parte `sublista` |
 | reglas repetidas | UNA regla por valor (el id lleva un hash del contenido; estable entre páginas) |
 
+## Ningún color ni tipografía literal: el set de diseño
+
+El transcriptor mide VALORES (`#F26621`, `rgba(0,0,0,0.2)`, `'Open Sans', sans-serif`), pero copiarlos a las reglas deja la identidad duplicada: cambiar el set no cambia el sitio. Por eso, si el perfil declara un bloque `tokens`, **cada valor se traduce al set ANTES de que la regla reciba su id** (`lib/tokens.mjs`, enganchado en `Registro.R`):
+
+```json
+"tokens": {
+  "tema": "../../contope-basis/theme.json",              paleta y familias del set (ruta relativa al perfil)
+  "colores": { "roles": { "accent": "var(--cod-color-accent)", ... }, "distanciaMaxima": 8 },
+  "familias": { "Open Sans": "var(--cod-font-body)", ... }
+}
+```
+
+| medido | queda |
+|---|---|
+| color opaco que calza EXACTO con la paleta | `var(--wp--preset--color--<slug>)` (o la variable que el perfil asigne a ese slug en `roles`, p. ej. el acento del núcleo `--cod-color-accent`) |
+| color que no calza | el color de la paleta MÁS CERCANO (distancia en OKLab × 100), anotado en el informe; si está a más de `distanciaMaxima`, queda marcado «fuera del set» |
+| color con alfa (sombras, velos, degradados) | `color-mix(in srgb, <variable> N%, transparent)`; alfa 0 → `transparent` |
+| `font-family` | la variable de la familia (`roles` del perfil, o `--wp--preset--font-family--<slug>` del theme.json); una familia que el set no conoce queda literal y marcada |
+| nombre de un rol `color` (`c-0e0c19`) | el nombre del token (`c-ink`): el hex deja de aparecer en cualquier parte |
+
+Lo decide el SITIO (qué variable representa a qué), no el transcriptor; el informe (`INFORME.md` › «Traducción al set de diseño» y `salida/tokens.json`) lista cada color acercado y cada familia. Lo que escribe `correcciones.json` pasa por la misma traducción. Para comprobar que el resultado de verdad gobierna el sitio: `scripts/basis/gobierno-del-set.mjs` (lo corre `auditoria-sitio.mjs`).
+
 ## Lo que NO sabe hacer (y lo dice)
 
 Todo módulo o patrón sin transcribir queda en `INFORME.md` con página › sección › fila › columna › módulo ›
