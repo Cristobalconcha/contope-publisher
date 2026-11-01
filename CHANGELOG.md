@@ -5,6 +5,15 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## Sin publicar — lo que el sitio de Basis pidió para quedar gobernado por el set
+
+Cambios del plugin que sólo existen en el banco de pruebas local de Basis; no tienen número de versión hasta que se publiquen. Lo que no los usa sale **idéntico a 0.3.85** (el CSS de las definiciones de estilo es byte a byte el de siempre: comprobado contra `scripts/css-del-tema.referencia.json`).
+
+- **Un color con alfa del set se puede escribir.** Las reglas `color`, `surface` (fondos, velo, borde) y las paradas de un degradado, la trama, la máscara, el divisor y el ícono aceptan `color-mix(in srgb, <color> N%, transparent)`, donde `<color>` es una variable (`var(--wp--preset--color--accent)`), un hexadecimal, `rgb()`/`hsl()`/`oklch()` o `currentColor`. Sólo esa forma exacta: no se anidan funciones, ni otro espacio de color, ni un segundo color, ni un porcentaje mayor que 100. Antes, un velo o una sombra con alfa obligaba a copiar el color como `rgba()` literal y la identidad quedaba duplicada. Prueba: `scripts/probar-set-de-diseno.php`.
+- **Las definiciones de estilo aceptan cualquier familia de Google Fonts** (Títulos / Cuerpo / Acento), no sólo las instaladas en `uploads/contope/fonts`: catálogo `catalogo/familias-google.json` (1.959 familias, de los metadatos públicos de fonts.google.com) y, además, las que el tema declara en su `theme.json` (`typography.fontFamilies`; Basis tiene «Big Shoulders Display», que Google ya renombró a «Big Shoulders»). Antes, un sitio cuyas tipografías vienen de su tema no podía elegir NINGUNA en Configuración: el menú sólo traía «Sin definir». La pantalla suma un grupo «Google Fonts». Elegir una familia no la carga: cargar el archivo sigue siendo cosa del sitio.
+
+---
+
 ## 0.3.85 — 30 de octubre de 2026
 
 Dos ampliaciones que apareció al cerrar las últimas diferencias de Basis contra su original. Lo que no las pide sale **idéntico a 0.3.84**.

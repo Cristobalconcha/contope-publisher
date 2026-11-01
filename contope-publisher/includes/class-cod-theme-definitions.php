@@ -75,9 +75,9 @@ final class COD_Theme_Definitions
             [
                 'title' => 'Tipografías',
                 'fields' => [
-                    ['id' => 'font_heading', 'label' => 'Títulos', 'type' => 'select', 'options' => self::font_options(), 'emite' => ['token' => '--cod-font-heading', 'quote' => true]],
-                    ['id' => 'font_body', 'label' => 'Cuerpo', 'type' => 'select', 'options' => self::font_options(), 'emite' => ['token' => '--cod-font-body', 'quote' => true]],
-                    ['id' => 'font_accent', 'label' => 'Acento', 'type' => 'select', 'options' => self::font_options(), 'emite' => ['token' => '--cod-font-accent', 'quote' => true]],
+                    ['id' => 'font_heading', 'label' => 'Títulos', 'type' => 'select', 'google' => true, 'options' => self::font_options(), 'emite' => ['token' => '--cod-font-heading', 'quote' => true]],
+                    ['id' => 'font_body', 'label' => 'Cuerpo', 'type' => 'select', 'google' => true, 'options' => self::font_options(), 'emite' => ['token' => '--cod-font-body', 'quote' => true]],
+                    ['id' => 'font_accent', 'label' => 'Acento', 'type' => 'select', 'google' => true, 'options' => self::font_options(), 'emite' => ['token' => '--cod-font-accent', 'quote' => true]],
                 ],
             ],
             [
@@ -401,12 +401,103 @@ final class COD_Theme_Definitions
     }
 
     /**
+     * Familias que el tema activo declara en su `theme.json`
+     * (`settings.typography.fontFamilies`): el nombre de la PRIMERA familia de
+     * cada pila, sin comillas.
+     *
+     * Existe porque un tema puede servir sus tipografías por su cuenta (con su
+     * propia hoja de @font-face) sin que estén en `uploads/contope/fonts`, que es
+     * lo único que `available_font_families()` mira. Sin esto, Basis —que declara
+     * sus cuatro familias en el theme.json— no podía elegir NINGUNA en la
+     * pantalla de Configuración: el menú sólo traía «Sin definir».
+     *
+     * @return string[]
+     */
+    public static function theme_font_families(): array
+    {
+        // Antes de que el tema esté cargado no hay theme.json que leer.
+        if (!function_exists('wp_get_global_settings') || !did_action('after_setup_theme')) {
+            return [];
+        }
+        $settings = wp_get_global_settings();
+        $seen = [];
+        foreach (['theme', 'custom'] as $origen) {
+            $lista = $settings['typography']['fontFamilies'][$origen] ?? [];
+            if (!is_array($lista)) {
+                continue;
+            }
+            foreach ($lista as $familia) {
+                if (!isset($familia['fontFamily']) || !is_string($familia['fontFamily'])) {
+                    continue;
+                }
+                $name = trim(explode(',', $familia['fontFamily'])[0]);
+                $name = trim((string) preg_replace('/^["\']|["\']$/', '', $name));
+                // Una pila que empieza por var(...) no nombra una familia.
+                if ($name === '' || strpos($name, '(') !== false || strpos($name, '--') === 0) {
+                    continue;
+                }
+                $seen[strtolower($name)] = $name;
+            }
+        }
+        $families = array_values($seen);
+        sort($families, SORT_STRING);
+
+        return $families;
+    }
+
+    /**
+     * El catálogo de Google Fonts: nombre de familia => categoría.
+     *
+     * Viene de `catalogo/familias-google.json` (los metadatos públicos de
+     * fonts.google.com, sin clave). Sirve para que Títulos / Cuerpo / Acento
+     * acepten CUALQUIER familia de Google, no sólo las que el sitio ya trae
+     * instaladas: el sistema de diseño trabaja con tipografías de Google.
+     *
+     * Elegir una familia no la carga: cargar el archivo es cosa del sitio (su
+     * hoja de @font-face, o `uploads/contope/fonts`). Esto sólo la declara.
+     *
+     * @return array<string, string>
+     */
+    public static function google_font_families(): array
+    {
+        static $catalogo = null;
+        if ($catalogo !== null) {
+            return $catalogo;
+        }
+        $catalogo = [];
+        $base = defined('COD_PUBLISHER_DIR') ? (string) COD_PUBLISHER_DIR : trailingslashit(dirname(__DIR__));
+        $ruta = $base . 'catalogo/familias-google.json';
+        if (is_readable($ruta)) {
+            $json = json_decode((string) file_get_contents($ruta), true);
+            if (is_array($json) && isset($json['familias']) && is_array($json['familias'])) {
+                foreach ($json['familias'] as $nombre => $categoria) {
+                    if (is_string($nombre) && $nombre !== '') {
+                        $catalogo[$nombre] = is_string($categoria) ? $categoria : '';
+                    }
+                }
+            }
+        }
+
+        return $catalogo;
+    }
+
+    /**
+     * Las familias que el sitio ya tiene a mano: las instaladas en uploads y las
+     * que declara el theme.json. (Las demás de Google se aceptan igual: ver
+     * `google_font_families()`.)
+     *
      * @return array<string, string>
      */
     private static function font_options(): array
     {
         $options = ['' => 'Sin definir'];
-        foreach (self::available_font_families() as $family) {
+        $seen = [];
+        foreach (array_merge(self::available_font_families(), self::theme_font_families()) as $family) {
+            $seen[strtolower($family)] = $family;
+        }
+        $families = array_values($seen);
+        sort($families, SORT_STRING);
+        foreach ($families as $family) {
             $options[$family] = $family;
         }
 
@@ -435,7 +526,14 @@ final class COD_Theme_Definitions
 
         if ($type === 'select') {
             $options = isset($field['options']) && is_array($field['options']) ? $field['options'] : [];
-            return array_key_exists($value, $options) ? $value : '';
+            if (array_key_exists($value, $options)) {
+                return $value;
+            }
+            // Una familia tipográfica puede ser cualquiera de Google Fonts.
+            if (!empty($field['google']) && array_key_exists($value, self::google_font_families())) {
+                return $value;
+            }
+            return '';
         }
 
         // image: una dirección de un archivo que YA está en la biblioteca de

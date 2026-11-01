@@ -7240,7 +7240,38 @@ final class COD_Canvas_MCP_Recipe_Compiler
     private function is_css_color(string $value): bool
     {
         return preg_match('/^(?:#[0-9a-fA-F]{3,8}|transparent|currentColor|(?:rgba?|hsla?|oklch)\([0-9.%\s,+-]+\))$/', $value) === 1
-            || $this->is_css_var_reference($value);
+            || $this->is_css_var_reference($value)
+            || $this->is_css_color_mix($value);
+    }
+
+    /**
+     * UN COLOR CON ALFA SOBRE UN COLOR DEL SET: `color-mix(in srgb, var(--token) 20%, transparent)`.
+     *
+     * POR QUÉ EXISTE. `var()` resuelve un color opaco del set, pero no sabe de alfa:
+     * `var(--token)` al 20 % no se puede escribir. Hasta ahora quien necesitaba un
+     * velo, una sombra o un degradado que se disuelve tenía que copiar el color como
+     * literal `rgba()` y la identidad quedaba duplicada. Es el caso del transcriptor
+     * de Divi (scripts/divi-a-contope/lib/tokens.mjs): traduce cada color medido al
+     * del set, y uno con alfa necesita esta forma.
+     *
+     * QUÉ SE ADMITE. Sólo mezclar UN color —una referencia a una variable, un
+     * hexadecimal, rgb()/hsl()/oklch() o currentColor— con `transparent`, en sRGB y
+     * con un porcentaje de 0 a 100. No se anidan funciones (el color de la izquierda
+     * no puede llevar `color-mix`) ni se admite otro espacio de color ni un segundo
+     * color: lo que no calza con esta forma exacta se rechaza.
+     */
+    private function is_css_color_mix(string $value): bool
+    {
+        $patron = '/^color-mix\(in srgb,\s*('
+            . 'var\(--[a-z0-9-]{1,60}\)'
+            . '|#[0-9a-fA-F]{3,8}'
+            . '|(?:rgba?|hsla?|oklch)\([0-9.%\s,+-]+\)'
+            . '|currentColor'
+            . ')\s+([0-9]{1,3}(?:\.[0-9]{1,2})?)%,\s*transparent\)$/D';
+        if (preg_match($patron, $value, $m) !== 1) {
+            return false;
+        }
+        return (float) $m[2] <= 100.0;
     }
 
     private function is_css_font_family(string $value): bool

@@ -573,6 +573,18 @@ final class COD_Settings_Admin
                             <?php echo esc_html($option_label); ?>
                         </option>
                     <?php endforeach; ?>
+                    <?php if (!empty($field['google'])) : ?>
+                        <?php /* Cualquier familia de Google Fonts: las que el sitio ya trae van arriba; el resto, acá. */ ?>
+                        <optgroup label="Google Fonts">
+                            <?php foreach (COD_Theme_Definitions::google_font_families() as $google_nombre => $google_categoria) : ?>
+                                <?php if (array_key_exists($google_nombre, $field['options'])) { continue; } ?>
+                                <option value="<?php echo esc_attr($google_nombre); ?>"
+                                    <?php selected($value, $google_nombre); ?>>
+                                    <?php echo esc_html($google_nombre); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </optgroup>
+                    <?php endif; ?>
                 </select>
             <?php elseif ($type === 'image') : ?>
                 <span class="cod-settings-image" data-cod-image-field="<?php echo esc_attr($field['id']); ?>">

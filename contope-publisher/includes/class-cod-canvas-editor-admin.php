@@ -522,7 +522,10 @@ final class COD_Canvas_Editor_Admin
             'siteFontCss' => COD_Canvas_Page_Publisher::site_font_css() . COD_Canvas_Page_Publisher::rotation_css() . COD_Canvas_Page_Publisher::carousel_rows_css() . COD_Canvas_Page_Publisher::shortcode_marker_css() . COD_Canvas_Page_Publisher::bloque_marker_css(),
             // El núcleo primero, igual que en la página publicada: si el lienzo
             // no lo recibe, muestra un color y el sitio otro.
-            'themeDefinitionsCss' => COD_Design_Core::css() . COD_Theme_Definitions::css(),
+            // Las variables de la paleta y de las familias del theme.json van antes: las reglas de
+            // diseño las usan (`var(--wp--preset--color--gris)`) y el lienzo no carga los estilos
+            // globales de WordPress, así que sin esto mostraría esos colores sin resolver.
+            'themeDefinitionsCss' => COD_Design_Core::variables_del_tema() . COD_Design_Core::css() . COD_Theme_Definitions::css(),
             // Base pública del sitio para las vistas en iframe del canvas
             // (p. ej. la preview del bloque "Formulario Orugantt").
             'siteUrl' => home_url('/'),

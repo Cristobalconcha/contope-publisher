@@ -262,6 +262,26 @@ final class COD_Design_Core
     }
 
     /**
+     * Las variables `:root` de la paleta y las familias del `theme.json` del tema activo
+     * (`--wp--preset--color--<slug>`, `--wp--preset--font-family--<slug>`…), tal como
+     * WordPress las imprime en la página publicada.
+     *
+     * Existe para el LIENZO del editor: una regla de diseño que usa el set escribe
+     * `var(--wp--preset--color--gris)`, y la página publicada lo resuelve porque WordPress
+     * carga sus estilos globales; el iframe del editor no los carga, y sin esto los mismos
+     * colores se verían sin resolver mientras se edita.
+     */
+    public static function variables_del_tema(): string
+    {
+        if (!function_exists('wp_get_global_stylesheet')) {
+            return '';
+        }
+        $css = wp_get_global_stylesheet(['variables']);
+
+        return is_string($css) ? $css : '';
+    }
+
+    /**
      * Lo que declaran las definiciones del tema guardadas por el plugin.
      *
      * @return array<string, string>
