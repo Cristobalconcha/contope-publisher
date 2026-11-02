@@ -1,2 +1,4 @@
 contope-publisher/assets/vendor/grapesjs/grapes.min.js -text
 contope-publisher/assets/vendor/grapesjs/grapes.min.css -text
+scripts/regresiones/linea-base/** -text
+fixtures/adn/** -text
