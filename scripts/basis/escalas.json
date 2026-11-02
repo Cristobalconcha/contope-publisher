@@ -1,0 +1,898 @@
+{
+  "generado": "2026-11-02",
+  "fuente": "salida/*.componer.json",
+  "escalas": {
+    "spacing": {
+      "razon": "Los valores de relleno, margen y separación se agrupan en 11 pasos. El 30 (71 usos) y el 20 (35) son el centro del sitio; el 50 y el 56 son el relleno vertical de las secciones (54 y 58 medidos); el 128 es el aire de la portada.",
+      "totalLiterales": 263,
+      "exactos": 162,
+      "aproximados": 101,
+      "mayorDesviacion": 4.6,
+      "pasos": [
+        {
+          "slug": "10",
+          "valor": "4px",
+          "usos": 7,
+          "exactos": 2,
+          "cubre": [
+            {
+              "medido": 4,
+              "veces": 2,
+              "desviacion": 0
+            },
+            {
+              "medido": 5,
+              "veces": 3,
+              "desviacion": -1
+            },
+            {
+              "medido": 6,
+              "veces": 1,
+              "desviacion": -2
+            },
+            {
+              "medido": 7,
+              "veces": 1,
+              "desviacion": -3
+            }
+          ]
+        },
+        {
+          "slug": "20",
+          "valor": "10px",
+          "usos": 30,
+          "exactos": 9,
+          "cubre": [
+            {
+              "medido": 8,
+              "veces": 3,
+              "desviacion": 2
+            },
+            {
+              "medido": 9,
+              "veces": 1,
+              "desviacion": 1
+            },
+            {
+              "medido": 9.8,
+              "veces": 8,
+              "desviacion": 0.2
+            },
+            {
+              "medido": 10,
+              "veces": 9,
+              "desviacion": 0
+            },
+            {
+              "medido": 12,
+              "veces": 9,
+              "desviacion": -2
+            }
+          ]
+        },
+        {
+          "slug": "30",
+          "valor": "16px",
+          "usos": 10,
+          "exactos": 3,
+          "cubre": [
+            {
+              "medido": 14,
+              "veces": 5,
+              "desviacion": 2
+            },
+            {
+              "medido": 15,
+              "veces": 2,
+              "desviacion": 1
+            },
+            {
+              "medido": 16,
+              "veces": 3,
+              "desviacion": 0
+            }
+          ]
+        },
+        {
+          "slug": "40",
+          "valor": "20px",
+          "usos": 38,
+          "exactos": 35,
+          "cubre": [
+            {
+              "medido": 19,
+              "veces": 2,
+              "desviacion": 1
+            },
+            {
+              "medido": 20,
+              "veces": 35,
+              "desviacion": 0
+            },
+            {
+              "medido": 21,
+              "veces": 1,
+              "desviacion": -1
+            }
+          ]
+        },
+        {
+          "slug": "50",
+          "valor": "24px",
+          "usos": 29,
+          "exactos": 12,
+          "cubre": [
+            {
+              "medido": 23,
+              "veces": 1,
+              "desviacion": 1
+            },
+            {
+              "medido": 24,
+              "veces": 12,
+              "desviacion": 0
+            },
+            {
+              "medido": 27,
+              "veces": 16,
+              "desviacion": -3
+            }
+          ]
+        },
+        {
+          "slug": "60",
+          "valor": "30px",
+          "usos": 81,
+          "exactos": 71,
+          "cubre": [
+            {
+              "medido": 28,
+              "veces": 3,
+              "desviacion": 2
+            },
+            {
+              "medido": 29,
+              "veces": 2,
+              "desviacion": 1
+            },
+            {
+              "medido": 29.69,
+              "veces": 1,
+              "desviacion": 0.3
+            },
+            {
+              "medido": 30,
+              "veces": 71,
+              "desviacion": 0
+            },
+            {
+              "medido": 32,
+              "veces": 2,
+              "desviacion": -2
+            },
+            {
+              "medido": 34,
+              "veces": 2,
+              "desviacion": -4
+            }
+          ]
+        },
+        {
+          "slug": "70",
+          "valor": "40px",
+          "usos": 15,
+          "exactos": 10,
+          "cubre": [
+            {
+              "medido": 35.37,
+              "veces": 1,
+              "desviacion": 4.6
+            },
+            {
+              "medido": 36,
+              "veces": 1,
+              "desviacion": 4
+            },
+            {
+              "medido": 38,
+              "veces": 2,
+              "desviacion": 2
+            },
+            {
+              "medido": 39,
+              "veces": 1,
+              "desviacion": 1
+            },
+            {
+              "medido": 40,
+              "veces": 10,
+              "desviacion": 0
+            }
+          ]
+        },
+        {
+          "slug": "80",
+          "valor": "50px",
+          "usos": 20,
+          "exactos": 20,
+          "cubre": [
+            {
+              "medido": 50,
+              "veces": 20,
+              "desviacion": 0
+            }
+          ]
+        },
+        {
+          "slug": "90",
+          "valor": "56px",
+          "usos": 28,
+          "exactos": 0,
+          "cubre": [
+            {
+              "medido": 54,
+              "veces": 13,
+              "desviacion": 2
+            },
+            {
+              "medido": 56.75,
+              "veces": 1,
+              "desviacion": -0.7
+            },
+            {
+              "medido": 57.6,
+              "veces": 1,
+              "desviacion": -1.6
+            },
+            {
+              "medido": 58,
+              "veces": 3,
+              "desviacion": -2
+            },
+            {
+              "medido": 59.39,
+              "veces": 6,
+              "desviacion": -3.4
+            },
+            {
+              "medido": 60,
+              "veces": 4,
+              "desviacion": -4
+            }
+          ]
+        },
+        {
+          "slug": "100",
+          "valor": "72px",
+          "usos": 4,
+          "exactos": 0,
+          "cubre": [
+            {
+              "medido": 68,
+              "veces": 1,
+              "desviacion": 4
+            },
+            {
+              "medido": 69.12,
+              "veces": 1,
+              "desviacion": 2.9
+            },
+            {
+              "medido": 74,
+              "veces": 2,
+              "desviacion": -2
+            }
+          ]
+        },
+        {
+          "slug": "110",
+          "valor": "128px",
+          "usos": 1,
+          "exactos": 0,
+          "cubre": [
+            {
+              "medido": 129.6,
+              "veces": 1,
+              "desviacion": -1.6
+            }
+          ]
+        },
+        {
+          "slug": "gutter",
+          "valor": "max(10%, calc((100% - var(--wp--style--global--content-size)) / 2))",
+          "usos": 12,
+          "exactos": 12,
+          "cubre": [
+            {
+              "medido": "80% con tope de 1080px",
+              "veces": 12,
+              "desviacion": 0
+            }
+          ]
+        }
+      ]
+    },
+    "font-size": {
+      "razon": "Los tamaños de letra se agrupan en 12 pasos. El 14 (23 usos) es el cuerpo chico; 16/18/20 son el cuerpo y los textos destacados; de 24 a 80 son títulos. Los títulos grandes llevan tamaño fluido (el mínimo es lo que el sitio original medido usa en el celular).",
+      "totalLiterales": 57,
+      "exactos": 48,
+      "aproximados": 9,
+      "mayorDesviacion": 2,
+      "pasos": [
+        {
+          "slug": "10",
+          "valor": "12px",
+          "usos": 1,
+          "exactos": 1,
+          "cubre": [
+            {
+              "medido": 12,
+              "veces": 1,
+              "desviacion": 0
+            }
+          ]
+        },
+        {
+          "slug": "20",
+          "valor": "14px",
+          "usos": 19,
+          "exactos": 17,
+          "cubre": [
+            {
+              "medido": 14,
+              "veces": 17,
+              "desviacion": 0
+            },
+            {
+              "medido": 15,
+              "veces": 2,
+              "desviacion": -1
+            }
+          ]
+        },
+        {
+          "slug": "30",
+          "valor": "16px",
+          "usos": 6,
+          "exactos": 6,
+          "cubre": [
+            {
+              "medido": 16,
+              "veces": 6,
+              "desviacion": 0
+            }
+          ]
+        },
+        {
+          "slug": "40",
+          "valor": "18px",
+          "usos": 4,
+          "exactos": 4,
+          "cubre": [
+            {
+              "medido": 18,
+              "veces": 4,
+              "desviacion": 0
+            }
+          ]
+        },
+        {
+          "slug": "50",
+          "valor": "20px",
+          "usos": 6,
+          "exactos": 5,
+          "cubre": [
+            {
+              "medido": 20,
+              "veces": 5,
+              "desviacion": 0
+            },
+            {
+              "medido": 22,
+              "veces": 1,
+              "desviacion": -2
+            }
+          ]
+        },
+        {
+          "slug": "60",
+          "valor": "24px",
+          "usos": 3,
+          "exactos": 2,
+          "cubre": [
+            {
+              "medido": 24,
+              "veces": 2,
+              "desviacion": 0
+            },
+            {
+              "medido": 26,
+              "veces": 1,
+              "desviacion": -2
+            }
+          ]
+        },
+        {
+          "slug": "70",
+          "valor": "28px",
+          "usos": 5,
+          "exactos": 4,
+          "cubre": [
+            {
+              "medido": 28,
+              "veces": 4,
+              "desviacion": 0
+            },
+            {
+              "medido": 30,
+              "veces": 1,
+              "desviacion": -2
+            }
+          ]
+        },
+        {
+          "slug": "80",
+          "valor": "32px",
+          "usos": 3,
+          "exactos": 2,
+          "cubre": [
+            {
+              "medido": 32,
+              "veces": 2,
+              "desviacion": 0
+            },
+            {
+              "medido": 34,
+              "veces": 1,
+              "desviacion": -2
+            }
+          ]
+        },
+        {
+          "slug": "90",
+          "valor": "40px",
+          "usos": 3,
+          "exactos": 1,
+          "cubre": [
+            {
+              "medido": 39,
+              "veces": 1,
+              "desviacion": 1
+            },
+            {
+              "medido": 40,
+              "veces": 1,
+              "desviacion": 0
+            },
+            {
+              "medido": 42,
+              "veces": 1,
+              "desviacion": -2
+            }
+          ]
+        },
+        {
+          "slug": "100",
+          "valor": "50px",
+          "usos": 5,
+          "exactos": 5,
+          "cubre": [
+            {
+              "medido": 50,
+              "veces": 5,
+              "desviacion": 0
+            }
+          ]
+        },
+        {
+          "slug": "110",
+          "valor": "56px",
+          "usos": 1,
+          "exactos": 0,
+          "cubre": [
+            {
+              "medido": 55,
+              "veces": 1,
+              "desviacion": 1
+            }
+          ]
+        },
+        {
+          "slug": "120",
+          "valor": "80px",
+          "usos": 1,
+          "exactos": 1,
+          "cubre": [
+            {
+              "medido": 80,
+              "veces": 1,
+              "desviacion": 0
+            }
+          ]
+        }
+      ]
+    },
+    "radius": {
+      "razon": "Los radios medidos son 3, 6, 8 y 10 px, el círculo (50 %) y la píldora (9999 px). Cada uno es un paso: son pocos y el ojo los distingue.",
+      "totalLiterales": 25,
+      "exactos": 25,
+      "aproximados": 0,
+      "pasos": [
+        {
+          "slug": "xs",
+          "valor": "3px",
+          "usos": 6,
+          "exactos": 6,
+          "cubre": [
+            {
+              "medido": "3px",
+              "veces": 6,
+              "desviacion": 0
+            }
+          ]
+        },
+        {
+          "slug": "s",
+          "valor": "6px",
+          "usos": 5,
+          "exactos": 5,
+          "cubre": [
+            {
+              "medido": "6px",
+              "veces": 5,
+              "desviacion": 0
+            }
+          ]
+        },
+        {
+          "slug": "m",
+          "valor": "8px",
+          "usos": 7,
+          "exactos": 7,
+          "cubre": [
+            {
+              "medido": "8px",
+              "veces": 7,
+              "desviacion": 0
+            }
+          ]
+        },
+        {
+          "slug": "l",
+          "valor": "10px",
+          "usos": 2,
+          "exactos": 2,
+          "cubre": [
+            {
+              "medido": "10px",
+              "veces": 2,
+              "desviacion": 0
+            }
+          ]
+        },
+        {
+          "slug": "circle",
+          "valor": "50%",
+          "usos": 4,
+          "exactos": 4,
+          "cubre": [
+            {
+              "medido": "50%",
+              "veces": 4,
+              "desviacion": 0
+            }
+          ]
+        },
+        {
+          "slug": "pill",
+          "valor": "9999px",
+          "usos": 1,
+          "exactos": 1,
+          "cubre": [
+            {
+              "medido": "9999px",
+              "veces": 1,
+              "desviacion": 0
+            }
+          ]
+        }
+      ]
+    },
+    "border": {
+      "razon": "El sitio usa un filete de 1 px y un contorno de enfoque de 2 px.",
+      "totalLiterales": 11,
+      "exactos": 11,
+      "aproximados": 0,
+      "pasos": [
+        {
+          "slug": "hairline",
+          "valor": "1px",
+          "usos": 10,
+          "exactos": 10,
+          "cubre": [
+            {
+              "medido": "1px",
+              "veces": 10,
+              "desviacion": 0
+            }
+          ]
+        },
+        {
+          "slug": "thick",
+          "valor": "2px",
+          "usos": 1,
+          "exactos": 1,
+          "cubre": [
+            {
+              "medido": "2px",
+              "veces": 1,
+              "desviacion": 0
+            }
+          ]
+        }
+      ]
+    },
+    "weight": {
+      "razon": "Cada peso de letra que el sitio declara (Open Sans: 300, 400, 600, 700, 800; los títulos 500) es un paso; no se agrupan porque la familia los dibuja distinto.",
+      "totalLiterales": 40,
+      "exactos": 40,
+      "aproximados": 0,
+      "pasos": [
+        {
+          "slug": "light",
+          "valor": "300",
+          "usos": 1,
+          "exactos": 1,
+          "cubre": [
+            {
+              "medido": "300",
+              "veces": 1,
+              "desviacion": 0
+            }
+          ]
+        },
+        {
+          "slug": "regular",
+          "valor": "400",
+          "usos": 1,
+          "exactos": 1,
+          "cubre": [
+            {
+              "medido": "400",
+              "veces": 1,
+              "desviacion": 0
+            }
+          ]
+        },
+        {
+          "slug": "medium",
+          "valor": "500",
+          "usos": 32,
+          "exactos": 32,
+          "cubre": [
+            {
+              "medido": "500",
+              "veces": 32,
+              "desviacion": 0
+            }
+          ]
+        },
+        {
+          "slug": "bold",
+          "valor": "700",
+          "usos": 4,
+          "exactos": 4,
+          "cubre": [
+            {
+              "medido": "700",
+              "veces": 4,
+              "desviacion": 0
+            }
+          ]
+        },
+        {
+          "slug": "extrabold",
+          "valor": "800",
+          "usos": 1,
+          "exactos": 1,
+          "cubre": [
+            {
+              "medido": "800",
+              "veces": 1,
+              "desviacion": 0
+            }
+          ]
+        },
+        {
+          "slug": "black",
+          "valor": "900",
+          "usos": 1,
+          "exactos": 1,
+          "cubre": [
+            {
+              "medido": "900",
+              "veces": 1,
+              "desviacion": 0
+            }
+          ]
+        }
+      ]
+    },
+    "leading": {
+      "razon": "Los interlineados sin unidad se agrupan en 5 pasos: 1, 1,2 (títulos), 1,4, 1,7 (cuerpo: 1,6 a 1,8) y 2.",
+      "totalLiterales": 37,
+      "exactos": 31,
+      "aproximados": 6,
+      "pasos": [
+        {
+          "slug": "none",
+          "valor": "1",
+          "usos": 4,
+          "exactos": 4,
+          "cubre": [
+            {
+              "medido": 1,
+              "veces": 4,
+              "desviacion": 0
+            }
+          ]
+        },
+        {
+          "slug": "tight",
+          "valor": "1.2",
+          "usos": 7,
+          "exactos": 7,
+          "cubre": [
+            {
+              "medido": 1.2,
+              "veces": 7,
+              "desviacion": 0
+            }
+          ]
+        },
+        {
+          "slug": "snug",
+          "valor": "1.4",
+          "usos": 6,
+          "exactos": 5,
+          "cubre": [
+            {
+              "medido": 1.4,
+              "veces": 5,
+              "desviacion": 0
+            },
+            {
+              "medido": 1.5,
+              "veces": 1,
+              "desviacion": "acercado"
+            }
+          ]
+        },
+        {
+          "slug": "normal",
+          "valor": "1.7",
+          "usos": 19,
+          "exactos": 14,
+          "cubre": [
+            {
+              "medido": 1.6,
+              "veces": 1,
+              "desviacion": "acercado"
+            },
+            {
+              "medido": 1.7,
+              "veces": 14,
+              "desviacion": 0
+            },
+            {
+              "medido": 1.75,
+              "veces": 3,
+              "desviacion": "acercado"
+            },
+            {
+              "medido": 1.8,
+              "veces": 1,
+              "desviacion": "acercado"
+            }
+          ]
+        },
+        {
+          "slug": "loose",
+          "valor": "2",
+          "usos": 1,
+          "exactos": 1,
+          "cubre": [
+            {
+              "medido": 2,
+              "veces": 1,
+              "desviacion": 0
+            }
+          ]
+        }
+      ]
+    },
+    "measure": {
+      "razon": "Dos anchos máximos de texto distintos del ancho de contenido (1080, que ya es --wp--style--global--content-size).",
+      "totalLiterales": 2,
+      "exactos": 2,
+      "aproximados": 0,
+      "pasos": [
+        {
+          "slug": "s",
+          "valor": "700px",
+          "usos": 1,
+          "exactos": 1,
+          "cubre": [
+            {
+              "medido": "700px",
+              "veces": 1,
+              "desviacion": 0
+            }
+          ]
+        },
+        {
+          "slug": "m",
+          "valor": "760px",
+          "usos": 1,
+          "exactos": 1,
+          "cubre": [
+            {
+              "medido": "760px",
+              "veces": 1,
+              "desviacion": 0
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "definiciones": {
+    "scale_spacing": "10=4px; 20=10px; 30=16px; 40=20px; 50=24px; 60=30px; 70=40px; 80=50px; 90=56px; 100=72px; 110=128px; gutter=max(10%, calc((100% - var(--wp--style--global--content-size)) / 2))",
+    "scale_font_size": "10=12px; 20=14px; 30=16px; 40=18px~15px; 50=20px~15px; 60=24px~18px; 70=28px~16px; 80=32px~24px; 90=40px~28px; 100=50px~30px; 110=56px~38px; 120=80px~28px",
+    "scale_radius": "xs=3px; s=6px; m=8px; l=10px; circle=50%; pill=9999px",
+    "scale_border": "hairline=1px; thick=2px",
+    "scale_weight": "light=300; regular=400; medium=500; bold=700; extrabold=800; black=900",
+    "scale_leading": "none=1; tight=1.2; snug=1.4; normal=1.7; loose=2",
+    "scale_measure": "s=700px; m=760px"
+  },
+  "huecos": {
+    "sombras": {
+      "razon": "El Core no tiene escala de sombras (pregunta Q3 abierta en la espec): no se inventa una.",
+      "literales": [
+        {
+          "valor": "color-mix(in srgb, var(--wp--preset--color--ink) 12%, transparent) 0px 24px 72px -12px",
+          "veces": 1
+        },
+        {
+          "valor": "2px 2px 10px color-mix(in srgb, var(--wp--preset--color--ink) 20%, transparent)",
+          "veces": 1
+        },
+        {
+          "valor": "0 4px 10px color-mix(in srgb, var(--wp--preset--color--ink) 20%, transparent)",
+          "veces": 2
+        }
+      ]
+    },
+    "interlineadoAbsoluto": {
+      "razon": "Interlineado en píxeles (el sitio usa 40 px en el encabezado): es una altura fija, no un interlineado; queda sin escala.",
+      "literales": [
+        {
+          "valor": "40px",
+          "veces": 3
+        }
+      ]
+    },
+    "otros": [
+      {
+        "valor": "espaciado calculado: calc((100% + -734px) / 2)",
+        "veces": 1
+      }
+    ],
+    "cubiertosPorElTema": [
+      {
+        "valor": "max-width 1080px → --wp--style--global--content-size (theme.json)",
+        "veces": 13
+      }
+    ]
+  }
+}

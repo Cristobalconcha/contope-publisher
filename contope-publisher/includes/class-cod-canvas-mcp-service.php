@@ -585,6 +585,39 @@ final class COD_Canvas_MCP_Service
                 'annotations' => $mutation,
             ],
             [
+                'name' => 'cod_read_block_page',
+                'title' => 'Leer una página en bloques',
+                'description' => 'Devuelve el contenido (bloques de WordPress, serializado) de una página y su revisión de contenido, la que hay que pasar como expectedRevision a cod_write_block_page.',
+                'inputSchema' => [
+                    'type' => 'object',
+                    'properties' => ['pageId' => ['type' => 'integer', 'minimum' => 1]],
+                    'required' => ['pageId'],
+                    'additionalProperties' => false,
+                ],
+                'outputSchema' => ['type' => 'object'],
+                'annotations' => $read_only,
+            ],
+            [
+                'name' => 'cod_write_block_page',
+                'title' => 'Escribir una página en bloques de WordPress',
+                'description' => 'Crea (pageId 0 + title) o reemplaza el contenido de una página cuyo contenido son bloques de WordPress. content es el texto serializado de los bloques (con sus comentarios wp:). Pasa por la compuerta del diseño: un bloque sólo puede llevar referencias al diseño del sitio (slug de preset, var:preset|spacing|40, var(--wp--custom--radius--m)); un color, tamaño, espaciado o tipografía literal se rechaza con el código y la ruta. Es la vía oficial: la REST cruda de WordPress pasa por la misma compuerta. Si la página tiene encabezado y pie por contope/lienzo, el contenido debe ir envuelto en ese bloque.',
+                'inputSchema' => [
+                    'type' => 'object',
+                    'properties' => [
+                        'pageId' => ['type' => 'integer', 'minimum' => 0],
+                        'expectedRevision' => ['type' => 'integer', 'minimum' => 0],
+                        'content' => ['type' => 'string', 'minLength' => 1],
+                        'title' => ['type' => 'string', 'minLength' => 1, 'maxLength' => 160],
+                        'slug' => ['type' => 'string', 'maxLength' => 160],
+                        'status' => ['type' => 'string', 'enum' => ['draft', 'publish', 'pending', 'private']],
+                    ],
+                    'required' => ['pageId', 'content'],
+                    'additionalProperties' => false,
+                ],
+                'outputSchema' => ['type' => 'object'],
+                'annotations' => $mutation,
+            ],
+            [
                 'name' => 'cod_preview_canvas_composition',
                 'title' => 'Previsualizar composición Canvas',
                 'description' => 'Valida composición, reglas, URLs seguras y formularios publicados contra una revisión sin escribir. No sustituye la revisión visual del Canvas ni carga activos.',
@@ -932,6 +965,23 @@ final class COD_Canvas_MCP_Service
             }
             $title = $this->normalize_page_title($arguments['title']);
             return is_wp_error($title) ? $title : $this->create_canvas_page($title);
+        }
+        if ($tool_name === 'cod_read_block_page') {
+            if (!$this->has_only_keys($arguments, ['pageId']) || !isset($arguments['pageId']) || !is_int($arguments['pageId']) || $arguments['pageId'] < 1) {
+                return new WP_Error('cod_mcp_invalid_arguments', 'pageId debe ser un entero positivo y el único argumento.');
+            }
+            return (new COD_Block_Page_Writer())->read($arguments['pageId']);
+        }
+        if ($tool_name === 'cod_write_block_page') {
+            if (!$this->has_only_keys($arguments, ['pageId', 'expectedRevision', 'content', 'title', 'slug', 'status'])
+                || !isset($arguments['pageId'], $arguments['content']) || !is_int($arguments['pageId']) || $arguments['pageId'] < 0
+                || !is_string($arguments['content']) || $arguments['content'] === '') {
+                return new WP_Error('cod_mcp_invalid_arguments', 'pageId (0 para crear) y content son obligatorios; los demás argumentos son expectedRevision, title, slug y status.');
+            }
+            if ($arguments['pageId'] > 0 && (!isset($arguments['expectedRevision']) || !is_int($arguments['expectedRevision']))) {
+                return new WP_Error('cod_mcp_invalid_arguments', 'Para reemplazar una página, expectedRevision es obligatorio (léela con cod_read_block_page).');
+            }
+            return (new COD_Block_Page_Writer())->write($arguments);
         }
         if ($tool_name === 'cod_preview_canvas_composition') {
             $input = $this->composition_arguments($arguments, false);

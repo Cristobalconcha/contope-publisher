@@ -191,6 +191,7 @@ final class COD_ADN_Registry
             '--wp--custom--border--' => 'borde-grosor',
             '--wp--custom--shadow--' => 'sombra',
             '--wp--custom--motion--' => 'movimiento',
+            '--wp--custom--layout--' => 'ancho-de-caja',
             '--wp--style--global--' => 'ancho-de-caja',
         ];
         foreach ($mapa as $prefijo => $clase) {
@@ -268,6 +269,9 @@ final class COD_ADN_Registry
                 self::agregar($nombres, $token, 'definiciones', $v[$id] . 'px');
             }
         }
+        foreach (COD_Theme_Definitions::nombres_de_escalas() as $nombre => $valor) {
+            self::agregar($nombres, $nombre, 'definiciones', $valor);
+        }
         for ($i = 1; $i <= 6; $i++) {
             if (isset($v['h' . $i . '_size']) && $v['h' . $i . '_size'] !== '') {
                 self::agregar($nombres, '--cod-h' . $i . '-size', 'definiciones', $v['h' . $i . '_size'] . 'px');
@@ -293,14 +297,48 @@ final class COD_ADN_Registry
         }
     }
 
-    /** @param array<string, array<string, string>> $nombres */
+    /**
+     * Los presets declarados por el tema del sitio (y los que una persona agregó en el editor del
+     * sitio), NO los que WordPress trae de fábrica. WordPress imprime sus propios colores
+     * (vivid-red, luminous-vivid-orange…), degradados, escalas de espaciado y sombras
+     * (natural, deep, sharp…) aunque el tema los desactive para el editor; si entraran al
+     * registro, una IA podría pintar con un rojo o una sombra que el diseño del sitio no definió.
+     * El registro es lo que el diseño del sitio define, y nada más.
+     *
+     * @param array<string, array<string, string>> $nombres
+     */
     private static function desde_theme_json(array &$nombres): void
     {
+        if (function_exists('wp_get_global_settings')) {
+            $ajustes = wp_get_global_settings();
+            $presets = [
+                ['color', 'palette', 'color', 'color'],
+                ['color', 'gradients', 'gradient', 'gradient'],
+                ['typography', 'fontSizes', 'font-size', 'size'],
+                ['typography', 'fontFamilies', 'font-family', 'fontFamily'],
+                ['spacing', 'spacingSizes', 'spacing', 'size'],
+                ['shadow', 'presets', 'shadow', 'shadow'],
+            ];
+            foreach ($presets as [$grupo, $clave, $tipo, $campo]) {
+                $porOrigen = is_array($ajustes) && isset($ajustes[$grupo][$clave]) && is_array($ajustes[$grupo][$clave]) ? $ajustes[$grupo][$clave] : [];
+                foreach (['theme', 'custom'] as $origen) {
+                    foreach (($porOrigen[$origen] ?? []) as $p) {
+                        if (is_array($p) && isset($p['slug']) && is_string($p['slug'])) {
+                            self::agregar($nombres, '--wp--preset--' . $tipo . '--' . $p['slug'], 'theme.json', is_string($p[$campo] ?? null) ? (string) $p[$campo] : '');
+                        }
+                    }
+                }
+            }
+        }
         if (function_exists('wp_get_global_stylesheet')) {
             $css = wp_get_global_stylesheet(['variables']);
             if (is_string($css) && $css !== '') {
-                if (preg_match_all('/(--[a-z0-9_-]+)\s*:\s*([^;}]*)/i', $css, $m, PREG_SET_ORDER) !== false) {
+                if (preg_match_all('/(--[a-z0-9_-]+)s*:s*([^;}]*)/i', $css, $m, PREG_SET_ORDER) !== false) {
                     foreach ($m as $par) {
+                        // Los presets ya entraron arriba por origen; acá sólo lo personalizado (--wp--custom--*).
+                        if (strpos($par[1], '--wp--preset--') === 0) {
+                            continue;
+                        }
                         self::agregar($nombres, $par[1], 'theme.json', trim($par[2]));
                     }
                 }

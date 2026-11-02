@@ -260,6 +260,18 @@ final class COD_ADN_Gate
             'Una variable local (--x) no puede llevar un color literal, ni un valor literal si se usa en una propiedad gobernada.',
             'var(--x, respaldo) no admite un respaldo literal; var(--x) exige que --x esté en el registro o se declare en la misma regla: ADN_VAR_UNKNOWN.',
             'Lo mismo vale para style="" y para los atributos de presentación SVG (fill, stroke, stop-color; font-* en text/tspan) y para los estilos de projectData.',
+            'Contenido en bloques de WordPress: un bloque sólo lleva referencias. style.color.*, style.typography.*, style.spacing.*, style.border.*, style.shadow y style.css deben ser var:preset|… o var(--nombre) del registro; backgroundColor/textColor/fontSize/fontFamily/gradient deben ser el slug de un preset que exista; no se admiten customTextColor, customBackgroundColor, customFontSize ni equivalentes; ni style="", SVG con colores, <style> o clases has-* con un slug que no exista.',
+        ];
+        $d['viasCerradas'] = [
+            'MCP propio (cod_*)',
+            'cod_write_block_page: la vía oficial para escribir una página cuyo contenido son bloques',
+            'REST de WordPress con contraseña de aplicación: wp/v2/pages, posts, blocks (wp_block), templates, template-parts, navigation, widgets (contenido de bloques) y global-styles (rechazado)',
+            'Importador de paquetes cuando lo dispara una petición que no es una persona en el editor',
+        ];
+        $d['limitesDeclarados'] = [
+            'WP-CLI y la base de datos son acceso al servidor: la compuerta no los alcanza.',
+            'Una persona con sesión en el editor (cookie + nonce) no se bloquea (la espec lo deja fuera a propósito).',
+            'XML-RPC se desactiva mientras la compuerta esté en ratchet o enforce.',
         ];
         $d['nombresPorClase'] = $por_clase;
         $d['camposGobernados'] = self::CAMPOS_DE_REGLA;
@@ -1327,6 +1339,384 @@ final class COD_ADN_Gate
             return true;
         }
         return false;
+    }
+
+    // =====================================================================
+    // Quién pide: el MCP, una contraseña de aplicación (REST), una persona
+    // =====================================================================
+
+    /** La petición se autenticó con una contraseña de aplicación (lo prende el gancho de WordPress). */
+    private static bool $contrasena_de_aplicacion = false;
+
+    public static function marcar_contrasena_de_aplicacion(bool $si = true): void
+    {
+        self::$contrasena_de_aplicacion = $si;
+    }
+
+    /**
+     * ¿La escritura la pide algo que NO es una persona en el editor? Es el MCP o una
+     * petición REST autenticada con contraseña de aplicación (la credencial que se le
+     * da a una IA o a un script). Una persona con sesión (cookie + nonce) en el
+     * editor de bloques o en el editor Canvas queda fuera, como dice la espec (4.1).
+     *
+     * WP-CLI y la base de datos son acceso al servidor y quedan fuera: es un límite
+     * declarado (CHANGELOG), no un olvido.
+     */
+    public static function peticion_no_humana(): bool
+    {
+        return self::$mcp || self::$contrasena_de_aplicacion;
+    }
+
+    // =====================================================================
+    // Contenido en bloques de WordPress (post_content): atributos, HTML guardado, clases
+    // =====================================================================
+
+    /** Atributos de un bloque que son el nombre (slug) de un preset: atributo → [propiedad CSS, tipo de variable]. */
+    private const SLUGS_DE_BLOQUE = [
+        'backgroundColor' => ['background-color', 'color'],
+        'textColor' => ['color', 'color'],
+        'overlayColor' => ['background-color', 'color'],
+        'borderColor' => ['border-color', 'color'],
+        'linkColor' => ['color', 'color'],
+        'iconColor' => ['color', 'color'],
+        'iconBackgroundColor' => ['background-color', 'color'],
+        'gradient' => ['background-image', 'gradient'],
+        'fontSize' => ['font-size', 'font-size'],
+        'fontFamily' => ['font-family', 'font-family'],
+    ];
+
+    /** Atributos antiguos con el valor literal en el propio atributo: siempre son un literal. */
+    private const LITERALES_DE_BLOQUE = [
+        'customTextColor' => 'color',
+        'customBackgroundColor' => 'background-color',
+        'customOverlayColor' => 'background-color',
+        'customGradient' => 'background-image',
+        'customFontSize' => 'font-size',
+    ];
+
+    /** Dentro de `style` de un bloque: las claves que no son diseño de estas clases (composición de la página, no identidad). */
+    private const ESTILO_DE_BLOQUE_NO_GOBERNADO = ['dimensions', 'position', 'background', 'layout', 'filter', 'visibility', 'lightbox'];
+
+    /** Dentro de `style.typography`: las claves que no son de las clases gobernadas. */
+    private const TIPOGRAFIA_NO_GOBERNADA = ['textAlign', 'textTransform', 'textDecoration', 'fontStyle', 'writingMode', 'textColumns', 'textIndent'];
+
+    /** Las clases `has-*` que son marcadores de WordPress y no el nombre de un preset. */
+    private const CLASES_MARCADOR = ['has-text-color', 'has-link-color', 'has-border-color', 'has-custom-font-size'];
+
+    /**
+     * Revisa el contenido de un post —bloques de WordPress— y devuelve un informe.
+     *
+     * Superficies: los atributos de cada bloque (`style.color.*`, `style.typography.*`,
+     * `style.spacing.*`, `style.border.*`, `style.shadow`, `style.css`, `layout.contentSize`,
+     * los slugs `backgroundColor`/`textColor`/`fontSize`/`fontFamily`/`gradient`, y los
+     * `custom*` antiguos), el HTML que el bloque guarda (`style=""`, atributos de
+     * presentación SVG, `<style>`, hojas enlazadas) y las clases `has-<slug>-…` con un
+     * slug que el registro no tiene. Mismos códigos y rutas que el resto de la compuerta.
+     *
+     * @return array<string, mixed> informe
+     */
+    public static function revisar_contenido(string $previo, string $nuevo, string $herramienta): array
+    {
+        $modo = self::modo();
+        $antes_n = self::$examinadas;
+        $nuevas_v = self::violaciones_de_contenido($nuevo);
+        $revisadas = self::$examinadas - $antes_n;
+        $heredadas = 0;
+        $pendientes = $nuevas_v;
+        if ($modo === 'ratchet' && $previo !== '') {
+            $conteo = [];
+            foreach (self::violaciones_de_contenido($previo) as $v) {
+                $conteo[$v['clave']] = ($conteo[$v['clave']] ?? 0) + 1;
+            }
+            $pendientes = [];
+            foreach ($nuevas_v as $v) {
+                if (($conteo[$v['clave']] ?? 0) > 0) {
+                    --$conteo[$v['clave']];
+                    ++$heredadas;
+                    continue;
+                }
+                $pendientes[] = $v;
+            }
+        }
+        return self::informe($modo, $revisadas, $pendientes, $heredadas, $herramienta);
+    }
+
+    /** @return array<int, array<string, mixed>> */
+    private static function violaciones_de_contenido(string $contenido): array
+    {
+        self::$fallos_de_analisis = [];
+        $out = [];
+        if (trim($contenido) === '') {
+            return $out;
+        }
+        $bloques = function_exists('parse_blocks') ? parse_blocks($contenido) : [];
+        foreach ($bloques as $i => $bloque) {
+            self::violaciones_de_un_bloque($bloque, 'blocks[' . $i . ']', $out);
+        }
+        foreach (self::$fallos_de_analisis as $donde) {
+            $out[] = self::violacion('ADN_SCAN_FAILED', 'analisis', '(contenido)', $donde, $donde, 'No se pudo analizar esta parte del contenido (demasiado grande o mal formada), y lo que no se puede revisar no se acepta.');
+        }
+        return $out;
+    }
+
+    /**
+     * @param array<string, mixed> $bloque
+     * @param array<int, array<string, mixed>> $out
+     */
+    private static function violaciones_de_un_bloque(array $bloque, string $ruta, array &$out): void
+    {
+        $nombre = isset($bloque['blockName']) && is_string($bloque['blockName']) ? $bloque['blockName'] : 'freeform';
+        $aqui = $ruta . '(' . $nombre . ')';
+        $attrs = isset($bloque['attrs']) && is_array($bloque['attrs']) ? $bloque['attrs'] : [];
+
+        foreach (self::violaciones_de_atributos($attrs, $aqui . '.attrs') as $v) {
+            $out[] = $v;
+        }
+        $html = isset($bloque['innerHTML']) && is_string($bloque['innerHTML']) ? $bloque['innerHTML'] : '';
+        if ($html !== '') {
+            foreach (self::bloques_html($html, $aqui . '.html') as $b) {
+                foreach (self::revisar_bloque($b['decls'], $b['ruta']) as $v) {
+                    $out[] = $v;
+                }
+            }
+            foreach (self::clases_has_de($html, $attrs['className'] ?? '', $aqui) as $v) {
+                $out[] = $v;
+            }
+        } elseif (isset($attrs['className']) && is_string($attrs['className'])) {
+            foreach (self::clases_has_de('', $attrs['className'], $aqui) as $v) {
+                $out[] = $v;
+            }
+        }
+        $internos = isset($bloque['innerBlocks']) && is_array($bloque['innerBlocks']) ? $bloque['innerBlocks'] : [];
+        foreach ($internos as $j => $hijo) {
+            if (is_array($hijo)) {
+                self::violaciones_de_un_bloque($hijo, $aqui . '.innerBlocks[' . $j . ']', $out);
+            }
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $attrs
+     * @return array<int, array<string, mixed>>
+     */
+    private static function violaciones_de_atributos(array $attrs, string $ruta): array
+    {
+        $out = [];
+        foreach (self::SLUGS_DE_BLOQUE as $atributo => [$prop, $tipo]) {
+            if (isset($attrs[$atributo]) && is_string($attrs[$atributo]) && $attrs[$atributo] !== '') {
+                $slug = $attrs[$atributo];
+                $valor = preg_match('/^[a-z0-9_-]+$/i', $slug) === 1 ? 'var(--wp--preset--' . $tipo . '--' . $slug . ')' : $slug;
+                foreach (self::revisar_declaracion($prop, $valor, $ruta . '.' . $atributo, []) as $v) {
+                    $out[] = $v;
+                }
+            }
+        }
+        foreach (self::LITERALES_DE_BLOQUE as $atributo => $prop) {
+            if (isset($attrs[$atributo]) && is_string($attrs[$atributo]) && $attrs[$atributo] !== '') {
+                // En estos atributos antiguos el valor ES el literal; un tamaño llega sin unidad.
+                $valor = $atributo === 'customFontSize' && is_numeric($attrs[$atributo]) ? $attrs[$atributo] . 'px' : $attrs[$atributo];
+                foreach (self::revisar_declaracion($prop, $valor, $ruta . '.' . $atributo, []) as $v) {
+                    $out[] = $v;
+                }
+            }
+        }
+        if (isset($attrs['customFontSize']) && !is_string($attrs['customFontSize']) && is_numeric($attrs['customFontSize'])) {
+            foreach (self::revisar_declaracion('font-size', $attrs['customFontSize'] . 'px', $ruta . '.customFontSize', []) as $v) {
+                $out[] = $v;
+            }
+        }
+        if (isset($attrs['layout']) && is_array($attrs['layout'])) {
+            foreach (['contentSize', 'wideSize'] as $k) {
+                if (isset($attrs['layout'][$k]) && is_string($attrs['layout'][$k]) && $attrs['layout'][$k] !== '') {
+                    foreach (self::revisar_declaracion('max-width', $attrs['layout'][$k], $ruta . '.layout.' . $k, []) as $v) {
+                        $out[] = $v;
+                    }
+                }
+            }
+        }
+        if (isset($attrs['style']) && is_array($attrs['style'])) {
+            foreach (self::violaciones_de_estilo($attrs['style'], $ruta . '.style') as $v) {
+                $out[] = $v;
+            }
+        }
+        return $out;
+    }
+
+    /**
+     * `style` de un bloque (el objeto que WordPress guarda en el comentario del bloque).
+     *
+     * @param array<string, mixed> $style
+     * @return array<int, array<string, mixed>>
+     */
+    private static function violaciones_de_estilo(array $style, string $ruta): array
+    {
+        $out = [];
+        $hoja = static function (string $prop, $valor, string $r) use (&$out): void {
+            if (is_string($valor) || is_int($valor) || is_float($valor)) {
+                foreach (self::revisar_declaracion($prop, self::valor_de_estilo((string) $valor), $r, []) as $v) {
+                    $out[] = $v;
+                }
+            }
+        };
+        foreach ($style as $clave => $valor) {
+            $r = $ruta . '.' . $clave;
+            switch ($clave) {
+                case 'color':
+                    if (is_array($valor)) {
+                        $hoja('color', $valor['text'] ?? null, $r . '.text');
+                        $hoja('background-color', $valor['background'] ?? null, $r . '.background');
+                        $hoja('background-image', $valor['gradient'] ?? null, $r . '.gradient');
+                    }
+                    break;
+                case 'typography':
+                    if (is_array($valor)) {
+                        foreach (['fontSize' => 'font-size', 'fontFamily' => 'font-family', 'fontWeight' => 'font-weight', 'lineHeight' => 'line-height', 'letterSpacing' => 'letter-spacing'] as $k => $prop) {
+                            $hoja($prop, $valor[$k] ?? null, $r . '.' . $k);
+                        }
+                        foreach ($valor as $k => $_) {
+                            if (!in_array($k, ['fontSize', 'fontFamily', 'fontWeight', 'lineHeight', 'letterSpacing'], true) && !in_array($k, self::TIPOGRAFIA_NO_GOBERNADA, true)) {
+                                $out[] = self::violacion('ADN_BLOCK_STYLE_UNKNOWN', 'analisis', 'typography.' . $k, '(sin clasificar)', $r . '.' . $k, 'style.typography.' . $k . ' no está clasificado como gobernado ni como exento: lo que no se puede revisar no se acepta.');
+                            }
+                        }
+                    }
+                    break;
+                case 'spacing':
+                    if (is_array($valor)) {
+                        foreach (['padding', 'margin', 'blockGap'] as $k) {
+                            self::hojas_de_lados($valor[$k] ?? null, $k === 'blockGap' ? 'gap' : $k, $r . '.' . $k, $out);
+                        }
+                    }
+                    break;
+                case 'border':
+                    if (is_array($valor)) {
+                        self::hojas_de_lados($valor['radius'] ?? null, 'border-radius', $r . '.radius', $out);
+                        self::hojas_de_lados($valor['width'] ?? null, 'border-width', $r . '.width', $out);
+                        $hoja('border-color', $valor['color'] ?? null, $r . '.color');
+                        foreach (['top', 'right', 'bottom', 'left'] as $lado) {
+                            if (isset($valor[$lado]) && is_array($valor[$lado])) {
+                                $hoja('border-' . $lado . '-width', $valor[$lado]['width'] ?? null, $r . '.' . $lado . '.width');
+                                $hoja('border-' . $lado . '-color', $valor[$lado]['color'] ?? null, $r . '.' . $lado . '.color');
+                            }
+                        }
+                    }
+                    break;
+                case 'outline':
+                    if (is_array($valor)) {
+                        $hoja('outline-color', $valor['color'] ?? null, $r . '.color');
+                        $hoja('outline-width', $valor['width'] ?? null, $r . '.width');
+                    }
+                    break;
+                case 'shadow':
+                    $hoja('box-shadow', $valor, $r);
+                    break;
+                case 'elements':
+                    if (is_array($valor)) {
+                        foreach ($valor as $elemento => $sub) {
+                            if (is_array($sub)) {
+                                foreach (self::violaciones_de_estilo($sub, $r . '.' . $elemento) as $v) {
+                                    $out[] = $v;
+                                }
+                            }
+                        }
+                    }
+                    break;
+                case 'css':
+                    if (is_string($valor) && $valor !== '') {
+                        foreach (self::bloques_css('x{' . $valor . '}', $r) as $b) {
+                            foreach (self::revisar_bloque($b['decls'], $b['ruta']) as $v) {
+                                $out[] = $v;
+                            }
+                        }
+                    }
+                    break;
+                default:
+                    if (is_string($clave) && $clave !== '' && $clave[0] === ':' && is_array($valor)) {
+                        // :hover, :focus… dentro de un elemento.
+                        foreach (self::violaciones_de_estilo($valor, $r) as $v) {
+                            $out[] = $v;
+                        }
+                    } elseif (!in_array($clave, self::ESTILO_DE_BLOQUE_NO_GOBERNADO, true)) {
+                        $out[] = self::violacion('ADN_BLOCK_STYLE_UNKNOWN', 'analisis', (string) $clave, '(sin clasificar)', $r, 'style.' . $clave . ' no está clasificado como gobernado ni como exento: lo que no se puede revisar no se acepta. Si es composición de la página, se agrega a la lista de exentos de la compuerta con su razón.');
+                    }
+            }
+        }
+        return $out;
+    }
+
+    /**
+     * @param mixed $valor
+     * @param array<int, array<string, mixed>> $out
+     */
+    private static function hojas_de_lados($valor, string $prop, string $ruta, array &$out): void
+    {
+        if (is_array($valor)) {
+            foreach ($valor as $k => $v) {
+                self::hojas_de_lados($v, $prop, $ruta . '.' . $k, $out);
+            }
+            return;
+        }
+        if (is_string($valor) || is_int($valor) || is_float($valor)) {
+            foreach (self::revisar_declaracion($prop, self::valor_de_estilo((string) $valor), $ruta, []) as $v) {
+                $out[] = $v;
+            }
+        }
+    }
+
+    /** `var:preset|spacing|40` → `var(--wp--preset--spacing--40)`; `var:custom|a|b` → `var(--wp--custom--a--b)`. */
+    private static function valor_de_estilo(string $valor): string
+    {
+        if (preg_match('/^var:(preset|custom|style)\|(.+)$/', trim($valor), $m) === 1) {
+            return 'var(--wp--' . $m[1] . '--' . str_replace('|', '--', $m[2]) . ')';
+        }
+        return $valor;
+    }
+
+    /**
+     * Clases `has-<slug>-color|background-color|border-color|font-size|font-family|gradient-background`
+     * con un slug que el registro no tiene. WordPress las imprime a partir de los slugs de los
+     * atributos; escribirlas a mano en `className` o en el HTML sería una referencia a un preset inexistente.
+     *
+     * @param mixed $nombre_de_clase
+     * @return array<int, array<string, mixed>>
+     */
+    private static function clases_has_de(string $html, $nombre_de_clase, string $ruta): array
+    {
+        $out = [];
+        $clases = [];
+        if (is_string($nombre_de_clase) && $nombre_de_clase !== '') {
+            foreach (preg_split('/\s+/', trim($nombre_de_clase)) ?: [] as $c) {
+                $clases[] = $c;
+            }
+        }
+        if ($html !== '' && preg_match_all('/\bclass\s*=\s*(?:"([^"]*)"|\'([^\']*)\')/i', $html, $m, PREG_SET_ORDER) !== false) {
+            foreach ($m as $par) {
+                $lista = ($par[1] ?? '') !== '' ? $par[1] : ($par[2] ?? '');
+                foreach (preg_split('/\s+/', trim($lista)) ?: [] as $c) {
+                    $clases[] = $c;
+                }
+            }
+        }
+        $tipos = ['background-color' => 'color', 'border-color' => 'color', 'color' => 'color', 'font-size' => 'font-size', 'font-family' => 'font-family', 'gradient-background' => 'gradient'];
+        foreach (array_unique($clases) as $c) {
+            if (strpos($c, 'has-') !== 0 || in_array($c, self::CLASES_MARCADOR, true)) {
+                continue;
+            }
+            if (preg_match('/^has-([a-z0-9_-]+?)-(background-color|border-color|color|font-size|font-family|gradient-background)$/', $c, $mm) !== 1) {
+                continue;
+            }
+            $nombre = '--wp--preset--' . $tipos[$mm[2]] . '--' . $mm[1];
+            if (!COD_ADN_Registry::tiene($nombre)) {
+                $out[] = self::violacion(
+                    'ADN_VAR_UNKNOWN',
+                    'variable',
+                    'class',
+                    $c,
+                    $ruta . '.class',
+                    'La clase ' . $c . ' apunta al preset ' . $nombre . ', que no está en el registro de diseño. Las clases has-* las imprime WordPress desde el slug de un atributo (backgroundColor, textColor, fontSize…) y el slug tiene que existir en el diseño del sitio.'
+                );
+            }
+        }
+        return $out;
     }
 
     // =====================================================================

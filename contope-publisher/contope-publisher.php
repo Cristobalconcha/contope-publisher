@@ -42,6 +42,8 @@ require_once COD_PUBLISHER_DIR . 'includes/class-cod-design-core.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-adn-registry.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-adn-gate.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-adn-gate-admin.php';
+require_once COD_PUBLISHER_DIR . 'includes/class-cod-adn-gate-rest.php';
+require_once COD_PUBLISHER_DIR . 'includes/class-cod-block-page-writer.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-settings-admin.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-site-package-exporter.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-site-package-importer.php';
@@ -130,6 +132,7 @@ add_action('plugins_loaded', static function (): void {
     (new COD_Inline_Editor_Frontend($canvas_repository, $region_resolver))->register();
     (new COD_Settings_Admin())->register();
     (new COD_ADN_Gate_Admin())->register();
+    (new COD_ADN_Gate_Rest())->register();
     (new COD_Medicion())->register();
     (new COD_SVG())->register();
     (new COD_Iconos_Rest())->register();
@@ -147,6 +150,7 @@ add_action('plugins_loaded', static function (): void {
     // los ajustes de WordPress. Si el tema declara uno, gana y el de WordPress
     // se apaga; si no declara ninguno, WordPress sigue haciendo lo suyo.
     COD_Theme_Definitions::registrar_icono();
+    COD_Theme_Definitions::registrar_escalas();
 
     // Fase 1 (POC): bloque Gutenberg nativo ocd/heading. Aditivo y aislado,
     // convive con el flujo Canvas legacy sin tocarlo.

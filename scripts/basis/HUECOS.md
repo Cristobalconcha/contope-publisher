@@ -220,3 +220,59 @@ en `uploads/iconos-divi/` y las formas del divisor en `uploads/divisores/` y `up
 4. Poner la clave de Mapbox (Configuración → Mapa: con ella el mapa de Contactos es el de verdad), la casilla real de destino del
    formulario `contacto-basis` (hoy apagado, con `PENDIENTE-DESTINO@basis.invalid`) y SMTP; revisar los `[PENDIENTE: …]` del texto legal.
 5. Comparar: `node scripts/basis/comparar-vivo.mjs todas todos http://<subdominio>`, `capturar-comparar.mjs <subdominio>` y `auditoria-sitio.mjs <subdominio>`.
+
+---
+
+## Pasada de bloques (1-nov-2026): las cinco páginas son bloques de WordPress
+
+Las páginas `inicio`, `basis-carpas-industriales`, `preguntas-frecuentes`, `contactos` y `terminos-y-privacidad` dejaron de ser documentos Canvas
+dibujados por shortcode: son **bloques de WordPress** dentro de `contope/lienzo` (que les pone el encabezado y el pie, que siguen siendo regiones
+del lienzo). Se rearman con `node scripts/basis/componer-bloques.mjs`, que escribe **sólo por `cod_write_block_page`** con la compuerta del diseño
+en `enforce`. Los documentos Canvas de las páginas quedan intactos en la base (y en `wp-local-basis/respaldos/antes-de-bloques-<fecha>/`); para volver:
+`php scripts/basis/respaldar-paginas.php --restaurar <carpeta>`. Para rehacer todo desde cero: `componer.mjs`, `componer-legal.mjs`,
+`aplicar.mjs` (sólo las regiones y el formulario importan; sus páginas Canvas ya no se muestran), `escalas-del-sitio.mjs`,
+`definiciones-del-set.php --theme-json` y `componer-bloques.mjs`.
+
+### Las escalas (`escalas-del-sitio.mjs` → `escalas.json` → definiciones → theme.json)
+
+Medido: **502 valores literales** en las composiciones (290 espaciado, 89 peso/interlineado, 65 tamaño, 26 radio, 15 ancho, 11 borde, 6 sombra; 0 color,
+0 familia). Cada escala se deriva de lo que el sitio usa; el informe de cuánto se aparta cada valor medido de su paso está en `escalas.json`.
+
+| escala | pasos | de cuántos literales salió |
+|---|---|---|
+| espaciado (`--wp--preset--spacing--*`) | 10=4, 20=10, 30=16, 40=20, 50=24, 60=30, 70=40, 80=50, 90=56, 100=72, 110=128 px y `gutter` (el margen de una fila: 80 % con tope de 1080) | 263 (162 exactos, 101 acercados, el mayor a 4,6 px) + 12 filas |
+| tamaños de letra (`--wp--preset--font-size--*`) | 10=12, 20=14, 30=16, 40=18, 50=20, 60=24, 70=28, 80=32, 90=40, 100=50, 110=56, 120=80 px (los de 20 px en adelante, fluidos hasta el mínimo que usa el original en el celular) | 57 (48 exactos) |
+| radios (`--wp--custom--radius--*`) | xs 3, s 6, m 8, l 10 px, circle 50 %, pill 9999 px | 25 (todos exactos) |
+| bordes (`--wp--custom--border--*`) | hairline 1 px, thick 2 px | 11 |
+| pesos (`--wp--custom--typography--font-weight--*`) | light 300, regular 400, medium 500, bold 700, extrabold 800, black 900 | 40 |
+| interlineados (`--wp--custom--typography--line-height--*`) | none 1, tight 1,2, snug 1,4, normal 1,7, loose 2 | 37 (31 exactos) |
+| medidas de texto (`--wp--custom--layout--measure--*`) | s 700, m 760 px (el 1080 ya es `--wp--style--global--content-size`) | 2 |
+
+### Huecos (listados, no inventados)
+
+- **Sombras:** 4 literales (3 sombras distintas). El Core no tiene escala de sombras (pregunta Q3 abierta); el registro ya no admite las sombras de fábrica de
+  WordPress (`natural`, `deep`…). Quedan sin sombra: las tarjetas del formulario y del mapa de Contactos, el botón «Contactanos hoy».
+- **Interlineado en píxeles** (`line-height: 40px`, 3 usos, sólo en el encabezado): es una altura fija, no un interlineado.
+- **Colores con alfa** (`color-mix(... 88 %, transparent)`): la paleta no declara variantes con transparencia. La caja de «Características» sale con fondo sólido
+  (el original dejaba ver el video a través, con desenfoque).
+- **Degradados:** los dos que usa el sitio (color→transparente) se declararon como presets del tema (`settings.color.gradients`, en `theme.json`), porque
+  `core/cover` sólo acepta un degradado por slug. No están en las definiciones del set (no hay un campo de degradados): son un hueco de las definiciones.
+- **Variante del formulario:** las ~70 variables (`settings.custom.form`) viven en `contope-basis/theme.json`, generadas de la medición del formulario de
+  Gravity. No están en las definiciones del set (Q3: el Core no expresa «variantes con datos»). Esos nombres son `neutro` en el registro: no sirven como valor de diseño en ninguna clase.
+
+### Diferencias visibles respecto del sitio anterior (lista completa en `salida/bloques/perdidas.json`)
+
+1. **Íconos de «Opciones comerciales»** (carrito, bodega, reloj de arena): salen como imagen SVG con el color de su archivo (negro), no blancos. `core/html` no guarda el
+   SVG en línea (el editor serializa vacío) y ningún bloque recolorea un SVG desde la paleta.
+2. **Acordeón:** es `core/accordion`; trae su ícono (chevron/“+”) y no el glifo ETmodules `e050` del original (ni lo esconde al abrir). El comportamiento (abrir, cerrar,
+   un solo pliegue abierto) es el del bloque nativo, con su API de interactividad.
+3. **Contorno de las fotos** (2 px blanco, separado 4 px) de «Soluciones inteligentes»: no hay atributo de bloque ni escala para `outline`.
+4. **Sombras** (ver hueco) y el **desenfoque** (`backdrop-filter`) de la caja de «Características».
+5. **Divisor curvo** de la cabecera de Preguntas frecuentes: no tiene bloque equivalente; la cabecera termina recta.
+6. **Barra lateral de `basis-carpas-industriales`:** los bloques de WordPress (`core/search`, `latest-posts`, `latest-comments`) se dibujan con el estilo del tema; las
+   «partes» con las que antes se les daba forma (etiqueta, entrada, botón, lista, enlace…) no tienen atributo de bloque.
+7. **Tamaños por punto de quiebre:** el original definía un tamaño distinto en escritorio, tablet y celular; los bloques usan tamaños fluidos (mínimo = lo que el original
+   usa en celular). A 768 y 393 el cuerpo de texto y los títulos pueden diferir unos píxeles. Lo mismo el relleno de las secciones (54 en escritorio y 50 en celular: un solo paso, 56).
+8. **Columnas:** `core/columns` apila a los 782 px; el original apilaba a 767. A 768 las columnas ya están apiladas en ambos.
+9. **Valores acercados a la escala:** 101 de 263 medidas de espaciado quedaron a menos de 5 px de su paso (el relleno de 27 px de las cajas pasó a 24; las separaciones de 59 px entre columnas a 56).
+10. **Tarjeta del mapa y del formulario en Contactos:** sin el radio ni la sombra de la caja del mapa; las columnas del formulario y del mapa dividen el ancho 61/39 sin descontar la separación.

@@ -35,6 +35,18 @@ const SITIO = (posicionales[0] || 'http://localhost:8894').replace(/\/+$/, '');
 const SAL = posicionales[1] || 'C:/Users/Cristobal concha/Sesión Claude/entregables/basis/capturas-comparacion';
 mkdirSync(SAL, { recursive: true });
 const PAGINAS = [['inicio', '/'], ['basis-carpas-industriales', '/basis-carpas-industriales/'], ['preguntas-frecuentes', '/preguntas-frecuentes/'], ['contactos', '/contactos/'], ['terminos-y-privacidad', '/terminos-y-privacidad/']];
+/*
+ * Lo que cada página DEBE tener, contado en las composiciones de origen (salida/*.componer.json: nodos de cada tipo; los íconos de
+ * «Opciones comerciales» son imágenes). Está escrito a mano a propósito: si lo leyera de lo que el guion de bloques genera, un
+ * guion que perdiera un acordeón perdería también la expectativa. Encontrar MENOS de lo esperado es un problema; CERO, más.
+ */
+const INVENTARIO = {
+  inicio: { imagenes: 7, videos: 1, acordeones: 1, pliegues: 3, botones: 3, listas: 4, titulos: 11 },
+  'basis-carpas-industriales': { buscadores: 1, entradas: 1, comentarios: 1, titulos: 3 },
+  'preguntas-frecuentes': { acordeones: 3, pliegues: 16, imagenes: 4, listas: 1, separadores: 1, titulos: 4 },
+  contactos: { formularios: 1, mapas: 1, titulos: 1 },
+  'terminos-y-privacidad': { tablas: 3, listas: 3, titulos: 20 },
+};
 const resultados = [];
 let fallas = 0;
 
@@ -96,37 +108,59 @@ for (const ancho of SOLO_GOBIERNO ? [] : [1440, 768, 393]) {
       }
       if (medios.fuentes.length) caso.problemas.push(`fuentes con error: ${medios.fuentes.join(', ')}`);
 
-      // 3. acordeones (cada grupo es un acordeón aparte: la página de preguntas tiene dos columnas, cada una con el suyo)
-      const pliegues = await evaluar(`document.querySelectorAll('[data-cod-acordeon-rol="resumen"]').length`);
+      // 3. inventario esperado de la página (bloques nativos): encontrar menos de lo esperado —sobre todo 0 donde se espera más— es un PROBLEMA
+      const esperado = INVENTARIO[slug];
+      const hallado = await evaluar(`(() => ({
+        acordeones: document.querySelectorAll('.wp-block-accordion').length,
+        pliegues: document.querySelectorAll('.wp-block-accordion-item').length,
+        formularios: document.querySelectorAll('.wp-block-contope-formulario .ofr-form, .ofr-form').length,
+        mapas: document.querySelectorAll('.wp-block-contope-mapa, [data-cod-behavior="mapa"]').length,
+        videos: document.querySelectorAll('video').length,
+        imagenes: document.querySelectorAll('figure.wp-block-image img').length,
+        tablas: document.querySelectorAll('figure.wp-block-table table').length,
+        listas: document.querySelectorAll('ul.wp-block-list, ol.wp-block-list').length,
+        botones: document.querySelectorAll('.wp-block-button__link').length,
+        titulos: document.querySelectorAll('.wp-block-heading').length,
+        buscadores: document.querySelectorAll('.wp-block-search').length,
+        entradas: document.querySelectorAll('.wp-block-latest-posts').length,
+        comentarios: document.querySelectorAll('.wp-block-latest-comments').length,
+        separadores: document.querySelectorAll('hr.wp-block-separator').length,
+      }))()`);
+      for (const [clave, n] of Object.entries(esperado)) {
+        if (hallado[clave] < n) caso.problemas.push(`inventario: se esperaban ${n} ${clave} y hay ${hallado[clave]}${hallado[clave] === 0 ? ' (CERO donde se espera algo)' : ''}`);
+      }
+      caso.notas.push('inventario: ' + Object.entries(esperado).map(([k, n]) => `${k} ${hallado[k]}/${n}`).join(', '));
+      const sinBloques = await evaluar(`document.querySelectorAll('[data-cod-document-id] .wp-block-contope-lienzo, .cod-canvas--bloques').length`);
+      if (!sinBloques) caso.problemas.push('la página no está dibujada por el bloque contope/lienzo (¿sigue siendo un documento Canvas?)');
+
+      // 3b. acordeones nativos (core/accordion, Interactivity API): cada pliegue se abre y se cierra al tocarlo y, con autoclose, cierra el anterior
+      const pliegues = await evaluar(`document.querySelectorAll('.wp-block-accordion-heading__toggle').length`);
       if (pliegues) {
-        const estado = (n) => evaluar(`(() => { const b = document.querySelectorAll('[data-cod-acordeon-rol="resumen"]')[${n}]; const p = document.getElementById(b.getAttribute('aria-controls')); const raiz = b.closest('[data-cod-behavior="acordeon"]'); const i = b.querySelector('[data-cod-acordeon-rol="icono"]'); const ri = i ? getComputedStyle(i) : null; const rp = p.getBoundingClientRect(); const hermanos = [...raiz.querySelectorAll('[data-cod-acordeon-rol="resumen"]')]; return { abierto: b.getAttribute('aria-expanded') === 'true', panelVisible: rp.height > 0 && getComputedStyle(p).display !== 'none', abiertosEnSuGrupo: hermanos.filter((h) => h.getAttribute('aria-expanded') === 'true').length, unoSolo: raiz.getAttribute('data-cod-acordeon-autoclose') !== '0', icono: i ? { estado: i.getAttribute('data-cod-acordeon-estado'), visible: ri.visibility !== 'hidden' && i.getBoundingClientRect().width > 0, dibujo: (ri.webkitMaskImage || ri.maskImage || '') + '|' + getComputedStyle(i, '::before').content + '|' + getComputedStyle(i, '::after').transform } : null }; })()`);
+        const estado = (n) => evaluar(`(() => { const b = document.querySelectorAll('.wp-block-accordion-heading__toggle')[${n}]; const p = document.getElementById(b.getAttribute('aria-controls')); const raiz = b.closest('.wp-block-accordion'); const rp = p.getBoundingClientRect(); const hermanos = [...raiz.querySelectorAll('.wp-block-accordion-heading__toggle')]; let auto = false; try { auto = JSON.parse(raiz.getAttribute('data-wp-context') || '{}').autoclose === true; } catch (e) { /* sin contexto */ } const i = b.querySelector('.wp-block-accordion-heading__toggle-icon'); const ri = i ? i.getBoundingClientRect() : null; return { abierto: b.getAttribute('aria-expanded') === 'true', panelVisible: rp.height > 0 && !p.hidden && getComputedStyle(p).visibility !== 'hidden', abiertosEnSuGrupo: hermanos.filter((h) => h.getAttribute('aria-expanded') === 'true').length, autoclose: auto || raiz.hasAttribute('data-autoclose'), icono: !!ri && ri.width > 0 }; })()`);
         const total = Math.min(pliegues, 8);
+        const modulos = await evaluar(`!!document.querySelector('script[type=importmap]')`);
+        if (!modulos) caso.problemas.push('no hay mapa de importación de módulos: la Interactivity API no puede cargar y los pliegues no responden');
         caso.notas.push(`${pliegues} pliegues`);
-        let iconosAbiertoVisibles = 0; let iconosCerradoVisibles = 0;
         for (let n = 0; n < total; n++) {
           const antes = await estado(n);
-          let c = await centroDe('[data-cod-acordeon-rol="resumen"]', n);
+          if (antes.abierto !== (await evaluar(`document.querySelectorAll('.wp-block-accordion-heading__toggle')[${n}].closest('.wp-block-accordion-item').classList.contains('is-open')`))) caso.problemas.push(`el pliegue ${n} dice aria-expanded=${antes.abierto} pero su clase is-open no coincide`);
+          let c = await centroDe('.wp-block-accordion-heading__toggle', n);
           if (!c) continue;
           if (c.h < 24) caso.problemas.push(`el pliegue ${n} mide ${Math.round(c.h)}px de alto: menos que el mínimo táctil de 24px`);
+          if (!antes.icono) caso.problemas.push(`el pliegue ${n} no muestra su ícono`);
           await tocar(c.x, c.y);
           let e = await estado(n);
           if (antes.abierto) {
-            // ya estaba abierto: tocarlo lo cierra
             if (e.abierto) caso.problemas.push(`el pliegue ${n} (abierto) no se cierra al tocarlo`);
           } else {
             if (!e.abierto || !e.panelVisible) caso.problemas.push(`el pliegue ${n} no se abre al tocarlo (abierto ${e.abierto}, panel visible ${e.panelVisible})`);
-            if (e.unoSolo && e.abiertosEnSuGrupo > 1) caso.problemas.push(`abrir el pliegue ${n} dejó ${e.abiertosEnSuGrupo} abiertos en su acordeón (debe cerrar el anterior)`);
-            // El ícono abierto tiene que mostrar el cambio: o se esconde (como en el original de Divi) o cambia de dibujo (+ → −).
-            if (e.icono && e.icono.visible && antes.icono && e.icono.dibujo === antes.icono.dibujo) iconosAbiertoVisibles++;
-            c = await centroDe('[data-cod-acordeon-rol="resumen"]', n);
+            if (e.autoclose && e.abiertosEnSuGrupo > 1) caso.problemas.push(`abrir el pliegue ${n} dejó ${e.abiertosEnSuGrupo} abiertos en su acordeón (autoclose)`);
+            c = await centroDe('.wp-block-accordion-heading__toggle', n);
             await tocar(c.x, c.y);
             e = await estado(n);
             if (e.abierto) caso.problemas.push(`el pliegue ${n} no se cierra al tocarlo otra vez`);
-            if (e.icono && e.icono.visible) iconosCerradoVisibles++;
           }
         }
-        caso.notas.push(`ícono: visible en ${iconosCerradoVisibles} pliegue(s) cerrado(s) y en ${iconosAbiertoVisibles} abierto(s) (el original lo esconde abierto)`);
-        if (iconosAbiertoVisibles) caso.problemas.push(`el ícono no cambia al abrir en ${iconosAbiertoVisibles} pliegue(s) (ni se esconde ni pasa de + a −)`);
       }
 
       // 4. botones fijos
@@ -153,21 +187,21 @@ for (const ancho of SOLO_GOBIERNO ? [] : [1440, 768, 393]) {
         caso.notas.push(`formulario: ${form.n} campos`);
       }
 
-      // 5b. bloques nativos de WordPress (nodo block: la barra lateral): dibujados, dentro del ancho, y el buscador escribe y apunta al sitio
-      const bloques = await evaluar(`(() => [...document.querySelectorAll('[data-cod-bloque]')].map((b) => { const r = b.getBoundingClientRect(); const f = b.querySelector('form[role=search]'); const i = f && f.querySelector('input[type=search]'); const bt = f && f.querySelector('button'); const ri = i && i.getBoundingClientRect(); const rb = bt && bt.getBoundingClientRect(); return { nombre: b.getAttribute('data-cod-bloque'), vacio: b.innerHTML.trim() === '' || /ocd:/.test(b.innerHTML), w: Math.round(r.width), h: Math.round(r.height), dentro: r.left >= -1 && r.right <= innerWidth + 1, busca: f ? { accion: f.getAttribute('action'), campo: i ? i.getAttribute('name') : null, campoVisible: !!ri && ri.width > 40 && ri.height > 24, botonVisible: !!rb && rb.width > 20 && rb.height > 20, botonDentro: !!rb && rb.right <= innerWidth + 1 } : null, enlaces: [...b.querySelectorAll('a')].map((a) => a.getAttribute('href')).filter(Boolean).length }; }))()`);
+      // 5b. bloques nativos de WordPress (buscador, entradas y comentarios recientes): dibujados, dentro del ancho, y el buscador escribe y apunta al sitio
+      const bloques = await evaluar(`(() => ['.wp-block-search', '.wp-block-latest-posts', '.wp-block-latest-comments'].flatMap((sel) => [...document.querySelectorAll(sel)].map((b) => { const r = b.getBoundingClientRect(); const f = b.querySelector('form[role=search]') || (b.matches('form') ? b : null); const i = b.querySelector('input[type=search]'); const bt = b.querySelector('button'); const ri = i && i.getBoundingClientRect(); const rb = bt && bt.getBoundingClientRect(); return { nombre: sel.replace('.wp-block-', 'core/'), vacio: b.textContent.trim() === '' && !i, w: Math.round(r.width), h: Math.round(r.height), dentro: r.left >= -1 && r.right <= innerWidth + 1, busca: i ? { accion: (f && f.getAttribute('action')) || '', campo: i.getAttribute('name'), campoVisible: !!ri && ri.width > 40 && ri.height > 24, botonVisible: !!rb && rb.width > 20 && rb.height > 20, botonDentro: !!rb && rb.right <= innerWidth + 1 } : null, enlaces: [...b.querySelectorAll('a')].map((a) => a.getAttribute('href')).filter(Boolean).length }; })))()`);
       for (const b of bloques) {
         if (b.vacio) caso.problemas.push(`el bloque ${b.nombre} salió vacío (WordPress no lo dibujó)`);
         if (!b.dentro) caso.problemas.push(`el bloque ${b.nombre} se sale de la pantalla`);
         if (b.busca) {
           if (b.busca.campo !== 's') caso.problemas.push('el buscador no envía el campo «s» de WordPress');
           if (!b.busca.campoVisible || !b.busca.botonVisible || !b.busca.botonDentro) caso.problemas.push('el buscador no se ve completo (campo o botón)');
-          const c = await centroDe('[data-cod-bloque="core/search"] input[type=search]', 0);
+          const c = await centroDe('.wp-block-search input[type=search]', 0);
           if (c) {
             await tocar(c.x, c.y);
             await cdp('Input.insertText', { text: 'bodega' });
-            const v = await evaluar(`document.querySelector('[data-cod-bloque="core/search"] input[type=search]').value`);
+            const v = await evaluar(`document.querySelector('.wp-block-search input[type=search]').value`);
             if (v !== 'bodega') caso.problemas.push(`no se puede escribir en el buscador (quedó «${v}»)`);
-            await evaluar(`document.querySelector('[data-cod-bloque="core/search"] input[type=search]').value = ''`);
+            await evaluar(`document.querySelector('.wp-block-search input[type=search]').value = ''`);
           }
         }
         caso.notas.push(`bloque ${b.nombre}: ${b.w}×${b.h}, ${b.enlaces} enlace(s)${b.busca ? ', buscador con acción ' + b.busca.accion : ''}`);

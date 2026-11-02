@@ -63,6 +63,18 @@ final class COD_Site_Package_Importer
         $source_url = untrailingslashit((string) ($manifest['sourceSiteUrl'] ?? ''));
         $target_url = untrailingslashit(home_url('/'));
 
+        // La compuerta del diseño: un paquete que llega por una petición que no es una persona en el
+        // editor (el MCP, una contraseña de aplicación) trae sus documentos por la misma compuerta que
+        // cualquier otra escritura. Se revisan TODOS antes de escribir el primero. WP-CLI y la
+        // administración con sesión quedan fuera, como dice la espec (límite declarado en el CHANGELOG).
+        if (COD_ADN_Gate::activo() && COD_ADN_Gate::peticion_no_humana()) {
+            $revision = $this->revisar_con_la_compuerta($manifest, $source_url, $target_url);
+            if (is_wp_error($revision)) {
+                $zip->close();
+                return $revision;
+            }
+        }
+
         $media_copied = $this->copy_media($zip);
         $zip->close();
         if (is_wp_error($media_copied)) {
@@ -114,6 +126,33 @@ final class COD_Site_Package_Importer
             'documents' => $document_ids,
             'mediaCopied' => $media_copied,
         ];
+    }
+
+    /**
+     * @param array<string, mixed> $manifest
+     * @return true|WP_Error
+     */
+    private function revisar_con_la_compuerta(array $manifest, string $source_url, string $target_url)
+    {
+        foreach ($manifest['documents'] as $document_id => $document) {
+            if (!is_array($document)) {
+                continue;
+            }
+            $despues = [
+                'html' => $this->rewrite_urls((string) ($document['html'] ?? ''), $source_url, $target_url),
+                'css' => $this->rewrite_urls((string) ($document['css'] ?? ''), $source_url, $target_url),
+                'projectData' => $this->rewrite_urls((string) ($document['projectData'] ?? '{}'), $source_url, $target_url),
+            ];
+            $guardado = $this->repository->load_existing((string) $document_id);
+            $antes = is_array($guardado)
+                ? ['html' => (string) ($guardado['html'] ?? ''), 'css' => (string) ($guardado['css'] ?? ''), 'projectData' => (string) ($guardado['projectData'] ?? '')]
+                : ['html' => '', 'css' => '', 'projectData' => ''];
+            $resuelto = COD_ADN_Gate::resolver(COD_ADN_Gate::revisar_documento($antes, $despues, 'importador de paquetes (documento ' . $document_id . ')'));
+            if (is_wp_error($resuelto)) {
+                return $resuelto;
+            }
+        }
+        return true;
     }
 
     /**

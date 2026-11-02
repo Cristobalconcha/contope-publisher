@@ -44,7 +44,7 @@ $comprobar = static function (string $caso, bool $ok, string $detalle = '') use 
 echo "\n== 1. lo instalado es lo que hay en el repositorio ==\n";
 $repo_dir = realpath(__DIR__ . '/../contope-publisher');
 $inst_dir = rtrim((string) COD_PUBLISHER_DIR, '/\\');
-foreach (['class-cod-adn-registry.php', 'class-cod-adn-gate.php', 'class-cod-adn-gate-admin.php', 'class-cod-canvas-document-repository.php', 'class-cod-canvas-mcp-service.php', 'class-cod-canvas-mcp-recipe-compiler.php', 'class-cod-mcp-server.php'] as $archivo) {
+foreach (['class-cod-adn-registry.php', 'class-cod-adn-gate.php', 'class-cod-adn-gate-rest.php', 'class-cod-block-page-writer.php', 'class-cod-site-package-importer.php', 'class-cod-adn-gate-admin.php', 'class-cod-canvas-document-repository.php', 'class-cod-canvas-mcp-service.php', 'class-cod-canvas-mcp-recipe-compiler.php', 'class-cod-mcp-server.php'] as $archivo) {
     $a = $repo_dir . '/includes/' . $archivo;
     $b = $inst_dir . '/includes/' . $archivo;
     $iguales = is_file($a) && is_file($b) && md5_file($a) === md5_file($b);
@@ -79,6 +79,9 @@ $clasificacion = [
     'cod_sync_project_data' => 'escribe',
     'cod_activate_section_whatsapp' => 'escribe',
     'cod_patch_geo_places' => 'escribe',
+    // la vía oficial del contenido en bloques: pasa por la compuerta (prueba: scripts/probar-compuerta-rest.php)
+    'cod_write_block_page' => 'escribe',
+    'cod_read_block_page' => 'lee',
     // validan sin escribir, con el mismo criterio que apply
     'cod_preview_canvas_composition' => 'revisa',
     // no escriben diseño
@@ -318,7 +321,7 @@ try {
     $intento('style.iconColor literal', 'cod_activate_section_whatsapp', $args_wa(['iconColor' => '#123456']), 'ADN_LITERAL_COLOR');
     $intento('style.backgroundColor literal', 'cod_activate_section_whatsapp', $args_wa(['backgroundColor' => 'rgb(1,2,3)']), 'ADN_LITERAL_COLOR');
     $intento('style.borderRadius literal', 'cod_activate_section_whatsapp', $args_wa(['borderRadius' => '8px']), 'ADN_LITERAL_RADIUS');
-    $valido('style con var() del registro', 'cod_activate_section_whatsapp', $args_wa(['iconColor' => 'var(--wp--preset--color--white)', 'backgroundColor' => 'var(--wp--preset--color--accent)']));
+    $valido('style con var() del registro', 'cod_activate_section_whatsapp', $args_wa(['iconColor' => 'var(--wp--preset--color--fondo-pagina)', 'backgroundColor' => 'var(--wp--preset--color--accent)']));
     if ($numero_original === null) {
         delete_option('cod_whatsapp_number');
     } else {
@@ -395,7 +398,7 @@ try {
     $reglas_ok = [
         $regla('c-ok', 'color', ['role' => 'titulo', 'color' => 'var(--wp--preset--color--accent)']),
         $regla('s-ok', 'spacing', ['paddingBlock' => 'var(--wp--preset--spacing--40)', 'bleed' => 'calc(-1 * var(--wp--preset--spacing--20))']),
-        $regla('t-ok', 'typography', ['role' => 'cuerpo', 'family' => 'var(--wp--preset--font-family--body)', 'fontSize' => 'var(--wp--preset--font-size--large)']),
+        $regla('t-ok', 'typography', ['role' => 'cuerpo', 'family' => 'var(--wp--preset--font-family--body)', 'fontSize' => 'var(--wp--preset--font-size--40)']),
         $regla('p-ok', 'properties', ['declarations' => ['margin-top' => '0', 'color' => 'inherit', 'border-top-width' => '0', '--mi-espacio' => 'var(--wp--preset--spacing--30)', 'padding-left' => 'var(--mi-espacio)']]),
     ];
     $ids_ok = array_map(static fn (array $r): string => $r['id'], $reglas_ok);

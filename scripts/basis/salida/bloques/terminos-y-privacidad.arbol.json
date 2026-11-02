@@ -1,0 +1,2163 @@
+[
+  {
+    "name": "contope/lienzo",
+    "attrs": {
+      "documentId": ""
+    },
+    "inner": [
+      {
+        "name": "core/group",
+        "attrs": {
+          "tagName": "section",
+          "align": "full",
+          "style": {
+            "spacing": {
+              "padding": {
+                "top": "var:preset|spacing|90",
+                "right": "0",
+                "bottom": "var:preset|spacing|90",
+                "left": "0"
+              },
+              "blockGap": "0"
+            }
+          }
+        },
+        "inner": [
+          {
+            "name": "core/group",
+            "attrs": {
+              "style": {
+                "spacing": {
+                  "padding": {
+                    "right": "var:preset|spacing|50",
+                    "left": "var:preset|spacing|50"
+                  },
+                  "blockGap": "0"
+                }
+              },
+              "layout": {
+                "type": "constrained",
+                "contentSize": "var(--wp--custom--layout--measure--m)",
+                "justifyContent": "left"
+              }
+            },
+            "inner": [
+              {
+                "name": "core/heading",
+                "attrs": {
+                  "textColor": "ink",
+                  "fontSize": "100",
+                  "fontFamily": "display",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--tight)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "0",
+                        "bottom": "var:preset|spacing|20"
+                      }
+                    }
+                  },
+                  "content": "Términos de uso y política de privacidad",
+                  "level": 1
+                },
+                "inner": []
+              },
+              {
+                "name": "core/group",
+                "attrs": {
+                  "backgroundColor": "casi-blanco",
+                  "style": {
+                    "spacing": {
+                      "padding": {
+                        "top": "var:preset|spacing|30",
+                        "right": "var:preset|spacing|40",
+                        "bottom": "var:preset|spacing|30",
+                        "left": "var:preset|spacing|40"
+                      },
+                      "margin": {
+                        "bottom": "var:preset|spacing|50"
+                      },
+                      "blockGap": "0"
+                    },
+                    "border": {
+                      "radius": "var(--wp--custom--radius--l)"
+                    }
+                  }
+                },
+                "inner": [
+                  {
+                    "name": "core/paragraph",
+                    "attrs": {
+                      "textColor": "dark",
+                      "fontSize": "30",
+                      "fontFamily": "body",
+                      "style": {
+                        "typography": {
+                          "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                          "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                          "textAlign": "left"
+                        },
+                        "spacing": {
+                          "margin": {
+                            "top": "0",
+                            "bottom": "0"
+                          }
+                        }
+                      },
+                      "content": "Versión en revisión legal. Este documento está siendo revisado y puede modificarse. Última actualización: [PENDIENTE: fecha de publicación — P3]."
+                    },
+                    "inner": []
+                  }
+                ]
+              },
+              {
+                "name": "core/paragraph",
+                "attrs": {
+                  "textColor": "texto-cuerpo",
+                  "fontSize": "30",
+                  "fontFamily": "body",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "0",
+                        "bottom": "var:preset|spacing|30"
+                      }
+                    }
+                  },
+                  "content": "Este documento se aplica al sitio basisbodegas.com (en adelante, «el sitio»). Al usar el sitio usted declara haberlo leído. Si no está de acuerdo, le pedimos que no lo use."
+                },
+                "inner": []
+              },
+              {
+                "name": "core/heading",
+                "attrs": {
+                  "textColor": "ink",
+                  "fontSize": "80",
+                  "fontFamily": "display",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--tight)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "var:preset|spacing|70",
+                        "bottom": "var:preset|spacing|20"
+                      }
+                    }
+                  },
+                  "content": "1. Quién es el responsable",
+                  "level": 2
+                },
+                "inner": []
+              },
+              {
+                "name": "core/paragraph",
+                "attrs": {
+                  "textColor": "texto-cuerpo",
+                  "fontSize": "30",
+                  "fontFamily": "body",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "0",
+                        "bottom": "var:preset|spacing|30"
+                      }
+                    }
+                  },
+                  "content": "El sitio es operado por Inmobiliaria Basis SpA, RUT 76.933.998-1, con domicilio en Av. 18 de Septiembre S/N, Hijuela 2, Fundo San Rafael, Sector Nuevo Sendero, Paine, Región Metropolitana [PENDIENTE: confirmar que es el domicilio legal — P2] (en adelante, «Basis», «nosotros»)."
+                },
+                "inner": []
+              },
+              {
+                "name": "core/paragraph",
+                "attrs": {
+                  "textColor": "texto-cuerpo",
+                  "fontSize": "30",
+                  "fontFamily": "body",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "0",
+                        "bottom": "var:preset|spacing|30"
+                      }
+                    }
+                  },
+                  "content": "Basis es la responsable del tratamiento de los datos personales que se recogen en el sitio."
+                },
+                "inner": []
+              },
+              {
+                "name": "core/paragraph",
+                "attrs": {
+                  "textColor": "texto-cuerpo",
+                  "fontSize": "30",
+                  "fontFamily": "body",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "0",
+                        "bottom": "var:preset|spacing|30"
+                      }
+                    }
+                  },
+                  "content": "Para cualquier consulta sobre este documento o sobre sus datos personales puede escribir a [PENDIENTE: correo de contacto — P1]. Para consultas comerciales también puede usar el WhatsApp +56 9 9799 5132."
+                },
+                "inner": []
+              },
+              {
+                "name": "core/heading",
+                "attrs": {
+                  "textColor": "ink",
+                  "fontSize": "80",
+                  "fontFamily": "display",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--tight)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "var:preset|spacing|70",
+                        "bottom": "var:preset|spacing|20"
+                      }
+                    }
+                  },
+                  "content": "2. Qué ofrece el sitio y cuál es su alcance",
+                  "level": 2
+                },
+                "inner": []
+              },
+              {
+                "name": "core/paragraph",
+                "attrs": {
+                  "textColor": "texto-cuerpo",
+                  "fontSize": "30",
+                  "fontFamily": "body",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "0",
+                        "bottom": "var:preset|spacing|30"
+                      }
+                    }
+                  },
+                  "content": "2.1. Qué es el sitio. Basis ofrece bodegas temporales trasladables (carpas industriales) en arriendo, en venta y en arriendo con compromiso de compra [PENDIENTE: confirmar que la venta la realiza Basis SpA — P10]. El sitio informa sobre esos productos y servicios y recibe consultas y solicitudes de cotización. No es una tienda en línea: no se contrata, no se compra ni se paga a través del sitio, y el sitio no procesa pagos ni datos de tarjetas."
+                },
+                "inner": []
+              },
+              {
+                "name": "core/paragraph",
+                "attrs": {
+                  "textColor": "texto-cuerpo",
+                  "fontSize": "30",
+                  "fontFamily": "body",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "0",
+                        "bottom": "var:preset|spacing|30"
+                      }
+                    }
+                  },
+                  "content": "2.2. El contrato es aparte. Cualquier arriendo, venta o arriendo con compromiso de compra se rige exclusivamente por el contrato o la cotización aceptada que se firme entre las partes. Nada de lo que aparece en el sitio modifica ese contrato ni obliga a Basis a contratar. Si algo del sitio difiere del contrato firmado, prevalece el contrato."
+                },
+                "inner": []
+              },
+              {
+                "name": "core/paragraph",
+                "attrs": {
+                  "textColor": "texto-cuerpo",
+                  "fontSize": "30",
+                  "fontFamily": "body",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "0",
+                        "bottom": "var:preset|spacing|30"
+                      }
+                    }
+                  },
+                  "content": "2.3. Información referencial. Las medidas, materiales, plazos de instalación, certificaciones, garantías, permisos y demás información técnica o comercial que aparece en el sitio (incluidas las Preguntas Frecuentes) es general y referencial. Las condiciones aplicables a su caso —por ejemplo, la garantía y sus exclusiones, lo que incluye el servicio de arriendo o los plazos de instalación— son las que consten en la cotización y en el contrato. Los requisitos de permisos municipales o autorizaciones sanitarias dependen de cada comuna y de cada proyecto, y pueden cambiar: verifíquelos con la autoridad correspondiente."
+                },
+                "inner": []
+              },
+              {
+                "name": "core/paragraph",
+                "attrs": {
+                  "textColor": "texto-cuerpo",
+                  "fontSize": "30",
+                  "fontFamily": "body",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "0",
+                        "bottom": "var:preset|spacing|30"
+                      }
+                    }
+                  },
+                  "content": "2.4. Destinatarios. El sitio está dirigido principalmente a empresas y a personas mayores de edad. Si usted contrata como consumidor final, le siguen aplicando los derechos que la Ley N° 19.496 sobre protección de los derechos de los consumidores le reconoce, que no se pueden renunciar y que nada de este documento limita."
+                },
+                "inner": []
+              },
+              {
+                "name": "core/heading",
+                "attrs": {
+                  "textColor": "ink",
+                  "fontSize": "80",
+                  "fontFamily": "display",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--tight)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "var:preset|spacing|70",
+                        "bottom": "var:preset|spacing|20"
+                      }
+                    }
+                  },
+                  "content": "3. Uso del sitio",
+                  "level": 2
+                },
+                "inner": []
+              },
+              {
+                "name": "core/paragraph",
+                "attrs": {
+                  "textColor": "texto-cuerpo",
+                  "fontSize": "30",
+                  "fontFamily": "body",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "0",
+                        "bottom": "var:preset|spacing|30"
+                      }
+                    }
+                  },
+                  "content": "Usted puede navegar el sitio y usar sus formularios y canales de contacto para fines lícitos. No puede:"
+                },
+                "inner": []
+              },
+              {
+                "name": "core/list",
+                "attrs": {
+                  "textColor": "texto-cuerpo",
+                  "fontSize": "30",
+                  "fontFamily": "body",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "padding": {
+                        "left": "var:preset|spacing|50"
+                      },
+                      "margin": {
+                        "top": "0",
+                        "bottom": "var:preset|spacing|30"
+                      }
+                    }
+                  },
+                  "ordered": false
+                },
+                "inner": [
+                  {
+                    "name": "core/list-item",
+                    "attrs": {
+                      "content": "usar el sitio para fines ilegales, engañosos o que dañen a Basis o a terceros;"
+                    },
+                    "inner": []
+                  },
+                  {
+                    "name": "core/list-item",
+                    "attrs": {
+                      "content": "intentar acceder sin autorización a sistemas o datos del sitio, alterarlo, sobrecargarlo o introducir código malicioso (conductas que la Ley N° 21.459 sobre delitos informáticos sanciona);"
+                    },
+                    "inner": []
+                  },
+                  {
+                    "name": "core/list-item",
+                    "attrs": {
+                      "content": "enviar información falsa, suplantar a otra persona o enviar datos personales de terceros sin que ellos lo hayan autorizado;"
+                    },
+                    "inner": []
+                  },
+                  {
+                    "name": "core/list-item",
+                    "attrs": {
+                      "content": "enviar por los formularios datos sensibles (salud, origen racial, creencias, situación socioeconómica u otros) ni información que no sea necesaria para su consulta;"
+                    },
+                    "inner": []
+                  },
+                  {
+                    "name": "core/list-item",
+                    "attrs": {
+                      "content": "copiar el sitio de forma masiva ni usarlo para envíos no solicitados."
+                    },
+                    "inner": []
+                  }
+                ]
+              },
+              {
+                "name": "core/paragraph",
+                "attrs": {
+                  "textColor": "texto-cuerpo",
+                  "fontSize": "30",
+                  "fontFamily": "body",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "0",
+                        "bottom": "var:preset|spacing|30"
+                      }
+                    }
+                  },
+                  "content": "Basis puede bloquear el acceso a quien incumpla estas reglas. El sitio no tiene cuentas de usuario."
+                },
+                "inner": []
+              },
+              {
+                "name": "core/heading",
+                "attrs": {
+                  "textColor": "ink",
+                  "fontSize": "80",
+                  "fontFamily": "display",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--tight)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "var:preset|spacing|70",
+                        "bottom": "var:preset|spacing|20"
+                      }
+                    }
+                  },
+                  "content": "4. Propiedad intelectual",
+                  "level": 2
+                },
+                "inner": []
+              },
+              {
+                "name": "core/paragraph",
+                "attrs": {
+                  "textColor": "texto-cuerpo",
+                  "fontSize": "30",
+                  "fontFamily": "body",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "0",
+                        "bottom": "var:preset|spacing|30"
+                      }
+                    }
+                  },
+                  "content": "Los textos, fotografías, imágenes, planos, diseños, logotipos, marcas y demás contenidos del sitio, así como su estructura y diseño, pertenecen a Inmobiliaria Basis SpA o a terceros que autorizaron su uso, y están protegidos por la Ley N° 17.336 sobre propiedad intelectual y la Ley N° 19.039 sobre propiedad industrial [PENDIENTE: confirmar titularidad y registro de la marca BASIS ante INAPI — P9]."
+                },
+                "inner": []
+              },
+              {
+                "name": "core/paragraph",
+                "attrs": {
+                  "textColor": "texto-cuerpo",
+                  "fontSize": "30",
+                  "fontFamily": "body",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "0",
+                        "bottom": "var:preset|spacing|30"
+                      }
+                    }
+                  },
+                  "content": "Usted puede verlos y compartir el enlace al sitio. No puede copiarlos, reproducirlos, modificarlos ni usarlos con fines comerciales sin autorización escrita previa de Basis. Usar el sitio no le otorga ninguna licencia sobre ellos."
+                },
+                "inner": []
+              },
+              {
+                "name": "core/heading",
+                "attrs": {
+                  "textColor": "ink",
+                  "fontSize": "80",
+                  "fontFamily": "display",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--tight)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "var:preset|spacing|70",
+                        "bottom": "var:preset|spacing|20"
+                      }
+                    }
+                  },
+                  "content": "5. Enlaces y servicios de terceros",
+                  "level": 2
+                },
+                "inner": []
+              },
+              {
+                "name": "core/paragraph",
+                "attrs": {
+                  "textColor": "texto-cuerpo",
+                  "fontSize": "30",
+                  "fontFamily": "body",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "0",
+                        "bottom": "var:preset|spacing|30"
+                      }
+                    }
+                  },
+                  "content": "El sitio contiene enlaces o botones hacia servicios de terceros (por ejemplo, WhatsApp, o el sitio de Econut, empresa que diseñó y desarrolló el sitio). Al usarlos usted se rige por los términos y la política de privacidad de ese tercero. Basis no controla esos servicios ni responde por su contenido."
+                },
+                "inner": []
+              },
+              {
+                "name": "core/heading",
+                "attrs": {
+                  "textColor": "ink",
+                  "fontSize": "80",
+                  "fontFamily": "display",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--tight)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "var:preset|spacing|70",
+                        "bottom": "var:preset|spacing|20"
+                      }
+                    }
+                  },
+                  "content": "6. Datos personales",
+                  "level": 2
+                },
+                "inner": []
+              },
+              {
+                "name": "core/paragraph",
+                "attrs": {
+                  "textColor": "texto-cuerpo",
+                  "fontSize": "30",
+                  "fontFamily": "body",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "0",
+                        "bottom": "var:preset|spacing|30"
+                      }
+                    }
+                  },
+                  "content": "Esta sección es nuestra política de privacidad. Se rige por la Ley N° 19.628 sobre protección de la vida privada y por la Ley N° 21.719, que la reemplaza y regula la protección de los datos personales a contar del 1 de diciembre de 2026."
+                },
+                "inner": []
+              },
+              {
+                "name": "core/heading",
+                "attrs": {
+                  "textColor": "ink",
+                  "fontSize": "60",
+                  "fontFamily": "display",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--tight)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "var:preset|spacing|50",
+                        "bottom": "var:preset|spacing|20"
+                      }
+                    }
+                  },
+                  "content": "6.1. Qué datos recogemos",
+                  "level": 3
+                },
+                "inner": []
+              },
+              {
+                "name": "core/paragraph",
+                "attrs": {
+                  "textColor": "texto-cuerpo",
+                  "fontSize": "30",
+                  "fontFamily": "body",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "0",
+                        "bottom": "var:preset|spacing|30"
+                      }
+                    }
+                  },
+                  "content": "Los que usted nos entrega, cuando completa el formulario de «Contactos &amp; Cotizaciones»: nombre y apellidos, correo electrónico (se pide dos veces para evitar errores), teléfono (opcional), el mensaje que escriba (hasta 600 caracteres) y, si la marca, su aceptación de recibir novedades. Si en lugar del formulario nos escribe por WhatsApp, recibimos su número de teléfono, su nombre de perfil y lo que usted escriba."
+                },
+                "inner": []
+              },
+              {
+                "name": "core/paragraph",
+                "attrs": {
+                  "textColor": "texto-cuerpo",
+                  "fontSize": "30",
+                  "fontFamily": "body",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "0",
+                        "bottom": "var:preset|spacing|30"
+                      }
+                    }
+                  },
+                  "content": "Los que se recogen automáticamente. Al enviar el formulario se guardan la fecha, la página de origen y datos técnicos de la conexión (dirección IP y tipo de navegador), que sirven para dar seguridad y evitar envíos automáticos. Si usted lo acepta en el banner de cookies, también se recogen datos de navegación: qué páginas visita, cuánto tiempo permanece, desde qué tipo de dispositivo y país accede y qué acciones realiza en el sitio (por ejemplo, abrir WhatsApp o enviar el formulario)."
+                },
+                "inner": []
+              },
+              {
+                "name": "core/paragraph",
+                "attrs": {
+                  "textColor": "texto-cuerpo",
+                  "fontSize": "30",
+                  "fontFamily": "body",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "0",
+                        "bottom": "var:preset|spacing|30"
+                      }
+                    }
+                  },
+                  "content": "Aunque no acepte cookies, al cargar el mapa y las tipografías del sitio, sus proveedores (§6.4) reciben necesariamente su dirección IP y datos técnicos del navegador."
+                },
+                "inner": []
+              },
+              {
+                "name": "core/heading",
+                "attrs": {
+                  "textColor": "ink",
+                  "fontSize": "60",
+                  "fontFamily": "display",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--tight)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "var:preset|spacing|50",
+                        "bottom": "var:preset|spacing|20"
+                      }
+                    }
+                  },
+                  "content": "6.2. No pedimos datos sensibles",
+                  "level": 3
+                },
+                "inner": []
+              },
+              {
+                "name": "core/paragraph",
+                "attrs": {
+                  "textColor": "texto-cuerpo",
+                  "fontSize": "30",
+                  "fontFamily": "body",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "0",
+                        "bottom": "var:preset|spacing|30"
+                      }
+                    }
+                  },
+                  "content": "No necesitamos ni le pedimos datos sensibles. Le rogamos que no los incluya en el mensaje."
+                },
+                "inner": []
+              },
+              {
+                "name": "core/heading",
+                "attrs": {
+                  "textColor": "ink",
+                  "fontSize": "60",
+                  "fontFamily": "display",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--tight)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "var:preset|spacing|50",
+                        "bottom": "var:preset|spacing|20"
+                      }
+                    }
+                  },
+                  "content": "6.3. Para qué los usamos, con qué base legal y por cuánto tiempo",
+                  "level": 3
+                },
+                "inner": []
+              },
+              {
+                "name": "core/table",
+                "attrs": {
+                  "textColor": "texto-cuerpo",
+                  "fontSize": "20",
+                  "fontFamily": "body",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--snug)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "bottom": "var:preset|spacing|50"
+                      }
+                    }
+                  },
+                  "head": [
+                    {
+                      "cells": [
+                        {
+                          "content": "Finalidad",
+                          "tag": "th",
+                          "scope": "col"
+                        },
+                        {
+                          "content": "Datos",
+                          "tag": "th",
+                          "scope": "col"
+                        },
+                        {
+                          "content": "Base de licitud",
+                          "tag": "th",
+                          "scope": "col"
+                        },
+                        {
+                          "content": "Cuánto los conservamos",
+                          "tag": "th",
+                          "scope": "col"
+                        }
+                      ]
+                    }
+                  ],
+                  "body": [
+                    {
+                      "cells": [
+                        {
+                          "content": "Responder su consulta y preparar una cotización",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Nombre, apellidos, correo, teléfono, mensaje",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Medidas precontractuales adoptadas a solicitud suya; interés legítimo de Basis en atender consultas comerciales",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "[PENDIENTE: confirmar — P6] Propuesta: hasta 24 meses desde el último contacto si no se contrata; luego se suprimen o anonimizan",
+                          "tag": "td"
+                        }
+                      ]
+                    },
+                    {
+                      "cells": [
+                        {
+                          "content": "Celebrar y cumplir el contrato de arriendo, venta o ACC, si se concreta",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Los del contrato",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Ejecución del contrato",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Mientras dure el contrato y después por los plazos legales de conservación (tributarios y de prescripción civil, hasta 6 años)",
+                          "tag": "td"
+                        }
+                      ]
+                    },
+                    {
+                      "cells": [
+                        {
+                          "content": "Enviarle novedades de Basis",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Nombre, correo",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Su consentimiento (la casilla del formulario, que viene desmarcada y es opcional)",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Hasta que lo retire",
+                          "tag": "td"
+                        }
+                      ]
+                    },
+                    {
+                      "cells": [
+                        {
+                          "content": "Medir cómo se usa el sitio y mejorarlo",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Datos de navegación, cookies",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Su consentimiento (banner de cookies)",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Mientras duren las cookies (§7)",
+                          "tag": "td"
+                        }
+                      ]
+                    },
+                    {
+                      "cells": [
+                        {
+                          "content": "Medir y mejorar nuestra publicidad, incluida la que se le muestra después de visitar el sitio (remarketing)",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Datos de navegación, cookies, identificadores",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Su consentimiento (banner de cookies)",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Mientras duren las cookies (§7)",
+                          "tag": "td"
+                        }
+                      ]
+                    },
+                    {
+                      "cells": [
+                        {
+                          "content": "Mostrar el mapa y las tipografías del sitio",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Dirección IP y datos técnicos",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Interés legítimo de Basis en que el sitio funcione y se vea correctamente",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Los define cada proveedor (§6.4)",
+                          "tag": "td"
+                        }
+                      ]
+                    },
+                    {
+                      "cells": [
+                        {
+                          "content": "Seguridad del sitio y prevención de envíos automáticos o abusivos",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Dirección IP, datos técnicos",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Interés legítimo de Basis",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Mientras se conserve el envío al que están asociados",
+                          "tag": "td"
+                        }
+                      ]
+                    },
+                    {
+                      "cells": [
+                        {
+                          "content": "Cumplir obligaciones legales y defender derechos de Basis",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Los que correspondan",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Obligación legal; interés legítimo",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Plazos legales y de prescripción",
+                          "tag": "td"
+                        }
+                      ]
+                    }
+                  ],
+                  "hasFixedLayout": false
+                },
+                "inner": []
+              },
+              {
+                "name": "core/paragraph",
+                "attrs": {
+                  "textColor": "texto-cuerpo",
+                  "fontSize": "30",
+                  "fontFamily": "body",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "0",
+                        "bottom": "var:preset|spacing|30"
+                      }
+                    }
+                  },
+                  "content": "Cuando la base es su consentimiento, puede retirarlo en cualquier momento, con la misma facilidad con que lo dio; retirarlo no afecta lo hecho antes. Para las novedades, escriba al correo del §6.7. Para las cookies, use «Preferencias de cookies» (§7)."
+                },
+                "inner": []
+              },
+              {
+                "name": "core/paragraph",
+                "attrs": {
+                  "textColor": "texto-cuerpo",
+                  "fontSize": "30",
+                  "fontFamily": "body",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "0",
+                        "bottom": "var:preset|spacing|30"
+                      }
+                    }
+                  },
+                  "content": "No vendemos sus datos personales. No tomamos decisiones que le produzcan efectos jurídicos basadas únicamente en tratamiento automatizado. La publicidad segmentada que realizamos con Google y Meta se activa sólo si usted acepta las cookies de publicidad."
+                },
+                "inner": []
+              },
+              {
+                "name": "core/heading",
+                "attrs": {
+                  "textColor": "ink",
+                  "fontSize": "60",
+                  "fontFamily": "display",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--tight)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "var:preset|spacing|50",
+                        "bottom": "var:preset|spacing|20"
+                      }
+                    }
+                  },
+                  "content": "6.4. Con quién los compartimos y transferencias al extranjero",
+                  "level": 3
+                },
+                "inner": []
+              },
+              {
+                "name": "core/paragraph",
+                "attrs": {
+                  "textColor": "texto-cuerpo",
+                  "fontSize": "30",
+                  "fontFamily": "body",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "0",
+                        "bottom": "var:preset|spacing|30"
+                      }
+                    }
+                  },
+                  "content": "Sus datos pueden ser tratados por estos terceros, en su mayoría fuera de Chile:"
+                },
+                "inner": []
+              },
+              {
+                "name": "core/table",
+                "attrs": {
+                  "textColor": "texto-cuerpo",
+                  "fontSize": "20",
+                  "fontFamily": "body",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--snug)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "bottom": "var:preset|spacing|50"
+                      }
+                    }
+                  },
+                  "head": [
+                    {
+                      "cells": [
+                        {
+                          "content": "Tercero",
+                          "tag": "th",
+                          "scope": "col"
+                        },
+                        {
+                          "content": "Para qué",
+                          "tag": "th",
+                          "scope": "col"
+                        },
+                        {
+                          "content": "País",
+                          "tag": "th",
+                          "scope": "col"
+                        },
+                        {
+                          "content": "Qué recibe",
+                          "tag": "th",
+                          "scope": "col"
+                        }
+                      ]
+                    }
+                  ],
+                  "body": [
+                    {
+                      "cells": [
+                        {
+                          "content": "Google LLC (Tag Manager, Analytics, Ads)",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Medir el uso del sitio y medir y dirigir nuestra publicidad, incluido el remarketing",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Estados Unidos y otros países donde Google opera",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Identificadores en cookies, IP, datos de navegación; sólo si usted acepta las cookies",
+                          "tag": "td"
+                        }
+                      ]
+                    },
+                    {
+                      "cells": [
+                        {
+                          "content": "Google LLC (Fonts)",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Servir las tipografías del sitio",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Estados Unidos",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "IP y datos técnicos del navegador",
+                          "tag": "td"
+                        }
+                      ]
+                    },
+                    {
+                      "cells": [
+                        {
+                          "content": "Meta Platforms, Inc. (Píxel de Meta)",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Medir y dirigir nuestra publicidad en Facebook e Instagram",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Estados Unidos",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Identificadores en cookies, IP, páginas visitadas; sólo si usted acepta las cookies",
+                          "tag": "td"
+                        }
+                      ]
+                    },
+                    {
+                      "cells": [
+                        {
+                          "content": "Meta / WhatsApp",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Atender su consulta si nos escribe por WhatsApp",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Estados Unidos",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Lo que usted envíe; opera bajo los términos de WhatsApp",
+                          "tag": "td"
+                        }
+                      ]
+                    },
+                    {
+                      "cells": [
+                        {
+                          "content": "Mapbox, Inc.",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Mostrar el mapa de ubicación",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Estados Unidos",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "IP y datos técnicos del navegador",
+                          "tag": "td"
+                        }
+                      ]
+                    },
+                    {
+                      "cells": [
+                        {
+                          "content": "[PENDIENTE: proveedor de hosting y correo — P4, P5]",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Alojar el sitio, guardar los envíos del formulario y notificarlos",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "[PENDIENTE]",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Los datos del formulario",
+                          "tag": "td"
+                        }
+                      ]
+                    },
+                    {
+                      "cells": [
+                        {
+                          "content": "Comercializadora Econut SpA, empresa del mismo grupo",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Diseño, desarrollo y mantención del sitio; puede acceder a los datos sólo para ello y por encargo de Basis [PENDIENTE: confirmar y formalizar el contrato de encargo — P7]",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Chile",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Acceso técnico al sitio",
+                          "tag": "td"
+                        }
+                      ]
+                    }
+                  ],
+                  "hasFixedLayout": false
+                },
+                "inner": []
+              },
+              {
+                "name": "core/paragraph",
+                "attrs": {
+                  "textColor": "texto-cuerpo",
+                  "fontSize": "30",
+                  "fontFamily": "body",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "0",
+                        "bottom": "var:preset|spacing|30"
+                      }
+                    }
+                  },
+                  "content": "Basis no entrega sus datos a otras empresas con fines propios de ellas. [PENDIENTE: confirmar que los contactos no se comparten con Econut ni con otras sociedades del grupo para sus propias campañas — P7.]"
+                },
+                "inner": []
+              },
+              {
+                "name": "core/paragraph",
+                "attrs": {
+                  "textColor": "texto-cuerpo",
+                  "fontSize": "30",
+                  "fontFamily": "body",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "0",
+                        "bottom": "var:preset|spacing|30"
+                      }
+                    }
+                  },
+                  "content": "Las transferencias a Estados Unidos se realizan al amparo de las condiciones contractuales de protección de datos que cada proveedor ofrece a sus clientes, y las de publicidad y medición sólo ocurren con su consentimiento. Si no lo desea, no acepte las cookies de medición y publicidad: podrá usar el sitio igual."
+                },
+                "inner": []
+              },
+              {
+                "name": "core/paragraph",
+                "attrs": {
+                  "textColor": "texto-cuerpo",
+                  "fontSize": "30",
+                  "fontFamily": "body",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "0",
+                        "bottom": "var:preset|spacing|30"
+                      }
+                    }
+                  },
+                  "content": "Podemos además comunicar datos a autoridades u organismos cuando la ley lo exija."
+                },
+                "inner": []
+              },
+              {
+                "name": "core/heading",
+                "attrs": {
+                  "textColor": "ink",
+                  "fontSize": "60",
+                  "fontFamily": "display",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--tight)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "var:preset|spacing|50",
+                        "bottom": "var:preset|spacing|20"
+                      }
+                    }
+                  },
+                  "content": "6.5. Seguridad",
+                  "level": 3
+                },
+                "inner": []
+              },
+              {
+                "name": "core/paragraph",
+                "attrs": {
+                  "textColor": "texto-cuerpo",
+                  "fontSize": "30",
+                  "fontFamily": "body",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "0",
+                        "bottom": "var:preset|spacing|30"
+                      }
+                    }
+                  },
+                  "content": "Aplicamos medidas técnicas y organizativas razonables para proteger los datos: conexión cifrada (https), acceso restringido a los envíos del formulario y filtros contra envíos automáticos. Ningún sistema es infalible; si ocurriera una vulneración que afecte sus datos y la ley lo exija, la informaremos a usted y a la autoridad en los plazos legales."
+                },
+                "inner": []
+              },
+              {
+                "name": "core/heading",
+                "attrs": {
+                  "textColor": "ink",
+                  "fontSize": "60",
+                  "fontFamily": "display",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--tight)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "var:preset|spacing|50",
+                        "bottom": "var:preset|spacing|20"
+                      }
+                    }
+                  },
+                  "content": "6.6. Sus derechos",
+                  "level": 3
+                },
+                "inner": []
+              },
+              {
+                "name": "core/paragraph",
+                "attrs": {
+                  "textColor": "texto-cuerpo",
+                  "fontSize": "30",
+                  "fontFamily": "body",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "0",
+                        "bottom": "var:preset|spacing|30"
+                      }
+                    }
+                  },
+                  "content": "Usted puede, en cualquier momento y de forma gratuita:"
+                },
+                "inner": []
+              },
+              {
+                "name": "core/list",
+                "attrs": {
+                  "textColor": "texto-cuerpo",
+                  "fontSize": "30",
+                  "fontFamily": "body",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "padding": {
+                        "left": "var:preset|spacing|50"
+                      },
+                      "margin": {
+                        "top": "0",
+                        "bottom": "var:preset|spacing|30"
+                      }
+                    }
+                  },
+                  "ordered": false
+                },
+                "inner": [
+                  {
+                    "name": "core/list-item",
+                    "attrs": {
+                      "content": "Acceso: saber si tratamos datos suyos y obtener copia de ellos, con la información sobre su origen, finalidades y destinatarios."
+                    },
+                    "inner": []
+                  },
+                  {
+                    "name": "core/list-item",
+                    "attrs": {
+                      "content": "Rectificación: corregir datos inexactos o incompletos."
+                    },
+                    "inner": []
+                  },
+                  {
+                    "name": "core/list-item",
+                    "attrs": {
+                      "content": "Supresión (antes llamada «cancelación»): pedir que los eliminemos cuando ya no sean necesarios, retire su consentimiento o el tratamiento sea ilícito, salvo que la ley nos obligue a conservarlos."
+                    },
+                    "inner": []
+                  },
+                  {
+                    "name": "core/list-item",
+                    "attrs": {
+                      "content": "Oposición: oponerse a un tratamiento determinado, en particular al marketing directo y a la elaboración de perfiles."
+                    },
+                    "inner": []
+                  },
+                  {
+                    "name": "core/list-item",
+                    "attrs": {
+                      "content": "Portabilidad: recibir los datos que nos entregó en un formato estructurado y de uso común, y pedir que se transmitan a otro responsable, cuando la ley lo permita."
+                    },
+                    "inner": []
+                  },
+                  {
+                    "name": "core/list-item",
+                    "attrs": {
+                      "content": "Bloqueo temporal: pedir que suspendamos el tratamiento mientras se resuelve una solicitud de rectificación, supresión u oposición."
+                    },
+                    "inner": []
+                  },
+                  {
+                    "name": "core/list-item",
+                    "attrs": {
+                      "content": "Retirar su consentimiento cuando el tratamiento se base en él."
+                    },
+                    "inner": []
+                  },
+                  {
+                    "name": "core/list-item",
+                    "attrs": {
+                      "content": "No ser objeto de decisiones basadas únicamente en un tratamiento automatizado que le produzcan efectos jurídicos o le afecten significativamente."
+                    },
+                    "inner": []
+                  }
+                ]
+              },
+              {
+                "name": "core/heading",
+                "attrs": {
+                  "textColor": "ink",
+                  "fontSize": "60",
+                  "fontFamily": "display",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--tight)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "var:preset|spacing|50",
+                        "bottom": "var:preset|spacing|20"
+                      }
+                    }
+                  },
+                  "content": "6.7. Cómo ejercerlos y a quién reclamar",
+                  "level": 3
+                },
+                "inner": []
+              },
+              {
+                "name": "core/paragraph",
+                "attrs": {
+                  "textColor": "texto-cuerpo",
+                  "fontSize": "30",
+                  "fontFamily": "body",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "0",
+                        "bottom": "var:preset|spacing|30"
+                      }
+                    }
+                  },
+                  "content": "Escriba a [PENDIENTE: correo para ejercer derechos — P1], a la atención de «Protección de datos» [PENDIENTE: persona o cargo que responde — P8], indicando su nombre, un medio para responderle, cuál derecho quiere ejercer y los datos o el tratamiento a que se refiere. Podremos pedirle información adicional sólo para verificar su identidad. Responderemos dentro de 30 días corridos desde que recibamos la solicitud, plazo que la ley permite prorrogar en casos justificados, avisándole el motivo. Si denegamos su solicitud, se lo comunicaremos por escrito con las razones."
+                },
+                "inner": []
+              },
+              {
+                "name": "core/paragraph",
+                "attrs": {
+                  "textColor": "texto-cuerpo",
+                  "fontSize": "30",
+                  "fontFamily": "body",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "0",
+                        "bottom": "var:preset|spacing|30"
+                      }
+                    }
+                  },
+                  "content": "Si no queda conforme con la respuesta o no la recibe, puede reclamar ante la Agencia de Protección de Datos Personales y, hasta que esa Agencia esté en funciones, ante los tribunales de justicia conforme a la ley."
+                },
+                "inner": []
+              },
+              {
+                "name": "core/heading",
+                "attrs": {
+                  "textColor": "ink",
+                  "fontSize": "60",
+                  "fontFamily": "display",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--tight)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "var:preset|spacing|50",
+                        "bottom": "var:preset|spacing|20"
+                      }
+                    }
+                  },
+                  "content": "6.8. Menores de edad",
+                  "level": 3
+                },
+                "inner": []
+              },
+              {
+                "name": "core/paragraph",
+                "attrs": {
+                  "textColor": "texto-cuerpo",
+                  "fontSize": "30",
+                  "fontFamily": "body",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "0",
+                        "bottom": "var:preset|spacing|30"
+                      }
+                    }
+                  },
+                  "content": "El sitio no está dirigido a menores de edad y no recogemos datos de menores a sabiendas. Si cree que un menor nos entregó datos, escríbanos y los eliminaremos."
+                },
+                "inner": []
+              },
+              {
+                "name": "core/heading",
+                "attrs": {
+                  "textColor": "ink",
+                  "fontSize": "80",
+                  "fontFamily": "display",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--tight)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "var:preset|spacing|70",
+                        "bottom": "var:preset|spacing|20"
+                      }
+                    }
+                  },
+                  "content": "7. Cookies",
+                  "level": 2
+                },
+                "inner": []
+              },
+              {
+                "name": "core/paragraph",
+                "attrs": {
+                  "textColor": "texto-cuerpo",
+                  "fontSize": "30",
+                  "fontFamily": "body",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "0",
+                        "bottom": "var:preset|spacing|30"
+                      }
+                    }
+                  },
+                  "content": "El sitio usa cookies y tecnologías similares. Al ingresar verá un aviso donde puede aceptar, rechazar o configurar las cookies, y rechazar es tan fácil como aceptar. Mientras usted no acepte, no se cargan las cookies de medición ni de publicidad."
+                },
+                "inner": []
+              },
+              {
+                "name": "core/table",
+                "attrs": {
+                  "textColor": "texto-cuerpo",
+                  "fontSize": "20",
+                  "fontFamily": "body",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--snug)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "bottom": "var:preset|spacing|50"
+                      }
+                    }
+                  },
+                  "head": [
+                    {
+                      "cells": [
+                        {
+                          "content": "Tipo",
+                          "tag": "th",
+                          "scope": "col"
+                        },
+                        {
+                          "content": "Para qué",
+                          "tag": "th",
+                          "scope": "col"
+                        },
+                        {
+                          "content": "Quién",
+                          "tag": "th",
+                          "scope": "col"
+                        },
+                        {
+                          "content": "Duración aproximada",
+                          "tag": "th",
+                          "scope": "col"
+                        }
+                      ]
+                    }
+                  ],
+                  "body": [
+                    {
+                      "cells": [
+                        {
+                          "content": "Necesarias",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Recordar su decisión sobre cookies y mantener la seguridad del formulario. Siempre activas.",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Basis",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Hasta 12 meses",
+                          "tag": "td"
+                        }
+                      ]
+                    },
+                    {
+                      "cells": [
+                        {
+                          "content": "Medición",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Saber cómo se usa el sitio (_ga, _ga_*)",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Google Analytics",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Hasta 2 años",
+                          "tag": "td"
+                        }
+                      ]
+                    },
+                    {
+                      "cells": [
+                        {
+                          "content": "Publicidad",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Medir y dirigir nuestra publicidad, incluido el remarketing (_gcl_*, _fbp y similares)",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Google Ads, Meta",
+                          "tag": "td"
+                        },
+                        {
+                          "content": "Entre 90 días y 2 años, según la cookie",
+                          "tag": "td"
+                        }
+                      ]
+                    }
+                  ],
+                  "hasFixedLayout": false
+                },
+                "inner": []
+              },
+              {
+                "name": "core/paragraph",
+                "attrs": {
+                  "textColor": "texto-cuerpo",
+                  "fontSize": "30",
+                  "fontFamily": "body",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "0",
+                        "bottom": "var:preset|spacing|30"
+                      }
+                    }
+                  },
+                  "content": "Las duraciones son aproximadas y las fija cada proveedor; la lista completa y actualizada está en la ventana de preferencias del aviso."
+                },
+                "inner": []
+              },
+              {
+                "name": "core/paragraph",
+                "attrs": {
+                  "textColor": "texto-cuerpo",
+                  "fontSize": "30",
+                  "fontFamily": "body",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "0",
+                        "bottom": "var:preset|spacing|30"
+                      }
+                    }
+                  },
+                  "content": "Puede cambiar o retirar su decisión cuando quiera desde «Preferencias de cookies», en el pie de cualquier página. También puede borrar o bloquear las cookies desde la configuración de su navegador."
+                },
+                "inner": []
+              },
+              {
+                "name": "core/heading",
+                "attrs": {
+                  "textColor": "ink",
+                  "fontSize": "80",
+                  "fontFamily": "display",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--tight)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "var:preset|spacing|70",
+                        "bottom": "var:preset|spacing|20"
+                      }
+                    }
+                  },
+                  "content": "8. Limitación de responsabilidad",
+                  "level": 2
+                },
+                "inner": []
+              },
+              {
+                "name": "core/paragraph",
+                "attrs": {
+                  "textColor": "texto-cuerpo",
+                  "fontSize": "30",
+                  "fontFamily": "body",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "0",
+                        "bottom": "var:preset|spacing|30"
+                      }
+                    }
+                  },
+                  "content": "Hacemos lo posible por mantener el sitio disponible y su información al día, pero se entrega «tal cual». En la medida que la ley lo permita, Basis no responde por:"
+                },
+                "inner": []
+              },
+              {
+                "name": "core/list",
+                "attrs": {
+                  "textColor": "texto-cuerpo",
+                  "fontSize": "30",
+                  "fontFamily": "body",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "padding": {
+                        "left": "var:preset|spacing|50"
+                      },
+                      "margin": {
+                        "top": "0",
+                        "bottom": "var:preset|spacing|30"
+                      }
+                    }
+                  },
+                  "ordered": false
+                },
+                "inner": [
+                  {
+                    "name": "core/list-item",
+                    "attrs": {
+                      "content": "interrupciones, errores o fallas del sitio o de servicios de terceros que no controla (hosting, mapas, WhatsApp, redes de comunicación);"
+                    },
+                    "inner": []
+                  },
+                  {
+                    "name": "core/list-item",
+                    "attrs": {
+                      "content": "decisiones que usted tome basándose sólo en la información referencial del sitio, sin una cotización ni un contrato;"
+                    },
+                    "inner": []
+                  },
+                  {
+                    "name": "core/list-item",
+                    "attrs": {
+                      "content": "daños indirectos o lucro cesante derivados del uso del sitio;"
+                    },
+                    "inner": []
+                  },
+                  {
+                    "name": "core/list-item",
+                    "attrs": {
+                      "content": "el contenido o las prácticas de los sitios y servicios de terceros enlazados."
+                    },
+                    "inner": []
+                  }
+                ]
+              },
+              {
+                "name": "core/paragraph",
+                "attrs": {
+                  "textColor": "texto-cuerpo",
+                  "fontSize": "30",
+                  "fontFamily": "body",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "0",
+                        "bottom": "var:preset|spacing|30"
+                      }
+                    }
+                  },
+                  "content": "Esta limitación no se aplica a los daños causados por dolo o culpa grave de Basis, ni afecta los derechos irrenunciables que la ley otorgue a los consumidores, ni las responsabilidades que se fijen en un contrato firmado."
+                },
+                "inner": []
+              },
+              {
+                "name": "core/heading",
+                "attrs": {
+                  "textColor": "ink",
+                  "fontSize": "80",
+                  "fontFamily": "display",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--tight)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "var:preset|spacing|70",
+                        "bottom": "var:preset|spacing|20"
+                      }
+                    }
+                  },
+                  "content": "9. Ley aplicable y jurisdicción",
+                  "level": 2
+                },
+                "inner": []
+              },
+              {
+                "name": "core/paragraph",
+                "attrs": {
+                  "textColor": "texto-cuerpo",
+                  "fontSize": "30",
+                  "fontFamily": "body",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "0",
+                        "bottom": "var:preset|spacing|30"
+                      }
+                    }
+                  },
+                  "content": "Este documento se rige por las leyes de la República de Chile. Cualquier controversia relacionada con el uso del sitio se someterá a los tribunales ordinarios de justicia de Santiago, sin perjuicio de las reglas de competencia que la ley establezca en favor de los consumidores. Los contratos de arriendo o venta tendrán la ley y el tribunal que ellos mismos establezcan."
+                },
+                "inner": []
+              },
+              {
+                "name": "core/heading",
+                "attrs": {
+                  "textColor": "ink",
+                  "fontSize": "80",
+                  "fontFamily": "display",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--tight)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "var:preset|spacing|70",
+                        "bottom": "var:preset|spacing|20"
+                      }
+                    }
+                  },
+                  "content": "10. Cambios a este documento",
+                  "level": 2
+                },
+                "inner": []
+              },
+              {
+                "name": "core/paragraph",
+                "attrs": {
+                  "textColor": "texto-cuerpo",
+                  "fontSize": "30",
+                  "fontFamily": "body",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "0",
+                        "bottom": "var:preset|spacing|30"
+                      }
+                    }
+                  },
+                  "content": "Podemos modificar este documento, por ejemplo por cambios legales o del sitio. Publicaremos la versión nueva en esta página con su fecha. Si el cambio afecta cómo tratamos sus datos de forma importante, se lo avisaremos de manera visible en el sitio y, cuando la ley lo exija, pediremos de nuevo su consentimiento."
+                },
+                "inner": []
+              },
+              {
+                "name": "core/heading",
+                "attrs": {
+                  "textColor": "ink",
+                  "fontSize": "80",
+                  "fontFamily": "display",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--tight)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "var:preset|spacing|70",
+                        "bottom": "var:preset|spacing|20"
+                      }
+                    }
+                  },
+                  "content": "11. Contacto y vigencia",
+                  "level": 2
+                },
+                "inner": []
+              },
+              {
+                "name": "core/paragraph",
+                "attrs": {
+                  "textColor": "texto-cuerpo",
+                  "fontSize": "30",
+                  "fontFamily": "body",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "0",
+                        "bottom": "var:preset|spacing|30"
+                      }
+                    }
+                  },
+                  "content": "Inmobiliaria Basis SpA · RUT 76.933.998-1 · Av. 18 de Septiembre S/N, Hijuela 2, Fundo San Rafael, Sector Nuevo Sendero, Paine, Región Metropolitana · [PENDIENTE: correo de contacto — P1] · WhatsApp +56 9 9799 5132."
+                },
+                "inner": []
+              },
+              {
+                "name": "core/paragraph",
+                "attrs": {
+                  "textColor": "texto-cuerpo",
+                  "fontSize": "30",
+                  "fontFamily": "body",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "0",
+                        "bottom": "var:preset|spacing|30"
+                      }
+                    }
+                  },
+                  "content": "Vigente desde: [PENDIENTE: fecha de publicación — P3]. Última actualización: [PENDIENTE: fecha — P3]."
+                },
+                "inner": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

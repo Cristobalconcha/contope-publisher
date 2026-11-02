@@ -121,5 +121,73 @@ if (!pv.error) {
     await llamar('cod_apply_canvas_composition', { pageId, documentId, expectedRevision: rev, previewId: pv.datos.previewId, composition: comp(['c-ok']), design: dis([reglaOk]) }));
 }
 
+// ---------------------------------------------------------------------------------------------
+// Las otras puertas: la REST de WordPress con la misma contraseña de aplicación, y cod_write_block_page.
+// ---------------------------------------------------------------------------------------------
+console.log('\n== REST de WordPress con contraseña de aplicación, y la vía oficial de bloques ==');
+const nombres = cap2.datos.adnGate.nombresPorClase || {};
+const unoDe = (clase, preferido) => { const l = nombres[clase] || []; return l.find((n) => n.endsWith('--' + preferido)) || l[0] || ''; };
+const slug = (nombre) => nombre.replace(/^--wp--(?:preset|custom)--[a-z-]+?--/, '');
+const colorSlug = slug(unoDe('color', 'accent'));
+const tamanoSlug = slug(unoDe('tamano', 'm'));
+const espSlug = slug(unoDe('espaciado', 'm'));
+const radio = unoDe('radio', 'm');
+const par = (nombre, attrs, html) => `<!-- wp:${nombre}${attrs ? ' ' + JSON.stringify(attrs) : ''} -->${html}<!-- /wp:${nombre} -->`;
+const CON_LITERAL = par('paragraph', { style: { color: { text: '#123456' } } }, '<p class="has-text-color" style="color:#123456">Hola</p>');
+const CON_PRESET = par('paragraph', { textColor: colorSlug, ...(tamanoSlug ? { fontSize: tamanoSlug } : {}), style: { ...(espSlug ? { spacing: { padding: { top: 'var:preset|spacing|' + espSlug } } } : {}), ...(radio ? { border: { radius: 'var(' + radio + ')' } } : {}) } },
+  `<p class="has-${colorSlug}-color has-text-color${tamanoSlug ? ' has-' + tamanoSlug + '-font-size' : ''}" style="${radio ? 'border-radius:var(' + radio + ');' : ''}${espSlug ? 'padding-top:var(--wp--preset--spacing--' + espSlug + ')' : ''}">Hola</p>`);
+const REST = SITIO + '/wp-json';
+async function rest(metodo, ruta, cuerpo, cabeceras) {
+  const r = await fetch(REST + ruta, { method: metodo, headers: { 'Content-Type': 'application/json', ...cabeceras }, body: cuerpo ? JSON.stringify(cuerpo) : undefined });
+  let j = {}; try { j = await r.json(); } catch { /* sin cuerpo */ }
+  return { estado: r.status, codigo: j.code ?? '', datos: j };
+}
+function verRest(titulo, ok, r) {
+  if (!ok) fallas += 1;
+  console.log(`\n${ok ? 'ok    ' : 'FALLA '} ${titulo}\n   servidor: HTTP ${r.estado}${r.codigo ? '  code=' + r.codigo : ''}`);
+  const v = r.datos?.data?.violaciones?.[0];
+  if (v) console.log(`   ruta:     ${v.ruta}\n   valor:    ${v.propiedad}: ${v.valor}`);
+}
+const conClave = { Authorization: auth };
+let rr = await rest('POST', '/wp/v2/pages', { title: 'ZZ REST literal', status: 'draft', content: CON_LITERAL }, conClave);
+verRest('INTENTO REST 1 · POST /wp/v2/pages con style.color.text:#123456 (contraseña de aplicación)', rr.estado === 400 && rr.codigo === 'ADN_LITERAL_COLOR', rr);
+rr = await rest('POST', '/wp/v2/pages', { title: 'ZZ REST preset', status: 'draft', content: CON_PRESET }, conClave);
+verRest('VÁLIDO · POST /wp/v2/pages con presets del registro', rr.estado === 201, rr);
+const idPreset = rr.datos?.id;
+const lista = await rest('GET', '/wp/v2/global-styles/themes/' + encodeURIComponent(process.env.TEMA || 'contope-basis'), null, conClave);
+void lista;
+rr = await rest('POST', '/wp/v2/global-styles/' + (Number(process.env.ID_ESTILOS_GLOBALES) || 1), { styles: { color: { background: '#000000' } } }, conClave);
+verRest('INTENTO REST 2 · POST /wp/v2/global-styles (cambiar los valores del registro)', rr.estado === 403 && rr.codigo === 'ADN_GLOBAL_STYLES_BLOCKED', rr);
+rr = await rest('PUT', '/wp/v2/plugins/contope-publisher/contope-publisher', { status: 'inactive' }, conClave);
+verRest('INTENTO REST 3 · desactivar el plugin (apagar la compuerta)', rr.estado === 403 && rr.codigo === 'ADN_PLUGIN_CHANGE_BLOCKED', rr);
+mostrar('INTENTO 8 · cod_write_block_page con style.color.text:#123456', true, 'ADN_LITERAL_COLOR',
+  await llamar('cod_write_block_page', { pageId: 0, title: 'ZZ MCP bloques literal', content: CON_LITERAL }));
+const bo = mostrar('VÁLIDO · cod_write_block_page con presets del registro', false, '',
+  await llamar('cod_write_block_page', { pageId: 0, title: 'ZZ MCP bloques preset', content: CON_PRESET }));
+
+// Una persona con sesión en el editor: cookie + nonce (sin contraseña de aplicación) no se bloquea.
+const claveLocal = process.env.CLAVE_HUMANA || (readFileSync('C:/Users/Cristobal concha/wp-local-basis/ACCESO-LOCAL.md', 'utf8').match(/Contraseña:\s*(\S+)/) || [])[1];
+const usuarioLocal = process.env.USUARIO_HUMANO || 'cristobal';
+if (claveLocal) {
+  const jar = new Map();
+  const guardar = (r) => { for (const c of r.headers.getSetCookie?.() || []) { const [kv] = c.split(';'); const i = kv.indexOf('='); jar.set(kv.slice(0, i), kv.slice(i + 1)); } };
+  const cookie = () => [...jar].map(([k, v]) => k + '=' + v).join('; ');
+  guardar(await fetch(SITIO + '/wp-login.php'));
+  jar.set('wordpress_test_cookie', 'WP%20Cookie%20check');
+  const login = await fetch(SITIO + '/wp-login.php', { method: 'POST', redirect: 'manual', headers: { 'Content-Type': 'application/x-www-form-urlencoded', Cookie: cookie() }, body: new URLSearchParams({ log: usuarioLocal, pwd: claveLocal, 'wp-submit': 'Acceder', redirect_to: SITIO + '/wp-admin/', testcookie: '1' }) });
+  guardar(login);
+  const nonce = (await (await fetch(SITIO + '/wp-admin/admin-ajax.php?action=rest-nonce', { headers: { Cookie: cookie() } })).text()).trim();
+  if (nonce && nonce.length < 20) {
+    rr = await rest('POST', '/wp/v2/pages', { title: 'ZZ REST persona', status: 'draft', content: CON_LITERAL }, { Cookie: cookie(), 'X-WP-Nonce': nonce });
+    verRest('PERSONA · POST /wp/v2/pages con el mismo literal, con sesión y nonce (no se bloquea)', rr.estado === 201, rr);
+    if (rr.datos?.id) await rest('DELETE', '/wp/v2/pages/' + rr.datos.id + '?force=true', null, { Cookie: cookie(), 'X-WP-Nonce': nonce });
+  } else {
+    fallas += 1;
+    console.log('\nFALLA  no pude abrir sesión de persona para la prueba (revisa USUARIO_HUMANO / CLAVE_HUMANA o ACCESO-LOCAL.md)');
+  }
+}
+if (idPreset) await rest('DELETE', '/wp/v2/pages/' + idPreset + '?force=true', null, conClave);
+if (bo?.datos?.pageId) await rest('DELETE', '/wp/v2/pages/' + bo.datos.pageId + '?force=true', null, conClave);
+
 console.log(`\n${fallas === 0 ? 'TODO COMO SE ESPERABA' : fallas + ' intento(s) no se comportaron como se esperaba'}`);
 process.exit(fallas === 0 ? 0 : 1);

@@ -55,8 +55,8 @@
       "_roles": "Los colores que las DEFINICIONES DE ESTILO del tema gobiernan van por la variable del núcleo (COD_Design_Core): accent, el fondo (surface) y el texto (ink). El resto de la paleta, por su variable de WordPress (--wp--preset--color--<slug>).",
       "roles": {
         "accent": "var(--cod-color-accent)",
-        "background": "var(--cod-color-surface)",
-        "text": "var(--cod-color-ink)"
+        "fondo-pagina": "var(--cod-color-surface)",
+        "texto-cuerpo": "var(--cod-color-ink)"
       },
       "distanciaMaxima": 8
     },

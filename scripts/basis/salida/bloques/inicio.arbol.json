@@ -1,0 +1,1866 @@
+[
+  {
+    "name": "contope/lienzo",
+    "attrs": {
+      "documentId": ""
+    },
+    "inner": [
+      {
+        "name": "core/cover",
+        "attrs": {
+          "url": "/wp-content/uploads/2025/07/Imagen-6.jpg",
+          "backgroundType": "image",
+          "dimRatio": 100,
+          "tagName": "section",
+          "align": "full",
+          "isDark": true,
+          "contentPosition": "center center",
+          "backgroundColor": "fondo-pagina",
+          "style": {
+            "spacing": {
+              "padding": {
+                "top": "var:preset|spacing|90",
+                "right": "0",
+                "bottom": "var:preset|spacing|110",
+                "left": "0"
+              },
+              "blockGap": "0"
+            }
+          },
+          "gradient": "texto-cuerpo-a-transparente",
+          "minHeight": 650,
+          "minHeightUnit": "px"
+        },
+        "inner": [
+          {
+            "name": "core/group",
+            "attrs": {
+              "style": {
+                "spacing": {
+                  "padding": {
+                    "top": "0",
+                    "right": "0",
+                    "bottom": "0",
+                    "left": "0"
+                  },
+                  "margin": {
+                    "top": "0",
+                    "bottom": "0",
+                    "left": "var:preset|spacing|gutter",
+                    "right": "var:preset|spacing|gutter"
+                  },
+                  "blockGap": "0"
+                },
+                "border": {
+                  "radius": "var(--wp--custom--radius--m)"
+                }
+              }
+            },
+            "inner": [
+              {
+                "name": "core/group",
+                "attrs": {
+                  "style": {
+                    "spacing": {
+                      "padding": {
+                        "top": "var:preset|spacing|70",
+                        "right": "var:preset|spacing|70",
+                        "bottom": "var:preset|spacing|50",
+                        "left": "var:preset|spacing|70"
+                      },
+                      "blockGap": "0"
+                    },
+                    "border": {
+                      "radius": "var(--wp--custom--radius--s)"
+                    }
+                  }
+                },
+                "inner": [
+                  {
+                    "name": "core/paragraph",
+                    "attrs": {
+                      "textColor": "fondo-pagina",
+                      "fontSize": "50",
+                      "fontFamily": "boton",
+                      "style": {
+                        "typography": {
+                          "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                          "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                          "textAlign": "right"
+                        },
+                        "spacing": {
+                          "margin": {
+                            "top": "0",
+                            "bottom": "var:preset|spacing|50"
+                          }
+                        }
+                      },
+                      "content": "De la agroindustria para la agroindustria"
+                    },
+                    "inner": []
+                  },
+                  {
+                    "name": "core/heading",
+                    "attrs": {
+                      "textColor": "fondo-pagina",
+                      "fontSize": "120",
+                      "fontFamily": "display",
+                      "style": {
+                        "typography": {
+                          "fontWeight": "var(--wp--custom--typography--font-weight--extrabold)",
+                          "lineHeight": "var(--wp--custom--typography--line-height--tight)",
+                          "textAlign": "right"
+                        },
+                        "spacing": {
+                          "margin": {
+                            "top": "0",
+                            "bottom": "var:preset|spacing|70"
+                          }
+                        }
+                      },
+                      "content": "La respuesta eficiente<br>a su demanda de bodegaje",
+                      "level": 1
+                    },
+                    "inner": []
+                  },
+                  {
+                    "name": "core/paragraph",
+                    "attrs": {
+                      "textColor": "fondo-pagina",
+                      "fontSize": "50",
+                      "fontFamily": "boton",
+                      "style": {
+                        "typography": {
+                          "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                          "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                          "textAlign": "right"
+                        },
+                        "spacing": {
+                          "margin": {
+                            "top": "0",
+                            "bottom": "var:preset|spacing|50"
+                          }
+                        }
+                      },
+                      "content": "Descubre cómo nuestras carpas industriales inteligentes transforman el<br>almacenamiento temporal con tecnología avanzada y eficiencia inigualable."
+                    },
+                    "inner": []
+                  },
+                  {
+                    "name": "core/buttons",
+                    "attrs": {
+                      "layout": {
+                        "type": "flex",
+                        "justifyContent": "right"
+                      },
+                      "style": {
+                        "spacing": {
+                          "margin": {
+                            "top": "0",
+                            "bottom": "0"
+                          }
+                        }
+                      }
+                    },
+                    "inner": [
+                      {
+                        "name": "core/button",
+                        "attrs": {
+                          "textColor": "accent",
+                          "backgroundColor": "fondo-pagina",
+                          "fontSize": "20",
+                          "fontFamily": "boton",
+                          "style": {
+                            "typography": {
+                              "fontWeight": "var(--wp--custom--typography--font-weight--bold)",
+                              "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                              "textAlign": "right"
+                            },
+                            "spacing": {
+                              "padding": {
+                                "top": "var:preset|spacing|20",
+                                "right": "var:preset|spacing|50",
+                                "bottom": "var:preset|spacing|20",
+                                "left": "var:preset|spacing|50"
+                              }
+                            },
+                            "border": {
+                              "radius": "var(--wp--custom--radius--pill)"
+                            }
+                          },
+                          "text": "Explorar Soluciones",
+                          "url": "#soluciones"
+                        },
+                        "inner": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "core/group",
+        "attrs": {
+          "tagName": "section",
+          "align": "full",
+          "anchor": "soluciones",
+          "backgroundColor": "gris-suave",
+          "style": {
+            "spacing": {
+              "padding": {
+                "top": "var:preset|spacing|90",
+                "right": "0",
+                "bottom": "var:preset|spacing|90",
+                "left": "0"
+              },
+              "blockGap": "0"
+            },
+            "dimensions": {
+              "minHeight": "804px"
+            },
+            "background": {
+              "backgroundImage": {
+                "url": "/wp-content/uploads/2025/07/aBlanco@4x.png",
+                "source": "file"
+              },
+              "backgroundSize": "55% auto",
+              "backgroundPosition": "100% 50%",
+              "backgroundRepeat": "no-repeat"
+            }
+          }
+        },
+        "inner": [
+          {
+            "name": "core/group",
+            "attrs": {
+              "style": {
+                "spacing": {
+                  "padding": {
+                    "top": "var:preset|spacing|50",
+                    "right": "0",
+                    "bottom": "var:preset|spacing|50",
+                    "left": "0"
+                  },
+                  "margin": {
+                    "top": "0",
+                    "bottom": "calc(-1 * var(--wp--preset--spacing--20))",
+                    "left": "var:preset|spacing|gutter",
+                    "right": "var:preset|spacing|gutter"
+                  },
+                  "blockGap": "0"
+                }
+              }
+            },
+            "inner": [
+              {
+                "name": "core/heading",
+                "attrs": {
+                  "textColor": "ink",
+                  "fontSize": "100",
+                  "fontFamily": "display",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--tight)",
+                      "textAlign": "left"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "0",
+                        "bottom": "var:preset|spacing|40"
+                      }
+                    }
+                  },
+                  "content": "Soluciones inteligentes",
+                  "level": 2
+                },
+                "inner": []
+              }
+            ]
+          },
+          {
+            "name": "core/columns",
+            "attrs": {
+              "style": {
+                "spacing": {
+                  "padding": {
+                    "top": "var:preset|spacing|50",
+                    "right": "0",
+                    "bottom": "var:preset|spacing|50",
+                    "left": "0"
+                  },
+                  "margin": {
+                    "top": "0",
+                    "bottom": "0",
+                    "left": "var:preset|spacing|gutter",
+                    "right": "var:preset|spacing|gutter"
+                  },
+                  "blockGap": {
+                    "top": "var:preset|spacing|60",
+                    "left": "var:preset|spacing|90"
+                  }
+                }
+              },
+              "verticalAlignment": "top"
+            },
+            "inner": [
+              {
+                "name": "core/column",
+                "attrs": {
+                  "style": {
+                    "spacing": {
+                      "padding": {
+                        "top": "0",
+                        "right": "0",
+                        "bottom": "0",
+                        "left": "0"
+                      },
+                      "blockGap": "0"
+                    }
+                  }
+                },
+                "inner": [
+                  {
+                    "name": "core/image",
+                    "attrs": {
+                      "url": "/wp-content/uploads/2025/07/Imagen-4.jpeg",
+                      "alt": "",
+                      "sizeSlug": "full",
+                      "linkDestination": "none",
+                      "aspectRatio": "4/3",
+                      "scale": "cover",
+                      "style": {
+                        "spacing": {
+                          "margin": {
+                            "top": "0",
+                            "bottom": "var:preset|spacing|60"
+                          }
+                        },
+                        "border": {
+                          "radius": "var(--wp--custom--radius--s)"
+                        }
+                      }
+                    },
+                    "inner": []
+                  },
+                  {
+                    "name": "core/heading",
+                    "attrs": {
+                      "textColor": "ink",
+                      "fontSize": "70",
+                      "fontFamily": "display",
+                      "style": {
+                        "typography": {
+                          "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                          "lineHeight": "var(--wp--custom--typography--line-height--snug)",
+                          "textAlign": "left"
+                        },
+                        "spacing": {
+                          "margin": {
+                            "top": "0",
+                            "bottom": "var:preset|spacing|40"
+                          }
+                        }
+                      },
+                      "content": "Aislación efectiva",
+                      "level": 5
+                    },
+                    "inner": []
+                  },
+                  {
+                    "name": "core/paragraph",
+                    "attrs": {
+                      "textColor": "dark",
+                      "fontSize": "30",
+                      "fontFamily": "boton",
+                      "style": {
+                        "typography": {
+                          "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                          "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                          "textAlign": "left"
+                        },
+                        "spacing": {
+                          "margin": {
+                            "top": "0",
+                            "bottom": "0"
+                          }
+                        }
+                      },
+                      "content": "Nuestras carpas son fabricadas con materiales de última generación que les brindan la máxima protección ante la de lluvia, sol y vectores."
+                    },
+                    "inner": []
+                  }
+                ]
+              },
+              {
+                "name": "core/column",
+                "attrs": {
+                  "style": {
+                    "spacing": {
+                      "padding": {
+                        "top": "0",
+                        "right": "0",
+                        "bottom": "0",
+                        "left": "0"
+                      },
+                      "blockGap": "0"
+                    }
+                  }
+                },
+                "inner": [
+                  {
+                    "name": "core/image",
+                    "attrs": {
+                      "url": "/wp-content/uploads/2025/07/Cierre-lateral.jpg",
+                      "alt": "",
+                      "sizeSlug": "full",
+                      "linkDestination": "none",
+                      "aspectRatio": "4/3",
+                      "scale": "cover",
+                      "style": {
+                        "spacing": {
+                          "margin": {
+                            "top": "0",
+                            "bottom": "var:preset|spacing|60"
+                          }
+                        },
+                        "border": {
+                          "radius": "var(--wp--custom--radius--s)"
+                        }
+                      }
+                    },
+                    "inner": []
+                  },
+                  {
+                    "name": "core/heading",
+                    "attrs": {
+                      "textColor": "ink",
+                      "fontSize": "70",
+                      "fontFamily": "display",
+                      "style": {
+                        "typography": {
+                          "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                          "lineHeight": "var(--wp--custom--typography--line-height--snug)",
+                          "textAlign": "left"
+                        },
+                        "spacing": {
+                          "margin": {
+                            "top": "0",
+                            "bottom": "var:preset|spacing|40"
+                          }
+                        }
+                      },
+                      "content": "Instalación Rápida",
+                      "level": 5
+                    },
+                    "inner": []
+                  },
+                  {
+                    "name": "core/paragraph",
+                    "attrs": {
+                      "textColor": "dark",
+                      "fontSize": "30",
+                      "fontFamily": "boton",
+                      "style": {
+                        "typography": {
+                          "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                          "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                          "textAlign": "left"
+                        },
+                        "spacing": {
+                          "margin": {
+                            "top": "0",
+                            "bottom": "0"
+                          }
+                        }
+                      },
+                      "content": "Nuestro sistema modular facilita una instalación rápida y eficiente, optimizando el espacio de almacenamiento con una mínima preparación del terreno."
+                    },
+                    "inner": []
+                  }
+                ]
+              },
+              {
+                "name": "core/column",
+                "attrs": {
+                  "style": {
+                    "spacing": {
+                      "padding": {
+                        "top": "0",
+                        "right": "0",
+                        "bottom": "0",
+                        "left": "0"
+                      },
+                      "blockGap": "0"
+                    }
+                  }
+                },
+                "inner": [
+                  {
+                    "name": "core/image",
+                    "attrs": {
+                      "url": "/wp-content/uploads/2025/07/Estructura3.jpg",
+                      "alt": "",
+                      "sizeSlug": "full",
+                      "linkDestination": "none",
+                      "aspectRatio": "4/3",
+                      "scale": "cover",
+                      "style": {
+                        "spacing": {
+                          "margin": {
+                            "top": "0",
+                            "bottom": "var:preset|spacing|60"
+                          }
+                        },
+                        "border": {
+                          "radius": "var(--wp--custom--radius--s)"
+                        }
+                      }
+                    },
+                    "inner": []
+                  },
+                  {
+                    "name": "core/heading",
+                    "attrs": {
+                      "textColor": "ink",
+                      "fontSize": "70",
+                      "fontFamily": "display",
+                      "style": {
+                        "typography": {
+                          "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                          "lineHeight": "var(--wp--custom--typography--line-height--snug)",
+                          "textAlign": "left"
+                        },
+                        "spacing": {
+                          "margin": {
+                            "top": "0",
+                            "bottom": "var:preset|spacing|40"
+                          }
+                        }
+                      },
+                      "content": "Materiales de optima calidad",
+                      "level": 5
+                    },
+                    "inner": []
+                  },
+                  {
+                    "name": "core/paragraph",
+                    "attrs": {
+                      "textColor": "dark",
+                      "fontSize": "30",
+                      "fontFamily": "boton",
+                      "style": {
+                        "typography": {
+                          "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                          "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                          "textAlign": "left"
+                        },
+                        "spacing": {
+                          "margin": {
+                            "top": "0",
+                            "bottom": "0"
+                          }
+                        }
+                      },
+                      "content": "Con materiales de alta calidad, nuestras carpas ofrecen un aislamiento superior, son ignífugas y sus estructuras de aluminio son livianas y robustas."
+                    },
+                    "inner": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "core/group",
+        "attrs": {
+          "tagName": "section",
+          "align": "full",
+          "backgroundColor": "fondo-pagina",
+          "style": {
+            "spacing": {
+              "padding": {
+                "top": "var:preset|spacing|90",
+                "right": "0",
+                "bottom": "var:preset|spacing|90",
+                "left": "0"
+              },
+              "blockGap": "0"
+            }
+          }
+        },
+        "inner": [
+          {
+            "name": "core/group",
+            "attrs": {
+              "style": {
+                "spacing": {
+                  "padding": {
+                    "top": "var:preset|spacing|50",
+                    "right": "0",
+                    "bottom": "var:preset|spacing|50",
+                    "left": "0"
+                  },
+                  "margin": {
+                    "top": "0",
+                    "bottom": "calc(-1 * var(--wp--preset--spacing--20))",
+                    "left": "var:preset|spacing|gutter",
+                    "right": "var:preset|spacing|gutter"
+                  },
+                  "blockGap": "0"
+                }
+              }
+            },
+            "inner": [
+              {
+                "name": "core/heading",
+                "attrs": {
+                  "textColor": "ink",
+                  "fontSize": "100",
+                  "fontFamily": "display",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--tight)",
+                      "textAlign": "center"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "0",
+                        "bottom": "var:preset|spacing|40"
+                      }
+                    }
+                  },
+                  "content": "Opciones comerciales",
+                  "level": 2
+                },
+                "inner": []
+              },
+              {
+                "name": "core/paragraph",
+                "attrs": {
+                  "textColor": "texto-cuerpo",
+                  "fontSize": "60",
+                  "fontFamily": "body",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                      "textAlign": "center"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "0",
+                        "bottom": "0"
+                      }
+                    }
+                  },
+                  "content": "Cuente con todas las alternativas para gestionar y financiar su Bodega Trasladable.<br>Hay una solución para cada situación:"
+                },
+                "inner": []
+              }
+            ]
+          },
+          {
+            "name": "core/columns",
+            "attrs": {
+              "backgroundColor": "accent",
+              "style": {
+                "spacing": {
+                  "padding": {
+                    "top": "var:preset|spacing|50",
+                    "right": "0",
+                    "bottom": "var:preset|spacing|50",
+                    "left": "0"
+                  },
+                  "margin": {
+                    "top": "0",
+                    "bottom": "0",
+                    "left": "var:preset|spacing|gutter",
+                    "right": "var:preset|spacing|gutter"
+                  },
+                  "blockGap": {
+                    "top": "var:preset|spacing|60",
+                    "left": "var:preset|spacing|90"
+                  }
+                },
+                "border": {
+                  "radius": {
+                    "topLeft": "var(--wp--custom--radius--s)",
+                    "topRight": "var(--wp--custom--radius--s)",
+                    "bottomRight": "0",
+                    "bottomLeft": "0"
+                  }
+                }
+              }
+            },
+            "inner": [
+              {
+                "name": "core/column",
+                "attrs": {
+                  "backgroundColor": "accent",
+                  "style": {
+                    "spacing": {
+                      "padding": {
+                        "top": "var:preset|spacing|40",
+                        "right": "var:preset|spacing|40",
+                        "bottom": "var:preset|spacing|40",
+                        "left": "var:preset|spacing|40"
+                      },
+                      "blockGap": "0"
+                    }
+                  }
+                },
+                "inner": [
+                  {
+                    "name": "core/group",
+                    "attrs": {
+                      "style": {
+                        "spacing": {
+                          "margin": {
+                            "top": "0",
+                            "bottom": "0"
+                          },
+                          "blockGap": "var:preset|spacing|30"
+                        }
+                      },
+                      "layout": {
+                        "type": "flex",
+                        "flexWrap": "nowrap",
+                        "verticalAlignment": "top"
+                      }
+                    },
+                    "inner": [
+                      {
+                        "name": "core/image",
+                        "attrs": {
+                          "url": "/wp-content/uploads/iconos-divi/fontawesome-f217.svg",
+                          "alt": "",
+                          "width": "45px",
+                          "height": "45px",
+                          "sizeSlug": "full",
+                          "linkDestination": "none",
+                          "style": {
+                            "spacing": {
+                              "margin": {
+                                "top": "0",
+                                "bottom": "0"
+                              }
+                            }
+                          }
+                        },
+                        "inner": []
+                      },
+                      {
+                        "name": "core/group",
+                        "attrs": {
+                          "style": {
+                            "spacing": {
+                              "blockGap": "0"
+                            },
+                            "layout": {
+                              "selfStretch": "fill"
+                            }
+                          }
+                        },
+                        "inner": [
+                          {
+                            "name": "core/heading",
+                            "attrs": {
+                              "textColor": "fondo-pagina",
+                              "fontSize": "70",
+                              "fontFamily": "display",
+                              "style": {
+                                "typography": {
+                                  "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                                  "lineHeight": "var(--wp--custom--typography--line-height--snug)",
+                                  "textAlign": "left"
+                                },
+                                "spacing": {
+                                  "margin": {
+                                    "top": "0",
+                                    "bottom": "var:preset|spacing|20"
+                                  }
+                                }
+                              },
+                              "content": "Compra tus bodegas",
+                              "level": 4
+                            },
+                            "inner": []
+                          },
+                          {
+                            "name": "core/paragraph",
+                            "attrs": {
+                              "textColor": "fondo-pagina",
+                              "fontSize": "30",
+                              "fontFamily": "boton",
+                              "style": {
+                                "typography": {
+                                  "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                                  "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                                  "textAlign": "left"
+                                },
+                                "spacing": {
+                                  "margin": {
+                                    "top": "0",
+                                    "bottom": "0"
+                                  }
+                                }
+                              },
+                              "content": "Para satisfacer el requerimiento de instalaciones permanentes o que superen los 5 años, comprar puede ser la opción más conveniente, especialmente si agrega Servicios Opcionales y la instalación dentro del total."
+                            },
+                            "inner": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "name": "core/column",
+                "attrs": {
+                  "backgroundColor": "accent",
+                  "style": {
+                    "spacing": {
+                      "padding": {
+                        "top": "var:preset|spacing|40",
+                        "right": "var:preset|spacing|40",
+                        "bottom": "var:preset|spacing|40",
+                        "left": "var:preset|spacing|40"
+                      },
+                      "blockGap": "0"
+                    }
+                  }
+                },
+                "inner": [
+                  {
+                    "name": "core/group",
+                    "attrs": {
+                      "style": {
+                        "spacing": {
+                          "margin": {
+                            "top": "0",
+                            "bottom": "0"
+                          },
+                          "blockGap": "var:preset|spacing|30"
+                        }
+                      },
+                      "layout": {
+                        "type": "flex",
+                        "flexWrap": "nowrap",
+                        "verticalAlignment": "top"
+                      }
+                    },
+                    "inner": [
+                      {
+                        "name": "core/image",
+                        "attrs": {
+                          "url": "/wp-content/uploads/iconos-divi/fontawesome-f494.svg",
+                          "alt": "",
+                          "width": "50px",
+                          "height": "50px",
+                          "sizeSlug": "full",
+                          "linkDestination": "none",
+                          "style": {
+                            "spacing": {
+                              "margin": {
+                                "top": "0",
+                                "bottom": "0"
+                              }
+                            }
+                          }
+                        },
+                        "inner": []
+                      },
+                      {
+                        "name": "core/group",
+                        "attrs": {
+                          "style": {
+                            "spacing": {
+                              "blockGap": "0"
+                            },
+                            "layout": {
+                              "selfStretch": "fill"
+                            }
+                          }
+                        },
+                        "inner": [
+                          {
+                            "name": "core/heading",
+                            "attrs": {
+                              "textColor": "fondo-pagina",
+                              "fontSize": "70",
+                              "fontFamily": "display",
+                              "style": {
+                                "typography": {
+                                  "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                                  "lineHeight": "var(--wp--custom--typography--line-height--snug)",
+                                  "textAlign": "left"
+                                },
+                                "spacing": {
+                                  "margin": {
+                                    "top": "0",
+                                    "bottom": "var:preset|spacing|20"
+                                  }
+                                }
+                              },
+                              "content": "Opción de Arriendo",
+                              "level": 4
+                            },
+                            "inner": []
+                          },
+                          {
+                            "name": "core/paragraph",
+                            "attrs": {
+                              "textColor": "fondo-pagina",
+                              "fontSize": "30",
+                              "fontFamily": "boton",
+                              "style": {
+                                "typography": {
+                                  "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                                  "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                                  "textAlign": "left"
+                                },
+                                "spacing": {
+                                  "margin": {
+                                    "top": "0",
+                                    "bottom": "0"
+                                  }
+                                }
+                              },
+                              "content": "Si su operación es temporal o su requerimiento de naves es fluctuante, la decisión de arrendar podría ser la mejor opción. Dispondrá de instalación en sus dependencias y con tarifas muy competitivas, ajustadas a la duración del contrato."
+                            },
+                            "inner": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "name": "core/column",
+                "attrs": {
+                  "backgroundColor": "accent",
+                  "style": {
+                    "spacing": {
+                      "padding": {
+                        "top": "var:preset|spacing|40",
+                        "right": "var:preset|spacing|40",
+                        "bottom": "var:preset|spacing|40",
+                        "left": "var:preset|spacing|40"
+                      },
+                      "blockGap": "0"
+                    }
+                  }
+                },
+                "inner": [
+                  {
+                    "name": "core/group",
+                    "attrs": {
+                      "style": {
+                        "spacing": {
+                          "margin": {
+                            "top": "0",
+                            "bottom": "0"
+                          },
+                          "blockGap": "var:preset|spacing|30"
+                        }
+                      },
+                      "layout": {
+                        "type": "flex",
+                        "flexWrap": "nowrap",
+                        "verticalAlignment": "top"
+                      }
+                    },
+                    "inner": [
+                      {
+                        "name": "core/image",
+                        "attrs": {
+                          "url": "/wp-content/uploads/iconos-divi/etmodules-e0e1.svg",
+                          "alt": "",
+                          "width": "40px",
+                          "height": "40px",
+                          "sizeSlug": "full",
+                          "linkDestination": "none",
+                          "style": {
+                            "spacing": {
+                              "margin": {
+                                "top": "0",
+                                "bottom": "0"
+                              }
+                            }
+                          }
+                        },
+                        "inner": []
+                      },
+                      {
+                        "name": "core/group",
+                        "attrs": {
+                          "style": {
+                            "spacing": {
+                              "blockGap": "0"
+                            },
+                            "layout": {
+                              "selfStretch": "fill"
+                            }
+                          }
+                        },
+                        "inner": [
+                          {
+                            "name": "core/heading",
+                            "attrs": {
+                              "textColor": "fondo-pagina",
+                              "fontSize": "70",
+                              "fontFamily": "display",
+                              "style": {
+                                "typography": {
+                                  "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                                  "lineHeight": "var(--wp--custom--typography--line-height--snug)",
+                                  "textAlign": "left"
+                                },
+                                "spacing": {
+                                  "margin": {
+                                    "top": "0",
+                                    "bottom": "var:preset|spacing|20"
+                                  }
+                                }
+                              },
+                              "content": "Opción ACC",
+                              "level": 4
+                            },
+                            "inner": []
+                          },
+                          {
+                            "name": "core/paragraph",
+                            "attrs": {
+                              "textColor": "fondo-pagina",
+                              "fontSize": "30",
+                              "fontFamily": "boton",
+                              "style": {
+                                "typography": {
+                                  "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                                  "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                                  "textAlign": "left"
+                                },
+                                "spacing": {
+                                  "margin": {
+                                    "top": "0",
+                                    "bottom": "0"
+                                  }
+                                }
+                              },
+                              "content": "Y si no desea inmovilizar recursos para faenas de largo plazo o permanente, el Arriendo con Compromiso de Compra (ACC) entrega un valor de arriendo intermedio que le permite adquirir la bodega arrendada al cabo de un plazo pre pactado."
+                            },
+                            "inner": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "core/group",
+            "attrs": {
+              "style": {
+                "spacing": {
+                  "padding": {
+                    "top": "var:preset|spacing|50",
+                    "right": "0",
+                    "bottom": "var:preset|spacing|50",
+                    "left": "0"
+                  },
+                  "margin": {
+                    "top": "0",
+                    "bottom": "0",
+                    "left": "var:preset|spacing|gutter",
+                    "right": "var:preset|spacing|gutter"
+                  },
+                  "blockGap": "0"
+                }
+              }
+            },
+            "inner": [
+              {
+                "name": "core/buttons",
+                "attrs": {
+                  "layout": {
+                    "type": "flex",
+                    "justifyContent": "center"
+                  },
+                  "style": {
+                    "spacing": {
+                      "margin": {
+                        "top": "0",
+                        "bottom": "0"
+                      }
+                    }
+                  }
+                },
+                "inner": [
+                  {
+                    "name": "core/button",
+                    "attrs": {
+                      "textColor": "fondo-pagina",
+                      "backgroundColor": "gris",
+                      "fontSize": "40",
+                      "fontFamily": "boton",
+                      "style": {
+                        "typography": {
+                          "fontWeight": "var(--wp--custom--typography--font-weight--bold)",
+                          "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                          "textAlign": "center"
+                        },
+                        "spacing": {
+                          "padding": {
+                            "top": "var:preset|spacing|20",
+                            "right": "var:preset|spacing|100",
+                            "bottom": "var:preset|spacing|20",
+                            "left": "var:preset|spacing|100"
+                          }
+                        },
+                        "border": {
+                          "radius": "var(--wp--custom--radius--pill)"
+                        }
+                      },
+                      "text": "Contáctanos Hoy",
+                      "url": "https://wa.me/56997995132?text=Gracias%20por%20contactar%20a%20BASIS.%20%C2%BFQu%C3%A9%20deseas%20cotizar%3F%20Si%20lo%20prefieres%2C%20podemos%20devolverte%20la%20llamada."
+                    },
+                    "inner": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "core/cover",
+        "attrs": {
+          "url": "/wp-content/uploads/2025/07/Video-Aereo-Carpas.mp4",
+          "backgroundType": "video",
+          "dimRatio": 0,
+          "tagName": "section",
+          "align": "full",
+          "isDark": false,
+          "contentPosition": "center center",
+          "backgroundColor": "fondo-pagina",
+          "style": {
+            "spacing": {
+              "padding": {
+                "top": "var:preset|spacing|90",
+                "right": "0",
+                "bottom": "var:preset|spacing|90",
+                "left": "0"
+              },
+              "blockGap": "0"
+            }
+          },
+          "overlayColor": "fondo-pagina",
+          "minHeight": 1510,
+          "minHeightUnit": "px"
+        },
+        "inner": [
+          {
+            "name": "core/columns",
+            "attrs": {
+              "backgroundColor": "fondo-pagina",
+              "style": {
+                "spacing": {
+                  "padding": {
+                    "top": "0",
+                    "right": "0",
+                    "bottom": "0",
+                    "left": "0"
+                  },
+                  "margin": {
+                    "top": "0",
+                    "bottom": "0"
+                  },
+                  "blockGap": {
+                    "top": "var:preset|spacing|60",
+                    "left": "var:preset|spacing|90"
+                  }
+                },
+                "border": {
+                  "radius": "var(--wp--custom--radius--m)"
+                }
+              },
+              "verticalAlignment": "top"
+            },
+            "inner": [
+              {
+                "name": "core/column",
+                "attrs": {
+                  "style": {
+                    "spacing": {
+                      "padding": {
+                        "top": "0",
+                        "right": "0",
+                        "bottom": "0",
+                        "left": "0"
+                      },
+                      "blockGap": "0"
+                    }
+                  }
+                },
+                "inner": [
+                  {
+                    "name": "core/heading",
+                    "attrs": {
+                      "textColor": "rojo",
+                      "fontSize": "90",
+                      "fontFamily": "display",
+                      "style": {
+                        "typography": {
+                          "fontWeight": "var(--wp--custom--typography--font-weight--black)",
+                          "lineHeight": "var(--wp--custom--typography--line-height--none)",
+                          "textAlign": "left"
+                        },
+                        "spacing": {
+                          "padding": {
+                            "top": "var:preset|spacing|60",
+                            "right": "var:preset|spacing|60",
+                            "left": "var:preset|spacing|60"
+                          },
+                          "margin": {
+                            "top": "0",
+                            "bottom": "var:preset|spacing|20"
+                          }
+                        }
+                      },
+                      "content": "Características",
+                      "level": 3
+                    },
+                    "inner": []
+                  },
+                  {
+                    "name": "core/list",
+                    "attrs": {
+                      "textColor": "ink",
+                      "fontSize": "50",
+                      "fontFamily": "body",
+                      "style": {
+                        "typography": {
+                          "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                          "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                          "textAlign": "left"
+                        },
+                        "spacing": {
+                          "padding": {
+                            "right": "var:preset|spacing|60",
+                            "bottom": "var:preset|spacing|30",
+                            "left": "var:preset|spacing|70"
+                          },
+                          "margin": {
+                            "top": "0",
+                            "bottom": "0"
+                          }
+                        }
+                      },
+                      "ordered": false
+                    },
+                    "inner": [
+                      {
+                        "name": "core/list-item",
+                        "attrs": {
+                          "content": "Materiales 100% impermeables y con retardante de fuego."
+                        },
+                        "inner": []
+                      },
+                      {
+                        "name": "core/list-item",
+                        "attrs": {
+                          "content": "Duración de más de 10 años en condiciones climáticas medias."
+                        },
+                        "inner": []
+                      }
+                    ]
+                  },
+                  {
+                    "name": "core/accordion",
+                    "attrs": {
+                      "iconPosition": "right",
+                      "showIcon": true,
+                      "autoclose": false,
+                      "headingLevel": 3,
+                      "style": {
+                        "spacing": {
+                          "blockGap": "0",
+                          "margin": {
+                            "top": "0",
+                            "bottom": "0"
+                          }
+                        }
+                      }
+                    },
+                    "inner": [
+                      {
+                        "name": "core/accordion-item",
+                        "attrs": {
+                          "style": {
+                            "spacing": {
+                              "padding": {
+                                "top": "var:preset|spacing|20",
+                                "bottom": "var:preset|spacing|20"
+                              }
+                            },
+                            "border": {
+                              "bottom": {
+                                "width": "var(--wp--custom--border--hairline)",
+                                "color": "var:preset|color|ink",
+                                "style": "solid"
+                              }
+                            }
+                          }
+                        },
+                        "inner": [
+                          {
+                            "name": "core/accordion-heading",
+                            "attrs": {
+                              "title": "Dimensiones",
+                              "level": 3,
+                              "textColor": "ink",
+                              "fontSize": "50",
+                              "fontFamily": "body",
+                              "style": {
+                                "typography": {
+                                  "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                                  "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                                  "textAlign": "left"
+                                }
+                              }
+                            },
+                            "inner": []
+                          },
+                          {
+                            "name": "core/accordion-panel",
+                            "attrs": {
+                              "style": {
+                                "spacing": {
+                                  "padding": {
+                                    "top": "var:preset|spacing|10"
+                                  },
+                                  "margin": {
+                                    "top": "0"
+                                  },
+                                  "blockGap": "0"
+                                }
+                              }
+                            },
+                            "inner": [
+                              {
+                                "name": "core/list",
+                                "attrs": {
+                                  "textColor": "ink",
+                                  "fontSize": "50",
+                                  "fontFamily": "body",
+                                  "style": {
+                                    "typography": {
+                                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                                      "textAlign": "left"
+                                    },
+                                    "spacing": {
+                                      "padding": {
+                                        "bottom": "var:preset|spacing|40",
+                                        "left": "var:preset|spacing|40"
+                                      },
+                                      "margin": {
+                                        "top": "0",
+                                        "bottom": "0"
+                                      }
+                                    }
+                                  },
+                                  "ordered": false
+                                },
+                                "inner": [
+                                  {
+                                    "name": "core/list-item",
+                                    "attrs": {
+                                      "content": "Ancho: 20 mt (Standard) opciones a pedido"
+                                    },
+                                    "inner": []
+                                  },
+                                  {
+                                    "name": "core/list-item",
+                                    "attrs": {
+                                      "content": "Largo: Opcional, variable en múltiplos de 5mt"
+                                    },
+                                    "inner": []
+                                  },
+                                  {
+                                    "name": "core/list-item",
+                                    "attrs": {
+                                      "content": "Alto Hombro: 5mt"
+                                    },
+                                    "inner": []
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "name": "core/accordion-item",
+                        "attrs": {
+                          "style": {
+                            "spacing": {
+                              "padding": {
+                                "top": "var:preset|spacing|20",
+                                "bottom": "var:preset|spacing|20"
+                              }
+                            },
+                            "border": {
+                              "bottom": {
+                                "width": "var(--wp--custom--border--hairline)",
+                                "color": "var:preset|color|ink",
+                                "style": "solid"
+                              }
+                            }
+                          }
+                        },
+                        "inner": [
+                          {
+                            "name": "core/accordion-heading",
+                            "attrs": {
+                              "title": "Material estructura",
+                              "level": 3,
+                              "textColor": "ink",
+                              "fontSize": "50",
+                              "fontFamily": "body",
+                              "style": {
+                                "typography": {
+                                  "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                                  "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                                  "textAlign": "left"
+                                }
+                              }
+                            },
+                            "inner": []
+                          },
+                          {
+                            "name": "core/accordion-panel",
+                            "attrs": {
+                              "style": {
+                                "spacing": {
+                                  "padding": {
+                                    "top": "var:preset|spacing|10"
+                                  },
+                                  "margin": {
+                                    "top": "0"
+                                  },
+                                  "blockGap": "0"
+                                }
+                              }
+                            },
+                            "inner": [
+                              {
+                                "name": "core/list",
+                                "attrs": {
+                                  "textColor": "ink",
+                                  "fontSize": "50",
+                                  "fontFamily": "body",
+                                  "style": {
+                                    "typography": {
+                                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                                      "textAlign": "left"
+                                    },
+                                    "spacing": {
+                                      "padding": {
+                                        "bottom": "var:preset|spacing|40",
+                                        "left": "var:preset|spacing|40"
+                                      },
+                                      "margin": {
+                                        "top": "0",
+                                        "bottom": "0"
+                                      }
+                                    }
+                                  },
+                                  "ordered": false
+                                },
+                                "inner": [
+                                  {
+                                    "name": "core/list-item",
+                                    "attrs": {
+                                      "content": "Perfil principal 203x112x4,5mm aleación de aluminio."
+                                    },
+                                    "inner": []
+                                  },
+                                  {
+                                    "name": "core/list-item",
+                                    "attrs": {
+                                      "content": "Cubierta de PVC 750g/m2*"
+                                    },
+                                    "inner": []
+                                  },
+                                  {
+                                    "name": "core/list-item",
+                                    "attrs": {
+                                      "content": "Murallas de PVC 650g/m2*"
+                                    },
+                                    "inner": []
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "name": "core/accordion-item",
+                        "attrs": {
+                          "style": {
+                            "spacing": {
+                              "padding": {
+                                "top": "var:preset|spacing|20",
+                                "bottom": "var:preset|spacing|20"
+                              }
+                            },
+                            "border": {
+                              "bottom": {
+                                "width": "var(--wp--custom--border--hairline)",
+                                "color": "var:preset|color|ink",
+                                "style": "solid"
+                              }
+                            }
+                          }
+                        },
+                        "inner": [
+                          {
+                            "name": "core/accordion-heading",
+                            "attrs": {
+                              "title": "Opcionales",
+                              "level": 3,
+                              "textColor": "ink",
+                              "fontSize": "50",
+                              "fontFamily": "body",
+                              "style": {
+                                "typography": {
+                                  "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                                  "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                                  "textAlign": "left"
+                                }
+                              }
+                            },
+                            "inner": []
+                          },
+                          {
+                            "name": "core/accordion-panel",
+                            "attrs": {
+                              "style": {
+                                "spacing": {
+                                  "padding": {
+                                    "top": "var:preset|spacing|10"
+                                  },
+                                  "margin": {
+                                    "top": "0"
+                                  },
+                                  "blockGap": "0"
+                                }
+                              }
+                            },
+                            "inner": [
+                              {
+                                "name": "core/list",
+                                "attrs": {
+                                  "textColor": "ink",
+                                  "fontSize": "50",
+                                  "fontFamily": "body",
+                                  "style": {
+                                    "typography": {
+                                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                                      "textAlign": "left"
+                                    },
+                                    "spacing": {
+                                      "padding": {
+                                        "bottom": "var:preset|spacing|40",
+                                        "left": "var:preset|spacing|40"
+                                      },
+                                      "margin": {
+                                        "top": "0",
+                                        "bottom": "0"
+                                      }
+                                    }
+                                  },
+                                  "ordered": false
+                                },
+                                "inner": [
+                                  {
+                                    "name": "core/list-item",
+                                    "attrs": {
+                                      "content": "Cortinas de acceso electricas"
+                                    },
+                                    "inner": []
+                                  },
+                                  {
+                                    "name": "core/list-item",
+                                    "attrs": {
+                                      "content": "Canaletas inter carpas"
+                                    },
+                                    "inner": []
+                                  },
+                                  {
+                                    "name": "core/list-item",
+                                    "attrs": {
+                                      "content": "Solerillas de aislación de aguas lluvias"
+                                    },
+                                    "inner": []
+                                  },
+                                  {
+                                    "name": "core/list-item",
+                                    "attrs": {
+                                      "content": "Luminarias Led"
+                                    },
+                                    "inner": []
+                                  },
+                                  {
+                                    "name": "core/list-item",
+                                    "attrs": {
+                                      "content": "Resalto contención aguas lluvia en accesos"
+                                    },
+                                    "inner": []
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "name": "core/column",
+                "attrs": {
+                  "style": {
+                    "spacing": {
+                      "padding": {
+                        "top": "0",
+                        "right": "0",
+                        "bottom": "0",
+                        "left": "0"
+                      },
+                      "blockGap": "0"
+                    }
+                  }
+                },
+                "inner": [
+                  {
+                    "name": "core/image",
+                    "attrs": {
+                      "url": "/wp-content/uploads/2025/07/Interior-doble-pilar-y-canaleta.jpg",
+                      "alt": "",
+                      "sizeSlug": "full",
+                      "linkDestination": "none",
+                      "aspectRatio": "8/13",
+                      "scale": "cover",
+                      "style": {
+                        "spacing": {
+                          "margin": {
+                            "top": "var:preset|spacing|60",
+                            "bottom": "var:preset|spacing|60"
+                          }
+                        },
+                        "border": {
+                          "radius": "var(--wp--custom--radius--m)"
+                        }
+                      }
+                    },
+                    "inner": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "core/group",
+        "attrs": {
+          "tagName": "section",
+          "align": "full",
+          "backgroundColor": "accent",
+          "style": {
+            "spacing": {
+              "padding": {
+                "top": "0",
+                "right": "0",
+                "bottom": "0",
+                "left": "0"
+              },
+              "margin": {
+                "top": "calc(-1 * var(--wp--preset--spacing--10))"
+              },
+              "blockGap": "0"
+            }
+          },
+          "gradient": "ink-a-transparente-65"
+        },
+        "inner": [
+          {
+            "name": "core/group",
+            "attrs": {
+              "style": {
+                "spacing": {
+                  "padding": {
+                    "top": "var:preset|spacing|50",
+                    "right": "0",
+                    "bottom": "var:preset|spacing|50",
+                    "left": "0"
+                  },
+                  "margin": {
+                    "top": "0",
+                    "bottom": "0",
+                    "left": "var:preset|spacing|gutter",
+                    "right": "var:preset|spacing|gutter"
+                  },
+                  "blockGap": "0"
+                }
+              }
+            },
+            "inner": [
+              {
+                "name": "core/group",
+                "attrs": {
+                  "backgroundColor": "fondo-pagina",
+                  "style": {
+                    "spacing": {
+                      "padding": {
+                        "top": "var:preset|spacing|90",
+                        "right": "var:preset|spacing|90",
+                        "bottom": "var:preset|spacing|90",
+                        "left": "var:preset|spacing|90"
+                      },
+                      "margin": {
+                        "top": "0",
+                        "bottom": "0"
+                      },
+                      "blockGap": "0"
+                    },
+                    "border": {
+                      "radius": "var(--wp--custom--radius--s)"
+                    },
+                    "dimensions": {
+                      "minHeight": "321px"
+                    }
+                  }
+                },
+                "inner": [
+                  {
+                    "name": "core/heading",
+                    "attrs": {
+                      "textColor": "ink",
+                      "fontSize": "100",
+                      "fontFamily": "display",
+                      "style": {
+                        "typography": {
+                          "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                          "lineHeight": "var(--wp--custom--typography--line-height--tight)",
+                          "textAlign": "center"
+                        },
+                        "spacing": {
+                          "margin": {
+                            "top": "0",
+                            "bottom": "var:preset|spacing|20"
+                          }
+                        }
+                      },
+                      "content": "Descubre Más Sobre Nuestras Carpas",
+                      "level": 2
+                    },
+                    "inner": []
+                  },
+                  {
+                    "name": "core/paragraph",
+                    "attrs": {
+                      "textColor": "dark",
+                      "fontSize": "40",
+                      "fontFamily": "boton",
+                      "style": {
+                        "typography": {
+                          "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                          "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                          "textAlign": "center"
+                        },
+                        "spacing": {
+                          "margin": {
+                            "top": "0",
+                            "bottom": "var:preset|spacing|40"
+                          }
+                        }
+                      },
+                      "content": "¿Interesado en optimizar tu espacio de almacenamiento? Contáctanos para obtener más información sobre nuestras carpas industriales inteligentes y cómo pueden beneficiar a tu negocio."
+                    },
+                    "inner": []
+                  },
+                  {
+                    "name": "core/buttons",
+                    "attrs": {
+                      "layout": {
+                        "type": "flex",
+                        "justifyContent": "center"
+                      },
+                      "style": {
+                        "spacing": {
+                          "margin": {
+                            "top": "0",
+                            "bottom": "0"
+                          }
+                        }
+                      }
+                    },
+                    "inner": [
+                      {
+                        "name": "core/button",
+                        "attrs": {
+                          "textColor": "fondo-pagina",
+                          "backgroundColor": "accent",
+                          "fontSize": "20",
+                          "fontFamily": "boton",
+                          "style": {
+                            "typography": {
+                              "fontWeight": "var(--wp--custom--typography--font-weight--bold)",
+                              "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                              "textAlign": "center"
+                            },
+                            "spacing": {
+                              "padding": {
+                                "top": "var:preset|spacing|20",
+                                "right": "var:preset|spacing|50",
+                                "bottom": "var:preset|spacing|20",
+                                "left": "var:preset|spacing|50"
+                              }
+                            },
+                            "border": {
+                              "radius": "var(--wp--custom--radius--pill)"
+                            }
+                          },
+                          "text": "Solicita Información",
+                          "url": "/contactos/"
+                        },
+                        "inner": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

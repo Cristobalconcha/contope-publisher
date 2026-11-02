@@ -1,0 +1,230 @@
+[
+  {
+    "name": "contope/lienzo",
+    "attrs": {
+      "documentId": ""
+    },
+    "inner": [
+      {
+        "name": "core/group",
+        "attrs": {
+          "tagName": "section",
+          "align": "full",
+          "style": {
+            "spacing": {
+              "padding": {
+                "top": "var:preset|spacing|90",
+                "right": "0",
+                "bottom": "0",
+                "left": "0"
+              },
+              "blockGap": "0"
+            }
+          }
+        },
+        "inner": [
+          {
+            "name": "core/columns",
+            "attrs": {
+              "style": {
+                "spacing": {
+                  "margin": {
+                    "left": "var:preset|spacing|gutter",
+                    "right": "var:preset|spacing|gutter"
+                  },
+                  "blockGap": {
+                    "top": "0",
+                    "left": "0"
+                  }
+                }
+              }
+            },
+            "inner": [
+              {
+                "name": "core/column",
+                "attrs": {
+                  "style": {
+                    "spacing": {
+                      "padding": {
+                        "top": "var:preset|spacing|90",
+                        "bottom": "var:preset|spacing|50"
+                      },
+                      "margin": {
+                        "top": "calc(-1 * var(--wp--preset--spacing--90))"
+                      },
+                      "blockGap": "0"
+                    },
+                    "border": {
+                      "right": {
+                        "width": "var(--wp--custom--border--hairline)",
+                        "color": "var:preset|color|gris-suave",
+                        "style": "solid"
+                      }
+                    }
+                  },
+                  "width": "79.125%"
+                },
+                "inner": [
+                  {
+                    "name": "core/heading",
+                    "attrs": {
+                      "textColor": "dark",
+                      "fontSize": "70",
+                      "fontFamily": "body",
+                      "style": {
+                        "typography": {
+                          "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                          "lineHeight": "var(--wp--custom--typography--line-height--none)",
+                          "textAlign": "left"
+                        },
+                        "spacing": {
+                          "padding": {
+                            "bottom": "var:preset|spacing|20"
+                          },
+                          "margin": {
+                            "top": "0",
+                            "bottom": "var:preset|spacing|40"
+                          }
+                        }
+                      },
+                      "content": "BASIS: Carpas Industriales",
+                      "level": 1
+                    },
+                    "inner": []
+                  }
+                ]
+              },
+              {
+                "name": "core/column",
+                "attrs": {
+                  "textColor": "texto-cuerpo",
+                  "style": {
+                    "spacing": {
+                      "padding": {
+                        "top": "0",
+                        "right": "0",
+                        "bottom": "var:preset|spacing|60",
+                        "left": "var:preset|spacing|60"
+                      },
+                      "blockGap": "0"
+                    }
+                  },
+                  "width": "20.874%"
+                },
+                "inner": [
+                  {
+                    "name": "core/search",
+                    "attrs": {
+                      "label": "Buscar",
+                      "buttonText": "Buscar",
+                      "style": {
+                        "spacing": {
+                          "margin": {
+                            "bottom": "var:preset|spacing|60"
+                          }
+                        }
+                      }
+                    },
+                    "inner": []
+                  },
+                  {
+                    "name": "core/group",
+                    "attrs": {
+                      "style": {
+                        "spacing": {
+                          "margin": {
+                            "bottom": "var:preset|spacing|60"
+                          },
+                          "blockGap": "0"
+                        }
+                      }
+                    },
+                    "inner": [
+                      {
+                        "name": "core/heading",
+                        "attrs": {
+                          "textColor": "dark",
+                          "fontSize": "60",
+                          "fontFamily": "body",
+                          "style": {
+                            "typography": {
+                              "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                              "lineHeight": "var(--wp--custom--typography--line-height--none)"
+                            },
+                            "spacing": {
+                              "padding": {
+                                "bottom": "var:preset|spacing|20"
+                              },
+                              "margin": {
+                                "top": "0",
+                                "bottom": "0"
+                              }
+                            }
+                          },
+                          "content": "Recent Posts",
+                          "level": 2
+                        },
+                        "inner": []
+                      },
+                      {
+                        "name": "core/latest-posts",
+                        "attrs": {},
+                        "inner": []
+                      }
+                    ]
+                  },
+                  {
+                    "name": "core/group",
+                    "attrs": {
+                      "style": {
+                        "spacing": {
+                          "margin": {
+                            "bottom": "var:preset|spacing|60"
+                          },
+                          "blockGap": "0"
+                        }
+                      }
+                    },
+                    "inner": [
+                      {
+                        "name": "core/heading",
+                        "attrs": {
+                          "textColor": "dark",
+                          "fontSize": "60",
+                          "fontFamily": "body",
+                          "style": {
+                            "typography": {
+                              "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                              "lineHeight": "var(--wp--custom--typography--line-height--none)"
+                            },
+                            "spacing": {
+                              "padding": {
+                                "bottom": "var:preset|spacing|20"
+                              },
+                              "margin": {
+                                "top": "0",
+                                "bottom": "0"
+                              }
+                            }
+                          },
+                          "content": "Recent Comments",
+                          "level": 2
+                        },
+                        "inner": []
+                      },
+                      {
+                        "name": "core/latest-comments",
+                        "attrs": {},
+                        "inner": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

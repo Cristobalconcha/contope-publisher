@@ -90,6 +90,7 @@ final class COD_Theme_Definitions
                     ['id' => 'h4_size', 'label' => 'H4', 'type' => 'number', 'min' => 12, 'max' => 120, 'unit' => 'px', 'emite' => ['token' => '--cod-h4-size', 'unit' => 'px']],
                     ['id' => 'h5_size', 'label' => 'H5', 'type' => 'number', 'min' => 12, 'max' => 120, 'unit' => 'px', 'emite' => ['token' => '--cod-h5-size', 'unit' => 'px']],
                     ['id' => 'h6_size', 'label' => 'H6', 'type' => 'number', 'min' => 12, 'max' => 120, 'unit' => 'px', 'emite' => ['token' => '--cod-h6-size', 'unit' => 'px']],
+                    ...self::campos_de_escala(),
                 ],
             ],
             [
@@ -140,6 +141,27 @@ final class COD_Theme_Definitions
                     ['id' => 'motion_response', 'label' => 'Responder', 'type' => 'motion', 'placeholder' => '160ms ease', 'emite' => ['token' => '--cod-motion-response']],
                 ],
             ],
+        ];
+    }
+
+    /**
+     * Los campos de ESCALA: pasos con nombre (paso=valor, uno por línea o separados por «;»). Cada paso se vuelve un
+     * nombre del registro de diseño que la compuerta admite y un preset del theme.json (--wp--preset--spacing--*,
+     * --wp--preset--font-size--*, --wp--custom--*). Un valor que no es un paso de la escala no entra por el MCP.
+     * Van aparte del schema() porque el filtro del theme.json las lee, y schema() consulta el theme.json (recursión).
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public static function campos_de_escala(): array
+    {
+        return [
+            ['id' => 'scale_spacing', 'label' => 'Espaciado: pasos (paso=valor; …)', 'type' => 'scale', 'scale' => 'length', 'preset' => 'spacing'],
+            ['id' => 'scale_font_size', 'label' => 'Tamaños de letra: pasos (paso=máximo~mínimo en móvil)', 'type' => 'scale', 'scale' => 'font-size', 'preset' => 'font-size'],
+            ['id' => 'scale_radius', 'label' => 'Radios: pasos', 'type' => 'scale', 'scale' => 'length', 'custom' => ['radius']],
+            ['id' => 'scale_border', 'label' => 'Grosores de borde: pasos', 'type' => 'scale', 'scale' => 'length', 'custom' => ['border']],
+            ['id' => 'scale_weight', 'label' => 'Pesos de letra: pasos', 'type' => 'scale', 'scale' => 'number', 'custom' => ['typography', 'fontWeight']],
+            ['id' => 'scale_leading', 'label' => 'Interlineados: pasos', 'type' => 'scale', 'scale' => 'number', 'custom' => ['typography', 'lineHeight']],
+            ['id' => 'scale_measure', 'label' => 'Anchos de texto (medidas): pasos', 'type' => 'scale', 'scale' => 'length', 'custom' => ['layout', 'measure']],
         ];
     }
 
@@ -591,6 +613,13 @@ final class COD_Theme_Definitions
             return $limpio;
         }
 
+        // scale: una lista de pasos «paso=valor» separados por «;» o por saltos de línea. El valor termina
+        // dentro de un :root y de un theme.json, así que se admite sólo una medida simple, un número o
+        // una expresión max()/min()/clamp()/calc() hecha de medidas y variables de ancho del tema.
+        if ($type === 'scale') {
+            return self::serializar_pasos(self::leer_pasos($value, (string) ($field['scale'] ?? 'length')));
+        }
+
         // number: se acota entre min y max. El 0 es válido cuando min es 0
         // (radius/spacing); '' ya se devolvió antes como "sin definir".
         //
@@ -609,6 +638,187 @@ final class COD_Theme_Definitions
         }
 
         return (string) $num;
+    }
+
+    // =====================================================================
+    // Escalas: pasos con nombre que el tema expone como presets
+    // =====================================================================
+
+    /**
+     * Lee «paso=valor; paso=valor» y devuelve sólo los pasos válidos, en orden.
+     * `scale`: length | font-size (admite «máximo~mínimo») | number.
+     *
+     * @return array<int, array{slug: string, valor: string, min: string}>
+     */
+    public static function leer_pasos(string $texto, string $tipo): array
+    {
+        $out = [];
+        $vistos = [];
+        foreach (preg_split('/[;\r\n]+/', $texto) ?: [] as $par) {
+            $par = trim($par);
+            if ($par === '' || strpos($par, '=') === false) {
+                continue;
+            }
+            [$slug, $valor] = array_map('trim', explode('=', $par, 2));
+            if (preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/', $slug) !== 1 || isset($vistos[$slug])) {
+                continue;
+            }
+            $minimo = '';
+            if ($tipo === 'font-size' && strpos($valor, '~') !== false) {
+                [$valor, $minimo] = array_map('trim', explode('~', $valor, 2));
+                if (!self::medida_valida($minimo)) {
+                    continue;
+                }
+            }
+            $ok = $tipo === 'number' ? preg_match('/^(?:\d+|\d*\.\d+)$/', $valor) === 1 : self::medida_valida($valor);
+            if (!$ok) {
+                continue;
+            }
+            $vistos[$slug] = true;
+            $out[] = ['slug' => $slug, 'valor' => $valor, 'min' => $minimo];
+        }
+        return $out;
+    }
+
+    /** @param array<int, array{slug: string, valor: string, min: string}> $pasos */
+    public static function serializar_pasos(array $pasos): string
+    {
+        $partes = [];
+        foreach ($pasos as $p) {
+            $partes[] = $p['slug'] . '=' . $p['valor'] . ($p['min'] !== '' ? '~' . $p['min'] : '');
+        }
+        return implode('; ', $partes);
+    }
+
+    /** Una medida simple (16px, 1.5rem, 50%) o una expresión max()/min()/clamp()/calc() de medidas y anchos del tema. */
+    private static function medida_valida(string $v): bool
+    {
+        if ($v === '' || strlen($v) > 200) {
+            return false;
+        }
+        if (preg_match('/^-?(?:\d+|\d*\.\d+)(?:px|rem|em|%|vw)$/', $v) === 1) {
+            return true;
+        }
+        if (preg_match('/^(?:max|min|clamp|calc)\(/', $v) !== 1) {
+            return false;
+        }
+        $sin_vars = preg_replace('/var\(--wp--style--global--[a-z-]+\)/', '1px', $v) ?? '';
+        if (preg_match('/^[0-9a-z%.,()\s*+\/-]+$/', $sin_vars) !== 1) {
+            return false;
+        }
+        if (preg_match_all('/[a-z]+(?=\()/', $sin_vars, $m) > 0) {
+            foreach ($m[0] as $fn) {
+                if (!in_array($fn, ['max', 'min', 'clamp', 'calc'], true)) {
+                    return false;
+                }
+            }
+        }
+        return substr_count($v, '(') === substr_count($v, ')');
+    }
+
+    /**
+     * Las escalas declaradas, por campo.
+     *
+     * @return array<string, array<int, array{slug: string, valor: string, min: string}>>
+     */
+    public static function escalas(): array
+    {
+        $raw = get_option(self::OPTION_KEY, '');
+        $guardado = is_string($raw) && $raw !== '' ? json_decode($raw, true) : [];
+        $guardado = is_array($guardado) ? $guardado : [];
+        $out = [];
+        foreach (self::campos_de_escala() as $campo) {
+            $pasos = self::leer_pasos((string) ($guardado[$campo['id']] ?? ''), (string) $campo['scale']);
+            if ($pasos !== []) {
+                $out[(string) $campo['id']] = $pasos;
+            }
+        }
+        return $out;
+    }
+
+    /**
+     * Lo que las escalas aportan al theme.json: presets de espaciado y de tamaño de letra, y
+     * valores personalizados (radios, bordes, pesos, interlineados, medidas). Vacío si no hay escalas.
+     *
+     * @return array<string, mixed>
+     */
+    public static function theme_json_partial(): array
+    {
+        $escalas = self::escalas();
+        if ($escalas === []) {
+            return [];
+        }
+        $campos = [];
+        foreach (self::campos_de_escala() as $campo) {
+            $campos[(string) $campo['id']] = $campo;
+        }
+        $ajustes = [];
+        foreach ($escalas as $id => $pasos) {
+            $campo = $campos[$id];
+            if (($campo['preset'] ?? '') === 'spacing') {
+                $ajustes['spacing']['defaultSpacingSizes'] = false;
+                foreach ($pasos as $p) {
+                    $ajustes['spacing']['spacingSizes'][] = ['slug' => $p['slug'], 'name' => $p['slug'] . ' (' . $p['valor'] . ')', 'size' => $p['valor']];
+                }
+            } elseif (($campo['preset'] ?? '') === 'font-size') {
+                foreach ($pasos as $p) {
+                    $tam = ['slug' => $p['slug'], 'name' => $p['slug'] . ' (' . $p['valor'] . ')', 'size' => $p['valor']];
+                    $tam['fluid'] = $p['min'] !== '' ? ['min' => $p['min'], 'max' => $p['valor']] : false;
+                    $ajustes['typography']['fontSizes'][] = $tam;
+                }
+                $ajustes['typography']['defaultFontSizes'] = false;
+            } elseif (isset($campo['custom']) && is_array($campo['custom'])) {
+                $nodo = &$ajustes['custom'];
+                foreach ($campo['custom'] as $clave) {
+                    $nodo[$clave] = $nodo[$clave] ?? [];
+                    $nodo = &$nodo[$clave];
+                }
+                foreach ($pasos as $p) {
+                    $nodo[$p['slug']] = $p['valor'];
+                }
+                unset($nodo);
+            }
+        }
+        return ['version' => 3, 'settings' => $ajustes];
+    }
+
+    /**
+     * Los nombres del registro de diseño que las escalas generan (nombre → valor), tal como los
+     * imprime WordPress: --wp--preset--spacing--<paso>, --wp--preset--font-size--<paso>,
+     * --wp--custom--radius--<paso>, --wp--custom--border--<paso>,
+     * --wp--custom--typography--font-weight--<paso>, --wp--custom--typography--line-height--<paso>,
+     * --wp--custom--layout--measure--<paso>.
+     *
+     * @return array<string, string>
+     */
+    public static function nombres_de_escalas(): array
+    {
+        $campos = [];
+        foreach (self::campos_de_escala() as $campo) {
+            $campos[(string) $campo['id']] = $campo;
+        }
+        $kebab = static fn (string $c): string => strtolower((string) preg_replace('/(?<!^)[A-Z]/', '-$0', $c));
+        $out = [];
+        foreach (self::escalas() as $id => $pasos) {
+            $campo = $campos[$id];
+            foreach ($pasos as $p) {
+                if (($campo['preset'] ?? '') !== '') {
+                    $out['--wp--preset--' . $campo['preset'] . '--' . $p['slug']] = $p['valor'];
+                } elseif (isset($campo['custom']) && is_array($campo['custom'])) {
+                    $out['--wp--custom--' . implode('--', array_map($kebab, $campo['custom'])) . '--' . $p['slug']] = $p['valor'];
+                }
+            }
+        }
+        return $out;
+    }
+
+    /** Engancha las escalas al theme.json del tema activo (los presets salen de las definiciones). */
+    public static function registrar_escalas(): void
+    {
+        add_filter('wp_theme_json_data_theme', static function ($datos) {
+            $parcial = self::theme_json_partial();
+            return $parcial === [] || !is_object($datos) || !method_exists($datos, 'update_with') ? $datos : $datos->update_with($parcial);
+        });
     }
 
     /**

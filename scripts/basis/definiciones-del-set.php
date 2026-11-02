@@ -15,11 +15,19 @@
  *   - las tipografías son las del sitio original (Google Fonts) y el movimiento usa los valores de
  *     ejemplo del propio esquema (`placeholder`).
  *
- * Es idempotente: correrlo dos veces deja lo mismo. Sólo toca esa opción.
+ * LAS ESCALAS (Escala en la pantalla de definiciones) salen de `scripts/basis/escalas.json`, que escribe
+ * `escalas-del-sitio.mjs` agrupando los valores que el sitio realmente usa: espaciado, tamaños de letra, radios, grosores de
+ * borde, pesos, interlineados y medidas de texto. Con `--theme-json` el guion además escribe esos presets en
+ * `contope-basis/theme.json` (para que sigan estilados con el plugin apagado); con el plugin activo el mismo filtro
+ * (`wp_theme_json_data_theme`) los toma de las definiciones, así que el theme.json y las definiciones no pueden decir cosas distintas.
+ * Las sombras no tienen escala (el Core no la tiene: pregunta Q3) y quedan como hueco.
+ *
+ * Es idempotente: * Es idempotente: correrlo dos veces deja lo mismo. Sólo toca esa opción.
  *
  *   php -c <php.ini> scripts/basis/definiciones-del-set.php [--solo-ver] [--acento=#RRGGBB]
  *
- *   --solo-ver        calcula e imprime, no guarda.
+ *   --theme-json      escribe también los presets de las escalas en contope-basis/theme.json.
+ *   --solo-ver        calcula e imprime, no guarda. *   --solo-ver        calcula e imprime, no guarda.
  *   --acento=#RRGGBB  fuerza otro color de acento (la prueba de gobierno); sin esto vale el del theme.json.
  *   --titulos=Familia fuerza otra familia para Títulos (la prueba de gobierno); sin esto, Big Shoulders Display.
  *
@@ -72,8 +80,8 @@ $urlIcono = $icono > 0 ? (string) wp_get_attachment_url($icono) : '';
 $valores = [
     'favicon' => $urlIcono,
     'mode' => 'light',
-    'color_bg' => $exigir('background'),
-    'color_text' => $exigir('text'),
+    'color_bg' => $exigir('fondo-pagina'),
+    'color_text' => $exigir('texto-cuerpo'),
     // «Primario»: el gris del encabezado y el pie (slug `gris`).
     'color_primary' => $exigir('gris'),
     'color_accent' => $acentoForzado !== '' ? strtoupper($acentoForzado) : $exigir('accent'),
@@ -83,11 +91,22 @@ $valores = [
     // El ancho es el rol «medida» del núcleo. NO se activa el modo «enclaustrado»: ese modo
     // encierra el lienzo entero en la caja y los fondos de sección dejarían de ir de borde a borde.
     'layout_max_width' => $anchoPx,
-    'motion_enter' => $ejemplo['motion_enter'] ?? '',
+    'motion_enter' => $ejemplo['motion_enter'] ?? '',    'motion_enter' => $ejemplo['motion_enter'] ?? '',
     'motion_response' => $ejemplo['motion_response'] ?? '',
 ];
 
-$limpios = COD_Theme_Definitions::sanitize($valores);
+// ---- las escalas: lo que el sitio usa, agrupado en pasos --------------------------------------------
+$archivoEscalas = __DIR__ . '/escalas.json';
+if (!is_file($archivoEscalas)) {
+    fwrite(STDERR, "falta scripts/basis/escalas.json: corre antes `node scripts/basis/escalas-del-sitio.mjs`\n");
+    exit(1);
+}
+$escalas = json_decode((string) file_get_contents($archivoEscalas), true);
+foreach (($escalas['definiciones'] ?? []) as $campo => $pasos) {
+    $valores[$campo] = (string) $pasos;
+}
+
+$limpios = COD_Theme_Definitions::sanitize($valores);$limpios = COD_Theme_Definitions::sanitize($valores);
 $perdidos = [];
 foreach ($valores as $k => $v) {
     if ($v !== '' && ($limpios[$k] ?? '') !== $v) {
@@ -106,6 +125,22 @@ if ($soloVer) {
     exit(0);
 }
 update_option(COD_Theme_Definitions::OPTION_KEY, wp_json_encode($guardar));
+
+// ---- los presets en el theme.json del tema (opcional) -----------------------------------------------
+if (in_array('--theme-json', $argv, true)) {
+    $ruta = dirname(__DIR__, 2) . '/contope-basis/theme.json';
+    $tema = json_decode((string) file_get_contents($ruta), true);
+    $parcial = COD_Theme_Definitions::theme_json_partial();
+    $aj = $parcial['settings'] ?? [];
+    $tema['settings']['spacing']['spacingSizes'] = $aj['spacing']['spacingSizes'] ?? [];
+    $tema['settings']['spacing']['defaultSpacingSizes'] = false;
+    $tema['settings']['typography']['fontSizes'] = $aj['typography']['fontSizes'] ?? [];
+    $tema['settings']['custom'] = $aj['custom'] ?? [];
+    $json = wp_json_encode($tema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+    $json = preg_replace_callback('/^( +)/m', static fn ($m) => str_repeat(' ', intdiv(strlen($m[1]), 2)), $json);
+    file_put_contents($ruta, $json . "\n");
+    echo "theme.json: " . count($aj['spacing']['spacingSizes'] ?? []) . " pasos de espaciado, " . count($aj['typography']['fontSizes'] ?? []) . " tamaños, custom: " . implode(', ', array_keys($aj['custom'] ?? [])) . "\n";
+}
 
 // ---- comprobación: el núcleo no debe tener nada sin declarar ------------------------------------
 $faltan = COD_Design_Core::faltantes();

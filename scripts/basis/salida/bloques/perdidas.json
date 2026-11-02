@@ -1,0 +1,221 @@
+{
+  "perdidas": [
+    {
+      "donde": "image-21 (imagen)",
+      "prop": "outline-width",
+      "valor": "2px",
+      "motivo": "el contorno (outline) no tiene atributo de bloque ni escala"
+    },
+    {
+      "donde": "image-21 (imagen)",
+      "prop": "outline-style",
+      "valor": "solid",
+      "motivo": "el contorno (outline) no tiene atributo de bloque ni escala"
+    },
+    {
+      "donde": "image-21 (imagen)",
+      "prop": "outline-color",
+      "valor": "var(--cod-color-surface)",
+      "motivo": "el contorno (outline) no tiene atributo de bloque ni escala"
+    },
+    {
+      "donde": "image-21 (imagen)",
+      "prop": "outline-offset",
+      "valor": "4px",
+      "motivo": "el contorno (outline) no tiene atributo de bloque ni escala"
+    },
+    {
+      "donde": "image-25 (imagen)",
+      "prop": "outline-width",
+      "valor": "2px",
+      "motivo": "el contorno (outline) no tiene atributo de bloque ni escala"
+    },
+    {
+      "donde": "image-25 (imagen)",
+      "prop": "outline-style",
+      "valor": "solid",
+      "motivo": "el contorno (outline) no tiene atributo de bloque ni escala"
+    },
+    {
+      "donde": "image-25 (imagen)",
+      "prop": "outline-color",
+      "valor": "var(--cod-color-surface)",
+      "motivo": "el contorno (outline) no tiene atributo de bloque ni escala"
+    },
+    {
+      "donde": "image-25 (imagen)",
+      "prop": "outline-offset",
+      "valor": "4px",
+      "motivo": "el contorno (outline) no tiene atributo de bloque ni escala"
+    },
+    {
+      "donde": "image-29 (imagen)",
+      "prop": "outline-width",
+      "valor": "2px",
+      "motivo": "el contorno (outline) no tiene atributo de bloque ni escala"
+    },
+    {
+      "donde": "image-29 (imagen)",
+      "prop": "outline-style",
+      "valor": "solid",
+      "motivo": "el contorno (outline) no tiene atributo de bloque ni escala"
+    },
+    {
+      "donde": "image-29 (imagen)",
+      "prop": "outline-color",
+      "valor": "var(--cod-color-surface)",
+      "motivo": "el contorno (outline) no tiene atributo de bloque ni escala"
+    },
+    {
+      "donde": "image-29 (imagen)",
+      "prop": "outline-offset",
+      "valor": "4px",
+      "motivo": "el contorno (outline) no tiene atributo de bloque ni escala"
+    },
+    {
+      "donde": "paragraph-39 (paragraph)",
+      "prop": "color del ícono",
+      "valor": "fondo-pagina",
+      "motivo": "un SVG puesto como imagen conserva el color de su archivo; ningún bloque lo recolorea con la paleta"
+    },
+    {
+      "donde": "paragraph-45 (paragraph)",
+      "prop": "color del ícono",
+      "valor": "fondo-pagina",
+      "motivo": "un SVG puesto como imagen conserva el color de su archivo; ningún bloque lo recolorea con la paleta"
+    },
+    {
+      "donde": "paragraph-51 (paragraph)",
+      "prop": "color del ícono",
+      "valor": "fondo-pagina",
+      "motivo": "un SVG puesto como imagen conserva el color de su archivo; ningún bloque lo recolorea con la paleta"
+    },
+    {
+      "donde": "group-67 (grupo)",
+      "prop": "background-color",
+      "valor": "color-mix(in srgb, var(--cod-color-surface) 88%, transparent)",
+      "motivo": "un color con transparencia no es un preset (la paleta no declara variantes con alfa)"
+    },
+    {
+      "donde": "group-67 (grupo)",
+      "prop": "backdrop-filter",
+      "valor": "blur(6px)",
+      "motivo": "el desenfoque no tiene atributo de bloque ni escala"
+    },
+    {
+      "donde": "group-rd-list-63-0 (pliegue)",
+      "prop": "border-bottom-color",
+      "valor": "color-mix(in srgb, var(--wp--preset--color--ink) 15%, transparent)",
+      "motivo": "un color con transparencia no es un preset (la paleta no declara variantes con alfa)"
+    },
+    {
+      "donde": "group-rd-list-63-1 (pliegue)",
+      "prop": "border-bottom-color",
+      "valor": "color-mix(in srgb, var(--wp--preset--color--ink) 15%, transparent)",
+      "motivo": "un color con transparencia no es un preset (la paleta no declara variantes con alfa)"
+    },
+    {
+      "donde": "group-rd-list-63-2 (pliegue)",
+      "prop": "border-bottom-color",
+      "valor": "color-mix(in srgb, var(--wp--preset--color--ink) 15%, transparent)",
+      "motivo": "un color con transparencia no es un preset (la paleta no declara variantes con alfa)"
+    },
+    {
+      "donde": "group-rd-list-63 (acordeón)",
+      "prop": "border-bottom-width",
+      "valor": "1px",
+      "motivo": "parte «item» del acordeón"
+    },
+    {
+      "donde": "group-rd-list-63 (acordeón)",
+      "prop": "border-bottom-style",
+      "valor": "solid",
+      "motivo": "parte «item» del acordeón"
+    },
+    {
+      "donde": "group-rd-list-63 (acordeón)",
+      "prop": "border-bottom-color",
+      "valor": "color-mix(in srgb, var(--wp--preset--color--ink) 15%, transparent)",
+      "motivo": "parte «item» del acordeón"
+    },
+    {
+      "donde": "group-rd-list-63 (acordeón)",
+      "prop": "icono del pliegue",
+      "valor": "ETmodules e050",
+      "motivo": "core/accordion trae su propio ícono (chevron); el glifo «+» del original no es un bloque ni una definición del set"
+    },
+    {
+      "donde": "image-65 (imagen)",
+      "prop": "outline-width",
+      "valor": "2px",
+      "motivo": "el contorno (outline) no tiene atributo de bloque ni escala"
+    },
+    {
+      "donde": "image-65 (imagen)",
+      "prop": "outline-style",
+      "valor": "solid",
+      "motivo": "el contorno (outline) no tiene atributo de bloque ni escala"
+    },
+    {
+      "donde": "image-65 (imagen)",
+      "prop": "outline-color",
+      "valor": "var(--cod-color-surface)",
+      "motivo": "el contorno (outline) no tiene atributo de bloque ni escala"
+    },
+    {
+      "donde": "image-65 (imagen)",
+      "prop": "outline-offset",
+      "valor": "4px",
+      "motivo": "el contorno (outline) no tiene atributo de bloque ni escala"
+    },
+    {
+      "donde": "group-73 (grupo)",
+      "prop": "box-shadow",
+      "valor": "color-mix(in srgb, var(--wp--preset--color--ink) 12%, transparent) 0px 24px 72px -12px",
+      "motivo": "sombra: el set no tiene escala de sombras (Q3)"
+    },
+    {
+      "donde": "group-32 (columna)",
+      "prop": "padding-right",
+      "valor": "5.499%",
+      "motivo": "no es una medida en px (no entra en la escala de espaciado)"
+    },
+    {
+      "donde": "block-24 (core/search)",
+      "prop": "partes",
+      "valor": "etiqueta, envoltura, entrada, botón…",
+      "motivo": "los bloques de WordPress se dibujan con el estilo del tema; sus partes no tienen atributo de bloque"
+    },
+    {
+      "donde": "block-26 (core/latest-posts)",
+      "prop": "partes",
+      "valor": "etiqueta, envoltura, entrada, botón…",
+      "motivo": "los bloques de WordPress se dibujan con el estilo del tema; sus partes no tienen atributo de bloque"
+    },
+    {
+      "donde": "block-29 (core/latest-comments)",
+      "prop": "partes",
+      "valor": "etiqueta, envoltura, entrada, botón…",
+      "motivo": "los bloques de WordPress se dibujan con el estilo del tema; sus partes no tienen atributo de bloque"
+    },
+    {
+      "donde": "group-54 (acordeón)",
+      "prop": "icono del pliegue",
+      "valor": "/wp-content/uploads/iconos-divi/etmodules-e050.svg",
+      "motivo": "core/accordion trae su propio ícono (chevron); el glifo «+» del original no es un bloque ni una definición del set"
+    },
+    {
+      "donde": "group-77 (acordeón)",
+      "prop": "icono del pliegue",
+      "valor": "/wp-content/uploads/iconos-divi/etmodules-e050.svg",
+      "motivo": "core/accordion trae su propio ícono (chevron); el glifo «+» del original no es un bloque ni una definición del set"
+    },
+    {
+      "donde": "group-88 (acordeón)",
+      "prop": "icono del pliegue",
+      "valor": "/wp-content/uploads/iconos-divi/etmodules-e050.svg",
+      "motivo": "core/accordion trae su propio ícono (chevron); el glifo «+» del original no es un bloque ni una definición del set"
+    }
+  ],
+  "avisos": []
+}

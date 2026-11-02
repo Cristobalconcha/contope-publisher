@@ -1,0 +1,1851 @@
+[
+  {
+    "name": "contope/lienzo",
+    "attrs": {
+      "documentId": ""
+    },
+    "inner": [
+      {
+        "name": "core/group",
+        "attrs": {
+          "tagName": "section",
+          "align": "full",
+          "backgroundColor": "gris",
+          "style": {
+            "spacing": {
+              "padding": {
+                "top": "0",
+                "right": "0",
+                "bottom": "var:preset|spacing|90",
+                "left": "0"
+              },
+              "blockGap": "0"
+            }
+          }
+        },
+        "inner": [
+          {
+            "name": "core/group",
+            "attrs": {
+              "style": {
+                "spacing": {
+                  "padding": {
+                    "top": "var:preset|spacing|50",
+                    "right": "0",
+                    "bottom": "var:preset|spacing|50",
+                    "left": "0"
+                  },
+                  "margin": {
+                    "top": "0",
+                    "bottom": "0",
+                    "left": "var:preset|spacing|gutter",
+                    "right": "var:preset|spacing|gutter"
+                  },
+                  "blockGap": "0"
+                }
+              }
+            },
+            "inner": [
+              {
+                "name": "core/heading",
+                "attrs": {
+                  "textColor": "fondo-pagina",
+                  "fontSize": "100",
+                  "fontFamily": "pliegue",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--light)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--snug)",
+                      "textAlign": "center"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "0",
+                        "bottom": "var:preset|spacing|20"
+                      }
+                    }
+                  },
+                  "content": "Preguntas Frecuentes",
+                  "level": 1
+                },
+                "inner": []
+              },
+              {
+                "name": "core/paragraph",
+                "attrs": {
+                  "textColor": "fondo-pagina",
+                  "fontSize": "40",
+                  "fontFamily": "body",
+                  "style": {
+                    "typography": {
+                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                      "lineHeight": "var(--wp--custom--typography--line-height--loose)",
+                      "textAlign": "center"
+                    },
+                    "spacing": {
+                      "margin": {
+                        "top": "0",
+                        "bottom": "0"
+                      }
+                    }
+                  },
+                  "content": "Todo lo que necesitas saber."
+                },
+                "inner": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "core/group",
+        "attrs": {
+          "tagName": "section",
+          "align": "full",
+          "backgroundColor": "gris-oscuro",
+          "style": {
+            "spacing": {
+              "padding": {
+                "top": "var:preset|spacing|90",
+                "right": "0",
+                "bottom": "var:preset|spacing|90",
+                "left": "0"
+              },
+              "blockGap": "0"
+            }
+          }
+        },
+        "inner": [
+          {
+            "name": "core/columns",
+            "attrs": {
+              "style": {
+                "spacing": {
+                  "padding": {
+                    "top": "var:preset|spacing|50",
+                    "right": "0",
+                    "bottom": "var:preset|spacing|50",
+                    "left": "0"
+                  },
+                  "margin": {
+                    "top": "0",
+                    "bottom": "0",
+                    "left": "var:preset|spacing|gutter",
+                    "right": "var:preset|spacing|gutter"
+                  },
+                  "blockGap": {
+                    "top": "var:preset|spacing|60",
+                    "left": "var:preset|spacing|90"
+                  }
+                }
+              },
+              "verticalAlignment": "top"
+            },
+            "inner": [
+              {
+                "name": "core/column",
+                "attrs": {
+                  "style": {
+                    "spacing": {
+                      "padding": {
+                        "top": "0",
+                        "right": "0",
+                        "bottom": "0",
+                        "left": "0"
+                      },
+                      "blockGap": "0"
+                    }
+                  }
+                },
+                "inner": [
+                  {
+                    "name": "core/heading",
+                    "attrs": {
+                      "textColor": "fondo-pagina",
+                      "fontSize": "50",
+                      "fontFamily": "pliegue",
+                      "style": {
+                        "typography": {
+                          "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                          "lineHeight": "var(--wp--custom--typography--line-height--snug)",
+                          "textAlign": "left"
+                        },
+                        "spacing": {
+                          "margin": {
+                            "top": "0",
+                            "bottom": "var:preset|spacing|70"
+                          }
+                        }
+                      },
+                      "content": "Bodegas Industriales flexibles – Venta y Arriendo",
+                      "level": 3
+                    },
+                    "inner": []
+                  },
+                  {
+                    "name": "core/accordion",
+                    "attrs": {
+                      "iconPosition": "right",
+                      "showIcon": true,
+                      "autoclose": true,
+                      "headingLevel": 3,
+                      "style": {
+                        "spacing": {
+                          "blockGap": "var:preset|spacing|60",
+                          "margin": {
+                            "top": "0",
+                            "bottom": "0"
+                          }
+                        }
+                      }
+                    },
+                    "inner": [
+                      {
+                        "name": "core/accordion-item",
+                        "attrs": {
+                          "openByDefault": true,
+                          "backgroundColor": "casi-blanco",
+                          "style": {
+                            "spacing": {
+                              "padding": {
+                                "top": "var:preset|spacing|40",
+                                "right": "var:preset|spacing|40",
+                                "bottom": "var:preset|spacing|40",
+                                "left": "var:preset|spacing|40"
+                              }
+                            },
+                            "border": {
+                              "radius": "var(--wp--custom--radius--l)"
+                            }
+                          }
+                        },
+                        "inner": [
+                          {
+                            "name": "core/accordion-heading",
+                            "attrs": {
+                              "title": "¿Qué tipo de naves industriales ofrecen?",
+                              "level": 3,
+                              "textColor": "texto-cuerpo",
+                              "fontSize": "40",
+                              "fontFamily": "pliegue",
+                              "style": {
+                                "typography": {
+                                  "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                                  "lineHeight": "var(--wp--custom--typography--line-height--snug)",
+                                  "textAlign": "left"
+                                }
+                              }
+                            },
+                            "inner": []
+                          },
+                          {
+                            "name": "core/accordion-panel",
+                            "attrs": {
+                              "style": {
+                                "spacing": {
+                                  "padding": {
+                                    "top": "var:preset|spacing|40"
+                                  },
+                                  "margin": {
+                                    "top": "0"
+                                  },
+                                  "blockGap": "0"
+                                }
+                              }
+                            },
+                            "inner": [
+                              {
+                                "name": "core/paragraph",
+                                "attrs": {
+                                  "textColor": "texto-cuerpo",
+                                  "fontSize": "20",
+                                  "fontFamily": "body",
+                                  "style": {
+                                    "typography": {
+                                      "fontWeight": "var(--wp--custom--typography--font-weight--regular)",
+                                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                                      "textAlign": "left"
+                                    },
+                                    "spacing": {
+                                      "margin": {
+                                        "top": "0",
+                                        "bottom": "0"
+                                      }
+                                    }
+                                  },
+                                  "content": "Ofrecemos bodegas modulares con cobertura flexible, tipo galpón, hangar y otros, todas diseñadas para uso industrial y logístico. Contamos con modelos fijos, desmontables y personalizables."
+                                },
+                                "inner": []
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "name": "core/accordion-item",
+                        "attrs": {
+                          "backgroundColor": "casi-blanco",
+                          "style": {
+                            "spacing": {
+                              "padding": {
+                                "top": "var:preset|spacing|40",
+                                "right": "var:preset|spacing|40",
+                                "bottom": "var:preset|spacing|40",
+                                "left": "var:preset|spacing|40"
+                              }
+                            },
+                            "border": {
+                              "radius": "var(--wp--custom--radius--l)"
+                            }
+                          }
+                        },
+                        "inner": [
+                          {
+                            "name": "core/accordion-heading",
+                            "attrs": {
+                              "title": "¿Las carpas pueden ser arrendadas o solo las venden?",
+                              "level": 3,
+                              "textColor": "texto-cuerpo",
+                              "fontSize": "40",
+                              "fontFamily": "pliegue",
+                              "style": {
+                                "typography": {
+                                  "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                                  "lineHeight": "var(--wp--custom--typography--line-height--snug)",
+                                  "textAlign": "left"
+                                }
+                              }
+                            },
+                            "inner": []
+                          },
+                          {
+                            "name": "core/accordion-panel",
+                            "attrs": {
+                              "style": {
+                                "spacing": {
+                                  "padding": {
+                                    "top": "var:preset|spacing|40"
+                                  },
+                                  "margin": {
+                                    "top": "0"
+                                  },
+                                  "blockGap": "0"
+                                }
+                              }
+                            },
+                            "inner": [
+                              {
+                                "name": "core/paragraph",
+                                "attrs": {
+                                  "textColor": "texto-cuerpo",
+                                  "fontSize": "20",
+                                  "fontFamily": "body",
+                                  "style": {
+                                    "typography": {
+                                      "fontWeight": "var(--wp--custom--typography--font-weight--regular)",
+                                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                                      "textAlign": "left"
+                                    },
+                                    "spacing": {
+                                      "margin": {
+                                        "top": "0",
+                                        "bottom": "0"
+                                      }
+                                    }
+                                  },
+                                  "content": "Disponemos de ambas modalidades: arriendo a corto o largo plazo y venta directa. También ofrecemos opción de arriendo con opción de compra."
+                                },
+                                "inner": []
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "name": "core/accordion-item",
+                        "attrs": {
+                          "backgroundColor": "casi-blanco",
+                          "style": {
+                            "spacing": {
+                              "padding": {
+                                "top": "var:preset|spacing|40",
+                                "right": "var:preset|spacing|40",
+                                "bottom": "var:preset|spacing|40",
+                                "left": "var:preset|spacing|40"
+                              }
+                            },
+                            "border": {
+                              "radius": "var(--wp--custom--radius--l)"
+                            }
+                          }
+                        },
+                        "inner": [
+                          {
+                            "name": "core/accordion-heading",
+                            "attrs": {
+                              "title": "¿Qué tamaños están disponibles?",
+                              "level": 3,
+                              "textColor": "texto-cuerpo",
+                              "fontSize": "40",
+                              "fontFamily": "pliegue",
+                              "style": {
+                                "typography": {
+                                  "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                                  "lineHeight": "var(--wp--custom--typography--line-height--snug)",
+                                  "textAlign": "left"
+                                }
+                              }
+                            },
+                            "inner": []
+                          },
+                          {
+                            "name": "core/accordion-panel",
+                            "attrs": {
+                              "style": {
+                                "spacing": {
+                                  "padding": {
+                                    "top": "var:preset|spacing|40"
+                                  },
+                                  "margin": {
+                                    "top": "0"
+                                  },
+                                  "blockGap": "0"
+                                }
+                              }
+                            },
+                            "inner": [
+                              {
+                                "name": "core/paragraph",
+                                "attrs": {
+                                  "textColor": "texto-cuerpo",
+                                  "fontSize": "20",
+                                  "fontFamily": "body",
+                                  "style": {
+                                    "typography": {
+                                      "fontWeight": "var(--wp--custom--typography--font-weight--regular)",
+                                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                                      "textAlign": "left"
+                                    },
+                                    "spacing": {
+                                      "margin": {
+                                        "top": "0",
+                                        "bottom": "0"
+                                      }
+                                    }
+                                  },
+                                  "content": "Las medidas más comunes para uso agroindustrial son de 20 metros de ancho y 5 metros de alto de hombro. No obstante, los anchos de las naves pueden ir desde los 10 metros y hasta los 40 metros de ancho, alto al hombro de 4 a 7 metros y el largo variable, en múltiplos de cinco metros, debido a la separación estándar entre cerchas. Nuestro tamaño mínimo de venta o arriendo es de 6 cerchas (incluyendo frontones), lo que a ancho estándar de 20 metros equivale a una superficie de 500m2."
+                                },
+                                "inner": []
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "name": "core/accordion-item",
+                        "attrs": {
+                          "backgroundColor": "casi-blanco",
+                          "style": {
+                            "spacing": {
+                              "padding": {
+                                "top": "var:preset|spacing|40",
+                                "right": "var:preset|spacing|40",
+                                "bottom": "var:preset|spacing|40",
+                                "left": "var:preset|spacing|40"
+                              }
+                            },
+                            "border": {
+                              "radius": "var(--wp--custom--radius--l)"
+                            }
+                          }
+                        },
+                        "inner": [
+                          {
+                            "name": "core/accordion-heading",
+                            "attrs": {
+                              "title": "¿Cuánto tiempo toma la instalación?",
+                              "level": 3,
+                              "textColor": "texto-cuerpo",
+                              "fontSize": "40",
+                              "fontFamily": "pliegue",
+                              "style": {
+                                "typography": {
+                                  "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                                  "lineHeight": "var(--wp--custom--typography--line-height--snug)",
+                                  "textAlign": "left"
+                                }
+                              }
+                            },
+                            "inner": []
+                          },
+                          {
+                            "name": "core/accordion-panel",
+                            "attrs": {
+                              "style": {
+                                "spacing": {
+                                  "padding": {
+                                    "top": "var:preset|spacing|40"
+                                  },
+                                  "margin": {
+                                    "top": "0"
+                                  },
+                                  "blockGap": "0"
+                                }
+                              }
+                            },
+                            "inner": [
+                              {
+                                "name": "core/paragraph",
+                                "attrs": {
+                                  "textColor": "texto-cuerpo",
+                                  "fontSize": "20",
+                                  "fontFamily": "body",
+                                  "style": {
+                                    "typography": {
+                                      "fontWeight": "var(--wp--custom--typography--font-weight--regular)",
+                                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                                      "textAlign": "left"
+                                    },
+                                    "spacing": {
+                                      "margin": {
+                                        "top": "0",
+                                        "bottom": "0"
+                                      }
+                                    }
+                                  },
+                                  "content": "Dependiendo del tamaño y condiciones del terreno, la instalación puede tomar desde 2 días cada 500m2. Coordinamos previamente con el cliente para optimizar tiempos. Cabe destacar que el personal de instalación está plenamente calificado y certificado para las labores y todas las maquinarias para esta faena están incluidas en el servicio."
+                                },
+                                "inner": []
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "name": "core/accordion-item",
+                        "attrs": {
+                          "backgroundColor": "casi-blanco",
+                          "style": {
+                            "spacing": {
+                              "padding": {
+                                "top": "var:preset|spacing|40",
+                                "right": "var:preset|spacing|40",
+                                "bottom": "var:preset|spacing|40",
+                                "left": "var:preset|spacing|40"
+                              }
+                            },
+                            "border": {
+                              "radius": "var(--wp--custom--radius--l)"
+                            }
+                          }
+                        },
+                        "inner": [
+                          {
+                            "name": "core/accordion-heading",
+                            "attrs": {
+                              "title": "¿Se necesita permiso municipal para instalar una carpa industrial?",
+                              "level": 3,
+                              "textColor": "texto-cuerpo",
+                              "fontSize": "40",
+                              "fontFamily": "pliegue",
+                              "style": {
+                                "typography": {
+                                  "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                                  "lineHeight": "var(--wp--custom--typography--line-height--snug)",
+                                  "textAlign": "left"
+                                }
+                              }
+                            },
+                            "inner": []
+                          },
+                          {
+                            "name": "core/accordion-panel",
+                            "attrs": {
+                              "style": {
+                                "spacing": {
+                                  "padding": {
+                                    "top": "var:preset|spacing|40"
+                                  },
+                                  "margin": {
+                                    "top": "0"
+                                  },
+                                  "blockGap": "0"
+                                }
+                              }
+                            },
+                            "inner": [
+                              {
+                                "name": "core/paragraph",
+                                "attrs": {
+                                  "textColor": "texto-cuerpo",
+                                  "fontSize": "20",
+                                  "fontFamily": "body",
+                                  "style": {
+                                    "typography": {
+                                      "fontWeight": "var(--wp--custom--typography--font-weight--regular)",
+                                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                                      "textAlign": "left"
+                                    },
+                                    "spacing": {
+                                      "margin": {
+                                        "top": "0",
+                                        "bottom": "0"
+                                      }
+                                    }
+                                  },
+                                  "content": "En general, No se requiere permiso municipal, para la instalación de estas bodegas pues se entiende que tienen carácter provisorio y no cuentan con cimientos. No obstante esta normativa puede cambiar o hacerse específica en cada municipio. La ventaja es que, en caso de ser así, usted puede desinstalar estas naves y trasladarla. Respecto autorización sanitaria, los materiales estructurales y coberturas (todos lavables, más herméticos y con menores niveles de condensación que los galpones de cubiertas galvanizadas) cumplen plenamente para obtener resolución favorable de la autoridad respectiva. No obstante el usuario debe agregar elementos adicionales simples para el sello perimetral. Asesoramos a nuestros clientes en este proceso."
+                                },
+                                "inner": []
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "name": "core/accordion-item",
+                        "attrs": {
+                          "backgroundColor": "casi-blanco",
+                          "style": {
+                            "spacing": {
+                              "padding": {
+                                "top": "var:preset|spacing|40",
+                                "right": "var:preset|spacing|40",
+                                "bottom": "var:preset|spacing|40",
+                                "left": "var:preset|spacing|40"
+                              }
+                            },
+                            "border": {
+                              "radius": "var(--wp--custom--radius--l)"
+                            }
+                          }
+                        },
+                        "inner": [
+                          {
+                            "name": "core/accordion-heading",
+                            "attrs": {
+                              "title": "¿Qué incluye el servicio de arriendo?",
+                              "level": 3,
+                              "textColor": "texto-cuerpo",
+                              "fontSize": "40",
+                              "fontFamily": "pliegue",
+                              "style": {
+                                "typography": {
+                                  "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                                  "lineHeight": "var(--wp--custom--typography--line-height--snug)",
+                                  "textAlign": "left"
+                                }
+                              }
+                            },
+                            "inner": []
+                          },
+                          {
+                            "name": "core/accordion-panel",
+                            "attrs": {
+                              "style": {
+                                "spacing": {
+                                  "padding": {
+                                    "top": "var:preset|spacing|40"
+                                  },
+                                  "margin": {
+                                    "top": "0"
+                                  },
+                                  "blockGap": "0"
+                                }
+                              }
+                            },
+                            "inner": [
+                              {
+                                "name": "core/paragraph",
+                                "attrs": {
+                                  "textColor": "texto-cuerpo",
+                                  "fontSize": "20",
+                                  "fontFamily": "body",
+                                  "style": {
+                                    "typography": {
+                                      "fontWeight": "var(--wp--custom--typography--font-weight--regular)",
+                                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                                      "textAlign": "left"
+                                    },
+                                    "spacing": {
+                                      "margin": {
+                                        "top": "0",
+                                        "bottom": "0"
+                                      }
+                                    }
+                                  },
+                                  "content": "El arriendo incluye:"
+                                },
+                                "inner": []
+                              },
+                              {
+                                "name": "core/list",
+                                "attrs": {
+                                  "textColor": "texto-cuerpo",
+                                  "fontSize": "20",
+                                  "fontFamily": "body",
+                                  "style": {
+                                    "typography": {
+                                      "fontWeight": "var(--wp--custom--typography--font-weight--regular)",
+                                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                                      "textAlign": "left"
+                                    },
+                                    "spacing": {
+                                      "padding": {
+                                        "left": "var:preset|spacing|30"
+                                      },
+                                      "margin": {
+                                        "top": "0",
+                                        "bottom": "0"
+                                      }
+                                    }
+                                  },
+                                  "ordered": false
+                                },
+                                "inner": [
+                                  {
+                                    "name": "core/list-item",
+                                    "attrs": {
+                                      "content": "Instalación y desinstalación"
+                                    },
+                                    "inner": []
+                                  },
+                                  {
+                                    "name": "core/list-item",
+                                    "attrs": {
+                                      "content": "Mantenimiento durante el período de uso"
+                                    },
+                                    "inner": []
+                                  },
+                                  {
+                                    "name": "core/list-item",
+                                    "attrs": {
+                                      "content": "Extintores"
+                                    },
+                                    "inner": []
+                                  },
+                                  {
+                                    "name": "core/list-item",
+                                    "attrs": {
+                                      "content": "Opcional: pisos, iluminación, portones sólidos y flexibles, anclaje reforzado y cierres perimetrales"
+                                    },
+                                    "inner": []
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "name": "core/accordion-item",
+                        "attrs": {
+                          "backgroundColor": "casi-blanco",
+                          "style": {
+                            "spacing": {
+                              "padding": {
+                                "top": "var:preset|spacing|40",
+                                "right": "var:preset|spacing|40",
+                                "bottom": "var:preset|spacing|40",
+                                "left": "var:preset|spacing|40"
+                              }
+                            },
+                            "border": {
+                              "radius": "var(--wp--custom--radius--l)"
+                            }
+                          }
+                        },
+                        "inner": [
+                          {
+                            "name": "core/accordion-heading",
+                            "attrs": {
+                              "title": "¿Ofrecen transporte?",
+                              "level": 3,
+                              "textColor": "texto-cuerpo",
+                              "fontSize": "40",
+                              "fontFamily": "pliegue",
+                              "style": {
+                                "typography": {
+                                  "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                                  "lineHeight": "var(--wp--custom--typography--line-height--snug)",
+                                  "textAlign": "left"
+                                }
+                              }
+                            },
+                            "inner": []
+                          },
+                          {
+                            "name": "core/accordion-panel",
+                            "attrs": {
+                              "style": {
+                                "spacing": {
+                                  "padding": {
+                                    "top": "var:preset|spacing|40"
+                                  },
+                                  "margin": {
+                                    "top": "0"
+                                  },
+                                  "blockGap": "0"
+                                }
+                              }
+                            },
+                            "inner": [
+                              {
+                                "name": "core/paragraph",
+                                "attrs": {
+                                  "textColor": "texto-cuerpo",
+                                  "fontSize": "20",
+                                  "fontFamily": "body",
+                                  "style": {
+                                    "typography": {
+                                      "fontWeight": "var(--wp--custom--typography--font-weight--regular)",
+                                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                                      "textAlign": "left"
+                                    },
+                                    "spacing": {
+                                      "margin": {
+                                        "top": "0",
+                                        "bottom": "0"
+                                      }
+                                    }
+                                  },
+                                  "content": "Sí, incluimos el transporte dentro de la región o zona pactada. Para distancias mayores, se cotiza el traslado aparte."
+                                },
+                                "inner": []
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "name": "core/accordion-item",
+                        "attrs": {
+                          "backgroundColor": "casi-blanco",
+                          "style": {
+                            "spacing": {
+                              "padding": {
+                                "top": "var:preset|spacing|40",
+                                "right": "var:preset|spacing|40",
+                                "bottom": "var:preset|spacing|40",
+                                "left": "var:preset|spacing|40"
+                              }
+                            },
+                            "border": {
+                              "radius": "var(--wp--custom--radius--l)"
+                            }
+                          }
+                        },
+                        "inner": [
+                          {
+                            "name": "core/accordion-heading",
+                            "attrs": {
+                              "title": "¿Qué formas de pago aceptan?",
+                              "level": 3,
+                              "textColor": "texto-cuerpo",
+                              "fontSize": "40",
+                              "fontFamily": "pliegue",
+                              "style": {
+                                "typography": {
+                                  "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                                  "lineHeight": "var(--wp--custom--typography--line-height--snug)",
+                                  "textAlign": "left"
+                                }
+                              }
+                            },
+                            "inner": []
+                          },
+                          {
+                            "name": "core/accordion-panel",
+                            "attrs": {
+                              "style": {
+                                "spacing": {
+                                  "padding": {
+                                    "top": "var:preset|spacing|40"
+                                  },
+                                  "margin": {
+                                    "top": "0"
+                                  },
+                                  "blockGap": "0"
+                                }
+                              }
+                            },
+                            "inner": [
+                              {
+                                "name": "core/paragraph",
+                                "attrs": {
+                                  "textColor": "texto-cuerpo",
+                                  "fontSize": "20",
+                                  "fontFamily": "body",
+                                  "style": {
+                                    "typography": {
+                                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                                      "textAlign": "left"
+                                    },
+                                    "spacing": {
+                                      "margin": {
+                                        "top": "0",
+                                        "bottom": "0"
+                                      }
+                                    }
+                                  },
+                                  "content": "Aceptamos transferencia bancaria, tarjetas de crédito/débito y pagos mediante leasing o financiamiento externo en caso de compra."
+                                },
+                                "inner": []
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "name": "core/accordion-item",
+                        "attrs": {
+                          "backgroundColor": "casi-blanco",
+                          "style": {
+                            "spacing": {
+                              "padding": {
+                                "top": "var:preset|spacing|40",
+                                "right": "var:preset|spacing|40",
+                                "bottom": "var:preset|spacing|40",
+                                "left": "var:preset|spacing|40"
+                              }
+                            },
+                            "border": {
+                              "radius": "var(--wp--custom--radius--l)"
+                            }
+                          }
+                        },
+                        "inner": [
+                          {
+                            "name": "core/accordion-heading",
+                            "attrs": {
+                              "title": "¿Ofrecen garantía?",
+                              "level": 3,
+                              "textColor": "texto-cuerpo",
+                              "fontSize": "40",
+                              "fontFamily": "pliegue",
+                              "style": {
+                                "typography": {
+                                  "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                                  "lineHeight": "var(--wp--custom--typography--line-height--snug)",
+                                  "textAlign": "left"
+                                }
+                              }
+                            },
+                            "inner": []
+                          },
+                          {
+                            "name": "core/accordion-panel",
+                            "attrs": {
+                              "style": {
+                                "spacing": {
+                                  "padding": {
+                                    "top": "var:preset|spacing|40"
+                                  },
+                                  "margin": {
+                                    "top": "0"
+                                  },
+                                  "blockGap": "0"
+                                }
+                              }
+                            },
+                            "inner": [
+                              {
+                                "name": "core/paragraph",
+                                "attrs": {
+                                  "textColor": "texto-cuerpo",
+                                  "fontSize": "20",
+                                  "fontFamily": "body",
+                                  "style": {
+                                    "typography": {
+                                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                                      "textAlign": "left"
+                                    },
+                                    "spacing": {
+                                      "margin": {
+                                        "top": "0",
+                                        "bottom": "0"
+                                      }
+                                    }
+                                  },
+                                  "content": "Sí. Nuestras bodegas cuentan con garantía de Materiales por 6 años, y el servicio de arriendo incluye mantenimiento sin costo adicional durante el período contratado."
+                                },
+                                "inner": []
+                              },
+                              {
+                                "name": "core/paragraph",
+                                "attrs": {
+                                  "textColor": "texto-cuerpo",
+                                  "fontSize": "20",
+                                  "fontFamily": "body",
+                                  "style": {
+                                    "typography": {
+                                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                                      "textAlign": "left"
+                                    },
+                                    "spacing": {
+                                      "margin": {
+                                        "top": "0",
+                                        "bottom": "0"
+                                      }
+                                    }
+                                  },
+                                  "content": "Garantía:"
+                                },
+                                "inner": []
+                              },
+                              {
+                                "name": "core/paragraph",
+                                "attrs": {
+                                  "textColor": "texto-cuerpo",
+                                  "fontSize": "20",
+                                  "fontFamily": "body",
+                                  "style": {
+                                    "typography": {
+                                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                                      "textAlign": "left"
+                                    },
+                                    "spacing": {
+                                      "margin": {
+                                        "top": "0",
+                                        "bottom": "0"
+                                      }
+                                    }
+                                  },
+                                  "content": "Los materiales de estructura* y cubiertas** de nuestras bodegas cuentan con una Garantía de 6 años. Incluye esta garantía eventos de lluvia y viento con rachas o flujos ocasionales máximos de 70km/hora. Se excluye de esta garantía, los daños ocasionados por el uso indebido de las estructuras, anclajes, soportes y cobertores, su exposición al fuego o materiales corrosivos, su intervención con herramientas y/u objetos cortopunzantes, perforaciones, soldaduras, golpes y/o colisiones de maquinaria, de vehículos, de otras construcciones o sus partes, de personas o animales; así como catástrofes de cualquier tipo y/o eventos naturales fuera de las condiciones geoclimáticas cotidianas de la zona de emplazamiento."
+                                },
+                                "inner": []
+                              },
+                              {
+                                "name": "core/separator",
+                                "attrs": {
+                                  "style": {
+                                    "spacing": {
+                                      "margin": {
+                                        "top": "0",
+                                        "bottom": "0"
+                                      }
+                                    }
+                                  },
+                                  "opacity": "css"
+                                },
+                                "inner": []
+                              },
+                              {
+                                "name": "core/paragraph",
+                                "attrs": {
+                                  "textColor": "texto-cuerpo",
+                                  "fontSize": "20",
+                                  "fontFamily": "body",
+                                  "style": {
+                                    "typography": {
+                                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                                      "textAlign": "left"
+                                    },
+                                    "spacing": {
+                                      "margin": {
+                                        "top": "0",
+                                        "bottom": "0"
+                                      }
+                                    }
+                                  },
+                                  "content": "*Bases de Pilar, Pilares, Flanjes esquineros, Cerchas, Uniones de cumbrera, Vigas y anclajes de vigas y Arriostramientos."
+                                },
+                                "inner": []
+                              },
+                              {
+                                "name": "core/paragraph",
+                                "attrs": {
+                                  "textColor": "texto-cuerpo",
+                                  "fontSize": "20",
+                                  "fontFamily": "body",
+                                  "style": {
+                                    "typography": {
+                                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                                      "textAlign": "left"
+                                    },
+                                    "spacing": {
+                                      "margin": {
+                                        "top": "0",
+                                        "bottom": "0"
+                                      }
+                                    }
+                                  },
+                                  "content": "**Cubiertas, murallas, Cubrecerchas y Canaletas de tela de PVC."
+                                },
+                                "inner": []
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "name": "core/column",
+                "attrs": {
+                  "style": {
+                    "spacing": {
+                      "padding": {
+                        "top": "0",
+                        "right": "0",
+                        "bottom": "0",
+                        "left": "0"
+                      },
+                      "blockGap": "0"
+                    }
+                  }
+                },
+                "inner": [
+                  {
+                    "name": "core/heading",
+                    "attrs": {
+                      "textColor": "fondo-pagina",
+                      "fontSize": "50",
+                      "fontFamily": "pliegue",
+                      "style": {
+                        "typography": {
+                          "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                          "lineHeight": "var(--wp--custom--typography--line-height--snug)",
+                          "textAlign": "left"
+                        },
+                        "spacing": {
+                          "margin": {
+                            "top": "0",
+                            "bottom": "var:preset|spacing|70"
+                          }
+                        }
+                      },
+                      "content": "Certificaciones<br>calidad de materiales",
+                      "level": 3
+                    },
+                    "inner": []
+                  },
+                  {
+                    "name": "core/accordion",
+                    "attrs": {
+                      "iconPosition": "right",
+                      "showIcon": true,
+                      "autoclose": true,
+                      "headingLevel": 3,
+                      "style": {
+                        "spacing": {
+                          "blockGap": "var:preset|spacing|60",
+                          "margin": {
+                            "top": "0",
+                            "bottom": "0"
+                          }
+                        }
+                      }
+                    },
+                    "inner": [
+                      {
+                        "name": "core/accordion-item",
+                        "attrs": {
+                          "openByDefault": true,
+                          "backgroundColor": "casi-blanco",
+                          "style": {
+                            "spacing": {
+                              "padding": {
+                                "top": "var:preset|spacing|40",
+                                "right": "var:preset|spacing|40",
+                                "bottom": "var:preset|spacing|40",
+                                "left": "var:preset|spacing|40"
+                              }
+                            },
+                            "border": {
+                              "radius": "var(--wp--custom--radius--l)"
+                            }
+                          }
+                        },
+                        "inner": [
+                          {
+                            "name": "core/accordion-heading",
+                            "attrs": {
+                              "title": "Flame Retardant B1 (DIN 4102-1)",
+                              "level": 3,
+                              "textColor": "texto-cuerpo",
+                              "fontSize": "40",
+                              "fontFamily": "pliegue",
+                              "style": {
+                                "typography": {
+                                  "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                                  "lineHeight": "var(--wp--custom--typography--line-height--snug)",
+                                  "textAlign": "left"
+                                }
+                              }
+                            },
+                            "inner": []
+                          },
+                          {
+                            "name": "core/accordion-panel",
+                            "attrs": {
+                              "style": {
+                                "spacing": {
+                                  "padding": {
+                                    "top": "var:preset|spacing|40"
+                                  },
+                                  "margin": {
+                                    "top": "0"
+                                  },
+                                  "blockGap": "0"
+                                }
+                              }
+                            },
+                            "inner": [
+                              {
+                                "name": "core/image",
+                                "attrs": {
+                                  "url": "/wp-content/uploads/2025/07/aiconopdf-300x300-1.png",
+                                  "alt": "",
+                                  "sizeSlug": "full",
+                                  "linkDestination": "media",
+                                  "width": "100px",
+                                  "style": {
+                                    "spacing": {
+                                      "margin": {
+                                        "top": "0",
+                                        "bottom": "var:preset|spacing|20"
+                                      }
+                                    }
+                                  },
+                                  "href": "/wp-content/uploads/2025/07/Flame-retardant-B1-Europe.pdf",
+                                  "linkTarget": "_blank",
+                                  "rel": "noreferrer noopener"
+                                },
+                                "inner": []
+                              },
+                              {
+                                "name": "core/paragraph",
+                                "attrs": {
+                                  "textColor": "texto-cuerpo",
+                                  "fontSize": "20",
+                                  "fontFamily": "body",
+                                  "style": {
+                                    "typography": {
+                                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                                      "textAlign": "left"
+                                    },
+                                    "spacing": {
+                                      "margin": {
+                                        "top": "0",
+                                        "bottom": "0"
+                                      }
+                                    }
+                                  },
+                                  "content": "Nuestro PVC tarpaulin blanco (JFS201-1) ha sido certificado como material de baja inflamabilidad clase B1 según DIN 4102-1. Superó exitosamente las pruebas de combustión, sin goteo, llama sostenida ni propagación peligrosa del fuego."
+                                },
+                                "inner": []
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "name": "core/accordion-item",
+                        "attrs": {
+                          "backgroundColor": "casi-blanco",
+                          "style": {
+                            "spacing": {
+                              "padding": {
+                                "top": "var:preset|spacing|40",
+                                "right": "var:preset|spacing|40",
+                                "bottom": "var:preset|spacing|40",
+                                "left": "var:preset|spacing|40"
+                              }
+                            },
+                            "border": {
+                              "radius": "var(--wp--custom--radius--l)"
+                            }
+                          }
+                        },
+                        "inner": [
+                          {
+                            "name": "core/accordion-heading",
+                            "attrs": {
+                              "title": "Envejecimiento por Luz (Xenon-arc)",
+                              "level": 3,
+                              "textColor": "texto-cuerpo",
+                              "fontSize": "40",
+                              "fontFamily": "pliegue",
+                              "style": {
+                                "typography": {
+                                  "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                                  "lineHeight": "var(--wp--custom--typography--line-height--snug)",
+                                  "textAlign": "left"
+                                }
+                              }
+                            },
+                            "inner": []
+                          },
+                          {
+                            "name": "core/accordion-panel",
+                            "attrs": {
+                              "style": {
+                                "spacing": {
+                                  "padding": {
+                                    "top": "var:preset|spacing|40"
+                                  },
+                                  "margin": {
+                                    "top": "0"
+                                  },
+                                  "blockGap": "0"
+                                }
+                              }
+                            },
+                            "inner": [
+                              {
+                                "name": "core/image",
+                                "attrs": {
+                                  "url": "/wp-content/uploads/2025/07/aiconopdf-300x300-1.png",
+                                  "alt": "",
+                                  "sizeSlug": "full",
+                                  "linkDestination": "media",
+                                  "width": "100px",
+                                  "style": {
+                                    "spacing": {
+                                      "margin": {
+                                        "top": "0",
+                                        "bottom": "var:preset|spacing|20"
+                                      }
+                                    }
+                                  },
+                                  "href": "/wp-content/uploads/2025/07/Light-ageing-test-of-PVC.pdf",
+                                  "linkTarget": "_blank",
+                                  "rel": "noreferrer noopener"
+                                },
+                                "inner": []
+                              },
+                              {
+                                "name": "core/paragraph",
+                                "attrs": {
+                                  "textColor": "texto-cuerpo",
+                                  "fontSize": "20",
+                                  "fontFamily": "body",
+                                  "style": {
+                                    "typography": {
+                                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                                      "textAlign": "left"
+                                    },
+                                    "spacing": {
+                                      "margin": {
+                                        "top": "0",
+                                        "bottom": "0"
+                                      }
+                                    }
+                                  },
+                                  "content": "Tras 800 horas de exposición a luz xenón (GB/T 16422.2-2022), el material no presentó grietas, decoloración ni deformaciones. Esta resistencia confirma su durabilidad ante condiciones ambientales exigentes."
+                                },
+                                "inner": []
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "name": "core/accordion-item",
+                        "attrs": {
+                          "backgroundColor": "casi-blanco",
+                          "style": {
+                            "spacing": {
+                              "padding": {
+                                "top": "var:preset|spacing|40",
+                                "right": "var:preset|spacing|40",
+                                "bottom": "var:preset|spacing|40",
+                                "left": "var:preset|spacing|40"
+                              }
+                            },
+                            "border": {
+                              "radius": "var(--wp--custom--radius--l)"
+                            }
+                          }
+                        },
+                        "inner": [
+                          {
+                            "name": "core/accordion-heading",
+                            "attrs": {
+                              "title": "Resistencia al Agua (EN ISO 811)",
+                              "level": 3,
+                              "textColor": "texto-cuerpo",
+                              "fontSize": "40",
+                              "fontFamily": "pliegue",
+                              "style": {
+                                "typography": {
+                                  "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                                  "lineHeight": "var(--wp--custom--typography--line-height--snug)",
+                                  "textAlign": "left"
+                                }
+                              }
+                            },
+                            "inner": []
+                          },
+                          {
+                            "name": "core/accordion-panel",
+                            "attrs": {
+                              "style": {
+                                "spacing": {
+                                  "padding": {
+                                    "top": "var:preset|spacing|40"
+                                  },
+                                  "margin": {
+                                    "top": "0"
+                                  },
+                                  "blockGap": "0"
+                                }
+                              }
+                            },
+                            "inner": [
+                              {
+                                "name": "core/image",
+                                "attrs": {
+                                  "url": "/wp-content/uploads/2025/07/aiconopdf-300x300-1.png",
+                                  "alt": "",
+                                  "sizeSlug": "full",
+                                  "linkDestination": "media",
+                                  "width": "100px",
+                                  "style": {
+                                    "spacing": {
+                                      "margin": {
+                                        "top": "0",
+                                        "bottom": "var:preset|spacing|20"
+                                      }
+                                    }
+                                  },
+                                  "href": "/wp-content/uploads/2025/07/Water-resistance-of-PVC.pdf",
+                                  "linkTarget": "_blank",
+                                  "rel": "noreferrer noopener"
+                                },
+                                "inner": []
+                              },
+                              {
+                                "name": "core/paragraph",
+                                "attrs": {
+                                  "textColor": "texto-cuerpo",
+                                  "fontSize": "20",
+                                  "fontFamily": "body",
+                                  "style": {
+                                    "typography": {
+                                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                                      "textAlign": "left"
+                                    },
+                                    "spacing": {
+                                      "margin": {
+                                        "top": "0",
+                                        "bottom": "0"
+                                      }
+                                    }
+                                  },
+                                  "content": "El PVC tarpaulin de 750g superó la prueba de columna de agua (&gt;2000 mmH₂O), cumpliendo con EN ISO 811:2018. Garantiza impermeabilidad superior, ideal para condiciones húmedas y uso exterior prolongado."
+                                },
+                                "inner": []
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "name": "core/accordion-item",
+                        "attrs": {
+                          "backgroundColor": "casi-blanco",
+                          "style": {
+                            "spacing": {
+                              "padding": {
+                                "top": "var:preset|spacing|40",
+                                "right": "var:preset|spacing|40",
+                                "bottom": "var:preset|spacing|40",
+                                "left": "var:preset|spacing|40"
+                              }
+                            },
+                            "border": {
+                              "radius": "var(--wp--custom--radius--l)"
+                            }
+                          }
+                        },
+                        "inner": [
+                          {
+                            "name": "core/accordion-heading",
+                            "attrs": {
+                              "title": "Certificación Aluminio 6005/T6",
+                              "level": 3,
+                              "textColor": "texto-cuerpo",
+                              "fontSize": "40",
+                              "fontFamily": "pliegue",
+                              "style": {
+                                "typography": {
+                                  "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                                  "lineHeight": "var(--wp--custom--typography--line-height--snug)",
+                                  "textAlign": "left"
+                                }
+                              }
+                            },
+                            "inner": []
+                          },
+                          {
+                            "name": "core/accordion-panel",
+                            "attrs": {
+                              "style": {
+                                "spacing": {
+                                  "padding": {
+                                    "top": "var:preset|spacing|40"
+                                  },
+                                  "margin": {
+                                    "top": "0"
+                                  },
+                                  "blockGap": "0"
+                                }
+                              }
+                            },
+                            "inner": [
+                              {
+                                "name": "core/image",
+                                "attrs": {
+                                  "url": "/wp-content/uploads/2025/07/aiconopdf-300x300-1.png",
+                                  "alt": "",
+                                  "sizeSlug": "full",
+                                  "linkDestination": "media",
+                                  "width": "100px",
+                                  "style": {
+                                    "spacing": {
+                                      "margin": {
+                                        "top": "0",
+                                        "bottom": "var:preset|spacing|20"
+                                      }
+                                    }
+                                  },
+                                  "href": "/wp-content/uploads/2025/07/Test-report-of-203x112x4.5mm-English.pdf",
+                                  "linkTarget": "_blank",
+                                  "rel": "noreferrer noopener"
+                                },
+                                "inner": []
+                              },
+                              {
+                                "name": "core/paragraph",
+                                "attrs": {
+                                  "textColor": "texto-cuerpo",
+                                  "fontSize": "20",
+                                  "fontFamily": "body",
+                                  "style": {
+                                    "typography": {
+                                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                                      "textAlign": "left"
+                                    },
+                                    "spacing": {
+                                      "margin": {
+                                        "top": "0",
+                                        "bottom": "0"
+                                      }
+                                    }
+                                  },
+                                  "content": "El perfil de aluminio modelo 6005/T6 cumple con los estándares GB/T 6892-2015. Presenta una resistencia a tracción de 280 N/mm² y dureza Webster de 15 HW, garantizando alta robustez y fiabilidad estructural."
+                                },
+                                "inner": []
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "name": "core/heading",
+                    "attrs": {
+                      "textColor": "fondo-pagina",
+                      "fontSize": "50",
+                      "fontFamily": "pliegue",
+                      "style": {
+                        "typography": {
+                          "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                          "lineHeight": "var(--wp--custom--typography--line-height--snug)",
+                          "textAlign": "left"
+                        },
+                        "spacing": {
+                          "margin": {
+                            "top": "0",
+                            "bottom": "var:preset|spacing|20"
+                          }
+                        }
+                      },
+                      "content": "Características y virtudes<br>de nuestras carpas",
+                      "level": 3
+                    },
+                    "inner": []
+                  },
+                  {
+                    "name": "core/accordion",
+                    "attrs": {
+                      "iconPosition": "right",
+                      "showIcon": true,
+                      "autoclose": true,
+                      "headingLevel": 3,
+                      "style": {
+                        "spacing": {
+                          "blockGap": "var:preset|spacing|60",
+                          "margin": {
+                            "top": "0",
+                            "bottom": "0"
+                          }
+                        }
+                      }
+                    },
+                    "inner": [
+                      {
+                        "name": "core/accordion-item",
+                        "attrs": {
+                          "backgroundColor": "casi-blanco",
+                          "style": {
+                            "spacing": {
+                              "padding": {
+                                "top": "var:preset|spacing|40",
+                                "right": "var:preset|spacing|40",
+                                "bottom": "var:preset|spacing|40",
+                                "left": "var:preset|spacing|40"
+                              }
+                            },
+                            "border": {
+                              "radius": "var(--wp--custom--radius--l)"
+                            }
+                          }
+                        },
+                        "inner": [
+                          {
+                            "name": "core/accordion-heading",
+                            "attrs": {
+                              "title": "¿Qué materiales utilizan en las estructuras?",
+                              "level": 3,
+                              "textColor": "texto-cuerpo",
+                              "fontSize": "40",
+                              "fontFamily": "pliegue",
+                              "style": {
+                                "typography": {
+                                  "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                                  "lineHeight": "var(--wp--custom--typography--line-height--snug)",
+                                  "textAlign": "left"
+                                }
+                              }
+                            },
+                            "inner": []
+                          },
+                          {
+                            "name": "core/accordion-panel",
+                            "attrs": {
+                              "style": {
+                                "spacing": {
+                                  "padding": {
+                                    "top": "var:preset|spacing|40"
+                                  },
+                                  "margin": {
+                                    "top": "0"
+                                  },
+                                  "blockGap": "0"
+                                }
+                              }
+                            },
+                            "inner": [
+                              {
+                                "name": "core/paragraph",
+                                "attrs": {
+                                  "textColor": "texto-cuerpo",
+                                  "fontSize": "20",
+                                  "fontFamily": "body",
+                                  "style": {
+                                    "typography": {
+                                      "fontWeight": "var(--wp--custom--typography--font-weight--regular)",
+                                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                                      "textAlign": "left"
+                                    },
+                                    "spacing": {
+                                      "margin": {
+                                        "top": "0",
+                                        "bottom": "0"
+                                      }
+                                    }
+                                  },
+                                  "content": "Nuestras carpas están construidas con estructuras de aleación de aluminio reforzado y algunos complementos de acero galvanizado de alta calidad. Las cubiertas son de lona de PVC de máxima resistencia (ignífuga, impermeable y con protección UV). Tanto el aluminio como el PVC de nuestras naves han sido probadas en climas como el de Chile por más de 10 años contínuos sin deterioro."
+                                },
+                                "inner": []
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "name": "core/accordion-item",
+                        "attrs": {
+                          "backgroundColor": "casi-blanco",
+                          "style": {
+                            "spacing": {
+                              "padding": {
+                                "top": "var:preset|spacing|40",
+                                "right": "var:preset|spacing|40",
+                                "bottom": "var:preset|spacing|40",
+                                "left": "var:preset|spacing|40"
+                              }
+                            },
+                            "border": {
+                              "radius": "var(--wp--custom--radius--l)"
+                            }
+                          }
+                        },
+                        "inner": [
+                          {
+                            "name": "core/accordion-heading",
+                            "attrs": {
+                              "title": "¿Las carpas resisten condiciones climáticas adversas?",
+                              "level": 3,
+                              "textColor": "texto-cuerpo",
+                              "fontSize": "40",
+                              "fontFamily": "pliegue",
+                              "style": {
+                                "typography": {
+                                  "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                                  "lineHeight": "var(--wp--custom--typography--line-height--snug)",
+                                  "textAlign": "left"
+                                }
+                              }
+                            },
+                            "inner": []
+                          },
+                          {
+                            "name": "core/accordion-panel",
+                            "attrs": {
+                              "style": {
+                                "spacing": {
+                                  "padding": {
+                                    "top": "var:preset|spacing|40"
+                                  },
+                                  "margin": {
+                                    "top": "0"
+                                  },
+                                  "blockGap": "0"
+                                }
+                              }
+                            },
+                            "inner": [
+                              {
+                                "name": "core/paragraph",
+                                "attrs": {
+                                  "textColor": "texto-cuerpo",
+                                  "fontSize": "20",
+                                  "fontFamily": "body",
+                                  "style": {
+                                    "typography": {
+                                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                                      "textAlign": "left"
+                                    },
+                                    "spacing": {
+                                      "margin": {
+                                        "top": "0",
+                                        "bottom": "0"
+                                      }
+                                    }
+                                  },
+                                  "content": "Nuestras carpas están diseñadas para resistir viento, lluvia intensa y radiación solar, de acuerdo a normas estructurales locales."
+                                },
+                                "inner": []
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "name": "core/accordion-item",
+                        "attrs": {
+                          "backgroundColor": "casi-blanco",
+                          "style": {
+                            "spacing": {
+                              "padding": {
+                                "top": "var:preset|spacing|40",
+                                "right": "var:preset|spacing|40",
+                                "bottom": "var:preset|spacing|40",
+                                "left": "var:preset|spacing|40"
+                              }
+                            },
+                            "border": {
+                              "radius": "var(--wp--custom--radius--l)"
+                            }
+                          }
+                        },
+                        "inner": [
+                          {
+                            "name": "core/accordion-heading",
+                            "attrs": {
+                              "title": "¿Pueden personalizar las carpas con colores o logotipos?",
+                              "level": 3,
+                              "textColor": "texto-cuerpo",
+                              "fontSize": "40",
+                              "fontFamily": "pliegue",
+                              "style": {
+                                "typography": {
+                                  "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                                  "lineHeight": "var(--wp--custom--typography--line-height--snug)",
+                                  "textAlign": "left"
+                                }
+                              }
+                            },
+                            "inner": []
+                          },
+                          {
+                            "name": "core/accordion-panel",
+                            "attrs": {
+                              "style": {
+                                "spacing": {
+                                  "padding": {
+                                    "top": "var:preset|spacing|40"
+                                  },
+                                  "margin": {
+                                    "top": "0"
+                                  },
+                                  "blockGap": "0"
+                                }
+                              }
+                            },
+                            "inner": [
+                              {
+                                "name": "core/paragraph",
+                                "attrs": {
+                                  "textColor": "texto-cuerpo",
+                                  "fontSize": "20",
+                                  "fontFamily": "body",
+                                  "style": {
+                                    "typography": {
+                                      "fontWeight": "var(--wp--custom--typography--font-weight--regular)",
+                                      "lineHeight": "var(--wp--custom--typography--line-height--normal)",
+                                      "textAlign": "left"
+                                    },
+                                    "spacing": {
+                                      "margin": {
+                                        "top": "0",
+                                        "bottom": "0"
+                                      }
+                                    }
+                                  },
+                                  "content": "Sí, ofrecemos opciones de personalización con colores corporativos, impresión de logotipos y de seguridad."
+                                },
+                                "inner": []
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]
