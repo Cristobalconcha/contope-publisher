@@ -823,7 +823,7 @@ CSS;
      * Estructura que arma el runtime dentro del grupo (raíz):
      *   [data-cod-mapa-estado="abierto"|"cerrado"]            la raíz
      *     [data-cod-mapa-rol="mini"]                          el botón con la imagen (se oculta al abrir)
-     *     …los hijos originales del grupo (la dirección escrita: siempre a la vista; abierto, el mapa grande baja a su propia línea)
+     *     …los hijos originales del grupo (la dirección escrita: a la vista con el mapa cerrado; se oculta al abrirlo, salvo en el mapa fijo)
      *     [data-cod-mapa-rol="grande"]                        el recuadro del mapa (oculto mientras está cerrado)
      *       .cod-mapa__lienzo                                 donde Mapbox dibuja
      *       .cod-mapa__estado                                 «Cargando…» o el aviso de que no llegó (con el enlace a «cómo llegar»)
@@ -863,6 +863,11 @@ CSS;
 /* Estructura (esto no se pisa): abierto esconde el mini y muestra el grande; cerrado, al revés. */
 {$cerrado} > {$grande}{display:none !important;}
 {$abierto} > {$mini}{display:none !important;}
+/* Abierto, se oculta lo demás del grupo (la dirección escrita del pie): el globo del
+   mapa ya la dice y verla dos veces sobra (decisión de Cristóbal, 2-nov-2026, para
+   Basis y Econut). Al cerrar vuelve. El mapa fijo está abierto siempre: ahí lo demás
+   del grupo es contenido y se respeta. */
+{$abierto}:not([data-cod-mapa-fijo="1"]) > :not({$mini}):not({$grande}){display:none !important;}
 /* Abierto, la raíz reclama su ancho. El mapa grande mide 100% DE ESTA RAÍZ, y
    cerrada la raíz mide lo que mide el mini: 60px. Donde el sitio la haya puesto
    como elemento de una fila flexible —el caso normal: el mini al lado de la
@@ -878,7 +883,7 @@ CSS;
    declaración no hace nada. El tope de ancho lo pone el sitio, que es quien
    sabe cuánto mide su contenido: en econut.cl son 1080. */
 {$abierto}{width:100%;flex-basis:100%;max-width:100%;grid-column:1 / -1;flex-wrap:wrap;}
-/* flex-wrap: el mapa grande (flex-basis 100%) necesita su propia línea, debajo de la dirección.
+/* flex-wrap: el mapa grande (flex-basis 100%) necesita su propia línea si algo del grupo sigue a la vista.
    Econut lo traía en su diseño; en el pie de Basis la raíz era una fila sin salto y la
    dirección quedaba al lado del mapa abierto en una columna de una palabra (2-nov-2026).
    Es de la conducta, igual que el flex-basis: el sitio no tiene por qué saberlo. */
