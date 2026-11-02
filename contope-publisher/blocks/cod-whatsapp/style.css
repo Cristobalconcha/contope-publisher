@@ -1,0 +1,62 @@
+/*
+ * Botón de WhatsApp (contope/whatsapp).
+ *
+ * Esta hoja NO trae colores, tipografías ni sombras: el color, el borde, el
+ * relleno y la letra los pone el diseño del sitio por los mismos caminos que a
+ * core/button (soportes de bloque con presets, styles.elements.button del
+ * theme.json). Aquí sólo hay disposición.
+ *
+ * Variables propias del bloque, todas opcionales; sin ellas se usan los presets
+ * del tema:
+ *   --contope-whatsapp-icono     tamaño del ícono            (1.75em)
+ *   --contope-whatsapp-margen    separación a la esquina     (preset de espacio 40, o 1rem)
+ *   --contope-whatsapp-capa      z-index del botón fijo      (50)
+ *
+ * Se apoya en la hoja de core/button (declarada como dependencia en block.json)
+ * para display, centrado y reinicio de la sombra.
+ */
+a.wp-block-contope-whatsapp {
+	display: inline-flex;
+	/* core/button estira el enlace al alto de su contenedor (height: 100%); fijo, eso es el alto de la ventana. */
+	block-size: auto;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5em;
+	line-height: 1;
+	text-decoration: none;
+}
+
+a.wp-block-contope-whatsapp .cod-whatsapp__icono {
+	flex: none;
+	inline-size: var(--contope-whatsapp-icono, 1.75em);
+	block-size: var(--contope-whatsapp-icono, 1.75em);
+}
+
+/* Sólo el ícono: un círculo en vez del óvalo de un botón con texto. El relleno
+   de los soportes de bloque (en línea) le gana a esta regla. */
+a.wp-block-contope-whatsapp.is-solo-icono {
+	aspect-ratio: 1;
+	padding-block: 0.5em;
+	padding-inline: 0.5em;
+}
+
+/* Fijo en una esquina. Con la esquina pegada al borde se logra la forma de
+   «pestaña» si el diseño le da un radio asimétrico. */
+a.wp-block-contope-whatsapp.is-fijo {
+	position: fixed;
+	z-index: var(--contope-whatsapp-capa, 50);
+	inset-block-end: var(--contope-whatsapp-margen, var(--wp--preset--spacing--40, 1rem));
+}
+
+a.wp-block-contope-whatsapp.is-fijo.is-posicion-derecha {
+	inset-inline-end: var(--contope-whatsapp-margen, var(--wp--preset--spacing--40, 1rem));
+}
+
+a.wp-block-contope-whatsapp.is-fijo.is-posicion-izquierda {
+	inset-inline-start: var(--contope-whatsapp-margen, var(--wp--preset--spacing--40, 1rem));
+}
+
+/* El aviso que sólo ve quien edita, cuando falta el número. */
+.cod-whatsapp-aviso {
+	margin: 0;
+}

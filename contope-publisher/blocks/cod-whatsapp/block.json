@@ -1,0 +1,78 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "contope/whatsapp",
+  "version": "0.1.0",
+  "title": "Botón de WhatsApp",
+  "category": "design",
+  "icon": "format-chat",
+  "description": "Botón que abre una conversación de WhatsApp. El número sale de Configuración → WhatsApp, nunca del contenido. Usa las mismas clases que el botón de WordPress, así que el diseño del sitio lo alcanza igual.",
+  "keywords": [ "whatsapp", "contacto", "mensaje", "boton", "contope" ],
+  "textdomain": "contope-publisher",
+  "attributes": {
+    "text": {
+      "type": "string",
+      "default": ""
+    },
+    "mensaje": {
+      "type": "string",
+      "default": ""
+    },
+    "ariaLabel": {
+      "type": "string",
+      "default": ""
+    },
+    "iconStyle": {
+      "type": "string",
+      "enum": [ "mono", "logo" ],
+      "default": "mono"
+    },
+    "fijo": {
+      "type": "boolean",
+      "default": false
+    },
+    "posicion": {
+      "type": "string",
+      "enum": [ "derecha", "izquierda" ],
+      "default": "derecha"
+    }
+  },
+  "supports": {
+    "html": false,
+    "anchor": true,
+    "align": false,
+    "color": {
+      "gradients": true,
+      "__experimentalDefaultControls": {
+        "background": true,
+        "text": true
+      }
+    },
+    "typography": {
+      "fontSize": true,
+      "__experimentalDefaultControls": {
+        "fontSize": true
+      }
+    },
+    "spacing": {
+      "padding": true,
+      "margin": true,
+      "__experimentalDefaultControls": {
+        "padding": true
+      }
+    },
+    "__experimentalBorder": {
+      "color": true,
+      "radius": true,
+      "style": true,
+      "width": true,
+      "__experimentalDefaultControls": {
+        "radius": true
+      }
+    },
+    "shadow": true
+  },
+  "editorScript": "file:./index.js",
+  "style": [ "wp-block-button", "file:./style.css" ],
+  "render": "file:./render.php"
+}

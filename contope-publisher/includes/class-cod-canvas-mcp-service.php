@@ -73,6 +73,11 @@ final class COD_Canvas_MCP_Service
                 'faltantes' => COD_Design_Core::faltantes(),
                 'aviso' => COD_Design_Core::aviso(),
             ],
+            // La compuerta del diseño: en qué modo está este sitio, qué nombres del
+            // registro se pueden referenciar y qué campos están gobernados. Va acá
+            // para que quien construya lo sepa ANTES de componer y no lo descubra
+            // por el rechazo.
+            'adnGate' => COD_ADN_Gate::descriptor(),
             'composition' => $catalog['composition'],
             'realization' => $catalog['realization'],
             'existingButNotCallableYet' => $catalog['existingButNotCallableYet'],
@@ -343,12 +348,12 @@ final class COD_Canvas_MCP_Service
         if (is_wp_error($target)) {
             return $target;
         }
-        $compiled = $this->compiler->compile($composition, $design);
+        $compiled = $this->compile_gated($composition, $design, $document_id);
         if (is_wp_error($compiled)) {
             return $compiled;
         }
         $preview_id = $this->compiler->preview_id((string) $compiled['compositionDigest'], $page_id, $document_id, $expected_revision);
-        return [
+        return $this->gate_extra($compiled) + [
             'target' => ['pageId' => $page_id, 'documentId' => $document_id, 'revision' => $expected_revision],
             'previewId' => $preview_id,
             'compositionDigest' => $compiled['compositionDigest'],
@@ -398,7 +403,7 @@ final class COD_Canvas_MCP_Service
         if (is_wp_error($target)) {
             return $target;
         }
-        $compiled = $this->compiler->compile($composition, $design);
+        $compiled = $this->compile_gated($composition, $design, $document_id);
         if (is_wp_error($compiled)) {
             return $compiled;
         }
@@ -453,7 +458,7 @@ final class COD_Canvas_MCP_Service
                 'summary' => $compiled['summary'],
                 'reviewedBaseRevision' => $expected_revision,
                 'designCore' => self::informe_del_nucleo(),
-            ],
+            ] + $this->gate_extra($compiled),
         ];
     }
 
@@ -1104,7 +1109,7 @@ final class COD_Canvas_MCP_Service
             'data-cod-geo-places="' . esc_attr($new_json) . '"',
             $html
         );
-        $saved = $this->repository->save($document_id, (string) $document['projectData'], $new_html, (string) $document['css']);
+        $saved = $this->guarded_save('cod_patch_geo_places', $document_id, $expected_revision, (string) $document['projectData'], $new_html, (string) $document['css']);
         if (is_wp_error($saved)) {
             return $saved;
         }
@@ -1112,7 +1117,7 @@ final class COD_Canvas_MCP_Service
             'previousCount' => count($decoded_current),
             'newCount' => count($places),
             'revision' => $saved['revision'],
-        ];
+        ] + $this->gate_extra($saved);
     }
 
     /**
@@ -1133,6 +1138,17 @@ final class COD_Canvas_MCP_Service
         $target = $this->target($page_id, $document_id, $expected_revision);
         if (is_wp_error($target)) {
             return $target;
+        }
+        // La compuerta revisa lo que la persona ESCRIBIÓ en `style` (colores y radio),
+        // no el módulo que fabrica el motor: su marcado lleva medidas y el verde de la
+        // marca de WhatsApp, que es del motor y no del diseño del sitio.
+        $informe_gate = null;
+        if (COD_ADN_Gate::activo()) {
+            $resuelto = COD_ADN_Gate::resolver(COD_ADN_Gate::revisar_estilo_whatsapp($style));
+            if (is_wp_error($resuelto)) {
+                return $resuelto;
+            }
+            $informe_gate = is_array($resuelto) ? $resuelto : null;
         }
         $document = $this->repository->load_existing($document_id);
         if (is_wp_error($document)) {
@@ -1218,11 +1234,20 @@ final class COD_Canvas_MCP_Service
             $new_html .= $dom->saveHTML($child);
         }
 
-        $saved = $this->repository->save($document_id, (string) $document['projectData'], $new_html, (string) $document['css']);
+        $saved = $this->repository->save_if_revision(
+            $document_id,
+            $expected_revision,
+            (string) $document['projectData'],
+            $new_html,
+            (string) $document['css'],
+            $informe_gate === null ? null : static function (array $guardado) use ($informe_gate) {
+                return $informe_gate;
+            }
+        );
         if (is_wp_error($saved)) {
             return $saved;
         }
-        return ['anchored' => $anchored, 'revision' => $saved['revision']];
+        return ['anchored' => $anchored, 'revision' => $saved['revision']] + $this->gate_extra($saved);
     }
 
     /**
@@ -1252,11 +1277,11 @@ final class COD_Canvas_MCP_Service
             return new WP_Error('cod_mcp_css_search_ambiguous', 'El texto buscado aparece ' . $count . ' veces; debe ser único para aplicar el reemplazo con seguridad.');
         }
         $new_css = str_replace($search, $replace, $css);
-        $saved = $this->repository->save($document_id, (string) $document['projectData'], (string) $document['html'], $new_css);
+        $saved = $this->guarded_save('cod_patch_css', $document_id, $expected_revision, (string) $document['projectData'], (string) $document['html'], $new_css);
         if (is_wp_error($saved)) {
             return $saved;
         }
-        return ['revision' => $saved['revision']];
+        return ['revision' => $saved['revision']] + $this->gate_extra($saved);
     }
 
     /**
@@ -1312,11 +1337,11 @@ final class COD_Canvas_MCP_Service
         if (is_wp_error($clean_css)) {
             return $clean_css;
         }
-        $saved = $this->repository->save($document_id, $clean_project, $clean_html, $clean_css);
+        $saved = $this->guarded_save('cod_write_canvas_document', $document_id, $expected_revision, $clean_project, $clean_html, $clean_css);
         if (is_wp_error($saved)) {
             return $saved;
         }
-        return ['revision' => $saved['revision']];
+        return ['revision' => $saved['revision']] + $this->gate_extra($saved);
     }
 
     /**
@@ -1396,11 +1421,11 @@ final class COD_Canvas_MCP_Service
             return $css;
         }
 
-        $saved = $this->repository->save($document_id, $project_data, $html, $css);
+        $saved = $this->guarded_save('cod_grapes_edit_node', $document_id, $expected_revision, $project_data, $html, $css);
         if (is_wp_error($saved)) {
             return $saved;
         }
-        return ['revision' => $saved['revision'], 'selector' => $selector];
+        return ['revision' => $saved['revision'], 'selector' => $selector] + $this->gate_extra($saved);
     }
 
     /** Busca `node` en ubicaciones comunes; no asume que esté en PATH bajo PHP-FPM. */
@@ -1514,11 +1539,11 @@ final class COD_Canvas_MCP_Service
         if (is_wp_error($project_json)) {
             return $project_json;
         }
-        $saved = $this->repository->save($document_id, $project_json, (string) $document['html'], (string) $document['css']);
+        $saved = $this->guarded_save('cod_sync_project_data', $document_id, $expected_revision, $project_json, (string) $document['html'], (string) $document['css']);
         if (is_wp_error($saved)) {
             return $saved;
         }
-        return ['revision' => $saved['revision'], 'synced' => true];
+        return ['revision' => $saved['revision'], 'synced' => true] + $this->gate_extra($saved);
     }
 
     /** @return array<string, mixed>|WP_Error */
@@ -1541,11 +1566,88 @@ final class COD_Canvas_MCP_Service
             return new WP_Error('cod_mcp_html_search_ambiguous', 'El texto buscado aparece ' . $count . ' veces; debe ser único para aplicar el reemplazo con seguridad.');
         }
         $new_html = str_replace($search, $replace, $html);
-        $saved = $this->repository->save($document_id, (string) $document['projectData'], $new_html, (string) $document['css']);
+        $saved = $this->guarded_save('cod_patch_html', $document_id, $expected_revision, (string) $document['projectData'], $new_html, (string) $document['css']);
         if (is_wp_error($saved)) {
             return $saved;
         }
-        return ['revision' => $saved['revision']];
+        return ['revision' => $saved['revision']] + $this->gate_extra($saved);
+    }
+
+    /**
+     * UNA SOLA entrada para preview y apply: los dos compilan por acá, así que no
+     * se pueden desalinear (lo que la previsualización acepta es lo que el apply
+     * acepta). Después de compilar, la compuerta del diseño revisa las reglas ya
+     * normalizadas y el contenido de nodos con color o medida propios.
+     *
+     * En `ratchet` compara contra la composición ya guardada del documento; si no
+     * hay (un parche crudo la vacía), todo literal cuenta como nuevo.
+     *
+     * @param array<string, mixed> $composition
+     * @param array<string, mixed> $design
+     * @return array<string, mixed>|WP_Error
+     */
+    private function compile_gated(array $composition, array $design, string $document_id)
+    {
+        $compiled = $this->compiler->compile($composition, $design);
+        if (is_wp_error($compiled) || !COD_ADN_Gate::activo()) {
+            return $compiled;
+        }
+        $base = null;
+        if (COD_ADN_Gate::modo() === 'ratchet') {
+            $guardada = $this->repository->read_composition($document_id);
+            if (is_array($guardada) && !empty($guardada['found']) && isset($guardada['design']['rules']) && is_array($guardada['design']['rules'])) {
+                $base = $guardada['design']['rules'];
+            }
+        }
+        $reglas = isset($compiled['designSnapshot']['rules']) && is_array($compiled['designSnapshot']['rules']) ? $compiled['designSnapshot']['rules'] : [];
+        $nodos = isset($composition['nodes']) && is_array($composition['nodes']) ? $composition['nodes'] : [];
+        $informe = COD_ADN_Gate::revisar_receta($reglas, $nodos, $base, $this->compiler->form_theme_types());
+        $resuelto = COD_ADN_Gate::resolver($informe);
+        if (is_wp_error($resuelto)) {
+            return $resuelto;
+        }
+        if (is_array($resuelto)) {
+            $compiled['adnGate'] = $resuelto;
+        }
+        return $compiled;
+    }
+
+    /**
+     * La ÚNICA vía por la que las herramientas crudas guardan. Toma la revisión
+     * esperada y la recompara DENTRO del bloqueo del documento, y corre ahí mismo la
+     * compuerta del diseño contra lo que hay guardado en ese instante.
+     *
+     * Ninguna herramienta de este servicio llama a repository->save() directo; una
+     * prueba lo comprueba, porque una vía sin compuerta es la vía que usa la IA.
+     *
+     * @return array<string, mixed>|WP_Error
+     */
+    private function guarded_save(string $tool, string $document_id, int $expected_revision, string $project_data, string $html, string $css)
+    {
+        $guard = null;
+        if (COD_ADN_Gate::activo()) {
+            $guard = static function (array $guardado) use ($tool, $project_data, $html, $css) {
+                $informe = COD_ADN_Gate::revisar_documento(
+                    $guardado,
+                    ['projectData' => $project_data, 'html' => $html, 'css' => $css],
+                    $tool
+                );
+                return COD_ADN_Gate::resolver($informe);
+            };
+        }
+        return $this->repository->save_if_revision($document_id, $expected_revision, $project_data, $html, $css, $guard);
+    }
+
+    /**
+     * Lo que la compuerta informa, para sumarlo a la respuesta. Vacío con la
+     * compuerta apagada: así `off` responde exactamente lo mismo que siempre.
+     *
+     * @param array<string, mixed> $resultado
+     * @return array<string, mixed>
+     */
+    private function gate_extra(array $resultado): array
+    {
+        return isset($resultado['adnGate']) && is_array($resultado['adnGate']) ? ['adnGate' => $resultado['adnGate']] : [];
     }
 
     /** @return array<string, mixed>|WP_Error */

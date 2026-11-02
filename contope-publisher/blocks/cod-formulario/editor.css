@@ -1,0 +1,18 @@
+/* Formulario: marcador de posición en el editor (el formulario real se ve en la página). */
+.wp-block-contope-formulario.cod-formulario-editor {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	padding: var(--wp--preset--spacing--40, 1rem);
+	background-color: color-mix(in srgb, currentColor 8%, transparent);
+}
+
+.cod-formulario-editor__titulo {
+	margin: 0;
+	font-weight: 600;
+}
+
+.cod-formulario-editor__detalle {
+	margin: 0;
+	opacity: 0.75;
+}

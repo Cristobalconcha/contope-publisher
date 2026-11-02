@@ -1,0 +1,27 @@
+/* Mapa de ubicación: vista previa en el editor (el runtime no corre acá). */
+.wp-block-contope-mapa.cod-mapa-editor {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	min-block-size: 12rem;
+	padding: var(--wp--preset--spacing--40, 1rem);
+	background-color: color-mix(in srgb, currentColor 8%, transparent);
+	text-align: center;
+}
+
+.cod-mapa-editor__pin {
+	inline-size: 2rem;
+	block-size: 2rem;
+}
+
+.cod-mapa-editor__titulo {
+	margin: 0;
+	font-weight: 600;
+}
+
+.cod-mapa-editor__detalle {
+	margin: 0;
+	opacity: 0.75;
+}

@@ -183,7 +183,14 @@ final class COD_MCP_Server
             return $this->tool_error($id, 'cod_mcp_invalid_arguments', 'arguments debe ser un objeto JSON.', $is_modern);
         }
 
-        $result = $this->service->call_tool($tool_name, $arguments);
+        // Mientras dura la llamada, la compuerta sabe que quien pide es el MCP: desde
+        // acá no se puede cambiar su modo (COD_ADN_Gate::set_modo lo rechaza).
+        COD_ADN_Gate::entrar_en_mcp();
+        try {
+            $result = $this->service->call_tool($tool_name, $arguments);
+        } finally {
+            COD_ADN_Gate::salir_de_mcp();
+        }
         if (is_wp_error($result)) {
             $details = $result->get_error_data();
             return $this->tool_error(

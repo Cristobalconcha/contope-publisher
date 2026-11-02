@@ -423,6 +423,69 @@ final class COD_Canvas_Document_Repository
     }
 
     /**
+     * Lo mismo que save(), para las herramientas MCP crudas (cod_patch_css,
+     * cod_patch_html, cod_write_canvas_document, cod_grapes_edit_node,
+     * cod_sync_project_data, cod_activate_section_whatsapp, cod_patch_geo_places).
+     *
+     * Dos cosas que save() no hace, las dos DENTRO del bloqueo del documento:
+     *
+     *  1. Vuelve a comparar la revisión. El servicio la comparaba en target(),
+     *     ANTES de tomar el bloqueo, y save() no la miraba: entre las dos cosas
+     *     otro proceso podía guardar, y esta escritura pisaba su resultado
+     *     sin saberlo (hallazgo H5 de la auditoría del 01-nov-2026).
+     *  2. Corre $guard con lo que hay guardado, ya con la revisión confirmada.
+     *     Es el lugar de la compuerta del diseño: lo que se compara contra lo
+     *     nuevo es exactamente lo que está en la base en este instante, no una
+     *     lectura vieja. Si el guard devuelve WP_Error no se escribe nada; si
+     *     devuelve un arreglo, se adjunta a la respuesta como `adnGate`.
+     *
+     * @param callable|null $guard function(array{projectData: string, html: string, css: string}): WP_Error|array|null
+     * @return array<string, mixed>|WP_Error
+     */
+    public function save_if_revision(string $document_id, int $expected_revision, string $project_data, string $html, string $css, ?callable $guard = null)
+    {
+        $post_id = $this->find_post_id($document_id);
+        if ($post_id === null) {
+            return new WP_Error('cod_canvas_document_not_found', 'No existe un documento Canvas con ese ID.');
+        }
+
+        return $this->with_document_lock($post_id, function () use ($document_id, $post_id, $expected_revision, $project_data, $html, $css, $guard) {
+            $actual_revision = (int) get_post_meta($post_id, self::META_REVISION, true);
+            if ($actual_revision !== $expected_revision) {
+                return $this->revision_conflict($expected_revision, $actual_revision);
+            }
+
+            $informe = null;
+            if ($guard !== null) {
+                $resultado = $guard([
+                    'projectData' => (string) get_post_meta($post_id, self::META_PROJECT_DATA, true),
+                    'html' => (string) get_post_meta($post_id, self::META_HTML, true),
+                    'css' => (string) get_post_meta($post_id, self::META_CSS, true),
+                ]);
+                if (is_wp_error($resultado)) {
+                    return $resultado;
+                }
+                $informe = is_array($resultado) ? $resultado : null;
+            }
+
+            $updated_at = gmdate('c');
+            // Ver la nota sobre wp_slash() en save().
+            update_post_meta($post_id, self::META_PROJECT_DATA, wp_slash($project_data));
+            update_post_meta($post_id, self::META_HTML, wp_slash($html));
+            update_post_meta($post_id, self::META_CSS, wp_slash($css));
+            update_post_meta($post_id, self::META_COMPOSITION, '');
+            update_post_meta($post_id, self::META_REVISION, $actual_revision + 1);
+            update_post_meta($post_id, self::META_UPDATED_AT, $updated_at);
+
+            $leido = $this->read($post_id, $document_id);
+            if ($informe !== null) {
+                $leido['adnGate'] = $informe;
+            }
+            return $leido;
+        });
+    }
+
+    /**
      * Persiste un resultado ya compilado por una receta semántica. Esta es la
      * única ruta de escritura MCP: exige una revisión exacta, crea el snapshot
      * del estado previo dentro del mismo bloqueo y jamás crea un documento por

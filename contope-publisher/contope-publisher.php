@@ -39,6 +39,9 @@ require_once COD_PUBLISHER_DIR . 'includes/class-cod-theme-builder-admin.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-inline-editor-frontend.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-theme-definitions.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-design-core.php';
+require_once COD_PUBLISHER_DIR . 'includes/class-cod-adn-registry.php';
+require_once COD_PUBLISHER_DIR . 'includes/class-cod-adn-gate.php';
+require_once COD_PUBLISHER_DIR . 'includes/class-cod-adn-gate-admin.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-settings-admin.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-site-package-exporter.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-site-package-importer.php';
@@ -62,6 +65,9 @@ require_once COD_PUBLISHER_DIR . 'includes/class-cod-catalogo.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-svg.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-block-lienzo.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-block-cuadrantes.php';
+require_once COD_PUBLISHER_DIR . 'includes/class-cod-block-formulario.php';
+require_once COD_PUBLISHER_DIR . 'includes/class-cod-block-mapa.php';
+require_once COD_PUBLISHER_DIR . 'includes/class-cod-block-whatsapp.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-medicion.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-migracion-nombres.php';
 
@@ -123,12 +129,17 @@ add_action('plugins_loaded', static function (): void {
     (new COD_Theme_Builder_Admin($canvas_repository, $canvas_publisher))->register();
     (new COD_Inline_Editor_Frontend($canvas_repository, $region_resolver))->register();
     (new COD_Settings_Admin())->register();
+    (new COD_ADN_Gate_Admin())->register();
     (new COD_Medicion())->register();
     (new COD_SVG())->register();
     (new COD_Iconos_Rest())->register();
     (new COD_Imagen_Progresiva())->register();
     (new COD_Block_Lienzo())->register();
     (new COD_Block_Cuadrantes())->register();
+    // Los tres bloques propios de Basis: formulario y mapa (WordPress no tiene familia equivalente) y WhatsApp (corresponde a core/button, ver su clase).
+    (new COD_Block_Formulario())->register();
+    (new COD_Block_Mapa())->register();
+    (new COD_Block_Whatsapp())->register();
     (new COD_Redes_Sociales())->register();
     (new COD_Mapa())->register();
 

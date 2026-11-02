@@ -1540,13 +1540,18 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 $normalized[$key] = $value[$key];
             }
         }
-        if (isset($value['fontWeight'])) {
+        if (isset($value['fontWeight']) && is_string($value['fontWeight']) && $this->is_registry_var($value['fontWeight'], false)) {
+            // Con la compuerta encendida, el peso puede ser un nombre del registro.
+            $normalized['fontWeight'] = $value['fontWeight'];
+        } elseif (isset($value['fontWeight'])) {
             if (!is_int($value['fontWeight']) || $value['fontWeight'] < 100 || $value['fontWeight'] > 900 || $value['fontWeight'] % 100 !== 0) {
                 return new WP_Error('cod_mcp_typography_rule_invalid', 'fontWeight debe estar entre 100 y 900 en pasos de 100.');
             }
             $normalized['fontWeight'] = $value['fontWeight'];
         }
-        if (isset($value['lineHeight'])) {
+        if (isset($value['lineHeight']) && is_string($value['lineHeight']) && $this->is_registry_var($value['lineHeight'], false)) {
+            $normalized['lineHeight'] = $value['lineHeight'];
+        } elseif (isset($value['lineHeight'])) {
             if ((!is_int($value['lineHeight']) && !is_float($value['lineHeight'])) || $value['lineHeight'] < 0.8 || $value['lineHeight'] > 3) {
                 return new WP_Error('cod_mcp_typography_rule_invalid', 'lineHeight debe estar entre 0.8 y 3.');
             }
@@ -7177,8 +7182,40 @@ final class COD_Canvas_MCP_Recipe_Compiler
         return is_string($value) && strpos($value, "\0") === false && (function_exists('mb_strlen') ? mb_strlen($value) : strlen($value)) <= $max_length;
     }
 
+    /**
+     * Con la compuerta del diseño encendida, una medida también puede ser una
+     * referencia a un nombre del registro: `var(--nombre)`, o `calc(-1 * var(--nombre))`
+     * donde se admite negativo. Con la compuerta apagada nada de esto existe y la
+     * validación es exactamente la de siempre.
+     */
+    private function is_registry_var(string $value, bool $allow_negative): bool
+    {
+        if (!COD_ADN_Gate::activo()) {
+            return false;
+        }
+        if (preg_match('/^var\((--[A-Za-z0-9_-]+)\)$/', $value, $m) === 1) {
+            return COD_ADN_Registry::tiene($m[1]);
+        }
+        return $allow_negative
+            && preg_match('/^calc\(\s*-1\s*\*\s*var\((--[A-Za-z0-9_-]+)\)\s*\)$/', $value, $m) === 1
+            && COD_ADN_Registry::tiene($m[1]);
+    }
+
+    /** @return array<string, string> clave → tipo (color, length, font, ratio, weight, shadow, keyword) de las variables de tema del formulario */
+    public function form_theme_types(): array
+    {
+        $tipos = [];
+        foreach ($this->form_theme_tokens() as $clave => $def) {
+            $tipos[(string) $clave] = (string) $def['type'];
+        }
+        return $tipos;
+    }
+
     private function is_css_length(string $value, bool $allow_negative = false): bool
     {
+        if ($this->is_registry_var($value, $allow_negative)) {
+            return true;
+        }
         if (preg_match('/^clamp\(([^,]+),([^,]+),([^\)]+)\)$/', $value, $matches) === 1) {
             return $this->is_css_length(trim($matches[1]), $allow_negative)
                 && $this->is_css_length(trim($matches[2]), $allow_negative)

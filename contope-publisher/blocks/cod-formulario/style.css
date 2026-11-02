@@ -1,0 +1,14 @@
+/*
+ * Formulario (contope/formulario).
+ *
+ * Sin colores, tipografías ni medidas propias: el diseño del formulario sale de
+ * las variables de su contrato (--ofr-*), que COD_Block_Formulario une con lo
+ * que el tema declara (settings.custom.form y los presets de color).
+ */
+.wp-block-contope-formulario {
+	max-inline-size: 100%;
+}
+
+.cod-formulario-aviso {
+	margin: 0;
+}

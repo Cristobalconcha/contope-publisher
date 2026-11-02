@@ -1,0 +1,58 @@
+/*
+ * Mapa de ubicación (contope/mapa).
+ *
+ * Complementa la hoja de la conducta «mapa» (COD_Canvas_Page_Publisher::mapa_css),
+ * que pone la estructura: qué se ve abierto o cerrado, el recuadro grande, la X.
+ * Aquí sólo está lo propio del bloque, y sin colores: el color, el borde y el
+ * radio los pone el diseño del sitio por los soportes de bloque; el recuadro del
+ * mapa toma los colores del sistema hasta entonces.
+ *
+ * Variables propias, opcionales:
+ *   --cod-mapa-alto             alto del mapa (lo escribe el bloque desde su atributo «alto»)
+ *   --contope-mapa-mini-alto    alto de la imagen del mapa cerrado        (12rem)
+ */
+.wp-block-contope-mapa {
+	/* El bloque llena su contenedor; la conducta lo topa a 80rem por omisión. */
+	--cod-mapa-ancho-maximo: none;
+	position: relative;
+	overflow: hidden;
+}
+
+/* El recuadro grande ocupa la caja del bloque, sin el margen que la conducta le da por omisión. */
+div.wp-block-contope-mapa > .cod-mapa__grande {
+	margin-block: 0;
+	max-inline-size: none;
+}
+
+/* El mini (la imagen de respaldo, o el enlace «cómo llegar» si no hay imagen) llena el bloque. */
+div.wp-block-contope-mapa > .cod-mapa__mini {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	inline-size: 100%;
+	block-size: var(--contope-mapa-mini-alto, 12rem);
+	box-sizing: border-box;
+	color: inherit;
+	text-align: center;
+}
+
+div.wp-block-contope-mapa > .cod-mapa__mini img {
+	display: block;
+	inline-size: 100%;
+	block-size: 100%;
+	object-fit: cover;
+}
+
+/* Mapa fijo: el mini mide lo mismo que el mapa que reemplaza. */
+div.wp-block-contope-mapa[data-cod-mapa-fijo="1"] > .cod-mapa__mini {
+	block-size: var(--cod-mapa-alto, 25rem);
+}
+
+/* Sin imagen de respaldo el enlace es sólo texto sobre una caja tenue del color del texto. */
+div.wp-block-contope-mapa > .cod-mapa__mini:not(:has(img)) {
+	background-color: color-mix(in srgb, currentColor 8%, transparent);
+}
+
+.cod-mapa-aviso {
+	margin: 0;
+}
