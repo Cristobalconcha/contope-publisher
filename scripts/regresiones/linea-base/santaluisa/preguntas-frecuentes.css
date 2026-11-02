@@ -1,0 +1,1472 @@
+/* ==== {{BASE}}/wp-content/plugins/contope-publisher/assets/css/cod-canvas-base.css?ver=0.3.82 ==== */
+/* Generado por scripts/generar-css-base.php desde
+ * COD_Canvas_MCP_Recipe_Compiler::base_styles(). No editar a mano:
+ * la fuente es esa función y `probar-css-base.php` comprueba que
+ * coincidan. */
+
+.cod-mcp-page{color:var(--cod-color-ink);background-color:var(--cod-color-surface);line-height:1.5;}
+.cod-mcp-page *{box-sizing:border-box;}
+.cod-mcp-page img,.cod-mcp-page video,.cod-mcp-page audio{display:block;max-width:100%;height:auto;}
+.cod-section{width:100%;padding:48px 24px;position:relative;}
+.cod-columns{display:grid;grid-template-columns:minmax(0,1fr);gap:24px;width:100%;}
+.cod-column{min-width:0;}
+.cod-group{display:grid;gap:16px;}
+.cod-node--layout{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;}
+.cod-node--gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;}
+.cod-mcp-gallery__item{margin:0;min-width:0;overflow:hidden;}
+.cod-mcp-gallery__item img{width:100%;height:100%;object-fit:cover;}
+.cod-mcp-gallery__item video,.cod-mcp-gallery__item figure{width:100%;height:100%;margin:0;}
+.cod-mcp-gallery__item video{object-fit:cover;display:block;}
+.cod-video--pendiente{display:flex;align-items:center;justify-content:center;width:100%;aspect-ratio:16/9;background-color:rgba(0,0,0,0.06);opacity:.75;font-size:.8em;letter-spacing:.06em;text-transform:uppercase;}
+.cod-rot-180{transform:rotate(180deg);}
+.cod-marco-girado{position:relative;overflow:hidden;container-type:size;}
+.cod-marco-girado>.cod-rot-90,.cod-marco-girado>.cod-rot-270{position:absolute;top:50%;left:50%;width:100cqh;height:100cqw;max-width:none;object-fit:cover;}
+.cod-marco-girado>.cod-rot-90{transform:translate(-50%,-50%) rotate(90deg);}
+.cod-marco-girado>.cod-rot-270{transform:translate(-50%,-50%) rotate(270deg);}
+@supports not (width:100cqh){.cod-marco-girado>.cod-rot-90,.cod-marco-girado>.cod-rot-270{position:static;width:100%;height:auto;transform:rotate(90deg);}}
+.cod-mcp-gallery__controls{grid-column:1/-1;display:flex;gap:8px;}
+.cod-mcp-lightbox{display:none;position:fixed;inset:0;z-index:9999;padding:32px;background-color:rgba(0,0,0,.86);align-items:center;justify-content:center;gap:12px;}
+.cod-mcp-lightbox.is-open{display:flex;}
+.cod-mcp-lightbox img{max-width:min(80vw,1100px);max-height:80vh;}
+.cod-node--table{overflow-x:auto;}
+.cod-node--table table{border-collapse:collapse;width:100%;}
+.cod-node--table th,.cod-node--table td{padding:.75rem;text-align:start;}
+.cod-button{display:inline-flex;align-items:center;justify-content:center;padding:.75rem 1.25rem;text-decoration:none;}
+@media(max-width:767px){.cod-section{padding:32px 16px;}.cod-node--layout,.cod-node--gallery{grid-template-columns:minmax(0,1fr);}}
+
+/* ==== {{BASE}}/wp-content/uploads/contope-disenos/santaluisa-web-e69b0bc9ee3f.css ==== */
+/* Hoja del diseño «santaluisa-web». La escribe COD_Diseno_Hoja al
+ * aplicar una composición; no se edita a mano. */
+.cod-rule--sl-wrap{max-width:var(--max-width);margin-inline-start:auto;margin-inline-end:auto;padding-inline-start:24px;padding-inline-end:24px;}
+:where(.cod-rule--sl-banda-oliva){position:relative;}
+.cod-rule--sl-banda-oliva{background-color:var(--oliva-700);color:var(--tierra-50);}
+.cod-rule--sl-banda-aire{padding-block-start:125px;padding-block-end:70px;padding-inline-start:0;padding-inline-end:0;margin-block-start:-69px;}
+.cod-rule--sl-rotulo{font-family:var(--font-body);font-size:11px;font-weight:500;line-height:1;letter-spacing:0.12em;text-transform:uppercase;}
+.cod-rule--sl-rotulo-color{--cod-color-rotulo:var(--dorado-600);color:var(--dorado-600);}
+.cod-rule--sl-rotulo-aire{margin-block-start:0;margin-block-end:6px;}
+.cod-rule--sl-titulo-script{font-family:var(--font-hero);font-size:clamp(40px, 5vw, 58px);font-weight:400;line-height:1;}
+.cod-rule--sl-titulo-script-caja{display:block;}
+.cod-rule--sl-titulo-caps{font-family:var(--font-body);font-size:clamp(26px, 3.4vw, 36px);font-weight:700;line-height:1.05;letter-spacing:0.01em;text-transform:uppercase;}
+.cod-rule--sl-titulo-caps-encaje{display:block;margin-block-start:-10px;}
+.cod-rule--sl-titulo-claro{--cod-color-titulo:#FFFFFF;color:#FFFFFF;}
+.cod-rule--sl-titulo-aire{margin-block-start:0;margin-block-end:18px;}
+.cod-rule--sl-titulo-portada{font-family:var(--font-body);font-size:clamp(38px, 5.4vw, 68px);font-weight:700;line-height:1.02;letter-spacing:0.01em;text-transform:uppercase;}
+.cod-rule--sl-titulo-portada-llana{font-family:var(--font-body);font-size:clamp(26px, 2.8vw, 32px);font-weight:700;line-height:1.05;}
+.cod-rule--sl-titulo-seccion-llana{font-family:var(--font-body);font-size:clamp(20px, 2.1vw, 24px);font-weight:700;line-height:1.05;}
+.cod-rule--sl-titulo-recuadro-script{font-family:var(--font-hero);font-size:clamp(32px, 3.8vw, 44px);font-weight:400;line-height:1;}
+.cod-rule--sl-titulo-recuadro{font-family:var(--font-body);font-size:clamp(20px, 2.4vw, 26px);font-weight:700;line-height:1.05;letter-spacing:0.01em;text-transform:uppercase;}
+.cod-rule--sl-titulo-recuadro-llana{font-family:var(--font-body);font-size:clamp(16px, 1.6vw, 18px);font-weight:700;line-height:1.1;}
+.cod-rule--sl-cuerpo{font-size:15px;line-height:1.5;max-width:480px;}
+.cod-rule--sl-cuerpo-color{--cod-color-cuerpo:var(--tierra-100);color:var(--tierra-100);}
+.cod-rule--sl-cuerpo-aire{margin-block-start:0;margin-block-end:20px;}
+.cod-rule--sl-btn{display:inline-flex;align-items:center;justify-content:center;column-gap:8px;font-size:12.5px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;text-decoration-line:none;padding-top:13px;padding-right:26px;padding-bottom:13px;padding-left:26px;border-top-left-radius:999px;border-top-right-radius:999px;border-bottom-right-radius:999px;border-bottom-left-radius:999px;border-top-width:1px;border-right-width:1px;border-bottom-width:1px;border-left-width:1px;border-top-style:solid;border-right-style:solid;border-bottom-style:solid;border-left-style:solid;cursor:pointer;white-space:nowrap;}
+.cod-rule--sl-btn-primario{background-color:var(--dorado-600);color:#2B2210;border-top-color:var(--dorado-600);border-right-color:var(--dorado-600);border-bottom-color:var(--dorado-600);border-left-color:var(--dorado-600);}
+.cod-rule--sl-btn-secundario{background-color:transparent;color:var(--oliva-700);border-top-color:var(--oliva-500);border-right-color:var(--oliva-500);border-bottom-color:var(--oliva-500);border-left-color:var(--oliva-500);}
+.cod-rule--sl-enlace-flecha{font-size:13px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;text-decoration-line:none;color:var(--oliva-700);border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--dorado-600);padding-bottom:3px;display:inline-block;}
+.cod-rule--sl-btn-foco:focus{outline-width:2px;outline-style:solid;outline-color:var(--dorado-600);outline-offset:3px;}
+:where(.cod-rule--sl-pie){position:relative;}
+.cod-rule--sl-pie{background-color:#2A2C22;color:var(--tierra-300);}
+.cod-rule--sl-pie-aire{padding-block-start:28px;padding-block-end:28px;text-align:center;}
+.cod-rule--sl-pie-texto{font-size:12px;line-height:1.5;text-align:center;}
+.cod-rule--sl-pie-enlace{display:inline-block;padding-block-start:13px;padding-block-end:13px;color:inherit;text-decoration-line:underline;cursor:pointer;}
+:where(.cod-rule--sl-legal-pagina){position:relative;}
+.cod-rule--sl-legal-pagina{background-color:#F5F0EB;}
+.cod-rule--sl-legal-aire{padding-block-start:80px;padding-block-end:80px;padding-inline-start:24px;padding-inline-end:24px;}
+.cod-rule--sl-legal-hoja{max-width:704px;margin-inline-start:auto;margin-inline-end:auto;}
+.cod-rule--sl-legal-marca{font-size:11px;line-height:1.5;}
+.cod-rule--sl-legal-marca-aire{margin-block-start:11px;margin-block-end:11px;}
+.cod-rule--sl-legal-titulo-aire{margin-block-start:21px;margin-block-end:21px;}
+.cod-rule--sl-legal-nota{font-size:13px;line-height:1.5;}
+.cod-rule--sl-legal-nota-aire{margin-block-start:13px;margin-block-end:13px;}
+.cod-rule--sl-legal-entrada{font-size:17.5px;line-height:1.6;}
+.cod-rule--sl-legal-entrada-aire{margin-block-start:17px;margin-block-end:17px;}
+.cod-rule--sl-legal-tema-aire{margin-block-start:40px;margin-block-end:8px;}
+.cod-rule--sl-legal-lista{max-width:760px;margin-block-start:10px;margin-block-end:28px;}
+.cod-rule--sl-legal-parrafo{font-size:13.5px;line-height:1.5;max-width:620px;}
+.cod-rule--sl-legal-parrafo-aire{margin-block-start:12px;margin-block-end:0;}
+:where(.cod-rule--sl-legal-banda-clara){position:relative;}
+.cod-rule--sl-legal-banda-clara{background-color:#FFFFFF;}
+.cod-rule--sl-legal-aire-hasta-la-onda{padding-block-start:80px;padding-block-end:0;padding-inline-start:24px;padding-inline-end:24px;}
+.cod-rule--sl-legal-aire-tras-la-onda{padding-block-start:8px;padding-block-end:80px;padding-inline-start:24px;padding-inline-end:24px;}
+.cod-rule--sl-legal-aire-con-onda{padding-block-start:24px;padding-block-end:24px;padding-inline-start:24px;padding-inline-end:24px;}
+.cod-rule--sl-texto-oliva{--cod-color-cuerpo:var(--oliva-700);color:var(--oliva-700);}
+.cod-rule--sl-pie-linea{display:flex;flex-wrap:wrap;justify-content:center;align-items:baseline;column-gap:6px;row-gap:2px;}
+.cod-rule--sl-wa-ventana{background-color:#FFFFFF;border-top-left-radius:16px;border-top-right-radius:16px;border-bottom-right-radius:16px;border-bottom-left-radius:16px;box-shadow:0 18px 48px rgba(0,0,0,0.28);color:var(--oliva-700);}
+.cod-rule--sl-wa-cabecera{display:flex;align-items:center;column-gap:10px;padding-top:12px;padding-right:12px;padding-bottom:12px;padding-left:16px;background-color:var(--oliva-700);color:var(--tierra-50);}
+.cod-rule--sl-wa-nombre{font-size:14px;font-weight:600;line-height:1.2;}
+.cod-rule--sl-wa-estado{font-size:11.5px;line-height:1.3;}
+.cod-rule--sl-wa-cerrar{margin-inline-start:auto;color:var(--tierra-50);cursor:pointer;background-color:transparent;text-decoration-line:none;font-size:12px;white-space:nowrap;padding-top:4px;padding-right:4px;padding-bottom:4px;padding-left:4px;}
+.cod-rule--sl-wa-cuerpo{padding-top:16px;padding-right:16px;padding-bottom:8px;padding-left:16px;}
+.cod-rule--sl-wa-saludo{font-size:13.5px;line-height:1.45;}
+.cod-rule--sl-wa-pie{display:grid;row-gap:10px;justify-items:stretch;padding-top:8px;padding-right:16px;padding-bottom:16px;padding-left:16px;}
+.cod-rule--sl-wa-nota{font-size:11px;line-height:1.35;}
+.cod-rule--sl-wa-enviar{justify-content:center;background-color:#128C7E;color:#FFFFFF;padding-top:10px;padding-right:14px;padding-bottom:10px;padding-left:14px;border-top-left-radius:999px;border-top-right-radius:999px;border-bottom-right-radius:999px;border-bottom-left-radius:999px;text-decoration-line:none;cursor:pointer;white-space:nowrap;}
+.cod-rule--sl-acordeon-pliegue{padding-block-start:8px;padding-block-end:8px;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--dorado-600);}
+.cod-rule--sl-acordeon-pregunta{font-size:14.5px;font-weight:700;line-height:1.5;}
+.cod-rule--sl-acordeon-pregunta-caja{padding-block-start:8px;padding-block-end:8px;margin-block-start:0;margin-block-end:0;}
+.cod-rule--sl-acordeon-sin-hueco{row-gap:0;}
+.cod-node-id-terminos :is([data-cod-acordeon-rol="item"], .wp-block-accordion-item){padding-block-start:8px;padding-block-end:8px;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--dorado-600);}
+.cod-node-id-privacidad :is([data-cod-acordeon-rol="item"], .wp-block-accordion-item){padding-block-start:8px;padding-block-end:8px;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--dorado-600);}
+:where(.cod-rule--sl-contacto-foto){position:relative;}
+.cod-rule--sl-contacto-foto{background-color:var(--oliva-700);color:var(--tierra-50);background-image:url("/wp-content/uploads/2026/09/contacto-mesa-firma.webp");background-repeat:no-repeat;background-position:center;background-size:650px auto;}
+.cod-rule--sl-contacto-foto-sitio{background-position:calc((100vw - 1180px) / 2 + 831px) top;}
+@media(min-width:768px) and (max-width:1023px){.cod-rule--sl-contacto-foto-fuera{background-image:none;}}
+@media(max-width:767px){.cod-rule--sl-contacto-foto-fuera-movil{background-image:none;}}
+.cod-rule--sl-contacto-grid{gap:48px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:flex-start;}
+@media(max-width:767px){.cod-rule--sl-contacto-grid{gap:48px;display:grid;grid-template-columns:minmax(0,1fr);align-items:flex-start;}}
+@media(min-width:768px) and (max-width:1023px){.cod-rule--sl-contacto-grid-tablet{gap:48px;display:grid;grid-template-columns:minmax(0,1fr);align-items:flex-start;}}
+.cod-rule--sl-dato{font-size:13.5px;line-height:1.5;}
+.cod-rule--sl-dato-linea{min-height:44px;display:block;padding-block-start:10px;padding-block-end:10px;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:rgba(255,255,255,0.15);}
+.cod-rule--sl-dato-enlace{font-weight:700;color:inherit;text-decoration-line:none;}
+.cod-rule--sl-columna-form{gap:12px;display:grid;grid-template-columns:minmax(0,1fr);align-items:flex-start;}
+.cod-rule--sl-form-intro{text-shadow:0 1px 6px rgba(0,0,0,0.55);margin-block-start:16px;margin-block-end:16px;}
+.cod-rule--sl-form{--ofr-color-text:var(--oliva-700);--ofr-color-text-muted:var(--tierra-500);--ofr-color-bg:#FFFFFF;--ofr-color-surface:var(--tierra-50);--ofr-color-surface-alt:var(--tierra-100);--ofr-color-border:var(--tierra-300);--ofr-color-border-strong:var(--tierra-500);--ofr-color-primary:var(--dorado-600);--ofr-color-primary-hover:var(--dorado-500);--ofr-color-primary-contrast:#2B2210;--ofr-font:var(--font-body);--ofr-radius:10px;--ofr-space-md:16px;}
+.cod-rule--sl-form .ofr-form{--ofr-color-text:var(--oliva-700);--ofr-color-text-muted:var(--tierra-500);--ofr-color-bg:#FFFFFF;--ofr-color-surface:var(--tierra-50);--ofr-color-surface-alt:var(--tierra-100);--ofr-color-border:var(--tierra-300);--ofr-color-border-strong:var(--tierra-500);--ofr-color-primary:var(--dorado-600);--ofr-color-primary-hover:var(--dorado-500);--ofr-color-primary-contrast:#2B2210;--ofr-font:var(--font-body);--ofr-radius:10px;--ofr-space-md:16px;}
+.cod-rule--sl-tarjeta{background-color:#FFFFFF;border-top-left-radius:16px;border-top-right-radius:16px;border-bottom-right-radius:16px;border-bottom-left-radius:16px;padding-top:32px;padding-right:32px;padding-bottom:32px;padding-left:32px;box-shadow:0 8px 24px rgba(0,0,0,0.12);}
+:where(.cod-rule--sl-faq-fondo){position:relative;}
+.cod-rule--sl-faq-fondo{background-image:url("/wp-content/uploads/open-codesign/galeria-camino.jpg");background-repeat:no-repeat;background-position:center;background-size:cover;}
+.cod-rule--sl-faq-marco{max-width:var(--max-width);margin-inline-start:auto;margin-inline-end:auto;padding-block-start:40px;padding-block-end:108px;padding-inline-start:24px;padding-inline-end:24px;position:relative;}
+.cod-rule--sl-faq-tarjeta{background-color:var(--tierra-50);padding-top:48px;padding-right:56px;padding-bottom:52px;padding-left:56px;margin-block-start:48px;margin-block-end:48px;margin-inline-start:56px;margin-inline-end:283px;border-top-left-radius:20px;border-top-right-radius:20px;border-bottom-right-radius:20px;border-bottom-left-radius:20px;position:relative;}
+@media(min-width:768px) and (max-width:1023px){.cod-rule--sl-faq-tarjeta-angosta{margin-inline-start:0;margin-inline-end:0;padding-right:28px;padding-left:28px;}}
+@media(max-width:767px){.cod-rule--sl-faq-tarjeta-movil{margin-inline-start:0;margin-inline-end:0;padding-top:32px;padding-right:20px;padding-bottom:32px;padding-left:20px;}}
+.cod-rule--sl-faq-persona{position:absolute;bottom:-155px;right:130px;z-index:3;}
+.cod-rule--sl-faq-persona-medida{width:295px;height:auto;}
+@media(min-width:768px) and (max-width:1023px){.cod-rule--sl-faq-persona-fuera{display:none;}}
+@media(max-width:767px){.cod-rule--sl-faq-persona-fuera-movil{display:none;}}
+.cod-rule--sl-faq-encabezado{padding-block-end:28px;}
+.cod-rule--sl-faq-bajada-medida{font-size:15px;line-height:1.5;max-width:560px;}
+.cod-rule--sl-faq-lista{padding-inline-end:130px;}
+@media(min-width:768px) and (max-width:1023px){.cod-rule--sl-faq-lista-angosta{padding-inline-end:0;}}
+@media(max-width:767px){.cod-rule--sl-faq-lista-movil{padding-inline-end:0;}}
+.cod-rule--sl-faq-respuesta{font-size:13.5px;line-height:1.5;}
+.cod-rule--sl-faq-respuesta-aire{margin-block-start:12px;}
+.cod-rule--sl-faq-cta{padding-top:26px;padding-right:26px;padding-bottom:26px;padding-left:26px;margin-block-start:34px;border-top-left-radius:16px;border-top-right-radius:16px;border-bottom-right-radius:16px;border-bottom-left-radius:16px;background-color:var(--dorado-50);}
+.cod-rule--sl-faq-cta-texto{font-size:13.5px;font-weight:600;line-height:1.5;}
+.cod-rule--sl-faq-cta-aire{margin-block-end:14px;}
+.cod-rule--sl-titulo-caps-caja{display:block;}
+.cod-node-id-faq-lista :is([data-cod-acordeon-rol="item"], .wp-block-accordion-item){padding-block-start:8px;padding-block-end:8px;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--dorado-600);}
+.cod-node-id-faq-lista :is([data-cod-acordeon-rol="resumen"], .wp-block-accordion-heading__toggle){font-size:14.5px;font-weight:700;line-height:1.5;}
+.cod-node-id-faq-lista :is([data-cod-acordeon-rol="resumen"], .wp-block-accordion-heading__toggle){--cod-color-cuerpo:var(--oliva-700);color:var(--oliva-700);}
+.cod-rule--sl-seccion-caja{max-width:var(--max-width);margin-inline-start:auto;margin-inline-end:auto;padding-inline-start:24px;padding-inline-end:24px;padding-block-start:48px;padding-block-end:56px;}
+.cod-rule--sl-seccion-seguida{max-width:var(--max-width);margin-inline-start:auto;margin-inline-end:auto;padding-inline-start:24px;padding-inline-end:24px;padding-block-start:8px;padding-block-end:64px;}
+.cod-rule--sl-cuerpo-tierra{--cod-color-cuerpo-suave:var(--slp-tierra-700);color:var(--slp-tierra-700);}
+.cod-rule--sl-apertura-grid{display:grid;grid-template-columns:minmax(0, 364px) minmax(0, 1fr);column-gap:40px;row-gap:40px;align-items:center;}
+@media(min-width:768px) and (max-width:1023px){.cod-rule--sl-apertura-grid-angosto{grid-template-columns:minmax(0, 1fr);}}
+@media(max-width:767px){.cod-rule--sl-apertura-grid-movil{grid-template-columns:minmax(0, 1fr);}}
+.cod-rule--sl-foto-marco{border-top-left-radius:20px;border-top-right-radius:20px;border-bottom-right-radius:20px;border-bottom-left-radius:20px;overflow:hidden;box-shadow:0 18px 44px rgba(60,50,20,0.16);}
+.cod-rule--sl-foto-apaisada img,.cod-rule--sl-foto-apaisada video,.cod-rule--sl-foto-apaisada canvas{aspect-ratio:3/2;object-fit:cover;}
+.cod-rule--sl-foto-cuadrada img,.cod-rule--sl-foto-cuadrada video,.cod-rule--sl-foto-cuadrada canvas{aspect-ratio:4/3;object-fit:cover;}
+:where(.cod-rule--sl-pilares-banda){position:relative;}
+.cod-rule--sl-pilares-banda{background-color:#FFFFFF;}
+.cod-rule--sl-pilares-aire{padding-block-start:56px;padding-block-end:56px;padding-inline-start:0;padding-inline-end:0;}
+.cod-rule--sl-pilares-intro{max-width:640px;margin-inline-start:auto;margin-inline-end:auto;margin-block-end:40px;text-align:center;}
+.cod-rule--sl-pilares-grid{display:grid;grid-template-columns:repeat(4, minmax(0, 1fr));column-gap:1px;row-gap:1px;background-color:var(--tierra-100);border-top-left-radius:20px;border-top-right-radius:20px;border-bottom-right-radius:20px;border-bottom-left-radius:20px;overflow:hidden;box-shadow:0 18px 44px rgba(60,50,20,0.1);}
+@media(min-width:768px) and (max-width:1023px){.cod-rule--sl-pilares-grid-tablet{grid-template-columns:repeat(2, minmax(0, 1fr));}}
+@media(max-width:767px){.cod-rule--sl-pilares-grid-movil{grid-template-columns:minmax(0, 1fr);}}
+.cod-rule--sl-pilar{background-color:#FFFFFF;padding-top:34px;padding-right:26px;padding-bottom:34px;padding-left:26px;text-align:center;}
+.cod-rule--sl-pilar-titulo{font-size:13px;font-weight:800;line-height:1.5;letter-spacing:0.06em;text-align:center;text-transform:uppercase;}
+.cod-rule--sl-pilar-titulo-aire{margin-block-start:0;margin-block-end:8px;}
+.cod-rule--sl-pilar-cuerpo{font-size:13px;line-height:1.5;text-align:center;}
+.cod-rule--sl-bloque-oliva{display:grid;grid-template-columns:minmax(0, 0.87fr) minmax(0, 1fr);background-color:var(--oliva-700);border-top-left-radius:20px;border-top-right-radius:20px;border-bottom-right-radius:20px;border-bottom-left-radius:20px;overflow:hidden;box-shadow:0 18px 44px rgba(60,50,20,0.16);align-items:center;}
+@media(min-width:768px) and (max-width:1023px){.cod-rule--sl-bloque-oliva-angosto{grid-template-columns:minmax(0, 1fr);}}
+@media(max-width:767px){.cod-rule--sl-bloque-oliva-movil{grid-template-columns:minmax(0, 1fr);}}
+.cod-rule--sl-bloque-oliva-texto{padding-top:40px;padding-right:44px;padding-bottom:40px;padding-left:44px;}
+.cod-rule--sl-foto-alta img,.cod-rule--sl-foto-alta video,.cod-rule--sl-foto-alta canvas{aspect-ratio:4/3;object-fit:cover;}
+.cod-rule--sl-proyecto-grid{gap:48px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:center;}
+@media(max-width:767px){.cod-rule--sl-proyecto-grid{gap:32px;display:grid;grid-template-columns:minmax(0,1fr);align-items:center;}}
+@media(min-width:768px) and (max-width:1023px){.cod-rule--sl-proyecto-grid-tablet{gap:32px;display:grid;grid-template-columns:minmax(0,1fr);align-items:flex-start;}}
+.cod-rule--sl-galeria{display:block;}
+.cod-rule--sl-galeria .cod-carousel__track{display:flex;overflow-x:auto;gap:12px;scroll-snap-type:x mandatory;}
+.cod-rule--sl-galeria .cod-carousel__track .cod-mcp-gallery__item{flex:0 0 calc((100% - 3*12px)/4);scroll-snap-align:start;}
+@media(max-width:767px){.cod-rule--sl-galeria .cod-carousel__track .cod-mcp-gallery__item{flex-basis:calc((100% - 0*12px)/1);}}
+.cod-rule--sl-galeria-aire{margin-block-start:32px;}
+.cod-rule--sl-galeria-leyenda{font-size:11.5px;font-weight:600;line-height:1.5;}
+.cod-rule--sl-galeria-leyenda-color{--cod-color-leyenda:var(--slp-tierra-700);color:var(--slp-tierra-700);}
+.cod-rule--sl-galeria-leyenda-aire{margin-block-start:10px;margin-inline-start:2px;margin-block-end:0;}
+.cod-rule--sl-galeria-foto{border-top-left-radius:14px;border-top-right-radius:14px;border-bottom-right-radius:14px;border-bottom-left-radius:14px;overflow:hidden;}
+.cod-rule--sl-galeria-flecha{min-width:44px;min-height:44px;background-color:#FFFFFF;color:var(--oliva-700);border-top-left-radius:50%;border-top-right-radius:50%;border-bottom-right-radius:50%;border-bottom-left-radius:50%;box-shadow:0 6px 16px rgba(40,35,20,0.18);cursor:pointer;font-size:20px;line-height:1;}
+.cod-rule--sl-galeria-flechas{display:flex;justify-content:center;column-gap:12px;margin-block-start:16px;}
+:where(.cod-rule--sl-cierre){position:relative;}
+.cod-rule--sl-cierre{background-color:var(--oliva-700);color:var(--tierra-50);}
+.cod-rule--sl-cierre-aire{padding-block-start:40px;padding-block-end:40px;padding-inline-start:24px;padding-inline-end:24px;text-align:center;}
+.cod-rule--sl-cierre-linea{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;column-gap:20px;row-gap:14px;}
+.cod-rule--sl-titulo-script-encaje{display:block;margin-block-start:-10px;}
+.cod-node-id-infra-galeria figcaption{font-size:11.5px;font-weight:600;line-height:1.5;}
+.cod-node-id-infra-galeria figcaption{--cod-color-leyenda:var(--slp-tierra-700);color:var(--slp-tierra-700);}
+.cod-node-id-infra-galeria figcaption{margin-block-start:10px;margin-inline-start:2px;margin-block-end:0;}
+.cod-node-id-infra-galeria .cod-mcp-gallery__item{border-top-left-radius:14px;border-top-right-radius:14px;border-bottom-right-radius:14px;border-bottom-left-radius:14px;overflow:hidden;}
+.cod-node-id-infra-galeria .cod-mcp-gallery__controls{display:flex;justify-content:center;column-gap:12px;margin-block-start:16px;}
+.cod-node-id-infra-galeria .cod-mcp-gallery__controls button{min-width:44px;min-height:44px;background-color:#FFFFFF;color:var(--oliva-700);border-top-left-radius:50%;border-top-right-radius:50%;border-bottom-right-radius:50%;border-bottom-left-radius:50%;box-shadow:0 6px 16px rgba(40,35,20,0.18);cursor:pointer;font-size:20px;line-height:1;}
+
+/* ==== {{BASE}}/wp-content/plugins/cookieadmin/assets/css/consent.css?ver=1.2.6 ==== */
+:root {
+	--cookieadmin-primary-color: #001d39;
+	--cookieadmin-primary-hover-color: #985e23;
+	
+	--cookieadmin-secondary-color: #0046b2;
+	--cookieadmin-secondary-hover-color: #0065ff;
+	
+	--cookieadmin-txcolor: #0f172a;
+	
+	--cookieadmin-green-txtcolor: #3a8356;
+	--cookieadmin-warning-txtcolor: #9c7930;
+	--cookieadmin-red-txtcolor: #b55355;
+	
+	--cookieadmin-green-color: #15a448;
+	--cookieadmin-warning-color: #e9b306;
+	--cookieadmin-red-color: #dd2727;
+}
+
+/* Typography baseline for the banner, modal and reconsent button. Everything inside
+   inherits from these roots instead of the theme's body (font, fluid size, line-height,
+   color, letter-spacing). Any explicit value here beats inheritance, whatever the theme's specificity. */
+.cookieadmin_law_container,
+.cookieadmin_cookie_modal,
+.cookieadmin_reconsent_wrap{
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+	font-size: 16px;
+	font-weight: 400;
+	font-style: normal;
+	line-height: 1.5;
+	letter-spacing: normal;
+	word-spacing: normal;
+	text-transform: none;
+	text-align: left;
+	color: #1f2937;
+}
+
+/*  Consent page css */
+
+.cookieadmin_cookie_modal label, .cookieadmin_cookie_modal input {
+	padding: 5px;
+	margin-right: 5px;
+	font-size: 15px;
+}
+
+.cookieadmin_cookie_modal label{
+	font-weight: 501;
+}
+
+.cookieadmin_bottom{
+	bottom:20px;
+}
+
+.cookieadmin_top{
+	top: 20px;
+}
+
+.cookieadmin_right{
+	right: 15px;
+}
+
+.cookieadmin_left{
+	left:15px;
+}
+
+
+ 
+/* Modal animations  */
+@keyframes cookieadmin_slideUp {
+	from {
+		transform: translateY(100%);
+		opacity: 0;
+	}
+	to {
+		transform: translateY(0);
+		opacity: 1;
+	}
+}
+
+@keyframes cookieadmin_slideSide {
+	from {
+		transform: translateX(-100%);
+		opacity: 0;
+	}
+	to {
+		transform: translateX(0);
+		opacity: 1;
+	}
+}
+
+/* Modal animations Ends */
+
+
+/* Consent page css End*/
+
+
+/* Website consent box  */
+
+.cookieadmin_law_container{
+	position: fixed;
+	width: 25%;
+	box-sizing: border-box;
+	z-index: 99999;
+	display: none;
+}
+
+.cookieadmin_law_container:focus{
+	outline: none;
+}
+
+.cookieadmin_consent_btns{
+	align-content: center;
+	display: flex;
+	justify-content: space-evenly;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+/* Percentage widths below stay; the cap stops the box growing on very wide screens */
+.cookieadmin_box{
+	/*position: fixed;*/
+	width: 25%;
+	max-width: 440px;
+	box-sizing: border-box;
+	display: none;
+}
+
+.cookieadmin_notice_group{
+	display: flex;
+	flex-direction: column;
+	gap: 10px; /* spacing between content and buttons */
+	align-items: flex-start;
+}
+
+
+.cookieadmin_consent_inside{
+	color: #1f2937;
+	background-color: #ffffff;
+	border: 1px solid #ffffff;
+	padding:15px;
+	border-radius: 4px;
+	box-shadow:1px 3px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Title and notice are <p>s: scoped by ID so theme paragraph sizes/margins don't apply.
+   No side padding, so text lines up with the buttons and links. */
+.cookieadmin_law_container p#cookieadmin_notice_title{
+	margin: 0 0 6px;
+	padding: 0;
+	font-size: 16px;
+	font-weight: 700;
+	line-height: 1.4;
+}
+
+.cookieadmin_law_container p#cookieadmin_notice{
+	margin: 0;
+	padding: 0;
+	font-size: 14px;
+	line-height: 22px;
+}
+
+.cookieadmin_notice_con{
+	padding: 0;
+	flex: 1;
+}
+
+/* Box layout: space between the notice and the buttons (footer layout uses the group's gap) */
+.cookieadmin_consent_inside > .cookieadmin_consent_btns{
+	margin-top: 12px;
+}
+
+.cookieadmin_cookie_modal{
+	display: none;
+	flex-direction: column;
+	position: fixed;
+	max-height: 80vh;
+	background-color: #FFFFFF;
+	border: 1px solid #F4F4F4;
+	border-radius: 8px;
+	box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+	z-index: 999999;
+}
+
+.cookieadmin_center{
+	top: 10%;
+	left: 22%;
+	max-width: 60vw;
+}
+
+.cookieadmin_side{
+	flex-direction: column;
+	position: fixed;
+	width: 35vw;
+	bottom: 0px;
+	animation: 0.5s ease-out forwards cookieadmin_slideSide;
+	max-height: 100vh;
+	left: 0px;
+	top: 0px;
+	border-radius: 0px;
+}
+
+.cookieadmin_down{
+	position: fixed;
+	max-width: 100%;
+	max-height: 55vh;
+	bottom: 0px;
+	animation: 0.5s ease-out forwards cookieadmin_slideUp;
+}
+
+.cookieadmin_cookie_modal:focus{
+	outline: none;
+}
+
+.cookieadmin_modal_overlay{
+	display: none; 
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.4); 
+	z-index: 1000;
+}
+
+/* Centered, not baseline: the CSS-drawn close button has no text baseline */
+.cookieadmin_mod_head{
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 12px;
+	padding: 14px 20px;
+	border-bottom: 1px solid #CCCCCC;
+}
+
+/* Close icon drawn in CSS, font-size 0 hides any glyph left in filtered templates.
+   "all: unset" + (0,3,1) selector keeps theme button/hover styles out, same as the category buttons. */
+.cookieadmin_cookie_modal .cookieadmin_mod_head button.cookieadmin_close_pref{
+	all: unset;
+	display: inline-block;
+	position: relative;
+	flex-shrink: 0;
+	width: 32px;
+	height: 32px;
+	border-radius: 4px;
+	color: #6b7280;
+	font-size: 0;
+	cursor: pointer;
+	transition: color .15s, background-color .15s;
+}
+
+.cookieadmin_cookie_modal .cookieadmin_mod_head button.cookieadmin_close_pref::before,
+.cookieadmin_cookie_modal .cookieadmin_mod_head button.cookieadmin_close_pref::after{
+	content: "";
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 16px;
+	height: 2px;
+	background-color: currentColor;
+	border-radius: 1px;
+	transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.cookieadmin_cookie_modal .cookieadmin_mod_head button.cookieadmin_close_pref::after{
+	transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.cookieadmin_cookie_modal .cookieadmin_mod_head button.cookieadmin_close_pref:hover{
+	color: #111827;
+	background-color: rgba(0, 0, 0, 0.06);
+}
+
+.cookieadmin_cookie_modal .cookieadmin_mod_head button.cookieadmin_close_pref:focus-visible{
+	outline: 2px solid var(--cookieadmin-secondary-color);
+	outline-offset: 2px;
+}
+
+.cookieadmin_preference_title{
+	margin: 0;
+	font-size: 20px;
+	font-weight: 700;
+	line-height: 1.3;
+}
+
+/* 5px + the wrapper's 15px lines the intro up with the title's 20px */
+.cookieadmin_preference_details{
+	padding: 0px 5px;
+}
+
+/* break-word (not overflow:auto) so long URLs wrap instead of adding an inner scrollbar */
+.cookieadmin_preference{
+	padding: 10px 0px;
+	font-size: 14px;
+	line-height: 28px;
+	overflow-wrap: break-word;
+}
+
+/* Admin-entered HTML: keep theme paragraph margins and link colors out */
+.cookieadmin_cookie_modal .cookieadmin_preference p{
+	margin: 0 0 8px;
+	padding: 0;
+	font-size: inherit;
+	line-height: inherit;
+}
+
+.cookieadmin_cookie_modal .cookieadmin_preference p:last-child{
+	margin-bottom: 0;
+}
+
+.cookieadmin_cookie_modal .cookieadmin_preference a{
+	color: inherit;
+	text-decoration: underline;
+}
+
+.cookieadmin_details_wrapper{
+	padding: 0px 15px;
+	height: calc(100% - 6%);
+	overflow: auto;
+	scrollbar-width: thin;
+}
+
+.cookieadmin_types{
+	padding: 10px 10px;
+	border-top: 1px solid #CCCCCC;
+}
+
+.cookieadmin_header{
+	display: flex;
+	justify-content: space-between;
+}
+
+
+/* Clickable header text, e.g. Pro's "Override GPC" label */
+.cookieadmin_header label[for]{
+	cursor: pointer;
+}
+
+/* Header labels get explicit displays scoped to .cookieadmin_header so theme rules
+   like "label { display: block }" can't push them onto their own line */
+.cookieadmin_header label.stitle{
+	display: inline;
+}
+
+.cookieadmin_header .cookieadmin_remark{
+	display:none;
+	justify-self:right;
+}
+
+.cookieadmin_header .cookieadmin_act{
+	display: inline;
+	color: #1863dc;
+}
+
+/* Lines up with .cookieadmin_desc; the old 4rem right margin squeezed cards on phones */
+.cookieadmin-modal-cookies-list{
+	display:none;
+	margin: 8px 20px 4px;
+	font-size: 14px;
+	text-align: left;
+}
+
+.cookieadmin-modal-cookies-list .cookieadmin-nocookie-cat{
+	display: block;
+	padding: 4px 0;
+	font-size: 13px;
+	font-weight: 600;
+	text-align: center;
+	opacity: 0.7;
+}
+
+.cookieadmin_desc{
+	padding:5px 20px;
+	font-size: 15px;
+	padding-right: 4rem;
+}
+
+.cookieadmin_footer{
+	left: 0px;
+	padding: 15px;
+	flex-wrap: wrap;
+	width: 100%;
+}
+
+/* Padding matches the header */
+.cookieadmin_modal_footer{
+	display: flex;
+	padding: 14px 20px;
+	flex-wrap: wrap;
+	gap: 8px;
+	border-top: 1px solid #CCCCCC;
+}
+
+/* GPC block and links take their own row above/below the buttons */
+.cookieadmin_modal_footer > :not(.cookieadmin_btn){
+	flex-basis: 100%;
+}
+
+/* Side panel is narrow: stack everything. nowrap matters, a wrapping column
+   overflows into extra columns beside the panel when height is limited. */
+.cookieadmin_side .cookieadmin_modal_footer{
+	flex-direction: column;
+	flex-wrap: nowrap;
+}
+
+.cookieadmin_cookie_modal.cookieadmin_side .cookieadmin_modal_footer > *{
+	flex: none;
+}
+
+/* Scoped to the containers so common theme rules (e.g. ".elementor-kit-N button") don't win.
+   Colors stay admin-controlled via the inline styles set in consent.js. */
+.cookieadmin_law_container button.cookieadmin_btn,
+.cookieadmin_cookie_modal button.cookieadmin_btn{
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: 1 1 0;
+	min-height: 40px;
+	margin: 0;
+	padding: 8px 16px;
+	background-color: transparent;
+	background-image: none;
+	border: 1px solid rgba(0, 0, 0, 0.2);
+	border-radius: 4px;
+	box-shadow: none;
+	color: #1863dc;
+	font-family: inherit;
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 1;
+	letter-spacing: normal;
+	text-align: center;
+	text-decoration: none;
+	text-shadow: none;
+	text-transform: none;
+	text-wrap: auto;
+	cursor: pointer;
+	transition: filter .15s;
+}
+
+/* Footer buttons size to their labels so "Save My Preferences" doesn't wrap;
+   they still fill the row. The banner keeps equal widths. */
+.cookieadmin_modal_footer button.cookieadmin_btn{
+	flex: 1 1 auto;
+}
+
+/* Banner box is narrow (25% of the screen at 1366px = ~338px): size buttons to their labels
+   with tighter padding so "Accept All" stays on one line; they still fill the row. */
+.cookieadmin_consent_inside > .cookieadmin_consent_btns button.cookieadmin_btn{
+	flex: 1 1 auto;
+	padding-left: 12px;
+	padding-right: 12px;
+}
+
+.cookieadmin_law_container button.cookieadmin_btn:hover,
+.cookieadmin_cookie_modal button.cookieadmin_btn:hover{
+	filter: brightness(0.92);
+}
+
+.cookieadmin_law_container button.cookieadmin_btn:focus-visible,
+.cookieadmin_cookie_modal button.cookieadmin_btn:focus-visible{
+	outline: 2px solid var(--cookieadmin-secondary-color);
+	outline-offset: 2px;
+}
+
+/* Category name + chevron in one accordion button. "all: unset" drops theme button styles;
+   the selector (0,3,1) outranks state rules like ".elementor-kit-N button:hover".
+   Scoped to .cookieadmin_header: Pro reuses this class for a shortcode button. */
+.cookieadmin_types .cookieadmin_header button.cookieadmin_show_pref_cookies{
+	all: unset;
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	padding: 5px 0;
+	color: inherit;
+	font: inherit;
+	font-size: 15px;
+	font-weight: 700;
+	line-height: 1.4;
+	cursor: pointer;
+}
+
+.cookieadmin_types .cookieadmin_header button.cookieadmin_show_pref_cookies::before{
+	content: "";
+	flex-shrink: 0;
+	width: 7px;
+	height: 7px;
+	border-right: 2px solid currentColor;
+	border-bottom: 2px solid currentColor;
+	transform: rotate(-45deg);
+	transition: transform .2s;
+}
+
+.cookieadmin_types .cookieadmin_header button.cookieadmin_show_pref_cookies.dwn::before{
+	transform: rotate(45deg);
+}
+
+/* all: unset removes the outline, so the focus ring is added back */
+.cookieadmin_types .cookieadmin_header button.cookieadmin_show_pref_cookies:focus-visible{
+	outline: 2px solid var(--cookieadmin-secondary-color);
+	outline-offset: 2px;
+	border-radius: 2px;
+}
+
+/* Reconsent: all:unset drops theme button styles (min-height, hover/focus rules); the
+   wrapper selector (0,2,2) outranks ".elementor-kit-N button:hover". Plain selector kept
+   for templates filtered without the wrapper class. JS toggles display inline (none/block). */
+button.cookieadmin_re_consent,
+body .cookieadmin_reconsent_wrap button.cookieadmin_re_consent{
+	all: unset;
+	display: none;
+	position: fixed;
+	bottom: 15px;
+	left: 15px;
+	z-index: 99999;
+	box-sizing: border-box;
+	width: 50px;
+	height: 50px;
+	padding: 5px;
+	border-radius: 50%;
+	background-color: #374FD4;
+	box-shadow: -4px 5px 10px rgba(0, 0, 0, 0.4);
+	cursor: pointer;
+	transition: filter .15s;
+}
+
+button.cookieadmin_re_consent:hover,
+body .cookieadmin_reconsent_wrap button.cookieadmin_re_consent:hover{
+	filter: brightness(0.92);
+}
+
+button.cookieadmin_re_consent:focus-visible,
+body .cookieadmin_reconsent_wrap button.cookieadmin_re_consent:focus-visible{
+	outline: 2px solid var(--cookieadmin-secondary-color);
+	outline-offset: 3px;
+}
+
+/* Block + the button's 5px padding centres the 40px icon; theme img rules kept out */
+.cookieadmin_re_consent img.cookieadmin_reconsent_img{
+	display: block;
+	width: 40px;
+	height: 40px;
+	max-width: none;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	border-radius: 0;
+	box-shadow: none;
+}
+
+/* Flat card: theme font, 4px corners like the buttons. Muted text uses opacity so it
+   works on any admin-chosen modal background. */
+.cookieadmin-cookie-card {
+	margin: 0 0 8px;
+	padding: 12px 14px;
+	border: 1px solid rgb(187 187 187 / 12%);
+	border-radius: 4px;
+	text-align: left;
+}
+
+.cookieadmin-cookie-header {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	gap: 2px 12px;
+	font-size: 14px;
+}
+
+.cookieadmin-cookie-name {
+	font-weight: 600;
+	word-break: break-word;
+	overflow-wrap: anywhere;
+}
+
+.cookieadmin-cookie-duration {
+	font-size: 13px;
+	opacity: 0.75;
+}
+
+.cookieadmin-cookie-duration > b {
+	font-weight: 600;
+}
+
+/* Scoped so theme paragraph margins/sizes don't apply */
+.cookieadmin-cookie-card p.cookieadmin-cookie-description {
+	margin: 6px 0 0;
+	padding: 0;
+	font-size: 13px;
+	line-height: 1.5;
+}
+
+.cookieadmin-cookie-tags {
+	display: flex;
+	gap: 8px;
+	margin-top: 8px;
+}
+
+.cookieadmin-tag {
+	background: rgba(0, 0, 0, 0.06);
+	padding: 2px 8px;
+	border-radius: 4px;
+	font-size: 12px;
+}
+
+/* Pro DPDP contact box. Keyed on the ID (not a new class) so it also restyles
+   older Pro versions that still output the shared .cookieadmin-cookie-card class. */
+#cookieadmin_dpdp_contact {
+	margin: 4px 0 12px;
+	padding: 12px 14px;
+	background: rgba(0, 0, 0, 0.04);
+	border: 1px solid rgba(0, 0, 0, 0.08);
+	border-radius: 4px;
+	box-shadow: none;
+	font-family: inherit;
+	font-size: 14px;
+	line-height: 1.5;
+	text-align: left;
+}
+
+#cookieadmin_dpdp_contact a {
+	color: inherit;
+	text-decoration: underline;
+}
+
+/* "Exercise your rights" link, the card's main action */
+#cookieadmin_dpdp_contact > a {
+	display: inline-block;
+	margin-top: 6px;
+	font-weight: 600;
+}
+
+/* Website consent box End*/
+
+
+
+
+
+/* Checkbox switch Start */
+
+/* Box matches the 34x21 slider; the modal's generic label/input padding is cancelled
+   so the switch no longer overflows its box */
+.cookieadmin_toggle,
+.cookieadmin_cookie_modal .cookieadmin_toggle {
+	position: relative;
+	display: inline-block;
+	flex-shrink: 0;
+	width: 34px;
+	height: 21px;
+	margin: 0;
+	padding: 0;
+}
+
+/* Hide the checkbox input */
+.cookieadmin_toggle input,
+.cookieadmin_cookie_modal .cookieadmin_toggle input{
+	/* display: none; */
+	position: absolute;
+	opacity: 0;
+	width: 0;
+	height: 0;
+	margin: 0;
+	padding: 0;
+}
+
+/* Text for screen readers / a11y checkers only, so toggle labels aren't empty */
+.cookieadmin_sr_only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+/* Keyboard accessibility: When the checkbox is focused, add a visible outline to indicate focus. */
+.cookieadmin_show_pref_cookies:focus-visible{
+	outline: 1px solid #000;
+}
+.cookieadmin_toggle input:focus + .cookieadmin_slider {
+    outline: 1px solid #000;
+}
+/* end keyboard accessibility */
+
+/* Describe slider's look and position. */
+.cookieadmin_slider {
+	position: absolute;
+	cursor: pointer;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: 21px;
+	width: 34px;
+	background-color: gray;
+	transition: .4s;
+	border-radius: 34px;
+}
+
+/* Describe the white ball's location 
+  and appearance in the slider. */
+.cookieadmin_slider:before {
+	position: absolute;
+	content: "";
+	height: 15px;
+	width: 15px;
+	left: 3.2px;
+	bottom: 3.2px;
+	background-color: white;
+	transition: .2s;
+	border-radius: 50%;
+}
+
+/* Modify the slider's background color to 
+  green once the checkbox has been selected. */
+input:checked+.cookieadmin_slider {
+	background-color: #3582c4;
+}
+
+/* When the checkbox is checked, shift the 
+  white ball towards the right within the slider. */
+input:checked+.cookieadmin_slider:before {
+	transform: translateX(13px);
+}
+
+/* Checkbox switch End */
+
+.cookieadmin_law_container .cookieadmin-poweredby{
+margin-top: 10px;
+}
+
+.cookieadmin_modal_footer_links .cookieadmin-poweredby{
+margin-left: auto;
+}
+
+.cookieadmin-poweredby a img{
+height: 15px;
+}
+
+.cookieadmin-poweredby a{
+color : unset;
+cursor: pointer;
+display: flex;
+justify-content: center;
+align-items: center;
+font-size: 11px;
+gap: 2px;
+text-decoration: none;
+}
+
+.cookieadmin_modal_footer .cookieadmin-poweredby a{
+justify-content: end;
+}
+
+#cookieadmin-gpc-toast{
+display:flex;
+visibility: hidden;
+position: fixed;
+bottom: 24px;
+right: 24px;
+color: #ffffff;
+padding: 10px 14px;
+border-radius: 6px;
+box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+align-items: center;
+justify-content: space-between;
+gap: 10px;
+font-size: 14px;
+z-index: 99999;
+opacity: 0;
+transform: translateY(20px);
+transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s 0.3s;
+line-height:1.5;
+}
+
+#cookieadmin_gpc_override{
+padding-bottom:10px;
+}
+
+/* Policy Links */
+.cookieadmin_policy_link_box{
+	display: flex;
+	justify-content: space-around;
+	gap: 4px 16px;
+	margin-top: 8px;
+	font-size: 13px;
+	flex-wrap: wrap;
+}
+
+/* Same treatment as the modal links, so theme link colors don't apply */
+.cookieadmin_law_container .cookieadmin_policy_link_box a{
+	color: inherit;
+	text-decoration: underline;
+}
+
+.cookieadmin_modal_policy_link_box{
+	display: flex;
+	gap: 4px 16px;
+	font-size: 13px;
+	flex-wrap: wrap;
+}
+
+/* Same treatment as the intro and DPDP links, so theme link colors don't apply */
+.cookieadmin_cookie_modal .cookieadmin_modal_policy_link_box a{
+	color: inherit;
+	text-decoration: underline;
+}
+
+/* Footer gap handles spacing; the old 9px side margins pushed links out of line with the buttons */
+.cookieadmin_modal_footer_links{
+	display:flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content:space-between;
+	gap: 8px 16px;
+	margin-top: 4px;
+}
+
+/* Hidden when there are no policy links and "Powered by" is off (Pro) */
+.cookieadmin_modal_footer_links:not(:has(*)){
+	display: none;
+}
+
+/* CSS for phones only */
+@media (max-width: 767px) {
+
+	.cookieadmin_center{
+		top: 10%;
+		left: 5%;
+		max-width: 90vw;
+	}
+
+	.cookieadmin_show_pref_cookies{
+		font-size: 14px;
+	}
+
+	/* Even 16px on both sides; the footer bar keeps its 100% width */
+	.cookieadmin_box{
+		left: 16px;
+		right: 16px;
+		width: auto;
+		max-width: none;
+	}
+	
+	.cookieadmin_side{
+		width: 100%;
+	}
+}
+
+/* CSS for tablet */
+@media (min-width: 768px) and (max-width: 991px) {
+
+	.cookieadmin_box{
+		width: 45%;
+	}
+}
+
+/* CSS for small laptop */
+@media (min-width: 992px) and (max-width: 1199px) {
+
+	.cookieadmin_box{
+		width: 35%;
+	}
+	
+}
+/* CSS for HD TV screens */
+@media (min-width: 1200px) and (max-width: 1360px) {
+
+	.cookieadmin_box{
+		width: 30%;
+	}
+}
+
+/* Desktop Layout */
+@media (min-width: 768px) {
+	.cookieadmin_notice_group {
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	.cookieadmin_notice_con {
+		flex: 1; /* take remaining space */
+	}
+
+	.cookieadmin_consent_btns {
+		flex-shrink: 0;
+	}
+	
+	/* Footer layout: the button group sizes to its content, so equal-width (flex-basis 0)
+	   buttons would shrink and wrap their labels. Size them to their labels instead. */
+	.cookieadmin_footer .cookieadmin_consent_btns button.cookieadmin_btn{
+		flex: 0 0 auto;
+	}
+}
+
+@media (max-width:480px){
+	.cookieadmin_preference_title{
+		font-size: 18px;
+	}
+	
+	/* 28px leaves no room for the categories on phones */
+	.cookieadmin_preference{
+		line-height: 22px;
+	}
+	
+	.cookieadmin_law_container button.cookieadmin_btn,
+	.cookieadmin_cookie_modal button.cookieadmin_btn,
+	.cookieadmin_consent_inside > .cookieadmin_consent_btns button.cookieadmin_btn{
+		flex-basis: 100%;
+	}
+	
+	.cookieadmin_modal_footer{
+		padding: 12px 16px;
+	}
+}
+
+@media (prefers-reduced-motion: reduce){
+	.cookieadmin_law_container *, .cookieadmin_cookie_modal *{
+		transition: none !important;
+	}
+}
+
+/* ==== {{BASE}}/wp-content/themes/contope-canvas/style.css?ver=0.1.0-dev ==== */
+/*
+Theme Name: ContOpe Canvas
+Description: Motor de tema de bloques genérico de ContOpe Design. Aporta layout, contenedores, columnas, comportamiento responsive y plantillas mínimas reutilizables para temas hijos de proyecto. No contiene identidad de ningún proyecto concreto.
+Version: 0.1.0-dev
+Requires at least: 6.5
+Requires PHP: 8.0
+Text Domain: cod-canvas
+*/
+
+/*
+ * Reglas estructurales reutilizables del motor Canvas.
+ * Los colores concretos se inyectan por variables (--cod-*) que cada tema hijo
+ * define; aquí sólo se usan fallbacks neutros para que el padre funcione solo.
+ */
+
+.wp-site-blocks { min-height: 100vh; }
+
+.cod-site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  border-bottom: 1px solid var(--cod-border-color, rgba(0, 0, 0, 0.12));
+  backdrop-filter: blur(14px);
+}
+
+.cod-main { margin-block-start: 0; }
+.cod-main > .wp-block-post-content { margin-block-start: 0; }
+.cod-main .wp-block-group { padding-block: clamp(2rem, 5vw, 5rem); }
+.cod-main .wp-block-group .wp-block-group { padding-block: 1.25rem; }
+.cod-main .wp-block-columns { gap: clamp(1.25rem, 3vw, 3rem); }
+.cod-main .wp-block-column { min-width: 0; }
+
+.cod-main .wp-block-image img,
+.cod-main .wp-block-video video { width: 100%; }
+
+.cod-main .wp-block-button__link { transition: transform .2s ease, background .2s ease; }
+.cod-main .wp-block-button__link:hover { transform: translateY(-1px); }
+
+.cod-main .wp-block-details {
+  border-bottom: 1px solid var(--cod-border-color, rgba(0, 0, 0, 0.12));
+  padding: 1rem 0;
+}
+.cod-main .wp-block-details summary { cursor: pointer; font-weight: 600; }
+
+.cod-site-footer { border-top: 1px solid var(--cod-border-color, rgba(0, 0, 0, 0.12)); }
+
+@media (max-width: 781px) {
+  .cod-main .wp-block-columns { flex-wrap: wrap !important; }
+  .cod-main .wp-block-column[style] { flex-basis: 100% !important; }
+  .cod-site-header { position: relative; }
+}
+
+/* ==== {{BASE}}/wp-content/themes/contope-santa-luisa/style.css?ver=0.2.7 ==== */
+/*
+Theme Name: ContOpe Design — Santa Luisa de Palpi
+Template: contope-canvas
+Description: Tema hijo del motor ContOpe Canvas para el proyecto Santa Luisa de Palpi. Aporta paleta, tipografía e identidad del proyecto sobre las reglas estructurales del padre.
+Version: 0.2.7
+Requires at least: 6.5
+Requires PHP: 8.0
+Text Domain: cod-santa-luisa
+*/
+
+/*
+ * La paleta y las tipografías del proyecto viven acá y en theme.json, no en el
+ * CSS de cada página. WordPress emite sus propias reglas globales sobre body y
+ * sobre h1–h6 a partir de theme.json; si esas reglas apuntan a otra familia, le
+ * ganan al lienzo por especificidad y el sitio se ve con dos identidades según
+ * la página. Por eso el orden correcto es: el tema declara la identidad, y el
+ * lienzo la extiende. Nunca al revés.
+ *
+ * Las familias reales del proyecto son dos: Montserrat y Birthstone. Se sirven
+ * como @font-face propias, sin pedirle nada a Google.
+ *
+ * Hubo una tercera, Lora, declarada como «tipografía de citas». Nunca se usó:
+ * era un resabio del primer sitio de prueba de Open CoDesign. Se quitó el
+ * 2026-09-16 porque una regla de la página legal la había tomado por estar
+ * disponible, y el texto de entrada salía con serifas en un sitio que no las
+ * usa. Una tipografía declarada y sin uso no es neutra: es una invitación a
+ * usarla por accidente.
+ */
+
+:root {
+  /* Dorado */
+  --slp-dorado-50: #f9f6e8;
+  --slp-dorado-100: #f1eacb;
+  --slp-dorado-300: #eed495;
+  --slp-dorado-500: #ddb441;
+  --slp-dorado-600: #cda23c;
+
+  /* Oliva */
+  --slp-oliva-50: #f5f9f6;
+  --slp-oliva-100: #ebf0e3;
+  --slp-oliva-300: #babba4;
+  --slp-oliva-500: #8e9075;
+  --slp-oliva-700: #70745e;
+
+  /* Tierra */
+  --slp-tierra-50: #f6f6f3;
+  --slp-tierra-100: #ecebe8;
+  --slp-tierra-300: #cdc8c6;
+  --slp-tierra-500: #968b8a;
+  --slp-tierra-700: #6e5f5f;
+
+  /* Roles, para no repetir el valor crudo en el resto de las reglas. */
+  --slp-accent: var(--slp-dorado-600);
+  --slp-accent-deep: #b58c2c;
+  --slp-green: var(--slp-oliva-700);
+  --slp-bg: var(--slp-tierra-50);
+  --slp-surface: #ffffff;
+  --slp-text: var(--slp-oliva-700);
+  --slp-muted: var(--slp-tierra-500);
+  --slp-border: var(--slp-tierra-300);
+
+  /* Alimenta los ganchos estructurales del motor Canvas con la paleta del proyecto. */
+  --cod-border-color: var(--slp-border);
+
+  /* Los mismos nombres que usa el lienzo, para que una pieza pegada en una
+     página suelta herede la identidad aunque no traiga su propio :root. */
+  --font-hero: 'Birthstone', 'Segoe Script', cursive;
+  --font-body: 'Montserrat', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --max-width: 1180px;
+
+  /* Nombres cortos, para que los documentos del lienzo tomen la paleta de
+     ACÁ y no declaren la suya. Hasta el 2026-09-16 cada documento cargaba su
+     propia copia con los mismos valores y otros nombres: la hoja central
+     existía y no la usaba nadie. Un mismo color definido en seis lugares se
+     desincroniza solo. Las tipografías y el ancho ya estaban acá arriba. */
+  --dorado-50: var(--slp-dorado-50);
+  --dorado-100: var(--slp-dorado-100);
+  --dorado-300: var(--slp-dorado-300);
+  --dorado-500: var(--slp-dorado-500);
+  --dorado-600: var(--slp-dorado-600);
+  --oliva-50: var(--slp-oliva-50);
+  --oliva-100: var(--slp-oliva-100);
+  --oliva-300: var(--slp-oliva-300);
+  --oliva-500: var(--slp-oliva-500);
+  --oliva-700: var(--slp-oliva-700);
+  --tierra-50: var(--slp-tierra-50);
+  --tierra-100: var(--slp-tierra-100);
+  --tierra-300: var(--slp-tierra-300);
+  --tierra-500: var(--slp-tierra-500);
+  --tierra-700: var(--slp-tierra-700);
+}
+
+body {
+  background: var(--slp-bg);
+  color: var(--slp-text);
+  font-family: var(--font-body);
+}
+
+/* Los títulos del proyecto son Montserrat en versales, no una serif. La regla
+   global de WordPress ya apunta a la familia correcta desde theme.json; esto
+   solo fija el peso y el interlineado para los encabezados que no pasan por el
+   lienzo (páginas de sistema, resultados de búsqueda, 404). */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-body);
+  font-weight: 700;
+  line-height: 1.05;
+  color: var(--slp-text);
+}
+
+.cod-site-header .wp-block-site-title {
+  font-family: var(--font-body);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+.cod-main .wp-block-image img,
+.cod-main .wp-block-video video { border-radius: 16px; }
+
+.cod-main .wp-block-button__link {
+  font-family: var(--font-body);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.cod-main .wp-block-button__link:hover { background: var(--slp-accent-deep); }
+
+.cod-main .wp-block-details summary {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.cod-main a:where(:not(.wp-element-button)) {
+  color: var(--slp-text);
+  text-decoration-color: var(--slp-accent);
+}
+
+/* ---------------------------------------------------------------------------
+   Banner de cookies (CookieAdmin 1.2.3)
+
+   El banner que trae el plugin ocupaba el 42,7% de la pantalla en teléfono
+   —400 px de 844— y 315 px de alto en escritorio. Un aviso que tapa media
+   pantalla no se lee: se cierra. Y ese fue el motivo real por el que el banner
+   se desactivó en septiembre: tapaba el sitio justo cuando alguien llegaba por
+   un QR, que es el único momento en que se tiene la atención de una persona
+   parada frente a un letrero.
+
+   Acá se reduce tipografía y espacios hasta dejarlo bajo el 15% de la pantalla
+   en ambos tamaños, y se oculta el «Powered by CookieAdmin», cuyo logotipo de
+   color no pertenece a la paleta del proyecto.
+
+   Los COLORES no se tocan desde acá a propósito: el plugin los emite como
+   estilos en línea desde su propia pantalla de ajustes, así que se configuran
+   ahí. Pelearles con !important sería esconder dónde se deciden.
+
+   Los tres botones quedan del mismo ancho y peso. Un banner donde «Aceptar»
+   es grande y «Rechazar» es chico no recoge un consentimiento válido.
+   --------------------------------------------------------------------------- */
+
+.cookieadmin_law_container {
+  width: min(400px, calc(100% - 32px));
+  font-family: var(--font-body);
+}
+
+.cookieadmin_consent_inside {
+  padding: 13px 15px 12px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.14);
+}
+
+#cookieadmin_notice_title {
+  font-size: 12.5px;
+  line-height: 1.3;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  padding-left: 0;
+}
+
+.cookieadmin_notice_con {
+  font-size: 11px;
+  line-height: 1.42;
+  padding: 0;
+  margin-top: 5px;
+}
+
+#cookieadmin_notice {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.42;
+}
+
+/* En una sola fila y del mismo ancho: los tres pesan igual. */
+.cookieadmin_consent_btns {
+  gap: 6px;
+  margin-top: 10px;
+  flex-wrap: nowrap;
+  justify-content: stretch;
+}
+
+.cookieadmin_consent_inside .cookieadmin_btn {
+  flex: 1 1 0;
+  min-width: 0;
+  margin: 0;
+  padding: 7px 4px;
+  font-family: var(--font-body);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+/* El logotipo del proveedor no es parte de la identidad del proyecto.
+   La licencia Pro además trae una casilla «Hide Powered by Link» en los
+   ajustes del plugin; esto lo resuelve aunque esa casilla no se marque. */
+.cookieadmin_law_container .cookieadmin-poweredby {
+  display: none;
+}
+
+/* El panel de «Configurar», con el mismo criterio que el banner:
+   tipografía y espacios reducidos, y sin el logotipo del proveedor.
+   La regla anterior sólo alcanzaba al banner; el panel es otro contenedor y
+   traía su propio «Powered by». */
+.cookieadmin_cookie_modal {
+  font-family: var(--font-body);
+  max-height: 72vh;
+}
+
+.cookieadmin_cookie_modal .cookieadmin-poweredby {
+  display: none;
+}
+
+#cookieadmin_preference_title {
+  font-size: 15px;
+  line-height: 1.3;
+  letter-spacing: 0.01em;
+}
+
+.cookieadmin_details_wrapper {
+  padding: 0 14px;
+  font-size: 11.5px;
+  line-height: 1.45;
+}
+
+.cookieadmin_details_wrapper p,
+.cookieadmin_details_wrapper li,
+.cookieadmin_details_wrapper div {
+  font-size: 11.5px;
+  line-height: 1.45;
+}
+
+.cookieadmin_modal_footer {
+  padding: 10px 14px;
+}
+
+.cookieadmin_modal_footer .cookieadmin_btn,
+.cookieadmin_modal_footer_links .cookieadmin_btn {
+  font-family: var(--font-body);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 7px 14px;
+  border-radius: 999px;
+}
+
+/* El borde de los botones es lo único de color que el plugin NO expone en sus
+   ajustes: lo trae fijo en gris. Por eso se corrige acá y no allá. El resto de
+   los colores —fondos, textos, enlaces, interruptores— se configuran en la
+   pantalla de CookieAdmin, que es donde corresponde. */
+.cookieadmin_btn {
+  border-color: var(--slp-tierra-300);
+}
+
+.cookieadmin_btn:hover {
+  border-color: var(--slp-dorado-600);
+}
+
+/* El plugin trae tres azules escritos a mano en su hoja, sin ajuste que los
+   gobierne: el «Siempre activas», el texto por defecto de los botones y el
+   interruptor encendido. Son los únicos colores que hay que corregir desde
+   acá; todo lo demás sale de su pantalla de ajustes. */
+.cookieadmin_act {
+  color: var(--slp-dorado-600);
+  font-weight: 600;
+}
+
+button.cookieadmin_btn {
+  color: var(--slp-oliva-700);
+}
+
+input:checked + .cookieadmin_slider {
+  background-color: var(--slp-dorado-600);
+}

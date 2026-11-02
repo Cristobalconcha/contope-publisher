@@ -1,0 +1,62 @@
+{
+  "sitio": "econut",
+  "base": "{{BASE}}",
+  "baseAlGuardar": "http://localhost:8891",
+  "generado": "2026-11-02T18:53:27.813Z",
+  "normalizaciones": [
+    "dirección del sitio → {{BASE}}",
+    "valores de nonce → {{NONCE}}",
+    "CRLF → LF"
+  ],
+  "paginas": [
+    {
+      "ruta": "/",
+      "slug": "inicio",
+      "urlFinal": "{{BASE}}/",
+      "htmlSha256": "476a45f495657cceb2ceb68d68ff26a6e657da3e00ca801af848e7752793ed35",
+      "cssSha256": "c48cf19bfe9879308d1a939321d83e206c3a53e13c4ff31b8e288eb64a7c2418",
+      "hojas": [
+        "{{BASE}}/wp-content/plugins/contope-publisher/assets/css/cod-canvas-base.css?ver=0.3.83",
+        "{{BASE}}/wp-content/uploads/contope-disenos/econut-web-7e5b309d0d5f.css",
+        "{{BASE}}/wp-content/themes/contope-econut/fuentes/fuentes.css?ver=0.2.0",
+        "{{BASE}}/wp-content/plugins/cookieadmin/assets/css/consent.css?ver=1.2.3",
+        "{{BASE}}/wp-content/themes/contope-canvas/style.css?ver=0.1.0-dev",
+        "{{BASE}}/wp-content/themes/contope-econut/style.css?ver=0.2.0",
+        "{{BASE}}/wp-content/themes/contope-econut/cookies.css"
+      ]
+    },
+    {
+      "ruta": "/contacto/",
+      "slug": "contacto",
+      "urlFinal": "{{BASE}}/contacto/",
+      "htmlSha256": "664697672f8b6838fe6ba237f2eb2a10f303a26dd55798f45acec25d4a5c9600",
+      "cssSha256": "cdaccc777e3e9da5b7803e5bd2a9c8a8357dd8bad358ef65a0fc293b053912e9",
+      "hojas": [
+        "{{BASE}}/wp-content/plugins/contope-publisher/assets/css/cod-canvas-base.css?ver=0.3.83",
+        "{{BASE}}/wp-content/uploads/contope-disenos/econut-web-7e5b309d0d5f.css",
+        "{{BASE}}/wp-content/themes/contope-econut/fuentes/fuentes.css?ver=0.2.0",
+        "{{BASE}}/wp-content/plugins/cookieadmin/assets/css/consent.css?ver=1.2.3",
+        "{{BASE}}/wp-content/themes/contope-canvas/style.css?ver=0.1.0-dev",
+        "{{BASE}}/wp-content/themes/contope-econut/style.css?ver=0.2.0",
+        "{{BASE}}/wp-content/themes/contope-econut/cookies.css",
+        "{{BASE}}/wp-content/plugins/orugantt-forms/assets/dist/orugantt-forms-runtime.css?ver=0.2.1"
+      ]
+    },
+    {
+      "ruta": "/terminos-y-privacidad/",
+      "slug": "terminos-y-privacidad",
+      "urlFinal": "{{BASE}}/terminos-y-privacidad/",
+      "htmlSha256": "20c377b8924b534ff35670d64847973295828ccf20de148e0dcf67c181bd0e1c",
+      "cssSha256": "c48cf19bfe9879308d1a939321d83e206c3a53e13c4ff31b8e288eb64a7c2418",
+      "hojas": [
+        "{{BASE}}/wp-content/plugins/contope-publisher/assets/css/cod-canvas-base.css?ver=0.3.83",
+        "{{BASE}}/wp-content/uploads/contope-disenos/econut-web-7e5b309d0d5f.css",
+        "{{BASE}}/wp-content/themes/contope-econut/fuentes/fuentes.css?ver=0.2.0",
+        "{{BASE}}/wp-content/plugins/cookieadmin/assets/css/consent.css?ver=1.2.3",
+        "{{BASE}}/wp-content/themes/contope-canvas/style.css?ver=0.1.0-dev",
+        "{{BASE}}/wp-content/themes/contope-econut/style.css?ver=0.2.0",
+        "{{BASE}}/wp-content/themes/contope-econut/cookies.css"
+      ]
+    }
+  ]
+}

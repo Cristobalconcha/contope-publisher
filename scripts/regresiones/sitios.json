@@ -4,12 +4,17 @@
     "santaluisa": {
       "base": "http://localhost:8890",
       "como_levantarlo": "C:/Users/Cristobal concha/wp-local/start-wp-local.bat (PHP embebido + SQLite en el puerto 8890; es el espejo de santaluisadepalpi.cl)",
-      "rutasExtra": [],
+      "rutasExtra": [
+        "/diferenciales/",
+        "/preguntas-frecuentes/",
+        "/contacto/",
+        "/terminos-y-condiciones/"
+      ],
       "auditoria": "scripts/santaluisa/auditoria-sitio.cjs"
     },
     "econut": {
       "base": "http://localhost:8891",
-      "como_levantarlo": "el local de Econut (puerto 8891, ver scripts/econut/README.md); su arranque no esta en wp-local/start-wp-local.bat",
+      "como_levantarlo": "C:/Users/Cristobal concha/wp-local-econut/start-wp-local-econut.bat (puerto 8891)",
       "rutasExtra": [],
       "auditoria": null
     }

@@ -1,0 +1,83 @@
+{
+  "sitio": "santaluisa",
+  "base": "{{BASE}}",
+  "baseAlGuardar": "http://localhost:8890",
+  "generado": "2026-11-02T18:53:48.958Z",
+  "normalizaciones": [
+    "dirección del sitio → {{BASE}}",
+    "valores de nonce → {{NONCE}}",
+    "CRLF → LF"
+  ],
+  "paginas": [
+    {
+      "ruta": "/",
+      "slug": "inicio",
+      "urlFinal": "{{BASE}}/",
+      "htmlSha256": "e21197ff8d3b2108e7c083442a9204fb476074fc8eced687a62ee53f371a13e5",
+      "cssSha256": "e1a70d26e9a5b931e2dbb1eec1e52a5ff4e951938a21762fa3d90b910f4833a5",
+      "hojas": [
+        "{{BASE}}/wp-content/plugins/contope-publisher/assets/css/cod-canvas-base.css?ver=0.3.82",
+        "{{BASE}}/wp-content/plugins/cookieadmin/assets/css/consent.css?ver=1.2.6",
+        "{{BASE}}/wp-content/themes/contope-canvas/style.css?ver=0.1.0-dev",
+        "{{BASE}}/wp-content/themes/contope-santa-luisa/style.css?ver=0.2.7"
+      ]
+    },
+    {
+      "ruta": "/contacto/",
+      "slug": "contacto",
+      "urlFinal": "{{BASE}}/contacto/",
+      "htmlSha256": "d340d27486495b64a30180c54634a0eab557930763221fedde132a6e97b9902f",
+      "cssSha256": "81ddf3e2dd6112758d8aec0564f0e9e62c51609ed7a5c077a8eaa3841b94b2d6",
+      "hojas": [
+        "{{BASE}}/wp-content/plugins/contope-publisher/assets/css/cod-canvas-base.css?ver=0.3.82",
+        "{{BASE}}/wp-content/uploads/contope-disenos/santaluisa-web-e69b0bc9ee3f.css",
+        "{{BASE}}/wp-content/plugins/cookieadmin/assets/css/consent.css?ver=1.2.6",
+        "{{BASE}}/wp-content/themes/contope-canvas/style.css?ver=0.1.0-dev",
+        "{{BASE}}/wp-content/themes/contope-santa-luisa/style.css?ver=0.2.7",
+        "{{BASE}}/wp-content/plugins/orugantt-forms/assets/dist/orugantt-forms-runtime.css?ver=0.2.1"
+      ]
+    },
+    {
+      "ruta": "/diferenciales/",
+      "slug": "diferenciales",
+      "urlFinal": "{{BASE}}/diferenciales/",
+      "htmlSha256": "02c8b3956c2ec4ff6d7dbb6c38b5a826b0f440d715abba3cf7e3eb283d0de9b6",
+      "cssSha256": "352dd19184fcd0bea60c3de1e62afcc999b4abaf14f4c54af79cf74a979cdf6e",
+      "hojas": [
+        "{{BASE}}/wp-content/plugins/contope-publisher/assets/css/cod-canvas-base.css?ver=0.3.82",
+        "{{BASE}}/wp-content/uploads/contope-disenos/santaluisa-web-e69b0bc9ee3f.css",
+        "{{BASE}}/wp-content/plugins/cookieadmin/assets/css/consent.css?ver=1.2.6",
+        "{{BASE}}/wp-content/themes/contope-canvas/style.css?ver=0.1.0-dev",
+        "{{BASE}}/wp-content/themes/contope-santa-luisa/style.css?ver=0.2.7"
+      ]
+    },
+    {
+      "ruta": "/preguntas-frecuentes/",
+      "slug": "preguntas-frecuentes",
+      "urlFinal": "{{BASE}}/preguntas-frecuentes/",
+      "htmlSha256": "892347ec25d1a99cd5c6af1f08fc825f4d0c0852082adfd455dd9dd18b7b2cf3",
+      "cssSha256": "352dd19184fcd0bea60c3de1e62afcc999b4abaf14f4c54af79cf74a979cdf6e",
+      "hojas": [
+        "{{BASE}}/wp-content/plugins/contope-publisher/assets/css/cod-canvas-base.css?ver=0.3.82",
+        "{{BASE}}/wp-content/uploads/contope-disenos/santaluisa-web-e69b0bc9ee3f.css",
+        "{{BASE}}/wp-content/plugins/cookieadmin/assets/css/consent.css?ver=1.2.6",
+        "{{BASE}}/wp-content/themes/contope-canvas/style.css?ver=0.1.0-dev",
+        "{{BASE}}/wp-content/themes/contope-santa-luisa/style.css?ver=0.2.7"
+      ]
+    },
+    {
+      "ruta": "/terminos-y-condiciones/",
+      "slug": "terminos-y-condiciones",
+      "urlFinal": "{{BASE}}/terminos-y-condiciones/",
+      "htmlSha256": "87416bfe4e352ddde4a54bf2adcd368b478b49a297d3c1709f70871f5d41b301",
+      "cssSha256": "352dd19184fcd0bea60c3de1e62afcc999b4abaf14f4c54af79cf74a979cdf6e",
+      "hojas": [
+        "{{BASE}}/wp-content/plugins/contope-publisher/assets/css/cod-canvas-base.css?ver=0.3.82",
+        "{{BASE}}/wp-content/uploads/contope-disenos/santaluisa-web-e69b0bc9ee3f.css",
+        "{{BASE}}/wp-content/plugins/cookieadmin/assets/css/consent.css?ver=1.2.6",
+        "{{BASE}}/wp-content/themes/contope-canvas/style.css?ver=0.1.0-dev",
+        "{{BASE}}/wp-content/themes/contope-santa-luisa/style.css?ver=0.2.7"
+      ]
+    }
+  ]
+}
