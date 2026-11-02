@@ -473,7 +473,7 @@ COD_ADN_Projection::build()  ──►  cod_adn_proj_r<N>  (registro, theme.json
 | `cod_theme_definitions` | a mano / `definiciones-del-set.php` | **proyección derivada**, leída a través del puntero `cod_adn_activa` (no se sobreescribe en vivo); la pantalla muestra los campos gobernados en sólo lectura («Gobernado por ADN `basis-web` r3») y **toda escritura directa distinta de la proyección falla** (P2.4) |
 | `COD_Design_Core::estado()` | definiciones > `theme.json` | **sólo ADN** (origen `adn`). No consulta el `theme.json` como segunda fuente: un `theme.json` viejo no puede volver a taparle un hueco al ADN (el defecto del issue #9) |
 | `--cod-color-accent`, `--cod-font-*`, `--cod-motion-*` | `:root` desde definiciones | **alias** de variables del registro; mismos nombres, así nada del sitio se rompe |
-| Hojas del tema (`contope-basis/style.css`, `cookies.css`) | consumen `--cod-color-*` / `--cod-font-*`, que sólo define el plugin (anulan a `theme.json` si el plugin se apaga) | **consumen directamente `--wp--preset--*` / `--wp--custom--*`**; si hace falta un alias, lo declara el propio tema en su `theme.json` generado, no el plugin. Las variables propias del tema se llaman `--basis-*` (no `--cod-*`, prefijo reservado: 4.1). Se mide: `grep -c "var(--cod-" contope-basis/*.css` = 0 (hoy 12 líneas; P2.6) |
+| Hojas del tema (`contope-basis/style.css`, `cookies.css`) | consumen `--cod-color-*` / `--cod-font-*`, que sólo define el plugin (anulan a `theme.json` si el plugin se apaga) | **consumen directamente `--wp--preset--*` / `--wp--custom--*`**; si hace falta un alias, lo declara el propio tema en su `theme.json` generado, no el plugin. Las variables propias del tema se llaman `--basis-*` (no `--cod-*`, prefijo reservado: 4.1). Se mide: `grep -c "var(--cod-" contope-basis/*.css` = 0 (eran 12 líneas en `b7b0478`; **hecho en F2**, P2.6) |
 
 **Respaldo si el plugin se apaga (H11).** El `theme.json` del tema es un artefacto generado (`cod_adn_export`) y se
 commitea; el filtro en tiempo de ejecución es un *no-op* cuando el `digest` del archivo coincide con el del ADN, y
@@ -483,6 +483,62 @@ del ADN con sello. **Pero el respaldo sólo existe si las hojas del tema lo usan
 leen `--cod-*`, que sólo define el plugin, y con la misma especificidad **anulan** el fondo, el texto y la fuente de
 `theme.json`. Por eso las hojas del tema consumen `--wp--preset--*` / `--wp--custom--*` directamente (tabla de arriba)
 y la subida a producción sube el `theme.json` regenerado con **cada** revisión activada del ADN (7.2).
+
+#### 3.6.1 Lo que F2 fijó (implementado, 02-nov-2026)
+
+**Quién lee la proyección.** Siempre por el puntero `cod_adn_activa` (`COD_ADN_Store::proyeccion_vigente()`):
+`COD_ADN_Theme::filtrar()` (el filtro `wp_theme_json_data_theme`, prioridad 9, antes del de las escalas de Configuración),
+`COD_Design_Core::estado()/css()`, `COD_Theme_Definitions::get()` y el registro de diseño (que lee lo que sirve WordPress,
+ya con el filtro). Sin ADN activo ninguno de los cuatro hace nada distinto: el filtro es un *no-op*, el núcleo sigue
+leyendo definiciones y `theme.json`, y `get()` devuelve la opción (P2.5, medido por `sin-adn-identico.mjs`).
+
+**El filtro.** Con ADN activo superpone el fragmento `themeJson` de la proyección al `theme.json` del tema: las
+**listas** (paleta, familias, tamaños, espaciados) REEMPLAZAN a las del archivo —el ADN es la autoridad de esas escalas y
+un archivo viejo no puede volver a taparle un hueco—; los mapas (`custom`, `styles`, `layout`) se mezclan por clave. Es
+*no-op* si el archivo del tema ya lleva el sello de **esta** revisión (`settings.custom.adn.digest`): entonces el archivo
+es una salida del ADN. `cod_adn_activada` descarta lo que WordPress recuerda (`wp_clean_theme_json_cache`). Esto es lo que
+hace que **importar el paquete deje al sitio destino con los mismos presets que el origen sin subir archivos de tema**:
+el `theme.json` de producción de Basis (el de `b7b0478`: 12 colores, 4 familias, sin escalas ni `custom`) queda, vía el
+ADN, con los 20 tamaños 10–200, los 31 espaciados numéricos, los 6 radios y el ancho de caja del local (P2.1 y la prueba
+de portabilidad). `cod_adn_export` (`formato: "theme-json"`) genera ese mismo archivo para commitearlo (base =
+`theme.base.json` si existe, si no el `theme.json` actual); con el archivo exportado el filtro no superpone nada y
+`wp_get_global_settings()`/`wp_get_global_styles()` dan lo mismo.
+
+**`cod_theme_definitions` es una proyección derivada, no se sobreescribe.** `get()` pone encima de la opción los campos del
+almacén plano de la proyección vigente (`COD_Theme_Definitions::gobernados()`). Un `update_option` directo que cambie un
+campo gobernado **devuelve false** y no cambia nada (`pre_update_option_cod_theme_definitions`); el formulario de Configuración
+muestra esos campos deshabilitados («Gobernado por ADN `basis-web` r3») y el servidor los ignora aunque se los manden
+(`respetar_gobierno`); lo que el ADN no gobierna (escalas de Configuración, ícono) se sigue escribiendo. Borrar la opción
+no cambia lo servido (WordPress no tiene un filtro previo al borrado y los valores gobernados no salen de la opción).
+
+**Mapeos que F1 dejó sin fijar (fijados):**
+
+| Caso | Regla |
+|---|---|
+| Rol de color Core → `--cod-color-*` | `background` → `--cod-color-surface`, `text` → `--cod-color-ink`, `accent` → `--cod-color-accent`, **`surface` (Core) → `--cod-color-primary`** (así lo llama el plugin; F1 lo dejaba en `--cod-color-surface` y pisaba el fondo), y los otros nueve roles → `--cod-color-<rol>` (`border`, `action`, `info`, `success`, `warning`, `error`, `active`, `inactive`, `focus`) |
+| `--wp--custom--radius--<rol>` con `rol` = referencia genérica | se navega la referencia (a **cualquier** requisito del contrato, no sólo a los proyectados) hasta un texto; si no llega, el último segmento si es un nombre (no un índice ni `nombre`/`name`/`value`/`rol`/`role`/`roles`); si no, `forma-<n>`. Dos nombres con el mismo slug se desambiguan (R3) |
+| `pill` / `circle` / `none` | `9999px` / `50%` / `0`. `longitud` sin `radioValor` **se omite y avisa** `ADN_RADIO_SIN_VALOR` (no se inventa un valor) |
+| Tamaño de letra | cada rol de `dim2.req02` es `--wp--preset--font-size--<slug del rol>`, **siempre `fluid:false`** (el ADN declara longitudes exactas; con `typography.fluid:true` en el tema, WordPress derivaría un `clamp()` y el tamaño cambiaría) y con `defaultFontSizes:false` (igual `defaultSpacingSizes:false` en espaciado) |
+| Almacén plano | los campos `font_*` guardan el **nombre** de la primera familia (así los cita Configuración y así los comillaba `css()`), no un `var()`; los `*_size` sólo admiten píxeles (otra unidad → `ADN_PLANO_UNIDAD`); los colores, el **literal** resuelto. El registro, en cambio, guarda la **referencia** (`var(--wp--preset--…)`) |
+| Ancho de caja (`dim3.req05`, ahora proyectado) | contenedor `contenido` → `settings.layout.contentSize`, `--wp--style--global--content-size`, `--cod-layout-max-width` (rol Core `measure`) y `layout_max_width`; contenedor `amplio` → `wideSize`; cualquier otro → `--wp--custom--layout--contenedor--<slug>` |
+| Movimiento Core (`dim8.req04`, ahora proyectado) | el movimiento con `caso` `enter`/`aparecer` → `--cod-motion-enter`; `response`/`responder` → `--cod-motion-response`; valor `<duración>ms <curva>` (la duración sale de `duracionMs` o de la referencia `tiempo` a `dim8.req03`). Todos los casos → `--wp--custom--motion--caso-<slug>` |
+| `styles` | `background` → `styles.color.background`; `text` → `styles.color.text`; `accent` → enlaces y fondo del botón; `font_body`/`font_heading` → `styles.typography.fontFamily` / `elements.heading`; todos como `var(--wp--preset--…)`, de modo que cambiar un color del ADN mueve todo lo que lo usa |
+
+**Q1(a) implementado.** `dim2.req02.roleStyles[].role` admite nombres libres además de los nueve del Core
+(`COD_ADN_Requisitos::ROLES_TIPOGRAFICOS_ABIERTOS`). Es un cambio del espejo web **adelantado al Core**: un ADN con roles
+extra lo valida esta web pero **no** `parsePortableDesignModel` de Desktop hasta que el Core lo abra (pedido ya registrado
+en Q1). `true` por omisión; poniéndolo en `false` vuelve la lista cerrada de nueve.
+
+**Lo que el ADN todavía no puede llevar (pedido Q4 al Core, ver 9.1).** Un sitio destino NO recibe por el paquete, aunque
+el local sí lo tenga: las transparencias de la paleta (`color-mix()`, que el Core no tiene como color-css), los degradados,
+las sombras (Q3), el paso de espaciado `gutter` (`max()/calc()`), `custom.border`, los pesos y los interlineados
+(`custom.typography.fontWeight|lineHeight`), las medidas de texto (`custom.layout.measure`), los desenfoques
+(`custom.blur`), `custom.form` (contrato de diseño del formulario) y los **valores por punto de quiebre** de la escala
+(`styles.css`: lo de tablet y celular). Está escrito en código (`COD_ADN_Theme::fuera_del_adn()`, se ve en `cod_adn_get`) y la
+prueba P2.7 exige que **todo lo del `custom` de referencia que no llegue esté en esa lista**: una pérdida no declarada
+hace fallar la prueba. Mientras Q4 siga abierta, esas piezas siguen viviendo en el `theme.json` del tema o en Configuración
+y **un sitio destino sin ellas no es idéntico al local** (en Basis: bordes, pesos, medidas de texto, formulario, sombras,
+`gutter` y la escala responsiva).
 
 **Familias de variables** (nombres deterministas: *slug* de `name`, con `_` y acentos normalizados):
 
@@ -1155,15 +1211,20 @@ completos y rechazan sobrescribir una página en bloques con el shortcode (H9). 
 - **P1b.3** Importar un paquete cuya página está en bloques sobre un sitio donde esa página ya está en bloques **con
   ediciones** → no se sobrescribe con el shortcode: rechazo con error explícito, `post_content` intacto (hash igual).
 
-### F2 — Proyección única
+### F2 — Proyección única — **implementada y verificada el 02-nov-2026** (ver 3.6.1)
 
 `COD_ADN_Projection` (por revisión), filtro `wp_theme_json_data_theme`, `cod_theme_definitions` derivada,
 `COD_Design_Core` lee sólo ADN, Configuración de sólo lectura, `cod_adn_export`, hojas del tema sobre `--wp--*`.
 
 - **P2.1** Con un ADN derivado del `theme.json` actual de Basis, `wp_get_global_settings()` da la **misma** paleta (los
   12 slugs con su hex) y las mismas 4 familias, comparado contra la **copia congelada** de `contope-basis/theme.json`
-  de `b7b0478` (no contra el regenerado). *Piso:* falla si se compararon menos de 12 colores o menos de 4 familias, o
-  si falta cualquiera de los dos archivos.
+  (no contra el regenerado). *Piso:* falla si se compararon menos de 12 colores o menos de 4 familias, o
+  si falta cualquiera de los dos archivos. **Corrección de F2:** la copia congelada es la de `5e118c5` (la que sirve el
+  local), no la de `b7b0478`: esa tiene dos slugs de color distintos (`background` y `text`, hoy `fondo-pagina` y
+  `texto-cuerpo`) y es, en cambio, el **destino atrasado** de la prueba de portabilidad. Las dos viven en `fixtures/adn/f2/`
+  con su sha256 en la prueba. *Hecho:* además de colores y familias se comparan los 20 tamaños, los 31 espaciados, los 6
+  radios y el ancho de caja, y se exige que el control (el destino atrasado **sin** ADN) dé 4 tamaños, 0 espaciados y sin
+  `custom`. Sobran en el destino, por diseño, los roles `display` y `cuerpo` (los pide `dim2.req07`).
 - **P2.2** `COD_Design_Core::faltantes() == []` **y** `estado()` devuelve el número esperado de roles, todos con
   origen `adn` (así no pasa en vacío).
 - **P2.3** Cambiar `accent` en el ADN (r+1) cambia `--cod-color-accent`, `--wp--preset--color--accent`, el color del
@@ -1177,7 +1238,13 @@ completos y rechazan sobrescribir una página en bloques con el shortcode (H9). 
   de normalizaciones está escrita). Falla si falta la línea base.
 - **P2.6** (H11) `grep -c "var(--cod-" contope-basis/*.css` = **0** (hoy 12 líneas) y ninguna hoja del tema declara
   `--cod-*` (las propias pasan a `--basis-*`). *Control:* la misma búsqueda sobre `b7b0478` debe dar 12; si da 0, el
-  grep está mal.
+  grep está mal. *Hecho:* `scripts/adn/probar-hojas-del-tema.mjs`. Además, los valores **calculados en el navegador** de
+  las 5 páginas (2.852 elementos × 23 propiedades, 1440 y 393) antes y después de tocar las hojas son los mismos
+  (`scripts/basis/medir-calculados.mjs`), con una única excepción medida y aceptada: el `font-family` calculado pasa de la
+  sola primera familia (`"Open Sans"`) a la pila completa del preset (`"Open Sans", system-ui, …`); la primera familia, la
+  que se dibuja, es idéntica.
+- **P2.7** (nueva, F2) Lo que el ADN no puede llevar (ver 3.6.1) está declarado en código y la prueba de portabilidad falla si
+  una pérdida del `custom` no está en esa lista. *Hecho:* `scripts/probar-adn-proyeccion.php`.
 
 ### F3 — Auditoría y modo `observe`
 
@@ -1378,6 +1445,16 @@ la correspondencia arquetipo → familia de bloque; **(b)** dejar fuera de Basis
 como **hueco declarado** en el informe de ajuste, y avanzar sin ellas. Mientras no se decida: **F4b y F8 quedan
 bloqueadas**, y una sombra o variante pedida da `ADN_NAME_UNRESOLVED`. **Recomendación:** no frenar F0-F7, que no
 dependen de Q3, y decidir antes de F8.
+
+**Q4 (nueva, F2). Qué más tiene que poder llevar el ADN para que un sitio sea idéntico al local sin subir archivos.** El
+Core no puede expresar: transparencias de la paleta (`color-mix()`), degradados, el paso de espaciado `gutter`
+(`max()/calc()`), escalas de grosor de borde, de peso y de interlineado, medidas de texto, desenfoques, valores por punto
+de quiebre de una escala, y el contrato de diseño del formulario (lista exacta en 3.6.1). Opciones: **(a)** ampliar el
+Core (requisitos nuevos para esas escalas, con valores por quiebre) — es lo que hace falta para que la promesa «el
+paquete lo lleva todo» sea cierta; **(b)** aceptar que esas piezas viajan sólo con el tema (subiendo el `theme.json`
+generado), lo que **contradice** la regla de subir sólo con Portabilidad. **Recomendación: (a), empezando por los
+valores por quiebre y el formulario**, que son lo que más se nota en celular; hasta entonces el informe de cada subida
+debe listar lo de `fuera_del_adn()`.
 
 **Pendiente heredado (sin número): los 7 colores fuera del set.** Siete colores de Basis no tienen equivalente en la
 paleta (2.5). Siguen abiertos; el extractor los lleva a `obs.colores-de-uso-puntual` y no se emiten.

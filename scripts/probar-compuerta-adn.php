@@ -88,6 +88,7 @@ $clasificacion = [
     'cod_get_capabilities' => 'lee',
     // el ADN: no escriben diseño en documentos; el import cambia lo que se puede referenciar (prueba: scripts/probar-adn-almacen.php)
     'cod_adn_get' => 'lee',
+    'cod_adn_export' => 'lee',
     'cod_adn_preview_import' => 'revisa',
     'cod_adn_apply_import' => 'adn',
     'cod_list_canvas_pages' => 'lee',

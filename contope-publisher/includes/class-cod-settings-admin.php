@@ -159,6 +159,7 @@ final class COD_Settings_Admin
 
         $values = COD_Theme_Definitions::get();
         $schema = COD_Theme_Definitions::schema();
+        $gobierno = COD_Theme_Definitions::rotulo_de_gobierno();
         ?>
         <div class="wrap cod-settings-wrap">
             <div class="cod-settings-header">
@@ -215,6 +216,11 @@ final class COD_Settings_Admin
                         Los campos sin definir no emiten CSS. Los valores iniciales provienen del
                         tema importado; guardá acá solo lo que quieras aplicar como base del sitio.
                     </p>
+                    <?php if ($gobierno !== '') : ?>
+                        <div class="notice notice-info inline">
+                            <p>Los campos marcados <em>Gobernado por <?php echo esc_html($gobierno); ?></em> salen del ADN de diseño del sitio y no se editan aquí: se cambian importando una revisión nueva del ADN.</p>
+                        </div>
+                    <?php endif; ?>
                     <form id="cod-settings-form" autocomplete="off">
                         <?php foreach ($schema as $group) : ?>
                             <fieldset class="cod-settings-group">
@@ -556,6 +562,10 @@ final class COD_Settings_Admin
         $id = 'cod-settings-' . $field['id'];
         $type = (string) ($field['type'] ?? 'text');
         $unit = (string) ($field['unit'] ?? '');
+        $gobernado = array_key_exists((string) $field['id'], COD_Theme_Definitions::gobernados());
+        if ($gobernado) {
+            echo '<fieldset disabled class="cod-settings-gobernado" style="border:0;margin:0;padding:0;min-width:0">';
+        }
         ?>
         <label class="cod-settings-field cod-settings-field--<?php echo esc_attr($type); ?>" for="<?php echo esc_attr($id); ?>">
             <span class="cod-settings-field-label">
@@ -630,6 +640,9 @@ final class COD_Settings_Admin
             <?php endif; ?>
         </label>
         <?php
+        if ($gobernado) {
+            echo '<small class="cod-settings-gobernado-nota">Gobernado por ' . esc_html(COD_Theme_Definitions::rotulo_de_gobierno()) . '</small></fieldset>';
+        }
     }
 
     public function handle_save(): void
@@ -645,9 +658,9 @@ final class COD_Settings_Admin
             wp_send_json_error(['message' => 'Las definiciones no son un JSON válido.'], 400);
         }
 
-        $values = COD_Theme_Definitions::sanitize($decoded);
+        $values = COD_Theme_Definitions::respetar_gobierno(COD_Theme_Definitions::sanitize($decoded));
         update_option(COD_Theme_Definitions::OPTION_KEY, wp_json_encode($values), false);
 
-        wp_send_json_success($values);
+        wp_send_json_success(COD_Theme_Definitions::get());
     }
 }

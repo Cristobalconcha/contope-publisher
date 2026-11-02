@@ -1,0 +1,204 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/theme.json",
+  "version": 3,
+  "settings": {
+    "appearanceTools": true,
+    "layout": {
+      "contentSize": "1080px",
+      "wideSize": "1440px"
+    },
+    "color": {
+      "palette": [
+        {
+          "slug": "background",
+          "color": "#FFFFFF",
+          "name": "Fondo"
+        },
+        {
+          "slug": "gris",
+          "color": "#898989",
+          "name": "Gris"
+        },
+        {
+          "slug": "gris-oscuro",
+          "color": "#636363",
+          "name": "Gris oscuro"
+        },
+        {
+          "slug": "gris-claro",
+          "color": "#D6D6D6",
+          "name": "Gris claro"
+        },
+        {
+          "slug": "gris-suave",
+          "color": "#D8D8D8",
+          "name": "Gris suave"
+        },
+        {
+          "slug": "casi-blanco",
+          "color": "#F4F4F4",
+          "name": "Casi blanco"
+        },
+        {
+          "slug": "dark",
+          "color": "#222222",
+          "name": "Negro"
+        },
+        {
+          "slug": "text",
+          "color": "#666666",
+          "name": "Texto"
+        },
+        {
+          "slug": "ink",
+          "color": "#0E0C19",
+          "name": "Tinta"
+        },
+        {
+          "slug": "accent",
+          "color": "#F26621",
+          "name": "Naranja Basis"
+        },
+        {
+          "slug": "rojo",
+          "color": "#E02B20",
+          "name": "Rojo"
+        },
+        {
+          "slug": "rojo-contacto",
+          "color": "#DC4017",
+          "name": "Rojo contacto"
+        }
+      ],
+      "defaultPalette": false,
+      "defaultGradients": false,
+      "custom": false,
+      "customGradient": false
+    },
+    "spacing": {
+      "units": [
+        "px",
+        "rem",
+        "vw",
+        "%"
+      ],
+      "blockGap": true
+    },
+    "typography": {
+      "fluid": true,
+      "fontFamilies": [
+        {
+          "slug": "display",
+          "name": "Títulos",
+          "fontFamily": "'Big Shoulders Display', 'Arial Narrow', system-ui, sans-serif"
+        },
+        {
+          "slug": "body",
+          "name": "Cuerpo",
+          "fontFamily": "'Open Sans', system-ui, -apple-system, 'Segoe UI', sans-serif"
+        },
+        {
+          "slug": "boton",
+          "name": "Botones",
+          "fontFamily": "'Roboto', 'Helvetica Neue', Arial, sans-serif"
+        },
+        {
+          "slug": "pliegue",
+          "name": "Pliegues",
+          "fontFamily": "'Montserrat', 'Helvetica Neue', Arial, sans-serif"
+        }
+      ],
+      "fontSizes": [
+        {
+          "slug": "small",
+          "name": "Pequeño",
+          "size": "0.8rem"
+        },
+        {
+          "slug": "medium",
+          "name": "Medio",
+          "size": "1rem"
+        },
+        {
+          "slug": "large",
+          "name": "Grande",
+          "size": "clamp(1.35rem, 2vw, 1.8rem)"
+        },
+        {
+          "slug": "x-large",
+          "name": "Muy grande",
+          "size": "clamp(2.4rem, 6vw, 5rem)"
+        }
+      ],
+      "defaultFontSizes": false
+    }
+  },
+  "styles": {
+    "color": {
+      "background": "#FFFFFF",
+      "text": "#666666"
+    },
+    "spacing": {
+      "blockGap": "1.25rem"
+    },
+    "typography": {
+      "fontFamily": "var(--wp--preset--font-family--body)",
+      "lineHeight": "1.7"
+    },
+    "elements": {
+      "heading": {
+        "typography": {
+          "fontFamily": "var(--wp--preset--font-family--display)",
+          "fontWeight": "500",
+          "lineHeight": "1.2"
+        }
+      },
+      "button": {
+        "color": {
+          "background": "#F26621",
+          "text": "#FFFFFF"
+        },
+        "border": {
+          "radius": "999px"
+        },
+        "typography": {
+          "fontFamily": "var(--wp--preset--font-family--boton)",
+          "fontSize": "14px",
+          "fontWeight": "700"
+        }
+      },
+      "link": {
+        "color": {
+          "text": "#F26621"
+        }
+      }
+    },
+    "blocks": {
+      "core/image": {
+        "border": {
+          "radius": "16px"
+        }
+      },
+      "core/group": {
+        "spacing": {
+          "padding": {
+            "left": "clamp(1.25rem, 4vw, 3rem)",
+            "right": "clamp(1.25rem, 4vw, 3rem)"
+          }
+        }
+      }
+    }
+  },
+  "templateParts": [
+    {
+      "name": "header",
+      "title": "Cabecera",
+      "area": "header"
+    },
+    {
+      "name": "footer",
+      "title": "Pie",
+      "area": "footer"
+    }
+  ]
+}

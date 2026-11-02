@@ -4,14 +4,14 @@
    12,7% de la pantalla de un teléfono. Un aviso que tapa media pantalla no se
    lee, se cierra — y un cierre apurado no es consentimiento informado.
    Los colores son los del set de Basis: estas variables sólo les ponen el
-   nombre que usa esta hoja; el valor sale de la paleta del theme.json y de las
-   definiciones de estilo (ContOpe → Configuración), no se copia acá.
+   nombre que usa esta hoja; el valor sale de la paleta del theme.json (que sale del
+   ADN), no se copia acá ni se pide al plugin: esta hoja no usa ninguna --cod-*.
    --------------------------------------------------------------------------- */
 
 :root {
-  --cod-basis-gris: var(--wp--preset--color--gris-oscuro);
-  --cod-basis-naranja: var(--cod-color-accent);
-  --cod-basis-claro: var(--wp--preset--color--gris-claro);
+  --basis-cookies-gris: var(--wp--preset--color--gris-oscuro);
+  --basis-cookies-naranja: var(--wp--preset--color--accent);
+  --basis-cookies-claro: var(--wp--preset--color--gris-claro);
 }
 
 /* Nota heredada del modelo:
@@ -133,11 +133,11 @@
    los colores —fondos, textos, enlaces, interruptores— se configuran en la
    pantalla de CookieAdmin, que es donde corresponde. */
 .cookieadmin_btn {
-  border-color: var(--cod-basis-claro);
+  border-color: var(--basis-cookies-claro);
 }
 
 .cookieadmin_btn:hover {
-  border-color: var(--cod-basis-naranja);
+  border-color: var(--basis-cookies-naranja);
 }
 
 /* El plugin trae tres azules escritos a mano en su hoja, sin ajuste que los
@@ -145,14 +145,14 @@
    interruptor encendido. Son los únicos colores que hay que corregir desde
    acá; todo lo demás sale de su pantalla de ajustes. */
 .cookieadmin_act {
-  color: var(--cod-basis-naranja);
+  color: var(--basis-cookies-naranja);
   font-weight: 600;
 }
 
 button.cookieadmin_btn {
-  color: var(--cod-basis-gris);
+  color: var(--basis-cookies-gris);
 }
 
 input:checked + .cookieadmin_slider {
-  background-color: var(--cod-basis-naranja);
+  background-color: var(--basis-cookies-naranja);
 }

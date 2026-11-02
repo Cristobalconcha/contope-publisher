@@ -183,7 +183,12 @@ try {
     $get1 = COD_ADN_Store::resumen(['definiciones']);
     $comprobar('cod_adn_get: activo, revisión 1, conteos coherentes', $get1['activo'] && $get1['revision'] === 1 && $get1['conteos']['confirmed'] === 7 && $get1['conteos']['emitidas'] >= 5, json_encode($get1['conteos']));
     $servido_r1 = $servido();
-    $comprobar('F1 no cambia lo servido: las 5 páginas son idénticas tras importar r1 (nadie consume todavía la proyección)', $servido_r1 === $base_servido);
+    // F2 supersedió esta promesa de F1 ("importar no cambia una página"): ahora la proyección SE CONSUME por el puntero.
+    $comprobar('F2 consume la proyección: tras importar r1 lo servido CAMBIA (el theme.json sale del ADN) y las 5 páginas siguen respondiendo', $servido_r1 !== $base_servido && count(array_filter($servido_r1, static function ($h) {
+        return $h !== 'SIN-RESPUESTA';
+    })) === 5, json_encode(array_keys(array_filter($servido_r1, static function ($h, $k) use ($base_servido) {
+        return $h === ($base_servido[$k] ?? null);
+    }, ARRAY_FILTER_USE_BOTH))));
 
     // ---------------------------------------------------------------------
     echo "\n== 2. P1.3 — idempotencia, revisión y identidad ==\n";
@@ -426,12 +431,12 @@ try {
     $despues = $foto();
     $comprobar('CONTROL: sin inyección el import pasa', !is_wp_error($res) && COD_ADN_Store::revision_activa() === $siguiente, $codigo($res));
     $comprobar('CONTROL: …y cod_adn_get y el puntero CAMBIAN (la prueba sabe ver un cambio)', $despues['get'] !== $antes['get'] && $despues['puntero'] !== $antes['puntero'] && $despues['posts'] === $antes['posts'] + 1);
-    $comprobar('F1 no consume la proyección: lo servido sigue igual aunque el puntero se movió', $despues['servido'] === $antes['servido']);
+    $comprobar('F2 consume la proyección: al mover el puntero lo servido cambia (la revisión nueva trae un color más a la paleta)', $despues['servido'] !== $antes['servido']);
     // CONTROL del instrumento que mira lo servido: un cambio real SE VE en el hash.
     update_option('blogname', 'Cambio de prueba del hash');
     $cambiado = $servido();
     update_option('blogname', $nombre_original);
-    $comprobar('CONTROL del instrumento: cambiar el nombre del sitio SÍ cambia el hash de las páginas servidas', $cambiado !== $antes['servido'] && $servido() === $antes['servido']);
+    $comprobar('CONTROL del instrumento: cambiar el nombre del sitio SÍ cambia el hash de las páginas servidas', $cambiado !== $despues['servido'] && $servido() === $despues['servido']);
 
     // ---------------------------------------------------------------------
     echo "\n== 6. herramientas del MCP y capacidades honestas ==\n";

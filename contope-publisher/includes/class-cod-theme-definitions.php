@@ -239,7 +239,111 @@ final class COD_Theme_Definitions
             }
         }
 
+        // Con un ADN activo esta opción es una PROYECCIÓN DERIVADA (ESPEC 3.3): los campos que el ADN
+        // gobierna se leen de la proyección vigente, por el puntero, y no de lo que haya guardado la opción.
+        foreach (self::gobernados() as $id => $valor) {
+            if (array_key_exists($id, $values)) {
+                $values[$id] = $valor;
+            }
+        }
+
         return $values;
+    }
+
+    /**
+     * Los campos que el ADN activo gobierna (id => valor), o [] sin ADN. Son los valores del almacén plano de
+     * la proyección vigente; no se sobreescribe la opción: se leen por el puntero.
+     *
+     * @return array<string, string>
+     */
+    public static function gobernados(): array
+    {
+        if (!class_exists('COD_ADN_Store')) {
+            return [];
+        }
+        $proyeccion = COD_ADN_Store::proyeccion_vigente();
+        if ($proyeccion === null || !is_array($proyeccion['plano'] ?? null)) {
+            return [];
+        }
+        $ids = [];
+        foreach (self::schema() as $group) {
+            foreach ($group['fields'] as $field) {
+                $ids[(string) $field['id']] = true;
+            }
+        }
+        $out = [];
+        foreach ($proyeccion['plano'] as $id => $valor) {
+            if (isset($ids[(string) $id]) && is_scalar($valor)) {
+                $out[(string) $id] = (string) $valor;
+            }
+        }
+        ksort($out);
+        return $out;
+    }
+
+    /** "ADN `basis-web` r3" si hay ADN activo que gobierna campos; si no, ''. */
+    public static function rotulo_de_gobierno(): string
+    {
+        $puntero = class_exists('COD_ADN_Store') ? COD_ADN_Store::puntero() : null;
+        return $puntero === null || self::gobernados() === [] ? '' : 'ADN `' . $puntero['designId'] . '` r' . (int) $puntero['revision'];
+    }
+
+    /** Lo que la opción tiene guardado, sin la proyección encima. @return array<string, mixed> */
+    private static function guardado_crudo(): array
+    {
+        $raw = get_option(self::OPTION_KEY, '');
+        $decoded = is_string($raw) && $raw !== '' ? json_decode($raw, true) : [];
+        return is_array($decoded) ? $decoded : [];
+    }
+
+    /**
+     * Devuelve los valores con los campos gobernados tal como están guardados: un formulario que los manda
+     * (con el valor que ve, el de la proyección) no los cambia.
+     *
+     * @param array<string, string> $values
+     * @return array<string, string>
+     */
+    public static function respetar_gobierno(array $values): array
+    {
+        $guardado = self::guardado_crudo();
+        foreach (array_keys(self::gobernados()) as $id) {
+            $values[$id] = isset($guardado[$id]) && is_scalar($guardado[$id]) ? (string) $guardado[$id] : '';
+        }
+        return $values;
+    }
+
+    /**
+     * P2.4: ninguna ruta de escritura distinta de la proyección cambia un campo gobernado. Un
+     * `update_option` directo que lo intente devuelve false y la opción queda como estaba. Lo que no gobierna el
+     * ADN (escalas, ícono, ajustes) se sigue escribiendo. Borrar la opción no cambia lo servido: los campos
+     * gobernados se leen de la proyección, no de la opción (WordPress no tiene un filtro previo al borrado).
+     *
+     * @param mixed $nuevo
+     * @param mixed $viejo
+     * @return mixed
+     */
+    public static function filtrar_escritura($nuevo, $viejo)
+    {
+        $gobernados = self::gobernados();
+        if ($gobernados === []) {
+            return $nuevo;
+        }
+        $n = is_string($nuevo) && $nuevo !== '' ? json_decode($nuevo, true) : [];
+        $v = is_string($viejo) && $viejo !== '' ? json_decode($viejo, true) : [];
+        $n = is_array($n) ? $n : [];
+        $v = is_array($v) ? $v : [];
+        foreach (array_keys($gobernados) as $id) {
+            if ((string) ($n[$id] ?? '') !== (string) ($v[$id] ?? '')) {
+                do_action('cod_theme_definitions_escritura_rechazada', $id);
+                return $viejo;
+            }
+        }
+        return $nuevo;
+    }
+
+    public static function registrar_gobierno(): void
+    {
+        add_filter('pre_update_option_' . self::OPTION_KEY, [self::class, 'filtrar_escritura'], 10, 2);
     }
 
     /**

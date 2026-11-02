@@ -905,6 +905,21 @@ final class COD_Canvas_MCP_Service
                 'annotations' => $read_only,
             ],
             [
+                'name' => 'cod_adn_export',
+                'title' => 'Exportar el ADN activo',
+                'description' => 'Exporta el ADN activo. formato "theme-json": el theme.json del tema generado desde la base del tema (theme.base.json si existe, si no el theme.json actual) con la proyección del ADN encima y el sello settings.custom.adn {designId, revision, digest}; es el artefacto que se commitea y se sube con el tema (respaldo si el plugin se apaga). formato "contract": el contrato guardado de la revisión activa, tal como se importó. No escribe nada.',
+                'inputSchema' => [
+                    'type' => 'object',
+                    'properties' => [
+                        'formato' => ['type' => 'string', 'enum' => ['theme-json', 'contract']],
+                    ],
+                    'required' => ['formato'],
+                    'additionalProperties' => false,
+                ],
+                'outputSchema' => ['type' => 'object'],
+                'annotations' => $read_only,
+            ],
+            [
                 'name' => 'cod_adn_preview_import',
                 'title' => 'Previsualizar import del ADN',
                 'description' => 'Valida un ADN (design-contract.json o design/model.json) y dice qué haría importarlo, sin escribir nada: errores con código, diff de definiciones y variables (agregadas, quitadas, renombradas, con otro valor, degradadas), las variables en uso que se romperían (rompe) y el previewId. Pasa el ADN como TEXTO JSON en model: es lo único que conserva la diferencia entre {} y [].',
@@ -968,6 +983,22 @@ final class COD_Canvas_MCP_Service
                 return new WP_Error('cod_mcp_invalid_arguments', 'incluir debe ser una lista con valores de: definiciones, registro, auditoria.');
             }
             return COD_ADN_Store::resumen(array_values($incluir));
+        }
+        if ($tool_name === 'cod_adn_export') {
+            $formato = $arguments['formato'] ?? null;
+            if (!$this->has_only_keys($arguments, ['formato']) || !in_array($formato, ['theme-json', 'contract'], true)) {
+                return new WP_Error('cod_mcp_invalid_arguments', 'cod_adn_export necesita formato: "theme-json" o "contract".');
+            }
+            if ($formato === 'theme-json') {
+                $salida = COD_ADN_Theme::exportar_theme_json();
+                return is_wp_error($salida) ? $salida : ['formato' => 'theme-json'] + $salida;
+            }
+            $puntero = COD_ADN_Store::puntero();
+            $contrato = $puntero === null ? null : COD_ADN_Store::contrato_de_revision((string) $puntero['designId'], (int) $puntero['revision']);
+            if ($puntero === null || $contrato === null) {
+                return new WP_Error('ADN_NOT_ACTIVE', 'Este sitio no tiene un ADN activo.');
+            }
+            return ['formato' => 'contract', 'designId' => $puntero['designId'], 'revision' => (int) $puntero['revision'], 'digest' => $puntero['digest'], 'json' => COD_ADN_Validator::json_canonico($contrato)];
         }
         if ($tool_name === 'cod_adn_preview_import' || $tool_name === 'cod_adn_apply_import') {
             $aplica = $tool_name === 'cod_adn_apply_import';

@@ -26,9 +26,9 @@ if (!defined('ABSPATH')) {
  * fallo, y para sincronizar procesos en la prueba de concurrencia. Sin nadie escuchando
  * no hacen nada.
  *
- * EN F1 NADIE CONSUME LA PROYECCIÓN PARA PINTAR. Importar un ADN no cambia una página. El
- * filtro de theme.json, COD_Design_Core, COD_Theme_Definitions y el emisor de `:root`
- * pasan a leerla por el puntero en F2 (COD_ADN_Store::proyeccion_vigente()).
+ * DESDE F2 LA PROYECCIÓN SE CONSUME, SIEMPRE POR EL PUNTERO (proyeccion_vigente()): el filtro de
+ * theme.json (COD_ADN_Theme), COD_Design_Core, COD_Theme_Definitions::get() y el emisor de `:root`.
+ * Sin ADN activo no se consume nada y el sitio queda exactamente como estaba.
  */
 final class COD_ADN_Store
 {
@@ -617,9 +617,11 @@ final class COD_ADN_Store
             'conteos' => $conteos,
             'proyeccion' => [
                 'themeJson' => self::estado_del_theme_json((string) $p['digest']),
-                // F2 pasa cod_theme_definitions a ser proyección derivada. Mientras tanto no se toca.
-                'themeDefinitions' => 'no-aplicada',
+                // cod_theme_definitions es una proyección derivada: los campos gobernados se leen por el puntero.
+                'themeDefinitions' => 'derivada',
+                'camposGobernados' => array_keys(COD_Theme_Definitions::gobernados()),
                 'variables' => count($proy['registro'] ?? []),
+                'fueraDelAdn' => array_keys(COD_ADN_Theme::fuera_del_adn()),
             ],
             'ignoradas' => $proy['ignoradas'] ?? [],
         ];
@@ -641,15 +643,6 @@ final class COD_ADN_Store
     /** sincronizado | adelantado | ausente, según el `digest` que lleve el theme.json del tema. */
     private static function estado_del_theme_json(string $digest): string
     {
-        $archivo = rtrim((string) get_stylesheet_directory(), '/\\') . '/theme.json';
-        if (!is_readable($archivo)) {
-            return 'ausente';
-        }
-        $json = json_decode((string) file_get_contents($archivo), true);
-        $del_archivo = is_array($json) ? ($json['settings']['custom']['adn']['digest'] ?? null) : null;
-        if (!is_string($del_archivo) || $del_archivo === '') {
-            return 'ausente';
-        }
-        return hash_equals($del_archivo, $digest) ? 'sincronizado' : 'adelantado';
+        return COD_ADN_Theme::estado_del_archivo();
     }
 }

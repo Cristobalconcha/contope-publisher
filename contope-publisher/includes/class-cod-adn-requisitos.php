@@ -37,7 +37,16 @@ final class COD_ADN_Requisitos
     public const MAX_MOTIVOS = 20;
 
     /** Requisitos que la web proyecta. */
-    public const PROYECTADOS = ['dim1.req01', 'dim1.req02', 'dim2.req01', 'dim2.req02', 'dim2.req07', 'dim3.req01', 'dim3.req02', 'dim4.req02', 'dim8.req03'];
+    public const PROYECTADOS = ['dim1.req01', 'dim1.req02', 'dim2.req01', 'dim2.req02', 'dim2.req07', 'dim3.req01', 'dim3.req02', 'dim3.req05', 'dim4.req02', 'dim8.req03', 'dim8.req04'];
+
+    /**
+     * Q1(a), DECIDIDO por el dueño el 02-nov-2026: `dim2.req02` admite roles tipográficos ADEMÁS de los nueve del Core,
+     * con nombre libre (el Core de Desktop lo abre en una versión menor; hasta entonces un ADN con roles extra lo
+     * valida esta web pero no `parsePortableDesignModel` de Desktop). Un rol extra se vuelve el tamaño de letra
+     * `--wp--preset--font-size--<slug del rol>`. El nombre debe dar un slug propio ([a-z0-9-], sin acentos).
+     * Poner en false vuelve a la lista cerrada de nueve.
+     */
+    public const ROLES_TIPOGRAFICOS_ABIERTOS = true;
 
     /** @var array<string, array<string, mixed>>|null */
     private static ?array $esquemas = null;
@@ -136,7 +145,7 @@ final class COD_ADN_Requisitos
             ],
             'dim2.req02' => [
                 'roleStyles' => self::campo(self::lista(self::objeto([
-                    'role' => self::campo(self::conjunto(self::ROLES_TIPOGRAFICOS)),
+                    'role' => self::campo(self::ROLES_TIPOGRAFICOS_ABIERTOS ? self::t('rol') : self::conjunto(self::ROLES_TIPOGRAFICOS)),
                     'family' => self::campo(self::union([self::ref('dim2.req01'), $texto])),
                     'fontSize' => self::campo($largo),
                     'fontWeight' => self::campo(self::numero(100, 900)),
@@ -165,6 +174,14 @@ final class COD_ADN_Requisitos
                     'derivation' => self::campo($derivacion('dim3.req01')),
                 ]))),
             ],
+            'dim3.req05' => [
+                'contenedores' => self::campo(self::lista(self::objeto([
+                    'nombre' => self::campo($texto),
+                    'maxWidth' => self::campo($largo),
+                    'padding' => self::campo(self::ref('dim3.req02')),
+                    'relacionSoporte' => self::campo($texto),
+                ]))),
+            ],
             'dim4.req02' => [
                 'formas' => self::campo(self::lista(self::objeto([
                     'rol' => self::campo(self::ref()),
@@ -172,6 +189,18 @@ final class COD_ADN_Requisitos
                     'radio' => self::campo(self::conjunto(self::RADIOS)),
                     'radioValor' => self::campo($largo, true),
                 ]))),
+            ],
+            'dim8.req04' => [
+                'movimientos' => self::campo(self::lista(self::objeto([
+                    'caso' => self::campo($texto),
+                    'curva' => self::campo($texto),
+                    'trayectoria' => self::campo($texto),
+                    'continuidadEspacial' => self::campo($texto),
+                    'amplitud' => self::campo($largo, true),
+                    'tiempo' => self::campo(self::ref('dim8.req03'), true),
+                    'duracionMs' => self::campo(self::numero(0, 5000), true),
+                ]))),
+                'sinAmplitud' => self::campo($texto, true),
             ],
             'dim8.req03' => [
                 'escala' => self::campo(self::lista(self::objeto(['nombre' => self::campo($texto), 'duracion' => self::campo(self::numero(0, 5000))]))),
@@ -230,6 +259,17 @@ final class COD_ADN_Requisitos
             }
         }
         return true;
+    }
+
+    /** El slug de un nombre de rol abierto, o '' si no es un nombre válido (vacío, símbolos sueltos, demasiado largo). */
+    public static function slug_de_rol(string $nombre): string
+    {
+        $limpio = COD_ADN_Js::trim($nombre);
+        if ($limpio === '' || mb_strlen($limpio, 'UTF-8') > 40 || preg_match('/^[\p{L}\p{N}][\p{L}\p{N} _-]*$/u', $limpio) !== 1) {
+            return '';
+        }
+        $slug = COD_ADN_Projection::slug($limpio);
+        return $slug === 'x' && mb_strtolower($limpio, 'UTF-8') !== 'x' ? '' : $slug;
     }
 
     /** `isColorCss` del Core. */
@@ -340,6 +380,12 @@ final class COD_ADN_Requisitos
             case 'texto':
                 if (!is_string($valor)) {
                     $agregar("slot '$ruta': se esperaba texto");
+                }
+                return;
+            case 'rol':
+                // Q1(a): un rol abierto es un texto cuyo slug no queda vacío ni cambia de nombre al normalizarse.
+                if (!is_string($valor) || self::slug_de_rol($valor) === '') {
+                    $agregar("slot '$ruta': se esperaba el nombre de un rol (letras, números o guion)");
                 }
                 return;
             case 'enum':

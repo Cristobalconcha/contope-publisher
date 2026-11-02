@@ -27,31 +27,33 @@ Text Domain: cod-basis
  *   #666666  texto de cuerpo                    #0E0C19  tinta de los títulos
  *   #E02B20 / #DC4017  los dos rojos de los títulos «Características» y «Contactos»
  *
- * La identidad se declara acá y en theme.json; el lienzo la extiende, nunca al
- * revés. QUÉ título va de qué color lo decide cada nodo con una regla de color.
+ * La identidad se declara en theme.json (que sale del ADN, ESPEC 3.6) y acá se
+ * LEE directo de sus variables --wp--preset--*: esta hoja no usa ninguna --cod-*,
+ * que sólo define el plugin. Con el plugin apagado el sitio conserva fondo, texto
+ * y fuente (H11). El lienzo la extiende, nunca al revés. QUÉ título va de qué color lo decide cada nodo con una regla de color.
  */
 :root {
-  --basis-naranja: var(--cod-color-accent);
+  --basis-naranja: var(--wp--preset--color--accent);
   --basis-gris: var(--wp--preset--color--gris);
   --basis-gris-oscuro: var(--wp--preset--color--gris-oscuro);
   --basis-gris-claro: var(--wp--preset--color--gris-claro);
   --basis-gris-suave: var(--wp--preset--color--gris-suave);
   --basis-casi-blanco: var(--wp--preset--color--casi-blanco);
   --basis-negro: var(--wp--preset--color--dark);
-  --basis-texto: var(--cod-color-ink);
+  --basis-texto: var(--wp--preset--color--texto-cuerpo);
   --basis-tinta: var(--wp--preset--color--ink);
   --basis-rojo: var(--wp--preset--color--rojo);
   --basis-rojo-contacto: var(--wp--preset--color--rojo-contacto);
 
-  --font-hero: var(--cod-font-heading);
-  --font-body: var(--cod-font-body);
+  --font-hero: var(--wp--preset--font-family--display);
+  --font-body: var(--wp--preset--font-family--body);
   --font-boton: var(--wp--preset--font-family--boton);
-  --font-pliegue: var(--cod-font-accent);
+  --font-pliegue: var(--wp--preset--font-family--pliegue);
 }
 
 /* El cuerpo del original: Open Sans 14px, interlineado 1,7 y gris #666. */
 body {
-  background-color: var(--cod-color-surface);
+  background-color: var(--wp--preset--color--fondo-pagina);
   color: var(--basis-texto);
   font-family: var(--font-body);
   font-size: 14px;

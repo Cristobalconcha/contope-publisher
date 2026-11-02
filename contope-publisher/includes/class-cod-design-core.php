@@ -32,6 +32,11 @@ if (!defined('ABSPATH')) {
  * niveles, al modo de Material Design: una paleta de quince colores sueltos es
  * demasiado grande para mantenerla, tres roles con cinco pasos cada uno no.
  *
+ * Con un ADN activo (F2) la respuesta cambia de fuente y de reglas: el núcleo se lee SÓLO de la
+ * proyección del ADN, por el puntero (origen `adn`). No se consulta `cod_theme_definitions` ni el
+ * `theme.json` como segunda fuente: un `theme.json` viejo no puede volver a taparle un hueco al ADN
+ * (el defecto del issue #9). Sin ADN activo todo sigue como antes.
+ *
  * Qué hace esta clase
  * -------------------
  * Contesta una sola pregunta: **¿el set declara este rol, y dónde?** Busca en
@@ -137,14 +142,18 @@ final class COD_Design_Core
      */
     public static function estado(): array
     {
-        $definiciones = self::desde_definiciones();
-        $tema = self::desde_theme_json();
+        $adn = self::desde_adn();
+        $definiciones = $adn === null ? self::desde_definiciones() : [];
+        $tema = $adn === null ? self::desde_theme_json() : [];
 
         $estado = [];
         foreach (self::roles() as $id => $rol) {
             $valor = '';
             $origen = '';
-            if (isset($definiciones[$id]) && $definiciones[$id] !== '') {
+            if ($adn !== null) {
+                $valor = (string) ($adn[$id] ?? '');
+                $origen = $valor !== '' ? 'adn' : '';
+            } elseif (isset($definiciones[$id]) && $definiciones[$id] !== '') {
                 $valor = $definiciones[$id];
                 $origen = 'definiciones';
             } elseif (isset($tema[$id]) && $tema[$id] !== '') {
@@ -232,6 +241,19 @@ final class COD_Design_Core
      */
     public static function css(): string
     {
+        // Con ADN activo salen TODAS las variables --cod-* de la proyección (ESPEC 3.6: son alias de las
+        // variables del registro; mismos nombres, así nada del sitio se rompe).
+        $proyeccion = class_exists('COD_ADN_Store') ? COD_ADN_Store::proyeccion_vigente() : null;
+        if ($proyeccion !== null) {
+            $alias = [];
+            foreach ((array) ($proyeccion['registro'] ?? []) as $nombre => $entrada) {
+                if (strpos((string) $nombre, '--cod-') === 0 && isset($entrada['valor']) && $entrada['valor'] !== '') {
+                    $alias[] = $nombre . ':' . $entrada['valor'];
+                }
+            }
+            return $alias === [] ? '' : ':root{' . implode(';', $alias) . ';}';
+        }
+
         $reglas = [];
         foreach (self::estado() as $rol) {
             if (!$rol['declarado']) {
@@ -279,6 +301,29 @@ final class COD_Design_Core
         $css = wp_get_global_stylesheet(['variables']);
 
         return is_string($css) ? $css : '';
+    }
+
+    /**
+     * Lo que declara el ADN activo, por rol del núcleo: el valor de la variable del plugin que la
+     * proyección emite para ese rol. null si no hay ADN activo.
+     *
+     * @return array<string, string>|null
+     */
+    private static function desde_adn(): ?array
+    {
+        if (!class_exists('COD_ADN_Store')) {
+            return null;
+        }
+        $proyeccion = COD_ADN_Store::proyeccion_vigente();
+        if ($proyeccion === null) {
+            return null;
+        }
+        $registro = (array) ($proyeccion['registro'] ?? []);
+        $valores = [];
+        foreach (self::roles() as $id => $rol) {
+            $valores[$id] = isset($registro[$rol['token']]['valor']) ? trim((string) $registro[$rol['token']]['valor']) : '';
+        }
+        return $valores;
     }
 
     /**

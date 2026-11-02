@@ -49,6 +49,7 @@ require_once COD_PUBLISHER_DIR . 'includes/class-cod-adn-lock.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-adn-projection.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-adn-integridad.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-adn-store.php';
+require_once COD_PUBLISHER_DIR . 'includes/class-cod-adn-theme.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-adn-admin.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-adn-gate.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-adn-gate-admin.php';
@@ -165,6 +166,9 @@ add_action('plugins_loaded', static function (): void {
     // los ajustes de WordPress. Si el tema declara uno, gana y el de WordPress
     // se apaga; si no declara ninguno, WordPress sigue haciendo lo suyo.
     COD_Theme_Definitions::registrar_icono();
+    // F2: con un ADN activo el theme.json sale de su proyección (y la opción de definiciones es derivada).
+    COD_ADN_Theme::registrar();
+    COD_Theme_Definitions::registrar_gobierno();
     COD_Theme_Definitions::registrar_escalas();
 
     // Fase 1 (POC): bloque Gutenberg nativo ocd/heading. Aditivo y aislado,
