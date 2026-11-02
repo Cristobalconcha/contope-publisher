@@ -1,0 +1,16 @@
+{
+  "id": "027-contrato-mal-entrada-texto",
+  "capa": 1,
+  "funcion": "parseDesignContract",
+  "origen": "packages/core/src/design-contract.test.ts › rejects non-object input",
+  "descripcion": "La entrada es un texto.",
+  "incomodo": false,
+  "entrada": "contract",
+  "esperado": {
+    "valido": false,
+    "salida": null
+  },
+  "cubre": [
+    "packages/core/src/design-contract.ts:245"
+  ]
+}

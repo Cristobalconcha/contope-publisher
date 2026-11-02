@@ -1,0 +1,118 @@
+{
+  "id": "017-contrato-ok-restriccion-sobre-si-misma",
+  "capa": 1,
+  "funcion": "parseDesignContract",
+  "origen": "nuevo",
+  "descripcion": "INCÓMODO: una definición puede listarse a sí misma en `constraintDefinitionIds` (el parser sólo exige que exista).",
+  "incomodo": true,
+  "entrada": {
+    "schemaVersion": 1,
+    "design": {
+      "id": "d1",
+      "revision": 1,
+      "createdAt": "2026-08-02T00:00:00.000Z",
+      "updatedAt": "2026-08-02T00:00:00.000Z"
+    },
+    "sources": [
+      {
+        "id": "brief",
+        "technicalKind": "text",
+        "purpose": "observation",
+        "label": "Project brief",
+        "locator": "Project brief",
+        "path": ".codesign/sources/brief.txt",
+        "importedAt": "2026-08-02T00:00:00.000Z"
+      }
+    ],
+    "definitions": [
+      {
+        "id": "hero-typeface",
+        "category": "typography",
+        "name": "Hero typeface",
+        "value": {
+          "family": "Lora"
+        },
+        "state": "confirmed",
+        "authority": "human-confirmed",
+        "evidenceSourceIds": [
+          "brief"
+        ],
+        "provenance": [
+          {
+            "sourceId": "brief",
+            "locator": "section 1"
+          },
+          {
+            "sourceId": "user",
+            "excerpt": "Confirmed in the design decision checklist"
+          }
+        ],
+        "constraintDefinitionIds": [
+          "hero-typeface"
+        ],
+        "reviewedAt": "2026-08-02T00:00:00.000Z"
+      }
+    ],
+    "developmentTasks": [],
+    "projections": {
+      "designMd": null
+    }
+  },
+  "esperado": {
+    "valido": true,
+    "salida": {
+      "schemaVersion": 1,
+      "design": {
+        "id": "d1",
+        "revision": 1,
+        "createdAt": "2026-08-02T00:00:00.000Z",
+        "updatedAt": "2026-08-02T00:00:00.000Z"
+      },
+      "sources": [
+        {
+          "id": "brief",
+          "technicalKind": "text",
+          "purpose": "observation",
+          "label": "Project brief",
+          "locator": "Project brief",
+          "path": ".codesign/sources/brief.txt",
+          "importedAt": "2026-08-02T00:00:00.000Z"
+        }
+      ],
+      "definitions": [
+        {
+          "id": "hero-typeface",
+          "category": "typography",
+          "name": "Hero typeface",
+          "value": {
+            "family": "Lora"
+          },
+          "state": "confirmed",
+          "authority": "human-confirmed",
+          "evidenceSourceIds": [
+            "brief"
+          ],
+          "provenance": [
+            {
+              "sourceId": "brief",
+              "locator": "section 1"
+            },
+            {
+              "sourceId": "user",
+              "excerpt": "Confirmed in the design decision checklist"
+            }
+          ],
+          "constraintDefinitionIds": [
+            "hero-typeface"
+          ],
+          "reviewedAt": "2026-08-02T00:00:00.000Z"
+        }
+      ],
+      "developmentTasks": [],
+      "projections": {
+        "designMd": null
+      }
+    }
+  },
+  "cubre": []
+}

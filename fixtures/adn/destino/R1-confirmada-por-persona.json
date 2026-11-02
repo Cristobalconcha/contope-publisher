@@ -1,0 +1,76 @@
+{
+  "id": "R1-confirmada-por-persona",
+  "regla": "R1",
+  "capa": 3,
+  "fuente": "3.2 R1 y 3.5 (tabla de estado y autoridad)",
+  "descripcion": "Definición `confirmed` con `human-confirmed` que alimenta una variable: se importa y se emite.",
+  "opciones": {
+    "emitirPropuestas": false
+  },
+  "entrada": {
+    "schemaVersion": 1,
+    "design": {
+      "id": "destino-prueba",
+      "revision": 1,
+      "createdAt": "2026-11-02T00:00:00.000Z",
+      "updatedAt": "2026-11-02T00:00:00.000Z"
+    },
+    "sources": [
+      {
+        "id": "obs",
+        "technicalKind": "css",
+        "purpose": "observation",
+        "label": "Medición del sitio",
+        "importedAt": "2026-11-02T00:00:00.000Z"
+      }
+    ],
+    "definitions": [
+      {
+        "id": "dim1.req01.def1",
+        "category": "color",
+        "name": "dim1.req01.def1",
+        "value": {
+          "institucionales": [
+            {
+              "name": "Verde oliva",
+              "value": "#5B6B3A"
+            }
+          ],
+          "neutros": [
+            {
+              "name": "Carbón",
+              "value": "#222222"
+            }
+          ]
+        },
+        "state": "confirmed",
+        "authority": "human-confirmed",
+        "evidenceSourceIds": [
+          "obs"
+        ],
+        "provenance": [
+          {
+            "sourceId": "obs"
+          }
+        ],
+        "constraintDefinitionIds": [],
+        "reviewedAt": "2026-11-02T00:00:00.000Z"
+      }
+    ],
+    "developmentTasks": [],
+    "projections": {
+      "designMd": null
+    }
+  },
+  "esperado": {
+    "import": "acepta",
+    "definiciones": {
+      "dim1.req01.def1": {
+        "estadoEfectivo": "confirmed",
+        "guardada": true,
+        "emitida": true,
+        "ignorada": null
+      }
+    }
+  }
+}

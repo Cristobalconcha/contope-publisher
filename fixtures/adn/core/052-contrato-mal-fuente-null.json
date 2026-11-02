@@ -1,0 +1,59 @@
+{
+  "id": "052-contrato-mal-fuente-null",
+  "capa": 1,
+  "funcion": "parseDesignContract",
+  "origen": "nuevo",
+  "descripcion": "Una fuente es `null`.",
+  "incomodo": false,
+  "entrada": {
+    "schemaVersion": 1,
+    "design": {
+      "id": "d1",
+      "revision": 1,
+      "createdAt": "2026-08-02T00:00:00.000Z",
+      "updatedAt": "2026-08-02T00:00:00.000Z"
+    },
+    "sources": [
+      null
+    ],
+    "definitions": [
+      {
+        "id": "hero-typeface",
+        "category": "typography",
+        "name": "Hero typeface",
+        "value": {
+          "family": "Lora"
+        },
+        "state": "confirmed",
+        "authority": "human-confirmed",
+        "evidenceSourceIds": [
+          "brief"
+        ],
+        "provenance": [
+          {
+            "sourceId": "brief",
+            "locator": "section 1"
+          },
+          {
+            "sourceId": "user",
+            "excerpt": "Confirmed in the design decision checklist"
+          }
+        ],
+        "constraintDefinitionIds": [],
+        "reviewedAt": "2026-08-02T00:00:00.000Z"
+      }
+    ],
+    "developmentTasks": [],
+    "projections": {
+      "designMd": null
+    }
+  },
+  "esperado": {
+    "valido": false,
+    "salida": null
+  },
+  "cubre": [
+    "packages/core/src/design-contract.ts:130",
+    "packages/core/src/design-contract.ts:260"
+  ]
+}

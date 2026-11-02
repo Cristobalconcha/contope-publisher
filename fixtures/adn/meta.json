@@ -1,0 +1,42 @@
+{
+  "generadoPor": "scripts/exportar-corpus-adn.ts",
+  "fuente": {
+    "packages/core/src/design-contract.ts": {
+      "sha256": "36dbe4c61d40800658e4c986eb61725c8ac7ee2d8bccd7d52a09855025d98c2f"
+    },
+    "packages/core/src/design-contract-portable.ts": {
+      "sha256": "77cd1774a510f8b0725d3a9a70945262a6451a66a6f876abfd015686d82a0ab1"
+    },
+    "packages/core/src/design-contract-design-md.ts": {
+      "sha256": "a4c43b382d096454f4c2fa9c7c34c3ffcc35cf16a4609787409833d58d655db8"
+    }
+  },
+  "ambito": {
+    "packages/core/src/design-contract.ts": [
+      "parseSource",
+      "parseProvenanceEntry",
+      "parseDefinition",
+      "parseDevelopmentTask",
+      "parseDesignContract"
+    ],
+    "packages/core/src/design-contract-portable.ts": [
+      "parseTransport",
+      "parseProvenance",
+      "parsePortableDesignModel"
+    ]
+  },
+  "conteo": {
+    "core": 214,
+    "coreValidos": 36,
+    "coreInvalidos": 178,
+    "ramasReturnNull": 35,
+    "ramasCubiertas": 35,
+    "destino": 30
+  },
+  "vocabularioDestino": {
+    "ignorada.R2-sin-resolver": "value ausente o {}: declarada y sin resolver (R2, H14)",
+    "ignorada.R4-no-proyectada": "el requisito no lo proyecta la web (R4)",
+    "ignorada.ADN_*": "código de error del Anexo B que dejó a la definición fuera de lo emitido",
+    "nota": "Los nombres R2-sin-resolver y R4-no-proyectada los fija este corpus; la espec no les da código. Confirmar en F1."
+  }
+}

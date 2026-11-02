@@ -1,0 +1,18 @@
+{
+  "id": "028-contrato-mal-entrada-lista",
+  "capa": 1,
+  "funcion": "parseDesignContract",
+  "origen": "packages/core/src/design-contract.test.ts › rejects non-object input",
+  "descripcion": "La entrada es una lista.",
+  "incomodo": false,
+  "entrada": [
+    1
+  ],
+  "esperado": {
+    "valido": false,
+    "salida": null
+  },
+  "cubre": [
+    "packages/core/src/design-contract.ts:245"
+  ]
+}

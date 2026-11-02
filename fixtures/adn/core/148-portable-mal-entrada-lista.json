@@ -1,0 +1,16 @@
+{
+  "id": "148-portable-mal-entrada-lista",
+  "capa": 1,
+  "funcion": "parsePortableDesignModel",
+  "origen": "nuevo",
+  "descripcion": "La entrada es una lista.",
+  "incomodo": false,
+  "entrada": [],
+  "esperado": {
+    "valido": false,
+    "salida": null
+  },
+  "cubre": [
+    "packages/core/src/design-contract-portable.ts:222"
+  ]
+}

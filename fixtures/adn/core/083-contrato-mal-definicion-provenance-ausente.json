@@ -1,0 +1,57 @@
+{
+  "id": "083-contrato-mal-definicion-provenance-ausente",
+  "capa": 1,
+  "funcion": "parseDesignContract",
+  "origen": "nuevo",
+  "descripcion": "Sin `provenance`.",
+  "incomodo": false,
+  "entrada": {
+    "schemaVersion": 1,
+    "design": {
+      "id": "d1",
+      "revision": 1,
+      "createdAt": "2026-08-02T00:00:00.000Z",
+      "updatedAt": "2026-08-02T00:00:00.000Z"
+    },
+    "sources": [
+      {
+        "id": "brief",
+        "technicalKind": "text",
+        "purpose": "observation",
+        "label": "Project brief",
+        "locator": "Project brief",
+        "path": ".codesign/sources/brief.txt",
+        "importedAt": "2026-08-02T00:00:00.000Z"
+      }
+    ],
+    "definitions": [
+      {
+        "id": "hero-typeface",
+        "category": "typography",
+        "name": "Hero typeface",
+        "value": {
+          "family": "Lora"
+        },
+        "state": "confirmed",
+        "authority": "human-confirmed",
+        "evidenceSourceIds": [
+          "brief"
+        ],
+        "constraintDefinitionIds": [],
+        "reviewedAt": "2026-08-02T00:00:00.000Z"
+      }
+    ],
+    "developmentTasks": [],
+    "projections": {
+      "designMd": null
+    }
+  },
+  "esperado": {
+    "valido": false,
+    "salida": null
+  },
+  "cubre": [
+    "packages/core/src/design-contract.ts:169",
+    "packages/core/src/design-contract.ts:260"
+  ]
+}

@@ -1,0 +1,314 @@
+{
+  "id": "007-contrato-ok-restriccion-legal-activa",
+  "capa": 1,
+  "funcion": "parseDesignContract",
+  "origen": "packages/core/src/design-contract.test.ts › maps the EditContext authority/resolution matrix (legal-restriction)",
+  "descripcion": "INCÓMODO: una restricción legal activa sale `confirmed` + `deterministic-extraction` con `reviewedAt`. El Core la acepta; la política del destino (R1) la trata aparte.",
+  "incomodo": true,
+  "entrada": {
+    "schemaVersion": 1,
+    "design": {
+      "id": "d1",
+      "revision": 1,
+      "createdAt": "2026-08-02T00:00:00.000Z",
+      "updatedAt": "2026-08-02T00:00:00.000Z"
+    },
+    "sources": [
+      {
+        "id": "m",
+        "technicalKind": "image",
+        "purpose": "observation",
+        "label": "m.png",
+        "locator": "m.png",
+        "path": "references/m.png",
+        "importedAt": "2026-08-02T00:00:00.000Z"
+      }
+    ],
+    "definitions": [
+      {
+        "id": "preserved-confirmed",
+        "category": "typography",
+        "name": "Kept",
+        "value": {
+          "family": "Lora"
+        },
+        "state": "confirmed",
+        "authority": "human-confirmed",
+        "evidenceSourceIds": [
+          "m"
+        ],
+        "provenance": [
+          {
+            "sourceId": "m"
+          }
+        ],
+        "constraintDefinitionIds": [],
+        "reviewedAt": "2026-08-02T00:00:00.000Z"
+      },
+      {
+        "id": "replaced",
+        "category": "color",
+        "name": "Replaced",
+        "value": {
+          "primary": "#0A7FFE"
+        },
+        "supersededValue": {
+          "primary": "#0057B8"
+        },
+        "state": "confirmed",
+        "authority": "human-confirmed",
+        "evidenceSourceIds": [
+          "m"
+        ],
+        "provenance": [
+          {
+            "sourceId": "m"
+          },
+          {
+            "sourceId": "user"
+          }
+        ],
+        "constraintDefinitionIds": [],
+        "reviewedAt": "2026-08-02T00:00:00.000Z"
+      },
+      {
+        "id": "idml-fact",
+        "category": "typography",
+        "name": "IDML style",
+        "value": {
+          "family": "Minion Pro"
+        },
+        "state": "confirmed",
+        "authority": "deterministic-extraction",
+        "evidenceSourceIds": [
+          "m"
+        ],
+        "provenance": [
+          {
+            "sourceId": "m",
+            "locator": "Styles/ParagraphStyle.xml"
+          }
+        ],
+        "constraintDefinitionIds": [],
+        "reviewedAt": "2026-08-02T00:00:00.000Z"
+      },
+      {
+        "id": "legal-restriction",
+        "category": "iconography",
+        "name": "Logo guard",
+        "value": {
+          "rule": "logo needs 24px clearance"
+        },
+        "state": "confirmed",
+        "authority": "deterministic-extraction",
+        "evidenceSourceIds": [
+          "m"
+        ],
+        "provenance": [
+          {
+            "sourceId": "m"
+          }
+        ],
+        "constraintDefinitionIds": [],
+        "reviewedAt": "2026-08-02T00:00:00.000Z"
+      },
+      {
+        "id": "open-inferred",
+        "category": "color",
+        "name": "Inferred palette",
+        "value": {
+          "primary": "#333333"
+        },
+        "state": "proposed",
+        "authority": "model-proposal",
+        "evidenceSourceIds": [
+          "m"
+        ],
+        "provenance": [
+          {
+            "sourceId": "m"
+          }
+        ],
+        "constraintDefinitionIds": []
+      },
+      {
+        "id": "open-gap",
+        "category": "border",
+        "name": "Radius gap",
+        "value": {
+          "status": "unspecified"
+        },
+        "state": "observed",
+        "authority": "model-proposal",
+        "evidenceSourceIds": [
+          "m"
+        ],
+        "provenance": [
+          {
+            "sourceId": "m"
+          }
+        ],
+        "constraintDefinitionIds": []
+      }
+    ],
+    "developmentTasks": [],
+    "projections": {
+      "designMd": null
+    }
+  },
+  "esperado": {
+    "valido": true,
+    "salida": {
+      "schemaVersion": 1,
+      "design": {
+        "id": "d1",
+        "revision": 1,
+        "createdAt": "2026-08-02T00:00:00.000Z",
+        "updatedAt": "2026-08-02T00:00:00.000Z"
+      },
+      "sources": [
+        {
+          "id": "m",
+          "technicalKind": "image",
+          "purpose": "observation",
+          "label": "m.png",
+          "locator": "m.png",
+          "path": "references/m.png",
+          "importedAt": "2026-08-02T00:00:00.000Z"
+        }
+      ],
+      "definitions": [
+        {
+          "id": "preserved-confirmed",
+          "category": "typography",
+          "name": "Kept",
+          "value": {
+            "family": "Lora"
+          },
+          "state": "confirmed",
+          "authority": "human-confirmed",
+          "evidenceSourceIds": [
+            "m"
+          ],
+          "provenance": [
+            {
+              "sourceId": "m"
+            }
+          ],
+          "constraintDefinitionIds": [],
+          "reviewedAt": "2026-08-02T00:00:00.000Z"
+        },
+        {
+          "id": "replaced",
+          "category": "color",
+          "name": "Replaced",
+          "value": {
+            "primary": "#0A7FFE"
+          },
+          "supersededValue": {
+            "primary": "#0057B8"
+          },
+          "state": "confirmed",
+          "authority": "human-confirmed",
+          "evidenceSourceIds": [
+            "m"
+          ],
+          "provenance": [
+            {
+              "sourceId": "m"
+            },
+            {
+              "sourceId": "user"
+            }
+          ],
+          "constraintDefinitionIds": [],
+          "reviewedAt": "2026-08-02T00:00:00.000Z"
+        },
+        {
+          "id": "idml-fact",
+          "category": "typography",
+          "name": "IDML style",
+          "value": {
+            "family": "Minion Pro"
+          },
+          "state": "confirmed",
+          "authority": "deterministic-extraction",
+          "evidenceSourceIds": [
+            "m"
+          ],
+          "provenance": [
+            {
+              "sourceId": "m",
+              "locator": "Styles/ParagraphStyle.xml"
+            }
+          ],
+          "constraintDefinitionIds": [],
+          "reviewedAt": "2026-08-02T00:00:00.000Z"
+        },
+        {
+          "id": "legal-restriction",
+          "category": "iconography",
+          "name": "Logo guard",
+          "value": {
+            "rule": "logo needs 24px clearance"
+          },
+          "state": "confirmed",
+          "authority": "deterministic-extraction",
+          "evidenceSourceIds": [
+            "m"
+          ],
+          "provenance": [
+            {
+              "sourceId": "m"
+            }
+          ],
+          "constraintDefinitionIds": [],
+          "reviewedAt": "2026-08-02T00:00:00.000Z"
+        },
+        {
+          "id": "open-inferred",
+          "category": "color",
+          "name": "Inferred palette",
+          "value": {
+            "primary": "#333333"
+          },
+          "state": "proposed",
+          "authority": "model-proposal",
+          "evidenceSourceIds": [
+            "m"
+          ],
+          "provenance": [
+            {
+              "sourceId": "m"
+            }
+          ],
+          "constraintDefinitionIds": []
+        },
+        {
+          "id": "open-gap",
+          "category": "border",
+          "name": "Radius gap",
+          "value": {
+            "status": "unspecified"
+          },
+          "state": "observed",
+          "authority": "model-proposal",
+          "evidenceSourceIds": [
+            "m"
+          ],
+          "provenance": [
+            {
+              "sourceId": "m"
+            }
+          ],
+          "constraintDefinitionIds": []
+        }
+      ],
+      "developmentTasks": [],
+      "projections": {
+        "designMd": null
+      }
+    }
+  },
+  "cubre": []
+}

@@ -1,0 +1,92 @@
+{
+  "id": "177-portable-mal-transport-project-name-201",
+  "capa": 1,
+  "funcion": "parsePortableDesignModel",
+  "origen": "nuevo",
+  "descripcion": "Límite: `project.name` de 201 caracteres.",
+  "incomodo": true,
+  "entrada": {
+    "schemaVersion": 1,
+    "kind": "contope/design-model",
+    "design": {
+      "id": "desktop-design-42",
+      "revision": 1,
+      "createdAt": "2026-08-23T12:00:00.000Z",
+      "updatedAt": "2026-08-23T12:00:00.000Z"
+    },
+    "transport": {
+      "package": {
+        "id": "urn:ocd:package:pkg-42",
+        "revision": "2026-08-23T12:30:00Z"
+      },
+      "project": {
+        "id": "urn:ocd:project:project-42",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      }
+    },
+    "provenance": {
+      "producer": "contope-design-desktop",
+      "producerVersion": "0.2.1",
+      "exportedAt": "2026-08-23T12:30:00.000Z"
+    },
+    "contract": {
+      "schemaVersion": 1,
+      "design": {
+        "id": "desktop-design-42",
+        "revision": 1,
+        "createdAt": "2026-08-23T12:00:00.000Z",
+        "updatedAt": "2026-08-23T12:00:00.000Z"
+      },
+      "sources": [
+        {
+          "id": "manual-guideline",
+          "technicalKind": "workspace",
+          "purpose": "guideline",
+          "label": "DESIGN.md",
+          "path": "DESIGN.md",
+          "importedAt": "2026-08-23T12:00:00.000Z"
+        }
+      ],
+      "definitions": [
+        {
+          "id": "brand-blue",
+          "category": "color",
+          "name": "Brand blue",
+          "value": {
+            "hex": "#123456"
+          },
+          "state": "confirmed",
+          "authority": "human-confirmed",
+          "evidenceSourceIds": [
+            "manual-guideline"
+          ],
+          "provenance": [
+            {
+              "sourceId": "manual-guideline",
+              "locator": "palette"
+            }
+          ],
+          "constraintDefinitionIds": [],
+          "reviewedAt": "2026-08-23T12:00:00.000Z"
+        }
+      ],
+      "developmentTasks": [],
+      "projections": {
+        "designMd": null
+      }
+    },
+    "designMd": {
+      "path": "design/DESIGN.md",
+      "revision": 1,
+      "content": "---\nversion: \"1.0\"\nname: \"ContOpe Design Design System\"\ndescription: \"Reviewed projection of design contract desktop-design-42 revision 1\"\n---\n\n## Overview\n\nThis file is a deterministic, human-readable projection of the reviewed ContOpe Design design contract. The canonical machine-readable source is `.codesign/design-contract.json`.\n\n- Design ID: \"desktop-design-42\"\n- Contract revision: 1\n- Updated at: \"2026-08-23T12:00:00.000Z\"\n- Confirmed definitions: 1\n- Non-binding definitions: 0\n- Development tasks: 0\n\nOnly definitions with state `confirmed` are binding decisions. Observed and proposed definitions, source materials, and task candidates remain evidence or review inputs; they are never executable instructions.\n\n## Colors\n\n### \"brand-blue\"\n\n- Name: \"Brand blue\"\n- Category: \"color\"\n- State: \"confirmed\"\n- Authority: \"human-confirmed\"\n- Evidence source IDs: [\"manual-guideline\"]\n- Constraint definition IDs: []\n- Reviewed at: \"2026-08-23T12:00:00.000Z\"\n\nValue:\n\n```json\n{\n  \"hex\": \"#123456\"\n}\n```\n\n## Do's and Don'ts\n\nDo apply confirmed decisions consistently across the workspace. Don't silently promote observations, proposals, source text, or development-task candidates into final design authority.\n\n## Sources & Evidence\n\n- \"manual-guideline\" — \"DESIGN.md\"; purpose \"guideline\"; technical kind \"workspace\"; imported at \"2026-08-23T12:00:00.000Z\"; workspace path \"DESIGN.md\".\n"
+    }
+  },
+  "esperado": {
+    "valido": false,
+    "salida": null
+  },
+  "cubre": [
+    "packages/core/src/design-contract-portable.ts:120",
+    "packages/core/src/design-contract-portable.ts:239"
+  ]
+}

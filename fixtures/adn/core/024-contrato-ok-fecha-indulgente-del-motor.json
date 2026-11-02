@@ -1,0 +1,115 @@
+{
+  "id": "024-contrato-ok-fecha-indulgente-del-motor",
+  "capa": 1,
+  "funcion": "parseDesignContract",
+  "origen": "nuevo",
+  "descripcion": "INCÓMODO y DEPENDIENTE DEL MOTOR: `isIsoDateString` usa `Date.parse`, que en V8 acepta formatos que no son ISO («Aug 2, 2026»). Un puerto a PHP debe decidir si reproduce esa indulgencia o la declara como divergencia deliberada de la capa 3.",
+  "incomodo": true,
+  "notas": "Resultado medido con el Node del exportador. No es una regla del Core: es el comportamiento de Date.parse.",
+  "entrada": {
+    "schemaVersion": 1,
+    "design": {
+      "id": "d1",
+      "revision": 1,
+      "createdAt": "Aug 2, 2026",
+      "updatedAt": "2026-08-02T00:00:00.000Z"
+    },
+    "sources": [
+      {
+        "id": "brief",
+        "technicalKind": "text",
+        "purpose": "observation",
+        "label": "Project brief",
+        "locator": "Project brief",
+        "path": ".codesign/sources/brief.txt",
+        "importedAt": "2026-08-02T00:00:00.000Z"
+      }
+    ],
+    "definitions": [
+      {
+        "id": "hero-typeface",
+        "category": "typography",
+        "name": "Hero typeface",
+        "value": {
+          "family": "Lora"
+        },
+        "state": "confirmed",
+        "authority": "human-confirmed",
+        "evidenceSourceIds": [
+          "brief"
+        ],
+        "provenance": [
+          {
+            "sourceId": "brief",
+            "locator": "section 1"
+          },
+          {
+            "sourceId": "user",
+            "excerpt": "Confirmed in the design decision checklist"
+          }
+        ],
+        "constraintDefinitionIds": [],
+        "reviewedAt": "2026-08-02T00:00:00.000Z"
+      }
+    ],
+    "developmentTasks": [],
+    "projections": {
+      "designMd": null
+    }
+  },
+  "esperado": {
+    "valido": true,
+    "salida": {
+      "schemaVersion": 1,
+      "design": {
+        "id": "d1",
+        "revision": 1,
+        "createdAt": "Aug 2, 2026",
+        "updatedAt": "2026-08-02T00:00:00.000Z"
+      },
+      "sources": [
+        {
+          "id": "brief",
+          "technicalKind": "text",
+          "purpose": "observation",
+          "label": "Project brief",
+          "locator": "Project brief",
+          "path": ".codesign/sources/brief.txt",
+          "importedAt": "2026-08-02T00:00:00.000Z"
+        }
+      ],
+      "definitions": [
+        {
+          "id": "hero-typeface",
+          "category": "typography",
+          "name": "Hero typeface",
+          "value": {
+            "family": "Lora"
+          },
+          "state": "confirmed",
+          "authority": "human-confirmed",
+          "evidenceSourceIds": [
+            "brief"
+          ],
+          "provenance": [
+            {
+              "sourceId": "brief",
+              "locator": "section 1"
+            },
+            {
+              "sourceId": "user",
+              "excerpt": "Confirmed in the design decision checklist"
+            }
+          ],
+          "constraintDefinitionIds": [],
+          "reviewedAt": "2026-08-02T00:00:00.000Z"
+        }
+      ],
+      "developmentTasks": [],
+      "projections": {
+        "designMd": null
+      }
+    }
+  },
+  "cubre": []
+}

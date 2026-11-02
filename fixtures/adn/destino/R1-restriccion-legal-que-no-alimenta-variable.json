@@ -1,0 +1,66 @@
+{
+  "id": "R1-restriccion-legal-que-no-alimenta-variable",
+  "regla": "R1",
+  "capa": 3,
+  "fuente": "3.2 R1 y 3.5 (tabla de estado y autoridad)",
+  "descripcion": "EXCEPCIÓN (H13): `confirmed` + `deterministic-extraction` con `reviewedAt` que no alimenta ninguna variable (una restricción legal). Se acepta, se guarda, no se emite (R4).",
+  "opciones": {
+    "emitirPropuestas": false
+  },
+  "entrada": {
+    "schemaVersion": 1,
+    "design": {
+      "id": "destino-prueba",
+      "revision": 1,
+      "createdAt": "2026-11-02T00:00:00.000Z",
+      "updatedAt": "2026-11-02T00:00:00.000Z"
+    },
+    "sources": [
+      {
+        "id": "obs",
+        "technicalKind": "css",
+        "purpose": "observation",
+        "label": "Medición del sitio",
+        "importedAt": "2026-11-02T00:00:00.000Z"
+      }
+    ],
+    "definitions": [
+      {
+        "id": "restriccion-legal.logo-despeje",
+        "category": "otra",
+        "name": "restriccion-legal.logo-despeje",
+        "value": {
+          "rule": "el logo necesita 24 px de despeje"
+        },
+        "state": "confirmed",
+        "authority": "deterministic-extraction",
+        "evidenceSourceIds": [
+          "obs"
+        ],
+        "provenance": [
+          {
+            "sourceId": "obs"
+          }
+        ],
+        "constraintDefinitionIds": [],
+        "reviewedAt": "2026-11-02T00:00:00.000Z"
+      }
+    ],
+    "developmentTasks": [],
+    "projections": {
+      "designMd": null
+    }
+  },
+  "esperado": {
+    "import": "acepta",
+    "definiciones": {
+      "restriccion-legal.logo-despeje": {
+        "estadoEfectivo": "confirmed",
+        "guardada": true,
+        "emitida": false,
+        "ignorada": "R4-no-proyectada"
+      }
+    }
+  },
+  "notas": "El id `restriccion-legal.*` no corresponde a ningún requisito que la web consuma; así se reconoce que «no alimenta variables»."
+}

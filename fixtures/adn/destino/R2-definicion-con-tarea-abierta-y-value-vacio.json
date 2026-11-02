@@ -1,0 +1,70 @@
+{
+  "id": "R2-definicion-con-tarea-abierta-y-value-vacio",
+  "regla": "R2",
+  "capa": 3,
+  "fuente": "3.2 R2 (H14)",
+  "descripcion": "Definición con `value: {}` apuntada por una tarea de desarrollo `active`: sin resolver, se guarda y no se emite.",
+  "opciones": {
+    "emitirPropuestas": false
+  },
+  "entrada": {
+    "schemaVersion": 1,
+    "design": {
+      "id": "destino-prueba",
+      "revision": 1,
+      "createdAt": "2026-11-02T00:00:00.000Z",
+      "updatedAt": "2026-11-02T00:00:00.000Z"
+    },
+    "sources": [
+      {
+        "id": "obs",
+        "technicalKind": "css",
+        "purpose": "observation",
+        "label": "Medición del sitio",
+        "importedAt": "2026-11-02T00:00:00.000Z"
+      }
+    ],
+    "definitions": [
+      {
+        "id": "dim1.req01.def1",
+        "category": "color",
+        "name": "dim1.req01.def1",
+        "value": {},
+        "state": "proposed",
+        "authority": "model-proposal",
+        "evidenceSourceIds": [
+          "obs"
+        ],
+        "provenance": [
+          {
+            "sourceId": "obs"
+          }
+        ],
+        "constraintDefinitionIds": []
+      }
+    ],
+    "developmentTasks": [
+      {
+        "id": "t-1",
+        "definitionId": "dim1.req01.def1",
+        "state": "active",
+        "constraintDefinitionIds": [],
+        "candidateDefinitionIds": []
+      }
+    ],
+    "projections": {
+      "designMd": null
+    }
+  },
+  "esperado": {
+    "import": "acepta",
+    "definiciones": {
+      "dim1.req01.def1": {
+        "estadoEfectivo": "proposed",
+        "guardada": true,
+        "emitida": false,
+        "ignorada": "R2-sin-resolver"
+      }
+    }
+  }
+}

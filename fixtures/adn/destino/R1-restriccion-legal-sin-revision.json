@@ -1,0 +1,58 @@
+{
+  "id": "R1-restriccion-legal-sin-revision",
+  "regla": "R1",
+  "capa": 3,
+  "fuente": "3.2 R1 y 3.5 (tabla de estado y autoridad)",
+  "descripcion": "La misma restricción pero SIN `reviewedAt`: la excepción no se aplica. Se rechaza.",
+  "opciones": {
+    "emitirPropuestas": false
+  },
+  "entrada": {
+    "schemaVersion": 1,
+    "design": {
+      "id": "destino-prueba",
+      "revision": 1,
+      "createdAt": "2026-11-02T00:00:00.000Z",
+      "updatedAt": "2026-11-02T00:00:00.000Z"
+    },
+    "sources": [
+      {
+        "id": "obs",
+        "technicalKind": "css",
+        "purpose": "observation",
+        "label": "Medición del sitio",
+        "importedAt": "2026-11-02T00:00:00.000Z"
+      }
+    ],
+    "definitions": [
+      {
+        "id": "restriccion-legal.logo-despeje",
+        "category": "otra",
+        "name": "restriccion-legal.logo-despeje",
+        "value": {
+          "rule": "el logo necesita 24 px de despeje"
+        },
+        "state": "confirmed",
+        "authority": "deterministic-extraction",
+        "evidenceSourceIds": [
+          "obs"
+        ],
+        "provenance": [
+          {
+            "sourceId": "obs"
+          }
+        ],
+        "constraintDefinitionIds": []
+      }
+    ],
+    "developmentTasks": [],
+    "projections": {
+      "designMd": null
+    }
+  },
+  "esperado": {
+    "import": "rechaza",
+    "codigo": "ADN_CONFIRMED_WITHOUT_HUMAN",
+    "definicion": "restriccion-legal.logo-despeje"
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "id": "R6-requisito-inexistente-en-propuesta",
+  "regla": "R6",
+  "capa": 3,
+  "fuente": "3.2 R6",
+  "descripcion": "Lo mismo en una definición `proposed`: el import no falla; no se emite y queda en `ignored[]` con el código.",
+  "opciones": {
+    "emitirPropuestas": true
+  },
+  "entrada": {
+    "schemaVersion": 1,
+    "design": {
+      "id": "destino-prueba",
+      "revision": 1,
+      "createdAt": "2026-11-02T00:00:00.000Z",
+      "updatedAt": "2026-11-02T00:00:00.000Z"
+    },
+    "sources": [
+      {
+        "id": "obs",
+        "technicalKind": "css",
+        "purpose": "observation",
+        "label": "Medición del sitio",
+        "importedAt": "2026-11-02T00:00:00.000Z"
+      }
+    ],
+    "definitions": [
+      {
+        "id": "dim1.req02.def1",
+        "category": "color",
+        "name": "dim1.req02.def1",
+        "value": {
+          "roleColors": [
+            {
+              "role": "background",
+              "color": {
+                "refReqId": "dim1.req01",
+                "refPath": [
+                  "institucionales",
+                  0,
+                  "value"
+                ]
+              },
+              "source": "adn",
+              "derivation": {
+                "of": "dim1.req01"
+              }
+            }
+          ]
+        },
+        "state": "proposed",
+        "authority": "model-proposal",
+        "evidenceSourceIds": [
+          "obs"
+        ],
+        "provenance": [
+          {
+            "sourceId": "obs"
+          }
+        ],
+        "constraintDefinitionIds": [],
+        "reviewedAt": "2026-11-02T00:00:00.000Z"
+      }
+    ],
+    "developmentTasks": [],
+    "projections": {
+      "designMd": null
+    }
+  },
+  "esperado": {
+    "import": "acepta",
+    "definiciones": {
+      "dim1.req02.def1": {
+        "estadoEfectivo": "proposed",
+        "guardada": true,
+        "emitida": false,
+        "ignorada": "ADN_REF_UNRESOLVED"
+      }
+    }
+  }
+}

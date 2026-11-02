@@ -1,0 +1,42 @@
+{
+  "id": "008-contrato-ok-minimo-sin-fuentes-ni-definiciones",
+  "capa": 1,
+  "funcion": "parseDesignContract",
+  "origen": "nuevo",
+  "descripcion": "Contrato mínimo: listas vacías, sin proyección de DESIGN.md.",
+  "incomodo": false,
+  "entrada": {
+    "schemaVersion": 1,
+    "design": {
+      "id": "d1",
+      "revision": 1,
+      "createdAt": "2026-08-02T00:00:00.000Z",
+      "updatedAt": "2026-08-02T00:00:00.000Z"
+    },
+    "sources": [],
+    "definitions": [],
+    "developmentTasks": [],
+    "projections": {
+      "designMd": null
+    }
+  },
+  "esperado": {
+    "valido": true,
+    "salida": {
+      "schemaVersion": 1,
+      "design": {
+        "id": "d1",
+        "revision": 1,
+        "createdAt": "2026-08-02T00:00:00.000Z",
+        "updatedAt": "2026-08-02T00:00:00.000Z"
+      },
+      "sources": [],
+      "definitions": [],
+      "developmentTasks": [],
+      "projections": {
+        "designMd": null
+      }
+    }
+  },
+  "cubre": []
+}

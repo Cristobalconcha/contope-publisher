@@ -1,0 +1,64 @@
+{
+  "id": "R4-requisito-que-la-web-no-proyecta",
+  "regla": "R4",
+  "capa": 3,
+  "fuente": "3.2 R4",
+  "descripcion": "Definición de un requisito que la web no proyecta (`dim5.req01`): se guarda y se lista en `ignored[]`; nunca se emite ni se descarta.",
+  "opciones": {
+    "emitirPropuestas": true
+  },
+  "entrada": {
+    "schemaVersion": 1,
+    "design": {
+      "id": "destino-prueba",
+      "revision": 1,
+      "createdAt": "2026-11-02T00:00:00.000Z",
+      "updatedAt": "2026-11-02T00:00:00.000Z"
+    },
+    "sources": [
+      {
+        "id": "obs",
+        "technicalKind": "css",
+        "purpose": "observation",
+        "label": "Medición del sitio",
+        "importedAt": "2026-11-02T00:00:00.000Z"
+      }
+    ],
+    "definitions": [
+      {
+        "id": "dim5.req01.def1",
+        "category": "otra",
+        "name": "dim5.req01.def1",
+        "value": {
+          "cualquier": "cosa"
+        },
+        "state": "proposed",
+        "authority": "model-proposal",
+        "evidenceSourceIds": [
+          "obs"
+        ],
+        "provenance": [
+          {
+            "sourceId": "obs"
+          }
+        ],
+        "constraintDefinitionIds": []
+      }
+    ],
+    "developmentTasks": [],
+    "projections": {
+      "designMd": null
+    }
+  },
+  "esperado": {
+    "import": "acepta",
+    "definiciones": {
+      "dim5.req01.def1": {
+        "estadoEfectivo": "proposed",
+        "guardada": true,
+        "emitida": false,
+        "ignorada": "R4-no-proyectada"
+      }
+    }
+  }
+}

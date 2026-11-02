@@ -1,0 +1,86 @@
+{
+  "id": "156-portable-mal-sin-designMd",
+  "capa": 1,
+  "funcion": "parsePortableDesignModel",
+  "origen": "nuevo",
+  "descripcion": "Falta la clave `designMd` (las claves son exactas).",
+  "incomodo": false,
+  "entrada": {
+    "schemaVersion": 1,
+    "kind": "contope/design-model",
+    "design": {
+      "id": "desktop-design-42",
+      "revision": 1,
+      "createdAt": "2026-08-23T12:00:00.000Z",
+      "updatedAt": "2026-08-23T12:00:00.000Z"
+    },
+    "transport": {
+      "package": {
+        "id": "urn:ocd:package:pkg-42",
+        "revision": "2026-08-23T12:30:00Z"
+      },
+      "project": {
+        "id": "urn:ocd:project:project-42",
+        "name": "Portable design test"
+      }
+    },
+    "provenance": {
+      "producer": "contope-design-desktop",
+      "producerVersion": "0.2.1",
+      "exportedAt": "2026-08-23T12:30:00.000Z"
+    },
+    "contract": {
+      "schemaVersion": 1,
+      "design": {
+        "id": "desktop-design-42",
+        "revision": 1,
+        "createdAt": "2026-08-23T12:00:00.000Z",
+        "updatedAt": "2026-08-23T12:00:00.000Z"
+      },
+      "sources": [
+        {
+          "id": "manual-guideline",
+          "technicalKind": "workspace",
+          "purpose": "guideline",
+          "label": "DESIGN.md",
+          "path": "DESIGN.md",
+          "importedAt": "2026-08-23T12:00:00.000Z"
+        }
+      ],
+      "definitions": [
+        {
+          "id": "brand-blue",
+          "category": "color",
+          "name": "Brand blue",
+          "value": {
+            "hex": "#123456"
+          },
+          "state": "confirmed",
+          "authority": "human-confirmed",
+          "evidenceSourceIds": [
+            "manual-guideline"
+          ],
+          "provenance": [
+            {
+              "sourceId": "manual-guideline",
+              "locator": "palette"
+            }
+          ],
+          "constraintDefinitionIds": [],
+          "reviewedAt": "2026-08-23T12:00:00.000Z"
+        }
+      ],
+      "developmentTasks": [],
+      "projections": {
+        "designMd": null
+      }
+    }
+  },
+  "esperado": {
+    "valido": false,
+    "salida": null
+  },
+  "cubre": [
+    "packages/core/src/design-contract-portable.ts:222"
+  ]
+}

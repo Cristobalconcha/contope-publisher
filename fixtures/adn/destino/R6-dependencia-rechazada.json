@@ -1,0 +1,106 @@
+{
+  "id": "R6-dependencia-rechazada",
+  "regla": "R6",
+  "capa": 3,
+  "fuente": "3.2 R6",
+  "descripcion": "Un rol `confirmed` apunta a una paleta `rejected`: una dependencia rechazada BLOQUEA.",
+  "opciones": {
+    "emitirPropuestas": false
+  },
+  "entrada": {
+    "schemaVersion": 1,
+    "design": {
+      "id": "destino-prueba",
+      "revision": 1,
+      "createdAt": "2026-11-02T00:00:00.000Z",
+      "updatedAt": "2026-11-02T00:00:00.000Z"
+    },
+    "sources": [
+      {
+        "id": "obs",
+        "technicalKind": "css",
+        "purpose": "observation",
+        "label": "Medición del sitio",
+        "importedAt": "2026-11-02T00:00:00.000Z"
+      }
+    ],
+    "definitions": [
+      {
+        "id": "dim1.req01.def1",
+        "category": "color",
+        "name": "dim1.req01.def1",
+        "value": {
+          "institucionales": [
+            {
+              "name": "Verde oliva",
+              "value": "#5B6B3A"
+            }
+          ],
+          "neutros": [
+            {
+              "name": "Carbón",
+              "value": "#222222"
+            }
+          ]
+        },
+        "state": "rejected",
+        "authority": "human-confirmed",
+        "evidenceSourceIds": [
+          "obs"
+        ],
+        "provenance": [
+          {
+            "sourceId": "obs"
+          }
+        ],
+        "constraintDefinitionIds": [],
+        "reviewedAt": "2026-11-02T00:00:00.000Z"
+      },
+      {
+        "id": "dim1.req02.def1",
+        "category": "color",
+        "name": "dim1.req02.def1",
+        "value": {
+          "roleColors": [
+            {
+              "role": "background",
+              "color": {
+                "refReqId": "dim1.req01",
+                "refPath": [
+                  "institucionales",
+                  0,
+                  "value"
+                ]
+              },
+              "source": "adn",
+              "derivation": {
+                "of": "dim1.req01"
+              }
+            }
+          ]
+        },
+        "state": "confirmed",
+        "authority": "human-confirmed",
+        "evidenceSourceIds": [
+          "obs"
+        ],
+        "provenance": [
+          {
+            "sourceId": "obs"
+          }
+        ],
+        "constraintDefinitionIds": [],
+        "reviewedAt": "2026-11-02T00:00:00.000Z"
+      }
+    ],
+    "developmentTasks": [],
+    "projections": {
+      "designMd": null
+    }
+  },
+  "esperado": {
+    "import": "rechaza",
+    "codigo": "ADN_REF_STATE",
+    "definicion": "dim1.req02.def1"
+  }
+}
