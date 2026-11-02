@@ -1,0 +1,102 @@
+{
+  "_comentario": "Configuracion de comparar-vivo.mjs (P0.4 de docs/ESPEC-adn-unica-puerta-y-bloques.md). Referencia: medidas CONGELADAS del Divi original (jamas basisbodegas.com, que ya es ContOpe). Cada archivo de referencia lleva su sha256: si cambia, el guion se niega a comparar. Las tolerancias las respeta el guion; no estan escritas en el codigo.",
+  "referenciaRaiz": "C:/Users/Cristobal concha/Sesión Claude/entregables/basis",
+  "anchos": [
+    1440,
+    768,
+    393
+  ],
+  "tolerancias": {
+    "altoPaginaPx": 3,
+    "imagenCajaPx": 3,
+    "fijoCajaPx": 3,
+    "tamLetraPx": 0.5,
+    "interlineadoPx": 1,
+    "espaciadoLetrasPx": 0.3,
+    "pesoDiferencia": 0
+  },
+  "textos": {
+    "_comentario": "Un texto del local que no está en la referencia es SOBRA (diferencia), y uno de la referencia que no está en el local es FALTA, salvo que calce con una de estas expresiones (texto normalizado: minúsculas, sólo letras y dígitos). Cada entrada es {\"expresion\": \"...\", \"motivo\": \"...\"} y exige su motivo. Hoy están vacías a propósito: ninguna diferencia está aceptada todavía.",
+    "sobraPermitidos": [],
+    "faltaPermitidos": []
+  },
+  "imagenes": {
+    "sobraPermitidos": [],
+    "_comentario": "Una imagen del local que la referencia no tiene (ni como <img> ni como fondo, ni oculta) es SOBRA salvo que calce con una de estas expresiones (nombre de archivo). Cada entrada: {\"expresion\",\"motivo\"}."
+  },
+  "paginas": {
+    "inicio": {
+      "ruta": "/",
+      "referencias": {
+        "393": {
+          "archivo": "original/datos/medida-inicio-393.json",
+          "sha256": "57b78ce7cba01f48ac73d035a65a7ba9856b51136f61c69ba55403ff7a8f848e"
+        },
+        "768": {
+          "archivo": "medicion-3/datos/medida-inicio-768.json",
+          "sha256": "b7fcfe62f5887a79e6d2fd66d834f1bce3074534d9ebca30334705d09859d29a"
+        },
+        "1440": {
+          "archivo": "original/datos/medida-inicio-1440.json",
+          "sha256": "7fac02da2737be60c30d1df706a268fc2915122db8df2690f601a8969b976878"
+        }
+      }
+    },
+    "basis-carpas-industriales": {
+      "ruta": "/basis-carpas-industriales/",
+      "referencias": {
+        "393": {
+          "archivo": "original/datos/medida-basis-carpas-industriales-393.json",
+          "sha256": "b425b6a5a08aa7116843f1167cef21e950f78a898a316c171212548a41ee3c50"
+        },
+        "768": {
+          "archivo": "medicion-3/datos/medida-basis-carpas-industriales-768.json",
+          "sha256": "81d3d1fc88bf06746313b644a13640865a7eefa085b77362931d61edd7415abd"
+        },
+        "1440": {
+          "archivo": "original/datos/medida-basis-carpas-industriales-1440.json",
+          "sha256": "da77cc649df98c26a6f03189f1c5249b438fc0d21ed4d4b360b17e80f3bb18e4"
+        }
+      }
+    },
+    "preguntas-frecuentes": {
+      "ruta": "/preguntas-frecuentes/",
+      "referencias": {
+        "393": {
+          "archivo": "original/datos/medida-preguntas-frecuentes-393.json",
+          "sha256": "f47eaafc5f7e86bc3cd9f537bd2f2633af0dd888f0ff30cb4d4e7597608a07a3"
+        },
+        "768": {
+          "archivo": "medicion-3/datos/medida-preguntas-frecuentes-768.json",
+          "sha256": "50f5eb82824ef4ec2beb03a262b62214589671cf239daf715c4752320eb064eb"
+        },
+        "1440": {
+          "archivo": "original/datos/medida-preguntas-frecuentes-1440.json",
+          "sha256": "7957198b076cf2d5526f5a561a91b6ee93827e03c62aecf65a0fddd539504153"
+        }
+      }
+    },
+    "contactos": {
+      "ruta": "/contactos/",
+      "referencias": {
+        "393": {
+          "archivo": "original/datos/medida-contactos-393.json",
+          "sha256": "2a385860acf646f1a18feb081e2458a0c4cd3c7e6e22a7d5c3fc6340a1dc5cb6"
+        },
+        "768": {
+          "archivo": "medicion-3/datos/medida-contactos-768.json",
+          "sha256": "405f8e2c42d342edb2c46ea05fd938f949ef7d56b5778c8b29507527b50b0676"
+        },
+        "1440": {
+          "archivo": "original/datos/medida-contactos-1440.json",
+          "sha256": "a8166e15f3d2152c073ce198b757c40d59928fcf2322bd32e5402913e8bd2c33"
+        }
+      }
+    },
+    "terminos-y-privacidad": {
+      "ruta": "/terminos-y-privacidad/",
+      "referencias": null,
+      "motivo": "El Divi original no tenia una pagina de terminos (original/datos/paginas-reales.json trae 4 paginas); no existe una referencia congelada contra la cual comparar."
+    }
+  }
+}

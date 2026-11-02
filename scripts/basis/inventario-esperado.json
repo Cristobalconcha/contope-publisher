@@ -1,0 +1,10 @@
+{
+  "_comentario": "Inventario ESPERADO de Basis (P0.2). Escrito a mano a partir de las composiciones de origen (salida/*.componer.json), no leido de lo que genera el sitio. EXACTO: auditoria-sitio.mjs falla si lo hallado es distinto, y falla con 'CERO donde se espera algo' si no hay ninguno. Lo que no figura aqui se espera en 0. 'mapas': el pie (region-footer.componer.json) lleva un mapa, asi que toda pagina tiene 1; contactos suma el suyo (2).",
+  "paginas": {
+    "inicio": { "imagenes": 4, "iconos": 3, "videos": 1, "acordeones": 1, "pliegues": 3, "botones": 3, "listas": 4, "titulos": 11, "mapas": 1 },
+    "basis-carpas-industriales": { "buscadores": 1, "entradas": 1, "comentarios": 1, "titulos": 3, "mapas": 1 },
+    "preguntas-frecuentes": { "acordeones": 3, "pliegues": 16, "imagenes": 4, "listas": 1, "separadores": 1, "titulos": 4, "mapas": 1 },
+    "contactos": { "formularios": 1, "mapas": 2, "titulos": 1 },
+    "terminos-y-privacidad": { "tablas": 3, "listas": 3, "titulos": 20, "mapas": 1 }
+  }
+}

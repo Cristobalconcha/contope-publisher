@@ -1,0 +1,17 @@
+{
+  "_comentario": "Sitios cuyas regresiones propias se guardan como linea base (P0.5 de docs/ESPEC-adn-unica-puerta-y-bloques.md): probar solo Basis no prueba que Santa Luisa y Econut sigan iguales (regla 12 de CLAUDE.md). 'base' es el local; las paginas clave salen del mapa del sitio (wp-sitemap-posts-page-1.xml) al guardar y quedan fijadas en el manifiesto de la linea base. Se guarda SOLO en localhost.",
+  "sitios": {
+    "santaluisa": {
+      "base": "http://localhost:8890",
+      "como_levantarlo": "C:/Users/Cristobal concha/wp-local/start-wp-local.bat (PHP embebido + SQLite en el puerto 8890; es el espejo de santaluisadepalpi.cl)",
+      "rutasExtra": [],
+      "auditoria": "scripts/santaluisa/auditoria-sitio.cjs"
+    },
+    "econut": {
+      "base": "http://localhost:8891",
+      "como_levantarlo": "el local de Econut (puerto 8891, ver scripts/econut/README.md); su arranque no esta en wp-local/start-wp-local.bat",
+      "rutasExtra": [],
+      "auditoria": null
+    }
+  }
+}
