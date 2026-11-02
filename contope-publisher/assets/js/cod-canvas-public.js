@@ -3008,6 +3008,7 @@
             win.clearTimeout(temporizadorMapa);
             aviso.hidden = true;
             grande.setAttribute('aria-busy', 'false');
+            despejarGlobo(globo);
           });
           // Una clave rechazada o un estilo que no llega aparecen como error ANTES de
           // cargar: se dice en vez de dejar el recuadro en blanco.
@@ -3025,6 +3026,24 @@
         } catch (e) {
           fallar('No se pudo cargar el mapa.');
         }
+      }
+
+      // El globo se abre sobre el marcador, que está al centro: en un mapa bajo o angosto su
+      // borde de arriba quedaba bajo los botones del mapa (el zoom, la X). Si choca con
+      // alguno, se baja el mapa lo justo para que el globo quede a la vista; si no, nada.
+      function despejarGlobo(globo) {
+        try {
+          var el = globo.getElement && globo.getElement();
+          if (!el || !mapa) return;
+          var caja = el.getBoundingClientRect();
+          var minimo = caja.top;
+          var estorbos = grande.querySelectorAll('.cod-mapa__cerrar, .mapboxgl-ctrl-top-left, .mapboxgl-ctrl-top-right');
+          for (var k = 0; k < estorbos.length; k++) {
+            var r = estorbos[k].getBoundingClientRect();
+            if (r.height && r.left < caja.right && r.right > caja.left && r.bottom + 8 > minimo) minimo = r.bottom + 8;
+          }
+          if (minimo > caja.top) mapa.panBy([0, caja.top - minimo], { animate: false });
+        } catch (e) { /* el globo queda donde Mapbox lo puso */ }
       }
 
       function destruirMapa() {
