@@ -25,7 +25,14 @@ casos válidos deben producir cero errores.
   `designModel`, `desktopSource` e `idml` (con sus roles `design-model`,
   `desktop-source`, `idml`) y de los roles `pattern`, `navigation` y `fonts`.
 
-Los valores `sha256` de los fixtures son *placeholders* de formato (digestos
+`valid/desktop-interchange/` además trae archivos REALES (F1b): `design/model.json`, `content/pages.json` y
+`wordpress/state.json`, con su tamaño y su `sha256` verdaderos en el manifiesto. Es lo que lee el importador del
+plugin (`scripts/probar-paquete-bloques.php`, P1b.1): el `design/model.json` es un `contope/design-model` generado
+por `projectPortableDesignModel` del Core desde un ADN de prueba (`scripts/adn/modelo-portable-core.mjs generar`) y lo
+acepta `parsePortableDesignModel` (`... validar`). Los demás archivos que el manifiesto declara (tema, fuentes,
+fuente de Desktop, IDML, readme) siguen sin existir: el importador sólo lee y verifica lo que usa.
+
+Los demás valores `sha256` de los fixtures son *placeholders* de formato (digestos
 reales de semillas derivadas de la ruta declarada), no digestos de los bytes
 reales del ZIP. El empaquetador debe recalcularlos al cerrar el `.ocdsite`.
 

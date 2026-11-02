@@ -1,9 +1,8 @@
 # Formato de paquete portable `.ocdsite` v1
 
-> Estado: **contrato verificable**. Este documento define y verifica el
-> contrato del paquete integral. **No declara implementada la portabilidad**:
-> la importación y exportación WordPress se construyen sobre este contrato en
-> fases posteriores. Aquí sólo se cierra la definición verificable del formato.
+> Estado: **contrato verificable e implementado en el plugin** (fase F1b, ver §10).
+> Las secciones 1 a 9 definen y verifican el contrato; la §10 dice qué lee y qué
+> escribe hoy el plugin (exportar e importar por ContOpe Design → Portabilidad).
 
 Este documento es la especificación del contenedor `.ocdsite` versión 1 y reemplaza
 a `docs/package-format-v0.md` para el paquete completo. El contrato v0 (nodos del
@@ -315,9 +314,52 @@ fecha-hora inválida, URI inválida, versión mal formada, rol inválido, boolea
 esperado, bloque duplicado, productor/nombre/revisión vacíos, referencia sin
 resolver, referencia duplicada, symlink declarado y JSON mal formado.
 
-## 10. Pendientes fuera de alcance
+## 10. Implementación en el plugin (F1b)
 
-Este contrato **no** implementa: empaque real del ZIP, cómputo/verificación de
-hashes sobre bytes, importación idempotente a entidades WordPress, exportación
-integral, ni roundtrip. Esos son owned por fases posteriores y por el
-integrador (Codex). Aquí se cierra sólo el contrato verificable del formato.
+El plugin ya EXPORTA e IMPORTA este formato (`COD_Site_Package_Exporter`, `COD_Site_Package_Importer`, el lector
+`COD_Site_Package_Format`), por la pantalla de wp-admin «ContOpe Design → Portabilidad» y por WP-CLI
+(`wp ocd export-site` / `wp ocd import-site`). Es la vía de producción: se exporta en el local y se importa en la
+web. Lo que pasa por cada ámbito:
+
+- **Contenido** (`entrypoints.content`, `content/pages.json`, esquema propio `contope/site-content` v1): las páginas, de
+  dos clases. Una página del lienzo viaja como `kind: "canvas"` (su `documentId`; en el destino vuelve a ser el
+  shortcode `[contope_canvas …]`). Una página EN BLOQUES viaja como `kind: "blocks"` y su `post_content` va tal cual en
+  un archivo propio (`content/pages/NNN-slug.html`, rol `content`) con su sha256 en `files[]`. Además: los documentos
+  del lienzo que referencian, TODAS las regiones (encabezado, cuerpo, pie), la plantilla global, los estilos
+  compartidos y la lista de medios (ruta real relativa a uploads + sha256). Un documento de contenido v0
+  (`schemaVersion: 0`) NO es este esquema: lo importa otra herramienta (ContOpe Design → Importar).
+- **Diseño** (`entrypoints.designModel`, `design/model.json`): el ADN activo, en el envoltorio `contope/design-model`.
+  El importador lo entrega al MISMO apply del almacén que usan la pantalla «Diseño (ADN)» y el MCP
+  (`COD_ADN_Store::aplicar`): misma validación, mismo diff, misma atomicidad. Si no hay ADN activo, el paquete no
+  lleva `designModel`. `provenance.producer` es siempre `contope-design-desktop` (el único valor que acepta
+  `parsePortableDesignModel`): es la procedencia del modelo, la del paquete va en `origin.producer`.
+- **Estado de WordPress** (`entrypoints.wordpressState`, `wordpress/state.json`, `contope/wordpress-state`): cómo se
+  aplicó el ADN (`emitirPropuestas` sí se respeta; el `modo` de la compuerta es informativo y NO se aplica) y qué
+  página es la portada (por slug; sólo se fija si el destino aún no eligió una).
+- **Tema** (`entrypoints.theme`): el `theme.json` del tema activo, como referencia. El importador no lo aplica.
+- **Activos** (`assets[]`): los medios que las páginas, los documentos y las fuentes citan. Dentro del ZIP se llaman por su
+  hash (`assets/<sha256>.<ext>`) porque las rutas portables no admiten `@`, espacios ni tildes; la ruta real viaja en
+  `content/pages.json`. Se deduplican por contenido.
+
+El importador REVISA todo antes de escribir nada (manifiesto, sha256 de lo que lee, requisitos del plugin y de WordPress,
+bloques que hacen falta, documentos saneados, la compuerta del diseño, el ADN y las páginas) y recién entonces escribe:
+primero el ADN, luego los medios (a archivos temporales ya verificados), los documentos y las páginas. Sólo lee y verifica
+los archivos que usa: el resto del inventario se ignora. Rechaza rutas fuera de la raíz, enlaces simbólicos y bombas de
+compresión.
+
+**H9.** Una página en bloques no se convierte jamás en shortcode, y una página en bloques editada en el sitio de destino
+no se pisa: si el paquete trae una página que allí ya está en bloques con un contenido distinto del que dejó la última
+importación (`_cod_package_content_sha`), el paquete ENTERO se rechaza con `cod_package_block_page_edited` y no se
+escribe nada. Se puede pedir el reemplazo expreso (casilla de la pantalla, `--reemplazar-editadas` en WP-CLI). Un
+paquete que trae como página del lienzo una página que allí ya es de bloques se rechaza siempre
+(`cod_package_would_revert_block_page`), sin excepción.
+
+Los paquetes del esquema anterior (`schemaVersion` + `pages`/`documents`, sin `formatVersion`) se siguen importando.
+
+## 11. Pendientes fuera de alcance
+
+El esquema del manifiesto (secciones 1 a 9) sigue sin inspeccionar bytes: lo hace el plugin (§10).
+Siguen pendientes, y fuera del plugin: el *round-trip* con ContOpe Design Desktop de `desktopSource` e `idml`
+(el importador del plugin los ignora), la firma o verificación de origen del paquete (§7: el importador no escanea
+secretos ni código ejecutable más allá de no leer lo que el manifiesto no declara) y aplicar el `theme.json` del paquete
+al tema de destino (depende de la proyección del ADN, fase F2).

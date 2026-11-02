@@ -2,3 +2,6 @@ contope-publisher/assets/vendor/grapesjs/grapes.min.js -text
 contope-publisher/assets/vendor/grapesjs/grapes.min.css -text
 scripts/regresiones/linea-base/** -text
 fixtures/adn/** -text
+fixtures/package-v1/valid/desktop-interchange/design/** -text
+fixtures/package-v1/valid/desktop-interchange/content/** -text
+fixtures/package-v1/valid/desktop-interchange/wordpress/** -text

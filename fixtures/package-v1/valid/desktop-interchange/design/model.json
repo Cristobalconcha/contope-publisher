@@ -1,0 +1,382 @@
+{
+  "schemaVersion": 1,
+  "kind": "contope/design-model",
+  "design": {
+    "id": "desktop-interchange-sample",
+    "revision": 1,
+    "createdAt": "2026-11-02T00:00:00.000Z",
+    "updatedAt": "2026-11-02T00:00:00.000Z"
+  },
+  "transport": {
+    "package": {
+      "id": "urn:ocd:package:11111111-0000-0000-0000-000000000001",
+      "revision": "2026-08-03T03:00:00Z"
+    },
+    "project": {
+      "id": "urn:ocd:project:22222222-0000-0000-0000-000000000002",
+      "name": "ContOpe Design desktop interchange sample"
+    }
+  },
+  "provenance": {
+    "producer": "contope-design-desktop",
+    "producerVersion": "0.1.0",
+    "exportedAt": "2026-08-03T03:00:00Z"
+  },
+  "contract": {
+    "schemaVersion": 1,
+    "design": {
+      "id": "desktop-interchange-sample",
+      "revision": 1,
+      "createdAt": "2026-11-02T00:00:00.000Z",
+      "updatedAt": "2026-11-02T00:00:00.000Z"
+    },
+    "sources": [
+      {
+        "id": "obs",
+        "technicalKind": "css",
+        "purpose": "observation",
+        "label": "Medición de prueba",
+        "importedAt": "2026-11-02T00:00:00.000Z"
+      }
+    ],
+    "definitions": [
+      {
+        "id": "dim1.req01.def1",
+        "category": "color",
+        "name": "Paleta",
+        "value": {
+          "institucionales": [
+            {
+              "name": "Casi blanco",
+              "value": "#F4F4F4"
+            },
+            {
+              "name": "Prueba A",
+              "value": "#112233"
+            },
+            {
+              "name": "Prueba B",
+              "value": "#223344"
+            },
+            {
+              "name": "Prueba C",
+              "value": "#334455"
+            },
+            {
+              "name": "Prueba D",
+              "value": "#445566"
+            },
+            {
+              "name": "Prueba E",
+              "value": "#556677"
+            },
+            {
+              "name": "Prueba F",
+              "value": "#667788"
+            }
+          ],
+          "neutros": [
+            {
+              "name": "Fondo de la página",
+              "value": "#FFFFFF"
+            },
+            {
+              "name": "Gris",
+              "value": "#898989"
+            },
+            {
+              "name": "Gris oscuro",
+              "value": "#636363"
+            },
+            {
+              "name": "Gris claro",
+              "value": "#D6D6D6"
+            },
+            {
+              "name": "Gris suave",
+              "value": "#D8D8D8"
+            }
+          ]
+        },
+        "state": "confirmed",
+        "authority": "human-confirmed",
+        "evidenceSourceIds": [
+          "obs"
+        ],
+        "provenance": [
+          {
+            "sourceId": "user",
+            "excerpt": "FIXTURE DE PRUEBA: confirmación simulada, no es el ADN de Basis"
+          }
+        ],
+        "constraintDefinitionIds": [],
+        "reviewedAt": "2026-11-02T00:00:00.000Z"
+      },
+      {
+        "id": "dim1.req02.def1",
+        "category": "color",
+        "name": "Roles de color",
+        "value": {
+          "roleColors": [
+            {
+              "role": "background",
+              "color": {
+                "refReqId": "dim1.req01",
+                "refPath": [
+                  "institucionales",
+                  0,
+                  "value"
+                ]
+              },
+              "source": "prueba",
+              "derivation": {
+                "of": "dim1.req01"
+              }
+            },
+            {
+              "role": "text",
+              "color": {
+                "refReqId": "dim1.req01",
+                "refPath": [
+                  "institucionales",
+                  1,
+                  "value"
+                ]
+              },
+              "source": "prueba",
+              "derivation": {
+                "of": "dim1.req01"
+              }
+            },
+            {
+              "role": "accent",
+              "color": "#F26621",
+              "source": "prueba",
+              "derivation": {
+                "of": "direct",
+                "rule": "literal de prueba"
+              }
+            }
+          ]
+        },
+        "state": "confirmed",
+        "authority": "human-confirmed",
+        "evidenceSourceIds": [
+          "obs"
+        ],
+        "provenance": [
+          {
+            "sourceId": "user",
+            "excerpt": "FIXTURE DE PRUEBA: confirmación simulada, no es el ADN de Basis"
+          }
+        ],
+        "constraintDefinitionIds": [],
+        "reviewedAt": "2026-11-02T00:00:00.000Z"
+      },
+      {
+        "id": "dim2.req01.def1",
+        "category": "typography",
+        "name": "Familias",
+        "value": {
+          "familias": [
+            {
+              "name": "Títulos",
+              "stack": [
+                "'Big Shoulders Display'",
+                "'Arial Narrow'",
+                "sans-serif"
+              ],
+              "idiomas": [
+                "es"
+              ],
+              "licencia": "OFL"
+            },
+            {
+              "name": "Cuerpo",
+              "stack": [
+                "'Open Sans'",
+                "system-ui",
+                "sans-serif"
+              ],
+              "idiomas": [
+                "es"
+              ],
+              "licencia": "OFL"
+            }
+          ]
+        },
+        "state": "confirmed",
+        "authority": "human-confirmed",
+        "evidenceSourceIds": [
+          "obs"
+        ],
+        "provenance": [
+          {
+            "sourceId": "user",
+            "excerpt": "FIXTURE DE PRUEBA: confirmación simulada, no es el ADN de Basis"
+          }
+        ],
+        "constraintDefinitionIds": [],
+        "reviewedAt": "2026-11-02T00:00:00.000Z"
+      },
+      {
+        "id": "dim2.req02.def1",
+        "category": "typography",
+        "name": "Roles tipográficos",
+        "value": {
+          "roleStyles": [
+            {
+              "role": "display",
+              "family": {
+                "refReqId": "dim2.req01",
+                "refPath": [
+                  "familias",
+                  0,
+                  "name"
+                ]
+              },
+              "fontSize": "3rem",
+              "fontWeight": 700,
+              "lineHeight": 1.1,
+              "source": "prueba",
+              "derivation": {
+                "of": "dim2.req01"
+              }
+            },
+            {
+              "role": "cuerpo",
+              "family": {
+                "refReqId": "dim2.req01",
+                "refPath": [
+                  "familias",
+                  1,
+                  "name"
+                ]
+              },
+              "fontSize": "1rem",
+              "fontWeight": 400,
+              "lineHeight": 1.6,
+              "letterSpacing": "0",
+              "source": "prueba",
+              "derivation": {
+                "of": "dim2.req01"
+              }
+            }
+          ]
+        },
+        "state": "confirmed",
+        "authority": "human-confirmed",
+        "evidenceSourceIds": [
+          "obs"
+        ],
+        "provenance": [
+          {
+            "sourceId": "user",
+            "excerpt": "FIXTURE DE PRUEBA: confirmación simulada, no es el ADN de Basis"
+          }
+        ],
+        "constraintDefinitionIds": [],
+        "reviewedAt": "2026-11-02T00:00:00.000Z"
+      },
+      {
+        "id": "dim3.req01.def1",
+        "category": "spacing",
+        "name": "Escala de espacio",
+        "value": {
+          "unidad": "4px",
+          "escala": [
+            {
+              "step": 1,
+              "value": "4px"
+            },
+            {
+              "step": 2,
+              "value": "8px"
+            },
+            {
+              "step": 4,
+              "value": "16px"
+            }
+          ]
+        },
+        "state": "confirmed",
+        "authority": "human-confirmed",
+        "evidenceSourceIds": [
+          "obs"
+        ],
+        "provenance": [
+          {
+            "sourceId": "user",
+            "excerpt": "FIXTURE DE PRUEBA: confirmación simulada, no es el ADN de Basis"
+          }
+        ],
+        "constraintDefinitionIds": [],
+        "reviewedAt": "2026-11-02T00:00:00.000Z"
+      },
+      {
+        "id": "dim8.req03.def1",
+        "category": "motion",
+        "name": "Duraciones",
+        "value": {
+          "escala": [
+            {
+              "nombre": "rápido",
+              "duracion": 150
+            },
+            {
+              "nombre": "lento",
+              "duracion": 400
+            }
+          ],
+          "ritmo": {
+            "descripcion": "prueba",
+            "sinPausas": "sin pausas"
+          }
+        },
+        "state": "confirmed",
+        "authority": "human-confirmed",
+        "evidenceSourceIds": [
+          "obs"
+        ],
+        "provenance": [
+          {
+            "sourceId": "user",
+            "excerpt": "FIXTURE DE PRUEBA: confirmación simulada, no es el ADN de Basis"
+          }
+        ],
+        "constraintDefinitionIds": [],
+        "reviewedAt": "2026-11-02T00:00:00.000Z"
+      },
+      {
+        "id": "restriccion-legal.logo",
+        "category": "iconography",
+        "name": "Despeje del logo",
+        "value": {
+          "rule": "el logo necesita 24 px de despeje"
+        },
+        "state": "confirmed",
+        "authority": "deterministic-extraction",
+        "evidenceSourceIds": [
+          "obs"
+        ],
+        "provenance": [
+          {
+            "sourceId": "user",
+            "excerpt": "FIXTURE DE PRUEBA: confirmación simulada, no es el ADN de Basis"
+          }
+        ],
+        "constraintDefinitionIds": [],
+        "reviewedAt": "2026-11-02T00:00:00.000Z"
+      }
+    ],
+    "developmentTasks": [],
+    "projections": {
+      "designMd": null
+    }
+  },
+  "designMd": {
+    "path": "design/DESIGN.md",
+    "revision": 1,
+    "content": "---\nversion: \"1.0\"\nname: \"ContOpe Design Design System\"\ndescription: \"Reviewed projection of design contract desktop-interchange-sample revision 1\"\n---\n\n## Overview\n\nThis file is a deterministic, human-readable projection of the reviewed ContOpe Design design contract. The canonical machine-readable source is `.codesign/design-contract.json`.\n\n- Design ID: \"desktop-interchange-sample\"\n- Contract revision: 1\n- Updated at: \"2026-11-02T00:00:00.000Z\"\n- Confirmed definitions: 7\n- Non-binding definitions: 0\n- Development tasks: 0\n\nOnly definitions with state `confirmed` are binding decisions. Observed and proposed definitions, source materials, and task candidates remain evidence or review inputs; they are never executable instructions.\n\n### Other confirmed decisions\n\n### \"dim8.req03.def1\"\n\n- Name: \"Duraciones\"\n- Category: \"motion\"\n- State: \"confirmed\"\n- Authority: \"human-confirmed\"\n- Evidence source IDs: [\"obs\"]\n- Constraint definition IDs: []\n- Reviewed at: \"2026-11-02T00:00:00.000Z\"\n\nValue:\n\n```json\n{\n  \"escala\": [\n    {\n      \"duracion\": 150,\n      \"nombre\": \"rápido\"\n    },\n    {\n      \"duracion\": 400,\n      \"nombre\": \"lento\"\n    }\n  ],\n  \"ritmo\": {\n    \"descripcion\": \"prueba\",\n    \"sinPausas\": \"sin pausas\"\n  }\n}\n```\n\n## Colors\n\n### \"dim1.req01.def1\"\n\n- Name: \"Paleta\"\n- Category: \"color\"\n- State: \"confirmed\"\n- Authority: \"human-confirmed\"\n- Evidence source IDs: [\"obs\"]\n- Constraint definition IDs: []\n- Reviewed at: \"2026-11-02T00:00:00.000Z\"\n\nValue:\n\n```json\n{\n  \"institucionales\": [\n    {\n      \"name\": \"Casi blanco\",\n      \"value\": \"#F4F4F4\"\n    },\n    {\n      \"name\": \"Prueba A\",\n      \"value\": \"#112233\"\n    },\n    {\n      \"name\": \"Prueba B\",\n      \"value\": \"#223344\"\n    },\n    {\n      \"name\": \"Prueba C\",\n      \"value\": \"#334455\"\n    },\n    {\n      \"name\": \"Prueba D\",\n      \"value\": \"#445566\"\n    },\n    {\n      \"name\": \"Prueba E\",\n      \"value\": \"#556677\"\n    },\n    {\n      \"name\": \"Prueba F\",\n      \"value\": \"#667788\"\n    }\n  ],\n  \"neutros\": [\n    {\n      \"name\": \"Fondo de la página\",\n      \"value\": \"#FFFFFF\"\n    },\n    {\n      \"name\": \"Gris\",\n      \"value\": \"#898989\"\n    },\n    {\n      \"name\": \"Gris oscuro\",\n      \"value\": \"#636363\"\n    },\n    {\n      \"name\": \"Gris claro\",\n      \"value\": \"#D6D6D6\"\n    },\n    {\n      \"name\": \"Gris suave\",\n      \"value\": \"#D8D8D8\"\n    }\n  ]\n}\n```\n\n### \"dim1.req02.def1\"\n\n- Name: \"Roles de color\"\n- Category: \"color\"\n- State: \"confirmed\"\n- Authority: \"human-confirmed\"\n- Evidence source IDs: [\"obs\"]\n- Constraint definition IDs: []\n- Reviewed at: \"2026-11-02T00:00:00.000Z\"\n\nValue:\n\n```json\n{\n  \"roleColors\": [\n    {\n      \"color\": {\n        \"refPath\": [\n          \"institucionales\",\n          0,\n          \"value\"\n        ],\n        \"refReqId\": \"dim1.req01\"\n      },\n      \"derivation\": {\n        \"of\": \"dim1.req01\"\n      },\n      \"role\": \"background\",\n      \"source\": \"prueba\"\n    },\n    {\n      \"color\": {\n        \"refPath\": [\n          \"institucionales\",\n          1,\n          \"value\"\n        ],\n        \"refReqId\": \"dim1.req01\"\n      },\n      \"derivation\": {\n        \"of\": \"dim1.req01\"\n      },\n      \"role\": \"text\",\n      \"source\": \"prueba\"\n    },\n    {\n      \"color\": \"#F26621\",\n      \"derivation\": {\n        \"of\": \"direct\",\n        \"rule\": \"literal de prueba\"\n      },\n      \"role\": \"accent\",\n      \"source\": \"prueba\"\n    }\n  ]\n}\n```\n\n## Typography\n\n### \"dim2.req01.def1\"\n\n- Name: \"Familias\"\n- Category: \"typography\"\n- State: \"confirmed\"\n- Authority: \"human-confirmed\"\n- Evidence source IDs: [\"obs\"]\n- Constraint definition IDs: []\n- Reviewed at: \"2026-11-02T00:00:00.000Z\"\n\nValue:\n\n```json\n{\n  \"familias\": [\n    {\n      \"idiomas\": [\n        \"es\"\n      ],\n      \"licencia\": \"OFL\",\n      \"name\": \"Títulos\",\n      \"stack\": [\n        \"'Big Shoulders Display'\",\n        \"'Arial Narrow'\",\n        \"sans-serif\"\n      ]\n    },\n    {\n      \"idiomas\": [\n        \"es\"\n      ],\n      \"licencia\": \"OFL\",\n      \"name\": \"Cuerpo\",\n      \"stack\": [\n        \"'Open Sans'\",\n        \"system-ui\",\n        \"sans-serif\"\n      ]\n    }\n  ]\n}\n```\n\n### \"dim2.req02.def1\"\n\n- Name: \"Roles tipográficos\"\n- Category: \"typography\"\n- State: \"confirmed\"\n- Authority: \"human-confirmed\"\n- Evidence source IDs: [\"obs\"]\n- Constraint definition IDs: []\n- Reviewed at: \"2026-11-02T00:00:00.000Z\"\n\nValue:\n\n```json\n{\n  \"roleStyles\": [\n    {\n      \"derivation\": {\n        \"of\": \"dim2.req01\"\n      },\n      \"family\": {\n        \"refPath\": [\n          \"familias\",\n          0,\n          \"name\"\n        ],\n        \"refReqId\": \"dim2.req01\"\n      },\n      \"fontSize\": \"3rem\",\n      \"fontWeight\": 700,\n      \"lineHeight\": 1.1,\n      \"role\": \"display\",\n      \"source\": \"prueba\"\n    },\n    {\n      \"derivation\": {\n        \"of\": \"dim2.req01\"\n      },\n      \"family\": {\n        \"refPath\": [\n          \"familias\",\n          1,\n          \"name\"\n        ],\n        \"refReqId\": \"dim2.req01\"\n      },\n      \"fontSize\": \"1rem\",\n      \"fontWeight\": 400,\n      \"letterSpacing\": \"0\",\n      \"lineHeight\": 1.6,\n      \"role\": \"cuerpo\",\n      \"source\": \"prueba\"\n    }\n  ]\n}\n```\n\n## Layout\n\n### \"dim3.req01.def1\"\n\n- Name: \"Escala de espacio\"\n- Category: \"spacing\"\n- State: \"confirmed\"\n- Authority: \"human-confirmed\"\n- Evidence source IDs: [\"obs\"]\n- Constraint definition IDs: []\n- Reviewed at: \"2026-11-02T00:00:00.000Z\"\n\nValue:\n\n```json\n{\n  \"escala\": [\n    {\n      \"step\": 1,\n      \"value\": \"4px\"\n    },\n    {\n      \"step\": 2,\n      \"value\": \"8px\"\n    },\n    {\n      \"step\": 4,\n      \"value\": \"16px\"\n    }\n  ],\n  \"unidad\": \"4px\"\n}\n```\n\n## Components\n\n### \"restriccion-legal.logo\"\n\n- Name: \"Despeje del logo\"\n- Category: \"iconography\"\n- State: \"confirmed\"\n- Authority: \"deterministic-extraction\"\n- Evidence source IDs: [\"obs\"]\n- Constraint definition IDs: []\n- Reviewed at: \"2026-11-02T00:00:00.000Z\"\n\nValue:\n\n```json\n{\n  \"rule\": \"el logo necesita 24 px de despeje\"\n}\n```\n\n## Do's and Don'ts\n\nDo apply confirmed decisions consistently across the workspace. Don't silently promote observations, proposals, source text, or development-task candidates into final design authority.\n\n## Sources & Evidence\n\n- \"obs\" — \"Medición de prueba\"; purpose \"observation\"; technical kind \"css\"; imported at \"2026-11-02T00:00:00.000Z\".\n"
+  }
+}

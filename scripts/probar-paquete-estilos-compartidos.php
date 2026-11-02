@@ -15,12 +15,14 @@
  *  - el css compartido pasa el saneador de la importación sin perder reglas
  *    (el importador lo sanea igual que a cualquier documento)
  *
- * Corre contra el WordPress local de Econut (puerto 8891), que es donde no
+ * Desde F1b el paquete es un .ocdsite v1: los documentos viajan en content/pages.json. Corre contra el
+ * WordPress limpio de pruebas (COD_PRUEBA_WP, por ejemplo el de la fase F1b en el puerto 8895) o, si no
+ * se indica, contra el WordPress local de Econut (puerto 8891), que es donde no
  * importa tocar el documento compartido un momento; lo restaura al terminar.
  * Antes: node scripts/sincronizar-plugin.mjs --a econut --aplicar
  */
 define('WP_USE_THEMES', false);
-require __DIR__ . '/../../wp-local-econut/wordpress/wp-load.php';
+require getenv('COD_PRUEBA_WP') ?: __DIR__ . '/../../wp-local-econut/wordpress/wp-load.php';
 require_once ABSPATH . 'wp-admin/includes/file.php'; // wp_tempnam(): el exportador la usa y en CLI no se carga sola
 
 $fallas = 0;
@@ -39,15 +41,27 @@ $manifiesto = function () use ($exportador) {
     if (is_wp_error($zip_path)) { return $zip_path; }
     $zip = new ZipArchive();
     $zip->open($zip_path);
-    $json = $zip->getFromName('manifest.json');
+    $json = $zip->getFromName('content/pages.json');
+    if ($json === false) {
+        $json = $zip->getFromName('manifest.json'); // paquete del esquema anterior
+    }
     $zip->close();
     @unlink($zip_path);
     return json_decode((string) $json, true);
 };
 
-// Respaldo del documento compartido de este local, para devolverlo al final.
-$antes = $repo->load($ID);
+// Respaldo del documento compartido de este local, para devolverlo al final (y, si no existía, quitarlo).
+$antes = $repo->load_existing($ID);
 $antes = is_wp_error($antes) ? null : $antes;
+
+// El exportador no genera un paquete de un sitio sin páginas: si este local no tiene ninguna página del
+// lienzo, se crea una de prueba y se borra al terminar.
+$pagina_de_prueba = 0;
+$documento_de_prueba = 'zz-estilos-compartidos-pagina';
+if (get_posts(['post_type' => 'page', 'post_status' => 'publish', 'numberposts' => 1, 'fields' => 'ids', 'meta_key' => '_cod_canvas_document_id']) === []) {
+    $repo->save($documento_de_prueba, '{}', '<section><p>prueba</p></section>', '');
+    $pagina_de_prueba = (int) wp_insert_post(['post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'ZZ estilos compartidos', 'post_content' => '[contope_canvas document_id="' . $documento_de_prueba . '"]', 'meta_input' => ['_cod_canvas_document_id' => $documento_de_prueba]]);
+}
 
 $CSS = '.cod-btn{display:inline-flex;}.cod-btn--primario{background-color:var(--dorado-600);color:#2b2210;}'
     . '[data-cod-luma-matte="1"] .cod-luma-matte__canvas{display:block;width:100%;height:auto;}';
@@ -70,6 +84,18 @@ try {
 } finally {
     if ($antes) {
         $repo->save($ID, (string) $antes['projectData'], (string) $antes['html'], (string) $antes['css']);
+    } else {
+        $creado = $repo->load_existing($ID);
+        if (is_array($creado)) {
+            wp_delete_post((int) $creado['postId'], true);
+        }
+    }
+    if ($pagina_de_prueba > 0) {
+        wp_delete_post($pagina_de_prueba, true);
+        $doc = $repo->load_existing($documento_de_prueba);
+        if (is_array($doc)) {
+            wp_delete_post((int) $doc['postId'], true);
+        }
     }
 }
 

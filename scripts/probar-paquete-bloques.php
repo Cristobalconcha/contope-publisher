@@ -1,0 +1,673 @@
+<?php
+/**
+ * Fase F1b (ESPEC-adn-unica-puerta-y-bloques): el paquete `.ocdsite` v1 con ADN, páginas en bloques,
+ * medios y regiones. Pruebas P1b.1, P1b.2 y P1b.3 con sus controles, más el lector del manifiesto, los
+ * paquetes del esquema anterior, el ZIP hostil y la ida y vuelta del ADN.
+ *
+ * Corre contra el WordPress LIMPIO de prueba (puerto 8895, carpeta wp-local-f1b-destino), nunca contra
+ * Santa Luisa, Econut ni Basis. Lo crea:  node scripts/paquete/crear-destino-limpio.mjs
+ * Después de tocar el plugin:               node scripts/paquete/crear-destino-limpio.mjs --sincronizar
+ *
+ * Esta prueba puede fallar de verdad: cada afirmación de "no se escribió nada" o "quedó intacto" tiene
+ * su CONTROL (la misma operación con la salvaguarda levantada, que sí cambia lo observado).
+ *
+ * Al terminar deja el sitio como lo encontró (posts, opciones y archivos de uploads de antes se conservan).
+ */
+define('WP_USE_THEMES', false);
+$wp_load = getenv('COD_PRUEBA_WP') ?: __DIR__ . '/../../wp-local-f1b-destino/wordpress/wp-load.php';
+require $wp_load;
+require_once ABSPATH . 'wp-admin/includes/file.php'; // wp_tempnam(): el exportador la usa y en CLI no se carga sola
+require __DIR__ . '/adn/lib/contrato-de-prueba.php';
+
+$fallas = 0;
+$ejecutadas = 0;
+$comprobar = static function (string $caso, bool $ok, string $detalle = '') use (&$fallas, &$ejecutadas): void {
+    ++$ejecutadas;
+    echo ($ok ? '  ok     ' : '  FALLA  ') . $caso . ($detalle !== '' && !$ok ? '   -> ' . $detalle : '') . "\n";
+    if (!$ok) {
+        ++$fallas;
+    }
+};
+$codigo = static function ($r): string {
+    return is_wp_error($r) ? $r->get_error_code() : 'sin error';
+};
+
+global $wpdb;
+$raiz = realpath(__DIR__ . '/..');
+$PHP_LOCAL = 'C:/Users/Cristobal concha/wp-local/php/php.exe';
+
+// ---------------------------------------------------------------------------
+echo "\n== 0. precondiciones ==\n";
+$comprobar('el sitio de prueba es el destino limpio (puerto 8895)', strpos((string) home_url(), ':8895') !== false, (string) home_url());
+$repo_dir = realpath($raiz . '/contope-publisher');
+$inst_dir = rtrim((string) COD_PUBLISHER_DIR, '/\\');
+$desiguales = [];
+foreach (array_merge(glob($repo_dir . '/includes/class-cod-site-package-*.php') ?: [], glob($repo_dir . '/includes/class-cod-adn-*.php') ?: [], [$repo_dir . '/contope-publisher.php']) as $a) {
+    $b = $inst_dir . substr($a, strlen($repo_dir));
+    if (!is_file($b) || md5_file($a) !== md5_file($b)) {
+        $desiguales[] = basename($a);
+    }
+}
+$comprobar('lo instalado en el sitio de prueba es lo que hay en el repositorio', $desiguales === [], 'distintos: ' . implode(', ', $desiguales) . ' (corre: node scripts/paquete/crear-destino-limpio.mjs --sincronizar)');
+if ($fallas > 0) {
+    echo "\n  Las precondiciones no se cumplen: no se corre nada.\n";
+    exit(1);
+}
+// El destino es de pruebas y se vacía de contenido de ContOpe antes de empezar (lo deja así la pantalla de la
+// prueba de Basis, que importa un sitio entero): las cuentas de esta prueba parten de un sitio limpio.
+$vaciado = [];
+exec(escapeshellarg($PHP_LOCAL) . ' -c ' . escapeshellarg('C:/Users/Cristobal concha/wp-local/php/php.ini') . ' ' . escapeshellarg($raiz . '/scripts/paquete/vaciar-destino.php') . ' ' . escapeshellarg($wp_load) . ' 2>&1', $vaciado);
+$comprobar('(preparación) el destino de pruebas se vació de contenido de ContOpe', strpos(implode('', $vaciado), 'borrados') !== false, implode(' ', $vaciado));
+wp_cache_flush();
+if (COD_ADN_Store::activo()) {
+    echo "\n  FALLA  este WordPress ya tiene un ADN activo: la prueba no lo pisa.\n";
+    exit(1);
+}
+
+// --- foto del estado de antes, para dejarlo igual
+$fotos = [
+    'posts' => array_map('intval', (array) $wpdb->get_col("SELECT ID FROM {$wpdb->posts}")),
+    'opciones' => (array) $wpdb->get_col("SELECT option_name FROM {$wpdb->options}"),
+    'show_on_front' => get_option('show_on_front'),
+    'page_on_front' => get_option('page_on_front'),
+    'page_for_posts' => get_option('page_for_posts'),
+    'modo' => get_option(COD_ADN_Gate::OPTION_MODE, null),
+];
+$upload = wp_get_upload_dir();
+$archivos_antes = [];
+$recorrer = static function (string $dir) use (&$recorrer, &$archivos_antes): void {
+    foreach (glob($dir . '/*') ?: [] as $f) {
+        if (is_dir($f)) {
+            $recorrer($f);
+        } else {
+            $archivos_antes[wp_normalize_path($f)] = true;
+        }
+    }
+};
+$recorrer(rtrim($upload['basedir'], '/\\'));
+
+$borrar_adn = static function () use ($wpdb): void {
+    foreach (get_posts(['post_type' => COD_ADN_Store::POST_TYPE, 'post_status' => 'any', 'numberposts' => -1, 'fields' => 'ids']) as $id) {
+        wp_delete_post((int) $id, true);
+    }
+    foreach ((array) $wpdb->get_col("SELECT option_name FROM {$wpdb->options} WHERE option_name LIKE 'cod_adn_%'") as $nombre) {
+        if (preg_match('/^cod_adn_(proj_r[0-9]+|lock_.*|activa)$/', (string) $nombre) === 1) {
+            delete_option((string) $nombre);
+        }
+    }
+};
+$temporales = [];
+$limpiar = static function () use (&$fotos, &$archivos_antes, &$temporales, $borrar_adn, $wpdb, $upload): void {
+    $borrar_adn();
+    foreach ((array) $wpdb->get_col("SELECT ID FROM {$wpdb->posts}") as $id) {
+        if (!in_array((int) $id, $fotos['posts'], true)) {
+            wp_delete_post((int) $id, true);
+        }
+    }
+    foreach ((array) $wpdb->get_col("SELECT option_name FROM {$wpdb->options}") as $nombre) {
+        if (!in_array($nombre, $fotos['opciones'], true) && strpos((string) $nombre, '_transient') === false) {
+            delete_option((string) $nombre);
+        }
+    }
+    foreach (['show_on_front', 'page_on_front', 'page_for_posts'] as $o) {
+        update_option($o, $fotos[$o]);
+    }
+    if ($fotos['modo'] === null) {
+        delete_option(COD_ADN_Gate::OPTION_MODE);
+    } else {
+        update_option(COD_ADN_Gate::OPTION_MODE, $fotos['modo'], false);
+    }
+    $rec = static function (string $dir) use (&$rec, &$archivos_antes): void {
+        foreach (glob($dir . '/*') ?: [] as $f) {
+            if (is_dir($f)) {
+                $rec($f);
+                @rmdir($f);
+            } elseif (!isset($archivos_antes[wp_normalize_path($f)])) {
+                @unlink($f);
+            }
+        }
+    };
+    $rec(rtrim($upload['basedir'], '/\\'));
+    foreach ($temporales as $t) {
+        if (is_file($t)) {
+            @unlink($t);
+        }
+    }
+};
+register_shutdown_function(static function () use (&$limpiar): void {
+    $limpiar();
+});
+
+// ---------------------------------------------------------------------------
+// Utilitarios de paquetes
+$tmp = static function (string $sufijo = '.zip') use (&$temporales): string {
+    $ruta = tempnam(sys_get_temp_dir(), 'zzf1b');
+    @unlink($ruta);
+    $ruta .= $sufijo;
+    $temporales[] = $ruta;
+    return $ruta;
+};
+$leer_zip = static function (string $ruta): array {
+    $zip = new ZipArchive();
+    $zip->open($ruta);
+    $salida = ['nombres' => [], 'contenidos' => []];
+    for ($i = 0; $i < $zip->numFiles; $i++) {
+        $n = (string) $zip->getNameIndex($i);
+        $salida['nombres'][] = $n;
+        $salida['contenidos'][$n] = (string) $zip->getFromIndex($i);
+    }
+    $zip->close();
+    return $salida;
+};
+/** Escribe un ZIP con los archivos dados (nombre => contenido). */
+$escribir_zip = static function (array $archivos) use ($tmp): string {
+    $ruta = $tmp();
+    $zip = new ZipArchive();
+    $zip->open($ruta, ZipArchive::CREATE | ZipArchive::OVERWRITE);
+    foreach ($archivos as $nombre => $contenido) {
+        $zip->addFromString($nombre, $contenido);
+    }
+    $zip->close();
+    return $ruta;
+};
+$repositorio = new COD_Canvas_Document_Repository();
+$exportador = new COD_Site_Package_Exporter($repositorio);
+$importador = new COD_Site_Package_Importer($repositorio, new COD_Canvas_Document_Sanitizer(), new COD_Media_Attachment_Sync());
+$sha = static function (string $s): string {
+    return hash('sha256', $s);
+};
+$contenido_de = static function (int $id): string {
+    return (string) get_post_field('post_content', $id, 'raw');
+};
+/** Escribe un post_content CRUDO en un post (sin kses): es la preparación de la prueba, no lo que se mide. */
+$poner_contenido = static function (int $id, string $contenido): void {
+    $kses = function_exists('kses_remove_filters') && has_filter('content_save_pre', 'wp_filter_post_kses');
+    if ($kses) {
+        kses_remove_filters();
+    }
+    try {
+        wp_update_post(['ID' => $id, 'post_content' => wp_slash($contenido)]);
+    } finally {
+        if ($kses) {
+            kses_init_filters();
+        }
+    }
+};
+$pagina_por_slug = static function (string $slug): ?int {
+    $ids = get_posts(['post_type' => 'page', 'post_status' => 'any', 'name' => $slug, 'numberposts' => 1, 'fields' => 'ids', 'no_found_rows' => true]);
+    return $ids === [] ? null : (int) $ids[0];
+};
+$cantidad_por_slug = static function (string $slug): int {
+    return count(get_posts(['post_type' => 'page', 'post_status' => 'any', 'name' => $slug, 'numberposts' => -1, 'fields' => 'ids', 'no_found_rows' => true]));
+};
+$ajv = static function (string $manifest_json) use ($PHP_LOCAL, $raiz, $tmp): array {
+    $archivo = $tmp('.json');
+    file_put_contents($archivo, $manifest_json);
+    $salida = [];
+    $codigo_salida = 0;
+    exec('node ' . escapeshellarg($raiz . '/scripts/paquete/validar-manifiesto-ajv.mjs') . ' ' . escapeshellarg($archivo) . ' 2>&1', $salida, $codigo_salida);
+    $json = json_decode(implode("\n", $salida), true);
+    return is_array($json) ? $json : ['ok' => false, 'codes' => ['SIN_RESPUESTA'], 'detalle' => $salida];
+};
+$core = static function (string $json) use ($raiz, $tmp): array {
+    $archivo = $tmp('.json');
+    file_put_contents($archivo, $json);
+    $salida = [];
+    $codigo_salida = 0;
+    exec('node ' . escapeshellarg($raiz . '/scripts/adn/modelo-portable-core.mjs') . ' validar ' . escapeshellarg($archivo) . ' 2>&1', $salida, $codigo_salida);
+    return ['ok' => $codigo_salida === 0, 'salida' => implode("\n", $salida)];
+};
+
+// ---------------------------------------------------------------------------
+echo "\n== 1. el lector del manifiesto: los 34 fixtures de package-v1 dan los mismos códigos que Ajv ==\n";
+$casos = [];
+$buscar = static function (string $dir) use (&$buscar, &$casos): void {
+    foreach (glob($dir . '/*') ?: [] as $f) {
+        if (is_dir($f)) {
+            if (is_file($f . '/manifest.json') && is_file($f . '/case.json')) {
+                $casos[] = $f;
+            } else {
+                $buscar($f);
+            }
+        }
+    }
+};
+$buscar($raiz . '/fixtures/package-v1');
+$comprobar('hay 34 fixtures (piso: si faltan, el cruce no mide)', count($casos) === 34, 'hay ' . count($casos));
+$no_coinciden = [];
+foreach ($casos as $dir) {
+    $caso = json_decode((string) file_get_contents($dir . '/case.json'), true);
+    $manifiesto = json_decode((string) file_get_contents($dir . '/manifest.json'), true);
+    $codigos = $manifiesto === null ? ['INVALID_JSON'] : array_values(array_unique(array_column(COD_Site_Package_Format::validar_manifiesto($manifiesto), 'code')));
+    $esperados = ($caso['expect'] ?? '') === 'valid' ? [] : (array) ($caso['expectedErrors'] ?? []);
+    sort($codigos);
+    sort($esperados);
+    if ($codigos !== $esperados) {
+        $no_coinciden[] = basename($dir) . ' esperaba [' . implode(',', $esperados) . '] dio [' . implode(',', $codigos) . ']';
+    }
+}
+$comprobar('cada fixture: mismos códigos que Ajv (válidos sin error, inválidos con exactamente los suyos)', $no_coinciden === [], implode(' | ', $no_coinciden));
+
+// ---------------------------------------------------------------------------
+echo "\n== 2. P1b.1 — el fixture desktop-interchange con su design/model.json deja un ADN activo ==\n";
+$fixture = $raiz . '/fixtures/package-v1/valid/desktop-interchange';
+$zip_fixture = static function (bool $con_modelo, ?callable $tocar = null) use ($fixture, $escribir_zip): string {
+    $archivos = [];
+    foreach (['manifest.json', 'content/pages.json', 'wordpress/state.json', 'design/model.json'] as $ruta) {
+        if (!$con_modelo && $ruta === 'design/model.json') {
+            continue;
+        }
+        $archivos[$ruta] = (string) file_get_contents($fixture . '/' . $ruta);
+    }
+    if ($tocar !== null) {
+        $archivos = $tocar($archivos);
+    }
+    return $escribir_zip($archivos);
+};
+$modelo_fixture = (string) file_get_contents($fixture . '/design/model.json');
+$core_fixture = $core($modelo_fixture);
+$comprobar('el design/model.json del fixture lo acepta parsePortableDesignModel DEL CORE', $core_fixture['ok'], $core_fixture['salida']);
+$analisis = COD_ADN_Parser::analizar_portable(json_decode($modelo_fixture));
+$comprobar('…y también el puerto de PHP del plugin', $analisis['valido'], implode(',', $analisis['traza']));
+
+$r = $importador->import($zip_fixture(true));
+$comprobar('importar el fixture completo: sin error', !is_wp_error($r), is_wp_error($r) ? $r->get_error_code() . ': ' . $r->get_error_message() : '');
+$p = COD_ADN_Store::puntero();
+$comprobar('queda un ADN activo con el design.id del fixture (desktop-interchange-sample, r1)', $p !== null && $p['designId'] === 'desktop-interchange-sample' && (int) $p['revision'] === 1, json_encode($p));
+$comprobar('…reportado por el importador como aplicado, por la misma puerta del almacén', !is_wp_error($r) && ($r['adn']['resultado'] ?? '') === 'aplicado' && ($r['formato'] ?? '') === 'v1');
+$comprobar('…y el digest activo es el del contrato que viaja en el archivo', $p !== null && hash_equals((string) $p['digest'], (string) COD_ADN_Validator::validar($modelo_fixture, ['emitirPropuestas' => false])['digest']));
+$fixture_sin = $zip_fixture(false);
+$antes = COD_ADN_Store::puntero();
+$borrar_adn();
+$r2 = $importador->import($fixture_sin);
+$comprobar('CONTROL: el mismo fixture SIN design/model.json falla (el manifiesto lo declara)', is_wp_error($r2) && $r2->get_error_code() === 'cod_package_file_missing', $codigo($r2));
+$comprobar('…y no deja ADN', COD_ADN_Store::puntero() === null);
+$tocado = $zip_fixture(true, static function (array $a): array {
+    $a['design/model.json'] = str_replace('desktop-interchange-sample', 'desktop-interchange-samplf', $a['design/model.json']);
+    return $a;
+});
+$r3 = $importador->import($tocado);
+$comprobar('CONTROL: un byte cambiado en design/model.json rompe el sha256 del manifiesto', is_wp_error($r3) && $r3->get_error_code() === 'cod_package_hash_mismatch', $codigo($r3));
+$comprobar('…y tampoco deja ADN', COD_ADN_Store::puntero() === null);
+$r4 = $importador->import($zip_fixture(true));
+$comprobar('reimportar el fixture otra vez: aplicado de nuevo (el ADN se había quitado)', !is_wp_error($r4) && ($r4['adn']['resultado'] ?? '') === 'aplicado');
+$r5 = $importador->import($zip_fixture(true));
+$comprobar('reimportar con el mismo ADN ya activo: unchanged, sin error', !is_wp_error($r5) && ($r5['adn']['resultado'] ?? '') === 'unchanged', is_wp_error($r5) ? $codigo($r5) : json_encode($r5['adn'] ?? null));
+$borrar_adn();
+
+// ---------------------------------------------------------------------------
+echo "\n== 3. P1b.2 — migrar a bloques, editar, exportar, importar en limpio: post_content idéntico y medios con el mismo hash ==\n";
+$png_a = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==');
+$png_b = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==');
+$dir_medios = rtrim($upload['basedir'], '/\\') . '/zz-f1b';
+wp_mkdir_p($dir_medios);
+file_put_contents($dir_medios . '/ñandú@2x.png', $png_a);
+file_put_contents($dir_medios . '/fondo-region.png', $png_b);
+$sha_a = hash('sha256', $png_a);
+$sha_b = hash('sha256', $png_b);
+
+$doc_a = 'zz-f1b-pagina-a';
+$doc_b = 'zz-f1b-pagina-b';
+$doc_region = 'zz-f1b-region-encabezado';
+$contenido_a = "<!-- wp:contope/lienzo -->\n"
+    . "<!-- wp:heading {\"level\":2} -->\n<h2 class=\"wp-block-heading\">Título con ñ, \"comillas\" y \\ barra</h2>\n<!-- /wp:heading -->\n\n"
+    . "<!-- wp:image {\"sizeSlug\":\"full\",\"linkDestination\":\"none\"} -->\n<figure class=\"wp-block-image size-full\"><img src=\"/wp-content/uploads/zz-f1b/%C3%B1and%C3%BA@2x.png\" alt=\"Ñandú \\u003cprueba\\u003e\"/></figure>\n<!-- /wp:image -->\n\n"
+    . "<!-- wp:paragraph -->\n<p>Texto con emoji 😀 y saltos\r\nde línea CRLF dentro.</p>\n<!-- /wp:paragraph -->\n"
+    . "<!-- /wp:contope/lienzo -->";
+$editado_a = str_replace('Texto con emoji', 'Texto EDITADO en Gutenberg con emoji', $contenido_a);
+$editado_a = str_replace("<!-- /wp:contope/lienzo -->", "<!-- wp:paragraph -->\n<p>Un bloque agregado a mano.</p>\n<!-- /wp:paragraph -->\n<!-- /wp:contope/lienzo -->", $editado_a);
+
+// 3.a la página nace del lienzo y se migra a bloques (conserva su metadato), después se edita en Gutenberg
+$repositorio->save($doc_a, '{}', '<section class="zz-a"><p>Hola</p></section>', '.zz-a{display:block}');
+$id_a = wp_insert_post(['post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'ZZ F1b A', 'post_name' => 'zz-f1b-a', 'post_content' => '[contope_canvas document_id="' . $doc_a . '"]', 'meta_input' => ['_cod_canvas_document_id' => $doc_a]], true);
+$comprobar('(preparación) la página de prueba A se creó como página del lienzo', is_int($id_a) && $id_a > 0);
+$poner_contenido($id_a, $contenido_a);
+update_post_meta($id_a, '_cod_content_revision', 1);
+$poner_contenido($id_a, $editado_a);
+update_post_meta($id_a, '_cod_content_revision', 2);
+$hash_origen_a = $sha($contenido_de($id_a));
+$comprobar('(preparación) quedó guardada la versión editada, tal cual', $contenido_de($id_a) === $editado_a);
+
+// una página que sigue siendo del lienzo, y una región (encabezado global) con una imagen en su HTML
+$repositorio->save($doc_b, '{}', '<section class="zz-b"><p>Página del lienzo B</p></section>', '.zz-b{color:var(--wp--preset--color--ink)}');
+$id_b = wp_insert_post(['post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'ZZ F1b B', 'post_name' => 'zz-f1b-b', 'post_content' => '[contope_canvas document_id="' . $doc_b . '"]', 'meta_input' => ['_cod_canvas_document_id' => $doc_b]], true);
+$repositorio->save($doc_region, '{}', '<header class="zz-hdr"><img src="/wp-content/uploads/zz-f1b/fondo-region.png" alt="">Encabezado</header>', '.zz-hdr{display:block}');
+$repositorio->save_region($doc_region, 'header', 'global', []);
+
+$zip1 = $exportador->export(true);
+$comprobar('exportar el sitio completo: sin error', !is_wp_error($zip1), is_wp_error($zip1) ? $zip1->get_error_code() . ': ' . $zip1->get_error_message() : '');
+if (is_wp_error($zip1)) {
+    echo "\n  No se puede seguir sin paquete.\n";
+    exit(1);
+}
+$temporales[] = $zip1;
+$z1 = $leer_zip($zip1);
+$manifiesto1 = json_decode($z1['contenidos']['manifest.json'], true);
+$comprobar('el paquete trae manifest.json con formatVersion 1 y entrypoints', ($manifiesto1['formatVersion'] ?? null) === 1 && isset($manifiesto1['entrypoints']['content'], $manifiesto1['entrypoints']['theme']));
+$comprobar('el manifiesto que EXPORTA el plugin lo valida el lector del plugin', COD_Site_Package_Format::validar_manifiesto($manifiesto1) === [], COD_Site_Package_Format::describir_errores(COD_Site_Package_Format::validar_manifiesto($manifiesto1)));
+$resp_ajv = $ajv($z1['contenidos']['manifest.json']);
+$comprobar('…y lo valida el esquema real (Ajv draft 2020-12 + referencias cruzadas)', $resp_ajv['ok'] === true, json_encode($resp_ajv['detalle'] ?? $resp_ajv));
+$archivo_a = null;
+foreach ($manifiesto1['files'] as $f) {
+    if (strpos($f['path'], 'content/pages/') === 0 && strpos($f['path'], 'zz-f1b-a') !== false) {
+        $archivo_a = $f;
+    }
+}
+$comprobar('la página en bloques viaja como su propio archivo, con el sha256 de su post_content', $archivo_a !== null && $archivo_a['sha256'] === $hash_origen_a && $z1['contenidos'][$archivo_a['path']] === $editado_a, $archivo_a === null ? 'no hay archivo de la página' : '');
+$contenido_json = json_decode($z1['contenidos']['content/pages.json'], true);
+$tipos = [];
+foreach ($contenido_json['pages'] as $pg) {
+    $tipos[$pg['slug']] = $pg['kind'];
+}
+$comprobar('el paquete distingue página en bloques de página del lienzo', ($tipos['zz-f1b-a'] ?? '') === 'blocks' && ($tipos['zz-f1b-b'] ?? '') === 'canvas', json_encode($tipos));
+$comprobar('la región (encabezado global) viaja aunque ninguna página ni plantilla la cite', isset($contenido_json['documents'][$doc_region]) && ($contenido_json['documents'][$doc_region]['regionKind'] ?? '') === 'header');
+$activos = [];
+foreach ($manifiesto1['assets'] as $as) {
+    $activos[$as['sha256']] = $as;
+}
+$comprobar('los dos medios viajan con su sha256 (el del nombre con ñ y @, citado desde un bloque; el de la región, desde un documento)', isset($activos[$sha_a], $activos[$sha_b]));
+$rutas_medios = array_column($contenido_json['media'], 'path');
+$comprobar('…y la ruta real (con ñ y @) viaja en el contenido, no en el nombre del ZIP', in_array('zz-f1b/ñandú@2x.png', $rutas_medios, true) && in_array('zz-f1b/fondo-region.png', $rutas_medios, true), json_encode($rutas_medios));
+$comprobar('requiredBlocks lista los bloques que las páginas usan', in_array('core/heading', $manifiesto1['capabilities']['requiredBlocks'], true) && in_array('core/image', $manifiesto1['capabilities']['requiredBlocks'], true) && in_array('contope/lienzo', $manifiesto1['capabilities']['requiredBlocks'], true), json_encode($manifiesto1['capabilities']['requiredBlocks']));
+$comprobar('un sitio sin ADN no lleva design/model.json (no se inventa)', !isset($manifiesto1['entrypoints']['designModel']) && !isset($z1['contenidos']['design/model.json']));
+
+// 3.b se deja el sitio limpio de lo que el paquete trae
+$vaciar_prueba = static function () use ($repositorio, $doc_a, $doc_b, $doc_region, $dir_medios, $wpdb): void {
+    foreach (get_posts(['post_type' => 'page', 'post_status' => 'any', 'numberposts' => -1, 'fields' => 'ids', 's' => '']) as $id) {
+        if (strpos((string) get_post_field('post_name', $id), 'zz-f1b') === 0) {
+            wp_delete_post((int) $id, true);
+        }
+    }
+    foreach ([$doc_a, $doc_b, $doc_region] as $d) {
+        $e = $repositorio->load_existing($d);
+        if (is_array($e)) {
+            wp_delete_post((int) $e['postId'], true);
+        }
+    }
+    foreach (glob($dir_medios . '/*') ?: [] as $f) {
+        @unlink($f);
+    }
+    foreach ((array) $wpdb->get_col("SELECT ID FROM {$wpdb->posts} WHERE post_type='attachment' AND guid LIKE '%zz-f1b%'") as $att) {
+        wp_delete_post((int) $att, true);
+    }
+};
+$vaciar_prueba();
+$comprobar('(preparación) el sitio queda sin la página, sin sus documentos y sin sus medios', $pagina_por_slug('zz-f1b-a') === null && !is_array($repositorio->load_existing($doc_region)) && !is_file($dir_medios . '/ñandú@2x.png'));
+
+$ri = $importador->import($zip1);
+$comprobar('importar el paquete en el sitio limpio: sin error', !is_wp_error($ri), is_wp_error($ri) ? $ri->get_error_code() . ': ' . $ri->get_error_message() : '');
+$nuevo_a = $pagina_por_slug('zz-f1b-a');
+$comprobar('la página en bloques existe, publicada, con su metadato', $nuevo_a !== null && get_post_status($nuevo_a) === 'publish' && get_post_meta($nuevo_a, '_cod_canvas_document_id', true) === $doc_a);
+$comprobar('post_content IDÉNTICO byte a byte (mismo sha256, mismo largo)', $nuevo_a !== null && $sha($contenido_de($nuevo_a)) === $hash_origen_a && strlen($contenido_de($nuevo_a)) === strlen($editado_a), $nuevo_a === null ? '' : 'largo ' . strlen($contenido_de($nuevo_a)) . ' vs ' . strlen($editado_a));
+$comprobar('…y NO es el shortcode del lienzo', $nuevo_a !== null && strpos($contenido_de($nuevo_a), '[contope_canvas') === false);
+$m_a = $dir_medios . '/ñandú@2x.png';
+$m_b = $dir_medios . '/fondo-region.png';
+$comprobar('los medios llegan con el mismo hash', is_file($m_a) && hash_file('sha256', $m_a) === $sha_a && is_file($m_b) && hash_file('sha256', $m_b) === $sha_b);
+$reg = $repositorio->load_existing($doc_region);
+$comprobar('la región llega con su tipo, su alcance y su HTML', is_array($reg) && $reg['regionKind'] === 'header' && $reg['regionScope'] === 'global' && strpos($reg['html'], 'fondo-region.png') !== false);
+$id_b2 = $pagina_por_slug('zz-f1b-b');
+$comprobar('la página del lienzo B vuelve como página del lienzo (shortcode)', $id_b2 !== null && $contenido_de($id_b2) === '[contope_canvas document_id="' . $doc_b . '"]');
+$comprobar('el importador contó la página en bloques', !is_wp_error($ri) && (int) $ri['blockPages'] === 1 && (int) $ri['mediaCopied'] === 2, json_encode(is_wp_error($ri) ? null : [$ri['blockPages'], $ri['mediaCopied']]));
+$rev1 = (int) get_post_meta((int) $nuevo_a, '_cod_content_revision', true);
+$rj = $importador->import($zip1);
+$comprobar('reimportar el mismo paquete no duplica la página ni cambia su contenido', !is_wp_error($rj) && $cantidad_por_slug('zz-f1b-a') === 1 && $sha($contenido_de((int) $pagina_por_slug('zz-f1b-a'))) === $hash_origen_a, $codigo($rj));
+$comprobar('…y como no cambió nada, no sube la revisión de contenido', (int) get_post_meta((int) $pagina_por_slug('zz-f1b-a'), '_cod_content_revision', true) === $rev1);
+$comprobar('…y los medios ya iguales no se vuelven a copiar', !is_wp_error($rj) && (int) $rj['mediaCopied'] === 0 && (int) $rj['mediaUnchanged'] === 2, json_encode(is_wp_error($rj) ? null : [$rj['mediaCopied'], $rj['mediaUnchanged']]));
+
+// ---------------------------------------------------------------------------
+echo "\n== 4. P1b.3 — una página en bloques con ediciones no se sobrescribe con el shortcode ==\n";
+$vaciar_prueba();
+// sitio donde A ya está en bloques, con ediciones DISTINTAS a las del paquete (nadie la importó nunca)
+$propia = str_replace('EDITADO en Gutenberg', 'EDITADO AQUÍ, en este sitio', $editado_a);
+$id_p = wp_insert_post(['post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'ZZ F1b A', 'post_name' => 'zz-f1b-a', 'post_content' => '', 'meta_input' => ['_cod_canvas_document_id' => $doc_a]], true);
+$poner_contenido((int) $id_p, $propia);
+$hash_propio = $sha($contenido_de((int) $id_p));
+$comprobar('(preparación) la página A de este sitio está en bloques y es distinta de la del paquete', $hash_propio !== $hash_origen_a && $contenido_de((int) $id_p) === $propia);
+
+$rr = $importador->import($zip1);
+$comprobar('importar el paquete: RECHAZO con error explícito (cod_package_block_page_edited)', is_wp_error($rr) && $rr->get_error_code() === 'cod_package_block_page_edited', $codigo($rr));
+$comprobar('…el mensaje nombra la página y dice que no se escribió nada', is_wp_error($rr) && strpos($rr->get_error_message(), 'zz-f1b-a') !== false && strpos($rr->get_error_message(), 'no se escribió nada') !== false);
+$comprobar('…post_content INTACTO (mismo hash)', $sha($contenido_de((int) $id_p)) === $hash_propio);
+$comprobar('…no quedó el shortcode', strpos($contenido_de((int) $id_p), '[contope_canvas') === false);
+$comprobar('…y NADA más se escribió: ni la página B, ni la región, ni los documentos, ni los medios', $pagina_por_slug('zz-f1b-b') === null && !is_array($repositorio->load_existing($doc_region)) && !is_array($repositorio->load_existing($doc_b)) && !is_file($m_a) && !is_file($m_b));
+$restos = glob($dir_medios . '/*.cod-part') ?: [];
+$comprobar('…ni archivos temporales a medio copiar', $restos === []);
+
+$rf = $importador->import($zip1, ['replace_edited_blocks' => true]);
+$comprobar('CONTROL: con el reemplazo pedido expresamente, el mismo paquete SÍ pisa la página (el hash cambia)', !is_wp_error($rf) && $sha($contenido_de((int) $id_p)) === $hash_origen_a, $codigo($rf));
+$comprobar('…y aun así jamás con el shortcode', strpos($contenido_de((int) $id_p), '[contope_canvas') === false);
+
+// la página que nadie editó desde la última importación se actualiza sin pedir nada
+$zip_v2 = $escribir_zip((function () use ($z1, $manifiesto1, $archivo_a, $editado_a): array {
+    $archivos = $z1['contenidos'];
+    $nuevo_texto = str_replace('Un bloque agregado a mano.', 'Un bloque agregado a mano, versión 2.', $editado_a);
+    $archivos[$archivo_a['path']] = $nuevo_texto;
+    $m = json_decode($archivos['manifest.json'], true);
+    foreach ($m['files'] as $i => $f) {
+        if ($f['path'] === $archivo_a['path']) {
+            $m['files'][$i]['size'] = strlen($nuevo_texto);
+            $m['files'][$i]['sha256'] = hash('sha256', $nuevo_texto);
+        }
+    }
+    $archivos['manifest.json'] = json_encode($m, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    $c = json_decode($archivos['content/pages.json'], true);
+    foreach ($c['pages'] as $i => $pg) {
+        if (($pg['content']['path'] ?? '') === $archivo_a['path']) {
+            $c['pages'][$i]['content']['sha256'] = hash('sha256', $nuevo_texto);
+        }
+    }
+    $json_c = json_encode($c, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    $archivos['content/pages.json'] = $json_c;
+    $m['files'] = array_map(static function (array $f) use ($json_c): array {
+        if ($f['path'] === 'content/pages.json') {
+            $f['size'] = strlen($json_c);
+            $f['sha256'] = hash('sha256', $json_c);
+        }
+        return $f;
+    }, $m['files']);
+    $archivos['manifest.json'] = json_encode($m, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    return $archivos;
+})());
+$rv2 = $importador->import($zip_v2);
+$comprobar('una página que nadie tocó desde la última importación se actualiza sin pedir permiso', !is_wp_error($rv2) && strpos($contenido_de((int) $id_p), 'versión 2') !== false, $codigo($rv2));
+// …y en cuanto alguien la edita aquí, vuelve a protegerse
+$poner_contenido((int) $id_p, $contenido_de((int) $id_p) . "\n<!-- wp:paragraph --><p>editada después</p><!-- /wp:paragraph -->");
+$hash_tras_edicion = $sha($contenido_de((int) $id_p));
+$rv3 = $importador->import($zip1);
+$comprobar('en cuanto se edita aquí, el siguiente import se rechaza otra vez y la deja intacta', is_wp_error($rv3) && $rv3->get_error_code() === 'cod_package_block_page_edited' && $sha($contenido_de((int) $id_p)) === $hash_tras_edicion, $codigo($rv3));
+
+// el shortcode jamás pisa bloques: un paquete del esquema anterior (página del lienzo) sobre la página que ya es de bloques
+$paquete_anterior = static function (array $paginas, array $documentos, string $origen = '') use ($escribir_zip): string {
+    return $escribir_zip(['manifest.json' => (string) wp_json_encode([
+        'schemaVersion' => COD_Site_Package_Exporter::PACKAGE_SCHEMA_VERSION,
+        'sourceSiteUrl' => $origen !== '' ? $origen : home_url('/'),
+        'pages' => $paginas,
+        'documents' => $documentos,
+    ])]);
+};
+$doc_vieja = ['title' => 'ZZ vieja', 'html' => '<section class="zz-v"><p>vieja</p></section>', 'css' => '.zz-v{display:block}', 'projectData' => '{}'];
+$zip_vieja = $paquete_anterior([['documentId' => $doc_a, 'title' => 'ZZ F1b A', 'slug' => 'zz-f1b-a', 'status' => 'publish']], [$doc_a => $doc_vieja]);
+$antes_vieja = $sha($contenido_de((int) $id_p));
+$rs = $importador->import($zip_vieja);
+$comprobar('un paquete que trae la página como página del lienzo sobre una página en bloques: RECHAZO (cod_package_would_revert_block_page)', is_wp_error($rs) && $rs->get_error_code() === 'cod_package_would_revert_block_page', $codigo($rs));
+$comprobar('…y post_content queda intacto, sin shortcode', $sha($contenido_de((int) $id_p)) === $antes_vieja && strpos($contenido_de((int) $id_p), '[contope_canvas') === false);
+$rs_forzado = $importador->import($zip_vieja, ['replace_edited_blocks' => true]);
+$comprobar('…y ni siquiera pidiendo el reemplazo se escribe el shortcode sobre bloques', is_wp_error($rs_forzado) && $rs_forzado->get_error_code() === 'cod_package_would_revert_block_page' && strpos($contenido_de((int) $id_p), '[contope_canvas') === false, $codigo($rs_forzado));
+$comprobar('…y el documento del paquete tampoco se escribió', !is_array($repositorio->load_existing($doc_a)) || (string) ($repositorio->load_existing($doc_a)['html'] ?? '') !== $doc_vieja['html']);
+// control: la misma entrada sobre una página que SÍ es del lienzo se importa
+$poner_contenido((int) $id_p, '[contope_canvas document_id="' . $doc_a . '"]');
+$rs_ok = $importador->import($zip_vieja);
+$comprobar('CONTROL: la misma entrada sobre una página del lienzo se importa y deja el shortcode', !is_wp_error($rs_ok) && $contenido_de((int) $id_p) === '[contope_canvas document_id="' . $doc_a . '"]', $codigo($rs_ok));
+
+// la migración: dest es del lienzo, el paquete trae bloques
+$rm = $importador->import($zip1);
+$comprobar('migración: sobre una página del lienzo, el paquete en bloques la reemplaza por sus bloques (sin pedir permiso)', !is_wp_error($rm) && $sha($contenido_de((int) $id_p)) === $hash_origen_a, $codigo($rm));
+
+// URL del origen distinta de la de este sitio: se reescribe (también escapada dentro de un JSON) y el resto queda igual
+$origen = 'http://origen-ficticio.test';
+$cuerpo_url = "<!-- wp:image {\"url\":\"http:\\/\\/origen-ficticio.test\\/wp-content\\/uploads\\/x.png\"} -->\n<figure class=\"wp-block-image\"><img src=\"http://origen-ficticio.test/wp-content/uploads/x.png\" alt=\"\"/></figure>\n<!-- /wp:image -->";
+$pagina_url = ['kind' => 'blocks', 'title' => 'ZZ F1b URL', 'slug' => 'zz-f1b-url', 'status' => 'draft', 'documentId' => '', 'postContent' => $cuerpo_url];
+$ru = $importador->import($paquete_anterior([$pagina_url], [], $origen));
+$id_u = $pagina_por_slug('zz-f1b-url');
+$esperado_u = str_replace(['http://origen-ficticio.test', 'http:\\/\\/origen-ficticio.test'], [untrailingslashit(home_url('/')), str_replace('/', '\\/', untrailingslashit(home_url('/')))], $cuerpo_url);
+$comprobar('una página en bloques con la URL de otro sitio llega con la URL de éste (plana y escapada) y nada más cambiado', !is_wp_error($ru) && $id_u !== null && $contenido_de($id_u) === $esperado_u && strpos($contenido_de($id_u), 'origen-ficticio') === false, $codigo($ru));
+$comprobar('…y queda en borrador, como decía el paquete', $id_u !== null && get_post_status($id_u) === 'draft');
+$rn = $importador->import($paquete_anterior([['kind' => 'blocks', 'title' => 'ZZ F1b NoB', 'slug' => 'zz-f1b-nob', 'status' => 'draft', 'postContent' => '[contope_canvas document_id="x"]']], []));
+$comprobar('una entrada "en bloques" cuyo contenido es un shortcode se rechaza (cod_package_page_not_blocks)', is_wp_error($rn) && $rn->get_error_code() === 'cod_package_page_not_blocks' && $pagina_por_slug('zz-f1b-nob') === null, $codigo($rn));
+
+// ---------------------------------------------------------------------------
+echo "\n== 5. los paquetes del esquema anterior se siguen importando ==\n";
+$vaciar_prueba();
+foreach (get_posts(['post_type' => 'page', 'post_status' => 'any', 'numberposts' => -1, 'fields' => 'ids']) as $id) {
+    if (strpos((string) get_post_field('post_name', $id), 'zz-f1b') === 0) {
+        wp_delete_post((int) $id, true);
+    }
+}
+$zip_vieja2 = $paquete_anterior([['documentId' => $doc_b, 'title' => 'ZZ F1b B', 'slug' => 'zz-f1b-b', 'status' => 'publish']], [$doc_b => ['title' => 'ZZ B', 'html' => '<section class="zz-b"><p>B vieja</p></section>', 'css' => '.zz-b{display:block}', 'projectData' => '{}']]);
+$rv = $importador->import($zip_vieja2);
+$id_bv = $pagina_por_slug('zz-f1b-b');
+$comprobar('importar un paquete del esquema anterior: página del lienzo con su shortcode y su documento', !is_wp_error($rv) && $id_bv !== null && $contenido_de($id_bv) === '[contope_canvas document_id="' . $doc_b . '"]' && is_array($repositorio->load_existing($doc_b)), $codigo($rv));
+$comprobar('…y lo reporta como del esquema anterior', !is_wp_error($rv) && ($rv['formato'] ?? '') === 'anterior' && (int) $rv['blockPages'] === 0);
+$rv_mal = $importador->import($escribir_zip(['manifest.json' => '{"schemaVersion":9,"pages":[],"documents":[]}']));
+$comprobar('una versión de esquema que no es la conocida se rechaza como antes', is_wp_error($rv_mal) && $rv_mal->get_error_code() === 'cod_package_schema_mismatch', $codigo($rv_mal));
+$rv_sin = $importador->import($escribir_zip(['manifest.json' => '{"foo":1}']));
+$comprobar('un manifiesto sin forma conocida se rechaza como antes', is_wp_error($rv_sin) && $rv_sin->get_error_code() === 'cod_package_manifest_shape', $codigo($rv_sin));
+
+// ---------------------------------------------------------------------------
+echo "\n== 6. el ZIP hostil y el paquete alterado ==\n";
+$vaciar_prueba();
+$r_ruta = $importador->import($escribir_zip(['manifest.json' => '{}', '../fuera.txt' => 'x']));
+$comprobar('una entrada con ".." sale del paquete: rechazada antes de leer nada', is_wp_error($r_ruta) && $r_ruta->get_error_code() === 'cod_package_zip_unsafe_path', $codigo($r_ruta));
+$r_abs = $importador->import($escribir_zip(['manifest.json' => '{}', '/etc/passwd' => 'x']));
+$comprobar('una entrada con ruta absoluta: rechazada', is_wp_error($r_abs) && $r_abs->get_error_code() === 'cod_package_zip_unsafe_path', $codigo($r_abs));
+$r_inv = $importador->import($escribir_zip(['manifest.json' => '{}', 'a\\b.txt' => 'x']));
+$comprobar('una entrada con barra invertida: rechazada', is_wp_error($r_inv) && $r_inv->get_error_code() === 'cod_package_zip_unsafe_path', $codigo($r_inv));
+$comprobar('CONTROL: sin la entrada hostil, el mismo manifiesto vacío llega al lector (y falla por su forma, no por el ZIP)', ($codigo($importador->import($escribir_zip(['manifest.json' => '{}'])))) === 'cod_package_manifest_shape');
+
+$tocar_zip = static function (callable $f) use ($z1, $escribir_zip): string {
+    return $escribir_zip($f($z1['contenidos']));
+};
+$r_pag = $importador->import($tocar_zip(static function (array $a) use ($archivo_a): array {
+    $a[$archivo_a['path']] .= ' ';
+    return $a;
+}));
+$comprobar('una página en bloques alterada (un espacio) no coincide con su sha256: se rechaza', is_wp_error($r_pag) && in_array($r_pag->get_error_code(), ['cod_package_hash_mismatch', 'cod_package_size_mismatch'], true), $codigo($r_pag));
+$comprobar('…y no se escribió nada', $pagina_por_slug('zz-f1b-a') === null && !is_array($repositorio->load_existing($doc_region)));
+// un medio con extensión ejecutable (el sha256 y el resto del paquete son legítimos: lo que se rechaza es el tipo)
+$r_php = $importador->import($tocar_zip(static function (array $a): array {
+    $c = json_decode($a['contenidos_pages'] ?? $a['content/pages.json'], true);
+    $c['media'][0]['path'] = 'zz-f1b/puerta-trasera.php';
+    $json_c = json_encode($c, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    $a['content/pages.json'] = $json_c;
+    $m = json_decode($a['manifest.json'], true);
+    foreach ($m['files'] as $i => $f) {
+        if ($f['path'] === 'content/pages.json') {
+            $m['files'][$i]['size'] = strlen($json_c);
+            $m['files'][$i]['sha256'] = hash('sha256', $json_c);
+        }
+    }
+    $a['manifest.json'] = json_encode($m, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    return $a;
+}));
+$comprobar('un medio con extensión ejecutable (.php) se rechaza antes de escribir nada (cod_package_media_path)', is_wp_error($r_php) && $r_php->get_error_code() === 'cod_package_media_path' && !is_file($dir_medios . '/puerta-trasera.php') && $pagina_por_slug('zz-f1b-a') === null, $codigo($r_php));
+$comprobar('…y la misma regla vale para un paquete del esquema anterior (media/….php)', ($codigo($importador->import($escribir_zip(['manifest.json' => (string) wp_json_encode(['schemaVersion' => 1, 'sourceSiteUrl' => home_url('/'), 'pages' => [], 'documents' => []]), 'media/zz-f1b/otra.php' => '<?php echo 1;'])))) === 'cod_package_media_path' && !is_file($dir_medios . '/otra.php'));
+$nombre_activo = $manifiesto1['assets'][0]['path'];
+$r_med = $importador->import($tocar_zip(static function (array $a) use ($nombre_activo): array {
+    $a[$nombre_activo] .= 'x';
+    return $a;
+}));
+$comprobar('un medio alterado: se rechaza (cod_package_media_hash)', is_wp_error($r_med) && $r_med->get_error_code() === 'cod_package_media_hash', $codigo($r_med));
+$comprobar('…y ningún medio ni página quedó escrito, ni temporal a medias', $pagina_por_slug('zz-f1b-a') === null && !is_file($m_a) && !is_file($m_b) && (glob($dir_medios . '/*') ?: []) === []);
+$r_blk = $importador->import($tocar_zip(static function (array $a): array {
+    $m = json_decode($a['manifest.json'], true);
+    $m['capabilities']['requiredBlocks'][] = 'zz/bloque-que-no-existe';
+    $a['manifest.json'] = json_encode($m, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    return $a;
+}));
+$comprobar('un bloque requerido que este sitio no tiene: se rechaza con su nombre (cod_package_blocks_missing)', is_wp_error($r_blk) && $r_blk->get_error_code() === 'cod_package_blocks_missing' && strpos($r_blk->get_error_message(), 'zz/bloque-que-no-existe') !== false, $codigo($r_blk));
+$r_cam = $importador->import($tocar_zip(static function (array $a): array {
+    $m = json_decode($a['manifest.json'], true);
+    $m['campoDesconocido'] = 1;
+    $a['manifest.json'] = json_encode($m, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    return $a;
+}));
+$comprobar('un campo desconocido en el manifiesto: se rechaza (cod_package_manifest_invalid, UNKNOWN_FIELD)', is_wp_error($r_cam) && $r_cam->get_error_code() === 'cod_package_manifest_invalid' && strpos($r_cam->get_error_message(), 'UNKNOWN_FIELD') !== false, $codigo($r_cam));
+$r_req = $importador->import($tocar_zip(static function (array $a): array {
+    $m = json_decode($a['manifest.json'], true);
+    $m['requirements']['publisher'] = '99.0.0';
+    $a['manifest.json'] = json_encode($m, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    return $a;
+}));
+$comprobar('un paquete que pide un plugin más nuevo que el instalado: se rechaza (cod_package_requirements)', is_wp_error($r_req) && $r_req->get_error_code() === 'cod_package_requirements', $codigo($r_req));
+
+// ---------------------------------------------------------------------------
+echo "\n== 7. el ADN viaja en el paquete y vuelve igual ==\n";
+$vaciar_prueba();
+$modelo_json = adn_de_prueba(['designId' => 'zz-f1b-adn', 'revision' => 2]);
+$previa = COD_ADN_Store::previsualizar($modelo_json);
+$aplic = COD_ADN_Store::aplicar($modelo_json, ['previewId' => $previa['previewId'], 'fuente' => 'upload']);
+$comprobar('(preparación) un ADN de prueba activo en el sitio de origen', !is_wp_error($aplic), is_wp_error($aplic) ? $aplic->get_error_code() . ': ' . $aplic->get_error_message() : '');
+$digest_origen = (string) (COD_ADN_Store::puntero()['digest'] ?? '');
+// una página en bloques para que el paquete tenga contenido
+$id_adn_pag = wp_insert_post(['post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'ZZ F1b ADN', 'post_name' => 'zz-f1b-adn-pag', 'post_content' => '', 'meta_input' => ['_cod_canvas_document_id' => 'zz-f1b-adn-doc']], true);
+$poner_contenido((int) $id_adn_pag, "<!-- wp:contope/lienzo -->\n<!-- wp:paragraph -->\n<p>Con ADN</p>\n<!-- /wp:paragraph -->\n<!-- /wp:contope/lienzo -->");
+$zip_adn = $exportador->export(false);
+$comprobar('exportar con ADN activo (solo estructura): sin error', !is_wp_error($zip_adn), is_wp_error($zip_adn) ? $zip_adn->get_error_code() . ': ' . $zip_adn->get_error_message() : '');
+$temporales[] = is_wp_error($zip_adn) ? '' : $zip_adn;
+$z_adn = $leer_zip($zip_adn);
+$m_adn = json_decode($z_adn['contenidos']['manifest.json'], true);
+$comprobar('el manifiesto apunta entrypoints.designModel a design/model.json con rol design-model', ($m_adn['entrypoints']['designModel'] ?? '') === 'design/model.json' && isset($z_adn['contenidos']['design/model.json']));
+$comprobar('…y el manifiesto con ADN también pasa el esquema real', ($ajv($z_adn['contenidos']['manifest.json']))['ok'] === true);
+$core_adn = $core($z_adn['contenidos']['design/model.json']);
+$comprobar('design/model.json (envoltorio contope/design-model) lo acepta parsePortableDesignModel DEL CORE', $core_adn['ok'], $core_adn['salida']);
+$modelo_exportado = json_decode($z_adn['contenidos']['design/model.json'], true);
+$comprobar('…con el mismo diseño (id y revisión) que el activo', ($modelo_exportado['design']['id'] ?? '') === 'zz-f1b-adn' && ($modelo_exportado['design']['revision'] ?? 0) === 2);
+$comprobar('"solo estructura": sin archivos de medios en el ZIP pero con la lista', !array_filter($z_adn['nombres'], static function (string $n): bool {
+    return strpos($n, 'assets/') === 0;
+}));
+
+$borrar_adn();
+$comprobar('(preparación) el sitio queda sin ADN', COD_ADN_Store::puntero() === null);
+wp_delete_post((int) $id_adn_pag, true);
+$r_adn = $importador->import($zip_adn);
+$p_adn = COD_ADN_Store::puntero();
+$comprobar('importar en un sitio sin ADN: queda activo el MISMO diseño, misma revisión y MISMO digest', !is_wp_error($r_adn) && $p_adn !== null && $p_adn['designId'] === 'zz-f1b-adn' && (int) $p_adn['revision'] === 2 && hash_equals($digest_origen, (string) $p_adn['digest']), is_wp_error($r_adn) ? $r_adn->get_error_code() . ': ' . $r_adn->get_error_message() : json_encode($p_adn));
+$comprobar('…y la página en bloques llegó con él', $pagina_por_slug('zz-f1b-adn-pag') !== null);
+
+// un ADN más viejo que el activo: el paquete entero se rechaza ANTES de escribir la página
+$nuevo_modelo = adn_de_prueba(['designId' => 'zz-f1b-adn', 'revision' => 3, 'extras_color' => ['Prueba Z' => '#778899']]);
+$previa3 = COD_ADN_Store::previsualizar($nuevo_modelo);
+COD_ADN_Store::aplicar($nuevo_modelo, ['previewId' => $previa3['previewId'], 'fuente' => 'upload']);
+wp_delete_post((int) $pagina_por_slug('zz-f1b-adn-pag'), true);
+$r_viejo = $importador->import($zip_adn);
+$comprobar('un paquete con un ADN más viejo que el activo se rechaza (ADN_REVISION_NOT_NEWER)', is_wp_error($r_viejo) && $r_viejo->get_error_code() === 'ADN_REVISION_NOT_NEWER', $codigo($r_viejo));
+$comprobar('…y NO escribió la página (el ADN se revisa antes que nada)', $pagina_por_slug('zz-f1b-adn-pag') === null);
+$comprobar('…ni tocó el ADN activo (sigue en r3)', (int) (COD_ADN_Store::puntero()['revision'] ?? 0) === 3);
+$borrar_adn();
+
+// ---------------------------------------------------------------------------
+echo "\n== 8. la compuerta del diseño también cubre las páginas en bloques que llegan por un paquete ==\n";
+$vaciar_prueba();
+$modo_original = get_option(COD_ADN_Gate::OPTION_MODE, null);
+$bloque_con_literal = "<!-- wp:paragraph {\"style\":{\"color\":{\"text\":\"#123456\"}}} -->\n<p class=\"has-text-color\" style=\"color:#123456\">literal</p>\n<!-- /wp:paragraph -->";
+$zip_literal = $paquete_anterior([['kind' => 'blocks', 'title' => 'ZZ F1b Lit', 'slug' => 'zz-f1b-lit', 'status' => 'draft', 'postContent' => $bloque_con_literal]], []);
+update_option(COD_ADN_Gate::OPTION_MODE, 'enforce', false);
+COD_ADN_Gate::marcar_contrasena_de_aplicacion(true);
+$r_lit = $importador->import($zip_literal);
+$comprobar('enforce y petición no humana: una página en bloques con un literal de color se rechaza', is_wp_error($r_lit) && strpos($r_lit->get_error_code(), 'ADN_LITERAL_') === 0, $codigo($r_lit));
+$comprobar('…y no se escribió', $pagina_por_slug('zz-f1b-lit') === null);
+COD_ADN_Gate::marcar_contrasena_de_aplicacion(false);
+$r_lit2 = $importador->import($zip_literal);
+$comprobar('CONTROL: una persona en la administración (sin contraseña de aplicación) lo importa', !is_wp_error($r_lit2) && $pagina_por_slug('zz-f1b-lit') !== null, $codigo($r_lit2));
+if ($modo_original === null) {
+    delete_option(COD_ADN_Gate::OPTION_MODE);
+} else {
+    update_option(COD_ADN_Gate::OPTION_MODE, $modo_original, false);
+}
+COD_ADN_Gate::marcar_contrasena_de_aplicacion(false);
+
+// ---------------------------------------------------------------------------
+echo "\n== resultado ==\n";
+$vaciar_prueba();
+echo ($fallas === 0 ? "  TODO OK ($ejecutadas comprobaciones)\n" : "  $fallas falla(s) de $ejecutadas\n");
+exit($fallas === 0 ? 0 : 1);

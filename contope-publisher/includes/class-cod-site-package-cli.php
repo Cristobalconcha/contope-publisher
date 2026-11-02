@@ -58,30 +58,45 @@ final class COD_Site_Package_CLI
      * ## OPTIONS
      *
      * <origen>
-     * : Ruta del archivo .zip a importar.
+     * : Ruta del archivo .zip (o .ocdsite) a importar.
+     *
+     * [--reemplazar-editadas]
+     * : Permite reemplazar las páginas en bloques que se editaron en este
+     * sitio. Por defecto NO: si el paquete trae una página que aquí ya está
+     * en bloques con ediciones distintas, el paquete se rechaza entero.
      *
      * ## EXAMPLES
      *
      *     wp ocd import-site ./santa-luisa.zip
+     *     wp ocd import-site ./basis.ocdsite --reemplazar-editadas
      */
-    public function import_site(array $args): void
+    public function import_site(array $args, array $assoc_args = []): void
     {
         $source = $args[0];
         if (!is_file($source)) {
             WP_CLI::error("No existe el archivo $source.");
             return;
         }
-        $result = $this->importer->import($source);
+        $result = $this->importer->import($source, [
+            'replace_edited_blocks' => isset($assoc_args['reemplazar-editadas']),
+        ]);
         if (is_wp_error($result)) {
             WP_CLI::error($result->get_error_message());
             return;
         }
         WP_CLI::success(sprintf(
-            '%d páginas, %d documentos, %d archivos de medios.',
+            '%d páginas (%d en bloques), %d documentos, %d archivos de medios copiados.',
             count($result['pages']),
+            (int) ($result['blockPages'] ?? 0),
             count($result['documents']),
             $result['mediaCopied']
         ));
+        if (is_array($result['adn'] ?? null)) {
+            WP_CLI::log(sprintf('ADN %s revisión %d: %s.', $result['adn']['designId'], $result['adn']['revision'], $result['adn']['resultado']));
+        }
+        foreach ((array) ($result['avisos'] ?? []) as $aviso) {
+            WP_CLI::warning((string) $aviso);
+        }
     }
 
     /**

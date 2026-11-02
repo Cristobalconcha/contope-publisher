@@ -55,6 +55,7 @@ require_once COD_PUBLISHER_DIR . 'includes/class-cod-adn-gate-admin.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-adn-gate-rest.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-block-page-writer.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-settings-admin.php';
+require_once COD_PUBLISHER_DIR . 'includes/class-cod-site-package-format.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-site-package-exporter.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-site-package-importer.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-site-package-admin.php';

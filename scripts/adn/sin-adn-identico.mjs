@@ -13,7 +13,11 @@
 // Control: con --provocar-diferencia cambia el nombre del sitio entre las dos tomas y exige que el guion FALLE.
 // Se niega a correr si el local tiene un ADN activo (con ADN las cosas SÍ pueden cambiar en F2 en adelante).
 //
-//   node scripts/adn/sin-adn-identico.mjs [--provocar-diferencia]
+// Por omisión la base es el último commit (HEAD) y debe ser anterior al almacén del ADN. Con `--base <commit>` se compara
+// contra otro: por ejemplo la fase F1b se mide contra el commit de F1 (el árbol de trabajo trae el paquete .ocdsite,
+// la base no) o contra el último commit anterior a F1, que es la promesa original de F1.
+//
+//   node scripts/adn/sin-adn-identico.mjs [--provocar-diferencia] [--base <commit>]
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
@@ -28,6 +32,12 @@ const PHP = 'C:/Users/Cristobal concha/wp-local/php/php.exe';
 const BASE = 'http://localhost:8894';
 const PAGINAS = ['', 'basis-carpas-industriales/', 'preguntas-frecuentes/', 'contactos/', 'terminos-y-privacidad/'];
 const provocar = process.argv.includes('--provocar-diferencia');
+const iBase = process.argv.indexOf('--base');
+const base = iBase >= 0 ? process.argv[iBase + 1] : 'HEAD';
+if (!base) {
+  console.error('ERROR: --base necesita un commit.');
+  process.exit(2);
+}
 const aWin = (p) => p.split('/').join('\\');
 
 const robocopia = (origen) => {
@@ -65,7 +75,7 @@ if (activo !== 'NO') {
 const tmp = mkdtempSync(join(tmpdir(), 'plugin-head-'));
 let codigoSalida = 0;
 try {
-  const tar = spawnSync('git', ['-C', repo, 'archive', '--format=tar', '-o', join(tmp, 'head.tar'), 'HEAD', 'contope-publisher'], { encoding: 'utf8' });
+  const tar = spawnSync('git', ['-C', repo, 'archive', '--format=tar', '-o', join(tmp, 'head.tar'), base, 'contope-publisher'], { encoding: 'utf8' });
   if (tar.status !== 0) throw new Error(`git archive falló: ${tar.stderr}`);
   const x = spawnSync('tar', ['-xf', 'head.tar'], { cwd: tmp, encoding: 'utf8' }); // cwd en la carpeta: GNU tar toma «C:» por un servidor
   if (x.status !== 0) throw new Error(`tar falló: ${x.stderr}`);
@@ -82,7 +92,8 @@ try {
   aCrlf(join(tmp, 'contope-publisher'));
   robocopia(`${tmp.split('\\').join('/')}/contope-publisher`);
   const sinF1 = php(`echo class_exists('COD_ADN_Store') ? 'CON' : 'SIN';`);
-  if (sinF1 !== 'SIN') throw new Error('el plugin del último commit ya trae el almacén del ADN: no hay con qué comparar');
+  if (sinF1 !== 'SIN' && iBase < 0) throw new Error('el plugin del último commit ya trae el almacén del ADN: no hay con qué comparar (usa --base <commit> con otro commit)');
+  console.log(`  base: ${base} (${sinF1 === 'SIN' ? 'sin' : 'con'} almacén del ADN)`);
   const a1 = await tomar('a');
   const a2 = await tomar('a2');
   const estable = JSON.stringify(a1) === JSON.stringify(a2);

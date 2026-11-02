@@ -5,15 +5,17 @@ if (!defined('ABSPATH')) {
 }
 
 /**
- * Pantalla "Empaquetar sitio": exporta un ZIP portable con las páginas
- * Canvas publicadas (más su plantilla global activa y medios referenciados)
- * y permite importar ese mismo tipo de paquete generado en otra
- * instalación. Ver COD_Site_Package_Exporter / COD_Site_Package_Importer.
+ * Pantalla "Portabilidad": exporta el sitio como un paquete `.ocdsite` (un ZIP:
+ * páginas del lienzo y en bloques, encabezado y pie, ADN y medios) y permite
+ * importar un paquete generado en otra instalación. Es la vía de PRODUCCIÓN para
+ * subir un sitio armado en el local: exportar allá, importar acá. Ver
+ * COD_Site_Package_Exporter / COD_Site_Package_Importer.
  */
 final class COD_Site_Package_Admin
 {
     private const EXPORT_ACTION = 'cod_export_site_package';
     private const IMPORT_ACTION = 'cod_import_site_package';
+    private const OK_PREFIX = 'cod_site_package_ok_';
     // Mismo slug que COD_Admin usaba: es el que "Editor de página",
     // "Plantillas" y "Configuración" ya esperan como padre. Cambiarlo acá
     // por uno propio los deja huérfanos (bug real, encontrado 2026-08-19).
@@ -66,14 +68,23 @@ final class COD_Site_Package_Admin
             <h1>Portabilidad</h1>
             <p>Mover el contenido de ContOpe Design entre dos instalaciones que tengan este mismo plugin (como una funcionalidad de exportar/importar de Divi, no un backup).</p>
             <?php if ($status === 'import_success') : ?>
-                <div class="notice notice-success"><p>Paquete importado correctamente.</p></div>
+                <div class="notice notice-success"><p>Paquete importado correctamente.</p>
+                    <?php $resumen = get_transient($this->ok_key()); delete_transient($this->ok_key()); ?>
+                    <?php if (is_array($resumen)) : ?>
+                        <ul style="list-style:disc;margin-left:1.5em">
+                            <?php foreach ($resumen as $linea) : ?>
+                                <li><?php echo esc_html((string) $linea); ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    <?php endif; ?>
+                </div>
             <?php elseif ($status === 'error') : ?>
                 <div class="notice notice-error"><p><?php echo esc_html(get_transient($this->error_key()) ?: 'La operación falló.'); ?></p></div>
                 <?php delete_transient($this->error_key()); ?>
             <?php endif; ?>
 
             <h2>Exportar</h2>
-            <p>Genera un ZIP con las páginas publicadas respaldadas por un documento Canvas y la plantilla de header/footer global activa. Elegí si incluir también los archivos de <code>uploads/</code> que referencian.</p>
+            <p>Genera un paquete <code>.ocdsite</code> (un ZIP) con las páginas publicadas del lienzo y las páginas en bloques (su contenido exacto), el encabezado y el pie globales, los estilos compartidos y, si el sitio tiene uno activo, el ADN de diseño. Elige si incluir también los archivos de <code>uploads/</code> que esas páginas citan.</p>
             <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
                 <input type="hidden" name="action" value="<?php echo esc_attr(self::EXPORT_ACTION); ?>">
                 <?php wp_nonce_field(self::EXPORT_ACTION); ?>
@@ -85,7 +96,7 @@ final class COD_Site_Package_Admin
                     <br>
                     <label>
                         <input type="radio" name="cod_include_media" value="0">
-                        Solo estructura (páginas y texto, sin medios — mucho más liviano; usalo cuando lo único que cambió es contenido, no imágenes)
+                        Solo estructura (páginas, texto y ADN, sin medios — mucho más liviano; úsalo cuando lo único que cambió es contenido, no imágenes)
                     </label>
                 </p>
                 <?php submit_button('Descargar paquete'); ?>
@@ -94,11 +105,17 @@ final class COD_Site_Package_Admin
             <hr>
 
             <h2>Importar</h2>
-            <p>Sube un paquete generado por esta misma pantalla en otra instalación — completo o solo estructura, cualquiera de los dos funciona acá. Las páginas y documentos existentes con el mismo identificador se actualizan; no se duplican.</p>
+            <p>Sube un paquete generado por esta misma pantalla en otra instalación — completo o solo estructura, cualquiera de los dos funciona acá. Las páginas y documentos existentes con el mismo identificador se actualizan; no se duplican. Si el paquete trae un ADN de diseño, se activa por la misma puerta que la pantalla «Diseño (ADN)». Antes de escribir nada se revisa todo el paquete: si algo no pasa, el sitio queda como estaba.</p>
             <form method="post" enctype="multipart/form-data" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
                 <input type="hidden" name="action" value="<?php echo esc_attr(self::IMPORT_ACTION); ?>">
                 <?php wp_nonce_field(self::IMPORT_ACTION); ?>
-                <input type="file" name="cod_site_package" accept="application/zip,.zip" required>
+                <input type="file" name="cod_site_package" accept="application/zip,.zip,.ocdsite" required>
+                <p>
+                    <label>
+                        <input type="checkbox" name="cod_replace_edited_blocks" value="1">
+                        Reemplazar las páginas en bloques que se editaron en este sitio (por defecto NO: si el paquete trae una página que aquí ya está en bloques con ediciones distintas, el paquete se rechaza entero y no se toca nada)
+                    </label>
+                </p>
                 <?php submit_button('Importar paquete'); ?>
             </form>
         </div>
@@ -142,13 +159,43 @@ final class COD_Site_Package_Admin
             $this->redirect_error('No se recibió un archivo válido.');
         }
 
-        $result = $this->importer->import($file['tmp_name']);
+        $result = $this->importer->import($file['tmp_name'], [
+            'replace_edited_blocks' => ($_POST['cod_replace_edited_blocks'] ?? '') === '1',
+        ]);
         if (is_wp_error($result)) {
             $this->redirect_error($result->get_error_message());
         }
+        set_transient($this->ok_key(), $this->resumen($result), MINUTE_IN_SECONDS * 5);
 
         wp_safe_redirect(add_query_arg(['page' => self::MENU_SLUG, 'cod_status' => 'import_success'], admin_url('admin.php')));
         exit;
+    }
+
+    /**
+     * @param array<string, mixed> $r
+     * @return array<int, string>
+     */
+    private function resumen(array $r): array
+    {
+        $lineas = [sprintf('%d páginas (%d en bloques), %d documentos, %d archivos de medios copiados.', count($r['pages']), (int) ($r['blockPages'] ?? 0), count($r['documents']), (int) $r['mediaCopied'])];
+        if (is_array($r['adn'] ?? null)) {
+            $lineas[] = sprintf('ADN %s revisión %d: %s.', (string) $r['adn']['designId'], (int) $r['adn']['revision'], (string) $r['adn']['resultado']);
+        }
+        if (!empty($r['mediaMissing'])) {
+            $lineas[] = sprintf('Faltan %d archivos de medios que el paquete no trae (era «solo estructura») y este sitio no tiene.', count((array) $r['mediaMissing']));
+        }
+        if (is_array($r['frontPage'] ?? null) && !empty($r['frontPage']['aplicada'])) {
+            $lineas[] = 'Se fijó la página de portada.';
+        }
+        foreach ((array) ($r['avisos'] ?? []) as $aviso) {
+            $lineas[] = 'Aviso: ' . (string) $aviso;
+        }
+        return $lineas;
+    }
+
+    private function ok_key(): string
+    {
+        return self::OK_PREFIX . get_current_user_id();
     }
 
     private function redirect_error(string $message): void
