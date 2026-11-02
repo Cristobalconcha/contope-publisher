@@ -14,9 +14,9 @@
           "style": {
             "spacing": {
               "padding": {
-                "top": "var:preset|spacing|90",
+                "top": "var:preset|spacing|200",
                 "right": "0",
-                "bottom": "var:preset|spacing|90",
+                "bottom": "var:preset|spacing|200",
                 "left": "0"
               },
               "blockGap": "0"
@@ -31,10 +31,10 @@
               "style": {
                 "spacing": {
                   "padding": {
-                    "top": "var:preset|spacing|50",
-                    "right": "var:preset|spacing|50",
-                    "bottom": "var:preset|spacing|50",
-                    "left": "var:preset|spacing|50"
+                    "top": "var:preset|spacing|130",
+                    "right": "var:preset|spacing|100",
+                    "bottom": "var:preset|spacing|130",
+                    "left": "var:preset|spacing|100"
                   },
                   "margin": {
                     "top": "0",
@@ -43,8 +43,8 @@
                     "right": "var:preset|spacing|gutter"
                   },
                   "blockGap": {
-                    "top": "var:preset|spacing|60",
-                    "left": "var:preset|spacing|90"
+                    "top": "var:preset|spacing|160",
+                    "left": "var:preset|spacing|250"
                   }
                 },
                 "border": {
@@ -61,9 +61,9 @@
                     "spacing": {
                       "padding": {
                         "top": "0",
-                        "right": "0",
+                        "right": "var:preset|spacing|10",
                         "bottom": "0",
-                        "left": "0"
+                        "left": "var:preset|spacing|10"
                       },
                       "blockGap": "0"
                     }
@@ -75,7 +75,7 @@
                     "name": "core/heading",
                     "attrs": {
                       "textColor": "rojo-contacto",
-                      "fontSize": "110",
+                      "fontSize": "190",
                       "fontFamily": "display",
                       "style": {
                         "typography": {
@@ -86,7 +86,7 @@
                         "spacing": {
                           "margin": {
                             "top": "0",
-                            "bottom": "var:preset|spacing|70"
+                            "bottom": "var:preset|spacing|180"
                           }
                         }
                       },
@@ -119,9 +119,9 @@
                     "spacing": {
                       "padding": {
                         "top": "0",
-                        "right": "0",
+                        "right": "var:preset|spacing|10",
                         "bottom": "0",
-                        "left": "0"
+                        "left": "var:preset|spacing|10"
                       },
                       "blockGap": "0"
                     }
@@ -137,6 +137,12 @@
                       "zoom": 17,
                       "alto": 800,
                       "fijo": true,
+                      "style": {
+                        "border": {
+                          "radius": "var(--wp--custom--radius--m)"
+                        },
+                        "shadow": "var:preset|shadow|20"
+                      },
                       "mini": "/wp-content/uploads/2025/07/Mapa-contacto-recorte.png",
                       "globo": "Planta Econut Av 18 de Septiembre sn Hijuela 2 Fundo San Rafael - Sector Nuevo Sendero, Paine, Región Metropolitana www.econut.cl",
                       "etiqueta": "Abrir el mapa de ubicación"

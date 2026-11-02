@@ -16,12 +16,13 @@
               "padding": {
                 "top": "0",
                 "right": "0",
-                "bottom": "var:preset|spacing|90",
+                "bottom": "var:preset|spacing|240",
                 "left": "0"
               },
               "blockGap": "0"
             }
-          }
+          },
+          "className": "is-style-divisor-abajo-gris-oscuro-divisor-7ee5846d"
         },
         "inner": [
           {
@@ -30,9 +31,9 @@
               "style": {
                 "spacing": {
                   "padding": {
-                    "top": "var:preset|spacing|50",
+                    "top": "var:preset|spacing|130",
                     "right": "0",
-                    "bottom": "var:preset|spacing|50",
+                    "bottom": "var:preset|spacing|130",
                     "left": "0"
                   },
                   "margin": {
@@ -47,51 +48,69 @@
             },
             "inner": [
               {
-                "name": "core/heading",
+                "name": "core/group",
                 "attrs": {
-                  "textColor": "fondo-pagina",
-                  "fontSize": "100",
-                  "fontFamily": "pliegue",
                   "style": {
-                    "typography": {
-                      "fontWeight": "var(--wp--custom--typography--font-weight--light)",
-                      "lineHeight": "var(--wp--custom--typography--line-height--snug)",
-                      "textAlign": "center"
-                    },
                     "spacing": {
-                      "margin": {
+                      "padding": {
                         "top": "0",
-                        "bottom": "var:preset|spacing|20"
-                      }
+                        "right": "0",
+                        "bottom": "0",
+                        "left": "0"
+                      },
+                      "blockGap": "0"
                     }
-                  },
-                  "content": "Preguntas Frecuentes",
-                  "level": 1
+                  }
                 },
-                "inner": []
-              },
-              {
-                "name": "core/paragraph",
-                "attrs": {
-                  "textColor": "fondo-pagina",
-                  "fontSize": "40",
-                  "fontFamily": "body",
-                  "style": {
-                    "typography": {
-                      "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
-                      "lineHeight": "var(--wp--custom--typography--line-height--loose)",
-                      "textAlign": "center"
+                "inner": [
+                  {
+                    "name": "core/heading",
+                    "attrs": {
+                      "textColor": "fondo-pagina",
+                      "fontSize": "170",
+                      "fontFamily": "pliegue",
+                      "style": {
+                        "typography": {
+                          "fontWeight": "var(--wp--custom--typography--font-weight--light)",
+                          "lineHeight": "var(--wp--custom--typography--line-height--snug)",
+                          "textAlign": "center"
+                        },
+                        "spacing": {
+                          "margin": {
+                            "top": "0",
+                            "bottom": "var:preset|spacing|30"
+                          }
+                        }
+                      },
+                      "content": "Preguntas Frecuentes",
+                      "level": 1
                     },
-                    "spacing": {
-                      "margin": {
-                        "top": "0",
-                        "bottom": "0"
-                      }
-                    }
+                    "inner": []
                   },
-                  "content": "Todo lo que necesitas saber."
-                },
-                "inner": []
+                  {
+                    "name": "core/paragraph",
+                    "attrs": {
+                      "textColor": "fondo-pagina",
+                      "fontSize": "60",
+                      "fontFamily": "body",
+                      "style": {
+                        "typography": {
+                          "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+                          "lineHeight": "var(--wp--custom--typography--line-height--loose)",
+                          "textAlign": "center"
+                        },
+                        "spacing": {
+                          "margin": {
+                            "top": "0",
+                            "bottom": "0"
+                          }
+                        }
+                      },
+                      "content": "Todo lo que necesitas saber."
+                    },
+                    "inner": []
+                  }
+                ]
               }
             ]
           }
@@ -106,9 +125,9 @@
           "style": {
             "spacing": {
               "padding": {
-                "top": "var:preset|spacing|90",
+                "top": "var:preset|spacing|220",
                 "right": "0",
-                "bottom": "var:preset|spacing|90",
+                "bottom": "var:preset|spacing|220",
                 "left": "0"
               },
               "blockGap": "0"
@@ -122,9 +141,9 @@
               "style": {
                 "spacing": {
                   "padding": {
-                    "top": "var:preset|spacing|50",
+                    "top": "var:preset|spacing|130",
                     "right": "0",
-                    "bottom": "var:preset|spacing|50",
+                    "bottom": "var:preset|spacing|130",
                     "left": "0"
                   },
                   "margin": {
@@ -134,8 +153,8 @@
                     "right": "var:preset|spacing|gutter"
                   },
                   "blockGap": {
-                    "top": "var:preset|spacing|60",
-                    "left": "var:preset|spacing|90"
+                    "top": "var:preset|spacing|160",
+                    "left": "var:preset|spacing|280"
                   }
                 }
               },
@@ -162,7 +181,7 @@
                     "name": "core/heading",
                     "attrs": {
                       "textColor": "fondo-pagina",
-                      "fontSize": "50",
+                      "fontSize": "90",
                       "fontFamily": "pliegue",
                       "style": {
                         "typography": {
@@ -173,7 +192,7 @@
                         "spacing": {
                           "margin": {
                             "top": "0",
-                            "bottom": "var:preset|spacing|70"
+                            "bottom": "var:preset|spacing|180"
                           }
                         }
                       },
@@ -191,7 +210,7 @@
                       "headingLevel": 3,
                       "style": {
                         "spacing": {
-                          "blockGap": "var:preset|spacing|60",
+                          "blockGap": "var:preset|spacing|150",
                           "margin": {
                             "top": "0",
                             "bottom": "0"
@@ -204,14 +223,15 @@
                         "name": "core/accordion-item",
                         "attrs": {
                           "openByDefault": true,
+                          "className": "is-style-pliegue-etmodules-e050-ninguno-gris-claro-50-a4c436",
                           "backgroundColor": "casi-blanco",
                           "style": {
                             "spacing": {
                               "padding": {
-                                "top": "var:preset|spacing|40",
-                                "right": "var:preset|spacing|40",
-                                "bottom": "var:preset|spacing|40",
-                                "left": "var:preset|spacing|40"
+                                "top": "var:preset|spacing|80",
+                                "right": "var:preset|spacing|80",
+                                "bottom": "var:preset|spacing|80",
+                                "left": "var:preset|spacing|80"
                               }
                             },
                             "border": {
@@ -226,13 +246,21 @@
                               "title": "¿Qué tipo de naves industriales ofrecen?",
                               "level": 3,
                               "textColor": "texto-cuerpo",
-                              "fontSize": "40",
+                              "fontSize": "60",
                               "fontFamily": "pliegue",
                               "style": {
                                 "typography": {
                                   "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
                                   "lineHeight": "var(--wp--custom--typography--line-height--snug)",
                                   "textAlign": "left"
+                                },
+                                "spacing": {
+                                  "padding": {
+                                    "top": "0",
+                                    "right": "0",
+                                    "bottom": "0",
+                                    "left": "0"
+                                  }
                                 }
                               }
                             },
@@ -244,7 +272,7 @@
                               "style": {
                                 "spacing": {
                                   "padding": {
-                                    "top": "var:preset|spacing|40"
+                                    "top": "var:preset|spacing|80"
                                   },
                                   "margin": {
                                     "top": "0"
@@ -284,14 +312,15 @@
                       {
                         "name": "core/accordion-item",
                         "attrs": {
+                          "className": "is-style-pliegue-etmodules-e050-ninguno-gris-claro-50-a4c436",
                           "backgroundColor": "casi-blanco",
                           "style": {
                             "spacing": {
                               "padding": {
-                                "top": "var:preset|spacing|40",
-                                "right": "var:preset|spacing|40",
-                                "bottom": "var:preset|spacing|40",
-                                "left": "var:preset|spacing|40"
+                                "top": "var:preset|spacing|80",
+                                "right": "var:preset|spacing|80",
+                                "bottom": "var:preset|spacing|80",
+                                "left": "var:preset|spacing|80"
                               }
                             },
                             "border": {
@@ -306,13 +335,21 @@
                               "title": "¿Las carpas pueden ser arrendadas o solo las venden?",
                               "level": 3,
                               "textColor": "texto-cuerpo",
-                              "fontSize": "40",
+                              "fontSize": "60",
                               "fontFamily": "pliegue",
                               "style": {
                                 "typography": {
                                   "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
                                   "lineHeight": "var(--wp--custom--typography--line-height--snug)",
                                   "textAlign": "left"
+                                },
+                                "spacing": {
+                                  "padding": {
+                                    "top": "0",
+                                    "right": "0",
+                                    "bottom": "0",
+                                    "left": "0"
+                                  }
                                 }
                               }
                             },
@@ -324,7 +361,7 @@
                               "style": {
                                 "spacing": {
                                   "padding": {
-                                    "top": "var:preset|spacing|40"
+                                    "top": "var:preset|spacing|80"
                                   },
                                   "margin": {
                                     "top": "0"
@@ -364,14 +401,15 @@
                       {
                         "name": "core/accordion-item",
                         "attrs": {
+                          "className": "is-style-pliegue-etmodules-e050-ninguno-gris-claro-50-a4c436",
                           "backgroundColor": "casi-blanco",
                           "style": {
                             "spacing": {
                               "padding": {
-                                "top": "var:preset|spacing|40",
-                                "right": "var:preset|spacing|40",
-                                "bottom": "var:preset|spacing|40",
-                                "left": "var:preset|spacing|40"
+                                "top": "var:preset|spacing|80",
+                                "right": "var:preset|spacing|80",
+                                "bottom": "var:preset|spacing|80",
+                                "left": "var:preset|spacing|80"
                               }
                             },
                             "border": {
@@ -386,13 +424,21 @@
                               "title": "¿Qué tamaños están disponibles?",
                               "level": 3,
                               "textColor": "texto-cuerpo",
-                              "fontSize": "40",
+                              "fontSize": "60",
                               "fontFamily": "pliegue",
                               "style": {
                                 "typography": {
                                   "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
                                   "lineHeight": "var(--wp--custom--typography--line-height--snug)",
                                   "textAlign": "left"
+                                },
+                                "spacing": {
+                                  "padding": {
+                                    "top": "0",
+                                    "right": "0",
+                                    "bottom": "0",
+                                    "left": "0"
+                                  }
                                 }
                               }
                             },
@@ -404,7 +450,7 @@
                               "style": {
                                 "spacing": {
                                   "padding": {
-                                    "top": "var:preset|spacing|40"
+                                    "top": "var:preset|spacing|80"
                                   },
                                   "margin": {
                                     "top": "0"
@@ -444,14 +490,15 @@
                       {
                         "name": "core/accordion-item",
                         "attrs": {
+                          "className": "is-style-pliegue-etmodules-e050-ninguno-gris-claro-50-a4c436",
                           "backgroundColor": "casi-blanco",
                           "style": {
                             "spacing": {
                               "padding": {
-                                "top": "var:preset|spacing|40",
-                                "right": "var:preset|spacing|40",
-                                "bottom": "var:preset|spacing|40",
-                                "left": "var:preset|spacing|40"
+                                "top": "var:preset|spacing|80",
+                                "right": "var:preset|spacing|80",
+                                "bottom": "var:preset|spacing|80",
+                                "left": "var:preset|spacing|80"
                               }
                             },
                             "border": {
@@ -466,13 +513,21 @@
                               "title": "¿Cuánto tiempo toma la instalación?",
                               "level": 3,
                               "textColor": "texto-cuerpo",
-                              "fontSize": "40",
+                              "fontSize": "60",
                               "fontFamily": "pliegue",
                               "style": {
                                 "typography": {
                                   "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
                                   "lineHeight": "var(--wp--custom--typography--line-height--snug)",
                                   "textAlign": "left"
+                                },
+                                "spacing": {
+                                  "padding": {
+                                    "top": "0",
+                                    "right": "0",
+                                    "bottom": "0",
+                                    "left": "0"
+                                  }
                                 }
                               }
                             },
@@ -484,7 +539,7 @@
                               "style": {
                                 "spacing": {
                                   "padding": {
-                                    "top": "var:preset|spacing|40"
+                                    "top": "var:preset|spacing|80"
                                   },
                                   "margin": {
                                     "top": "0"
@@ -524,14 +579,15 @@
                       {
                         "name": "core/accordion-item",
                         "attrs": {
+                          "className": "is-style-pliegue-etmodules-e050-ninguno-gris-claro-50-a4c436",
                           "backgroundColor": "casi-blanco",
                           "style": {
                             "spacing": {
                               "padding": {
-                                "top": "var:preset|spacing|40",
-                                "right": "var:preset|spacing|40",
-                                "bottom": "var:preset|spacing|40",
-                                "left": "var:preset|spacing|40"
+                                "top": "var:preset|spacing|80",
+                                "right": "var:preset|spacing|80",
+                                "bottom": "var:preset|spacing|80",
+                                "left": "var:preset|spacing|80"
                               }
                             },
                             "border": {
@@ -546,13 +602,21 @@
                               "title": "¿Se necesita permiso municipal para instalar una carpa industrial?",
                               "level": 3,
                               "textColor": "texto-cuerpo",
-                              "fontSize": "40",
+                              "fontSize": "60",
                               "fontFamily": "pliegue",
                               "style": {
                                 "typography": {
                                   "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
                                   "lineHeight": "var(--wp--custom--typography--line-height--snug)",
                                   "textAlign": "left"
+                                },
+                                "spacing": {
+                                  "padding": {
+                                    "top": "0",
+                                    "right": "0",
+                                    "bottom": "0",
+                                    "left": "0"
+                                  }
                                 }
                               }
                             },
@@ -564,7 +628,7 @@
                               "style": {
                                 "spacing": {
                                   "padding": {
-                                    "top": "var:preset|spacing|40"
+                                    "top": "var:preset|spacing|80"
                                   },
                                   "margin": {
                                     "top": "0"
@@ -604,14 +668,15 @@
                       {
                         "name": "core/accordion-item",
                         "attrs": {
+                          "className": "is-style-pliegue-etmodules-e050-ninguno-gris-claro-50-a4c436",
                           "backgroundColor": "casi-blanco",
                           "style": {
                             "spacing": {
                               "padding": {
-                                "top": "var:preset|spacing|40",
-                                "right": "var:preset|spacing|40",
-                                "bottom": "var:preset|spacing|40",
-                                "left": "var:preset|spacing|40"
+                                "top": "var:preset|spacing|80",
+                                "right": "var:preset|spacing|80",
+                                "bottom": "var:preset|spacing|80",
+                                "left": "var:preset|spacing|80"
                               }
                             },
                             "border": {
@@ -626,13 +691,21 @@
                               "title": "¿Qué incluye el servicio de arriendo?",
                               "level": 3,
                               "textColor": "texto-cuerpo",
-                              "fontSize": "40",
+                              "fontSize": "60",
                               "fontFamily": "pliegue",
                               "style": {
                                 "typography": {
                                   "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
                                   "lineHeight": "var(--wp--custom--typography--line-height--snug)",
                                   "textAlign": "left"
+                                },
+                                "spacing": {
+                                  "padding": {
+                                    "top": "0",
+                                    "right": "0",
+                                    "bottom": "0",
+                                    "left": "0"
+                                  }
                                 }
                               }
                             },
@@ -644,7 +717,7 @@
                               "style": {
                                 "spacing": {
                                   "padding": {
-                                    "top": "var:preset|spacing|40"
+                                    "top": "var:preset|spacing|80"
                                   },
                                   "margin": {
                                     "top": "0"
@@ -691,7 +764,7 @@
                                     },
                                     "spacing": {
                                       "padding": {
-                                        "left": "var:preset|spacing|30"
+                                        "left": "var:preset|spacing|50"
                                       },
                                       "margin": {
                                         "top": "0",
@@ -739,14 +812,15 @@
                       {
                         "name": "core/accordion-item",
                         "attrs": {
+                          "className": "is-style-pliegue-etmodules-e050-ninguno-gris-claro-50-a4c436",
                           "backgroundColor": "casi-blanco",
                           "style": {
                             "spacing": {
                               "padding": {
-                                "top": "var:preset|spacing|40",
-                                "right": "var:preset|spacing|40",
-                                "bottom": "var:preset|spacing|40",
-                                "left": "var:preset|spacing|40"
+                                "top": "var:preset|spacing|80",
+                                "right": "var:preset|spacing|80",
+                                "bottom": "var:preset|spacing|80",
+                                "left": "var:preset|spacing|80"
                               }
                             },
                             "border": {
@@ -761,13 +835,21 @@
                               "title": "¿Ofrecen transporte?",
                               "level": 3,
                               "textColor": "texto-cuerpo",
-                              "fontSize": "40",
+                              "fontSize": "60",
                               "fontFamily": "pliegue",
                               "style": {
                                 "typography": {
                                   "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
                                   "lineHeight": "var(--wp--custom--typography--line-height--snug)",
                                   "textAlign": "left"
+                                },
+                                "spacing": {
+                                  "padding": {
+                                    "top": "0",
+                                    "right": "0",
+                                    "bottom": "0",
+                                    "left": "0"
+                                  }
                                 }
                               }
                             },
@@ -779,7 +861,7 @@
                               "style": {
                                 "spacing": {
                                   "padding": {
-                                    "top": "var:preset|spacing|40"
+                                    "top": "var:preset|spacing|80"
                                   },
                                   "margin": {
                                     "top": "0"
@@ -819,14 +901,15 @@
                       {
                         "name": "core/accordion-item",
                         "attrs": {
+                          "className": "is-style-pliegue-etmodules-e050-ninguno-gris-claro-50-a4c436",
                           "backgroundColor": "casi-blanco",
                           "style": {
                             "spacing": {
                               "padding": {
-                                "top": "var:preset|spacing|40",
-                                "right": "var:preset|spacing|40",
-                                "bottom": "var:preset|spacing|40",
-                                "left": "var:preset|spacing|40"
+                                "top": "var:preset|spacing|80",
+                                "right": "var:preset|spacing|80",
+                                "bottom": "var:preset|spacing|80",
+                                "left": "var:preset|spacing|80"
                               }
                             },
                             "border": {
@@ -841,13 +924,21 @@
                               "title": "¿Qué formas de pago aceptan?",
                               "level": 3,
                               "textColor": "texto-cuerpo",
-                              "fontSize": "40",
+                              "fontSize": "60",
                               "fontFamily": "pliegue",
                               "style": {
                                 "typography": {
                                   "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
                                   "lineHeight": "var(--wp--custom--typography--line-height--snug)",
                                   "textAlign": "left"
+                                },
+                                "spacing": {
+                                  "padding": {
+                                    "top": "0",
+                                    "right": "0",
+                                    "bottom": "0",
+                                    "left": "0"
+                                  }
                                 }
                               }
                             },
@@ -859,7 +950,7 @@
                               "style": {
                                 "spacing": {
                                   "padding": {
-                                    "top": "var:preset|spacing|40"
+                                    "top": "var:preset|spacing|80"
                                   },
                                   "margin": {
                                     "top": "0"
@@ -899,14 +990,15 @@
                       {
                         "name": "core/accordion-item",
                         "attrs": {
+                          "className": "is-style-pliegue-etmodules-e050-ninguno-gris-claro-50-a4c436",
                           "backgroundColor": "casi-blanco",
                           "style": {
                             "spacing": {
                               "padding": {
-                                "top": "var:preset|spacing|40",
-                                "right": "var:preset|spacing|40",
-                                "bottom": "var:preset|spacing|40",
-                                "left": "var:preset|spacing|40"
+                                "top": "var:preset|spacing|80",
+                                "right": "var:preset|spacing|80",
+                                "bottom": "var:preset|spacing|80",
+                                "left": "var:preset|spacing|80"
                               }
                             },
                             "border": {
@@ -921,13 +1013,21 @@
                               "title": "¿Ofrecen garantía?",
                               "level": 3,
                               "textColor": "texto-cuerpo",
-                              "fontSize": "40",
+                              "fontSize": "60",
                               "fontFamily": "pliegue",
                               "style": {
                                 "typography": {
                                   "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
                                   "lineHeight": "var(--wp--custom--typography--line-height--snug)",
                                   "textAlign": "left"
+                                },
+                                "spacing": {
+                                  "padding": {
+                                    "top": "0",
+                                    "right": "0",
+                                    "bottom": "0",
+                                    "left": "0"
+                                  }
                                 }
                               }
                             },
@@ -939,7 +1039,7 @@
                               "style": {
                                 "spacing": {
                                   "padding": {
-                                    "top": "var:preset|spacing|40"
+                                    "top": "var:preset|spacing|80"
                                   },
                                   "margin": {
                                     "top": "0"
@@ -1107,7 +1207,7 @@
                     "name": "core/heading",
                     "attrs": {
                       "textColor": "fondo-pagina",
-                      "fontSize": "50",
+                      "fontSize": "90",
                       "fontFamily": "pliegue",
                       "style": {
                         "typography": {
@@ -1118,7 +1218,7 @@
                         "spacing": {
                           "margin": {
                             "top": "0",
-                            "bottom": "var:preset|spacing|70"
+                            "bottom": "var:preset|spacing|180"
                           }
                         }
                       },
@@ -1136,10 +1236,10 @@
                       "headingLevel": 3,
                       "style": {
                         "spacing": {
-                          "blockGap": "var:preset|spacing|60",
+                          "blockGap": "var:preset|spacing|150",
                           "margin": {
                             "top": "0",
-                            "bottom": "0"
+                            "bottom": "var:preset|spacing|290"
                           }
                         }
                       }
@@ -1149,14 +1249,15 @@
                         "name": "core/accordion-item",
                         "attrs": {
                           "openByDefault": true,
+                          "className": "is-style-pliegue-etmodules-e050-ninguno-gris-claro-50-a4c436",
                           "backgroundColor": "casi-blanco",
                           "style": {
                             "spacing": {
                               "padding": {
-                                "top": "var:preset|spacing|40",
-                                "right": "var:preset|spacing|40",
-                                "bottom": "var:preset|spacing|40",
-                                "left": "var:preset|spacing|40"
+                                "top": "var:preset|spacing|80",
+                                "right": "var:preset|spacing|80",
+                                "bottom": "var:preset|spacing|80",
+                                "left": "var:preset|spacing|80"
                               }
                             },
                             "border": {
@@ -1171,13 +1272,21 @@
                               "title": "Flame Retardant B1 (DIN 4102-1)",
                               "level": 3,
                               "textColor": "texto-cuerpo",
-                              "fontSize": "40",
+                              "fontSize": "60",
                               "fontFamily": "pliegue",
                               "style": {
                                 "typography": {
                                   "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
                                   "lineHeight": "var(--wp--custom--typography--line-height--snug)",
                                   "textAlign": "left"
+                                },
+                                "spacing": {
+                                  "padding": {
+                                    "top": "0",
+                                    "right": "0",
+                                    "bottom": "0",
+                                    "left": "0"
+                                  }
                                 }
                               }
                             },
@@ -1189,7 +1298,7 @@
                               "style": {
                                 "spacing": {
                                   "padding": {
-                                    "top": "var:preset|spacing|40"
+                                    "top": "var:preset|spacing|80"
                                   },
                                   "margin": {
                                     "top": "0"
@@ -1210,11 +1319,15 @@
                                   "style": {
                                     "spacing": {
                                       "margin": {
-                                        "top": "0",
-                                        "bottom": "var:preset|spacing|20"
+                                        "top": "var:preset|spacing|80",
+                                        "bottom": "var:preset|spacing|160"
                                       }
+                                    },
+                                    "border": {
+                                      "radius": "0"
                                     }
                                   },
+                                  "align": "center",
                                   "href": "/wp-content/uploads/2025/07/Flame-retardant-B1-Europe.pdf",
                                   "linkTarget": "_blank",
                                   "rel": "noreferrer noopener"
@@ -1251,14 +1364,15 @@
                       {
                         "name": "core/accordion-item",
                         "attrs": {
+                          "className": "is-style-pliegue-etmodules-e050-ninguno-gris-claro-50-a4c436",
                           "backgroundColor": "casi-blanco",
                           "style": {
                             "spacing": {
                               "padding": {
-                                "top": "var:preset|spacing|40",
-                                "right": "var:preset|spacing|40",
-                                "bottom": "var:preset|spacing|40",
-                                "left": "var:preset|spacing|40"
+                                "top": "var:preset|spacing|80",
+                                "right": "var:preset|spacing|80",
+                                "bottom": "var:preset|spacing|80",
+                                "left": "var:preset|spacing|80"
                               }
                             },
                             "border": {
@@ -1273,13 +1387,21 @@
                               "title": "Envejecimiento por Luz (Xenon-arc)",
                               "level": 3,
                               "textColor": "texto-cuerpo",
-                              "fontSize": "40",
+                              "fontSize": "60",
                               "fontFamily": "pliegue",
                               "style": {
                                 "typography": {
                                   "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
                                   "lineHeight": "var(--wp--custom--typography--line-height--snug)",
                                   "textAlign": "left"
+                                },
+                                "spacing": {
+                                  "padding": {
+                                    "top": "0",
+                                    "right": "0",
+                                    "bottom": "0",
+                                    "left": "0"
+                                  }
                                 }
                               }
                             },
@@ -1291,7 +1413,7 @@
                               "style": {
                                 "spacing": {
                                   "padding": {
-                                    "top": "var:preset|spacing|40"
+                                    "top": "var:preset|spacing|80"
                                   },
                                   "margin": {
                                     "top": "0"
@@ -1313,10 +1435,14 @@
                                     "spacing": {
                                       "margin": {
                                         "top": "0",
-                                        "bottom": "var:preset|spacing|20"
+                                        "bottom": "var:preset|spacing|40"
                                       }
+                                    },
+                                    "border": {
+                                      "radius": "0"
                                     }
                                   },
+                                  "align": "center",
                                   "href": "/wp-content/uploads/2025/07/Light-ageing-test-of-PVC.pdf",
                                   "linkTarget": "_blank",
                                   "rel": "noreferrer noopener"
@@ -1353,14 +1479,15 @@
                       {
                         "name": "core/accordion-item",
                         "attrs": {
+                          "className": "is-style-pliegue-etmodules-e050-ninguno-gris-claro-50-a4c436",
                           "backgroundColor": "casi-blanco",
                           "style": {
                             "spacing": {
                               "padding": {
-                                "top": "var:preset|spacing|40",
-                                "right": "var:preset|spacing|40",
-                                "bottom": "var:preset|spacing|40",
-                                "left": "var:preset|spacing|40"
+                                "top": "var:preset|spacing|80",
+                                "right": "var:preset|spacing|80",
+                                "bottom": "var:preset|spacing|80",
+                                "left": "var:preset|spacing|80"
                               }
                             },
                             "border": {
@@ -1375,13 +1502,21 @@
                               "title": "Resistencia al Agua (EN ISO 811)",
                               "level": 3,
                               "textColor": "texto-cuerpo",
-                              "fontSize": "40",
+                              "fontSize": "60",
                               "fontFamily": "pliegue",
                               "style": {
                                 "typography": {
                                   "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
                                   "lineHeight": "var(--wp--custom--typography--line-height--snug)",
                                   "textAlign": "left"
+                                },
+                                "spacing": {
+                                  "padding": {
+                                    "top": "0",
+                                    "right": "0",
+                                    "bottom": "0",
+                                    "left": "0"
+                                  }
                                 }
                               }
                             },
@@ -1393,7 +1528,7 @@
                               "style": {
                                 "spacing": {
                                   "padding": {
-                                    "top": "var:preset|spacing|40"
+                                    "top": "var:preset|spacing|80"
                                   },
                                   "margin": {
                                     "top": "0"
@@ -1415,10 +1550,14 @@
                                     "spacing": {
                                       "margin": {
                                         "top": "0",
-                                        "bottom": "var:preset|spacing|20"
+                                        "bottom": "var:preset|spacing|40"
                                       }
+                                    },
+                                    "border": {
+                                      "radius": "0"
                                     }
                                   },
+                                  "align": "center",
                                   "href": "/wp-content/uploads/2025/07/Water-resistance-of-PVC.pdf",
                                   "linkTarget": "_blank",
                                   "rel": "noreferrer noopener"
@@ -1455,14 +1594,15 @@
                       {
                         "name": "core/accordion-item",
                         "attrs": {
+                          "className": "is-style-pliegue-etmodules-e050-ninguno-gris-claro-50-a4c436",
                           "backgroundColor": "casi-blanco",
                           "style": {
                             "spacing": {
                               "padding": {
-                                "top": "var:preset|spacing|40",
-                                "right": "var:preset|spacing|40",
-                                "bottom": "var:preset|spacing|40",
-                                "left": "var:preset|spacing|40"
+                                "top": "var:preset|spacing|80",
+                                "right": "var:preset|spacing|80",
+                                "bottom": "var:preset|spacing|80",
+                                "left": "var:preset|spacing|80"
                               }
                             },
                             "border": {
@@ -1477,13 +1617,21 @@
                               "title": "Certificación Aluminio 6005/T6",
                               "level": 3,
                               "textColor": "texto-cuerpo",
-                              "fontSize": "40",
+                              "fontSize": "60",
                               "fontFamily": "pliegue",
                               "style": {
                                 "typography": {
                                   "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
                                   "lineHeight": "var(--wp--custom--typography--line-height--snug)",
                                   "textAlign": "left"
+                                },
+                                "spacing": {
+                                  "padding": {
+                                    "top": "0",
+                                    "right": "0",
+                                    "bottom": "0",
+                                    "left": "0"
+                                  }
                                 }
                               }
                             },
@@ -1495,7 +1643,7 @@
                               "style": {
                                 "spacing": {
                                   "padding": {
-                                    "top": "var:preset|spacing|40"
+                                    "top": "var:preset|spacing|80"
                                   },
                                   "margin": {
                                     "top": "0"
@@ -1517,10 +1665,14 @@
                                     "spacing": {
                                       "margin": {
                                         "top": "0",
-                                        "bottom": "var:preset|spacing|20"
+                                        "bottom": "var:preset|spacing|40"
                                       }
+                                    },
+                                    "border": {
+                                      "radius": "0"
                                     }
                                   },
+                                  "align": "center",
                                   "href": "/wp-content/uploads/2025/07/Test-report-of-203x112x4.5mm-English.pdf",
                                   "linkTarget": "_blank",
                                   "rel": "noreferrer noopener"
@@ -1560,7 +1712,7 @@
                     "name": "core/heading",
                     "attrs": {
                       "textColor": "fondo-pagina",
-                      "fontSize": "50",
+                      "fontSize": "90",
                       "fontFamily": "pliegue",
                       "style": {
                         "typography": {
@@ -1571,7 +1723,7 @@
                         "spacing": {
                           "margin": {
                             "top": "0",
-                            "bottom": "var:preset|spacing|20"
+                            "bottom": "var:preset|spacing|30"
                           }
                         }
                       },
@@ -1589,7 +1741,7 @@
                       "headingLevel": 3,
                       "style": {
                         "spacing": {
-                          "blockGap": "var:preset|spacing|60",
+                          "blockGap": "var:preset|spacing|150",
                           "margin": {
                             "top": "0",
                             "bottom": "0"
@@ -1601,14 +1753,15 @@
                       {
                         "name": "core/accordion-item",
                         "attrs": {
+                          "className": "is-style-pliegue-etmodules-e050-etmodules-e050-gris-claro-50-4906a4",
                           "backgroundColor": "casi-blanco",
                           "style": {
                             "spacing": {
                               "padding": {
-                                "top": "var:preset|spacing|40",
-                                "right": "var:preset|spacing|40",
-                                "bottom": "var:preset|spacing|40",
-                                "left": "var:preset|spacing|40"
+                                "top": "var:preset|spacing|80",
+                                "right": "var:preset|spacing|80",
+                                "bottom": "var:preset|spacing|80",
+                                "left": "var:preset|spacing|80"
                               }
                             },
                             "border": {
@@ -1623,13 +1776,21 @@
                               "title": "¿Qué materiales utilizan en las estructuras?",
                               "level": 3,
                               "textColor": "texto-cuerpo",
-                              "fontSize": "40",
+                              "fontSize": "60",
                               "fontFamily": "pliegue",
                               "style": {
                                 "typography": {
                                   "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
                                   "lineHeight": "var(--wp--custom--typography--line-height--snug)",
                                   "textAlign": "left"
+                                },
+                                "spacing": {
+                                  "padding": {
+                                    "top": "0",
+                                    "right": "0",
+                                    "bottom": "0",
+                                    "left": "0"
+                                  }
                                 }
                               }
                             },
@@ -1641,7 +1802,7 @@
                               "style": {
                                 "spacing": {
                                   "padding": {
-                                    "top": "var:preset|spacing|40"
+                                    "top": "var:preset|spacing|80"
                                   },
                                   "margin": {
                                     "top": "0"
@@ -1681,14 +1842,15 @@
                       {
                         "name": "core/accordion-item",
                         "attrs": {
+                          "className": "is-style-pliegue-etmodules-e050-etmodules-e050-gris-claro-50-4906a4",
                           "backgroundColor": "casi-blanco",
                           "style": {
                             "spacing": {
                               "padding": {
-                                "top": "var:preset|spacing|40",
-                                "right": "var:preset|spacing|40",
-                                "bottom": "var:preset|spacing|40",
-                                "left": "var:preset|spacing|40"
+                                "top": "var:preset|spacing|80",
+                                "right": "var:preset|spacing|80",
+                                "bottom": "var:preset|spacing|80",
+                                "left": "var:preset|spacing|80"
                               }
                             },
                             "border": {
@@ -1703,13 +1865,21 @@
                               "title": "¿Las carpas resisten condiciones climáticas adversas?",
                               "level": 3,
                               "textColor": "texto-cuerpo",
-                              "fontSize": "40",
+                              "fontSize": "60",
                               "fontFamily": "pliegue",
                               "style": {
                                 "typography": {
                                   "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
                                   "lineHeight": "var(--wp--custom--typography--line-height--snug)",
                                   "textAlign": "left"
+                                },
+                                "spacing": {
+                                  "padding": {
+                                    "top": "0",
+                                    "right": "0",
+                                    "bottom": "0",
+                                    "left": "0"
+                                  }
                                 }
                               }
                             },
@@ -1721,7 +1891,7 @@
                               "style": {
                                 "spacing": {
                                   "padding": {
-                                    "top": "var:preset|spacing|40"
+                                    "top": "var:preset|spacing|80"
                                   },
                                   "margin": {
                                     "top": "0"
@@ -1761,14 +1931,15 @@
                       {
                         "name": "core/accordion-item",
                         "attrs": {
+                          "className": "is-style-pliegue-etmodules-e050-etmodules-e050-gris-claro-50-4906a4",
                           "backgroundColor": "casi-blanco",
                           "style": {
                             "spacing": {
                               "padding": {
-                                "top": "var:preset|spacing|40",
-                                "right": "var:preset|spacing|40",
-                                "bottom": "var:preset|spacing|40",
-                                "left": "var:preset|spacing|40"
+                                "top": "var:preset|spacing|80",
+                                "right": "var:preset|spacing|80",
+                                "bottom": "var:preset|spacing|80",
+                                "left": "var:preset|spacing|80"
                               }
                             },
                             "border": {
@@ -1783,13 +1954,21 @@
                               "title": "¿Pueden personalizar las carpas con colores o logotipos?",
                               "level": 3,
                               "textColor": "texto-cuerpo",
-                              "fontSize": "40",
+                              "fontSize": "60",
                               "fontFamily": "pliegue",
                               "style": {
                                 "typography": {
                                   "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
                                   "lineHeight": "var(--wp--custom--typography--line-height--snug)",
                                   "textAlign": "left"
+                                },
+                                "spacing": {
+                                  "padding": {
+                                    "top": "0",
+                                    "right": "0",
+                                    "bottom": "0",
+                                    "left": "0"
+                                  }
                                 }
                               }
                             },
@@ -1801,7 +1980,7 @@
                               "style": {
                                 "spacing": {
                                   "padding": {
-                                    "top": "var:preset|spacing|40"
+                                    "top": "var:preset|spacing|80"
                                   },
                                   "margin": {
                                     "top": "0"

@@ -51,5 +51,30 @@ foreach ($paginas as $slug) {
         }
     }
 }
-echo $fallas === 0 ? "\nCUMPLE: 0 literales de diseño en el contenido guardado de las 5 páginas\n" : "\nNO CUMPLE: $fallas página(s)\n";
+// ---------------------------------------------------------------------------------------------------------------------------
+// Las regresiones de la comparación antes/después siguen cerradas: se mira lo que el contenido GUARDADO dice (por estructura, no por píxel).
+echo "\nRegresiones cerradas (contenido guardado):\n";
+$contenido = static function (string $slug): string {
+    $p = get_page_by_path($slug);
+    return $p ? (string) $p->post_content : '';
+};
+$inicio = $contenido('inicio');
+$faq = $contenido('preguntas-frecuentes');
+$comprobar = static function (string $caso, bool $ok) use (&$fallas): void {
+    echo ($ok ? '  ok     ' : '  FALLA  ') . $caso . "\n";
+    if (!$ok) {
+        ++$fallas;
+    }
+};
+$comprobar('Características: el recuadro es un color de la paleta con transparencia (no sólido) y sin literales', strpos($inicio, '"backgroundColor":"fondo-pagina-88"') !== false);
+$comprobar('Características: el recuadro lleva el desenfoque como estilo de bloque registrado', strpos($inicio, 'is-style-desenfoque-s') !== false);
+$comprobar('Características: el contenedor del video es «constrained» (el recuadro queda centrado con el ancho de contenido)', strpos($inicio, '"layout":{"type":"constrained"}') !== false);
+$comprobar('Opciones comerciales: los íconos son core/icon con un color de la paleta (no imágenes)', substr_count($inicio, 'wp:icon {"icon":"contope/') === 3 && substr_count($inicio, '"textColor":"fondo-pagina"') >= 3);
+$comprobar('Soluciones inteligentes: las fotos llevan el contorno separado como estilo de bloque registrado', preg_match_all('/contorno-thick-fondo-pagina-\d+/', $inicio) >= 4);
+$comprobar('Descubre más: el degradado termina en el color de fondo (naranja), no en transparente sobre otro fondo', strpos($inicio, '"gradient":"ink-a-accent-65"') !== false);
+$comprobar('Preguntas frecuentes: cada pliegue lleva el estilo del ícono y del estado abierto', substr_count($faq, 'is-style-pliegue-') >= 10);
+$comprobar('Preguntas frecuentes: el divisor curvo del encabezado es un estilo de bloque registrado', strpos($faq, 'is-style-divisor-abajo-') !== false);
+$comprobar('basis-carpas-industriales: la barra lateral lleva las partes de los bloques de WordPress como estilo registrado', substr_count($contenido('basis-carpas-industriales'), 'is-style-partes-') >= 3);
+$comprobar('Términos y privacidad: la columna de texto es el contenedor «constrained» de una medida del set (queda centrada)', (bool) preg_match('/"layout":\{"type":"constrained","contentSize":"var\(--wp--custom--layout--measure--[a-z]+\)"\}/', str_replace(chr(92) . 'u002d', '-', $contenido('terminos-y-privacidad'))));
+echo $fallas === 0 ? "\nCUMPLE: 0 literales de diseño en el contenido guardado de las 5 páginas y las regresiones siguen cerradas\n" : "\nNO CUMPLE: $fallas comprobación(es)\n";
 exit($fallas === 0 ? 0 : 1);

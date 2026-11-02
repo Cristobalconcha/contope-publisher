@@ -72,6 +72,8 @@ $comprobar('mapa no tiene atributo de clave (la clave nunca va en el contenido)'
     && !isset($mapa->attributes['token'], $mapa->attributes['clave'], $mapa->attributes['apiKey'], $mapa->attributes['accessToken']));
 $comprobar('mapa declara lat, lng, zoom, alto y fijo', $mapa instanceof WP_Block_Type
     && isset($mapa->attributes['lat'], $mapa->attributes['lng'], $mapa->attributes['zoom'], $mapa->attributes['alto'], $mapa->attributes['fijo']));
+$comprobar('mapa tiene el soporte de sombra de Gutenberg (style.shadow: un paso de la escala de sombras del sitio) y de radio', $mapa instanceof WP_Block_Type
+    && !empty($mapa->supports['shadow']) && !empty($mapa->supports['__experimentalBorder']['radius']));
 $form = $registro->get_registered('contope/formulario');
 $comprobar('formulario declara formSlug', $form instanceof WP_Block_Type && isset($form->attributes['formSlug']));
 

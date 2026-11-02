@@ -155,13 +155,20 @@ final class COD_Theme_Definitions
     public static function campos_de_escala(): array
     {
         return [
-            ['id' => 'scale_spacing', 'label' => 'Espaciado: pasos (paso=valor; …)', 'type' => 'scale', 'scale' => 'length', 'preset' => 'spacing'],
-            ['id' => 'scale_font_size', 'label' => 'Tamaños de letra: pasos (paso=máximo~mínimo en móvil)', 'type' => 'scale', 'scale' => 'font-size', 'preset' => 'font-size'],
+            ['id' => 'scale_spacing', 'label' => 'Espaciado: pasos (paso=valor, o paso=escritorio/tablet/celular)', 'type' => 'scale', 'scale' => 'spacing', 'preset' => 'spacing'],
+            ['id' => 'scale_font_size', 'label' => 'Tamaños de letra: pasos (paso=escritorio/tablet/celular, o paso=máximo~mínimo en móvil para un tamaño fluido)', 'type' => 'scale', 'scale' => 'font-size', 'preset' => 'font-size'],
             ['id' => 'scale_radius', 'label' => 'Radios: pasos', 'type' => 'scale', 'scale' => 'length', 'custom' => ['radius']],
             ['id' => 'scale_border', 'label' => 'Grosores de borde: pasos', 'type' => 'scale', 'scale' => 'length', 'custom' => ['border']],
             ['id' => 'scale_weight', 'label' => 'Pesos de letra: pasos', 'type' => 'scale', 'scale' => 'number', 'custom' => ['typography', 'fontWeight']],
             ['id' => 'scale_leading', 'label' => 'Interlineados: pasos', 'type' => 'scale', 'scale' => 'number', 'custom' => ['typography', 'lineHeight']],
             ['id' => 'scale_measure', 'label' => 'Anchos de texto (medidas): pasos', 'type' => 'scale', 'scale' => 'length', 'custom' => ['layout', 'measure']],
+            // Transparencias: un paso es un color de la paleta con su opacidad («blanco-88=fondo-pagina 88%»). Entra a la paleta del
+            // tema como `--wp--preset--color--<paso>`, así que el bloque lo usa por su slug (backgroundColor, textColor…).
+            ['id' => 'scale_alpha', 'label' => 'Transparencias de la paleta: pasos (paso=color N%)', 'type' => 'scale', 'scale' => 'alpha', 'preset' => 'color'],
+            // Sombras: pasos con nombre. Entran a `settings.shadow.presets` y el bloque las usa por `style.shadow` (var:preset|shadow|paso).
+            ['id' => 'scale_shadow', 'label' => 'Sombras: pasos (paso=desplazamientos, desenfoque y color con opacidad)', 'type' => 'scale', 'scale' => 'shadow', 'preset' => 'shadow'],
+            // Desenfoques del fondo (backdrop-filter): pasos. Los usa un estilo de bloque del tema, nunca el contenido.
+            ['id' => 'scale_blur', 'label' => 'Desenfoques del fondo: pasos', 'type' => 'scale', 'scale' => 'length', 'custom' => ['blur']],
         ];
     }
 
@@ -646,9 +653,11 @@ final class COD_Theme_Definitions
 
     /**
      * Lee «paso=valor; paso=valor» y devuelve sólo los pasos válidos, en orden.
-     * `scale`: length | font-size (admite «máximo~mínimo») | number.
+     * `scale`: length | spacing | font-size | number | alpha | shadow. Un tamaño de letra admite «máximo~mínimo» (fluido); un tamaño o un
+     * espaciado admiten «escritorio/tablet/celular» (cada punto de quiebre con su valor: «50px/28px/20px»; un tramo vacío hereda el de escritorio:
+     * «50px//20px»).
      *
-     * @return array<int, array{slug: string, valor: string, min: string}>
+     * @return array<int, array{slug: string, valor: string, min: string, tablet: string, movil: string}>
      */
     public static function leer_pasos(string $texto, string $tipo): array
     {
@@ -664,30 +673,93 @@ final class COD_Theme_Definitions
                 continue;
             }
             $minimo = '';
+            $tablet = '';
+            $movil = '';
+            // Un tamaño de letra o un espaciado puede traer un valor por punto de quiebre («50px/28px/20px»). Una fórmula con paréntesis (el
+            // gutter, que divide) no.
+            if (in_array($tipo, ['font-size', 'spacing'], true) && strpos($valor, '/') !== false && strpos($valor, '(') === false) {
+                $partes = array_map('trim', explode('/', $valor));
+                if (count($partes) !== 3 || !self::medida_valida($partes[0]) || ($partes[1] !== '' && !self::medida_valida($partes[1])) || ($partes[2] !== '' && !self::medida_valida($partes[2]))) {
+                    continue;
+                }
+                [$valor, $tablet, $movil] = $partes;
+            }
             if ($tipo === 'font-size' && strpos($valor, '~') !== false) {
                 [$valor, $minimo] = array_map('trim', explode('~', $valor, 2));
                 if (!self::medida_valida($minimo)) {
                     continue;
                 }
             }
-            $ok = $tipo === 'number' ? preg_match('/^(?:\d+|\d*\.\d+)$/', $valor) === 1 : self::medida_valida($valor);
+            if ($tipo === 'number') {
+                $ok = preg_match('/^(?:\d+|\d*\.\d+)$/', $valor) === 1;
+            } elseif ($tipo === 'alpha') {
+                $ok = self::alfa_valida($valor);
+            } elseif ($tipo === 'shadow') {
+                $ok = self::sombra_valida($valor);
+            } else {
+                $ok = self::medida_valida($valor);
+            }
             if (!$ok) {
                 continue;
             }
             $vistos[$slug] = true;
-            $out[] = ['slug' => $slug, 'valor' => $valor, 'min' => $minimo];
+            $out[] = ['slug' => $slug, 'valor' => $valor, 'min' => $minimo, 'tablet' => $tablet, 'movil' => $movil];
         }
         return $out;
     }
 
-    /** @param array<int, array{slug: string, valor: string, min: string}> $pasos */
+    /** @param array<int, array{slug: string, valor: string, min: string, tablet?: string, movil?: string}> $pasos */
     public static function serializar_pasos(array $pasos): string
     {
         $partes = [];
         foreach ($pasos as $p) {
-            $partes[] = $p['slug'] . '=' . $p['valor'] . ($p['min'] !== '' ? '~' . $p['min'] : '');
+            $quiebres = (($p['tablet'] ?? '') !== '' || ($p['movil'] ?? '') !== '') ? '/' . ($p['tablet'] ?? '') . '/' . ($p['movil'] ?? '') : '';
+            $partes[] = $p['slug'] . '=' . $p['valor'] . $quiebres . ($p['min'] !== '' ? '~' . $p['min'] : '');
         }
         return implode('; ', $partes);
+    }
+
+    /** «color N%»: el slug de un color de la paleta y su opacidad (1 a 99). */
+    private static function alfa_valida(string $v): bool
+    {
+        return preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)* (?:[1-9]\d?)(?:\.\d+)?%$/', $v) === 1;
+    }
+
+    /** El color de una paso de alfa o de una sombra: color-mix de un color de la paleta con transparente. */
+    public static function color_con_alfa(string $slug, string $porcentaje): string
+    {
+        return 'color-mix(in srgb, var(--wp--preset--color--' . $slug . ') ' . $porcentaje . ', transparent)';
+    }
+
+    /**
+     * Una sombra: una o más capas separadas por coma; cada capa son medidas (px o 0) y, a lo sumo, un color de la paleta con
+     * opacidad. Ni un color literal ni una función cualquiera: el valor termina dentro de un theme.json y de un :root.
+     */
+    private static function sombra_valida(string $v): bool
+    {
+        if ($v === '' || strlen($v) > 400) {
+            return false;
+        }
+        foreach (explode(',', (string) preg_replace('/color-mix\(in srgb, var\(--wp--preset--color--[a-z0-9-]+\) \d{1,2}%, transparent\)/', 'C', $v)) as $capa) {
+            $fichas = preg_split('/\s+/', trim($capa)) ?: [];
+            $medidas = 0;
+            $colores = 0;
+            foreach ($fichas as $f) {
+                if ($f === 'C') {
+                    ++$colores;
+                } elseif ($f === 'inset') {
+                    continue;
+                } elseif (preg_match('/^-?(?:\d+|\d*\.\d+)(?:px)?$/', $f) === 1) {
+                    ++$medidas;
+                } else {
+                    return false;
+                }
+            }
+            if ($medidas < 2 || $medidas > 4 || $colores !== 1) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /** Una medida simple (16px, 1.5rem, 50%) o una expresión max()/min()/clamp()/calc() de medidas y anchos del tema. */
@@ -758,12 +830,23 @@ final class COD_Theme_Definitions
             if (($campo['preset'] ?? '') === 'spacing') {
                 $ajustes['spacing']['defaultSpacingSizes'] = false;
                 foreach ($pasos as $p) {
-                    $ajustes['spacing']['spacingSizes'][] = ['slug' => $p['slug'], 'name' => $p['slug'] . ' (' . $p['valor'] . ')', 'size' => $p['valor']];
+                    $quiebres = (($p['tablet'] ?? '') !== '' || ($p['movil'] ?? '') !== '') ? ' / ' . (($p['tablet'] ?? '') ?: $p['valor']) . ' / ' . (($p['movil'] ?? '') ?: $p['valor']) : '';
+                    $ajustes['spacing']['spacingSizes'][] = ['slug' => $p['slug'], 'name' => $p['slug'] . ' (' . $p['valor'] . $quiebres . ')', 'size' => $p['valor']];
+                }
+            } elseif (($campo['preset'] ?? '') === 'color') {
+                foreach ($pasos as $p) {
+                    [$base, $pct] = explode(' ', $p['valor'], 2);
+                    $ajustes['color']['palette'][] = ['slug' => $p['slug'], 'name' => $base . ' al ' . $pct, 'color' => self::color_con_alfa($base, $pct)];
+                }
+            } elseif (($campo['preset'] ?? '') === 'shadow') {
+                foreach ($pasos as $p) {
+                    $ajustes['shadow']['presets'][] = ['slug' => $p['slug'], 'name' => $p['slug'], 'shadow' => $p['valor']];
                 }
             } elseif (($campo['preset'] ?? '') === 'font-size') {
                 foreach ($pasos as $p) {
                     $tam = ['slug' => $p['slug'], 'name' => $p['slug'] . ' (' . $p['valor'] . ')', 'size' => $p['valor']];
                     $tam['fluid'] = $p['min'] !== '' ? ['min' => $p['min'], 'max' => $p['valor']] : false;
+                    $tam['name'] = $p['slug'] . ' (' . $p['valor'] . (($p['tablet'] ?? '') !== '' || ($p['movil'] ?? '') !== '' ? ' / ' . (($p['tablet'] ?? '') ?: $p['valor']) . ' / ' . (($p['movil'] ?? '') ?: $p['valor']) : '') . ')';
                     $ajustes['typography']['fontSizes'][] = $tam;
                 }
                 $ajustes['typography']['defaultFontSizes'] = false;
@@ -812,12 +895,77 @@ final class COD_Theme_Definitions
         return $out;
     }
 
+    public const MARCA_CSS_ESCALA = 'cod-escalas-con-quiebres';
+    /** Los puntos de quiebre del plugin (los mismos del lienzo): tablet 768 a 1023 y celular hasta 767. */
+    public const QUIEBRE_TABLET = '(min-width: 768px) and (max-width: 1023px)';
+    public const QUIEBRE_MOVIL = '(max-width: 767px)';
+
+    /**
+     * El CSS de las escalas con punto de quiebre (tamaños de letra y espaciado): cada paso «escritorio/tablet/celular» redefine su propia
+     * variable (--wp--preset--font-size--<paso>, --wp--preset--spacing--<paso>) dentro del punto de quiebre. Sólo declara variables de la
+     * escala, con los valores de la escala: el bloque sigue pidiendo `fontSize: "<paso>"` o `var:preset|spacing|<paso>` y WordPress imprime
+     * la referencia a la variable. Va entre marcas para poder rehacerse sin duplicarse. '' si ningún paso tiene quiebres.
+     */
+    public static function css_de_escalas_con_quiebres(): string
+    {
+        $tablet = '';
+        $movil = '';
+        foreach (['scale_font_size' => 'font-size', 'scale_spacing' => 'spacing'] as $campo => $preset) {
+            foreach (self::escalas()[$campo] ?? [] as $p) {
+                if (($p['tablet'] ?? '') !== '') {
+                    $tablet .= '--wp--preset--' . $preset . '--' . $p['slug'] . ':' . $p['tablet'] . ';';
+                }
+                if (($p['movil'] ?? '') !== '') {
+                    $movil .= '--wp--preset--' . $preset . '--' . $p['slug'] . ':' . $p['movil'] . ';';
+                }
+            }
+        }
+        if ($tablet === '' && $movil === '') {
+            return '';
+        }
+        $css = '';
+        if ($tablet !== '') {
+            $css .= '@media ' . self::QUIEBRE_TABLET . '{:root{' . $tablet . '}}';
+        }
+        if ($movil !== '') {
+            $css .= '@media ' . self::QUIEBRE_MOVIL . '{:root{' . $movil . '}}';
+        }
+        return '/*' . self::MARCA_CSS_ESCALA . '*/' . $css . '/*/' . self::MARCA_CSS_ESCALA . '*/';
+    }
+
+    /** Pone (o rehace) el bloque de las escalas con quiebres dentro del CSS que el tema ya trae. */
+    public static function css_con_escalas_con_quiebres(string $existente): string
+    {
+        $m = preg_quote(self::MARCA_CSS_ESCALA, '#');
+        $sin = trim((string) preg_replace('#/\*' . $m . '\*/.*?/\*/' . $m . '\*/#s', '', $existente));
+        $nuevo = self::css_de_escalas_con_quiebres();
+        return trim($sin . ($sin !== '' && $nuevo !== '' ? "\n" : '') . $nuevo);
+    }
+
     /** Engancha las escalas al theme.json del tema activo (los presets salen de las definiciones). */
     public static function registrar_escalas(): void
     {
         add_filter('wp_theme_json_data_theme', static function ($datos) {
             $parcial = self::theme_json_partial();
-            return $parcial === [] || !is_object($datos) || !method_exists($datos, 'update_with') ? $datos : $datos->update_with($parcial);
+            if ($parcial === [] || !is_object($datos) || !method_exists($datos, 'update_with')) {
+                return $datos;
+            }
+            // La paleta es del tema: las transparencias se SUMAN a sus colores, no la reemplazan.
+            if (!empty($parcial['settings']['color']['palette']) && method_exists($datos, 'get_data')) {
+                $actual = $datos->get_data()['settings']['color']['palette'] ?? [];
+                // En este punto la paleta puede venir por origen (['theme' => [...]]) o como lista.
+                if (is_array($actual) && isset($actual['theme']) && is_array($actual['theme'])) {
+                    $actual = $actual['theme'];
+                }
+                $nuevos = array_column($parcial['settings']['color']['palette'], 'slug');
+                $propios = array_values(array_filter(is_array($actual) ? $actual : [], static fn ($c): bool => is_array($c) && !in_array($c['slug'] ?? '', $nuevos, true)));
+                $parcial['settings']['color']['palette'] = array_merge($propios, $parcial['settings']['color']['palette']);
+            }
+            // Los pasos con punto de quiebre llevan su CSS (variables de la escala) en el CSS del tema.
+            if (self::css_de_escalas_con_quiebres() !== '' && method_exists($datos, 'get_data')) {
+                $parcial['styles']['css'] = self::css_con_escalas_con_quiebres((string) ($datos->get_data()['styles']['css'] ?? ''));
+            }
+            return $datos->update_with($parcial);
         });
     }
 

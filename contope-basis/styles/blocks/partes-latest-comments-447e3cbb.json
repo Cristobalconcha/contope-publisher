@@ -1,0 +1,13 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/theme.json",
+  "version": 3,
+  "title": "Partes del bloque",
+  "slug": "partes-latest-comments-447e3cbb",
+  "blockTypes": [
+    "core/latest-comments"
+  ],
+  "styles": {
+    "css": "& .wp-block-latest-comments__no-comments { font-family: var(--wp--preset--font-family--body); font-size: var(--wp--preset--font-size--20); font-weight: var(--wp--custom--typography--font-weight--medium); line-height: var(--wp--custom--typography--line-height--airy); color: var(--wp--preset--color--texto-cuerpo); }"
+  },
+  "_generado": "scripts/basis/componer-bloques.mjs"
+}

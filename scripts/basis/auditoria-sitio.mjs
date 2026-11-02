@@ -41,7 +41,8 @@ const PAGINAS = [['inicio', '/'], ['basis-carpas-industriales', '/basis-carpas-i
  * guion que perdiera un acordeón perdería también la expectativa. Encontrar MENOS de lo esperado es un problema; CERO, más.
  */
 const INVENTARIO = {
-  inicio: { imagenes: 7, videos: 1, acordeones: 1, pliegues: 3, botones: 3, listas: 4, titulos: 11 },
+  // los tres íconos de «Opciones comerciales» son `core/icon` (un <svg> en línea que toma el color de la paleta), ya no tres imágenes
+  inicio: { imagenes: 4, iconos: 3, videos: 1, acordeones: 1, pliegues: 3, botones: 3, listas: 4, titulos: 11 },
   'basis-carpas-industriales': { buscadores: 1, entradas: 1, comentarios: 1, titulos: 3 },
   'preguntas-frecuentes': { acordeones: 3, pliegues: 16, imagenes: 4, listas: 1, separadores: 1, titulos: 4 },
   contactos: { formularios: 1, mapas: 1, titulos: 1 },
@@ -117,6 +118,7 @@ for (const ancho of SOLO_GOBIERNO ? [] : [1440, 768, 393]) {
         mapas: document.querySelectorAll('.wp-block-contope-mapa, [data-cod-behavior="mapa"]').length,
         videos: document.querySelectorAll('video').length,
         imagenes: document.querySelectorAll('figure.wp-block-image img').length,
+        iconos: document.querySelectorAll('.wp-block-icon svg').length,
         tablas: document.querySelectorAll('figure.wp-block-table table').length,
         listas: document.querySelectorAll('ul.wp-block-list, ol.wp-block-list').length,
         botones: document.querySelectorAll('.wp-block-button__link').length,
@@ -147,7 +149,9 @@ for (const ancho of SOLO_GOBIERNO ? [] : [1440, 768, 393]) {
           let c = await centroDe('.wp-block-accordion-heading__toggle', n);
           if (!c) continue;
           if (c.h < 24) caso.problemas.push(`el pliegue ${n} mide ${Math.round(c.h)}px de alto: menos que el mínimo táctil de 24px`);
-          if (!antes.icono) caso.problemas.push(`el pliegue ${n} no muestra su ícono`);
+          const iconoEscondidoAlAbrir = antes.abierto && await evaluar(`/-ninguno-/.test(document.querySelectorAll('.wp-block-accordion-heading__toggle')[${n}].closest('.wp-block-accordion-item').className)`);
+          if (!antes.icono && !iconoEscondidoAlAbrir) caso.problemas.push(`el pliegue ${n} no muestra su ícono`);
+          if (antes.icono && iconoEscondidoAlAbrir) caso.problemas.push(`el pliegue ${n} está abierto y su estilo dice «sin ícono al abrir», pero lo muestra`);
           await tocar(c.x, c.y);
           let e = await estado(n);
           if (antes.abierto) {

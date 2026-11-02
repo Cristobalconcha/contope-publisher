@@ -1,0 +1,13 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/theme.json",
+  "version": 3,
+  "title": "Sin líneas",
+  "slug": "sin-lineas",
+  "blockTypes": [
+    "core/table"
+  ],
+  "styles": {
+    "css": "border-collapse: collapse; width: 100%;\n& th { padding: var(--wp--preset--spacing--40) !important; border: 0 !important; text-align: start; }\n& td { padding: var(--wp--preset--spacing--40) !important; border: 0 !important; text-align: start; }"
+  },
+  "_generado": "scripts/basis/componer-bloques.mjs"
+}

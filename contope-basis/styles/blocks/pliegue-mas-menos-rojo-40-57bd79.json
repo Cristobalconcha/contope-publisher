@@ -1,0 +1,13 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/theme.json",
+  "version": 3,
+  "title": "Pliegue (ícono y estado abierto)",
+  "slug": "pliegue-mas-menos-rojo-40-57bd79",
+  "blockTypes": [
+    "core/accordion-item"
+  ],
+  "styles": {
+    "css": "& > .wp-block-accordion-heading .wp-block-accordion-heading__toggle-icon { font-size: 0; width: var(--wp--preset--spacing--40); height: var(--wp--preset--spacing--40); background-color: var(--wp--preset--color--rojo); -webkit-mask: url(/wp-content/uploads/contope-iconos/icono-mas.svg) center / contain no-repeat; mask: url(/wp-content/uploads/contope-iconos/icono-mas.svg) center / contain no-repeat; transform: none; }\n&.is-open > .wp-block-accordion-heading .wp-block-accordion-heading__toggle-icon { -webkit-mask: url(/wp-content/uploads/contope-iconos/icono-menos.svg) center / contain no-repeat; mask: url(/wp-content/uploads/contope-iconos/icono-menos.svg) center / contain no-repeat; }"
+  },
+  "_generado": "scripts/basis/componer-bloques.mjs"
+}

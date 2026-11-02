@@ -3,299 +3,228 @@
   "fuente": "salida/*.componer.json",
   "escalas": {
     "spacing": {
-      "razon": "Los valores de relleno, margen y separación se agrupan en 11 pasos. El 30 (71 usos) y el 20 (35) son el centro del sitio; el 50 y el 56 son el relleno vertical de las secciones (54 y 58 medidos); el 128 es el aire de la portada.",
+      "razon": "Los valores de relleno, margen y separación se agrupan en pasos. El 30 (71 usos) y el 20 (35) son el centro del sitio; el 56 es el relleno vertical de las secciones; el 128 es el aire de la portada. Se sumaron como paso propio los valores medidos que se repiten (6 veces o más) y que el redondeo habría movido 2 px o más: 27 (el relleno de cada fila, 16 usos), 54 (el de cada sección, 13), 12 (9) y 59,39 (la separación entre columnas, 6). Cada paso es «escritorio / tablet / celular»: el relleno, el margen y la separación que el original cambia por punto de quiebre son pasos propios (los de tablet y celular son los medidos); lo que no cambia hereda el de escritorio.",
       "totalLiterales": 263,
-      "exactos": 162,
-      "aproximados": 101,
+      "exactos": 206,
+      "aproximados": 57,
       "mayorDesviacion": 4.6,
       "pasos": [
         {
           "slug": "10",
-          "valor": "4px",
-          "usos": 7,
-          "exactos": 2,
-          "cubre": [
-            {
-              "medido": 4,
-              "veces": 2,
-              "desviacion": 0
-            },
-            {
-              "medido": 5,
-              "veces": 3,
-              "desviacion": -1
-            },
-            {
-              "medido": 6,
-              "veces": 1,
-              "desviacion": -2
-            },
-            {
-              "medido": 7,
-              "veces": 1,
-              "desviacion": -3
-            }
-          ]
+          "valor": "0px",
+          "tablet": "",
+          "movil": "20px",
+          "usos": 10
         },
         {
           "slug": "20",
-          "valor": "10px",
-          "usos": 30,
-          "exactos": 9,
-          "cubre": [
-            {
-              "medido": 8,
-              "veces": 3,
-              "desviacion": 2
-            },
-            {
-              "medido": 9,
-              "veces": 1,
-              "desviacion": 1
-            },
-            {
-              "medido": 9.8,
-              "veces": 8,
-              "desviacion": 0.2
-            },
-            {
-              "medido": 10,
-              "veces": 9,
-              "desviacion": 0
-            },
-            {
-              "medido": 12,
-              "veces": 9,
-              "desviacion": -2
-            }
-          ]
+          "valor": "4px",
+          "tablet": "",
+          "movil": "",
+          "usos": 5
         },
         {
           "slug": "30",
-          "valor": "16px",
-          "usos": 10,
-          "exactos": 3,
-          "cubre": [
-            {
-              "medido": 14,
-              "veces": 5,
-              "desviacion": 2
-            },
-            {
-              "medido": 15,
-              "veces": 2,
-              "desviacion": 1
-            },
-            {
-              "medido": 16,
-              "veces": 3,
-              "desviacion": 0
-            }
-          ]
+          "valor": "10px",
+          "tablet": "",
+          "movil": "",
+          "usos": 33
         },
         {
           "slug": "40",
-          "valor": "20px",
-          "usos": 38,
-          "exactos": 35,
-          "cubre": [
-            {
-              "medido": 19,
-              "veces": 2,
-              "desviacion": 1
-            },
-            {
-              "medido": 20,
-              "veces": 35,
-              "desviacion": 0
-            },
-            {
-              "medido": 21,
-              "veces": 1,
-              "desviacion": -1
-            }
-          ]
+          "valor": "12px",
+          "tablet": "",
+          "movil": "",
+          "usos": 13
         },
         {
           "slug": "50",
-          "valor": "24px",
-          "usos": 29,
-          "exactos": 12,
-          "cubre": [
-            {
-              "medido": 23,
-              "veces": 1,
-              "desviacion": 1
-            },
-            {
-              "medido": 24,
-              "veces": 12,
-              "desviacion": 0
-            },
-            {
-              "medido": 27,
-              "veces": 16,
-              "desviacion": -3
-            }
-          ]
+          "valor": "16px",
+          "tablet": "",
+          "movil": "",
+          "usos": 47
         },
         {
           "slug": "60",
-          "valor": "30px",
-          "usos": 81,
-          "exactos": 71,
-          "cubre": [
-            {
-              "medido": 28,
-              "veces": 3,
-              "desviacion": 2
-            },
-            {
-              "medido": 29,
-              "veces": 2,
-              "desviacion": 1
-            },
-            {
-              "medido": 29.69,
-              "veces": 1,
-              "desviacion": 0.3
-            },
-            {
-              "medido": 30,
-              "veces": 71,
-              "desviacion": 0
-            },
-            {
-              "medido": 32,
-              "veces": 2,
-              "desviacion": -2
-            },
-            {
-              "medido": 34,
-              "veces": 2,
-              "desviacion": -4
-            }
-          ]
+          "valor": "20px",
+          "tablet": "19px",
+          "movil": "",
+          "usos": 1
         },
         {
           "slug": "70",
-          "valor": "40px",
-          "usos": 15,
-          "exactos": 10,
-          "cubre": [
-            {
-              "medido": 35.37,
-              "veces": 1,
-              "desviacion": 4.6
-            },
-            {
-              "medido": 36,
-              "veces": 1,
-              "desviacion": 4
-            },
-            {
-              "medido": 38,
-              "veces": 2,
-              "desviacion": 2
-            },
-            {
-              "medido": 39,
-              "veces": 1,
-              "desviacion": 1
-            },
-            {
-              "medido": 40,
-              "veces": 10,
-              "desviacion": 0
-            }
-          ]
+          "valor": "20px",
+          "tablet": "",
+          "movil": "19px",
+          "usos": 1
         },
         {
           "slug": "80",
-          "valor": "50px",
-          "usos": 20,
-          "exactos": 20,
-          "cubre": [
-            {
-              "medido": 50,
-              "veces": 20,
-              "desviacion": 0
-            }
-          ]
+          "valor": "20px",
+          "tablet": "",
+          "movil": "",
+          "usos": 34
         },
         {
           "slug": "90",
-          "valor": "56px",
-          "usos": 28,
-          "exactos": 0,
-          "cubre": [
-            {
-              "medido": 54,
-              "veces": 13,
-              "desviacion": 2
-            },
-            {
-              "medido": 56.75,
-              "veces": 1,
-              "desviacion": -0.7
-            },
-            {
-              "medido": 57.6,
-              "veces": 1,
-              "desviacion": -1.6
-            },
-            {
-              "medido": 58,
-              "veces": 3,
-              "desviacion": -2
-            },
-            {
-              "medido": 59.39,
-              "veces": 6,
-              "desviacion": -3.4
-            },
-            {
-              "medido": 60,
-              "veces": 4,
-              "desviacion": -4
-            }
-          ]
+          "valor": "24px",
+          "tablet": "0px",
+          "movil": "0px",
+          "usos": 1
         },
         {
           "slug": "100",
-          "valor": "72px",
-          "usos": 4,
-          "exactos": 0,
-          "cubre": [
-            {
-              "medido": 68,
-              "veces": 1,
-              "desviacion": 4
-            },
-            {
-              "medido": 69.12,
-              "veces": 1,
-              "desviacion": 2.9
-            },
-            {
-              "medido": 74,
-              "veces": 2,
-              "desviacion": -2
-            }
-          ]
+          "valor": "24px",
+          "tablet": "",
+          "movil": "",
+          "usos": 20
         },
         {
           "slug": "110",
+          "valor": "24px",
+          "tablet": "30px",
+          "movil": "20px",
+          "usos": 1
+        },
+        {
+          "slug": "120",
+          "valor": "27px",
+          "tablet": "",
+          "movil": "",
+          "usos": 1
+        },
+        {
+          "slug": "130",
+          "valor": "27px",
+          "tablet": "30px",
+          "movil": "30px",
+          "usos": 21
+        },
+        {
+          "slug": "140",
+          "valor": "30px",
+          "tablet": "0px",
+          "movil": "0px",
+          "usos": 1
+        },
+        {
+          "slug": "150",
+          "valor": "30px",
+          "tablet": "10px",
+          "movil": "10px",
+          "usos": 3
+        },
+        {
+          "slug": "160",
+          "valor": "30px",
+          "tablet": "",
+          "movil": "",
+          "usos": 13
+        },
+        {
+          "slug": "170",
+          "valor": "40px",
+          "tablet": "30px",
+          "movil": "20px",
+          "usos": 3
+        },
+        {
+          "slug": "180",
+          "valor": "40px",
+          "tablet": "",
+          "movil": "",
+          "usos": 16
+        },
+        {
+          "slug": "190",
+          "valor": "50px",
+          "tablet": "",
+          "movil": "",
+          "usos": 0
+        },
+        {
+          "slug": "200",
+          "valor": "54px",
+          "tablet": "50px",
+          "movil": "50px",
+          "usos": 9
+        },
+        {
+          "slug": "210",
+          "valor": "54px",
+          "tablet": "",
+          "movil": "32px",
+          "usos": 2
+        },
+        {
+          "slug": "220",
+          "valor": "54px",
+          "tablet": "",
+          "movil": "",
+          "usos": 2
+        },
+        {
+          "slug": "230",
+          "valor": "56px",
+          "tablet": "0px",
+          "movil": "0px",
+          "usos": 1
+        },
+        {
+          "slug": "240",
+          "valor": "56px",
+          "tablet": "50px",
+          "movil": "50px",
+          "usos": 1
+        },
+        {
+          "slug": "250",
+          "valor": "56px",
+          "tablet": "",
+          "movil": "",
+          "usos": 0
+        },
+        {
+          "slug": "260",
+          "valor": "59.39px",
+          "tablet": "0px",
+          "movil": "0px",
+          "usos": 7
+        },
+        {
+          "slug": "270",
+          "valor": "59.39px",
+          "tablet": "30px",
+          "movil": "20px",
+          "usos": 4
+        },
+        {
+          "slug": "280",
+          "valor": "59.39px",
+          "tablet": "",
+          "movil": "",
+          "usos": 1
+        },
+        {
+          "slug": "290",
+          "valor": "72px",
+          "tablet": "",
+          "movil": "",
+          "usos": 3
+        },
+        {
+          "slug": "300",
           "valor": "128px",
-          "usos": 1,
-          "exactos": 0,
-          "cubre": [
-            {
-              "medido": 129.6,
-              "veces": 1,
-              "desviacion": -1.6
-            }
-          ]
+          "tablet": "69.12px",
+          "movil": "35.37px",
+          "usos": 1
+        },
+        {
+          "slug": "310",
+          "valor": "128px",
+          "tablet": "",
+          "movil": "",
+          "usos": 0
         },
         {
           "slug": "gutter",
@@ -313,202 +242,150 @@
       ]
     },
     "font-size": {
-      "razon": "Los tamaños de letra se agrupan en 12 pasos. El 14 (23 usos) es el cuerpo chico; 16/18/20 son el cuerpo y los textos destacados; de 24 a 80 son títulos. Los títulos grandes llevan tamaño fluido (el mínimo es lo que el sitio original medido usa en el celular).",
-      "totalLiterales": 57,
-      "exactos": 48,
-      "aproximados": 9,
-      "mayorDesviacion": 2,
+      "razon": "Cada paso es «escritorio / tablet / celular»: el sitio original define un tamaño distinto en cada punto de quiebre (un título de 50 px baja a 28 px en tablet y a 20 px en el celular). El escritorio, el tablet y el celular son los tamaños MEDIDOS, sin redondear. Lo que un texto no redefine en un punto de quiebre hereda el de escritorio. WordPress imprime una sola variable por paso; el tema la redefine dentro de cada punto de quiebre (los del lienzo: tablet 768 a 1023, celular hasta 767).",
+      "totalLiterales": 134,
+      "exactos": 134,
+      "aproximados": 0,
       "pasos": [
         {
           "slug": "10",
           "valor": "12px",
-          "usos": 1,
-          "exactos": 1,
-          "cubre": [
-            {
-              "medido": 12,
-              "veces": 1,
-              "desviacion": 0
-            }
-          ]
+          "tablet": "",
+          "movil": "",
+          "usos": 1
         },
         {
           "slug": "20",
           "valor": "14px",
-          "usos": 19,
-          "exactos": 17,
-          "cubre": [
-            {
-              "medido": 14,
-              "veces": 17,
-              "desviacion": 0
-            },
-            {
-              "medido": 15,
-              "veces": 2,
-              "desviacion": -1
-            }
-          ]
+          "tablet": "",
+          "movil": "",
+          "usos": 31
         },
         {
           "slug": "30",
           "valor": "16px",
-          "usos": 6,
-          "exactos": 6,
-          "cubre": [
-            {
-              "medido": 16,
-              "veces": 6,
-              "desviacion": 0
-            }
-          ]
+          "tablet": "15px",
+          "movil": "14px",
+          "usos": 6
         },
         {
           "slug": "40",
-          "valor": "18px",
-          "usos": 4,
-          "exactos": 4,
-          "cubre": [
-            {
-              "medido": 18,
-              "veces": 4,
-              "desviacion": 0
-            }
-          ]
+          "valor": "16px",
+          "tablet": "",
+          "movil": "",
+          "usos": 43
         },
         {
           "slug": "50",
-          "valor": "20px",
-          "usos": 6,
-          "exactos": 5,
-          "cubre": [
-            {
-              "medido": 20,
-              "veces": 5,
-              "desviacion": 0
-            },
-            {
-              "medido": 22,
-              "veces": 1,
-              "desviacion": -2
-            }
-          ]
+          "valor": "18px",
+          "tablet": "16px",
+          "movil": "14px",
+          "usos": 1
         },
         {
           "slug": "60",
-          "valor": "24px",
-          "usos": 3,
-          "exactos": 2,
-          "cubre": [
-            {
-              "medido": 24,
-              "veces": 2,
-              "desviacion": 0
-            },
-            {
-              "medido": 26,
-              "veces": 1,
-              "desviacion": -2
-            }
-          ]
+          "valor": "18px",
+          "tablet": "",
+          "movil": "",
+          "usos": 5
         },
         {
           "slug": "70",
-          "valor": "28px",
-          "usos": 5,
-          "exactos": 4,
-          "cubre": [
-            {
-              "medido": 28,
-              "veces": 4,
-              "desviacion": 0
-            },
-            {
-              "medido": 30,
-              "veces": 1,
-              "desviacion": -2
-            }
-          ]
+          "valor": "20px",
+          "tablet": "16px",
+          "movil": "14px",
+          "usos": 2
         },
         {
           "slug": "80",
-          "valor": "32px",
-          "usos": 3,
-          "exactos": 2,
-          "cubre": [
-            {
-              "medido": 32,
-              "veces": 2,
-              "desviacion": 0
-            },
-            {
-              "medido": 34,
-              "veces": 1,
-              "desviacion": -2
-            }
-          ]
+          "valor": "20px",
+          "tablet": "",
+          "movil": "",
+          "usos": 5
         },
         {
           "slug": "90",
-          "valor": "40px",
-          "usos": 3,
-          "exactos": 1,
-          "cubre": [
-            {
-              "medido": 39,
-              "veces": 1,
-              "desviacion": 1
-            },
-            {
-              "medido": 40,
-              "veces": 1,
-              "desviacion": 0
-            },
-            {
-              "medido": 42,
-              "veces": 1,
-              "desviacion": -2
-            }
-          ]
+          "valor": "22px",
+          "tablet": "",
+          "movil": "",
+          "usos": 3
         },
         {
           "slug": "100",
-          "valor": "50px",
-          "usos": 5,
-          "exactos": 5,
-          "cubre": [
-            {
-              "medido": 50,
-              "veces": 5,
-              "desviacion": 0
-            }
-          ]
+          "valor": "24px",
+          "tablet": "",
+          "movil": "",
+          "usos": 9
         },
         {
           "slug": "110",
-          "valor": "56px",
-          "usos": 1,
-          "exactos": 0,
-          "cubre": [
-            {
-              "medido": 55,
-              "veces": 1,
-              "desviacion": 1
-            }
-          ]
+          "valor": "26px",
+          "tablet": "",
+          "movil": "",
+          "usos": 2
         },
         {
           "slug": "120",
+          "valor": "28px",
+          "tablet": "15px",
+          "movil": "14px",
+          "usos": 6
+        },
+        {
+          "slug": "130",
+          "valor": "30px",
+          "tablet": "",
+          "movil": "",
+          "usos": 1
+        },
+        {
+          "slug": "140",
+          "valor": "32px",
+          "tablet": "",
+          "movil": "",
+          "usos": 11
+        },
+        {
+          "slug": "150",
+          "valor": "42px",
+          "tablet": "",
+          "movil": "",
+          "usos": 1
+        },
+        {
+          "slug": "160",
+          "valor": "50px",
+          "tablet": "28px",
+          "movil": "20px",
+          "usos": 3
+        },
+        {
+          "slug": "170",
+          "valor": "50px",
+          "tablet": "40px",
+          "movil": "32px",
+          "usos": 1
+        },
+        {
+          "slug": "180",
+          "valor": "50px",
+          "tablet": "",
+          "movil": "34px",
+          "usos": 1
+        },
+        {
+          "slug": "190",
+          "valor": "55px",
+          "tablet": "",
+          "movil": "39px",
+          "usos": 1
+        },
+        {
+          "slug": "200",
           "valor": "80px",
-          "usos": 1,
-          "exactos": 1,
-          "cubre": [
-            {
-              "medido": 80,
-              "veces": 1,
-              "desviacion": 0
-            }
-          ]
+          "tablet": "50px",
+          "movil": "28px",
+          "usos": 1
         }
       ]
     },
@@ -719,10 +596,10 @@
       ]
     },
     "leading": {
-      "razon": "Los interlineados sin unidad se agrupan en 5 pasos: 1, 1,2 (títulos), 1,4, 1,7 (cuerpo: 1,6 a 1,8) y 2.",
+      "razon": "Cada interlineado sin unidad que el sitio declara es un paso: 1, 1,2 (títulos), 1,4, 1,5, 1,6, 1,7 (el del cuerpo, 14 usos), 1,75, 1,8 y 2. Un interlineado distinto mueve el salto de renglón de un párrafo y cambia su alto, así que no se redondean entre sí.",
       "totalLiterales": 37,
-      "exactos": 31,
-      "aproximados": 6,
+      "exactos": 37,
+      "aproximados": 0,
       "pasos": [
         {
           "slug": "none",
@@ -753,46 +630,78 @@
         {
           "slug": "snug",
           "valor": "1.4",
-          "usos": 6,
+          "usos": 5,
           "exactos": 5,
           "cubre": [
             {
               "medido": 1.4,
               "veces": 5,
               "desviacion": 0
-            },
+            }
+          ]
+        },
+        {
+          "slug": "cozy",
+          "valor": "1.5",
+          "usos": 1,
+          "exactos": 1,
+          "cubre": [
             {
               "medido": 1.5,
               "veces": 1,
-              "desviacion": "acercado"
+              "desviacion": 0
+            }
+          ]
+        },
+        {
+          "slug": "comfy",
+          "valor": "1.6",
+          "usos": 1,
+          "exactos": 1,
+          "cubre": [
+            {
+              "medido": 1.6,
+              "veces": 1,
+              "desviacion": 0
             }
           ]
         },
         {
           "slug": "normal",
           "valor": "1.7",
-          "usos": 19,
+          "usos": 14,
           "exactos": 14,
           "cubre": [
-            {
-              "medido": 1.6,
-              "veces": 1,
-              "desviacion": "acercado"
-            },
             {
               "medido": 1.7,
               "veces": 14,
               "desviacion": 0
-            },
+            }
+          ]
+        },
+        {
+          "slug": "relaxed",
+          "valor": "1.75",
+          "usos": 3,
+          "exactos": 3,
+          "cubre": [
             {
               "medido": 1.75,
               "veces": 3,
-              "desviacion": "acercado"
-            },
+              "desviacion": 0
+            }
+          ]
+        },
+        {
+          "slug": "airy",
+          "valor": "1.8",
+          "usos": 1,
+          "exactos": 1,
+          "cubre": [
             {
               "medido": 1.8,
               "veces": 1,
-              "desviacion": "acercado"
+              "desviacion": 0
             }
           ]
         },
@@ -844,34 +753,126 @@
           ]
         }
       ]
+    },
+    "alpha": {
+      "razon": "Cada color de la paleta con transparencia que el sitio usa (el recuadro blanco sobre el video, el filete de los pliegues) es un paso: «color N %». El bloque lo pide por su slug, como a cualquier color de la paleta.",
+      "totalLiterales": 2,
+      "exactos": 2,
+      "aproximados": 0,
+      "pasos": [
+        {
+          "slug": "fondo-pagina-88",
+          "valor": "fondo-pagina 88%",
+          "usos": 1,
+          "exactos": 1,
+          "cubre": [
+            {
+              "medido": "fondo-pagina 88%",
+              "veces": 1,
+              "desviacion": 0
+            }
+          ]
+        },
+        {
+          "slug": "ink-15",
+          "valor": "ink 15%",
+          "usos": 1,
+          "exactos": 1,
+          "cubre": [
+            {
+              "medido": "ink 15%",
+              "veces": 1,
+              "desviacion": 0
+            }
+          ]
+        }
+      ]
+    },
+    "blur": {
+      "razon": "El desenfoque del fondo detrás de un recuadro translúcido (backdrop-filter). Un paso por cada radio medido.",
+      "totalLiterales": 1,
+      "exactos": 1,
+      "aproximados": 0,
+      "pasos": [
+        {
+          "slug": "s",
+          "valor": "6px",
+          "usos": 1,
+          "exactos": 1,
+          "cubre": [
+            {
+              "medido": "6px",
+              "veces": 1,
+              "desviacion": 0
+            }
+          ]
+        }
+      ]
+    },
+    "shadow": {
+      "razon": "Las sombras que el sitio usa (tarjetas, botón, recuadro del mapa), de menor a mayor desenfoque. Un paso por sombra distinta; se aplican con style.shadow (var:preset|shadow|paso).",
+      "totalLiterales": 4,
+      "exactos": 4,
+      "aproximados": 0,
+      "pasos": [
+        {
+          "slug": "10",
+          "valor": "0 4px 10px color-mix(in srgb, var(--wp--preset--color--ink) 20%, transparent)",
+          "usos": 2,
+          "exactos": 2,
+          "cubre": [
+            {
+              "medido": "0 4px 10px color-mix(in srgb, var(--wp--preset--color--ink) 20%, transparent)",
+              "veces": 2,
+              "desviacion": 0
+            }
+          ]
+        },
+        {
+          "slug": "20",
+          "valor": "2px 2px 10px color-mix(in srgb, var(--wp--preset--color--ink) 20%, transparent)",
+          "usos": 1,
+          "exactos": 1,
+          "cubre": [
+            {
+              "medido": "2px 2px 10px color-mix(in srgb, var(--wp--preset--color--ink) 20%, transparent)",
+              "veces": 1,
+              "desviacion": 0
+            }
+          ]
+        },
+        {
+          "slug": "30",
+          "valor": "color-mix(in srgb, var(--wp--preset--color--ink) 12%, transparent) 0px 24px 72px -12px",
+          "usos": 1,
+          "exactos": 1,
+          "cubre": [
+            {
+              "medido": "color-mix(in srgb, var(--wp--preset--color--ink) 12%, transparent) 0px 24px 72px -12px",
+              "veces": 1,
+              "desviacion": 0
+            }
+          ]
+        }
+      ]
     }
   },
   "definiciones": {
-    "scale_spacing": "10=4px; 20=10px; 30=16px; 40=20px; 50=24px; 60=30px; 70=40px; 80=50px; 90=56px; 100=72px; 110=128px; gutter=max(10%, calc((100% - var(--wp--style--global--content-size)) / 2))",
-    "scale_font_size": "10=12px; 20=14px; 30=16px; 40=18px~15px; 50=20px~15px; 60=24px~18px; 70=28px~16px; 80=32px~24px; 90=40px~28px; 100=50px~30px; 110=56px~38px; 120=80px~28px",
+    "scale_spacing": "10=0px//20px; 20=4px; 30=10px; 40=12px; 50=16px; 60=20px/19px/; 70=20px//19px; 80=20px; 90=24px/0px/0px; 100=24px; 110=24px/30px/20px; 120=27px; 130=27px/30px/30px; 140=30px/0px/0px; 150=30px/10px/10px; 160=30px; 170=40px/30px/20px; 180=40px; 190=50px; 200=54px/50px/50px; 210=54px//32px; 220=54px; 230=56px/0px/0px; 240=56px/50px/50px; 250=56px; 260=59.39px/0px/0px; 270=59.39px/30px/20px; 280=59.39px; 290=72px; 300=128px/69.12px/35.37px; 310=128px; gutter=max(10%, calc((100% - var(--wp--style--global--content-size)) / 2))",
+    "scale_font_size": "10=12px; 20=14px; 30=16px/15px/14px; 40=16px; 50=18px/16px/14px; 60=18px; 70=20px/16px/14px; 80=20px; 90=22px; 100=24px; 110=26px; 120=28px/15px/14px; 130=30px; 140=32px; 150=42px; 160=50px/28px/20px; 170=50px/40px/32px; 180=50px//34px; 190=55px//39px; 200=80px/50px/28px",
     "scale_radius": "xs=3px; s=6px; m=8px; l=10px; circle=50%; pill=9999px",
     "scale_border": "hairline=1px; thick=2px",
     "scale_weight": "light=300; regular=400; medium=500; bold=700; extrabold=800; black=900",
-    "scale_leading": "none=1; tight=1.2; snug=1.4; normal=1.7; loose=2",
-    "scale_measure": "s=700px; m=760px"
+    "scale_leading": "none=1; tight=1.2; snug=1.4; cozy=1.5; comfy=1.6; normal=1.7; relaxed=1.75; airy=1.8; loose=2",
+    "scale_measure": "s=700px; m=760px",
+    "scale_alpha": "fondo-pagina-88=fondo-pagina 88%; ink-15=ink 15%",
+    "scale_shadow": "10=0 4px 10px color-mix(in srgb, var(--wp--preset--color--ink) 20%, transparent); 20=2px 2px 10px color-mix(in srgb, var(--wp--preset--color--ink) 20%, transparent); 30=color-mix(in srgb, var(--wp--preset--color--ink) 12%, transparent) 0px 24px 72px -12px",
+    "scale_blur": "s=6px"
   },
   "huecos": {
     "sombras": {
-      "razon": "El Core no tiene escala de sombras (pregunta Q3 abierta en la espec): no se inventa una.",
-      "literales": [
-        {
-          "valor": "color-mix(in srgb, var(--wp--preset--color--ink) 12%, transparent) 0px 24px 72px -12px",
-          "veces": 1
-        },
-        {
-          "valor": "2px 2px 10px color-mix(in srgb, var(--wp--preset--color--ink) 20%, transparent)",
-          "veces": 1
-        },
-        {
-          "valor": "0 4px 10px color-mix(in srgb, var(--wp--preset--color--ink) 20%, transparent)",
-          "veces": 2
-        }
-      ]
+      "razon": "Ya no es un hueco: las sombras que el sitio usa son los pasos de la escala `shadow` (settings.shadow.presets). Quedaría aquí una sombra que no sea una medida con un color de la paleta.",
+      "literales": []
     },
     "interlineadoAbsoluto": {
       "razon": "Interlineado en píxeles (el sitio usa 40 px en el encabezado): es una altura fija, no un interlineado; queda sin escala.",

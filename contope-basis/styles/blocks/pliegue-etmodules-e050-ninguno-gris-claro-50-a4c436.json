@@ -1,0 +1,13 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/theme.json",
+  "version": 3,
+  "title": "Pliegue (ícono y estado abierto)",
+  "slug": "pliegue-etmodules-e050-ninguno-gris-claro-50-a4c436",
+  "blockTypes": [
+    "core/accordion-item"
+  ],
+  "styles": {
+    "css": "& > .wp-block-accordion-heading .wp-block-accordion-heading__toggle-icon { font-size: 0; width: var(--wp--preset--spacing--50); height: var(--wp--preset--spacing--50); background-color: var(--wp--preset--color--gris-claro); -webkit-mask: url(/wp-content/uploads/contope-iconos/icono-etmodules-e050.svg) center / contain no-repeat; mask: url(/wp-content/uploads/contope-iconos/icono-etmodules-e050.svg) center / contain no-repeat; transform: none; }\n&.is-open > .wp-block-accordion-heading .wp-block-accordion-heading__toggle-icon { display: none; }\n&.is-open { background-color: var(--wp--preset--color--fondo-pagina) !important; }\n&.is-open > .wp-block-accordion-heading { color: var(--wp--preset--color--dark) !important; }"
+  },
+  "_generado": "scripts/basis/componer-bloques.mjs"
+}

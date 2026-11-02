@@ -1,0 +1,13 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/theme.json",
+  "version": 3,
+  "title": "Alto mínimo por punto de quiebre",
+  "slug": "altura-321-255-264",
+  "blockTypes": [
+    "core/group"
+  ],
+  "styles": {
+    "css": "min-height: 321px;"
+  },
+  "_generado": "scripts/basis/componer-bloques.mjs"
+}

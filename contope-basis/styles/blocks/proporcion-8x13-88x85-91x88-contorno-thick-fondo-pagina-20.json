@@ -1,0 +1,13 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/theme.json",
+  "version": 3,
+  "title": "Imagen: contorno y proporción",
+  "slug": "proporcion-8x13-88x85-91x88-contorno-thick-fondo-pagina-20",
+  "blockTypes": [
+    "core/image"
+  ],
+  "styles": {
+    "css": "& img { aspect-ratio: 8/13; object-fit: cover; }\n& img { outline: var(--wp--custom--border--thick) solid var(--wp--preset--color--fondo-pagina); outline-offset: var(--wp--preset--spacing--20); }"
+  },
+  "_generado": "scripts/basis/componer-bloques.mjs"
+}

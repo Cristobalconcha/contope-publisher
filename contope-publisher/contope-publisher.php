@@ -56,6 +56,7 @@ require_once COD_PUBLISHER_DIR . 'includes/class-cod-divisor.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-icono.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-iconos-catalogo.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-iconos-rest.php';
+require_once COD_PUBLISHER_DIR . 'includes/class-cod-iconos-de-bloque.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-imagen-progresiva.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-diseno-hoja.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-mapa.php';
@@ -136,6 +137,7 @@ add_action('plugins_loaded', static function (): void {
     (new COD_Medicion())->register();
     (new COD_SVG())->register();
     (new COD_Iconos_Rest())->register();
+    (new COD_Iconos_De_Bloque())->register();
     (new COD_Imagen_Progresiva())->register();
     (new COD_Block_Lienzo())->register();
     (new COD_Block_Cuadrantes())->register();

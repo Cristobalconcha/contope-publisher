@@ -1,0 +1,13 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/theme.json",
+  "version": 3,
+  "title": "Fondo desenfocado",
+  "slug": "desenfoque-s",
+  "blockTypes": [
+    "core/columns"
+  ],
+  "styles": {
+    "css": "backdrop-filter: blur(var(--wp--custom--blur--s));"
+  },
+  "_generado": "scripts/basis/componer-bloques.mjs"
+}

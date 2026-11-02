@@ -214,7 +214,7 @@ en `uploads/iconos-divi/` y las formas del divisor en `uploads/divisores/` y `up
    `basis-tokens`** (ver 5 y 13; el parche contra `main` está en `docs/`), CookieAdmin y los temas `contope-canvas` y `contope-basis`.
 1b. El sitio de destino en **español** (los textos de los bloques de WordPress, como «No hay comentarios que mostrar.», salen del idioma del
    sitio) y con sus entradas reales: el buscador y las listas de la barra lateral de `basis-carpas-industriales` las dibuja WordPress con lo que haya.
-2. Copiar `uploads/2025/07/*`, `uploads/divisores/*`, `uploads/formas/*` (`scripts/instalar-formas-de-divisor.php`) y `uploads/iconos-divi/*`.
+2. Copiar `uploads/2025/07/*`, `uploads/divisores/*`, `uploads/formas/*` (`scripts/instalar-formas-de-divisor.php`) `uploads/iconos-divi/*` y, para los bloques, **`uploads/contope-iconos/*`** (los glifos del set como `icono-<nombre>.svg`, más el «+» y el «−» del pliegue: los copia `componer-bloques.mjs`; el plugin los registra como íconos del bloque `core/icon`, colección `contope`). El tema `contope-basis` tiene que llevar su carpeta **`styles/blocks/`** (los estilos de bloque registrados) y su `theme.json` completo (paleta con transparencias, sombras, desenfoques, escalas y el CSS entre marcas de los puntos de quiebre).
 3. `SITIO=… AUTH_FILE=… node scripts/basis/aplicar.mjs` (todo por el canal MCP y REST; no sube ningún guion).
 3b. **Antes de aplicar, declarar las definiciones de estilo del tema** (ContOpe → Configuración → «Definiciones de estilo del tema»: ícono, modo claro, paleta, Títulos = Big Shoulders Display, Cuerpo = Open Sans, Acento = Montserrat, ancho máximo 1080 px, movimiento). Sin ellas las variables `--cod-*` que usa el diseño quedan sin resolver y el sitio se ve sin color ni tipografía; `definiciones-del-set.php` las deja en el local con los valores exactos (léanse de ahí). El plugin del destino tiene que ser el de este repositorio (color-mix y familias de Google).
 4. Poner la clave de Mapbox (Configuración → Mapa: con ella el mapa de Contactos es el de verdad), la casilla real de destino del
@@ -236,43 +236,77 @@ en `enforce`. Los documentos Canvas de las páginas quedan intactos en la base (
 ### Las escalas (`escalas-del-sitio.mjs` → `escalas.json` → definiciones → theme.json)
 
 Medido: **502 valores literales** en las composiciones (290 espaciado, 89 peso/interlineado, 65 tamaño, 26 radio, 15 ancho, 11 borde, 6 sombra; 0 color,
-0 familia). Cada escala se deriva de lo que el sitio usa; el informe de cuánto se aparta cada valor medido de su paso está en `escalas.json`.
+0 familia) más 2 colores con transparencia y 1 desenfoque. Cada escala se deriva de lo que el sitio usa; el informe de cuánto se aparta cada valor
+medido de su paso está en `escalas.json`. **El espaciado y los tamaños de letra son «escritorio / tablet / celular»** (un paso con su valor en cada
+punto de quiebre del lienzo: tablet 768 a 1023, celular hasta 767): WordPress imprime UNA variable por paso y el CSS del tema (`styles.css` del
+`theme.json`, entre marcas) la redefine dentro de cada punto de quiebre. El bloque no cambia (`fontSize: "160"`, `var:preset|spacing|200`).
 
 | escala | pasos | de cuántos literales salió |
 |---|---|---|
-| espaciado (`--wp--preset--spacing--*`) | 10=4, 20=10, 30=16, 40=20, 50=24, 60=30, 70=40, 80=50, 90=56, 100=72, 110=128 px y `gutter` (el margen de una fila: 80 % con tope de 1080) | 263 (162 exactos, 101 acercados, el mayor a 4,6 px) + 12 filas |
-| tamaños de letra (`--wp--preset--font-size--*`) | 10=12, 20=14, 30=16, 40=18, 50=20, 60=24, 70=28, 80=32, 90=40, 100=50, 110=56, 120=80 px (los de 20 px en adelante, fluidos hasta el mínimo que usa el original en el celular) | 57 (48 exactos) |
+| espaciado (`--wp--preset--spacing--*`) | 31 pasos (desktop/tablet/celular en px; 16 con valor propio en un punto de quiebre): 10=0/0/20; 20=4; 30=10; 40=12; 50=16; 60=20/19/20; 70=20/20/19; 80=20; 90=24/0/0; 100=24; 110=24/30/20; 120=27; 130=27/30/30; 140=30/0/0; 150=30/10/10; 160=30; 170=40/30/20; 180=40; 190=50; 200=54/50/50; 210=54/54/32; 220=54; 230=56/0/0; 240=56/50/50; 250=56; 260=59.39/0/0; 270=59.39/30/20; 280=59.39; 290=72; 300=128/69.12/35.37; 310=128; y `gutter` (el margen de una fila: 80 % con tope de 1080) | 263 (206 exactos, 57 acercados al paso de escritorio, el mayor a 4.6 px) + 12 filas |
+| tamaños de letra (`--wp--preset--font-size--*`) | 20 pasos, todos EXACTOS (ya no se redondean al escritorio; 9 con tamaño propio en tablet o celular): 10=12; 20=14; 30=16/15/14; 40=16; 50=18/16/14; 60=18; 70=20/16/14; 80=20; 90=22; 100=24; 110=26; 120=28/15/14; 130=30; 140=32; 150=42; 160=50/28/20; 170=50/40/32; 180=50/50/34; 190=55/55/39; 200=80/50/28 | 134 textos |
 | radios (`--wp--custom--radius--*`) | xs 3, s 6, m 8, l 10 px, circle 50 %, pill 9999 px | 25 (todos exactos) |
 | bordes (`--wp--custom--border--*`) | hairline 1 px, thick 2 px | 11 |
 | pesos (`--wp--custom--typography--font-weight--*`) | light 300, regular 400, medium 500, bold 700, extrabold 800, black 900 | 40 |
-| interlineados (`--wp--custom--typography--line-height--*`) | none 1, tight 1,2, snug 1,4, normal 1,7, loose 2 | 37 (31 exactos) |
+| interlineados (`--wp--custom--typography--line-height--*`) | none 1, tight 1.2, snug 1.4, cozy 1.5, comfy 1.6, normal 1.7, relaxed 1.75, airy 1.8, loose 2 (se sumaron 1,5, 1,6, 1,75 y 1,8: un interlineado distinto mueve el salto de renglón) | 37 (37 exactos) |
 | medidas de texto (`--wp--custom--layout--measure--*`) | s 700, m 760 px (el 1080 ya es `--wp--style--global--content-size`) | 2 |
+| transparencias de la paleta (`--wp--preset--color--*`, en `settings.color.palette`) | fondo-pagina-88 = fondo-pagina 88%, ink-15 = ink 15% | 2 |
+| sombras (`--wp--preset--shadow--*`, en `settings.shadow.presets`) | 3 pasos: 10 = 0 4px 10px ink 20 %; 20 = 2px 2px 10px ink 20 %; 30 = ink 12 % 0px 24px 72px -12px | 4 |
+| desenfoques (`--wp--custom--blur--*`) | s = 6px | 1 |
 
-### Huecos (listados, no inventados)
+### Cómo se cerró cada regresión de la comparación antes/después (segunda pasada, 1-nov-2026)
 
-- **Sombras:** 4 literales (3 sombras distintas). El Core no tiene escala de sombras (pregunta Q3 abierta); el registro ya no admite las sombras de fábrica de
-  WordPress (`natural`, `deep`…). Quedan sin sombra: las tarjetas del formulario y del mapa de Contactos, el botón «Contactanos hoy».
-- **Interlineado en píxeles** (`line-height: 40px`, 3 usos, sólo en el encabezado): es una altura fija, no un interlineado.
-- **Colores con alfa** (`color-mix(... 88 %, transparent)`): la paleta no declara variantes con transparencia. La caja de «Características» sale con fondo sólido
-  (el original dejaba ver el video a través, con desenfoque).
-- **Degradados:** los dos que usa el sitio (color→transparente) se declararon como presets del tema (`settings.color.gradients`, en `theme.json`), porque
-  `core/cover` sólo acepta un degradado por slug. No están en las definiciones del set (no hay un campo de degradados): son un hueco de las definiciones.
-- **Variante del formulario:** las ~70 variables (`settings.custom.form`) viven en `contope-basis/theme.json`, generadas de la medición del formulario de
-  Gravity. No están en las definiciones del set (Q3: el Core no expresa «variantes con datos»). Esos nombres son `neutro` en el registro: no sirven como valor de diseño en ninguna clase.
+Regla del dueño: el diseño sólo entra como referencia a lo que el sistema define; si algo no se puede expresar, **se amplía el sistema**, nunca se rodea con un
+literal, WP-CLI, la base ni apagando la compuerta (`enforce` en todas las escrituras). Cada ampliación tiene su prueba.
 
-### Diferencias visibles respecto del sitio anterior (lista completa en `salida/bloques/perdidas.json`)
+| regresión | por qué pasaba | ampliación del sistema que la cerró |
+|---|---|---|
+| **Características** (recuadro blanco sólido, enorme, sin márgenes; títulos de pliegue sin relleno, peso ni «+» rojo) | el contenedor del video no centraba su contenido (`flow`, no `constrained`); el color con transparencia se aplanaba a un blanco sólido; la foto no descontaba su `calc(100 % − 30 px)`; la alineación vertical de una columna se perdía; el pliegue perdía su relleno, el peso 700 del propio título y el ícono | contenedor **`constrained`** (la caja «100 % con tope» queda centrada con su relleno por dentro); escala de **transparencias** (`fondo-pagina-88` es un color de la paleta); escala de **desenfoques** + estilo de bloque `desenfoque-s`; margen derecho de la foto; `verticalAlignment` por columna; relleno del bloque `core/accordion`; título con su peso; estilo de bloque **`pliegue-…`** (el «+» rojo de 14 px sale de la parte `icono`: color de la paleta, paso de espaciado y el dibujo del set) |
+| **Opciones comerciales** (íconos blancos desaparecidos) | un SVG puesto como imagen conserva el color de su archivo (negro) y no puede tomar uno de la paleta | **`core/icon`** (la familia «ícono» de WordPress 7.1) + `COD_Iconos_De_Bloque`: colección `contope` con los glifos del set; `textColor: "fondo-pagina"` |
+| **Soluciones inteligentes** (fotos sin el marco blanco de 2 px a 4 px) | no hay atributo de bloque ni escala para `outline` | **estilo de bloque registrado** de `core/image` (`…contorno-thick-fondo-pagina-20`): `outline` con el paso `thick` de la escala de bordes, un color de la paleta y un paso del espaciado; no admite un valor libre |
+| **Descubre más sobre nuestras carpas** (degradado oscuro→gris claro en vez de oscuro→naranja) | el original apila un color de fondo bajo un degradado «color→transparente»; el preset de WordPress REEMPLAZA el fondo, así que el naranja se perdía | el preset se declara «ink → accent» (es lo que se ve: un degradado a transparente sobre un fondo opaco termina en ese fondo) |
+| **Ícono del pliegue** (FAQ: «+» en círculo gris que se esconde al abrir) | `core/accordion` trae su propio «+» de texto | estilo de bloque `pliegue-…` con el glifo del set como máscara, color de la paleta y paso de espaciado; el estado abierto (fondo blanco, título oscuro) sale de las partes en estado «current» |
+| **Divisor curvo de Preguntas frecuentes** | no hay bloque equivalente | estilo de bloque `divisor-abajo-…` de `core/group`: la forma del sitio (SVG de Medios) como máscara, con un color de la paleta |
+| **Barra lateral** (buscador, entradas y comentarios recientes) | las «partes» de un bloque de WordPress no tienen atributo de bloque | estilo de bloque `partes-…` de `core/search`, `core/latest-posts` y `core/latest-comments`: cada declaración medida se traduce a una referencia al sistema |
+| **Términos y privacidad** (texto pegado a la izquierda, 24 px del borde) | el tope de 760 px con `margin: auto` se tradujo a «contenido a la izquierda»; y el relleno de 24 px iba por FUERA del tope (el original mide el tope con `border-box`) | la sección es `constrained` con la medida `--wp--custom--layout--measure--m` (la caja queda centrada y el relleno por dentro) |
+| **Tamaños de título y cuerpo por punto de quiebre** | los tamaños de bloque son uno solo (fluido); el original define uno por punto de quiebre | escalas «escritorio / tablet / celular» (arriba) |
+| **Relleno, margen y separación por punto de quiebre** | igual | escala de espaciado «escritorio / tablet / celular» |
+| **Proporción de las fotos en tablet y celular** | `core/image` tiene UNA proporción | estilo de bloque con la proporción de escritorio y, en el CSS del tema (entre marcas), la de tablet y celular: sólo la clase del estilo registrado y `aspect-ratio` |
+| **Sombras y desenfoque** | el Core no tiene escala de sombras (Q3) | escalas de **sombras** (`settings.shadow.presets`; `style.shadow`) y de **desenfoques**; `contope/mapa` declara el soporte de sombra de Gutenberg |
 
-1. **Íconos de «Opciones comerciales»** (carrito, bodega, reloj de arena): salen como imagen SVG con el color de su archivo (negro), no blancos. `core/html` no guarda el
-   SVG en línea (el editor serializa vacío) y ningún bloque recolorea un SVG desde la paleta.
-2. **Acordeón:** es `core/accordion`; trae su ícono (chevron/“+”) y no el glifo ETmodules `e050` del original (ni lo esconde al abrir). El comportamiento (abrir, cerrar,
-   un solo pliegue abierto) es el del bloque nativo, con su API de interactividad.
-3. **Contorno de las fotos** (2 px blanco, separado 4 px) de «Soluciones inteligentes»: no hay atributo de bloque ni escala para `outline`.
-4. **Sombras** (ver hueco) y el **desenfoque** (`backdrop-filter`) de la caja de «Características».
-5. **Divisor curvo** de la cabecera de Preguntas frecuentes: no tiene bloque equivalente; la cabecera termina recta.
-6. **Barra lateral de `basis-carpas-industriales`:** los bloques de WordPress (`core/search`, `latest-posts`, `latest-comments`) se dibujan con el estilo del tema; las
-   «partes» con las que antes se les daba forma (etiqueta, entrada, botón, lista, enlace…) no tienen atributo de bloque.
-7. **Tamaños por punto de quiebre:** el original definía un tamaño distinto en escritorio, tablet y celular; los bloques usan tamaños fluidos (mínimo = lo que el original
-   usa en celular). A 768 y 393 el cuerpo de texto y los títulos pueden diferir unos píxeles. Lo mismo el relleno de las secciones (54 en escritorio y 50 en celular: un solo paso, 56).
-8. **Columnas:** `core/columns` apila a los 782 px; el original apilaba a 767. A 768 las columnas ya están apiladas en ambos.
-9. **Valores acercados a la escala:** 101 de 263 medidas de espaciado quedaron a menos de 5 px de su paso (el relleno de 27 px de las cajas pasó a 24; las separaciones de 59 px entre columnas a 56).
-10. **Tarjeta del mapa y del formulario en Contactos:** sin el radio ni la sombra de la caja del mapa; las columnas del formulario y del mapa dividen el ancho 61/39 sin descontar la separación.
+### Huecos que SIGUEN abiertos (listados, no inventados)
+
+- **Interlineado en píxeles** (`line-height: 40px`, 3 usos, sólo en el encabezado, que sigue siendo una región del lienzo): es una altura fija, no un interlineado.
+- **Variante del formulario:** las ~70 variables (`settings.custom.form`) viven en `contope-basis/theme.json`, generadas de la medición del formulario de Gravity. No
+  están en las definiciones del set (el Core no expresa «variantes con datos»). Esos nombres son `neutro` en el registro: no sirven como valor de diseño en ninguna clase.
+- **Degradados:** los dos que usa el sitio (`texto-cuerpo → transparente` sobre la foto de la portada y `ink → accent`) se declaran como presets del tema
+  (`settings.color.gradients`) desde `componer-bloques.mjs`, no desde las definiciones (no hay un campo de degradados).
+- **Relleno derecho en porcentaje** (`padding-right: 5,499 %` de una columna de la barra lateral): la escala de espaciado es en px.
+- **Ancho propio en tablet** de la foto grande de «Características» (704 px centrada con un margen calculado): el bloque de imagen tiene un solo ancho.
+- **Columnas:** `core/columns` apila a los 782 px y el original a los 767 (entre 768 y 781 px las columnas ya están apiladas en el local).
+- **Azul de la portada, verde del botón de WhatsApp y azul del botón de ayuda al pasar el mouse, ámbar del botón «Enviar»:** colores del original que no están en la
+  paleta (decisión del dueño, ver arriba).
+- **Varias variaciones de bloque a la vez:** WordPress procesa UN estilo por bloque, así que lo que una foto necesita (contorno y proporción) se junta en un solo estilo.
+
+### Diferencias visibles que quedan respecto del original (medidas con `comparar-vivo.mjs`, original en vivo)
+
+Corrida del 1-nov-2026 (original en vivo, local en `wp-local-basis`, plugin 0.3.85 + lo «sin publicar»), con `comparar-vivo.mjs todas todos` y `capturar-bloques.mjs`.
+Las láminas «antes | después» están en `Sesión Claude/entregables/basis/bloques/` (`antes/` es el sitio anterior dibujado por el lienzo, `despues/` el de bloques;
+la primera pasada de bloques, con las regresiones, quedó en `primera-pasada/`).
+
+| página | ancho | alto original / local | diferencia |
+|---|---|---|---|
+| inicio | 1440 / 768 / 393 | 4381 / 4382 · 5734 / 5737 · 5777 / 5778 | +1 / +3 / +1 (antes de esta pasada: −36 / +480 / +384) |
+| basis-carpas-industriales | 1440 / 768 / 393 | 950 / 950 · 950 / 950 · 852 / 852 | 0 / 0 / 0 |
+| preguntas-frecuentes | 1440 / 768 / 393 | 1753 / 1755 · 2586 / 2587 · 3202 / 3205 | +2 / +1 / +3 (antes: −57 / +100 / −136) |
+| contactos | 1440 / 768 / 393 | 1354 / 1356 · 2313 / 2313 · 2654 / 2654 | +2 / 0 / 0 |
+| terminos-y-privacidad (el sitio anterior, sin original en vivo) | 1440 / 768 / 393 | 9801 / 9826 · 9931 / 9956 · 15367 / 15392 | +25 en los tres (+0,3 %); antes de esta pasada 7790 / 8092 / 13518: la columna de texto quedaba pegada a la izquierda y sin la separación de 16 px del motor entre sus hijos, y las tablas traían las líneas de `core/table` |
+
+Todos los textos, en todas las páginas y anchos, tienen el tamaño, el peso, el interlineado y la familia del original (0 diferencias de tipografía por punto de quiebre).
+Lo que queda a la vista, y por qué:
+
+- **Colores que la paleta redondeó al más cercano** (decisión ya tomada, ver «El sitio está gobernado por el set»): el texto de los párrafos de la portada (#3C3A47 → #222222), el negro puro de los títulos de la columna de «Características» (#000000 → `ink` #0E0C19), los grises de las etiquetas del formulario, el azul del velo de la portada (gris), el ámbar del botón «Enviar» (naranja).
+- **Sombras:** el original usa `rgba(0,0,0,.12)` y `rgba(0,0,0,.2)`; la escala usa el negro del set (`ink`) a la misma opacidad (el tinte es 14, 12, 25).
+- **Barra lateral de `basis-carpas-industriales`:** su texto queda 24 px a la izquierda del original (la columna del contenido lleva un relleno derecho de 5,499 %: la escala de espaciado es en px).
+- **Cajas sin pareja** que la herramienta lista y las láminas confirman que no se ven: el contenedor `main` del lienzo, el `<input>` y el botón del buscador (WordPress los dibuja con otro DOM), los textos de los pliegues cerrados (la herramienta los cuenta como visibles en WordPress; las láminas y la auditoría confirman que no se ven), el mapa de Mapbox.
+- **Desplazamientos de ±1 a ±3 px** en alto de página: el redondeo de las cajas medidas.

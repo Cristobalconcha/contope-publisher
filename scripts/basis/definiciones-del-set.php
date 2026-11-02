@@ -20,7 +20,8 @@
  * borde, pesos, interlineados y medidas de texto. Con `--theme-json` el guion además escribe esos presets en
  * `contope-basis/theme.json` (para que sigan estilados con el plugin apagado); con el plugin activo el mismo filtro
  * (`wp_theme_json_data_theme`) los toma de las definiciones, así que el theme.json y las definiciones no pueden decir cosas distintas.
- * Las sombras no tienen escala (el Core no la tiene: pregunta Q3) y quedan como hueco.
+ * Las transparencias de la paleta, las sombras y los desenfoques también son escalas (`scale_alpha`, `scale_shadow`, `scale_blur`), y el
+ * espaciado y los tamaños de letra admiten un valor por punto de quiebre (`escritorio/tablet/celular`): su CSS va en `styles.css` del theme.json.
  *
  * Es idempotente: * Es idempotente: correrlo dos veces deja lo mismo. Sólo toca esa opción.
  *
@@ -135,7 +136,27 @@ if (in_array('--theme-json', $argv, true)) {
     $tema['settings']['spacing']['spacingSizes'] = $aj['spacing']['spacingSizes'] ?? [];
     $tema['settings']['spacing']['defaultSpacingSizes'] = false;
     $tema['settings']['typography']['fontSizes'] = $aj['typography']['fontSizes'] ?? [];
+    // La variante del formulario (`custom.form`) no es una escala: la escribe `componer-bloques.mjs`; aquí se conserva.
+    $form = $tema['settings']['custom']['form'] ?? null;
     $tema['settings']['custom'] = $aj['custom'] ?? [];
+    if ($form !== null) {
+        $tema['settings']['custom']['form'] = $form;
+    }
+    // Las transparencias de la paleta se SUMAN a los colores del tema (las que ya había, derivadas, se rehacen).
+    $propios = array_values(array_filter($tema['settings']['color']['palette'] ?? [], static fn ($c): bool => strpos((string) ($c['color'] ?? ''), 'color-mix(') !== 0));
+    $tema['settings']['color']['palette'] = array_merge($propios, $aj['color']['palette'] ?? []);
+    // Los pasos con punto de quiebre (tamaños y espaciado): su CSS (variables de la escala dentro de cada punto de quiebre) va entre marcas en styles.css.
+    $cssTema = COD_Theme_Definitions::css_con_escalas_con_quiebres((string) ($tema['styles']['css'] ?? ''));
+    if ($cssTema !== '') {
+        $tema['styles']['css'] = $cssTema;
+    } else {
+        unset($tema['styles']['css']);
+    }
+    if (!empty($aj['shadow']['presets'])) {
+        $tema['settings']['shadow'] = ['defaultPresets' => false, 'presets' => $aj['shadow']['presets']];
+    } else {
+        unset($tema['settings']['shadow']);
+    }
     $json = wp_json_encode($tema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
     $json = preg_replace_callback('/^( +)/m', static fn ($m) => str_repeat(' ', intdiv(strlen($m[1]), 2)), $json);
     file_put_contents($ruta, $json . "\n");

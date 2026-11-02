@@ -1,0 +1,13 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/theme.json",
+  "version": 3,
+  "title": "Divisor de sección",
+  "slug": "divisor-abajo-gris-oscuro-divisor-7ee5846d",
+  "blockTypes": [
+    "core/group"
+  ],
+  "styles": {
+    "css": "position: relative;\n&::after { content: \"\"; position: absolute; left: 0; right: 0; bottom: 0; height: 2.5vw; background-color: var(--wp--preset--color--gris-oscuro); -webkit-mask: url(/wp-content/uploads/divisores/divisor-7ee5846d.svg) center / 100% 100% no-repeat; mask: url(/wp-content/uploads/divisores/divisor-7ee5846d.svg) center / 100% 100% no-repeat; pointer-events: none; }"
+  },
+  "_generado": "scripts/basis/componer-bloques.mjs"
+}

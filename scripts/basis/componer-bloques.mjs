@@ -20,7 +20,7 @@
  * hace falta una sesión de persona: se toma de wp-local-basis/ACCESO-LOCAL.md (CLAVE_HUMANA / USUARIO_HUMANO lo reemplazan).
  * Sólo toca el WordPress local de Basis.
  */
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, copyFileSync, unlinkSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -75,6 +75,49 @@ for (const slug of PAGINAS) {
   console.log(`${slug}: ${JSON.stringify(arboles[slug].bloques).match(/"name"/g).length} bloques, ${arboles[slug].perdidas} diferencias anotadas`);
 }
 
+// ------------------------------------------------------------------------------------------ íconos del repertorio del sitio
+// Los glifos (uploads/iconos-divi) y los dos dibujos del pliegue («+» y «−», los mismos trazos del motor del lienzo) viven en la carpeta
+// del set de íconos del plugin; el plugin los registra como íconos del bloque core/icon (colección «contope», COD_Iconos_De_Bloque).
+const CARPETA_ICONOS = path.join(uploads, 'contope-iconos');
+function copiarIconos() {
+  mkdirSync(CARPETA_ICONOS, { recursive: true });
+  const trazo = (d) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="${d}"/></svg>`;
+  writeFileSync(path.join(CARPETA_ICONOS, 'icono-mas.svg'), trazo('M11 5h2v14h-2zM5 11h14v2H5z'));
+  writeFileSync(path.join(CARPETA_ICONOS, 'icono-menos.svg'), trazo('M5 11h14v2H5z'));
+  for (const forma of T.iconosUsados) {
+    const origen = path.join(uploads, forma.replace(/^\/wp-content\/uploads\//, ''));
+    const nombre = path.basename(forma).toLowerCase();
+    if (existsSync(origen)) copyFileSync(origen, path.join(CARPETA_ICONOS, `icono-${nombre}`));
+    else console.error(`falta el glifo ${origen}`);
+  }
+}
+if (!SOLO.length) copiarIconos();
+
+// ------------------------------------------------------------------------------------------ estilos de bloque del tema
+// Cada estilo que el traductor pidió (contorno de una foto, desenfoque del fondo, ícono de un pliegue) es un archivo
+// styles/blocks/<nombre>.json del tema: un estilo de bloque REGISTRADO de WordPress. Sus declaraciones son sólo referencias al sistema.
+function escribirEstilosDeBloque() {
+  const carpeta = path.join(repo, 'contope-basis', 'styles', 'blocks');
+  mkdirSync(carpeta, { recursive: true });
+  const MARCA = 'scripts/basis/componer-bloques.mjs';
+  const vigentes = new Set();
+  let cambio = false;
+  for (const e of T.estilos.values()) {
+    const css = e.reglas.map((r) => (r.sel === '&' ? r.decls.map(([p, v]) => `${p}: ${v};`).join(' ') : `${r.sel} { ${r.decls.map(([p, v]) => `${p}: ${v};`).join(' ')} }`)).join('\n');
+    const archivo = path.join(carpeta, `${e.nombre}.json`);
+    vigentes.add(`${e.nombre}.json`);
+    const json = JSON.stringify({ $schema: 'https://schemas.wp.org/trunk/theme.json', version: 3, title: e.titulo, slug: e.nombre, blockTypes: [e.bloque], styles: { css }, _generado: MARCA }, null, 2) + '\n';
+    if (!existsSync(archivo) || readFileSync(archivo, 'utf8') !== json) { writeFileSync(archivo, json); cambio = true; }
+  }
+  // Los que ya no se usan (y los generó este guion) se quitan.
+  for (const f of readdirSync(carpeta)) {
+    if (!f.endsWith('.json') || vigentes.has(f)) continue;
+    try { if (JSON.parse(readFileSync(path.join(carpeta, f), 'utf8'))._generado === MARCA) { unlinkSync(path.join(carpeta, f)); cambio = true; } } catch { /* otro archivo */ }
+  }
+  return cambio;
+}
+const cambioEstilos = SOLO.length ? false : escribirEstilosDeBloque();
+
 // ------------------------------------------------------------------------------------------ el tema (degradados y variante del formulario)
 function actualizarTema() {
   const ruta = path.join(repo, 'contope-basis', 'theme.json');
@@ -91,6 +134,19 @@ function actualizarTema() {
     tema.settings.custom = tema.settings.custom || {};
     tema.settings.custom.form = Object.fromEntries(Object.entries(formularioTema).map(([k, v]) => [k, trad(v)]));
   }
+  // Lo que un estilo de bloque cambia en un punto de quiebre (la proporción de una imagen en tablet o celular) va en el CSS del tema,
+  // entre marcas, junto al de los tamaños de letra: sólo la clase del estilo registrado y la propiedad de proporción.
+  const MARCA = 'cod-estilos-responsivos';
+  const QUIEBRES = { tablet: '(min-width: 768px) and (max-width: 1023px)', movil: '(max-width: 767px)' };
+  const reglasResp = [];
+  for (const punto of ['tablet', 'movil']) {
+    const del = [...T.responsivos.values()].filter((r) => r.punto === punto);
+    if (del.length) reglasResp.push(`@media ${QUIEBRES[punto]}{${del.map((r) => `${r.clase}{${r.selector}:${r.decls}}`).join('')}}`);
+  }
+  const bloqueResp = reglasResp.length ? `/*${MARCA}*/${reglasResp.join('')}/*/${MARCA}*/` : '';
+  const sinMarcas = String(tema.styles.css ?? '').replace(new RegExp(`/\\*${MARCA}\\*/[\\s\\S]*?/\\*/${MARCA}\\*/`), '').trim();
+  const cssFinal = [sinMarcas, bloqueResp].filter(Boolean).join('\n');
+  if (cssFinal) tema.styles.css = cssFinal; else delete tema.styles.css;
   let json = JSON.stringify(tema, null, 2);
   if (crlf) json = json.replace(/\n/g, '\r\n');
   if (json + (crlf ? '\r\n' : '\n') === crudo || json === crudo) return false;
@@ -98,8 +154,8 @@ function actualizarTema() {
   return true;
 }
 if (!SIN_TEMA && !SOLO.length) {
-  if (actualizarTema()) {
-    console.log('theme.json actualizado (degradados y variante del formulario) → se copia al local');
+  if (actualizarTema() || cambioEstilos) {
+    console.log('tema actualizado (degradados, variante del formulario o estilos de bloque) → se copia al local');
     const r = spawnSync('node', [path.join(aqui, 'sincronizar-local.mjs')], { encoding: 'utf8' });
     if (r.status !== 0) { console.error(r.stdout + r.stderr); process.exit(1); }
   }
