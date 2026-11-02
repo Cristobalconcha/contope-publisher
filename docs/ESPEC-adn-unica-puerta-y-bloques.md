@@ -1012,6 +1012,13 @@ el sello del `theme.json` y el hash de `post_content` de las cinco páginas.
 
 ### 7.2 Subida a producción (sin MCP arriba)
 
+> **Corrección del dueño, 02-nov-2026:** la subida NO se hace por SQL ni por el Administrador de archivos. Se hace con
+> **Portabilidad** (exportar en el local, importar en la web): «migrar desde una instalación local a una remota es
+> exactamente lo mismo que migrar entre dos instalaciones». Vale igual para Econut. Consecuencia: el paquete de
+> Portabilidad tiene que llevar todo lo que hoy esta tabla sube a mano (ADN, `theme.json` generado, regiones y
+> páginas en bloques); eso es la fase **F1b (paquete `.ocdsite`)**, que pasa a ser requisito de F10. Los pasos de la
+> tabla siguen valiendo como **orden e invariantes**; la columna «Cómo» queda reemplazada por el import.
+
 Orden y por qué ninguno deja el sitio sin estilos:
 
 | # | Paso | Cómo | Invariante | Reversa |
@@ -1350,6 +1357,7 @@ Opciones: **(a)** abrir `dim2.req02` en el Core a roles adicionales con nombre l
 cubiertos (hay precedente: en `dim4.req01` «la lista queda ABIERTA por D12: lo cerrado es el SET (lo que el diseñador declaró es todo lo que hay), no el vocabulario que el manifiesto acepta»); es un
 cambio de manifiesto en versión menor; **(b)** normalizar Basis a 9 roles: varios títulos cambian de tamaño
 (p. ej. 55 → 50, 42 → 40, 30 → 28), con el desvío escrito en el informe de ajuste.
+**DECIDIDO por Cristóbal el 02-nov-2026: (a), ampliar el Core.**
 **Recomendación: (a)**, porque la migración se pidió "visualmente idéntica al original" y la armonización (b) es
 una decisión de diseño que se hace después, en Desktop, con muestras a la vista, no por un umbral del extractor.
 
@@ -1357,6 +1365,9 @@ una decisión de diseño que se hace después, en Desktop, con muestras a la vis
 del Core y no una función chica) o vía B provisoria (hoja de revisión + sello que ejecuto cuando tú lo digas en el
 chat, con huella). **Recomendación:** hacer las dos: F6 en paralelo, y la B sólo para Basis, con la hoja y su sha256
 guardados como evidencia. Dado el tamaño de F6, la B probablemente sea la vía real para Basis.
+
+**DECIDIDO por Cristóbal el 02-nov-2026 sobre Q3: (a), agregar al Core la escala de sombras y la diferencia por
+variante con datos. F4b y F8 dejan de estar bloqueadas por la decisión; ahora dependen de ese trabajo en el Core.**
 
 **Q3 (nueva, H6). Sombras y variantes con datos en el Core.** Hoy el Core **no puede expresar** (a) una escala de
 sombras con valores (`dim4.req04` es profundidad; `dim4.req05`, política de efectos) ni (b) una diferencia por variante
