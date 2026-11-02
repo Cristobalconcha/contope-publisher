@@ -823,7 +823,7 @@ CSS;
      * Estructura que arma el runtime dentro del grupo (raíz):
      *   [data-cod-mapa-estado="abierto"|"cerrado"]            la raíz
      *     [data-cod-mapa-rol="mini"]                          el botón con la imagen (se oculta al abrir)
-     *     …los hijos originales del grupo (la dirección escrita: siempre a la vista)
+     *     …los hijos originales del grupo (la dirección escrita: a la vista con el mapa cerrado; se ocultan al abrirlo, salvo en el mapa fijo)
      *     [data-cod-mapa-rol="grande"]                        el recuadro del mapa (oculto mientras está cerrado)
      *       .cod-mapa__lienzo                                 donde Mapbox dibuja
      *       .cod-mapa__estado                                 «Cargando…» o el aviso de que no llegó (con el enlace a «cómo llegar»)
@@ -863,6 +863,11 @@ CSS;
 /* Estructura (esto no se pisa): abierto esconde el mini y muestra el grande; cerrado, al revés. */
 {$cerrado} > {$grande}{display:none !important;}
 {$abierto} > {$mini}{display:none !important;}
+/* Abierto, se oculta todo lo demás del grupo (la dirección escrita del pie). Con el
+   mapa grande ocupando el ancho, la dirección quedaba al lado en una columna de
+   pocos caracteres (Basis, 2-nov-2026), y el globo del mapa ya la dice. El mapa
+   fijo está abierto siempre: ahí lo demás del grupo es contenido y se respeta. */
+{$abierto}:not([data-cod-mapa-fijo="1"]) > :not({$mini}):not({$grande}){display:none !important;}
 /* Abierto, la raíz reclama su ancho. El mapa grande mide 100% DE ESTA RAÍZ, y
    cerrada la raíz mide lo que mide el mini: 60px. Donde el sitio la haya puesto
    como elemento de una fila flexible —el caso normal: el mini al lado de la
