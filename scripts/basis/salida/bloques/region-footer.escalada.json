@@ -1,0 +1,1147 @@
+{
+  "design": {
+    "schemaVersion": 1,
+    "designId": "basis-web",
+    "expectedDesignRevision": 2,
+    "reviewState": "session",
+    "rules": [
+      {
+        "id": "s-0a8f53",
+        "kind": "surface",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "backgroundColor": "var(--wp--preset--color--gris)"
+        }
+      },
+      {
+        "id": "col-542b47",
+        "kind": "layout",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "mode": "stack",
+          "gap": "0",
+          "align": "stretch"
+        }
+      },
+      {
+        "id": "cl-04ba3c",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "padding-top": "0",
+            "padding-right": "0",
+            "padding-bottom": "0",
+            "padding-left": "0",
+            "min-width": "0px"
+          }
+        }
+      },
+      {
+        "id": "mg-a343db",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "margin-block-start": "0",
+            "margin-block-end": "0"
+          }
+        }
+      },
+      {
+        "id": "c-c3ef5d",
+        "kind": "color",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "c-fondo-pagina",
+          "color": "var(--cod-color-surface)",
+          "apply": "text"
+        }
+      },
+      {
+        "id": "sec-83739f",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "padding-top": "0",
+            "padding-bottom": "0",
+            "padding-left": "0",
+            "padding-right": "0",
+            "min-height": "120px"
+          }
+        }
+      },
+      {
+        "id": "fila-44e63a",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "width": "80%",
+            "max-width": "var(--wp--style--global--content-size)",
+            "margin-inline-start": "auto",
+            "margin-inline-end": "auto",
+            "padding-top": "var(--wp--preset--spacing--180)",
+            "padding-right": "0",
+            "padding-bottom": "var(--wp--preset--spacing--20)",
+            "padding-left": "0",
+            "margin-block-start": "0",
+            "margin-block-end": "0",
+            "display": "grid",
+            "grid-template-columns": "minmax(0, 168fr) minmax(0, 624fr) minmax(0, 168fr)",
+            "column-gap": "var(--wp--preset--spacing--280)",
+            "align-items": "start"
+          }
+        }
+      },
+      {
+        "id": "fila-175af7",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "grid-template-columns": "minmax(0, 1fr)",
+            "column-gap": "0",
+            "row-gap": "var(--wp--preset--spacing--160)"
+          }
+        }
+      },
+      {
+        "id": "cl-310207",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "padding-top": "var(--wp--preset--spacing--80)",
+            "padding-right": "0",
+            "padding-bottom": "var(--wp--preset--spacing--80)",
+            "padding-left": "0",
+            "min-width": "0px"
+          }
+        }
+      },
+      {
+        "id": "cl-fbeb8a",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "padding-right": "0",
+            "padding-left": "0"
+          }
+        }
+      },
+      {
+        "id": "img-a8fc03",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "width": "131px",
+            "max-width": "100%",
+            "margin-inline-start": "0",
+            "margin-inline-end": "0",
+            "height": "auto"
+          }
+        }
+      },
+      {
+        "id": "mg-7be022",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "margin-block-start": "calc(-1 * var(--wp--preset--spacing--120))",
+            "margin-block-end": "calc(-1 * var(--wp--preset--spacing--120))"
+          }
+        }
+      },
+      {
+        "id": "cl-1befc2",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "padding-right": "0",
+            "padding-left": "0"
+          }
+        }
+      },
+      {
+        "id": "t-4995fe",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "t-open-sans-12-500",
+          "family": "var(--cod-font-body)",
+          "fontSize": "var(--wp--preset--font-size--10)",
+          "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+          "lineHeight": "var(--wp--custom--typography--line-height--snug)",
+          "align": "start"
+        }
+      },
+      {
+        "id": "mg-dir-23e5f2",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "margin-block-start": "0",
+            "margin-block-end": "0",
+            "flex-grow": "0",
+            "flex-shrink": "1",
+            "flex-basis": "auto",
+            "min-width": "0px"
+          }
+        }
+      },
+      {
+        "id": "mapa-4d3ee2",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "display": "flex",
+            "flex-wrap": "nowrap",
+            "align-items": "center",
+            "row-gap": "var(--wp--preset--spacing--50)",
+            "column-gap": "var(--wp--preset--spacing--50)",
+            "justify-content": "flex-start"
+          }
+        }
+      },
+      {
+        "id": "mini-d36841",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "width": "60px",
+            "height": "60px",
+            "border-top-left-radius": "var(--wp--custom--radius--m)",
+            "border-top-right-radius": "var(--wp--custom--radius--m)",
+            "border-bottom-right-radius": "var(--wp--custom--radius--m)",
+            "border-bottom-left-radius": "var(--wp--custom--radius--m)",
+            "object-fit": "cover",
+            "display": "block",
+            "flex-shrink": "1",
+            "min-width": "0px"
+          }
+        }
+      },
+      {
+        "id": "mapa-ca1d42",
+        "kind": "interaction",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "behavior": "mapa"
+        }
+      },
+      {
+        "id": "mg-cod-6200d9",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "margin-block-start": "calc(-1 * var(--wp--preset--spacing--30))",
+            "margin-block-end": "var(--wp--preset--spacing--80)"
+          }
+        }
+      },
+      {
+        "id": "img-debbb6",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "width": "71px",
+            "max-width": "100%",
+            "margin-inline-start": "auto",
+            "margin-inline-end": "0",
+            "height": "auto"
+          }
+        }
+      },
+      {
+        "id": "img-5fa8d4",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "margin-inline-start": "var(--wp--preset--spacing--80)"
+          }
+        }
+      },
+      {
+        "id": "t-cecbd9",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "role": "t-open-sans-14-500",
+          "family": "var(--cod-font-body)",
+          "fontSize": "var(--wp--preset--font-size--20)",
+          "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+          "lineHeight": "var(--wp--custom--typography--line-height--tight)",
+          "align": "end"
+        }
+      },
+      {
+        "id": "racimo-i-196ced",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "margin-inline-start": "0"
+          }
+        }
+      },
+      {
+        "id": "racimo-i-6e120d",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "margin-inline-start": "0"
+          }
+        }
+      },
+      {
+        "id": "racimo-i-8bdadc",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "tablet",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "margin-inline-start": "0"
+          }
+        }
+      },
+      {
+        "id": "racimo-8c95a4",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "display": "flex",
+            "flex-wrap": "wrap",
+            "align-items": "center",
+            "row-gap": "var(--wp--preset--spacing--80)",
+            "column-gap": "var(--wp--preset--spacing--80)",
+            "justify-content": "flex-end"
+          }
+        }
+      },
+      {
+        "id": "fila-3ad2ce",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "tablet",
+          "state": "default"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "https://basisbodegas.com",
+              "rationale": "Transcrito de https://basisbodegas.com (Divi) por divi-a-contope: estilos computados medidos con el navegador."
+            }
+          ]
+        },
+        "status": "reviewed",
+        "value": {
+          "declarations": {
+            "grid-template-columns": "minmax(0, 1fr)",
+            "column-gap": "0",
+            "row-gap": "var(--wp--preset--spacing--160)"
+          }
+        }
+      },
+      {
+        "id": "bas-pie-fila-movil",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "value": {
+          "declarations": {
+            "width": "100%",
+            "padding-right": "var(--wp--preset--spacing--100)",
+            "padding-left": "var(--wp--preset--spacing--100)"
+          }
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "scripts/basis/correcciones.json",
+              "rationale": "En celular el pie dejaba 58 px a cada lado (80 % de ancho más 20 px de relleno por columna) y el mapa abierto medía 260 px; Econut deja 24. Todo el pie queda alineado a la izquierda y con interlineado de celular (Cristóbal, 2-nov)."
+            }
+          ]
+        },
+        "status": "reviewed"
+      },
+      {
+        "id": "bas-pie-texto-movil",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "value": {
+          "role": "pie-movil",
+          "family": "var(--cod-font-body)",
+          "fontSize": "var(--wp--preset--font-size--10)",
+          "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+          "lineHeight": "var(--wp--custom--typography--line-height--cozy)",
+          "align": "start"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "scripts/basis/correcciones.json",
+              "rationale": "En celular el pie dejaba 58 px a cada lado (80 % de ancho más 20 px de relleno por columna) y el mapa abierto medía 260 px; Econut deja 24. Todo el pie queda alineado a la izquierda y con interlineado de celular (Cristóbal, 2-nov)."
+            }
+          ]
+        },
+        "status": "reviewed"
+      },
+      {
+        "id": "bas-pie-credito-texto-movil",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "value": {
+          "role": "pie-credito-movil",
+          "family": "var(--cod-font-body)",
+          "fontSize": "var(--wp--preset--font-size--20)",
+          "fontWeight": "var(--wp--custom--typography--font-weight--medium)",
+          "lineHeight": "var(--wp--custom--typography--line-height--cozy)",
+          "align": "start"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "scripts/basis/correcciones.json",
+              "rationale": "En celular el pie dejaba 58 px a cada lado (80 % de ancho más 20 px de relleno por columna) y el mapa abierto medía 260 px; Econut deja 24. Todo el pie queda alineado a la izquierda y con interlineado de celular (Cristóbal, 2-nov)."
+            }
+          ]
+        },
+        "status": "reviewed"
+      },
+      {
+        "id": "bas-pie-credito-movil",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "value": {
+          "declarations": {
+            "justify-content": "flex-start"
+          }
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "scripts/basis/correcciones.json",
+              "rationale": "En celular el pie dejaba 58 px a cada lado (80 % de ancho más 20 px de relleno por columna) y el mapa abierto medía 260 px; Econut deja 24. Todo el pie queda alineado a la izquierda y con interlineado de celular (Cristóbal, 2-nov)."
+            }
+          ]
+        },
+        "status": "reviewed"
+      },
+      {
+        "id": "bas-pie-legal-barra",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "value": {
+          "declarations": {
+            "display": "flex",
+            "flex-wrap": "wrap",
+            "align-items": "center",
+            "justify-content": "center",
+            "row-gap": "var(--wp--preset--spacing--30)",
+            "column-gap": "var(--wp--preset--spacing--30)",
+            "width": "80%",
+            "max-width": "var(--wp--style--global--content-size)",
+            "margin-inline-start": "auto",
+            "margin-inline-end": "auto",
+            "margin-block-start": "var(--wp--preset--spacing--30)",
+            "padding-bottom": "var(--wp--preset--spacing--80)"
+          }
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "scripts/basis/correcciones.json",
+              "rationale": "Ley 21.719 (vigente desde el 1-dic-2026): el pie tiene que llevar siempre a la vista un enlace a los términos y la privacidad y otro para revisar o cambiar el consentimiento de cookies. CookieAdmin (versión gratis) no trae ícono flotante: este enlace es el único camino (Cristóbal, 2-nov)."
+            }
+          ]
+        },
+        "status": "reviewed"
+      },
+      {
+        "id": "bas-pie-legal-barra-movil",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "value": {
+          "declarations": {
+            "width": "100%",
+            "padding-right": "var(--wp--preset--spacing--100)",
+            "padding-left": "var(--wp--preset--spacing--100)",
+            "justify-content": "flex-start"
+          }
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "scripts/basis/correcciones.json",
+              "rationale": "Ley 21.719 (vigente desde el 1-dic-2026): el pie tiene que llevar siempre a la vista un enlace a los términos y la privacidad y otro para revisar o cambiar el consentimiento de cookies. CookieAdmin (versión gratis) no trae ícono flotante: este enlace es el único camino (Cristóbal, 2-nov)."
+            }
+          ]
+        },
+        "status": "reviewed"
+      },
+      {
+        "id": "bas-pie-legal-texto",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "value": {
+          "role": "pie-legal",
+          "family": "var(--cod-font-body)",
+          "fontSize": "var(--wp--preset--font-size--10)",
+          "fontWeight": "var(--wp--custom--typography--font-weight--regular)",
+          "lineHeight": "var(--wp--custom--typography--line-height--cozy)",
+          "align": "start"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "scripts/basis/correcciones.json",
+              "rationale": "Ley 21.719 (vigente desde el 1-dic-2026): el pie tiene que llevar siempre a la vista un enlace a los términos y la privacidad y otro para revisar o cambiar el consentimiento de cookies. CookieAdmin (versión gratis) no trae ícono flotante: este enlace es el único camino (Cristóbal, 2-nov)."
+            }
+          ]
+        },
+        "status": "reviewed"
+      },
+      {
+        "id": "bas-pie-legal-color",
+        "kind": "color",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "value": {
+          "role": "c-background",
+          "color": "var(--cod-color-surface)",
+          "apply": "text"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "scripts/basis/correcciones.json",
+              "rationale": "Ley 21.719 (vigente desde el 1-dic-2026): el pie tiene que llevar siempre a la vista un enlace a los términos y la privacidad y otro para revisar o cambiar el consentimiento de cookies. CookieAdmin (versión gratis) no trae ícono flotante: este enlace es el único camino (Cristóbal, 2-nov)."
+            }
+          ]
+        },
+        "status": "reviewed"
+      },
+      {
+        "id": "bas-pie-legal-punto",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "value": {
+          "declarations": {
+            "opacity": "0.5"
+          }
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "scripts/basis/correcciones.json",
+              "rationale": "Ley 21.719 (vigente desde el 1-dic-2026): el pie tiene que llevar siempre a la vista un enlace a los términos y la privacidad y otro para revisar o cambiar el consentimiento de cookies. CookieAdmin (versión gratis) no trae ícono flotante: este enlace es el único camino (Cristóbal, 2-nov)."
+            }
+          ]
+        },
+        "status": "reviewed"
+      },
+      {
+        "id": "bas-pie-preferencias",
+        "kind": "interaction",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "value": {
+          "behavior": "preferencias-cookies"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "scripts/basis/correcciones.json",
+              "rationale": "Ley 21.719 (vigente desde el 1-dic-2026): el pie tiene que llevar siempre a la vista un enlace a los términos y la privacidad y otro para revisar o cambiar el consentimiento de cookies. CookieAdmin (versión gratis) no trae ícono flotante: este enlace es el único camino (Cristóbal, 2-nov)."
+            }
+          ]
+        },
+        "status": "reviewed"
+      }
+    ]
+  },
+  "composition": {
+    "schemaVersion": 2,
+    "nodes": [
+      {
+        "id": "footer-87",
+        "kind": "footer",
+        "ruleIds": [
+          "sec-83739f",
+          "s-0a8f53"
+        ],
+        "children": [
+          {
+            "id": "group-86",
+            "kind": "group",
+            "ruleIds": [
+              "fila-44e63a",
+              "fila-175af7",
+              "fila-3ad2ce",
+              "bas-pie-fila-movil"
+            ],
+            "children": [
+              {
+                "id": "group-78",
+                "kind": "group",
+                "ruleIds": [
+                  "col-542b47",
+                  "cl-310207",
+                  "cl-fbeb8a"
+                ],
+                "children": [
+                  {
+                    "id": "image-77",
+                    "kind": "image",
+                    "ruleIds": [
+                      "img-a8fc03",
+                      "mg-7be022"
+                    ],
+                    "content": {
+                      "assetUrl": "/wp-content/uploads/2025/07/aRecurso-12.png",
+                      "alt": ""
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "group-81",
+                "kind": "group",
+                "ruleIds": [
+                  "col-542b47",
+                  "cl-04ba3c",
+                  "cl-1befc2"
+                ],
+                "children": [
+                  {
+                    "id": "group-80",
+                    "kind": "group",
+                    "ruleIds": [
+                      "mapa-ca1d42",
+                      "mapa-4d3ee2",
+                      "mg-cod-6200d9"
+                    ],
+                    "children": [
+                      {
+                        "id": "paragraph-79",
+                        "kind": "paragraph",
+                        "ruleIds": [
+                          "t-4995fe",
+                          "c-c3ef5d",
+                          "mg-dir-23e5f2",
+                          "bas-pie-texto-movil"
+                        ],
+                        "content": {
+                          "text": "Av 18 de Septiembre sn Hijuela 2\nFundo San Rafael - Sector Nuevo Sendero,\nPaine, Región Metropolitana"
+                        }
+                      }
+                    ],
+                    "partes": {
+                      "mini": [
+                        "mini-d36841"
+                      ]
+                    },
+                    "content": {
+                      "lat": -33.80413624737442,
+                      "lng": -70.68161681668681,
+                      "zoom": 17,
+                      "mini": "/wp-content/uploads/2025/07/Mini-mapa.png",
+                      "etiqueta": "Abrir el mapa de ubicación",
+                      "globo": "Planta Econut Av 18 de Septiembre sn Hijuela 2 Fundo San Rafael - Sector Nuevo Sendero, Paine, Región Metropolitana www.econut.cl"
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "group-85",
+                "kind": "group",
+                "ruleIds": [
+                  "col-542b47",
+                  "cl-04ba3c",
+                  "cl-1befc2"
+                ],
+                "children": [
+                  {
+                    "id": "group-84",
+                    "kind": "group",
+                    "ruleIds": [
+                      "racimo-8c95a4",
+                      "bas-pie-credito-movil"
+                    ],
+                    "children": [
+                      {
+                        "id": "paragraph-83",
+                        "kind": "paragraph",
+                        "ruleIds": [
+                          "t-cecbd9",
+                          "c-c3ef5d",
+                          "mg-a343db",
+                          "bas-pie-credito-texto-movil"
+                        ],
+                        "content": {
+                          "text": "Diseño y\ndesarrollo"
+                        }
+                      },
+                      {
+                        "id": "image-82",
+                        "kind": "image",
+                        "ruleIds": [
+                          "img-debbb6",
+                          "img-5fa8d4",
+                          "mg-a343db",
+                          "racimo-i-196ced",
+                          "racimo-i-8bdadc",
+                          "racimo-i-6e120d"
+                        ],
+                        "content": {
+                          "assetUrl": "/wp-content/uploads/2025/07/Altfx-2-Calado.png",
+                          "alt": ""
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "pie-legal",
+            "kind": "group",
+            "ruleIds": [
+              "bas-pie-legal-barra",
+              "bas-pie-legal-barra-movil"
+            ],
+            "children": [
+              {
+                "id": "pie-legal-terminos",
+                "kind": "link",
+                "ruleIds": [
+                  "bas-pie-legal-texto",
+                  "bas-pie-legal-color"
+                ],
+                "content": {
+                  "label": "Términos y privacidad",
+                  "href": "/terminos-y-privacidad/"
+                }
+              },
+              {
+                "id": "pie-legal-punto",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "bas-pie-legal-texto",
+                  "bas-pie-legal-color",
+                  "bas-pie-legal-punto"
+                ],
+                "content": {
+                  "text": "·"
+                }
+              },
+              {
+                "id": "pie-legal-cookies",
+                "kind": "link",
+                "ruleIds": [
+                  "bas-pie-legal-texto",
+                  "bas-pie-legal-color",
+                  "bas-pie-preferencias"
+                ],
+                "content": {
+                  "label": "Preferencias de cookies",
+                  "href": "/terminos-y-privacidad/"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

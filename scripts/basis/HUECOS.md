@@ -310,3 +310,21 @@ Lo que queda a la vista, y por qué:
 - **Barra lateral de `basis-carpas-industriales`:** su texto queda 24 px a la izquierda del original (la columna del contenido lleva un relleno derecho de 5,499 %: la escala de espaciado es en px).
 - **Cajas sin pareja** que la herramienta lista y las láminas confirman que no se ven: el contenedor `main` del lienzo, el `<input>` y el botón del buscador (WordPress los dibuja con otro DOM), los textos de los pliegues cerrados (la herramienta los cuenta como visibles en WordPress; las láminas y la auditoría confirman que no se ven), el mapa de Mapbox.
 - **Desplazamientos de ±1 a ±3 px** en alto de página: el redondeo de las cajas medidas.
+
+---
+
+## El pie: línea legal y celular (2-nov-2026)
+
+**Qué se hizo.** (1) El pie no tenía ningún enlace a los términos ni a las preferencias de cookies; la Ley 21.719 (1-dic-2026) pide uno siempre visible y Basis usa CookieAdmin gratis (sin ícono flotante), así que el pie es el único camino. Se agregó la línea «Términos y privacidad · Preferencias de cookies» (como en Econut: `/terminos-y-privacidad/`, y la conducta `preferencias-cookies` con esa dirección de respaldo). (2) En celular el contenido del pie quedaba a 58 px de cada lado; ahora a 24 (paso 24 del espaciado), con todo alineado a la izquierda y el interlineado de celular en 1,5.
+
+**Cómo.** Todo vive en `correcciones.json` (región «pie»), que `componer.mjs` ahora aplica también al pie: `agregarNodos` (la línea legal), `reglasNuevas` (`bas-pie-*`), `agregarReglas` con los selectores nuevos `hijoDe` y `nodoConTexto`, y `declaraciones` (el relleno de 20 px por columna pasa a 0). Como la compuerta (`enforce`) no deja entrar valores medidos en las regiones, `escalar-regiones.mjs` (con `lib/regiones.mjs`) los pasa a referencias del sistema antes de aplicar (`salida/bloques/region-<k>.escalada.json`); `aplicar.mjs` usa esos archivos. `probar-pie.mjs` lo comprueba en el navegador y `capturar-pie.mjs` arma las láminas «antes | después» (`entregables/basis/bloques/pie-<ancho>.png`).
+
+**Para subirlo a producción** (nada del plugin ni del tema: ya están): `componer.mjs` → `escalar-regiones.mjs` → `aplicar.mjs` (o `divi-a-contope/aplicar.mjs region footer salida/bloques/region-footer.escalada.json`) apuntando a basisbodegas.com. Requiere que exista `/terminos-y-privacidad/` y que CookieAdmin esté activo.
+
+**Diferencias de escritorio que quedan, y por qué.** El pie al pasar por las escalas redondea al paso más cercano cuatro medidas que no son paso propio: relleno superior de la fila 36→40 px, inferior 6→4, márgenes del logo −28→−27 y separación del mapa 15→16 px (cambian como mucho 4 px; agregar pasos propios renumeraría los slugs y obligaría a rehacer las cinco páginas). La altura del pie sube de 120 a 186 px por la línea legal.
+
+**Pendiente / hallazgos.**
+- El **encabezado** no se puede volver a aplicar: su región trae una sombra (`box-shadow` de 0 4px 10px), un `gap: 42px` de ícono y un radio `50% 0 0 50%` del botón de WhatsApp que la compuerta rechaza (el que está en la base se aplicó antes de `enforce`). `aplicar.mjs` lo dice y sale con error sin frenar el pie. Hay que ampliar el sistema (paso de sombra y radio asimétrico en la escala) para poder reaplicarlo.
+- **`aplicar.mjs`, el paso «páginas»:** sigue mandando las composiciones del lienzo (`salida/<pagina>.componer.json`, con valores medidos) y la compuerta las rechaza (212 valores en `inicio`); las páginas ya son bloques y se escriben con `componer-bloques.mjs`. El paso quedó obsoleto: las regiones se aplican antes y no se ven afectadas, pero el guion termina con error ahí.
+- **Tablet (768):** el crédito «Diseño y desarrollo» sigue a la derecha (es una sola columna, pero la alineación a la izquierda sólo se pidió para celular).
+- `componer.mjs` regenera los ids y roles de color de las páginas y del encabezado (`c-bd95c9` → `c-c3ef5d`, `c-background` → `c-fondo-pagina`) porque la paleta del tema cambió de slugs desde la última vez; sólo se dejaron los archivos del pie, el resto de `salida/` se mantuvo como estaba.

@@ -82,7 +82,10 @@ const primeraFamilia = (v) => String(v).split(',')[0].replace(/["']/g, '').trim(
  * @param {number} [o.distanciaMaxima] más lejos que esto del color más cercano = «fuera del set»
  */
 export function crearTraductor({ paleta, familiasTema = [], roles = {}, familias = {}, distanciaMaxima = 8 }) {
-  const colores = paleta.map((p) => {
+  // Un paso de la paleta que es una TRANSPARENCIA de otro (`color-mix(in srgb, var(--wp--preset--color--x) 88%, transparent)`,
+  // las escalas de transparencias del set) no es un color base al que acercar un valor medido: se salta. Todo lo demás tiene
+  // que ser hex o rgb(), y si no, se corta.
+  const colores = paleta.filter((p) => !/^color-mix\(/i.test(String(p.color).trim())).map((p) => {
     const k = leer(p.color);
     if (!k) throw new Error(`tokens: el color «${p.color}» de la paleta (${p.slug}) no es hex ni rgb()`);
     return { slug: p.slug, hex: hexDe(k), k, token: roles[p.slug] || `var(--wp--preset--color--${p.slug})` };

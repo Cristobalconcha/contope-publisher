@@ -34,7 +34,16 @@ for (const nombre of aj.iconos || []) {
   console.log(`  ${nombre}: ${r.ok ? 'ok' : 'NO (' + r.status + ')'}`);
 }
 console.log('== regiones');
-for (const k of ['header', 'footer']) correr(path.join(dc, 'aplicar.mjs'), ['region', k, path.join(aqui, `salida/region-${k}.componer.json`), ...probar]);
+// La compuerta del diseño (enforce) no deja entrar valores literales: antes de aplicar, las reglas medidas de cada región pasan a
+// referencias del sistema (escalar-regiones.mjs → salida/bloques/region-<k>.escalada.json). Si una región no pasa, se dice y se sigue
+// con la otra; al final el guion sale con error.
+correr(path.join(aqui, 'escalar-regiones.mjs'), []);
+let regionesFallidas = 0;
+for (const k of ['header', 'footer']) {
+  try { correr(path.join(dc, 'aplicar.mjs'), ['region', k, path.join(aqui, `salida/bloques/region-${k}.escalada.json`), ...probar]); }
+  catch (e) { regionesFallidas++; console.log(`  ✗ región ${k} NO se aplicó: ${String(e.stderr || e.message).slice(0, 700)}`); }
+}
+if (regionesFallidas) process.exitCode = 1;
 console.log('== páginas');
 for (const slug of [...perfil.paginasReales, 'terminos-y-privacidad']) correr(path.join(dc, 'aplicar.mjs'), ['pagina', path.join(aqui, `salida/${slug}.componer.json`), ...probar]);
 console.log('== ajustes');

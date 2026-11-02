@@ -101,7 +101,7 @@
         }
       },
       {
-        "id": "c-bd95c9",
+        "id": "c-c3ef5d",
         "kind": "color",
         "scope": {
           "breakpoint": "all",
@@ -118,7 +118,7 @@
         },
         "status": "reviewed",
         "value": {
-          "role": "c-background",
+          "role": "c-fondo-pagina",
           "color": "var(--cod-color-surface)",
           "apply": "text"
         }
@@ -257,8 +257,8 @@
         "status": "reviewed",
         "value": {
           "declarations": {
-            "padding-right": "20px",
-            "padding-left": "20px"
+            "padding-right": "0px",
+            "padding-left": "0px"
           }
         }
       },
@@ -332,8 +332,8 @@
         "status": "reviewed",
         "value": {
           "declarations": {
-            "padding-right": "20px",
-            "padding-left": "20px"
+            "padding-right": "0px",
+            "padding-left": "0px"
           }
         }
       },
@@ -688,6 +688,258 @@
             "row-gap": "30px"
           }
         }
+      },
+      {
+        "id": "bas-pie-fila-movil",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "value": {
+          "declarations": {
+            "width": "100%",
+            "padding-right": "24px",
+            "padding-left": "24px"
+          }
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "scripts/basis/correcciones.json",
+              "rationale": "En celular el pie dejaba 58 px a cada lado (80 % de ancho más 20 px de relleno por columna) y el mapa abierto medía 260 px; Econut deja 24. Todo el pie queda alineado a la izquierda y con interlineado de celular (Cristóbal, 2-nov)."
+            }
+          ]
+        },
+        "status": "reviewed"
+      },
+      {
+        "id": "bas-pie-texto-movil",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "value": {
+          "role": "pie-movil",
+          "family": "var(--cod-font-body)",
+          "fontSize": "12px",
+          "fontWeight": 500,
+          "lineHeight": 1.5,
+          "align": "start"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "scripts/basis/correcciones.json",
+              "rationale": "En celular el pie dejaba 58 px a cada lado (80 % de ancho más 20 px de relleno por columna) y el mapa abierto medía 260 px; Econut deja 24. Todo el pie queda alineado a la izquierda y con interlineado de celular (Cristóbal, 2-nov)."
+            }
+          ]
+        },
+        "status": "reviewed"
+      },
+      {
+        "id": "bas-pie-credito-texto-movil",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "value": {
+          "role": "pie-credito-movil",
+          "family": "var(--cod-font-body)",
+          "fontSize": "14px",
+          "fontWeight": 500,
+          "lineHeight": 1.5,
+          "align": "start"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "scripts/basis/correcciones.json",
+              "rationale": "En celular el pie dejaba 58 px a cada lado (80 % de ancho más 20 px de relleno por columna) y el mapa abierto medía 260 px; Econut deja 24. Todo el pie queda alineado a la izquierda y con interlineado de celular (Cristóbal, 2-nov)."
+            }
+          ]
+        },
+        "status": "reviewed"
+      },
+      {
+        "id": "bas-pie-credito-movil",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "value": {
+          "declarations": {
+            "justify-content": "flex-start"
+          }
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "scripts/basis/correcciones.json",
+              "rationale": "En celular el pie dejaba 58 px a cada lado (80 % de ancho más 20 px de relleno por columna) y el mapa abierto medía 260 px; Econut deja 24. Todo el pie queda alineado a la izquierda y con interlineado de celular (Cristóbal, 2-nov)."
+            }
+          ]
+        },
+        "status": "reviewed"
+      },
+      {
+        "id": "bas-pie-legal-barra",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "value": {
+          "declarations": {
+            "display": "flex",
+            "flex-wrap": "wrap",
+            "align-items": "center",
+            "justify-content": "center",
+            "gap": "10px",
+            "width": "80%",
+            "max-width": "1080px",
+            "margin-inline-start": "auto",
+            "margin-inline-end": "auto",
+            "margin-block-start": "10px",
+            "padding-bottom": "20px"
+          }
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "scripts/basis/correcciones.json",
+              "rationale": "Ley 21.719 (vigente desde el 1-dic-2026): el pie tiene que llevar siempre a la vista un enlace a los términos y la privacidad y otro para revisar o cambiar el consentimiento de cookies. CookieAdmin (versión gratis) no trae ícono flotante: este enlace es el único camino (Cristóbal, 2-nov)."
+            }
+          ]
+        },
+        "status": "reviewed"
+      },
+      {
+        "id": "bas-pie-legal-barra-movil",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "mobile",
+          "state": "default"
+        },
+        "value": {
+          "declarations": {
+            "width": "100%",
+            "padding-right": "24px",
+            "padding-left": "24px",
+            "justify-content": "flex-start"
+          }
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "scripts/basis/correcciones.json",
+              "rationale": "Ley 21.719 (vigente desde el 1-dic-2026): el pie tiene que llevar siempre a la vista un enlace a los términos y la privacidad y otro para revisar o cambiar el consentimiento de cookies. CookieAdmin (versión gratis) no trae ícono flotante: este enlace es el único camino (Cristóbal, 2-nov)."
+            }
+          ]
+        },
+        "status": "reviewed"
+      },
+      {
+        "id": "bas-pie-legal-texto",
+        "kind": "typography",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "value": {
+          "role": "pie-legal",
+          "family": "var(--cod-font-body)",
+          "fontSize": "12px",
+          "fontWeight": 400,
+          "lineHeight": 1.5,
+          "align": "start"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "scripts/basis/correcciones.json",
+              "rationale": "Ley 21.719 (vigente desde el 1-dic-2026): el pie tiene que llevar siempre a la vista un enlace a los términos y la privacidad y otro para revisar o cambiar el consentimiento de cookies. CookieAdmin (versión gratis) no trae ícono flotante: este enlace es el único camino (Cristóbal, 2-nov)."
+            }
+          ]
+        },
+        "status": "reviewed"
+      },
+      {
+        "id": "bas-pie-legal-color",
+        "kind": "color",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "value": {
+          "role": "c-background",
+          "color": "var(--cod-color-surface)",
+          "apply": "text"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "scripts/basis/correcciones.json",
+              "rationale": "Ley 21.719 (vigente desde el 1-dic-2026): el pie tiene que llevar siempre a la vista un enlace a los términos y la privacidad y otro para revisar o cambiar el consentimiento de cookies. CookieAdmin (versión gratis) no trae ícono flotante: este enlace es el único camino (Cristóbal, 2-nov)."
+            }
+          ]
+        },
+        "status": "reviewed"
+      },
+      {
+        "id": "bas-pie-legal-punto",
+        "kind": "properties",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "value": {
+          "declarations": {
+            "opacity": "0.5"
+          }
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "scripts/basis/correcciones.json",
+              "rationale": "Ley 21.719 (vigente desde el 1-dic-2026): el pie tiene que llevar siempre a la vista un enlace a los términos y la privacidad y otro para revisar o cambiar el consentimiento de cookies. CookieAdmin (versión gratis) no trae ícono flotante: este enlace es el único camino (Cristóbal, 2-nov)."
+            }
+          ]
+        },
+        "status": "reviewed"
+      },
+      {
+        "id": "bas-pie-preferencias",
+        "kind": "interaction",
+        "scope": {
+          "breakpoint": "all",
+          "state": "default"
+        },
+        "value": {
+          "behavior": "preferencias-cookies"
+        },
+        "provenance": {
+          "sources": [
+            {
+              "kind": "reference",
+              "reference": "scripts/basis/correcciones.json",
+              "rationale": "Ley 21.719 (vigente desde el 1-dic-2026): el pie tiene que llevar siempre a la vista un enlace a los términos y la privacidad y otro para revisar o cambiar el consentimiento de cookies. CookieAdmin (versión gratis) no trae ícono flotante: este enlace es el único camino (Cristóbal, 2-nov)."
+            }
+          ]
+        },
+        "status": "reviewed"
       }
     ]
   },
@@ -708,7 +960,8 @@
             "ruleIds": [
               "fila-44e63a",
               "fila-175af7",
-              "fila-3ad2ce"
+              "fila-3ad2ce",
+              "bas-pie-fila-movil"
             ],
             "children": [
               {
@@ -757,8 +1010,9 @@
                         "kind": "paragraph",
                         "ruleIds": [
                           "t-4995fe",
-                          "c-bd95c9",
-                          "mg-dir-23e5f2"
+                          "c-c3ef5d",
+                          "mg-dir-23e5f2",
+                          "bas-pie-texto-movil"
                         ],
                         "content": {
                           "text": "Av 18 de Septiembre sn Hijuela 2\nFundo San Rafael - Sector Nuevo Sendero,\nPaine, Región Metropolitana"
@@ -794,7 +1048,8 @@
                     "id": "group-84",
                     "kind": "group",
                     "ruleIds": [
-                      "racimo-8c95a4"
+                      "racimo-8c95a4",
+                      "bas-pie-credito-movil"
                     ],
                     "children": [
                       {
@@ -802,8 +1057,9 @@
                         "kind": "paragraph",
                         "ruleIds": [
                           "t-cecbd9",
-                          "c-bd95c9",
-                          "mg-a343db"
+                          "c-c3ef5d",
+                          "mg-a343db",
+                          "bas-pie-credito-texto-movil"
                         ],
                         "content": {
                           "text": "Diseño y\ndesarrollo"
@@ -828,6 +1084,53 @@
                     ]
                   }
                 ]
+              }
+            ]
+          },
+          {
+            "id": "pie-legal",
+            "kind": "group",
+            "ruleIds": [
+              "bas-pie-legal-barra",
+              "bas-pie-legal-barra-movil"
+            ],
+            "children": [
+              {
+                "id": "pie-legal-terminos",
+                "kind": "link",
+                "ruleIds": [
+                  "bas-pie-legal-texto",
+                  "bas-pie-legal-color"
+                ],
+                "content": {
+                  "label": "Términos y privacidad",
+                  "href": "/terminos-y-privacidad/"
+                }
+              },
+              {
+                "id": "pie-legal-punto",
+                "kind": "paragraph",
+                "ruleIds": [
+                  "bas-pie-legal-texto",
+                  "bas-pie-legal-color",
+                  "bas-pie-legal-punto"
+                ],
+                "content": {
+                  "text": "·"
+                }
+              },
+              {
+                "id": "pie-legal-cookies",
+                "kind": "link",
+                "ruleIds": [
+                  "bas-pie-legal-texto",
+                  "bas-pie-legal-color",
+                  "bas-pie-preferencias"
+                ],
+                "content": {
+                  "label": "Preferencias de cookies",
+                  "href": "/terminos-y-privacidad/"
+                }
               }
             ]
           }

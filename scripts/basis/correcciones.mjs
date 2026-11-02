@@ -65,10 +65,13 @@ export function aplicarCorrecciones(slug, nodos, correcciones) {
     let veces = 0;
     const sumar = (n) => { for (const r of c.reglas) if (!n.ruleIds.includes(r)) n.ruleIds.push(r); veces++; };
     // sóloFotos: imágenes de foto (jpg/webp), no íconos ni dibujos en png/svg.
-    if (c.kind) recorrer(nodos, (n) => { if (n.kind === c.kind && (!c.soloFotos || /.(jpe?g|webp)$/i.test(n.content?.assetUrl || ''))) sumar(n); });
+    // hijoDe: sólo los nodos cuyo padre es de ese tipo (el hijo directo del pie, por ejemplo: la fila de tres columnas).
+    if (c.kind) recorrer(nodos, (n, padre) => { if (n.kind === c.kind && (!c.hijoDe || padre?.kind === c.hijoDe) && (!c.soloFotos || /.(jpe?g|webp)$/i.test(n.content?.assetUrl || ''))) sumar(n); });
     if (c.seccionConTexto) for (const sec of nodos) { let t = false; recorrer([sec], (n) => { if (textoDe(n) === c.seccionConTexto) t = true; }); if (t && sec.kind === 'section') { sumar(sec); break; } }
     // filaConTexto: el recuadro (fila) que contiene la columna con ese texto.
     if (c.filaConTexto) recorrer(nodos, (n) => { if (n.kind === 'group' && (n.children || []).some((col) => col.kind === 'group' && (col.children || []).some((h) => textoDe(h) === c.filaConTexto))) sumar(n); });
+    // nodoConTexto: el nodo cuyo texto empieza así (un párrafo suelto, la dirección del pie).
+    if (c.nodoConTexto) recorrer(nodos, (n) => { if (textoDe(n).startsWith(c.nodoConTexto)) sumar(n); });
     if (c.grupoConTexto) recorrer(nodos, (n) => { if (n.kind === 'group' && (n.children || []).some((h) => textoDe(h) === c.grupoConTexto)) sumar(n); });
     if (c.pagina === '*' && !veces) continue; // la página no tiene ese tipo de nodo
     exigir(veces > 0, `reglas ${c.reglas.join(', ')} → ${veces} nodo(s)`);
@@ -96,6 +99,15 @@ export function aplicarCorrecciones(slug, nodos, correcciones) {
       hecho = true;
     });
     exigir(hecho, `lista «${c.primerItem}…» → acordeón (varios abiertos a la vez)`);
+  }
+  // Nodos nuevos (una línea legal en el pie, por ejemplo). `dentroDe` es el tipo del nodo que los recibe (el primero que se
+  // encuentre) y van al FINAL de sus hijos. Los nodos viajan tal cual están en correcciones.json; sus reglas son
+  // `reglasNuevas` de la misma región, así que pasan por el set como cualquier otra.
+  for (const c of (correcciones.agregarNodos || []).filter((c) => c.pagina === slug)) {
+    let receptor = null;
+    recorrer(nodos, (n) => { if (!receptor && n.kind === c.dentroDe) receptor = n; });
+    exigir(receptor, `nodos nuevos dentro de «${c.dentroDe}»`);
+    receptor.children = [...(receptor.children || []), ...structuredClone(c.nodos)];
   }
   return hechos;
 }

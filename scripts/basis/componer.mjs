@@ -39,7 +39,12 @@ for (const [slug, p] of Object.entries(r.paginas)) {
 // Encabezado y pie son globales: salen de la primera página (en Divi son una plantilla única).
 const primera = Object.values(r.paginas)[0];
 writeFileSync(path.join(salida, 'region-header.componer.json'), JSON.stringify({ design: disenoDe(r.reg, primera.encabezado, perfil.designId), composition: { schemaVersion: 2, nodes: primera.encabezado } }, null, 2));
-writeFileSync(path.join(salida, 'region-footer.componer.json'), JSON.stringify({ design: disenoDe(r.reg, primera.pie, perfil.designId), composition: { schemaVersion: 2, nodes: primera.pie } }, null, 2));
+// Las correcciones de `correcciones.json` también valen para el pie (región «pie»): la línea legal, el margen y la alineación de celular.
+// Se aplican a los nodos y a las reglas del pie igual que a una página.
+for (const h of aplicarCorrecciones('pie', primera.pie, correcciones)) console.log(`  corrección pie: ${h}`);
+const disenoPie = disenoDe(r.reg, primera.pie, perfil.designId);
+for (const h of corregirReglas('pie', disenoPie, correcciones, primera.pie, r.tokens)) console.log(`  corrección pie: ${h}`);
+writeFileSync(path.join(salida, 'region-footer.componer.json'), JSON.stringify({ design: disenoPie, composition: { schemaVersion: 2, nodes: primera.pie } }, null, 2));
 writeFileSync(path.join(salida, 'informe.json'), JSON.stringify(r.informe, null, 2));
 writeFileSync(path.join(salida, 'INFORME.md'), informeMarkdown(r.informe, 'Basis · informe del transcriptor Divi → ContOpe') + (r.tokens ? '\n' + informeDeTokens(r.tokens.informe()) + '\n' : ''));
 if (r.tokens) writeFileSync(path.join(salida, 'tokens.json'), JSON.stringify(r.tokens.informe(), null, 2));
