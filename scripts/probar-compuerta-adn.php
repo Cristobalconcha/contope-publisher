@@ -86,6 +86,10 @@ $clasificacion = [
     'cod_preview_canvas_composition' => 'revisa',
     // no escriben diseño
     'cod_get_capabilities' => 'lee',
+    // el ADN: no escriben diseño en documentos; el import cambia lo que se puede referenciar (prueba: scripts/probar-adn-almacen.php)
+    'cod_adn_get' => 'lee',
+    'cod_adn_preview_import' => 'revisa',
+    'cod_adn_apply_import' => 'adn',
     'cod_list_canvas_pages' => 'lee',
     'cod_get_canvas_page_state' => 'lee',
     'cod_read_canvas_composition' => 'lee',
@@ -453,7 +457,8 @@ try {
     $modo('enforce');
     foreach ($servicio->tool_definitions() as $t) {
         $props = array_keys($t['inputSchema']['properties'] ?? []);
-        $roza = array_filter($props, static fn (string $p): bool => preg_match('/mode|modo|gate|adn/i', $p) === 1);
+        // `model` es el ADN que se importa (cod_adn_preview_import / cod_adn_apply_import), no un modo: calza con /mode/ por casualidad.
+        $roza = array_filter($props, static fn (string $p): bool => $p !== 'model' && preg_match('/mode|modo|gate|adn/i', $p) === 1);
         $comprobar('la herramienta ' . $t['name'] . ' no tiene un parámetro de modo y rechaza argumentos de más', $roza === [] && ($t['inputSchema']['additionalProperties'] ?? true) === false);
     }
     $r = $servicio->call_tool('cod_get_capabilities', ['modo' => 'off']);

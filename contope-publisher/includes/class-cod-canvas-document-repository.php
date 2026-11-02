@@ -530,10 +530,22 @@ final class COD_Canvas_Document_Repository
 
         return $this->with_document_lock(
             $post_id,
-            function () use ($document_id, $post_id, $expected_revision, $storage, $composition_json, $snapshot_session, $snapshot_label) {
+            function () use ($document_id, $post_id, $expected_revision, $storage, $composition_json, $snapshot_session, $snapshot_label, $compiled) {
                 $actual_revision = (int) get_post_meta($post_id, self::META_REVISION, true);
                 if ($actual_revision !== $expected_revision) {
                     return $this->revision_conflict($expected_revision, $actual_revision);
+                }
+
+                // H5: lo compilado contra una revisión del ADN no se guarda si, mientras tanto, entró
+                // otra. Se recompara AQUÍ, dentro del bloqueo y justo antes de escribir, no sólo al compilar.
+                if (COD_ADN_Gate::activo()) {
+                    $esperada_adn = $compiled['designSnapshot']['expectedDesignRevision'] ?? null;
+                    if (is_int($esperada_adn)) {
+                        $stale = COD_ADN_Store::comprobar_revision_esperada($esperada_adn);
+                        if (is_wp_error($stale)) {
+                            return $stale;
+                        }
+                    }
                 }
 
                 $snapshot = $this->create_snapshot_for_post($post_id, $snapshot_session, $snapshot_label);
@@ -692,15 +704,26 @@ final class COD_Canvas_Document_Repository
      */
     private function with_document_lock(int $post_id, callable $operation)
     {
+        // El bloqueo global de diseño (COMPARTIDO): un import del ADN no puede cambiar lo que los
+        // documentos pueden referenciar mientras una escritura está en curso, ni al revés. Sin ADN
+        // ni import en curso no toca la base (COD_ADN_Lock::compartido_si_hace_falta devuelve null).
+        $diseno = COD_ADN_Lock::compartido_si_hace_falta();
+        if (is_wp_error($diseno)) {
+            return $diseno;
+        }
         $lock = $this->acquire_document_lock($post_id);
         if (is_wp_error($lock)) {
+            COD_ADN_Lock::soltar_compartido($diseno);
             return $lock;
         }
 
         try {
+            // Gancho para las pruebas de concurrencia (P1.6): se dispara con AMBOS bloqueos tomados.
+            do_action('cod_adn_escritura_en_curso', $post_id);
             return $operation();
         } finally {
             $this->release_document_lock($lock);
+            COD_ADN_Lock::soltar_compartido($diseno);
         }
     }
 

@@ -53,7 +53,8 @@ final class COD_Canvas_MCP_Service
             ],
             'designRuleSet' => [
                 'supported' => true,
-                'portableContractPersisted' => false,
+                'portableContractPersisted' => COD_ADN_Store::activo(),
+                'importsPortableModel' => true,
                 'readsDesktopContract' => false,
                 'writesDesktopContract' => false,
                 'reason' => 'COD Web acepta una instantánea explícita de reglas trazables para trabajar directo con IA. Desktop deberá emitir la misma forma cuando su importador esté listo; Canvas no altera design-contract.json.',
@@ -78,6 +79,8 @@ final class COD_Canvas_MCP_Service
             // para que quien construya lo sepa ANTES de componer y no lo descubra
             // por el rechazo.
             'adnGate' => COD_ADN_Gate::descriptor(),
+            // El ADN activo del sitio (ESPEC 3.4). Sin ADN: `activo: false` y nada más cambia.
+            'adn' => COD_ADN_Store::descriptor(),
             'composition' => $catalog['composition'],
             'realization' => $catalog['realization'],
             'existingButNotCallableYet' => $catalog['existingButNotCallableYet'],
@@ -887,6 +890,56 @@ final class COD_Canvas_MCP_Service
                 'outputSchema' => ['type' => 'object'],
                 'annotations' => $publish,
             ],
+            [
+                'name' => 'cod_adn_get',
+                'title' => 'ADN de diseño activo',
+                'description' => 'Resume el ADN de diseño activo del sitio: designId, revisión, huella, modo de la compuerta, fuente, conteos por estado, estado de la proyección y las definiciones guardadas que no se emiten (ignoradas). Con incluir: ["definiciones","registro","auditoria"] agrega el detalle. Es lo que hay que consultar para saber qué expectedDesignRevision usar.',
+                'inputSchema' => [
+                    'type' => 'object',
+                    'properties' => [
+                        'incluir' => ['type' => 'array', 'items' => ['type' => 'string', 'enum' => ['definiciones', 'registro', 'auditoria']], 'uniqueItems' => true],
+                    ],
+                    'additionalProperties' => false,
+                ],
+                'outputSchema' => ['type' => 'object'],
+                'annotations' => $read_only,
+            ],
+            [
+                'name' => 'cod_adn_preview_import',
+                'title' => 'Previsualizar import del ADN',
+                'description' => 'Valida un ADN (design-contract.json o design/model.json) y dice qué haría importarlo, sin escribir nada: errores con código, diff de definiciones y variables (agregadas, quitadas, renombradas, con otro valor, degradadas), las variables en uso que se romperían (rompe) y el previewId. Pasa el ADN como TEXTO JSON en model: es lo único que conserva la diferencia entre {} y [].',
+                'inputSchema' => [
+                    'type' => 'object',
+                    'properties' => [
+                        'model' => ['description' => 'El ADN: texto JSON (recomendado) u objeto.'],
+                        'expectedCurrentRevision' => ['type' => 'integer', 'minimum' => 0, 'description' => 'La revisión activa que quien llama cree que hay (0 si no hay ADN).'],
+                        'emitirPropuestas' => ['type' => 'boolean', 'description' => 'Emitir también las definiciones proposed (sólo para un documento de ensayo). Por omisión false.'],
+                    ],
+                    'required' => ['model'],
+                    'additionalProperties' => false,
+                ],
+                'outputSchema' => ['type' => 'object'],
+                'annotations' => $read_only,
+            ],
+            [
+                'name' => 'cod_adn_apply_import',
+                'title' => 'Aplicar import del ADN',
+                'description' => 'Aplica un ADN con el previewId exacto de cod_adn_preview_import. Atómico: o queda activa la revisión nueva entera o sigue la anterior. Se rechaza si quita, renombra o degrada variables que el sitio usa (ADN_REF_BROKEN): ese permiso sólo existe en wp-admin. Responde ADN_BUSY si hay una escritura de documento en curso.',
+                'inputSchema' => [
+                    'type' => 'object',
+                    'properties' => [
+                        'model' => ['description' => 'El mismo ADN que se previsualizó: texto JSON (recomendado) u objeto.'],
+                        'previewId' => ['type' => 'string', 'minLength' => 1],
+                        'expectedCurrentRevision' => ['type' => 'integer', 'minimum' => 0],
+                        'emitirPropuestas' => ['type' => 'boolean'],
+                        'fuente' => ['type' => 'string', 'enum' => ['desktop', 'extractor', 'upload']],
+                    ],
+                    'required' => ['model', 'previewId'],
+                    'additionalProperties' => false,
+                ],
+                'outputSchema' => ['type' => 'object'],
+                'annotations' => $mutation,
+            ],
         ];
     }
 
@@ -905,6 +958,40 @@ final class COD_Canvas_MCP_Service
     {
         if ($tool_name === 'cod_get_capabilities') {
             return $this->reject_unexpected_arguments($arguments) ?? $this->capabilities();
+        }
+        if ($tool_name === 'cod_adn_get') {
+            if (!$this->has_only_keys($arguments, ['incluir'])) {
+                return new WP_Error('cod_mcp_invalid_arguments', 'cod_adn_get sólo acepta incluir.');
+            }
+            $incluir = $arguments['incluir'] ?? [];
+            if (!is_array($incluir) || array_diff($incluir, ['definiciones', 'registro', 'auditoria']) !== []) {
+                return new WP_Error('cod_mcp_invalid_arguments', 'incluir debe ser una lista con valores de: definiciones, registro, auditoria.');
+            }
+            return COD_ADN_Store::resumen(array_values($incluir));
+        }
+        if ($tool_name === 'cod_adn_preview_import' || $tool_name === 'cod_adn_apply_import') {
+            $aplica = $tool_name === 'cod_adn_apply_import';
+            $permitidos = $aplica ? ['model', 'previewId', 'expectedCurrentRevision', 'emitirPropuestas', 'fuente'] : ['model', 'expectedCurrentRevision', 'emitirPropuestas'];
+            if (!$this->has_only_keys($arguments, $permitidos) || !array_key_exists('model', $arguments) || (!is_string($arguments['model']) && !is_array($arguments['model']))) {
+                return new WP_Error('cod_mcp_invalid_arguments', 'Se esperaba model (texto JSON u objeto)' . ($aplica ? ' y previewId' : '') . ', y nada fuera de: ' . implode(', ', $permitidos) . '.');
+            }
+            if (isset($arguments['expectedCurrentRevision']) && !is_int($arguments['expectedCurrentRevision'])) {
+                return new WP_Error('cod_mcp_invalid_arguments', 'expectedCurrentRevision debe ser un entero.');
+            }
+            if (isset($arguments['emitirPropuestas']) && !is_bool($arguments['emitirPropuestas'])) {
+                return new WP_Error('cod_mcp_invalid_arguments', 'emitirPropuestas debe ser booleano.');
+            }
+            $opciones = [
+                'emitirPropuestas' => !empty($arguments['emitirPropuestas']),
+                'expectedCurrentRevision' => $arguments['expectedCurrentRevision'] ?? null,
+            ];
+            if (!$aplica) {
+                return COD_ADN_Store::previsualizar($arguments['model'], $opciones);
+            }
+            if (!isset($arguments['previewId']) || !is_string($arguments['previewId']) || $arguments['previewId'] === '') {
+                return new WP_Error('cod_mcp_invalid_arguments', 'previewId es obligatorio y debe ser el que devolvió cod_adn_preview_import.');
+            }
+            return COD_ADN_Store::aplicar($arguments['model'], $opciones + ['previewId' => $arguments['previewId'], 'fuente' => (string) ($arguments['fuente'] ?? 'upload')]);
         }
         if ($tool_name === 'cod_list_canvas_pages') {
             $error = $this->reject_unexpected_arguments($arguments);
@@ -1641,6 +1728,13 @@ final class COD_Canvas_MCP_Service
         $compiled = $this->compiler->compile($composition, $design);
         if (is_wp_error($compiled) || !COD_ADN_Gate::activo()) {
             return $compiled;
+        }
+        // Con un ADN activo, la composición se hizo contra su revisión o no vale (ADN_REVISION_STALE).
+        if (isset($design['expectedDesignRevision']) && is_int($design['expectedDesignRevision'])) {
+            $stale = COD_ADN_Store::comprobar_revision_esperada($design['expectedDesignRevision']);
+            if (is_wp_error($stale)) {
+                return $stale;
+            }
         }
         $base = null;
         if (COD_ADN_Gate::modo() === 'ratchet') {

@@ -40,6 +40,16 @@ require_once COD_PUBLISHER_DIR . 'includes/class-cod-inline-editor-frontend.php'
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-theme-definitions.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-design-core.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-adn-registry.php';
+require_once COD_PUBLISHER_DIR . 'includes/class-cod-adn-js.php';
+require_once COD_PUBLISHER_DIR . 'includes/class-cod-adn-design-md.php';
+require_once COD_PUBLISHER_DIR . 'includes/class-cod-adn-parser.php';
+require_once COD_PUBLISHER_DIR . 'includes/class-cod-adn-requisitos.php';
+require_once COD_PUBLISHER_DIR . 'includes/class-cod-adn-validator.php';
+require_once COD_PUBLISHER_DIR . 'includes/class-cod-adn-lock.php';
+require_once COD_PUBLISHER_DIR . 'includes/class-cod-adn-projection.php';
+require_once COD_PUBLISHER_DIR . 'includes/class-cod-adn-integridad.php';
+require_once COD_PUBLISHER_DIR . 'includes/class-cod-adn-store.php';
+require_once COD_PUBLISHER_DIR . 'includes/class-cod-adn-admin.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-adn-gate.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-adn-gate-admin.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-adn-gate-rest.php';
@@ -133,6 +143,8 @@ add_action('plugins_loaded', static function (): void {
     (new COD_Inline_Editor_Frontend($canvas_repository, $region_resolver))->register();
     (new COD_Settings_Admin())->register();
     (new COD_ADN_Gate_Admin())->register();
+    (new COD_ADN_Store())->register();
+    (new COD_ADN_Admin())->register();
     (new COD_ADN_Gate_Rest())->register();
     (new COD_Medicion())->register();
     (new COD_SVG())->register();

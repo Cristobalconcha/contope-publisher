@@ -1,0 +1,390 @@
+{
+  "generadoPor": "scripts/adn/generar-fechas-v8.mjs",
+  "motor": "node v22.19.0 (V8 12.4.254.21-node.29)",
+  "noReproducidas": [
+    "foo 1",
+    "0"
+  ],
+  "cadenas": [
+    {
+      "texto": "2026-08-02",
+      "valida": true
+    },
+    {
+      "texto": "2026-08-02T00:00:00.000Z",
+      "valida": true
+    },
+    {
+      "texto": "2026-08-02T10:00:00+02:00",
+      "valida": true
+    },
+    {
+      "texto": "2026-02-30",
+      "valida": true
+    },
+    {
+      "texto": "2026-02-30T00:00:00Z",
+      "valida": true
+    },
+    {
+      "texto": "2026-13-01",
+      "valida": false
+    },
+    {
+      "texto": "2026-00-10",
+      "valida": false
+    },
+    {
+      "texto": "2026-01-32",
+      "valida": false
+    },
+    {
+      "texto": "2026-01-31T24:00:00Z",
+      "valida": true
+    },
+    {
+      "texto": "2026-01-31T24:00:01Z",
+      "valida": false
+    },
+    {
+      "texto": "2026-01-31T25:00:00Z",
+      "valida": false
+    },
+    {
+      "texto": "2026-01-31T23:60:00Z",
+      "valida": false
+    },
+    {
+      "texto": "2026-01-31T23:59:60Z",
+      "valida": false
+    },
+    {
+      "texto": "2026-08",
+      "valida": true
+    },
+    {
+      "texto": "2026",
+      "valida": true
+    },
+    {
+      "texto": "20260802",
+      "valida": false
+    },
+    {
+      "texto": "2026-8-2",
+      "valida": true
+    },
+    {
+      "texto": "2026-08-2",
+      "valida": true
+    },
+    {
+      "texto": "2026/08/02",
+      "valida": true
+    },
+    {
+      "texto": "08/02/2026",
+      "valida": true
+    },
+    {
+      "texto": "8/2/2026",
+      "valida": true
+    },
+    {
+      "texto": "Aug 2, 2026",
+      "valida": true
+    },
+    {
+      "texto": "August 2, 2026",
+      "valida": true
+    },
+    {
+      "texto": "2 Aug 2026",
+      "valida": true
+    },
+    {
+      "texto": "Sun, 02 Aug 2026 10:00:00 GMT",
+      "valida": true
+    },
+    {
+      "texto": "Sun Aug 02 2026 10:00:00 GMT+0200 (CEST)",
+      "valida": true
+    },
+    {
+      "texto": "Aug 2 2026 10:00",
+      "valida": true
+    },
+    {
+      "texto": "Aug 2, 2026 10:00:00 PM",
+      "valida": true
+    },
+    {
+      "texto": "yesterday",
+      "valida": false
+    },
+    {
+      "texto": "tomorrow",
+      "valida": false
+    },
+    {
+      "texto": "soon",
+      "valida": false
+    },
+    {
+      "texto": "someday",
+      "valida": false
+    },
+    {
+      "texto": "never",
+      "valida": false
+    },
+    {
+      "texto": "last week",
+      "valida": false
+    },
+    {
+      "texto": "",
+      "valida": false
+    },
+    {
+      "texto": "  ",
+      "valida": false
+    },
+    {
+      "texto": "foo 1",
+      "valida": true
+    },
+    {
+      "texto": "2026-08-02 10:00",
+      "valida": true
+    },
+    {
+      "texto": "2026-08-02 10:00:00Z",
+      "valida": true
+    },
+    {
+      "texto": "2026-08-02T10:00",
+      "valida": true
+    },
+    {
+      "texto": "2026-08-02T10:00:00",
+      "valida": true
+    },
+    {
+      "texto": "2026-08-02T10:00:00.5Z",
+      "valida": true
+    },
+    {
+      "texto": "2026-08-02T10:00:00.123456Z",
+      "valida": true
+    },
+    {
+      "texto": "2026-08-02T10Z",
+      "valida": false
+    },
+    {
+      "texto": "+002026-08-02T00:00:00Z",
+      "valida": true
+    },
+    {
+      "texto": "-000001-01-01T00:00:00Z",
+      "valida": true
+    },
+    {
+      "texto": "-000000-01-01T00:00:00Z",
+      "valida": false
+    },
+    {
+      "texto": "2026-08-02t10:00:00z",
+      "valida": true
+    },
+    {
+      "texto": "2026-08-02T10:00:00+0200",
+      "valida": true
+    },
+    {
+      "texto": "2026-08-02T10:00:00+02",
+      "valida": false
+    },
+    {
+      "texto": "2026-08-02T10:00:00 +02:00",
+      "valida": false
+    },
+    {
+      "texto": "2026-08-02Z",
+      "valida": true
+    },
+    {
+      "texto": "1 Jan 70",
+      "valida": true
+    },
+    {
+      "texto": "Jan 1 70",
+      "valida": true
+    },
+    {
+      "texto": "Jan 1 49",
+      "valida": true
+    },
+    {
+      "texto": "Jan 1 50",
+      "valida": true
+    },
+    {
+      "texto": "12/31/99",
+      "valida": true
+    },
+    {
+      "texto": "1/1/1",
+      "valida": true
+    },
+    {
+      "texto": "Thursday, 01-Jan-1970 00:00:00 GMT",
+      "valida": true
+    },
+    {
+      "texto": "Aug 32 2026",
+      "valida": false
+    },
+    {
+      "texto": "Feb 30 2026",
+      "valida": true
+    },
+    {
+      "texto": "2026-08-02T00:00:00.000+24:00",
+      "valida": false
+    },
+    {
+      "texto": "2026-08-02T00:00:00.000+23:59",
+      "valida": true
+    },
+    {
+      "texto": "2026-08-02T00:00:00.000-00:00",
+      "valida": true
+    },
+    {
+      "texto": "0000-01-01",
+      "valida": true
+    },
+    {
+      "texto": "275760-09-13",
+      "valida": false
+    },
+    {
+      "texto": "+275760-09-13T00:00:00.000Z",
+      "valida": true
+    },
+    {
+      "texto": "+275760-09-13T00:00:00.001Z",
+      "valida": false
+    },
+    {
+      "texto": "Aug 2, 2026 25:00",
+      "valida": false
+    },
+    {
+      "texto": "Aug 2, 2026 10:60",
+      "valida": true
+    },
+    {
+      "texto": "2026 Aug 2",
+      "valida": true
+    },
+    {
+      "texto": "Aug 2026",
+      "valida": true
+    },
+    {
+      "texto": "2 2026",
+      "valida": false
+    },
+    {
+      "texto": "12:00",
+      "valida": false
+    },
+    {
+      "texto": "Mon",
+      "valida": false
+    },
+    {
+      "texto": "Aug",
+      "valida": false
+    },
+    {
+      "texto": "2026-08-02T10:00:00,5Z",
+      "valida": false
+    },
+    {
+      "texto": "2026-08-02T10:00:00.Z",
+      "valida": false
+    },
+    {
+      "texto": "2026-08-02T1:00:00Z",
+      "valida": false
+    },
+    {
+      "texto": "2026-8-02T10:00:00Z",
+      "valida": false
+    },
+    {
+      "texto": "  2026-08-02",
+      "valida": true
+    },
+    {
+      "texto": "2026-08-02  ",
+      "valida": true
+    },
+    {
+      "texto": "2026-08-02T10:00:00Z ",
+      "valida": false
+    },
+    {
+      "texto": "2026-08-02 ",
+      "valida": true
+    },
+    {
+      "texto": "2026-08-02T10:00:00.000Z",
+      "valida": true
+    },
+    {
+      "texto": "2026-08-03T00:00:00.000Z",
+      "valida": true
+    },
+    {
+      "texto": "2026-08-23T14:30:00.5+02:00",
+      "valida": true
+    },
+    {
+      "texto": "2026-08-23T12:30:00",
+      "valida": true
+    },
+    {
+      "texto": "2026-13-45T00:00:00Z",
+      "valida": false
+    },
+    {
+      "texto": "x",
+      "valida": false
+    },
+    {
+      "texto": "null",
+      "valida": false
+    },
+    {
+      "texto": "undefined",
+      "valida": false
+    },
+    {
+      "texto": "NaN",
+      "valida": false
+    },
+    {
+      "texto": "0",
+      "valida": true
+    },
+    {
+      "texto": "1787488200",
+      "valida": false
+    }
+  ]
+}
