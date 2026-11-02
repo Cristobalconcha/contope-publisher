@@ -333,9 +333,11 @@ web. Lo que pasa por cada ámbito:
   (`COD_ADN_Store::aplicar`): misma validación, mismo diff, misma atomicidad. Si no hay ADN activo, el paquete no
   lleva `designModel`. `provenance.producer` es siempre `contope-design-desktop` (el único valor que acepta
   `parsePortableDesignModel`): es la procedencia del modelo, la del paquete va en `origin.producer`.
-- **Estado de WordPress** (`entrypoints.wordpressState`, `wordpress/state.json`, `contope/wordpress-state`): cómo se
-  aplicó el ADN (`emitirPropuestas` sí se respeta; el `modo` de la compuerta es informativo y NO se aplica) y qué
-  página es la portada (por slug; sólo se fija si el destino aún no eligió una).
+- **Estado de WordPress** (`entrypoints.wordpressState`, `wordpress/state.json`, `contope/wordpress-state`, `version: 2`):
+  cómo se aplicó el ADN (`emitirPropuestas` sí se respeta; el `modo` de la compuerta es informativo y NO se aplica), qué
+  página es la portada (por slug; sólo se fija si el destino aún no eligió una) y el **estado del sitio** (§10.1): lo
+  que hace que un sitio armado en el local se vea igual en producción. Un `state.json` de `version: 1` (sin esas
+  secciones) se sigue leyendo: simplemente no trae estado del sitio.
 - **Tema** (`entrypoints.theme`): el `theme.json` del tema activo, como referencia. El importador no lo aplica.
 - **Activos** (`assets[]`): los medios que las páginas, los documentos y las fuentes citan. Dentro del ZIP se llaman por su
   hash (`assets/<sha256>.<ext>`) porque las rutas portables no admiten `@`, espacios ni tildes; la ruta real viaja en
@@ -347,6 +349,60 @@ primero el ADN, luego los medios (a archivos temporales ya verificados), los doc
 los archivos que usa: el resto del inventario se ignora. Rechaza rutas fuera de la raíz, enlaces simbólicos y bombas de
 compresión.
 
+### 10.1 El estado del sitio (`wordpress/state.json` versión 2)
+
+Es lo que el paquete lleva además de las páginas. **Ningún número de WordPress viaja**: un menú que apunta a la
+página 12 no sirve donde esa página es la 47. Todo lo que apunta a algo viaja con una identidad portable y el importador la
+vuelve a resolver contra el sitio de destino.
+
+| Sección de `state.json` | Qué lleva | Identidad portable | En el destino |
+|---|---|---|---|
+| `site` | título, descripción, estructura de enlaces permanentes, base de categorías y de etiquetas | — (texto) | se escriben las opciones; si cambian los enlaces permanentes se regeneran las reglas |
+| `branding` | ícono del sitio (`site_icon`), logo del sitio (`site_logo`) y logo del tema (`custom_logo`) | ruta del archivo en `uploads` + sha256 | el archivo llega con los medios, se registra su adjunto y se fija la opción con el número de ESTE sitio |
+| `navigation` | las navegaciones de bloques (`wp_navigation`) | slug; sus enlaces a páginas/categorías llevan `ocdRef` (`{postType, slug}` o `{taxonomy, slug}`) en lugar de `id` | se buscan por slug (no se duplican); `ocdRef` vuelve a ser el `id` de este sitio |
+| `menus` | los menús clásicos con sus enlaces, jerarquía, clases, destino de apertura | slug del menú; cada enlace a una página/entrada/categoría lleva `ref` | se buscan por slug; los enlaces se rehacen si cambiaron (no se duplican) |
+| `menuLocations` | ubicación de menú → slug del menú | slug | se fijan sólo las ubicaciones del paquete; las otras del destino se conservan |
+| `iconSet` + archivos `contope-iconos/…` | estilo de íconos (`cod_icono_estilo`) y TODO el set de la carpeta (los .svg y la tipografía de símbolos) | ruta + sha256 | archivos sueltos de `uploads` (no se vuelven adjuntos de la Biblioteca) |
+| `designSheets` + archivos `contope-disenos/…` | las hojas de diseño generadas que usan los documentos que viajan (`cod_disenos_hojas`) | designId + archivo | archivos sueltos; el documento viaja ahora con su `composition`, de ahí sale a qué diseño pertenece y por tanto qué hoja se sirve |
+| `content/pages.json` → `documents[].regionTargets/regionExcludes` | los destinos de una región LOCAL (encabezado/pie por página, hijos de, categoría, etiqueta) | `{type, ref: {postType\|taxonomy, slug}}` en lugar de `{type, id}` | se resuelven DESPUÉS de escribir las páginas |
+| páginas en bloques con `<!-- wp:navigation {"ref":N} -->` | el bloque que cita una navegación | `ocdNavRef` (slug) en lugar de `ref` | vuelve a ser el número de la navegación de este sitio |
+
+Los medios del estado del sitio van en `content.media` como los demás (ruta real + sha256 + activo deduplicado por
+contenido). Los que NO son adjuntos de la Biblioteca (set de íconos, hojas) llevan `"attach": false` y `"group"`
+(`iconos` | `disenos`); el ícono y los logos llevan `"group": "marca"` y sí se registran como adjuntos.
+
+**Reglas de importación**
+
+- *Todo se valida antes de escribir.* Una sección con forma inválida (tipo de enlace inventado, ruta de archivo que sale de
+  `uploads`, slug mal formado) rechaza el paquete entero (`cod_package_site_shape`). El destino de una región que ni el
+  paquete ni el sitio tienen lo rechaza también (`cod_package_region_target_unresolved`). Un enlace de menú o de navegación a
+  un contenido que el destino no tiene NO rechaza: pasa a ser un enlace común (conserva su URL) y se avisa.
+- *Idempotente.* Los menús y las navegaciones se buscan por slug; los archivos, por ruta y sha256; un segundo import del mismo
+  paquete no crea menús, enlaces, navegaciones, adjuntos ni páginas de más ni vuelve a copiar archivos.
+- *No pisa lo editado en el destino* (el mismo mecanismo que H9). El destino recuerda, por cada ajuste, el valor en que lo
+  dejó la última importación (`cod_package_ajustes_importados`). Un ajuste se **escribe** si el destino lo tiene vacío o "de
+  fábrica" (título «WordPress», sin descripción, enlaces simples…), si ya es igual al del paquete, o si nadie lo tocó desde la
+  última importación. Si el destino tiene otro valor, editado después, el paquete ENTERO se rechaza
+  (`cod_package_settings_edited`, con la lista de lo editado) y no se escribe nada, salvo el reemplazo expreso: la misma
+  casilla de la pantalla y el mismo `--reemplazar-editadas` de WP-CLI que ya usa H9.
+- *Orden de escritura:* ADN → medios → documentos (con su composición) → navegaciones nuevas (vacías, para tener su número)
+  → páginas → regiones (con sus destinos ya resueltos) → ajustes, marca, navegaciones (contenido), menús y ubicaciones → hojas.
+
+**Lo que NO lleva, y por qué**
+
+- `blog_public` (visibilidad en buscadores), `admin_email`, `siteurl`/`home`, zona horaria, idioma, formatos de fecha, comentarios,
+  tamaños de medios y usuarios: son decisiones DEL SITIO DE DESTINO. Producción suele querer lo contrario del local (indexarse,
+  otro correo, otra zona), y un paquete que los pisara dejaría el sitio real sin indexar o con el correo del local.
+- Plantillas y partes de plantilla guardadas en la base (`wp_template`, `wp_template_part`) y los estilos globales del usuario
+  (`wp_global_styles`): el aspecto lo gobierna el ADN (F2); un segundo canal de estilo en el paquete reabriría la puerta que
+  F1 cerró.
+- `cod_theme_definitions` (colores, tipografías y el ícono que declara el tema): es la PROYECCIÓN del ADN; la trae el ADN. Ojo:
+  su campo `favicon` guarda una URL con el host del origen; mientras no lo regenere la proyección, el sitio de destino sirve el
+  ícono de WordPress (`site_icon`, que sí viaja) y no el declarado por el tema.
+- Menús de entradas sin publicar, navegaciones sin publicar y los enlaces de menú a contenido que ya no existe (viajan como enlace
+  común).
+- Las ubicaciones de menú de un tema que el destino no tenga activo: se guardan igual (son opciones del tema activo del destino).
+
 **H9.** Una página en bloques no se convierte jamás en shortcode, y una página en bloques editada en el sitio de destino
 no se pisa: si el paquete trae una página que allí ya está en bloques con un contenido distinto del que dejó la última
 importación (`_cod_package_content_sha`), el paquete ENTERO se rechaza con `cod_package_block_page_edited` y no se
@@ -357,6 +413,11 @@ paquete que trae como página del lienzo una página que allí ya es de bloques 
 Los paquetes del esquema anterior (`schemaVersion` + `pages`/`documents`, sin `formatVersion`) se siguen importando.
 
 ## 11. Pendientes fuera de alcance
+
+- Los destinos de región que apuntan a contenido que el paquete no exporta (páginas en borrador, entradas) se resuelven por slug
+  contra el destino: si allí no existe, el paquete se rechaza. No hay forma de pedir "ignorar esa regla".
+- Si el destino tiene más documentos del mismo diseño que el origen, la hoja generada que viaja no incluye sus reglas hasta que
+  el destino vuelva a aplicar una composición (que regenera la hoja).
 
 El esquema del manifiesto (secciones 1 a 9) sigue sin inspeccionar bytes: lo hace el plugin (§10).
 Siguen pendientes, y fuera del plugin: el *round-trip* con ContOpe Design Desktop de `desktopSource` e `idml`

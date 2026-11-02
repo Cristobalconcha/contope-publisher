@@ -32,6 +32,11 @@ por `projectPortableDesignModel` del Core desde un ADN de prueba (`scripts/adn/m
 acepta `parsePortableDesignModel` (`... validar`). Los demás archivos que el manifiesto declara (tema, fuentes,
 fuente de Desktop, IDML, readme) siguen sin existir: el importador sólo lee y verifica lo que usa.
 
+El `wordpress/state.json` de `desktop-interchange` es deliberadamente de `version: 1` (sin las secciones del estado del
+sitio: `site`, `branding`, `navigation`, `menus`…): es el caso "paquete anterior" que el importador tiene que seguir leyendo
+(`docs/package-format-v1.md` §10.1). El estado del sitio se prueba de punta a punta en `scripts/probar-paquete-bloques.php`
+(sección 9) y en `scripts/paquete/probar-pantalla.mjs`.
+
 Los demás valores `sha256` de los fixtures son *placeholders* de formato (digestos
 reales de semillas derivadas de la ruta declarada), no digestos de los bytes
 reales del ZIP. El empaquetador debe recalcularlos al cerrar el `.ocdsite`.

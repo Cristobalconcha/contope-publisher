@@ -4,6 +4,8 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+require_once __DIR__ . '/class-cod-site-package-sitio.php';
+
 /**
  * Empaqueta el sitio en un `.ocdsite` v1 (docs/package-format-v1.md): un ZIP con `manifest.json`
  * (`formatVersion` + `entrypoints`), el contenido, el ADN, el estado de WordPress y los medios.
@@ -18,7 +20,10 @@ if (!defined('ABSPATH')) {
  *    plantilla global activa y los estilos compartidos.
  *  - `design/model.json`    el ADN activo, si hay uno, en el envoltorio `contope/design-model`
  *                           (el mismo que valida `parsePortableDesignModel` del Core).
- *  - `wordpress/state.json` lo que no es contenido: cómo se aplicó el ADN y qué página es la portada.
+ *  - `wordpress/state.json` lo que no es contenido: cómo se aplicó el ADN, qué página es la portada y el
+ *                           ESTADO DEL SITIO (COD_Site_Package_Sitio): título y descripción, enlaces
+ *                           permanentes, ícono y logo, menús y navegaciones con sus ubicaciones, el set de
+ *                           íconos y las hojas de diseño. Ningún número de WordPress viaja.
  *  - `themes/<tema>/theme.json` el theme.json del tema activo (informativo: el destino NO lo
  *                           aplica; el ADN no lo pisa en F1, ver ESPEC 3.3).
  *  - `assets/…`             los medios que las páginas, los documentos y las fuentes citan, con
@@ -68,15 +73,10 @@ final class COD_Site_Package_Exporter
         // Las regiones con tipo (encabezado, cuerpo, pie) valen por sí mismas: una región GLOBAL no
         // está en ninguna plantilla ni la cita ninguna página, y sin ella el sitio importado sale
         // sin encabezado ni pie. Antes de F1b sólo viajaban las que estaban en la plantilla global.
+        // Sus destinos por página/categoría/etiqueta viajan por identidad (slug), no por número.
         $avisos = [];
         foreach ($this->repository->list_region_documents() as $region) {
             $document_ids[(string) $region['documentId']] = true;
-            foreach (array_merge((array) ($region['regionTargets'] ?? []), (array) ($region['regionExcludes'] ?? [])) as $regla) {
-                if (is_array($regla) && isset($regla['id'])) {
-                    $avisos[] = 'La región «' . $region['documentId'] . '» apunta a un destino por número (' . $regla['type'] . ' ' . $regla['id'] . '); ese número es de ESTE sitio y puede no ser el mismo en el destino.';
-                    break;
-                }
-            }
         }
 
         // Los estilos compartidos (.cod-btn, .contacto__cta--ghost, el matte de luminancia…) viven
@@ -97,6 +97,15 @@ final class COD_Site_Package_Exporter
             $documents[(string) $document_id] = $document;
         }
 
+        // ---- el estado del sitio (marca, menús, íconos, hojas) y los destinos de región en forma portable
+        $documents = COD_Site_Package_Sitio::documentos_portables($documents, $avisos);
+        $sitio = COD_Site_Package_Sitio::capturar($documents, $avisos);
+        $navegaciones = COD_Site_Package_Sitio::navegaciones_por_id();
+        foreach ($paginas['blocks'] as $i => $page) {
+            // un bloque de navegación cita su navegación por número: viaja por slug
+            $paginas['blocks'][$i]['postContent'] = COD_Site_Package_Sitio::contenido_a_portable($page['postContent'], $navegaciones, $avisos);
+        }
+
         // ---- medios: los que citan los documentos, las páginas en bloques y las fuentes del sitio
         $media_paths = $this->collect_media_paths($documents);
         foreach ($paginas['blocks'] as $page) {
@@ -106,6 +115,13 @@ final class COD_Site_Package_Exporter
         // así que nunca las detecta el escaneo por texto: sin esto, un paquete "completo" migra las
         // imágenes pero deja el sitio destino sin las tipografías reales.
         $media_paths = array_merge($media_paths, $this->collect_site_font_paths());
+        // Lo que el estado del sitio necesita: el archivo del ícono y del logo (adjuntos), el set de íconos y
+        // las hojas de diseño (archivos sueltos de uploads, sin adjunto).
+        $propiedades_de_medio = [];
+        foreach ($sitio['medios'] as $relativa => $m) {
+            $media_paths[$relativa] = $m['abs'];
+            $propiedades_de_medio[$relativa] = ['attach' => $m['attach'], 'group' => $m['grupo']];
+        }
         ksort($media_paths);
 
         // ---- piezas del paquete
@@ -151,6 +167,13 @@ final class COD_Site_Package_Exporter
             $tamano = (int) filesize($absoluta);
             $id = 'urn:ocd:asset:sha256-' . substr($sha, 0, 40);
             $entrada = ['path' => $relativa, 'sha256' => $sha, 'size' => $tamano, 'asset' => $include_media ? $id : null];
+            if (isset($propiedades_de_medio[$relativa])) {
+                // "attach: false" = archivo de uploads que NO es un adjunto de la Biblioteca (íconos, hojas)
+                if ($propiedades_de_medio[$relativa]['attach'] === false) {
+                    $entrada['attach'] = false;
+                }
+                $entrada['group'] = $propiedades_de_medio[$relativa]['group'];
+            }
             $lista_medios[] = $entrada;
             if ($include_media && !isset($assets[$id])) {
                 $extension = strtolower(preg_replace('/[^A-Za-z0-9]/', '', (string) pathinfo($absoluta, PATHINFO_EXTENSION)) ?? '');
@@ -183,10 +206,10 @@ final class COD_Site_Package_Exporter
 
         $state_json = wp_json_encode([
             'schema' => COD_Site_Package_Format::STATE_SCHEMA,
-            'version' => 1,
+            'version' => 2,
             'adn' => $adn === null ? null : $adn['estado'],
             'reading' => $this->lectura($paginas),
-        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        ] + $sitio['estado'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         if (!is_string($state_json)) {
             return new WP_Error('cod_package_encode', 'No fue posible serializar el estado de WordPress del paquete.');
         }

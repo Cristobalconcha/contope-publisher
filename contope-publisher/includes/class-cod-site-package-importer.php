@@ -4,6 +4,8 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+require_once __DIR__ . '/class-cod-site-package-sitio.php';
+
 /**
  * Importa un paquete generado por COD_Site_Package_Exporter: recrea (o actualiza, si ya existen)
  * los documentos Canvas, las regiones y las páginas, coloca los medios bajo `wp-content/uploads/`
@@ -122,6 +124,14 @@ final class COD_Site_Package_Importer
             return $faltan;
         }
 
+        // El estado del sitio (título, enlaces permanentes, marca, menús, ubicaciones, íconos, hojas, destinos de
+        // región): se resuelve contra ESTE sitio y se decide qué haría, antes de escribir. Un valor propio del
+        // destino, editado después de la última importación, rechaza el paquete entero salvo el reemplazo expreso.
+        $sitio = COD_Site_Package_Sitio::revisar($plan['estado'], $plan['pages'], $documentos, $plan['media'], $source_url, $target_url, $reemplazar);
+        if (is_wp_error($sitio)) {
+            return $sitio;
+        }
+
         // La compuerta del diseño: un paquete que llega por una petición que no es una persona en el
         // editor (el MCP, una contraseña de aplicación) trae sus documentos y sus páginas por la
         // misma compuerta que cualquier otra escritura. Se revisan TODOS antes de escribir el primero.
@@ -192,9 +202,17 @@ final class COD_Site_Package_Importer
             }
         }
 
+        // las navegaciones de bloques que el paquete trae y este sitio no tiene: primero, para que las páginas
+        // que las citan reciban su número
+        $navegaciones = COD_Site_Package_Sitio::asegurar_navegaciones($sitio);
+
         $page_ids = [];
         $por_slug = [];
+        $avisos_de_enlaces = [];
         foreach ($paginas as $p) {
+            if ($p['page']['kind'] === 'blocks') {
+                $p['contenido'] = COD_Site_Package_Sitio::contenido_a_destino($p['contenido'], [], $navegaciones, $avisos_de_enlaces);
+            }
             $post_id = $p['page']['kind'] === 'blocks'
                 ? $this->escribir_pagina_en_bloques($p)
                 : $this->import_page($p['page']);
@@ -205,7 +223,22 @@ final class COD_Site_Package_Importer
             $por_slug[(string) $p['page']['slug']] = (int) $post_id;
         }
 
+        // las regiones, ahora que las páginas existen: sus destinos viajan por slug y aquí vuelven a ser números
+        foreach ($sitio['reglas'] as $document_id => $reglas) {
+            $region_saved = $this->repository->save_region(
+                (string) $document_id,
+                (string) $documentos[$document_id]['regionKind'],
+                (string) $documentos[$document_id]['regionScope'],
+                COD_Site_Package_Sitio::reglas_a_destino($reglas['targets'], $por_slug),
+                COD_Site_Package_Sitio::reglas_a_destino($reglas['excludes'], $por_slug)
+            );
+            if (is_wp_error($region_saved)) {
+                return $region_saved;
+            }
+        }
+
         $portada = $this->aplicar_portada($plan['reading'], $por_slug);
+        $aplicado = COD_Site_Package_Sitio::aplicar($sitio, $por_slug, $this->media_sync);
 
         return [
             'pages' => $page_ids,
@@ -218,7 +251,8 @@ final class COD_Site_Package_Importer
             })),
             'adn' => $resultado_adn,
             'frontPage' => $portada,
-            'avisos' => $plan['avisos'],
+            'avisos' => array_merge($plan['avisos'], $sitio['avisos'], $avisos_de_enlaces, $aplicado['avisos']),
+            'sitio' => $aplicado['hechos'],
             'formato' => $plan['dialect'],
         ];
     }
@@ -259,6 +293,7 @@ final class COD_Site_Package_Importer
             'model' => null,
             'adnEmitir' => false,
             'reading' => null,
+            'estado' => null,
             'avisos' => [],
         ];
     }
@@ -333,7 +368,7 @@ final class COD_Site_Package_Importer
                 }
                 $asset = $activos[$m['asset']];
             }
-            $medios[] = ['path' => $m['path'], 'sha256' => is_string($m['sha256'] ?? null) ? $m['sha256'] : null, 'asset' => $asset];
+            $medios[] = ['path' => $m['path'], 'sha256' => is_string($m['sha256'] ?? null) ? $m['sha256'] : null, 'asset' => $asset, 'attach' => ($m['attach'] ?? true) !== false];
         }
 
         $model = null;
@@ -372,6 +407,7 @@ final class COD_Site_Package_Importer
             'model' => $model,
             'adnEmitir' => $emitir,
             'reading' => isset($estado['reading']) && is_array($estado['reading']) ? $estado['reading'] : null,
+            'estado' => isset($entrypoints['wordpressState']) && is_array($estado) ? $estado : null,
             'avisos' => isset($contenido['avisos']) && is_array($contenido['avisos']) ? array_values(array_map('strval', $contenido['avisos'])) : [],
         ];
     }
@@ -467,9 +503,13 @@ final class COD_Site_Package_Importer
             if (is_wp_error($clean_project)) {
                 $clean_project = '{}';
             }
+            // La composición (el recibo de cómo se armó: de ahí sale a qué diseño pertenece el documento y, con él, su
+            // hoja generada) sólo se conserva si el saneado no cambió el documento: si lo cambió, ya no lo describe.
+            $composicion = $this->rewrite_urls((string) ($document['composition'] ?? ''), $source_url, $target_url);
             $listos[(string) $document_id] = [
                 'html' => $clean_html,
                 'css' => $clean_css,
+                'composition' => $clean_html === $html && $clean_css === $css ? $composicion : '',
                 'projectData' => $clean_project,
                 'title' => trim((string) ($document['title'] ?? '')),
                 'regionKind' => (string) ($document['regionKind'] ?? ''),
@@ -509,6 +549,10 @@ final class COD_Site_Package_Importer
             }
 
             $nuevo = $this->rewrite_urls((string) $page['postContent'], $source_url, $target_url);
+            // los bloques de navegación citan su navegación por slug: las que este sitio ya tiene vuelven a ser
+            // su número (las que aún no existen se resuelven al escribir)
+            $sin_avisos = [];
+            $nuevo = COD_Site_Package_Sitio::contenido_a_destino($nuevo, [], COD_Site_Package_Sitio::navegaciones_id_por_slug(), $sin_avisos, true);
             if ($destino === null) {
                 $plan[] = ['page' => $page, 'accion' => 'crear', 'destino' => null, 'contenido' => $nuevo, 'previo' => ''];
                 continue;
@@ -682,20 +726,16 @@ final class COD_Site_Package_Importer
             wp_update_post(['ID' => (int) $saved['postId'], 'post_title' => sanitize_text_field($title)]);
         }
 
-        $region_kind = (string) $documento['regionKind'];
-        if ($region_kind !== '') {
-            $region_saved = $this->repository->save_region(
-                $document_id,
-                $region_kind,
-                (string) $documento['regionScope'],
-                $documento['regionTargets'],
-                $documento['regionExcludes']
-            );
-            if (is_wp_error($region_saved)) {
-                return $region_saved;
+        // La composición viaja con el documento (save() la vacía): sin ella el destino no sabe de qué diseño
+        // es el documento y sirve su CSS en línea en vez de la hoja generada.
+        if ((string) $documento['composition'] !== '' && isset($saved['postId'])) {
+            $decodificada = json_decode((string) $documento['composition'], true);
+            if (is_array($decodificada) && isset($decodificada['composition'], $decodificada['design'])) {
+                update_post_meta((int) $saved['postId'], COD_Canvas_Document_Repository::META_COMPOSITION, wp_slash((string) $documento['composition']));
             }
         }
 
+        // (La región —tipo, alcance y destinos— se escribe después de las páginas: sus destinos viajan por slug.)
         return true;
     }
 
@@ -908,7 +948,7 @@ final class COD_Site_Package_Importer
             }
             if (is_file($destino) && hash_equals($m['asset']['sha256'], (string) hash_file('sha256', $destino))) {
                 $iguales++;
-                $puestos[] = ['final' => $destino, 'temporal' => null];
+                $puestos[] = ['final' => $destino, 'temporal' => null, 'attach' => $m['attach']];
                 continue;
             }
             $temporal = $this->preparar_medio($zip, $m['asset'], $destino);
@@ -916,7 +956,7 @@ final class COD_Site_Package_Importer
                 $errores = $temporal;
                 break;
             }
-            $puestos[] = ['final' => $destino, 'temporal' => $temporal];
+            $puestos[] = ['final' => $destino, 'temporal' => $temporal, 'attach' => $m['attach']];
         }
         if ($errores !== null) {
             foreach ($puestos as $p) {
@@ -934,11 +974,19 @@ final class COD_Site_Package_Importer
                     // Windows no mueve encima de un archivo existente
                     @unlink($p['final']);
                     if (!@rename($p['temporal'], $p['final'])) {
-                        @unlink($p['temporal']);
+                        // no se dejan archivos a medias: los temporales que aún no se movieron se borran
+                        foreach ($puestos as $resto) {
+                            if ($resto['temporal'] !== null && is_file($resto['temporal'])) {
+                                @unlink($resto['temporal']);
+                            }
+                        }
                         return new WP_Error('cod_package_media_write', 'No fue posible escribir ' . basename($p['final']) . '.');
                     }
                 }
                 $copiados++;
+            }
+            if (!$p['attach']) {
+                continue; // íconos del set y hojas generadas: archivos de uploads, no adjuntos de la Biblioteca
             }
             $sync_result = $this->media_sync->sync_file($p['final']);
             if (is_wp_error($sync_result)) {

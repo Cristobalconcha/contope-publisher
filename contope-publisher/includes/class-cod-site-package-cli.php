@@ -61,9 +61,10 @@ final class COD_Site_Package_CLI
      * : Ruta del archivo .zip (o .ocdsite) a importar.
      *
      * [--reemplazar-editadas]
-     * : Permite reemplazar las páginas en bloques que se editaron en este
-     * sitio. Por defecto NO: si el paquete trae una página que aquí ya está
-     * en bloques con ediciones distintas, el paquete se rechaza entero.
+     * : Permite reemplazar lo que se editó en este sitio: las páginas en
+     * bloques y los ajustes (título, menús, logo, enlaces permanentes…). Por
+     * defecto NO: si el paquete trae algo que aquí ya tiene ediciones
+     * distintas, el paquete se rechaza entero.
      *
      * ## EXAMPLES
      *
@@ -93,6 +94,9 @@ final class COD_Site_Package_CLI
         ));
         if (is_array($result['adn'] ?? null)) {
             WP_CLI::log(sprintf('ADN %s revisión %d: %s.', $result['adn']['designId'], $result['adn']['revision'], $result['adn']['resultado']));
+        }
+        if (!empty($result['sitio'])) {
+            WP_CLI::log(sprintf('Estado del sitio: %d elementos escritos (%s).', count((array) $result['sitio']), implode(', ', array_map('strval', (array) $result['sitio']))));
         }
         foreach ((array) ($result['avisos'] ?? []) as $aviso) {
             WP_CLI::warning((string) $aviso);

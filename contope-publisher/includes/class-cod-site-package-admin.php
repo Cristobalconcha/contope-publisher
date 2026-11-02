@@ -6,7 +6,8 @@ if (!defined('ABSPATH')) {
 
 /**
  * Pantalla "Portabilidad": exporta el sitio como un paquete `.ocdsite` (un ZIP:
- * páginas del lienzo y en bloques, encabezado y pie, ADN y medios) y permite
+ * páginas del lienzo y en bloques, encabezado y pie, ADN, medios y el estado del sitio:
+ * título, enlaces permanentes, logo e ícono, menús, íconos y hojas de diseño) y permite
  * importar un paquete generado en otra instalación. Es la vía de PRODUCCIÓN para
  * subir un sitio armado en el local: exportar allá, importar acá. Ver
  * COD_Site_Package_Exporter / COD_Site_Package_Importer.
@@ -84,7 +85,7 @@ final class COD_Site_Package_Admin
             <?php endif; ?>
 
             <h2>Exportar</h2>
-            <p>Genera un paquete <code>.ocdsite</code> (un ZIP) con las páginas publicadas del lienzo y las páginas en bloques (su contenido exacto), el encabezado y el pie globales, los estilos compartidos y, si el sitio tiene uno activo, el ADN de diseño. Elige si incluir también los archivos de <code>uploads/</code> que esas páginas citan.</p>
+            <p>Genera un paquete <code>.ocdsite</code> (un ZIP) con las páginas publicadas del lienzo y las páginas en bloques (su contenido exacto), el encabezado y el pie globales, los estilos compartidos, el estado del sitio (título y descripción, enlaces permanentes, logo e ícono, menús y navegaciones, set de íconos, hojas de diseño) y, si el sitio tiene uno activo, el ADN de diseño. Nada viaja por número de WordPress: lo que apunta a una página o categoría viaja por su nombre y se vuelve a enlazar en el destino. Elige si incluir también los archivos de <code>uploads/</code> que esas páginas citan.</p>
             <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
                 <input type="hidden" name="action" value="<?php echo esc_attr(self::EXPORT_ACTION); ?>">
                 <?php wp_nonce_field(self::EXPORT_ACTION); ?>
@@ -105,7 +106,7 @@ final class COD_Site_Package_Admin
             <hr>
 
             <h2>Importar</h2>
-            <p>Sube un paquete generado por esta misma pantalla en otra instalación — completo o solo estructura, cualquiera de los dos funciona acá. Las páginas y documentos existentes con el mismo identificador se actualizan; no se duplican. Si el paquete trae un ADN de diseño, se activa por la misma puerta que la pantalla «Diseño (ADN)». Antes de escribir nada se revisa todo el paquete: si algo no pasa, el sitio queda como estaba.</p>
+            <p>Sube un paquete generado por esta misma pantalla en otra instalación — completo o solo estructura, cualquiera de los dos funciona acá. Las páginas y documentos existentes con el mismo identificador se actualizan; no se duplican. Si el paquete trae un ADN de diseño, se activa por la misma puerta que la pantalla «Diseño (ADN)». Antes de escribir nada se revisa todo el paquete: si algo no pasa, el sitio queda como estaba. Un ajuste de este sitio (título, menús, logo…) que se editó después de la última importación no se pisa: el paquete se rechaza entero, salvo que marques la casilla de reemplazo.</p>
             <form method="post" enctype="multipart/form-data" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
                 <input type="hidden" name="action" value="<?php echo esc_attr(self::IMPORT_ACTION); ?>">
                 <?php wp_nonce_field(self::IMPORT_ACTION); ?>
@@ -113,7 +114,7 @@ final class COD_Site_Package_Admin
                 <p>
                     <label>
                         <input type="checkbox" name="cod_replace_edited_blocks" value="1">
-                        Reemplazar las páginas en bloques que se editaron en este sitio (por defecto NO: si el paquete trae una página que aquí ya está en bloques con ediciones distintas, el paquete se rechaza entero y no se toca nada)
+                        Reemplazar lo que se editó en este sitio: páginas en bloques y ajustes (título, menús, logo, enlaces permanentes…) (por defecto NO: si el paquete trae algo que aquí ya tiene ediciones distintas, el paquete se rechaza entero y no se toca nada)
                     </label>
                 </p>
                 <?php submit_button('Importar paquete'); ?>
@@ -186,6 +187,9 @@ final class COD_Site_Package_Admin
         }
         if (is_array($r['frontPage'] ?? null) && !empty($r['frontPage']['aplicada'])) {
             $lineas[] = 'Se fijó la página de portada.';
+        }
+        if (!empty($r['sitio'])) {
+            $lineas[] = sprintf('Estado del sitio: %d elementos escritos (ajustes, marca, menús, navegaciones).', count((array) $r['sitio']));
         }
         foreach ((array) ($r['avisos'] ?? []) as $aviso) {
             $lineas[] = 'Aviso: ' . (string) $aviso;

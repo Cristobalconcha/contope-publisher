@@ -3,6 +3,8 @@
 //
 // Es un sitio aparte de Santa Luisa (8890), Econut (8891) y Basis (8894): carpeta propia
 // (`wp-local-f1b-destino`), base SQLite propia, puerto 8895. No toca ninguno de los otros.
+// Con `OCD_DESTINO_PUERTO=8896` crea OTRO destino independiente (`wp-local-f1b-destino-8896`): sirve cuando
+// otra persona o proceso está usando el 8895.
 //
 // Qué lleva: el núcleo de WordPress (copiado de la carpeta de Basis, sólo lectura), la integración
 // de SQLite (copiada de Econut), el plugin contope-publisher y los temas contope-canvas y
@@ -24,8 +26,8 @@ import { fileURLToPath } from 'node:url';
 
 const repo = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const casa = path.resolve(repo, '..');
-const PUERTO = 8895;
-const carpeta = path.join(casa, 'wp-local-f1b-destino');
+const PUERTO = Number(process.env.OCD_DESTINO_PUERTO ?? 8895);
+const carpeta = path.join(casa, PUERTO === 8895 ? 'wp-local-f1b-destino' : `wp-local-f1b-destino-${PUERTO}`);
 const wp = path.join(carpeta, 'wordpress');
 const php = path.join(casa, 'wp-local', 'php', 'php.exe');
 const phpIni = path.join(casa, 'wp-local', 'php', 'php.ini');

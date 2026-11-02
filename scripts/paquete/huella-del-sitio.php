@@ -6,6 +6,10 @@
  *   php huella-del-sitio.php <wp-load.php> paquete <entrada.json>
  *       entrada.json: {"media": ["2025/07/a.png", ...], "documents": ["cod-region-header", ...]}
  *       salida: {home, pages{slug:{id,status,len,sha,docId,rev}}, media{ruta:sha|null}, documents{id:{htmlSha,cssSha,projectDataSha,regionKind,regionScope}}, adn, reading}
+ *   php huella-del-sitio.php <wp-load.php> sitio
+ *       salida: el estado del SITIO en forma comparable entre dos instalaciones (sin números de WordPress): título,
+ *       descripción, enlaces permanentes, ícono y logos (con sha256 del archivo), set de íconos, hojas de diseño y
+ *       los menús y navegaciones como los pinta WordPress (texto y destino RELATIVO de cada enlace)
  *   php huella-del-sitio.php <wp-load.php> resumen
  *       salida: {posts, sha, opciones, maxId}  → un resumen de TODO el contenido, para comprobar que un sitio no cambió
  */
@@ -23,6 +27,12 @@ if ($modo === 'resumen') {
     $metas = (string) $wpdb->get_var("SELECT MD5(GROUP_CONCAT(CONCAT(post_id,'=',meta_key,'=',MD5(IFNULL(meta_value,''))) ORDER BY meta_id SEPARATOR '|')) FROM {$wpdb->postmeta} WHERE meta_key NOT IN ('_edit_lock','_edit_last')");
     $opciones = (array) $wpdb->get_col("SELECT option_name FROM {$wpdb->options} WHERE option_name NOT LIKE '_transient%' AND option_name NOT LIKE '_site_transient%' ORDER BY option_name");
     echo json_encode(['posts' => count($filas), 'sha' => hash('sha256', $linea), 'metas' => $metas, 'opciones' => count($opciones), 'maxId' => (int) end($filas)->ID]);
+    exit(0);
+}
+
+if ($modo === 'sitio') {
+    require __DIR__ . '/huella-del-sitio-estado.php';
+    echo json_encode(cod_huella_del_estado_del_sitio(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     exit(0);
 }
 

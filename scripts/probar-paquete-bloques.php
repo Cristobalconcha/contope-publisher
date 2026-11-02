@@ -14,7 +14,9 @@
  * Al terminar deja el sitio como lo encontró (posts, opciones y archivos de uploads de antes se conservan).
  */
 define('WP_USE_THEMES', false);
-$wp_load = getenv('COD_PRUEBA_WP') ?: __DIR__ . '/../../wp-local-f1b-destino/wordpress/wp-load.php';
+// El destino limpio: 8895 por omisión; `OCD_DESTINO_PUERTO=8896` usa otro independiente (crear-destino-limpio.mjs).
+$puerto_destino = (int) (getenv('OCD_DESTINO_PUERTO') ?: 8895);
+$wp_load = getenv('COD_PRUEBA_WP') ?: __DIR__ . '/../../wp-local-f1b-destino' . ($puerto_destino === 8895 ? '' : '-' . $puerto_destino) . '/wordpress/wp-load.php';
 require $wp_load;
 require_once ABSPATH . 'wp-admin/includes/file.php'; // wp_tempnam(): el exportador la usa y en CLI no se carga sola
 require __DIR__ . '/adn/lib/contrato-de-prueba.php';
@@ -38,7 +40,7 @@ $PHP_LOCAL = 'C:/Users/Cristobal concha/wp-local/php/php.exe';
 
 // ---------------------------------------------------------------------------
 echo "\n== 0. precondiciones ==\n";
-$comprobar('el sitio de prueba es el destino limpio (puerto 8895)', strpos((string) home_url(), ':8895') !== false, (string) home_url());
+$comprobar('el sitio de prueba es un destino limpio (carpeta wp-local-f1b-destino*)', strpos(str_replace('\\', '/', (string) ABSPATH), '/wp-local-f1b-destino') !== false, (string) home_url() . ' ' . ABSPATH);
 $repo_dir = realpath($raiz . '/contope-publisher');
 $inst_dir = rtrim((string) COD_PUBLISHER_DIR, '/\\');
 $desiguales = [];
@@ -665,6 +667,394 @@ if ($modo_original === null) {
     update_option(COD_ADN_Gate::OPTION_MODE, $modo_original, false);
 }
 COD_ADN_Gate::marcar_contrasena_de_aplicacion(false);
+
+// ---------------------------------------------------------------------------
+echo "\n== 9. P1b.4 — el estado del SITIO viaja: título, enlaces permanentes, logo, ícono, menús, íconos, hojas y destinos de región ==\n";
+// El destino se deja de fábrica y se arma ahí un sitio con todo lo que un paquete tiene que llevar. Se exporta,
+// se vacía (los números de página cambian: WordPress no reutiliza ids) y se importa: lo que apunte a un número
+// del origen quedaría roto, y la prueba lo ve.
+$vaciar_destino = static function () use ($PHP_LOCAL, $raiz, $wp_load): void {
+    $salida = [];
+    exec(escapeshellarg($PHP_LOCAL) . ' -c ' . escapeshellarg('C:/Users/Cristobal concha/wp-local/php/php.ini') . ' ' . escapeshellarg($raiz . '/scripts/paquete/vaciar-destino.php') . ' ' . escapeshellarg($wp_load) . ' 2>&1', $salida);
+    wp_cache_flush();
+};
+$vaciar_destino();
+$vaciar_prueba();
+
+$hacer_png = static function (int $r, int $g, int $b): string {
+    $im = imagecreatetruecolor(48, 48);
+    imagefill($im, 0, 0, (int) imagecolorallocate($im, $r, $g, $b));
+    ob_start();
+    imagepng($im);
+    return (string) ob_get_clean();
+};
+$sincronizador = new COD_Media_Attachment_Sync();
+$adjunto = static function (string $nombre, string $bytes) use ($dir_medios, $sincronizador): int {
+    wp_mkdir_p($dir_medios);
+    file_put_contents($dir_medios . '/' . $nombre, $bytes);
+    $id = $sincronizador->sync_file($dir_medios . '/' . $nombre);
+    return is_wp_error($id) ? 0 : (int) $id;
+};
+$base_subidas = rtrim($upload['basedir'], '/\\');
+
+// ---- el sitio de origen
+$cat_vieja = get_term_by('slug', 'zz-f1b-cat', 'category');
+if ($cat_vieja instanceof WP_Term) {
+    wp_delete_term($cat_vieja->term_id, 'category');
+}
+$cat_id = (int) wp_insert_term('ZZ F1b Categoría', 'category', ['slug' => 'zz-f1b-cat'])['term_id'];
+$contenido_nav_ref = static function (int $nav): string {
+    return "<!-- wp:contope/lienzo -->\n<!-- wp:navigation {\"ref\":" . $nav . ",\"overlayMenu\":\"never\"} /-->\n<!-- /wp:contope/lienzo -->";
+};
+$crear_pagina = static function (string $slug, string $titulo, string $contenido) use ($poner_contenido): int {
+    $id = wp_insert_post(['post_type' => 'page', 'post_status' => 'publish', 'post_title' => $titulo, 'post_name' => $slug, 'post_content' => '[contope_canvas document_id="' . $slug . '"]', 'meta_input' => ['_cod_canvas_document_id' => $slug]], true);
+    $poner_contenido((int) $id, $contenido);
+    update_post_meta((int) $id, '_cod_content_revision', 1);
+    return (int) $id;
+};
+$home = untrailingslashit((string) home_url('/'));
+$id_p1 = $crear_pagina('zz-f1b-nav-inicio', 'ZZ Inicio', "<!-- wp:contope/lienzo -->\n<!-- wp:paragraph -->\n<p>Inicio</p>\n<!-- /wp:paragraph -->\n<!-- /wp:contope/lienzo -->");
+$id_p2 = $crear_pagina('zz-f1b-nav-contacto', 'ZZ Contacto', "<!-- wp:contope/lienzo -->\n<!-- wp:paragraph -->\n<p>Contacto</p>\n<!-- /wp:paragraph -->\n<!-- /wp:contope/lienzo -->");
+$contenido_navegacion = "<!-- wp:navigation-link {\"label\":\"Inicio\",\"type\":\"page\",\"id\":" . $id_p1 . ",\"url\":\"" . $home . "/zz-f1b-nav-inicio/\",\"kind\":\"post-type\",\"isTopLevelLink\":true} /-->\n"
+    . "<!-- wp:navigation-submenu {\"label\":\"Más\",\"type\":\"page\",\"id\":" . $id_p2 . ",\"url\":\"" . $home . "/zz-f1b-nav-contacto/\",\"kind\":\"post-type\",\"isTopLevelLink\":true} -->\n"
+    . "<!-- wp:navigation-link {\"label\":\"Categoría\",\"type\":\"category\",\"id\":" . $cat_id . ",\"url\":\"" . $home . "/category/zz-f1b-cat/\",\"kind\":\"taxonomy\"} /-->\n"
+    . "<!-- /wp:navigation-submenu -->\n"
+    . "<!-- wp:navigation-link {\"label\":\"Externo\",\"url\":\"https://example.org/zz\",\"kind\":\"custom\",\"isTopLevelLink\":true} /-->";
+$nav_id = (int) wp_insert_post(['post_type' => 'wp_navigation', 'post_status' => 'publish', 'post_title' => 'ZZ Navegación principal', 'post_name' => 'zz-f1b-navegacion', 'post_content' => $contenido_navegacion]);
+$id_p3 = $crear_pagina('zz-f1b-nav-citante', 'ZZ Citante', $contenido_nav_ref($nav_id));
+
+$menu_id = (int) wp_create_nav_menu('ZZ Menú clásico');
+wp_update_term($menu_id, 'nav_menu', ['slug' => 'zz-f1b-menu']);
+$item1 = (int) wp_update_nav_menu_item($menu_id, 0, ['menu-item-title' => 'Inicio & más', 'menu-item-type' => 'post_type', 'menu-item-object' => 'page', 'menu-item-object-id' => $id_p1, 'menu-item-status' => 'publish', 'menu-item-position' => 1, 'menu-item-classes' => 'zz-clase otra']);
+wp_update_nav_menu_item($menu_id, 0, ['menu-item-title' => 'Contacto', 'menu-item-type' => 'post_type', 'menu-item-object' => 'page', 'menu-item-object-id' => $id_p2, 'menu-item-parent-id' => $item1, 'menu-item-status' => 'publish', 'menu-item-position' => 2, 'menu-item-target' => '_blank']);
+wp_update_nav_menu_item($menu_id, 0, ['menu-item-title' => 'Temas', 'menu-item-type' => 'taxonomy', 'menu-item-object' => 'category', 'menu-item-object-id' => $cat_id, 'menu-item-status' => 'publish', 'menu-item-position' => 3]);
+wp_update_nav_menu_item($menu_id, 0, ['menu-item-title' => 'Afuera', 'menu-item-type' => 'custom', 'menu-item-url' => 'https://example.org/afuera?x=1', 'menu-item-status' => 'publish', 'menu-item-position' => 4]);
+set_theme_mod('nav_menu_locations', ['primary' => $menu_id, 'footer' => $menu_id]);
+
+update_option('blogname', 'ZZ Título & prueba');
+update_option('blogdescription', 'ZZ descripción del sitio');
+global $wp_rewrite;
+$wp_rewrite->set_permalink_structure('/%postname%/');
+$wp_rewrite->set_category_base('temas-zz');
+
+$adj_icono = $adjunto('zz-icono.png', $hacer_png(200, 30, 30));
+$adj_logo_sitio = $adjunto('zz-logo-sitio.png', $hacer_png(30, 200, 30));
+$adj_logo_tema = $adjunto('zz-logo-tema.png', $hacer_png(30, 30, 200));
+update_option('site_icon', $adj_icono);
+set_theme_mod('custom_logo', $adj_logo_tema);
+update_option('site_logo', $adj_logo_sitio); // WordPress sincroniza custom_logo y site_logo: quedan los dos en este último
+$comprobar('(preparación) tres adjuntos distintos para ícono, logo del sitio y logo del tema', $adj_icono > 0 && $adj_logo_sitio > 0 && $adj_logo_tema > 0 && count(array_unique([$adj_icono, $adj_logo_sitio, $adj_logo_tema])) === 3);
+
+$carpeta_iconos = $base_subidas . '/contope-iconos';
+wp_mkdir_p($carpeta_iconos);
+$svg = static function (string $trazo): string {
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="' . $trazo . '"/></svg>';
+};
+file_put_contents($carpeta_iconos . '/icono-zzf1b-outlined.svg', $svg('M1 1h22v22H1z'));
+file_put_contents($carpeta_iconos . '/icono-zzf1b-rounded.svg', $svg('M2 2h20v20H2z'));
+file_put_contents($carpeta_iconos . '/icono-red-zzf1b.svg', $svg('M3 3h18v18H3z'));
+update_option('cod_icono_estilo', 'rounded');
+
+$diseno_zz = 'zz-f1b-diseno';
+$doc_con_diseno = 'zz-f1b-region-diseno';
+$repositorio->save($doc_con_diseno, '{}', '<header class="zz-d"><p>Con diseño</p></header>', '.zz-d{display:block}');
+$post_diseno = (int) ($repositorio->load_existing($doc_con_diseno)['postId'] ?? 0);
+update_post_meta($post_diseno, COD_Canvas_Document_Repository::META_COMPOSITION, wp_slash(json_encode(['composition' => ['nodes' => []], 'design' => ['designId' => $diseno_zz]])));
+$repositorio->save_region($doc_con_diseno, 'footer', 'global', []);
+$carpeta_hojas = $base_subidas . '/contope-disenos';
+wp_mkdir_p($carpeta_hojas);
+file_put_contents($carpeta_hojas . '/' . $diseno_zz . '-0123456789ab.css', '.zz-d{display:block}' . "\n");
+update_option('cod_disenos_hojas', [$diseno_zz => ['archivo' => $diseno_zz . '-0123456789ab.css', 'sello' => '0123456789ab']], false);
+
+$doc_local = 'zz-f1b-region-local';
+$repositorio->save($doc_local, '{}', '<header class="zz-l"><p>Local</p></header>', '.zz-l{display:block}');
+$repositorio->save_region($doc_local, 'header', 'local', [['type' => 'post', 'id' => $id_p1], ['type' => 'category', 'id' => $cat_id]], [['type' => 'children_of', 'id' => $id_p2]]);
+
+// ---- qué se ve del sitio, en forma portable y comparable entre dos sitios
+$foto_del_sitio = static function () use ($repositorio): array {
+    $avisos = [];
+    $documentos = [];
+    foreach ($repositorio->list_region_documents() as $d) {
+        $documentos[(string) $d['documentId']] = $d;
+    }
+    $documentos = COD_Site_Package_Sitio::documentos_portables($documentos, $avisos);
+    $captura = COD_Site_Package_Sitio::capturar($documentos, $avisos);
+    $reglas = [];
+    foreach ($documentos as $id => $d) {
+        $reglas[(string) $id] = [$d['regionTargets'], $d['regionExcludes']];
+    }
+    $archivos = [];
+    foreach ($captura['medios'] as $ruta => $m) {
+        $archivos[$ruta] = hash_file('sha256', $m['abs']);
+    }
+    ksort($archivos);
+    ksort($reglas);
+    // los números de WordPress no se comparan: se comparan las identidades
+    return ['estado' => $captura['estado'], 'reglas' => $reglas, 'archivos' => $archivos];
+};
+/** Qué secciones del sitio no son iguales (vacío = el destino es igual al origen). */
+$diferencias = static function (array $origen, array $destino): array {
+    $mal = [];
+    foreach ($origen['estado'] as $seccion => $valor) {
+        if (json_encode($valor) !== json_encode($destino['estado'][$seccion] ?? null)) {
+            $mal[] = $seccion;
+        }
+    }
+    foreach (['reglas', 'archivos'] as $seccion) {
+        if (json_encode($origen[$seccion]) !== json_encode($destino[$seccion])) {
+            $mal[] = $seccion;
+        }
+    }
+    return $mal;
+};
+$foto_origen = $foto_del_sitio();
+$ids_origen = ['p1' => $id_p1, 'p2' => $id_p2, 'p3' => $id_p3, 'nav' => $nav_id, 'cat' => $cat_id];
+$comprobar('(preparación) la foto del origen trae menús, navegación, marca, íconos, hojas y reglas', count($foto_origen['estado']['menus']) === 1 && count($foto_origen['estado']['navigation']) === 1 && $foto_origen['estado']['branding']['siteIcon'] !== null && $foto_origen['estado']['branding']['customLogo'] !== null && $foto_origen['estado']['iconSet']['files'] === 3 && isset($foto_origen['estado']['designSheets'][$diseno_zz]) && isset($foto_origen['reglas'][$doc_local]), json_encode(array_keys($foto_origen['estado'])));
+
+// ---- exportar
+$zip9 = $exportador->export(true);
+$comprobar('exportar el sitio con menús, marca, íconos y hojas: sin error', !is_wp_error($zip9), is_wp_error($zip9) ? $zip9->get_error_code() . ': ' . $zip9->get_error_message() : '');
+if (is_wp_error($zip9)) {
+    echo "\n  No se puede seguir sin paquete.\n";
+    exit(1);
+}
+$temporales[] = $zip9;
+$z9 = $leer_zip($zip9);
+$manifiesto9 = json_decode($z9['contenidos']['manifest.json'], true);
+$comprobar('el manifiesto del paquete lo valida el lector del plugin y el esquema real (Ajv)', COD_Site_Package_Format::validar_manifiesto($manifiesto9) === [] && $ajv($z9['contenidos']['manifest.json'])['ok'] === true);
+$estado9 = json_decode($z9['contenidos']['wordpress/state.json'], true);
+$comprobar('state.json trae las secciones del sitio (versión 2)', ($estado9['version'] ?? 0) === 2 && isset($estado9['site'], $estado9['branding'], $estado9['navigation'], $estado9['menus'], $estado9['menuLocations'], $estado9['iconSet'], $estado9['designSheets']));
+$documentos9 = json_decode($z9['contenidos']['content/pages.json'], true)['documents'];
+$portable = $estado9['navigation'][0]['content'] . "
+" . json_encode($estado9['menus']) . "
+" . json_encode([$documentos9[$doc_local]['regionTargets'], $documentos9[$doc_local]['regionExcludes']]);
+$numeros_viajan = [];
+foreach ([$id_p1 => 'p1', $id_p2 => 'p2', $cat_id => 'cat'] as $numero => $nombre) {
+    if (preg_match('/"(id|object_id)":' . $numero . '(?!\d)/', $portable) === 1) {
+        $numeros_viajan[] = $nombre . '=' . $numero;
+    }
+}
+$comprobar('(piso) lo portable sí trae las referencias por nombre (ocdRef, ref/slug)', strpos($portable, 'ocdRef') !== false && strpos($portable, '"slug":"zz-f1b-nav-inicio"') !== false && strpos($portable, '"slug":"zz-f1b-cat"') !== false);
+$comprobar('NINGÚN número de página ni de categoría viaja en menús, navegación ni destinos de región', $numeros_viajan === [], implode(', ', $numeros_viajan));
+$pagina_citante = null;
+foreach (json_decode($z9['contenidos']['content/pages.json'], true)['pages'] as $pg) {
+    if ($pg['slug'] === 'zz-f1b-nav-citante') {
+        $pagina_citante = (string) $z9['contenidos'][$pg['content']['path']];
+    }
+}
+$comprobar('…ni el número de la navegación citada por una página (viaja por slug)', $pagina_citante !== null && strpos($pagina_citante, '"ocdNavRef":"zz-f1b-navegacion"') !== false && strpos($pagina_citante, '"ref":' . $nav_id) === false, (string) $pagina_citante);
+$comprobar('el set de íconos y la hoja viajan como archivos sueltos (sin adjunto)', count(array_filter($manifiesto9['assets'], static function (array $a): bool {
+    return $a['mime'] === 'image/svg+xml' || $a['mime'] === 'text/css';
+})) >= 4);
+
+// ---- importar en el sitio vaciado: los números de página son otros
+$vaciar_destino();
+$vaciar_prueba();
+foreach (['wp_navigation', 'nav_menu_item'] as $tipo) {
+    $comprobar('(preparación) el destino quedó sin ' . $tipo, get_posts(['post_type' => $tipo, 'post_status' => 'any', 'numberposts' => -1, 'fields' => 'ids']) === []);
+}
+$comprobar('(preparación) el título del destino volvió a ser el de fábrica', get_option('blogname') === 'WordPress' && get_option('permalink_structure') === '' && (int) get_option('site_icon') === 0);
+$r9 = $importador->import($zip9);
+$comprobar('importar el paquete en el destino vaciado: sin error', !is_wp_error($r9), is_wp_error($r9) ? $r9->get_error_code() . ': ' . $r9->get_error_message() : '');
+if (is_wp_error($r9)) {
+    echo "\n  No se puede seguir sin importar.\n";
+    exit(1);
+}
+$foto_destino = $foto_del_sitio();
+$mal = $diferencias($foto_origen, $foto_destino);
+$comprobar('el destino es IGUAL al origen: ajustes, marca, navegación, menús, ubicaciones, íconos, hojas y destinos de región', $mal === [], 'distintos: ' . implode(', ', $mal));
+$p1 = $pagina_por_slug('zz-f1b-nav-inicio');
+$p2 = $pagina_por_slug('zz-f1b-nav-contacto');
+$p3 = $pagina_por_slug('zz-f1b-nav-citante');
+$comprobar('…y los números de página CAMBIARON (si no, la prueba no mediría el remapeo)', $p1 !== null && $p2 !== null && $p1 !== $id_p1 && $p2 !== $id_p2 && $p3 !== $id_p3, json_encode([$id_p1, $p1, $id_p2, $p2]));
+$term_menu = get_term_by('slug', 'zz-f1b-menu', 'nav_menu');
+$items_destino = $term_menu instanceof WP_Term ? wp_get_nav_menu_items($term_menu->term_id) : [];
+$objetos = [];
+foreach ((array) $items_destino as $it) {
+    $objetos[html_entity_decode((string) $it->title)] = (int) $it->object_id;
+}
+$comprobar('los enlaces del menú clásico apuntan a las páginas y a la categoría DEL DESTINO', ($objetos['Inicio & más'] ?? 0) === $p1 && ($objetos['Contacto'] ?? 0) === $p2 && ($objetos['Temas'] ?? 0) === (int) (get_term_by('slug', 'zz-f1b-cat', 'category')->term_id ?? -1), json_encode($objetos));
+$comprobar('…con su jerarquía, destino de apertura y clases', count($items_destino) === 4 && (int) $items_destino[1]->menu_item_parent === (int) $items_destino[0]->ID && $items_destino[1]->target === '_blank' && in_array('zz-clase', (array) $items_destino[0]->classes, true));
+$ubicaciones_destino = get_nav_menu_locations();
+$comprobar('las ubicaciones del menú (primary, footer) apuntan al menú del destino', term_exists((int) ($ubicaciones_destino['primary'] ?? 0), 'nav_menu') !== null && (int) ($ubicaciones_destino['primary'] ?? 0) === (int) ($term_menu->term_id ?? -1) && (int) ($ubicaciones_destino['footer'] ?? 0) === (int) ($term_menu->term_id ?? -1), json_encode($ubicaciones_destino));
+$nav_post = get_posts(['post_type' => 'wp_navigation', 'name' => 'zz-f1b-navegacion', 'post_status' => 'any', 'numberposts' => 1])[0] ?? null;
+$cont_nav = $nav_post instanceof WP_Post ? (string) $nav_post->post_content : '';
+$comprobar('la navegación de bloques enlaza a las páginas del destino (id y ref nuevos, ninguno del origen)', $nav_post instanceof WP_Post && strpos($cont_nav, '"id":' . $p1) !== false && strpos($cont_nav, '"id":' . $p2) !== false && strpos($cont_nav, '"id":' . $id_p1) === false && strpos($cont_nav, 'ocdRef') === false, $cont_nav);
+$comprobar('…y la página que la cita apunta a la navegación del destino', $p3 !== null && $nav_post instanceof WP_Post && strpos($contenido_de($p3), '"ref":' . $nav_post->ID) !== false && strpos($contenido_de($p3), 'ocdNavRef') === false, $p3 !== null ? $contenido_de($p3) : 'sin página');
+$cat_dest = (int) (get_term_by('slug', 'zz-f1b-cat', 'category')->term_id ?? 0);
+$reglas_dest = $repositorio->load_existing($doc_local);
+$comprobar('los destinos de la región local son las páginas y la categoría DEL DESTINO', is_array($reglas_dest) && $reglas_dest['regionTargets'] === [['type' => 'post', 'id' => $p1], ['type' => 'category', 'id' => $cat_dest]] && $reglas_dest['regionExcludes'] === [['type' => 'children_of', 'id' => $p2]], json_encode(is_array($reglas_dest) ? [$reglas_dest['regionTargets'], $reglas_dest['regionExcludes']] : $reglas_dest));
+$comprobar('el título, la descripción y los enlaces permanentes quedaron igual (y las reglas de enlace se regeneraron)', get_option('blogname') === 'ZZ Título &amp; prueba' || get_option('blogname') === 'ZZ Título & prueba', (string) get_option('blogname'));
+$comprobar('…enlaces permanentes y base de categorías', get_option('permalink_structure') === '/%postname%/' && get_option('category_base') === 'temas-zz', (string) get_option('permalink_structure') . ' ' . (string) get_option('category_base'));
+$sha_origen_marca = [$foto_origen['archivos'][$foto_origen['estado']['branding']['siteIcon']['path']] ?? '', $foto_origen['archivos'][$foto_origen['estado']['branding']['siteLogo']['path']] ?? '', $foto_origen['archivos'][$foto_origen['estado']['branding']['customLogo']['path']] ?? ''];
+$sha_destino_marca = [];
+foreach ([(int) get_option('site_icon'), (int) get_option('site_logo'), (int) get_theme_mod('custom_logo')] as $adjunto_id) {
+    $archivo_destino = get_attached_file($adjunto_id);
+    $sha_destino_marca[] = is_string($archivo_destino) && is_file($archivo_destino) ? hash_file('sha256', $archivo_destino) : 'sin archivo (adjunto ' . $adjunto_id . ')';
+}
+// (WordPress mantiene site_logo y custom_logo en el mismo valor: hay dos archivos distintos, ícono y logo)
+$comprobar('el ícono y los dos logos son los MISMOS ARCHIVOS (sha256) en adjuntos del destino', $sha_origen_marca === $sha_destino_marca && !in_array('', $sha_origen_marca, true) && count(array_unique($sha_destino_marca)) === 2, json_encode([$sha_origen_marca, $sha_destino_marca]));
+$comprobar('…y el estilo de íconos, el set (3 archivos, sin adjuntos) y la hoja de diseño llegaron', get_option('cod_icono_estilo') === 'rounded' && count(glob($base_subidas . '/contope-iconos/*.svg') ?: []) === 3 && is_file($base_subidas . '/contope-disenos/' . $diseno_zz . '-0123456789ab.css') && (get_option('cod_disenos_hojas')[$diseno_zz]['archivo'] ?? '') === $diseno_zz . '-0123456789ab.css' && get_posts(['post_type' => 'attachment', 'post_status' => 'inherit', 'numberposts' => -1, 'fields' => 'ids', 'meta_key' => '_wp_attached_file', 'meta_value' => 'contope-iconos/icono-zzf1b-outlined.svg']) === []);
+$comprobar('…y la composición del documento viajó: el destino sabe de qué diseño es (de ahí sale su hoja)', (json_decode((string) ($repositorio->load_existing($doc_con_diseno)['composition'] ?? ''), true)['design']['designId'] ?? '') === $diseno_zz);
+
+// ---- idempotencia: reimportar no duplica nada
+$cuentas = static function (): array {
+    $c = [];
+    foreach (['page', 'wp_navigation', 'nav_menu_item', 'attachment', 'cod_canvas_doc'] as $tipo) {
+        $c[$tipo] = count(get_posts(['post_type' => $tipo, 'post_status' => 'any', 'numberposts' => -1, 'fields' => 'ids', 'no_found_rows' => true]));
+    }
+    $c['menus'] = count(wp_get_nav_menus());
+    $c['ids_menu'] = array_map(static function ($i): int {
+        return (int) $i->ID;
+    }, (array) wp_get_nav_menu_items((int) (get_term_by('slug', 'zz-f1b-menu', 'nav_menu')->term_id ?? 0)));
+    return $c;
+};
+$cuentas1 = $cuentas();
+$r9b = $importador->import($zip9);
+$cuentas2 = $cuentas();
+$comprobar('reimportar el mismo paquete: sin error, sin menús, navegaciones, adjuntos ni páginas de más', !is_wp_error($r9b) && $cuentas1 === $cuentas2, is_wp_error($r9b) ? $codigo($r9b) : json_encode([$cuentas1, $cuentas2]));
+$comprobar('…los archivos no se vuelven a copiar y el destino sigue igual al origen', !is_wp_error($r9b) && (int) $r9b['mediaCopied'] === 0 && $diferencias($foto_origen, $foto_del_sitio()) === [], is_wp_error($r9b) ? '' : (string) $r9b['mediaCopied']);
+
+// ---- no se pisa lo editado en el destino (el mismo mecanismo que H9)
+update_option('blogname', 'Título editado en producción');
+$ed_item = (int) $items_destino[3]->ID;
+wp_update_nav_menu_item((int) $term_menu->term_id, $ed_item, ['menu-item-title' => 'Afuera EDITADO', 'menu-item-type' => 'custom', 'menu-item-url' => 'https://example.org/afuera?x=1', 'menu-item-status' => 'publish', 'menu-item-position' => 4]);
+$antes_ed = [get_option('blogname'), json_encode($cuentas()['ids_menu'])];
+$r9c = $importador->import($zip9);
+$comprobar('un título y un menú editados en el destino rechazan el paquete entero (cod_package_settings_edited)', is_wp_error($r9c) && $r9c->get_error_code() === 'cod_package_settings_edited', $codigo($r9c));
+$comprobar('…con los nombres de lo editado en el mensaje', is_wp_error($r9c) && strpos($r9c->get_error_message(), 'el título del sitio') !== false && strpos($r9c->get_error_message(), 'zz-f1b-menu') !== false && strpos($r9c->get_error_message(), 'no se escribió nada') !== false, is_wp_error($r9c) ? $r9c->get_error_message() : '');
+$comprobar('…y no se escribió NADA: el título y el menú siguen como los dejó el destino', [get_option('blogname'), json_encode($cuentas()['ids_menu'])] === $antes_ed && (string) get_post_field('post_title', $ed_item) === 'Afuera EDITADO');
+$r9d = $importador->import($zip9, ['replace_edited_blocks' => true]);
+$comprobar('CONTROL: con el reemplazo expreso el mismo paquete entra', !is_wp_error($r9d) && $diferencias($foto_origen, $foto_del_sitio()) === [], $codigo($r9d));
+
+// ---- el paquete "solo estructura" (se exporta ahora, mientras el sitio está armado; se importa al final)
+$zip_liviano = $exportador->export(false);
+$comprobar('exportar solo estructura con estado del sitio: sin error', !is_wp_error($zip_liviano));
+if (!is_wp_error($zip_liviano)) {
+    $temporales[] = $zip_liviano;
+}
+
+// ---- controles: si el transporte se rompe, la prueba lo ve
+/** Rehace un paquete cambiando state.json (y la entrada del manifiesto que lo cuenta). */
+$reempaquetar = static function (string $origen, callable $cambiar_estado, ?callable $cambiar_contenido = null) use ($tmp): string {
+    $z = new ZipArchive();
+    $z->open($origen);
+    $archivos = [];
+    for ($i = 0; $i < $z->numFiles; $i++) {
+        $archivos[(string) $z->getNameIndex($i)] = (string) $z->getFromIndex($i);
+    }
+    $z->close();
+    $manifiesto = json_decode($archivos['manifest.json'], true);
+    $tocar = static function (string $ruta, callable $f) use (&$archivos, &$manifiesto): void {
+        $dato = json_decode($archivos[$ruta], true);
+        $nuevo = (string) json_encode($f($dato), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        $archivos[$ruta] = $nuevo;
+        foreach ($manifiesto['files'] as $i => $fila) {
+            if ($fila['path'] === $ruta) {
+                $manifiesto['files'][$i]['size'] = strlen($nuevo);
+                $manifiesto['files'][$i]['sha256'] = hash('sha256', $nuevo);
+            }
+        }
+    };
+    $tocar('wordpress/state.json', $cambiar_estado);
+    if ($cambiar_contenido !== null) {
+        $tocar('content/pages.json', $cambiar_contenido);
+    }
+    $archivos['manifest.json'] = (string) json_encode($manifiesto, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    $ruta = $tmp();
+    $nuevo = new ZipArchive();
+    $nuevo->open($ruta, ZipArchive::CREATE | ZipArchive::OVERWRITE);
+    foreach ($archivos as $nombre => $contenido) {
+        $nuevo->addFromString($nombre, $contenido);
+    }
+    $nuevo->close();
+    return $ruta;
+};
+$importar_en_vacio = static function (string $zip) use ($vaciar_destino, $vaciar_prueba, $importador): array {
+    $vaciar_destino();
+    $vaciar_prueba();
+    return [$importador->import($zip)];
+};
+
+$roto_menus = $reempaquetar($zip9, static function (array $e): array {
+    unset($e['menus'], $e['navigation'], $e['menuLocations']);
+    return $e;
+});
+[$rm] = $importar_en_vacio($roto_menus);
+$mal_menus = !is_wp_error($rm) ? $diferencias($foto_origen, $foto_del_sitio()) : ['no importó'];
+$comprobar('CONTROL: sin el transporte de menús el destino NO sale igual y el instrumento lo dice (menus, navigation, ubicaciones)', in_array('menus', $mal_menus, true) && in_array('navigation', $mal_menus, true) && in_array('menuLocations', $mal_menus, true), implode(', ', $mal_menus));
+
+$roto_marca = $reempaquetar($zip9, static function (array $e): array {
+    $e['branding'] = ['siteIcon' => null, 'siteLogo' => null, 'customLogo' => null];
+    return $e;
+});
+[$rb] = $importar_en_vacio($roto_marca);
+$mal_marca = !is_wp_error($rb) ? $diferencias($foto_origen, $foto_del_sitio()) : ['no importó'];
+$comprobar('CONTROL: sin el transporte de logo e ícono el destino NO sale igual (branding)', in_array('branding', $mal_marca, true), implode(', ', $mal_marca));
+
+$roto_regiones = $reempaquetar($zip9, static function (array $e): array {
+    return $e;
+}, static function (array $c) use ($doc_local, $ids_origen): array {
+    // el defecto de antes: los destinos de la región viajan POR NÚMERO del origen
+    $c['documents'][$doc_local]['regionTargets'] = [['type' => 'post', 'id' => $ids_origen['p1']], ['type' => 'category', 'id' => $ids_origen['cat']]];
+    $c['documents'][$doc_local]['regionExcludes'] = [['type' => 'children_of', 'id' => $ids_origen['p2']]];
+    return $c;
+});
+[$rr] = $importar_en_vacio($roto_regiones);
+$mal_regiones = !is_wp_error($rr) ? $diferencias($foto_origen, $foto_del_sitio()) : ['no importó'];
+$comprobar('CONTROL: con los destinos de región por número del origen, el destino queda apuntando a otras páginas y el instrumento lo ve (reglas)', in_array('reglas', $mal_regiones, true), implode(', ', $mal_regiones));
+
+$roto_iconos = $reempaquetar($zip9, static function (array $e): array {
+    $e['iconSet'] = ['style' => '', 'files' => 0];
+    $e['designSheets'] = [];
+    return $e;
+});
+[$ri] = $importar_en_vacio($roto_iconos);
+$mal_iconos = !is_wp_error($ri) ? $diferencias($foto_origen, $foto_del_sitio()) : ['no importó'];
+$comprobar('CONTROL: sin el estilo de íconos ni las hojas el destino NO sale igual (iconSet, designSheets)', in_array('iconSet', $mal_iconos, true) && in_array('designSheets', $mal_iconos, true), implode(', ', $mal_iconos));
+
+// ---- lo inválido se rechaza ANTES de escribir
+$vaciar_destino();
+$vaciar_prueba();
+$sin_resolver = $reempaquetar($zip9, static function (array $e): array {
+    return $e;
+}, static function (array $c) use ($doc_local): array {
+    $c['documents'][$doc_local]['regionTargets'] = [['type' => 'post', 'ref' => ['postType' => 'page', 'slug' => 'una-pagina-que-no-existe-en-ningun-lado']]];
+    return $c;
+});
+$estado_antes = [get_option('blogname'), count(get_posts(['post_type' => 'page', 'post_status' => 'any', 'numberposts' => -1, 'fields' => 'ids']))];
+$rs = $importador->import($sin_resolver);
+$comprobar('un destino de región que ni el paquete ni el sitio tienen rechaza el paquete (cod_package_region_target_unresolved)', is_wp_error($rs) && $rs->get_error_code() === 'cod_package_region_target_unresolved', $codigo($rs));
+$comprobar('…sin escribir nada (ni el título, ni las páginas)', [get_option('blogname'), count(get_posts(['post_type' => 'page', 'post_status' => 'any', 'numberposts' => -1, 'fields' => 'ids']))] === $estado_antes);
+$estado_malo = $reempaquetar($zip9, static function (array $e): array {
+    $e['menus'][0]['items'][0]['type'] = 'tipo-inventado';
+    return $e;
+});
+$rm2 = $importador->import($estado_malo);
+$comprobar('un menú con un tipo de enlace inventado rechaza el paquete (cod_package_site_shape) y no escribe nada', is_wp_error($rm2) && $rm2->get_error_code() === 'cod_package_site_shape' && get_option('blogname') === $estado_antes[0], $codigo($rm2));
+$ruta_mala = $reempaquetar($zip9, static function (array $e): array {
+    $e['branding']['siteIcon']['path'] = '../../wp-config.php';
+    return $e;
+});
+$rp = $importador->import($ruta_mala);
+$comprobar('un ícono con una ruta que sale de uploads rechaza el paquete', is_wp_error($rp) && $rp->get_error_code() === 'cod_package_site_shape', $codigo($rp));
+
+// ---- el paquete "solo estructura" sigue entrando (los archivos que faltan no son un error)
+if (!is_wp_error($zip_liviano)) {
+    $vaciar_destino();
+    $vaciar_prueba();
+    $rl = $importador->import($zip_liviano);
+    $comprobar('…y se importa sin error aunque no traiga los archivos (avisa de los que faltan)', !is_wp_error($rl), $codigo($rl));
+}
+
+$vaciar_destino();
+$vaciar_prueba();
+foreach (['zz-f1b-cat'] as $slug_termino) {
+    $termino = get_term_by('slug', $slug_termino, 'category');
+    if ($termino instanceof WP_Term) {
+        wp_delete_term($termino->term_id, 'category');
+    }
+}
 
 // ---------------------------------------------------------------------------
 echo "\n== resultado ==\n";
