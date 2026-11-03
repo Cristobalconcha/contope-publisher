@@ -1,0 +1,66 @@
+{
+  "id": "E030-dim1.req16-paradas-no-es-lista",
+  "capa": 4,
+  "requisito": "dim1.req16",
+  "manifiesto": {
+    "manifestVersion": "1.3",
+    "revision": 4
+  },
+  "intencion": "mal",
+  "descripcion": "`paradas` es un objeto.",
+  "value": {
+    "degradados": [
+      {
+        "nombre": "x",
+        "tipo": "linear",
+        "angulo": 90,
+        "paradas": {}
+      }
+    ]
+  },
+  "contexto": {
+    "dim1.req01": {
+      "institucionales": [
+        {
+          "name": "Naranja Basis",
+          "value": "#F26621"
+        }
+      ],
+      "neutros": [
+        {
+          "name": "Tinta",
+          "value": "#0E0C19"
+        },
+        {
+          "name": "Gris",
+          "value": "#898989"
+        }
+      ]
+    },
+    "dim1.req15": {
+      "transparencias": [
+        {
+          "nombre": "ink al 15%",
+          "base": {
+            "refReqId": "dim1.req01",
+            "refPath": [
+              "neutros",
+              0
+            ]
+          },
+          "opacidad": 15
+        }
+      ]
+    }
+  },
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "degradados[0].paradas"
+    ],
+    "motivos": [
+      "slot 'degradados[0].paradas': se esperaba lista(...)"
+    ],
+    "predicado": "no-cumple"
+  }
+}

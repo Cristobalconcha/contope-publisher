@@ -1,0 +1,30 @@
+{
+  "id": "E077-dim3.req12-medidas-de-basis",
+  "capa": 4,
+  "requisito": "dim3.req12",
+  "manifiesto": {
+    "manifestVersion": "1.2",
+    "revision": 3
+  },
+  "intencion": "ok",
+  "descripcion": "Las dos medidas de Basis (`custom.layout.measure`: s 700px, m 760px).",
+  "value": {
+    "medidas": [
+      {
+        "nombre": "s",
+        "valor": "700px"
+      },
+      {
+        "nombre": "m",
+        "valor": "760px"
+      }
+    ]
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "cumple"
+  }
+}

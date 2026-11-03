@@ -1,0 +1,40 @@
+{
+  "id": "E097-dim4.req09-signo-mas",
+  "capa": 4,
+  "requisito": "dim4.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "mal",
+  "descripcion": "`+2px` (el signo más no se admite).",
+  "value": {
+    "sombras": [
+      {
+        "nombre": "10",
+        "x": "+2px",
+        "y": "4px",
+        "desenfoque": "10px",
+        "expansion": "0px",
+        "color": {
+          "refReqId": "dim1.req15",
+          "refPath": [
+            "transparencias",
+            0
+          ]
+        }
+      }
+    ]
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "sombras[0].x"
+    ],
+    "motivos": [
+      "slot 'sombras[0].x': no es una longitud-css válida (con signo opcional)"
+    ],
+    "predicado": "cumple"
+  }
+}

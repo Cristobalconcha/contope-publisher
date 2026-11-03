@@ -1,0 +1,26 @@
+{
+  "id": "E121-dim7.req09-tema-y-ausencia",
+  "capa": 4,
+  "requisito": "dim7.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "soloForma",
+  "descripcion": "Tema y ausencia a la vez.",
+  "value": {
+    "temaFormulario": {
+      "medidas": {
+        "radio": "4px"
+      }
+    },
+    "sinTemaFormulario": "no"
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "no-cumple"
+  }
+}

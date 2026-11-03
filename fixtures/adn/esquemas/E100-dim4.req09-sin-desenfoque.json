@@ -1,0 +1,39 @@
+{
+  "id": "E100-dim4.req09-sin-desenfoque",
+  "capa": 4,
+  "requisito": "dim4.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "mal",
+  "descripcion": "Sin `desenfoque`.",
+  "value": {
+    "sombras": [
+      {
+        "nombre": "10",
+        "x": "0px",
+        "y": "4px",
+        "expansion": "0px",
+        "color": {
+          "refReqId": "dim1.req15",
+          "refPath": [
+            "transparencias",
+            0
+          ]
+        }
+      }
+    ]
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "sombras[0].desenfoque"
+    ],
+    "motivos": [
+      "slot 'sombras[0]': campo obligatorio 'desenfoque' ausente"
+    ],
+    "predicado": "no-cumple"
+  }
+}

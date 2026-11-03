@@ -1,0 +1,81 @@
+{
+  "id": "E024-dim1.req16-angulo-400",
+  "capa": 4,
+  "requisito": "dim1.req16",
+  "manifiesto": {
+    "manifestVersion": "1.3",
+    "revision": 4
+  },
+  "intencion": "mal",
+  "descripcion": "Ángulo 400 (máximo 360).",
+  "value": {
+    "degradados": [
+      {
+        "nombre": "x",
+        "tipo": "linear",
+        "angulo": 400,
+        "paradas": [
+          {
+            "color": {
+              "refReqId": "dim1.req01",
+              "refPath": [
+                "neutros",
+                0
+              ]
+            },
+            "posicion": 0
+          },
+          {
+            "color": "transparent",
+            "posicion": 100
+          }
+        ]
+      }
+    ]
+  },
+  "contexto": {
+    "dim1.req01": {
+      "institucionales": [
+        {
+          "name": "Naranja Basis",
+          "value": "#F26621"
+        }
+      ],
+      "neutros": [
+        {
+          "name": "Tinta",
+          "value": "#0E0C19"
+        },
+        {
+          "name": "Gris",
+          "value": "#898989"
+        }
+      ]
+    },
+    "dim1.req15": {
+      "transparencias": [
+        {
+          "nombre": "ink al 15%",
+          "base": {
+            "refReqId": "dim1.req01",
+            "refPath": [
+              "neutros",
+              0
+            ]
+          },
+          "opacidad": 15
+        }
+      ]
+    }
+  },
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "degradados[0].angulo"
+    ],
+    "motivos": [
+      "slot 'degradados[0].angulo': numero 400 por encima del máximo 360"
+    ],
+    "predicado": "cumple"
+  }
+}

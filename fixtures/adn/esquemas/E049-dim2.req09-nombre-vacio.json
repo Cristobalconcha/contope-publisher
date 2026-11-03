@@ -1,0 +1,26 @@
+{
+  "id": "E049-dim2.req09-nombre-vacio",
+  "capa": 4,
+  "requisito": "dim2.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "soloForma",
+  "descripcion": "Un nombre vacío es texto para la forma; el predicado lo rechaza.",
+  "value": {
+    "pesos": [
+      {
+        "nombre": "",
+        "valor": 400
+      }
+    ]
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "no-cumple"
+  }
+}

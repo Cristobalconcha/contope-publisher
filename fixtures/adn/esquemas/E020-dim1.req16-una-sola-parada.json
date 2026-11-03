@@ -1,0 +1,73 @@
+{
+  "id": "E020-dim1.req16-una-sola-parada",
+  "capa": 4,
+  "requisito": "dim1.req16",
+  "manifiesto": {
+    "manifestVersion": "1.3",
+    "revision": 4
+  },
+  "intencion": "soloForma",
+  "descripcion": "Una parada no es un degradado: la forma la deja pasar, el predicado exige dos o más.",
+  "value": {
+    "degradados": [
+      {
+        "nombre": "x",
+        "tipo": "linear",
+        "angulo": 90,
+        "paradas": [
+          {
+            "color": {
+              "refReqId": "dim1.req01",
+              "refPath": [
+                "neutros",
+                0
+              ]
+            },
+            "posicion": 0
+          }
+        ]
+      }
+    ]
+  },
+  "contexto": {
+    "dim1.req01": {
+      "institucionales": [
+        {
+          "name": "Naranja Basis",
+          "value": "#F26621"
+        }
+      ],
+      "neutros": [
+        {
+          "name": "Tinta",
+          "value": "#0E0C19"
+        },
+        {
+          "name": "Gris",
+          "value": "#898989"
+        }
+      ]
+    },
+    "dim1.req15": {
+      "transparencias": [
+        {
+          "nombre": "ink al 15%",
+          "base": {
+            "refReqId": "dim1.req01",
+            "refPath": [
+              "neutros",
+              0
+            ]
+          },
+          "opacidad": 15
+        }
+      ]
+    }
+  },
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "no-cumple"
+  }
+}

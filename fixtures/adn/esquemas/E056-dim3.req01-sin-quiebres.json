@@ -1,0 +1,31 @@
+{
+  "id": "E056-dim3.req01-sin-quiebres",
+  "capa": 4,
+  "requisito": "dim3.req01",
+  "manifiesto": {
+    "manifestVersion": "1.2",
+    "revision": 3
+  },
+  "intencion": "ok",
+  "descripcion": "COMPATIBILIDAD: una escala sin `porQuiebre` (lo que era válido ayer).",
+  "value": {
+    "unidad": "4px",
+    "escala": [
+      {
+        "step": 1,
+        "value": "4px"
+      },
+      {
+        "step": 2,
+        "value": "8px"
+      }
+    ]
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "cumple"
+  }
+}

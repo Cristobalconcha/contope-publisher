@@ -1,0 +1,64 @@
+{
+  "id": "E085-dim4.req09-tres-sombras-de-basis",
+  "capa": 4,
+  "requisito": "dim4.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "ok",
+  "descripcion": "Las tres sombras de `settings.shadow.presets` de Basis, con el color por referencia a una transparencia (la tinta al 20 % y al 12 %); la tercera lleva expansión NEGATIVA.",
+  "value": {
+    "sombras": [
+      {
+        "nombre": "10",
+        "x": "0px",
+        "y": "4px",
+        "desenfoque": "10px",
+        "expansion": "0px",
+        "color": {
+          "refReqId": "dim1.req15",
+          "refPath": [
+            "transparencias",
+            0
+          ]
+        }
+      },
+      {
+        "nombre": "20",
+        "x": "2px",
+        "y": "2px",
+        "desenfoque": "10px",
+        "expansion": "0px",
+        "color": {
+          "refReqId": "dim1.req15",
+          "refPath": [
+            "transparencias",
+            0
+          ]
+        }
+      },
+      {
+        "nombre": "30",
+        "x": "0px",
+        "y": "24px",
+        "desenfoque": "72px",
+        "expansion": "-12px",
+        "color": {
+          "refReqId": "dim1.req15",
+          "refPath": [
+            "transparencias",
+            1
+          ]
+        }
+      }
+    ]
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "cumple"
+  }
+}

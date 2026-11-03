@@ -1,0 +1,36 @@
+{
+  "id": "E086-dim4.req09-cero-sin-unidad-y-color-de-la-paleta",
+  "capa": 4,
+  "requisito": "dim4.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "ok",
+  "descripcion": "Cero sin unidad (`0`) y el color tomado directamente de la paleta.",
+  "value": {
+    "sombras": [
+      {
+        "nombre": "10",
+        "x": "0",
+        "y": "0",
+        "desenfoque": "10px",
+        "expansion": "0",
+        "color": {
+          "refReqId": "dim1.req01",
+          "refPath": [
+            "neutros",
+            0
+          ]
+        }
+      }
+    ]
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "cumple"
+  }
+}

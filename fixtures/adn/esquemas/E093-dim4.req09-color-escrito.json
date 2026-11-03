@@ -1,0 +1,34 @@
+{
+  "id": "E093-dim4.req09-color-escrito",
+  "capa": 4,
+  "requisito": "dim4.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "mal",
+  "descripcion": "Color escrito en vez de referenciado.",
+  "value": {
+    "sombras": [
+      {
+        "nombre": "10",
+        "x": "0px",
+        "y": "4px",
+        "desenfoque": "10px",
+        "expansion": "0px",
+        "color": "#0E0C19"
+      }
+    ]
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "sombras[0].color"
+    ],
+    "motivos": [
+      "slot 'sombras[0].color': no cumple ningún miembro de la unión"
+    ],
+    "predicado": "cumple"
+  }
+}

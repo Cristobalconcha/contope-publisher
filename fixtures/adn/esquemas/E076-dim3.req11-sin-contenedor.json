@@ -1,0 +1,57 @@
+{
+  "id": "E076-dim3.req11-sin-contenedor",
+  "capa": 4,
+  "requisito": "dim3.req11",
+  "manifiesto": {
+    "manifestVersion": "1.2",
+    "revision": 3
+  },
+  "intencion": "mal",
+  "descripcion": "Falta `contenedor`.",
+  "value": {
+    "margenLateral": {
+      "nombre": "gutter",
+      "minimo": "10%"
+    }
+  },
+  "contexto": {
+    "dim3.req05": {
+      "contenedores": [
+        {
+          "nombre": "contenido",
+          "maxWidth": "1080px",
+          "padding": {
+            "refReqId": "dim3.req02",
+            "refPath": [
+              "roleSpacing",
+              0
+            ]
+          },
+          "relacionSoporte": "centrado"
+        },
+        {
+          "nombre": "amplio",
+          "maxWidth": "1440px",
+          "padding": {
+            "refReqId": "dim3.req02",
+            "refPath": [
+              "roleSpacing",
+              1
+            ]
+          },
+          "relacionSoporte": "centrado"
+        }
+      ]
+    }
+  },
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "margenLateral.contenedor"
+    ],
+    "motivos": [
+      "slot 'margenLateral': campo obligatorio 'contenedor' ausente"
+    ],
+    "predicado": "no-cumple"
+  }
+}

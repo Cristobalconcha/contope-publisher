@@ -1,0 +1,26 @@
+{
+  "id": "E171-dim9.req09-familia-vacia",
+  "capa": 4,
+  "requisito": "dim9.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "soloForma",
+  "descripcion": "Familia vacía: texto para la forma; el predicado lo rechaza.",
+  "value": {
+    "correspondencias": [
+      {
+        "arquetipo": "accion",
+        "familiaDeBloque": ""
+      }
+    ]
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "no-cumple"
+  }
+}

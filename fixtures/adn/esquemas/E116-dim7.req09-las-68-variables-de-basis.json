@@ -1,0 +1,212 @@
+{
+  "id": "E116-dim7.req09-las-68-variables-de-basis",
+  "capa": 4,
+  "requisito": "dim7.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "ok",
+  "descripcion": "Un tema con LAS 68 variables de `custom.form` de Basis, cada una con un valor del tipo que le toca: colores y sombras por referencia, medidas en longitud, pesos e interlineados en número.",
+  "value": {
+    "temaFormulario": {
+      "colores": {
+        "texto": {
+          "refReqId": "dim1.req01",
+          "refPath": [
+            "neutros",
+            0
+          ]
+        },
+        "textoSuave": {
+          "refReqId": "dim1.req01",
+          "refPath": [
+            "neutros",
+            1
+          ]
+        },
+        "fondo": "transparent",
+        "superficie": {
+          "refReqId": "dim1.req01",
+          "refPath": [
+            "neutros",
+            1
+          ]
+        },
+        "superficieAlt": {
+          "refReqId": "dim1.req01",
+          "refPath": [
+            "neutros",
+            0
+          ]
+        },
+        "borde": {
+          "refReqId": "dim1.req01",
+          "refPath": [
+            "neutros",
+            1
+          ]
+        },
+        "bordeFuerte": {
+          "refReqId": "dim1.req01",
+          "refPath": [
+            "neutros",
+            0
+          ]
+        },
+        "principal": {
+          "refReqId": "dim1.req01",
+          "refPath": [
+            "neutros",
+            1
+          ]
+        },
+        "principalHover": {
+          "refReqId": "dim1.req01",
+          "refPath": [
+            "neutros",
+            0
+          ]
+        },
+        "principalContraste": {
+          "refReqId": "dim1.req01",
+          "refPath": [
+            "neutros",
+            1
+          ]
+        },
+        "campoFondo": {
+          "refReqId": "dim1.req01",
+          "refPath": [
+            "neutros",
+            0
+          ]
+        },
+        "campoTexto": {
+          "refReqId": "dim1.req01",
+          "refPath": [
+            "neutros",
+            1
+          ]
+        },
+        "etiquetaColor": {
+          "refReqId": "dim1.req01",
+          "refPath": [
+            "neutros",
+            0
+          ]
+        },
+        "subetiquetaColor": {
+          "refReqId": "dim1.req01",
+          "refPath": [
+            "neutros",
+            1
+          ]
+        },
+        "opcionColor": {
+          "refReqId": "dim1.req01",
+          "refPath": [
+            "neutros",
+            0
+          ]
+        },
+        "casillaFondo": {
+          "refReqId": "dim1.req01",
+          "refPath": [
+            "neutros",
+            1
+          ]
+        },
+        "casillaMarca": {
+          "refReqId": "dim1.req01",
+          "refPath": [
+            "neutros",
+            0
+          ]
+        }
+      },
+      "tipografia": {
+        "familia": {
+          "refReqId": "dim2.req01",
+          "refPath": [
+            "familias",
+            1
+          ]
+        },
+        "campoTamano": "13px",
+        "etiquetaTamano": "14px",
+        "subetiquetaTamano": "15px",
+        "ayudaTamano": "16px",
+        "contadorTamano": "17px",
+        "opcionTamano": "18px",
+        "botonTamano": "19px",
+        "peso": 400,
+        "etiquetaPeso": 500,
+        "subetiquetaPeso": 600,
+        "opcionPeso": 400,
+        "botonPeso": 500,
+        "interlineado": 1.43,
+        "ayudaInterlineado": 1.53,
+        "opcionInterlineado": 1.63,
+        "contadorInterlineado": 1.73
+      },
+      "medidas": {
+        "radio": "0px",
+        "espaciado": "1px",
+        "campoBordeAncho": "2px",
+        "campoRellenoY": "3px",
+        "campoRellenoX": "4px",
+        "grupoTituloSeparacion": "5px",
+        "etiquetaSeparacion": "6px",
+        "etiquetaRellenoSuperior": "7px",
+        "opcionEtiquetaRellenoSuperior": "8px",
+        "controlSeparacion": "9px",
+        "ayudaRellenoY": "10px",
+        "ayudaSeparacion": "11px",
+        "contadorRellenoY": "12px",
+        "contadorSeparacion": "13px",
+        "pieRellenoY": "14px",
+        "pieSeparacion": "15px",
+        "rejillaSeparacion": "16px",
+        "rejillaFilaSeparacion": "17px",
+        "rejillaSubSeparacion": "18px",
+        "opcionesRellenoY": "1.23px",
+        "casillaTamano": "20px",
+        "casillaMargenSuperior": "21px",
+        "casillaMargenLateral": "22px",
+        "opcionSangria": "23px",
+        "opcionSeparacion": "24px",
+        "botonAncho": "100%",
+        "botonRellenoY": "26px",
+        "botonRellenoX": "27px",
+        "botonRadio": "28px",
+        "contadorAlineacion": "left",
+        "opcionAlineacion": "center",
+        "casillaApariencia": "none"
+      },
+      "sombras": {
+        "sombra": {
+          "refReqId": "dim4.req09",
+          "refPath": [
+            "sombras",
+            3
+          ]
+        },
+        "botonSombra": {
+          "refReqId": "dim4.req09",
+          "refPath": [
+            "sombras",
+            3
+          ]
+        }
+      }
+    }
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "cumple"
+  }
+}

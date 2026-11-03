@@ -7,11 +7,17 @@
 //      ampliada (misma primera familia). Y P2.3: una revisión 2 con otro accent cambia, en el navegador, --cod-color-accent,
 //      --wp--preset--color--accent y el fondo del botón; el CONTROL (dos tomas sin importar nada) no cambia.
 //   3. Se quita el ADN del local (queda como estaba: sin ADN, modo de la compuerta original).
-//   4. Destino LIMPIO (8895) con un theme.json ATRASADO: se importa el paquete y probar-adn-proyeccion.php comprueba que
-//      wp_get_global_settings() da los mismos presets que el local (paleta, familias, tamaños, espaciados, custom.radius…),
-//      más P2.1 a P2.4 y los mapeos.
+//   4. Destino LIMPIO (8895; con OCD_DESTINO_PUERTO=8896, el otro) con un theme.json ATRASADO: se importa el paquete y
+//      probar-adn-proyeccion.php comprueba que TODO `settings` de wp_get_global_settings() —no sólo los presets: paleta con sus
+//      transparencias, degradados, sombras, tamaños y espaciados con el gutter, y el `custom` completo (radius, border, typography,
+//      layout, blur, form de 68 variables)— es IGUAL al del local de Basis (salvo los pocos extras que declara
+//      scripts/adn/lib/comparar-ajustes.php), más P2.1 a P2.4 y los mapeos; con sus CONTROLES (un valor cambiado, un extra no declarado).
+//   5. Ese mismo destino, importado con el paquete CON medios, en el navegador: el valor calculado de todos los elementos de las 5 páginas
+//      (escritorio y celular) es el de Basis local, sin lo que no es del diseño (cookies, mapa, formulario, listas de entradas). Es la meta
+//      real: que el sitio importado SE VEA igual. CONTROL: el mismo destino sin el ADN se ve muy distinto.
 //
 //   node scripts/adn/probar-portabilidad-presets.mjs --base <medicion-antes.json> [--sin-navegador]
+//   OCD_DESTINO_PUERTO=8896 node scripts/adn/probar-portabilidad-presets.mjs --base <medicion-antes.json>
 //
 // La medición "antes" se toma con:  node scripts/basis/medir-calculados.mjs guardar <archivo>   ANTES de tocar las hojas del tema.
 // Sólo escribe en los dos sitios de prueba (Basis local y el destino limpio) y los deja como estaban.
@@ -30,6 +36,8 @@ const args = process.argv.slice(2);
 const idxBase = args.indexOf('--base');
 const BASE = idxBase >= 0 ? args[idxBase + 1] : '';
 const SIN_NAVEGADOR = args.includes('--sin-navegador');
+// El destino limpio: 8895 por omisión; `OCD_DESTINO_PUERTO=8896` usa otro independiente (ver scripts/paquete/crear-destino-limpio.mjs).
+const PUERTO_DESTINO = Number(process.env['OCD_DESTINO_PUERTO'] ?? 8895);
 const tmp = mkdtempSync(path.join(tmpdir(), 'f2-portabilidad-'));
 const zip = path.join(tmp, 'basis-con-adn.ocdsite');
 
@@ -93,7 +101,7 @@ let r = local('importar-r1');
 paso(r.ok, 'el ADN derivado del theme.json de Basis se importa en el local (r1)', r.crudo);
 if (!r.ok) process.exit(1);
 try {
-  r = local('exportar-paquete', [zip]);
+  r = local('exportar-paquete', SIN_NAVEGADOR ? [zip] : [zip, '--con-medios']);
   paso(r.ok && r.datos.bytes > 1000, 'el sitio se exporta a un .ocdsite que lleva el ADN', r.crudo);
 
   if (!SIN_NAVEGADOR) {
@@ -125,9 +133,56 @@ try {
 }
 
 console.log('\n-- 4. destino limpio con theme.json atrasado: se importa el paquete y se comparan los presets --');
-const pr = php(path.join(raiz, 'scripts', 'probar-adn-proyeccion.php'), [], { COD_F2_PAQUETE: zip });
+const pr = php(path.join(raiz, 'scripts', 'probar-adn-proyeccion.php'), [], { COD_F2_PAQUETE: zip, OCD_DESTINO_PUERTO: String(PUERTO_DESTINO) });
 console.log(pr.salida.split('\n').map((l) => '  ' + l).join('\n'));
-paso(pr.codigo === 0, 'probar-adn-proyeccion.php con el paquete real: P2.1 a P2.4, portabilidad y mapeos', `código ${pr.codigo}`);
+paso(pr.codigo === 0, 'probar-adn-proyeccion.php con el paquete real: settings y custom completos iguales al local, P2.1 a P2.4 y mapeos', `código ${pr.codigo}`);
+
+if (!SIN_NAVEGADOR) {
+  console.log(`\n-- 5. el sitio IMPORTADO, en el navegador: los valores calculados de las 5 páginas son los de Basis local (destino ${PUERTO_DESTINO}) --`);
+  const URL_DESTINO = `http://localhost:${PUERTO_DESTINO}`;
+  const WP_LOAD = path.join(raiz, '..', PUERTO_DESTINO === 8895 ? 'wp-local-f1b-destino' : `wp-local-f1b-destino-${PUERTO_DESTINO}`, 'wordpress', 'wp-load.php');
+  const destino = (accion, extra = []) => {
+    const r = php(path.join(aqui, 'f2-destino.php'), [WP_LOAD, accion, ...extra]);
+    const linea = r.salida.trim().split('\n').filter((l) => l.startsWith('{')).pop();
+    let datos = {};
+    try { datos = JSON.parse(linea); } catch { /* sin JSON */ }
+    return { ok: r.codigo === 0 && datos.ok === true, datos, crudo: r.salida };
+  };
+  const medirSitio = (url, archivo) => spawnSync(process.execPath, [path.join(raiz, 'scripts', 'basis', 'medir-calculados.mjs'), 'guardar', archivo, '--sitio', url], { encoding: 'utf8', cwd: raiz, timeout: 900000 });
+  const compararSitios = (a, b) => spawnSync(process.execPath, [path.join(raiz, 'scripts', 'basis', 'medir-calculados.mjs'), 'comparar', a, b, '--sin-ajenos'], { encoding: 'utf8', cwd: raiz, maxBuffer: 16 * 1024 * 1024 });
+  const basisConAdn = path.join(tmp, 'con-adn.json'); // lo midió el paso 2 (el local con el ADN activo, que el paso 2 probó igual al de antes de F2)
+  const destinoPrueba = async () => {
+    const hay = await fetch(`${URL_DESTINO}/wp-login.php`, { redirect: 'manual', signal: AbortSignal.timeout(8000) }).then((r) => r.status === 200, () => false);
+    return hay;
+  };
+  if (!(await destinoPrueba())) {
+    paso(false, `el destino ${URL_DESTINO} responde (arráncalo: php -S localhost:${PUERTO_DESTINO} -t <carpeta>\\wordpress)`);
+  } else {
+    try {
+      const imp = destino('importar', [zip]);
+      paso(imp.ok && imp.datos.adn?.designId === 'basis-web', 'el destino (theme.json atrasado + lo que el ADN no lleva, declarado) importa el paquete con medios y queda con el ADN de Basis', imp.crudo);
+      const conAdn = path.join(tmp, 'destino-con-adn.json');
+      let m = medirSitio(URL_DESTINO, conAdn);
+      paso(m.status === 0, 'medición de las 5 páginas del destino (escritorio y celular)', m.stdout + m.stderr);
+      let c = compararSitios(basisConAdn, conAdn);
+      console.log('        ' + c.stdout.trim().split('\n').slice(0, 1).join(''));
+      paso(c.status === 0, 'DESTINO == BASIS: color, texto, tamaños, pesos, interlineados, radios, bordes, espaciado y medidas de todos los elementos de las 5 páginas son los de Basis local (sin cookies, mapa, formulario ni listas de entradas)', c.stdout.split('\n').slice(0, 8).join(' | '));
+      // CONTROL: el mismo destino SIN el ADN (el theme.json atrasado a solas) tiene que verse distinto, o la comparación no estaría midiendo nada.
+      const q = destino('quitar-adn');
+      paso(q.ok && q.datos.activo === false, 'CONTROL: se quita el ADN del destino (el contenido y el theme.json quedan)', q.crudo);
+      const sinAdn = path.join(tmp, 'destino-sin-adn.json');
+      m = medirSitio(URL_DESTINO, sinAdn);
+      paso(m.status === 0, 'CONTROL: medición del destino sin ADN', m.stdout + m.stderr);
+      c = compararSitios(basisConAdn, sinAdn);
+      const difs = Number((c.stdout.match(/(\d+) diferencias/) ?? [])[1] ?? 0);
+      console.log('        ' + c.stdout.trim().split('\n').slice(0, 1).join(''));
+      paso(c.status === 1 && difs > 100, 'CONTROL: sin el ADN el destino se ve MUY distinto del local (la comparación de arriba sí mide el diseño)', `código ${c.status}, ${difs} diferencias`);
+    } finally {
+      const l = destino('limpiar');
+      paso(l.ok && l.datos.themeJson === true, 'el destino queda limpio y con el theme.json del repositorio', l.crudo);
+    }
+  }
+}
 
 console.log(malos === 0 ? '\nTODO VERDE' : `\nFALLARON ${malos}`);
 process.exit(malos === 0 ? 0 : 1);

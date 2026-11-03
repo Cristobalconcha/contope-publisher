@@ -1,0 +1,26 @@
+{
+  "id": "E164-dim9.req09-arquetipo-secuencia-editorial",
+  "capa": 4,
+  "requisito": "dim9.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "ok",
+  "descripcion": "El arquetipo «secuencia-editorial» puede recibir su familia de bloque.",
+  "value": {
+    "correspondencias": [
+      {
+        "arquetipo": "secuencia-editorial",
+        "familiaDeBloque": "core/group"
+      }
+    ]
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "cumple"
+  }
+}

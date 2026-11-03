@@ -1,0 +1,29 @@
+{
+  "id": "E126-dim7.req09-peso-1000",
+  "capa": 4,
+  "requisito": "dim7.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "mal",
+  "descripcion": "Peso 1000.",
+  "value": {
+    "temaFormulario": {
+      "tipografia": {
+        "etiquetaPeso": 1000
+      }
+    }
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "temaFormulario.tipografia.etiquetaPeso"
+    ],
+    "motivos": [
+      "slot 'temaFormulario.tipografia.etiquetaPeso': numero 1000 por encima del máximo 900"
+    ],
+    "predicado": "cumple"
+  }
+}

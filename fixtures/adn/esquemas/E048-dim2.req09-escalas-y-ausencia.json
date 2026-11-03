@@ -1,0 +1,27 @@
+{
+  "id": "E048-dim2.req09-escalas-y-ausencia",
+  "capa": 4,
+  "requisito": "dim2.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "soloForma",
+  "descripcion": "Escala y ausencia a la vez.",
+  "value": {
+    "pesos": [
+      {
+        "nombre": "bold",
+        "valor": 700
+      }
+    ],
+    "sinEscalas": "no"
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "no-cumple"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "id": "E087-dim4.req09-desplazamientos-negativos",
+  "capa": 4,
+  "requisito": "dim4.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "ok",
+  "descripcion": "Desplazamiento negativo (sombra hacia arriba y a la izquierda).",
+  "value": {
+    "sombras": [
+      {
+        "nombre": "10",
+        "x": "-2px",
+        "y": "-4px",
+        "desenfoque": "10px",
+        "expansion": "0px",
+        "color": {
+          "refReqId": "dim1.req15",
+          "refPath": [
+            "transparencias",
+            0
+          ]
+        }
+      }
+    ]
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "cumple"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "id": "E063-dim3.req10-vacio",
+  "capa": 4,
+  "requisito": "dim3.req10",
+  "manifiesto": {
+    "manifestVersion": "1.2",
+    "revision": 3
+  },
+  "intencion": "soloForma",
+  "descripcion": "Objeto vacío.",
+  "value": {},
+  "contexto": {},
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "no-cumple"
+  }
+}

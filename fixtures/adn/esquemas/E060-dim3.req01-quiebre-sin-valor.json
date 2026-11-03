@@ -1,0 +1,36 @@
+{
+  "id": "E060-dim3.req01-quiebre-sin-valor",
+  "capa": 4,
+  "requisito": "dim3.req01",
+  "manifiesto": {
+    "manifestVersion": "1.2",
+    "revision": 3
+  },
+  "intencion": "mal",
+  "descripcion": "Una entrada de `porQuiebre` sin `value`.",
+  "value": {
+    "unidad": "4px",
+    "escala": [
+      {
+        "step": 1,
+        "value": "4px",
+        "porQuiebre": [
+          {
+            "quiebre": "mobile"
+          }
+        ]
+      }
+    ]
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "escala[0].porQuiebre[0].value"
+    ],
+    "motivos": [
+      "slot 'escala[0].porQuiebre[0]': campo obligatorio 'value' ausente"
+    ],
+    "predicado": "cumple"
+  }
+}

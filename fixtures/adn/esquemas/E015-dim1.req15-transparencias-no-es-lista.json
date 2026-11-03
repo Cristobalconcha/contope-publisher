@@ -1,0 +1,46 @@
+{
+  "id": "E015-dim1.req15-transparencias-no-es-lista",
+  "capa": 4,
+  "requisito": "dim1.req15",
+  "manifiesto": {
+    "manifestVersion": "1.3",
+    "revision": 4
+  },
+  "intencion": "mal",
+  "descripcion": "`transparencias` es un objeto.",
+  "value": {
+    "transparencias": {
+      "nombre": "x"
+    }
+  },
+  "contexto": {
+    "dim1.req01": {
+      "institucionales": [
+        {
+          "name": "Naranja Basis",
+          "value": "#F26621"
+        }
+      ],
+      "neutros": [
+        {
+          "name": "Tinta",
+          "value": "#0E0C19"
+        },
+        {
+          "name": "Gris",
+          "value": "#898989"
+        }
+      ]
+    }
+  },
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "transparencias"
+    ],
+    "motivos": [
+      "slot 'transparencias': se esperaba lista(...)"
+    ],
+    "predicado": "no-cumple"
+  }
+}

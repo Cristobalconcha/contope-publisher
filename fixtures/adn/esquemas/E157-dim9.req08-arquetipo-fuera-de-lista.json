@@ -1,0 +1,62 @@
+{
+  "id": "E157-dim9.req08-arquetipo-fuera-de-lista",
+  "capa": 4,
+  "requisito": "dim9.req08",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "mal",
+  "descripcion": "Arquetipo que no es uno de los diez.",
+  "value": {
+    "diferencias": [
+      {
+        "arquetipo": "carrusel",
+        "variante": "contorno",
+        "cambios": [
+          {
+            "propiedad": "border-width",
+            "valor": {
+              "tipo": "palabra",
+              "palabra": "none"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "contexto": {
+    "dim9.req03": {
+      "variantes": [
+        {
+          "arquetipo": "accion",
+          "nombre": "contorno",
+          "heredaDe": {
+            "refReqId": "dim9.req01",
+            "refPath": []
+          },
+          "diferencia": "quita el relleno y deja el borde"
+        },
+        {
+          "arquetipo": "contenedor",
+          "nombre": "tarjeta-con-contorno",
+          "heredaDe": {
+            "refReqId": "dim9.req01",
+            "refPath": []
+          },
+          "diferencia": "agrega contorno grueso"
+        }
+      ]
+    }
+  },
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "diferencias[0].arquetipo"
+    ],
+    "motivos": [
+      "slot 'diferencias[0].arquetipo': se esperaba uno de enum(accion|contenedor|navegacion|feedback|entrada|secuencia-editorial|lista|tabla|metricas|representacion-de-datos)"
+    ],
+    "predicado": "no-cumple"
+  }
+}

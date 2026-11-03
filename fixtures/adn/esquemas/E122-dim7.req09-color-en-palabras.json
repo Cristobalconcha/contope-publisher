@@ -1,0 +1,29 @@
+{
+  "id": "E122-dim7.req09-color-en-palabras",
+  "capa": 4,
+  "requisito": "dim7.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "mal",
+  "descripcion": "Un color en palabras («oscuro»).",
+  "value": {
+    "temaFormulario": {
+      "colores": {
+        "texto": "oscuro"
+      }
+    }
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "temaFormulario.colores.texto"
+    ],
+    "motivos": [
+      "slot 'temaFormulario.colores.texto': no cumple ningún miembro de la unión"
+    ],
+    "predicado": "cumple"
+  }
+}

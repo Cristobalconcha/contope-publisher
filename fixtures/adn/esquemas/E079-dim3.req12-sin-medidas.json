@@ -1,0 +1,21 @@
+{
+  "id": "E079-dim3.req12-sin-medidas",
+  "capa": 4,
+  "requisito": "dim3.req12",
+  "manifiesto": {
+    "manifestVersion": "1.2",
+    "revision": 3
+  },
+  "intencion": "ok",
+  "descripcion": "Ausencia declarada.",
+  "value": {
+    "sinMedidas": "sólo los contenedores"
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "cumple"
+  }
+}

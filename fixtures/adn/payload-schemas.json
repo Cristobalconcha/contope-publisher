@@ -1,0 +1,2243 @@
+{
+  "generadoPor": "scripts/exportar-corpus-adn.ts",
+  "nota": "El payloadSchema de cada requisito, tal como lo publica el manifiesto del Core. `estado`: nuevo = pedido Q1/Q3/Q4 (02-nov-2026), ampliado = requisito existente con campos nuevos opcionales, portado = ya lo porta el plugin. Un tipo `longitud-css` con `conSigno: true` admite un `-` delante.",
+  "requisitos": {
+    "dim1.req01": {
+      "estado": "portado",
+      "manifestVersion": "1.3",
+      "revision": 4,
+      "dependsOn": [],
+      "payloadSchema": {
+        "institucionales": {
+          "type": {
+            "kind": "lista",
+            "of": {
+              "kind": "objeto",
+              "fields": {
+                "name": {
+                  "type": {
+                    "kind": "texto"
+                  }
+                },
+                "value": {
+                  "type": {
+                    "kind": "color-css"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "neutros": {
+          "type": {
+            "kind": "lista",
+            "of": {
+              "kind": "objeto",
+              "fields": {
+                "name": {
+                  "type": {
+                    "kind": "texto"
+                  }
+                },
+                "value": {
+                  "type": {
+                    "kind": "color-css"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "dim1.req02": {
+      "estado": "portado",
+      "manifestVersion": "1.3",
+      "revision": 4,
+      "dependsOn": [
+        "dim1.req01"
+      ],
+      "payloadSchema": {
+        "roleColors": {
+          "type": {
+            "kind": "lista",
+            "of": {
+              "kind": "objeto",
+              "fields": {
+                "role": {
+                  "type": {
+                    "kind": "enum",
+                    "values": [
+                      "background",
+                      "surface",
+                      "text",
+                      "border",
+                      "accent",
+                      "action",
+                      "info",
+                      "success",
+                      "warning",
+                      "error",
+                      "active",
+                      "inactive",
+                      "focus"
+                    ]
+                  }
+                },
+                "color": {
+                  "type": {
+                    "kind": "union",
+                    "of": [
+                      {
+                        "kind": "ref",
+                        "reqId": "dim1.req01"
+                      },
+                      {
+                        "kind": "color-css"
+                      }
+                    ]
+                  }
+                },
+                "source": {
+                  "type": {
+                    "kind": "texto"
+                  }
+                },
+                "derivation": {
+                  "type": {
+                    "kind": "objeto",
+                    "fields": {
+                      "of": {
+                        "type": {
+                          "kind": "enum",
+                          "values": [
+                            "dim1.req01",
+                            "direct"
+                          ]
+                        }
+                      },
+                      "rule": {
+                        "type": {
+                          "kind": "texto"
+                        },
+                        "optional": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "dim1.req15": {
+      "estado": "nuevo",
+      "manifestVersion": "1.3",
+      "revision": 4,
+      "dependsOn": [
+        "dim1.req01"
+      ],
+      "payloadSchema": {
+        "transparencias": {
+          "type": {
+            "kind": "lista",
+            "of": {
+              "kind": "objeto",
+              "fields": {
+                "nombre": {
+                  "type": {
+                    "kind": "texto"
+                  }
+                },
+                "base": {
+                  "type": {
+                    "kind": "ref",
+                    "reqId": "dim1.req01"
+                  }
+                },
+                "opacidad": {
+                  "type": {
+                    "kind": "numero",
+                    "min": 0,
+                    "max": 100
+                  }
+                }
+              }
+            }
+          },
+          "optional": true
+        },
+        "sinTransparencias": {
+          "type": {
+            "kind": "texto"
+          },
+          "optional": true
+        }
+      }
+    },
+    "dim1.req16": {
+      "estado": "nuevo",
+      "manifestVersion": "1.3",
+      "revision": 4,
+      "dependsOn": [
+        "dim1.req01",
+        "dim1.req15"
+      ],
+      "payloadSchema": {
+        "degradados": {
+          "type": {
+            "kind": "lista",
+            "of": {
+              "kind": "objeto",
+              "fields": {
+                "nombre": {
+                  "type": {
+                    "kind": "texto"
+                  }
+                },
+                "tipo": {
+                  "type": {
+                    "kind": "enum",
+                    "values": [
+                      "linear",
+                      "radial"
+                    ]
+                  }
+                },
+                "angulo": {
+                  "type": {
+                    "kind": "numero",
+                    "min": 0,
+                    "max": 360
+                  },
+                  "optional": true
+                },
+                "paradas": {
+                  "type": {
+                    "kind": "lista",
+                    "of": {
+                      "kind": "objeto",
+                      "fields": {
+                        "color": {
+                          "type": {
+                            "kind": "union",
+                            "of": [
+                              {
+                                "kind": "ref",
+                                "reqId": "dim1.req01"
+                              },
+                              {
+                                "kind": "ref",
+                                "reqId": "dim1.req15"
+                              },
+                              {
+                                "kind": "enum",
+                                "values": [
+                                  "transparent"
+                                ]
+                              }
+                            ]
+                          }
+                        },
+                        "posicion": {
+                          "type": {
+                            "kind": "numero",
+                            "min": 0,
+                            "max": 100
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "optional": true
+        },
+        "sinDegradados": {
+          "type": {
+            "kind": "texto"
+          },
+          "optional": true
+        }
+      }
+    },
+    "dim2.req01": {
+      "estado": "portado",
+      "manifestVersion": "1.1",
+      "revision": 2,
+      "dependsOn": [],
+      "payloadSchema": {
+        "familias": {
+          "type": {
+            "kind": "lista",
+            "of": {
+              "kind": "objeto",
+              "fields": {
+                "name": {
+                  "type": {
+                    "kind": "texto"
+                  }
+                },
+                "stack": {
+                  "type": {
+                    "kind": "lista",
+                    "of": {
+                      "kind": "texto"
+                    }
+                  }
+                },
+                "idiomas": {
+                  "type": {
+                    "kind": "lista",
+                    "of": {
+                      "kind": "texto"
+                    }
+                  }
+                },
+                "licencia": {
+                  "type": {
+                    "kind": "texto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "dim2.req02": {
+      "estado": "ampliado",
+      "manifestVersion": "1.1",
+      "revision": 2,
+      "dependsOn": [
+        "dim2.req01"
+      ],
+      "payloadSchema": {
+        "roleStyles": {
+          "type": {
+            "kind": "lista",
+            "of": {
+              "kind": "objeto",
+              "fields": {
+                "role": {
+                  "type": {
+                    "kind": "texto"
+                  }
+                },
+                "family": {
+                  "type": {
+                    "kind": "union",
+                    "of": [
+                      {
+                        "kind": "ref",
+                        "reqId": "dim2.req01"
+                      },
+                      {
+                        "kind": "texto"
+                      }
+                    ]
+                  }
+                },
+                "fontSize": {
+                  "type": {
+                    "kind": "longitud-css"
+                  }
+                },
+                "fontWeight": {
+                  "type": {
+                    "kind": "numero",
+                    "min": 100,
+                    "max": 900
+                  }
+                },
+                "lineHeight": {
+                  "type": {
+                    "kind": "numero",
+                    "min": 0.8,
+                    "max": 3
+                  }
+                },
+                "letterSpacing": {
+                  "type": {
+                    "kind": "longitud-css"
+                  },
+                  "optional": true
+                },
+                "porQuiebre": {
+                  "type": {
+                    "kind": "lista",
+                    "of": {
+                      "kind": "objeto",
+                      "fields": {
+                        "quiebre": {
+                          "type": {
+                            "kind": "enum",
+                            "values": [
+                              "tablet",
+                              "mobile"
+                            ]
+                          }
+                        },
+                        "fontSize": {
+                          "type": {
+                            "kind": "longitud-css"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "optional": true
+                },
+                "source": {
+                  "type": {
+                    "kind": "texto"
+                  }
+                },
+                "derivation": {
+                  "type": {
+                    "kind": "objeto",
+                    "fields": {
+                      "of": {
+                        "type": {
+                          "kind": "enum",
+                          "values": [
+                            "dim2.req01",
+                            "direct"
+                          ]
+                        }
+                      },
+                      "rule": {
+                        "type": {
+                          "kind": "texto"
+                        },
+                        "optional": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "dim2.req07": {
+      "estado": "portado",
+      "manifestVersion": "1.1",
+      "revision": 2,
+      "dependsOn": [
+        "dim2.req01",
+        "dim2.req02"
+      ],
+      "payloadSchema": {
+        "correspondencias": {
+          "type": {
+            "kind": "lista",
+            "of": {
+              "kind": "objeto",
+              "fields": {
+                "campoPlano": {
+                  "type": {
+                    "kind": "enum",
+                    "values": [
+                      "font_heading",
+                      "font_body",
+                      "font_accent",
+                      "size_base",
+                      "h1_size",
+                      "h2_size",
+                      "h3_size",
+                      "h4_size",
+                      "h5_size",
+                      "h6_size"
+                    ]
+                  }
+                },
+                "role": {
+                  "type": {
+                    "kind": "ref",
+                    "reqId": "dim2.req02"
+                  }
+                },
+                "nota": {
+                  "type": {
+                    "kind": "texto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "dim2.req09": {
+      "estado": "nuevo",
+      "manifestVersion": "1.1",
+      "revision": 2,
+      "dependsOn": [],
+      "payloadSchema": {
+        "pesos": {
+          "type": {
+            "kind": "lista",
+            "of": {
+              "kind": "objeto",
+              "fields": {
+                "nombre": {
+                  "type": {
+                    "kind": "texto"
+                  }
+                },
+                "valor": {
+                  "type": {
+                    "kind": "numero",
+                    "min": 100,
+                    "max": 900
+                  }
+                }
+              }
+            }
+          },
+          "optional": true
+        },
+        "interlineados": {
+          "type": {
+            "kind": "lista",
+            "of": {
+              "kind": "objeto",
+              "fields": {
+                "nombre": {
+                  "type": {
+                    "kind": "texto"
+                  }
+                },
+                "valor": {
+                  "type": {
+                    "kind": "numero",
+                    "min": 0.8,
+                    "max": 3
+                  }
+                }
+              }
+            }
+          },
+          "optional": true
+        },
+        "sinEscalas": {
+          "type": {
+            "kind": "texto"
+          },
+          "optional": true
+        }
+      }
+    },
+    "dim3.req01": {
+      "estado": "ampliado",
+      "manifestVersion": "1.2",
+      "revision": 3,
+      "dependsOn": [],
+      "payloadSchema": {
+        "unidad": {
+          "type": {
+            "kind": "longitud-css"
+          }
+        },
+        "escala": {
+          "type": {
+            "kind": "lista",
+            "of": {
+              "kind": "objeto",
+              "fields": {
+                "step": {
+                  "type": {
+                    "kind": "numero",
+                    "min": 1
+                  }
+                },
+                "value": {
+                  "type": {
+                    "kind": "longitud-css"
+                  }
+                },
+                "porQuiebre": {
+                  "type": {
+                    "kind": "lista",
+                    "of": {
+                      "kind": "objeto",
+                      "fields": {
+                        "quiebre": {
+                          "type": {
+                            "kind": "enum",
+                            "values": [
+                              "tablet",
+                              "mobile"
+                            ]
+                          }
+                        },
+                        "value": {
+                          "type": {
+                            "kind": "longitud-css"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "optional": true
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "dim3.req02": {
+      "estado": "portado",
+      "manifestVersion": "1.2",
+      "revision": 3,
+      "dependsOn": [
+        "dim3.req01"
+      ],
+      "payloadSchema": {
+        "roleSpacing": {
+          "type": {
+            "kind": "lista",
+            "of": {
+              "kind": "objeto",
+              "fields": {
+                "role": {
+                  "type": {
+                    "kind": "enum",
+                    "values": [
+                      "intraelemento",
+                      "interelemento",
+                      "entre-secciones"
+                    ]
+                  }
+                },
+                "value": {
+                  "type": {
+                    "kind": "union",
+                    "of": [
+                      {
+                        "kind": "ref",
+                        "reqId": "dim3.req01"
+                      },
+                      {
+                        "kind": "longitud-css"
+                      }
+                    ]
+                  }
+                },
+                "source": {
+                  "type": {
+                    "kind": "texto"
+                  }
+                },
+                "derivation": {
+                  "type": {
+                    "kind": "objeto",
+                    "fields": {
+                      "of": {
+                        "type": {
+                          "kind": "enum",
+                          "values": [
+                            "dim3.req01",
+                            "direct"
+                          ]
+                        }
+                      },
+                      "rule": {
+                        "type": {
+                          "kind": "texto"
+                        },
+                        "optional": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "dim3.req05": {
+      "estado": "portado",
+      "manifestVersion": "1.2",
+      "revision": 3,
+      "dependsOn": [
+        "dim3.req02",
+        "dim3.req04"
+      ],
+      "payloadSchema": {
+        "contenedores": {
+          "type": {
+            "kind": "lista",
+            "of": {
+              "kind": "objeto",
+              "fields": {
+                "nombre": {
+                  "type": {
+                    "kind": "texto"
+                  }
+                },
+                "maxWidth": {
+                  "type": {
+                    "kind": "longitud-css"
+                  }
+                },
+                "padding": {
+                  "type": {
+                    "kind": "ref",
+                    "reqId": "dim3.req02"
+                  }
+                },
+                "relacionSoporte": {
+                  "type": {
+                    "kind": "texto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "dim3.req10": {
+      "estado": "nuevo",
+      "manifestVersion": "1.2",
+      "revision": 3,
+      "dependsOn": [],
+      "payloadSchema": {
+        "quiebres": {
+          "type": {
+            "kind": "lista",
+            "of": {
+              "kind": "objeto",
+              "fields": {
+                "nombre": {
+                  "type": {
+                    "kind": "enum",
+                    "values": [
+                      "tablet",
+                      "mobile"
+                    ]
+                  }
+                },
+                "desde": {
+                  "type": {
+                    "kind": "longitud-css"
+                  },
+                  "optional": true
+                },
+                "hasta": {
+                  "type": {
+                    "kind": "longitud-css"
+                  }
+                }
+              }
+            }
+          },
+          "optional": true
+        },
+        "sinQuiebres": {
+          "type": {
+            "kind": "texto"
+          },
+          "optional": true
+        }
+      }
+    },
+    "dim3.req11": {
+      "estado": "nuevo",
+      "manifestVersion": "1.2",
+      "revision": 3,
+      "dependsOn": [
+        "dim3.req05"
+      ],
+      "payloadSchema": {
+        "margenLateral": {
+          "type": {
+            "kind": "objeto",
+            "fields": {
+              "nombre": {
+                "type": {
+                  "kind": "texto"
+                }
+              },
+              "minimo": {
+                "type": {
+                  "kind": "longitud-css"
+                }
+              },
+              "contenedor": {
+                "type": {
+                  "kind": "ref",
+                  "reqId": "dim3.req05"
+                }
+              }
+            }
+          },
+          "optional": true
+        },
+        "sinMargenLateral": {
+          "type": {
+            "kind": "texto"
+          },
+          "optional": true
+        }
+      }
+    },
+    "dim3.req12": {
+      "estado": "nuevo",
+      "manifestVersion": "1.2",
+      "revision": 3,
+      "dependsOn": [],
+      "payloadSchema": {
+        "medidas": {
+          "type": {
+            "kind": "lista",
+            "of": {
+              "kind": "objeto",
+              "fields": {
+                "nombre": {
+                  "type": {
+                    "kind": "texto"
+                  }
+                },
+                "valor": {
+                  "type": {
+                    "kind": "longitud-css"
+                  }
+                }
+              }
+            }
+          },
+          "optional": true
+        },
+        "sinMedidas": {
+          "type": {
+            "kind": "texto"
+          },
+          "optional": true
+        }
+      }
+    },
+    "dim4.req02": {
+      "estado": "portado",
+      "manifestVersion": "1.1",
+      "revision": 2,
+      "dependsOn": [
+        "dim4.req01"
+      ],
+      "payloadSchema": {
+        "formas": {
+          "type": {
+            "kind": "lista",
+            "of": {
+              "kind": "objeto",
+              "fields": {
+                "rol": {
+                  "type": {
+                    "kind": "ref"
+                  }
+                },
+                "vocabulario": {
+                  "type": {
+                    "kind": "texto"
+                  }
+                },
+                "radio": {
+                  "type": {
+                    "kind": "enum",
+                    "values": [
+                      "longitud",
+                      "none",
+                      "pill",
+                      "circle"
+                    ]
+                  }
+                },
+                "radioValor": {
+                  "type": {
+                    "kind": "longitud-css"
+                  },
+                  "optional": true
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "dim4.req09": {
+      "estado": "nuevo",
+      "manifestVersion": "1.1",
+      "revision": 2,
+      "dependsOn": [],
+      "payloadSchema": {
+        "sombras": {
+          "type": {
+            "kind": "lista",
+            "of": {
+              "kind": "objeto",
+              "fields": {
+                "nombre": {
+                  "type": {
+                    "kind": "texto"
+                  }
+                },
+                "x": {
+                  "type": {
+                    "kind": "longitud-css",
+                    "conSigno": true
+                  }
+                },
+                "y": {
+                  "type": {
+                    "kind": "longitud-css",
+                    "conSigno": true
+                  }
+                },
+                "desenfoque": {
+                  "type": {
+                    "kind": "longitud-css"
+                  }
+                },
+                "expansion": {
+                  "type": {
+                    "kind": "longitud-css",
+                    "conSigno": true
+                  }
+                },
+                "color": {
+                  "type": {
+                    "kind": "union",
+                    "of": [
+                      {
+                        "kind": "ref",
+                        "reqId": "dim1.req15"
+                      },
+                      {
+                        "kind": "ref",
+                        "reqId": "dim1.req01"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "optional": true
+        },
+        "sinSombras": {
+          "type": {
+            "kind": "texto"
+          },
+          "optional": true
+        }
+      }
+    },
+    "dim4.req10": {
+      "estado": "nuevo",
+      "manifestVersion": "1.1",
+      "revision": 2,
+      "dependsOn": [],
+      "payloadSchema": {
+        "grosores": {
+          "type": {
+            "kind": "lista",
+            "of": {
+              "kind": "objeto",
+              "fields": {
+                "nombre": {
+                  "type": {
+                    "kind": "texto"
+                  }
+                },
+                "valor": {
+                  "type": {
+                    "kind": "longitud-css"
+                  }
+                }
+              }
+            }
+          },
+          "optional": true
+        },
+        "sinGrosores": {
+          "type": {
+            "kind": "texto"
+          },
+          "optional": true
+        }
+      }
+    },
+    "dim4.req11": {
+      "estado": "nuevo",
+      "manifestVersion": "1.1",
+      "revision": 2,
+      "dependsOn": [],
+      "payloadSchema": {
+        "desenfoques": {
+          "type": {
+            "kind": "lista",
+            "of": {
+              "kind": "objeto",
+              "fields": {
+                "nombre": {
+                  "type": {
+                    "kind": "texto"
+                  }
+                },
+                "valor": {
+                  "type": {
+                    "kind": "longitud-css"
+                  }
+                }
+              }
+            }
+          },
+          "optional": true
+        },
+        "sinDesenfoques": {
+          "type": {
+            "kind": "texto"
+          },
+          "optional": true
+        }
+      }
+    },
+    "dim7.req09": {
+      "estado": "nuevo",
+      "manifestVersion": "1.1",
+      "revision": 2,
+      "dependsOn": [
+        "dim7.req05"
+      ],
+      "payloadSchema": {
+        "temaFormulario": {
+          "type": {
+            "kind": "objeto",
+            "fields": {
+              "colores": {
+                "type": {
+                  "kind": "objeto",
+                  "fields": {
+                    "texto": {
+                      "type": {
+                        "kind": "union",
+                        "of": [
+                          {
+                            "kind": "ref",
+                            "reqId": "dim1.req01"
+                          },
+                          {
+                            "kind": "ref",
+                            "reqId": "dim1.req15"
+                          },
+                          {
+                            "kind": "color-css"
+                          },
+                          {
+                            "kind": "enum",
+                            "values": [
+                              "transparent"
+                            ]
+                          }
+                        ]
+                      },
+                      "optional": true
+                    },
+                    "textoSuave": {
+                      "type": {
+                        "kind": "union",
+                        "of": [
+                          {
+                            "kind": "ref",
+                            "reqId": "dim1.req01"
+                          },
+                          {
+                            "kind": "ref",
+                            "reqId": "dim1.req15"
+                          },
+                          {
+                            "kind": "color-css"
+                          },
+                          {
+                            "kind": "enum",
+                            "values": [
+                              "transparent"
+                            ]
+                          }
+                        ]
+                      },
+                      "optional": true
+                    },
+                    "fondo": {
+                      "type": {
+                        "kind": "union",
+                        "of": [
+                          {
+                            "kind": "ref",
+                            "reqId": "dim1.req01"
+                          },
+                          {
+                            "kind": "ref",
+                            "reqId": "dim1.req15"
+                          },
+                          {
+                            "kind": "color-css"
+                          },
+                          {
+                            "kind": "enum",
+                            "values": [
+                              "transparent"
+                            ]
+                          }
+                        ]
+                      },
+                      "optional": true
+                    },
+                    "superficie": {
+                      "type": {
+                        "kind": "union",
+                        "of": [
+                          {
+                            "kind": "ref",
+                            "reqId": "dim1.req01"
+                          },
+                          {
+                            "kind": "ref",
+                            "reqId": "dim1.req15"
+                          },
+                          {
+                            "kind": "color-css"
+                          },
+                          {
+                            "kind": "enum",
+                            "values": [
+                              "transparent"
+                            ]
+                          }
+                        ]
+                      },
+                      "optional": true
+                    },
+                    "superficieAlt": {
+                      "type": {
+                        "kind": "union",
+                        "of": [
+                          {
+                            "kind": "ref",
+                            "reqId": "dim1.req01"
+                          },
+                          {
+                            "kind": "ref",
+                            "reqId": "dim1.req15"
+                          },
+                          {
+                            "kind": "color-css"
+                          },
+                          {
+                            "kind": "enum",
+                            "values": [
+                              "transparent"
+                            ]
+                          }
+                        ]
+                      },
+                      "optional": true
+                    },
+                    "borde": {
+                      "type": {
+                        "kind": "union",
+                        "of": [
+                          {
+                            "kind": "ref",
+                            "reqId": "dim1.req01"
+                          },
+                          {
+                            "kind": "ref",
+                            "reqId": "dim1.req15"
+                          },
+                          {
+                            "kind": "color-css"
+                          },
+                          {
+                            "kind": "enum",
+                            "values": [
+                              "transparent"
+                            ]
+                          }
+                        ]
+                      },
+                      "optional": true
+                    },
+                    "bordeFuerte": {
+                      "type": {
+                        "kind": "union",
+                        "of": [
+                          {
+                            "kind": "ref",
+                            "reqId": "dim1.req01"
+                          },
+                          {
+                            "kind": "ref",
+                            "reqId": "dim1.req15"
+                          },
+                          {
+                            "kind": "color-css"
+                          },
+                          {
+                            "kind": "enum",
+                            "values": [
+                              "transparent"
+                            ]
+                          }
+                        ]
+                      },
+                      "optional": true
+                    },
+                    "principal": {
+                      "type": {
+                        "kind": "union",
+                        "of": [
+                          {
+                            "kind": "ref",
+                            "reqId": "dim1.req01"
+                          },
+                          {
+                            "kind": "ref",
+                            "reqId": "dim1.req15"
+                          },
+                          {
+                            "kind": "color-css"
+                          },
+                          {
+                            "kind": "enum",
+                            "values": [
+                              "transparent"
+                            ]
+                          }
+                        ]
+                      },
+                      "optional": true
+                    },
+                    "principalHover": {
+                      "type": {
+                        "kind": "union",
+                        "of": [
+                          {
+                            "kind": "ref",
+                            "reqId": "dim1.req01"
+                          },
+                          {
+                            "kind": "ref",
+                            "reqId": "dim1.req15"
+                          },
+                          {
+                            "kind": "color-css"
+                          },
+                          {
+                            "kind": "enum",
+                            "values": [
+                              "transparent"
+                            ]
+                          }
+                        ]
+                      },
+                      "optional": true
+                    },
+                    "principalContraste": {
+                      "type": {
+                        "kind": "union",
+                        "of": [
+                          {
+                            "kind": "ref",
+                            "reqId": "dim1.req01"
+                          },
+                          {
+                            "kind": "ref",
+                            "reqId": "dim1.req15"
+                          },
+                          {
+                            "kind": "color-css"
+                          },
+                          {
+                            "kind": "enum",
+                            "values": [
+                              "transparent"
+                            ]
+                          }
+                        ]
+                      },
+                      "optional": true
+                    },
+                    "campoFondo": {
+                      "type": {
+                        "kind": "union",
+                        "of": [
+                          {
+                            "kind": "ref",
+                            "reqId": "dim1.req01"
+                          },
+                          {
+                            "kind": "ref",
+                            "reqId": "dim1.req15"
+                          },
+                          {
+                            "kind": "color-css"
+                          },
+                          {
+                            "kind": "enum",
+                            "values": [
+                              "transparent"
+                            ]
+                          }
+                        ]
+                      },
+                      "optional": true
+                    },
+                    "campoTexto": {
+                      "type": {
+                        "kind": "union",
+                        "of": [
+                          {
+                            "kind": "ref",
+                            "reqId": "dim1.req01"
+                          },
+                          {
+                            "kind": "ref",
+                            "reqId": "dim1.req15"
+                          },
+                          {
+                            "kind": "color-css"
+                          },
+                          {
+                            "kind": "enum",
+                            "values": [
+                              "transparent"
+                            ]
+                          }
+                        ]
+                      },
+                      "optional": true
+                    },
+                    "etiquetaColor": {
+                      "type": {
+                        "kind": "union",
+                        "of": [
+                          {
+                            "kind": "ref",
+                            "reqId": "dim1.req01"
+                          },
+                          {
+                            "kind": "ref",
+                            "reqId": "dim1.req15"
+                          },
+                          {
+                            "kind": "color-css"
+                          },
+                          {
+                            "kind": "enum",
+                            "values": [
+                              "transparent"
+                            ]
+                          }
+                        ]
+                      },
+                      "optional": true
+                    },
+                    "subetiquetaColor": {
+                      "type": {
+                        "kind": "union",
+                        "of": [
+                          {
+                            "kind": "ref",
+                            "reqId": "dim1.req01"
+                          },
+                          {
+                            "kind": "ref",
+                            "reqId": "dim1.req15"
+                          },
+                          {
+                            "kind": "color-css"
+                          },
+                          {
+                            "kind": "enum",
+                            "values": [
+                              "transparent"
+                            ]
+                          }
+                        ]
+                      },
+                      "optional": true
+                    },
+                    "opcionColor": {
+                      "type": {
+                        "kind": "union",
+                        "of": [
+                          {
+                            "kind": "ref",
+                            "reqId": "dim1.req01"
+                          },
+                          {
+                            "kind": "ref",
+                            "reqId": "dim1.req15"
+                          },
+                          {
+                            "kind": "color-css"
+                          },
+                          {
+                            "kind": "enum",
+                            "values": [
+                              "transparent"
+                            ]
+                          }
+                        ]
+                      },
+                      "optional": true
+                    },
+                    "casillaFondo": {
+                      "type": {
+                        "kind": "union",
+                        "of": [
+                          {
+                            "kind": "ref",
+                            "reqId": "dim1.req01"
+                          },
+                          {
+                            "kind": "ref",
+                            "reqId": "dim1.req15"
+                          },
+                          {
+                            "kind": "color-css"
+                          },
+                          {
+                            "kind": "enum",
+                            "values": [
+                              "transparent"
+                            ]
+                          }
+                        ]
+                      },
+                      "optional": true
+                    },
+                    "casillaMarca": {
+                      "type": {
+                        "kind": "union",
+                        "of": [
+                          {
+                            "kind": "ref",
+                            "reqId": "dim1.req01"
+                          },
+                          {
+                            "kind": "ref",
+                            "reqId": "dim1.req15"
+                          },
+                          {
+                            "kind": "color-css"
+                          },
+                          {
+                            "kind": "enum",
+                            "values": [
+                              "transparent"
+                            ]
+                          }
+                        ]
+                      },
+                      "optional": true
+                    }
+                  }
+                },
+                "optional": true
+              },
+              "tipografia": {
+                "type": {
+                  "kind": "objeto",
+                  "fields": {
+                    "familia": {
+                      "type": {
+                        "kind": "ref",
+                        "reqId": "dim2.req01"
+                      },
+                      "optional": true
+                    },
+                    "campoTamano": {
+                      "type": {
+                        "kind": "longitud-css"
+                      },
+                      "optional": true
+                    },
+                    "etiquetaTamano": {
+                      "type": {
+                        "kind": "longitud-css"
+                      },
+                      "optional": true
+                    },
+                    "subetiquetaTamano": {
+                      "type": {
+                        "kind": "longitud-css"
+                      },
+                      "optional": true
+                    },
+                    "ayudaTamano": {
+                      "type": {
+                        "kind": "longitud-css"
+                      },
+                      "optional": true
+                    },
+                    "contadorTamano": {
+                      "type": {
+                        "kind": "longitud-css"
+                      },
+                      "optional": true
+                    },
+                    "opcionTamano": {
+                      "type": {
+                        "kind": "longitud-css"
+                      },
+                      "optional": true
+                    },
+                    "botonTamano": {
+                      "type": {
+                        "kind": "longitud-css"
+                      },
+                      "optional": true
+                    },
+                    "peso": {
+                      "type": {
+                        "kind": "numero",
+                        "min": 100,
+                        "max": 900
+                      },
+                      "optional": true
+                    },
+                    "etiquetaPeso": {
+                      "type": {
+                        "kind": "numero",
+                        "min": 100,
+                        "max": 900
+                      },
+                      "optional": true
+                    },
+                    "subetiquetaPeso": {
+                      "type": {
+                        "kind": "numero",
+                        "min": 100,
+                        "max": 900
+                      },
+                      "optional": true
+                    },
+                    "opcionPeso": {
+                      "type": {
+                        "kind": "numero",
+                        "min": 100,
+                        "max": 900
+                      },
+                      "optional": true
+                    },
+                    "botonPeso": {
+                      "type": {
+                        "kind": "numero",
+                        "min": 100,
+                        "max": 900
+                      },
+                      "optional": true
+                    },
+                    "interlineado": {
+                      "type": {
+                        "kind": "numero",
+                        "min": 0.8,
+                        "max": 3
+                      },
+                      "optional": true
+                    },
+                    "ayudaInterlineado": {
+                      "type": {
+                        "kind": "numero",
+                        "min": 0.8,
+                        "max": 3
+                      },
+                      "optional": true
+                    },
+                    "opcionInterlineado": {
+                      "type": {
+                        "kind": "numero",
+                        "min": 0.8,
+                        "max": 3
+                      },
+                      "optional": true
+                    },
+                    "contadorInterlineado": {
+                      "type": {
+                        "kind": "numero",
+                        "min": 0.8,
+                        "max": 3
+                      },
+                      "optional": true
+                    }
+                  }
+                },
+                "optional": true
+              },
+              "medidas": {
+                "type": {
+                  "kind": "objeto",
+                  "fields": {
+                    "radio": {
+                      "type": {
+                        "kind": "longitud-css"
+                      },
+                      "optional": true
+                    },
+                    "espaciado": {
+                      "type": {
+                        "kind": "longitud-css"
+                      },
+                      "optional": true
+                    },
+                    "campoBordeAncho": {
+                      "type": {
+                        "kind": "longitud-css"
+                      },
+                      "optional": true
+                    },
+                    "campoRellenoY": {
+                      "type": {
+                        "kind": "longitud-css"
+                      },
+                      "optional": true
+                    },
+                    "campoRellenoX": {
+                      "type": {
+                        "kind": "longitud-css"
+                      },
+                      "optional": true
+                    },
+                    "grupoTituloSeparacion": {
+                      "type": {
+                        "kind": "longitud-css"
+                      },
+                      "optional": true
+                    },
+                    "etiquetaSeparacion": {
+                      "type": {
+                        "kind": "longitud-css"
+                      },
+                      "optional": true
+                    },
+                    "etiquetaRellenoSuperior": {
+                      "type": {
+                        "kind": "longitud-css"
+                      },
+                      "optional": true
+                    },
+                    "opcionEtiquetaRellenoSuperior": {
+                      "type": {
+                        "kind": "longitud-css"
+                      },
+                      "optional": true
+                    },
+                    "controlSeparacion": {
+                      "type": {
+                        "kind": "longitud-css"
+                      },
+                      "optional": true
+                    },
+                    "ayudaRellenoY": {
+                      "type": {
+                        "kind": "longitud-css"
+                      },
+                      "optional": true
+                    },
+                    "ayudaSeparacion": {
+                      "type": {
+                        "kind": "longitud-css"
+                      },
+                      "optional": true
+                    },
+                    "contadorRellenoY": {
+                      "type": {
+                        "kind": "longitud-css"
+                      },
+                      "optional": true
+                    },
+                    "contadorSeparacion": {
+                      "type": {
+                        "kind": "longitud-css"
+                      },
+                      "optional": true
+                    },
+                    "pieRellenoY": {
+                      "type": {
+                        "kind": "longitud-css"
+                      },
+                      "optional": true
+                    },
+                    "pieSeparacion": {
+                      "type": {
+                        "kind": "longitud-css"
+                      },
+                      "optional": true
+                    },
+                    "rejillaSeparacion": {
+                      "type": {
+                        "kind": "longitud-css"
+                      },
+                      "optional": true
+                    },
+                    "rejillaFilaSeparacion": {
+                      "type": {
+                        "kind": "longitud-css"
+                      },
+                      "optional": true
+                    },
+                    "rejillaSubSeparacion": {
+                      "type": {
+                        "kind": "longitud-css"
+                      },
+                      "optional": true
+                    },
+                    "opcionesRellenoY": {
+                      "type": {
+                        "kind": "longitud-css"
+                      },
+                      "optional": true
+                    },
+                    "casillaTamano": {
+                      "type": {
+                        "kind": "longitud-css"
+                      },
+                      "optional": true
+                    },
+                    "casillaMargenSuperior": {
+                      "type": {
+                        "kind": "longitud-css"
+                      },
+                      "optional": true
+                    },
+                    "casillaMargenLateral": {
+                      "type": {
+                        "kind": "longitud-css"
+                      },
+                      "optional": true
+                    },
+                    "opcionSangria": {
+                      "type": {
+                        "kind": "longitud-css"
+                      },
+                      "optional": true
+                    },
+                    "opcionSeparacion": {
+                      "type": {
+                        "kind": "longitud-css"
+                      },
+                      "optional": true
+                    },
+                    "botonAncho": {
+                      "type": {
+                        "kind": "longitud-css"
+                      },
+                      "optional": true
+                    },
+                    "botonRellenoY": {
+                      "type": {
+                        "kind": "longitud-css"
+                      },
+                      "optional": true
+                    },
+                    "botonRellenoX": {
+                      "type": {
+                        "kind": "longitud-css"
+                      },
+                      "optional": true
+                    },
+                    "botonRadio": {
+                      "type": {
+                        "kind": "longitud-css"
+                      },
+                      "optional": true
+                    },
+                    "contadorAlineacion": {
+                      "type": {
+                        "kind": "enum",
+                        "values": [
+                          "left",
+                          "center",
+                          "right"
+                        ]
+                      },
+                      "optional": true
+                    },
+                    "opcionAlineacion": {
+                      "type": {
+                        "kind": "enum",
+                        "values": [
+                          "left",
+                          "center",
+                          "right"
+                        ]
+                      },
+                      "optional": true
+                    },
+                    "casillaApariencia": {
+                      "type": {
+                        "kind": "enum",
+                        "values": [
+                          "none",
+                          "auto"
+                        ]
+                      },
+                      "optional": true
+                    }
+                  }
+                },
+                "optional": true
+              },
+              "sombras": {
+                "type": {
+                  "kind": "objeto",
+                  "fields": {
+                    "sombra": {
+                      "type": {
+                        "kind": "union",
+                        "of": [
+                          {
+                            "kind": "ref",
+                            "reqId": "dim4.req09"
+                          },
+                          {
+                            "kind": "enum",
+                            "values": [
+                              "none"
+                            ]
+                          }
+                        ]
+                      },
+                      "optional": true
+                    },
+                    "botonSombra": {
+                      "type": {
+                        "kind": "union",
+                        "of": [
+                          {
+                            "kind": "ref",
+                            "reqId": "dim4.req09"
+                          },
+                          {
+                            "kind": "enum",
+                            "values": [
+                              "none"
+                            ]
+                          }
+                        ]
+                      },
+                      "optional": true
+                    }
+                  }
+                },
+                "optional": true
+              }
+            }
+          },
+          "optional": true
+        },
+        "sinTemaFormulario": {
+          "type": {
+            "kind": "texto"
+          },
+          "optional": true
+        }
+      }
+    },
+    "dim8.req03": {
+      "estado": "portado",
+      "manifestVersion": "1.0",
+      "revision": 1,
+      "dependsOn": [
+        "dim8.req02"
+      ],
+      "payloadSchema": {
+        "escala": {
+          "type": {
+            "kind": "lista",
+            "of": {
+              "kind": "objeto",
+              "fields": {
+                "nombre": {
+                  "type": {
+                    "kind": "texto"
+                  }
+                },
+                "duracion": {
+                  "type": {
+                    "kind": "numero",
+                    "min": 0,
+                    "max": 5000
+                  }
+                }
+              }
+            }
+          }
+        },
+        "ritmo": {
+          "type": {
+            "kind": "objeto",
+            "fields": {
+              "descripcion": {
+                "type": {
+                  "kind": "texto"
+                }
+              },
+              "pausas": {
+                "type": {
+                  "kind": "lista",
+                  "of": {
+                    "kind": "texto"
+                  }
+                },
+                "optional": true
+              },
+              "sinPausas": {
+                "type": {
+                  "kind": "texto"
+                },
+                "optional": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "dim8.req04": {
+      "estado": "portado",
+      "manifestVersion": "1.0",
+      "revision": 1,
+      "dependsOn": [
+        "dim8.req03"
+      ],
+      "payloadSchema": {
+        "movimientos": {
+          "type": {
+            "kind": "lista",
+            "of": {
+              "kind": "objeto",
+              "fields": {
+                "caso": {
+                  "type": {
+                    "kind": "texto"
+                  }
+                },
+                "curva": {
+                  "type": {
+                    "kind": "texto"
+                  }
+                },
+                "trayectoria": {
+                  "type": {
+                    "kind": "texto"
+                  }
+                },
+                "continuidadEspacial": {
+                  "type": {
+                    "kind": "texto"
+                  }
+                },
+                "amplitud": {
+                  "type": {
+                    "kind": "longitud-css"
+                  },
+                  "optional": true
+                },
+                "tiempo": {
+                  "type": {
+                    "kind": "ref",
+                    "reqId": "dim8.req03"
+                  },
+                  "optional": true
+                },
+                "duracionMs": {
+                  "type": {
+                    "kind": "numero",
+                    "min": 0,
+                    "max": 5000
+                  },
+                  "optional": true
+                }
+              }
+            }
+          }
+        },
+        "sinAmplitud": {
+          "type": {
+            "kind": "texto"
+          },
+          "optional": true
+        }
+      }
+    },
+    "dim9.req08": {
+      "estado": "nuevo",
+      "manifestVersion": "1.1",
+      "revision": 2,
+      "dependsOn": [
+        "dim9.req03"
+      ],
+      "payloadSchema": {
+        "diferencias": {
+          "type": {
+            "kind": "lista",
+            "of": {
+              "kind": "objeto",
+              "fields": {
+                "arquetipo": {
+                  "type": {
+                    "kind": "enum",
+                    "values": [
+                      "accion",
+                      "contenedor",
+                      "navegacion",
+                      "feedback",
+                      "entrada",
+                      "secuencia-editorial",
+                      "lista",
+                      "tabla",
+                      "metricas",
+                      "representacion-de-datos"
+                    ]
+                  }
+                },
+                "variante": {
+                  "type": {
+                    "kind": "texto"
+                  }
+                },
+                "cambios": {
+                  "type": {
+                    "kind": "lista",
+                    "of": {
+                      "kind": "objeto",
+                      "fields": {
+                        "propiedad": {
+                          "type": {
+                            "kind": "texto"
+                          }
+                        },
+                        "valor": {
+                          "type": {
+                            "kind": "union",
+                            "of": [
+                              {
+                                "kind": "objeto",
+                                "fields": {
+                                  "tipo": {
+                                    "type": {
+                                      "kind": "enum",
+                                      "values": [
+                                        "color"
+                                      ]
+                                    }
+                                  },
+                                  "color": {
+                                    "type": {
+                                      "kind": "union",
+                                      "of": [
+                                        {
+                                          "kind": "ref",
+                                          "reqId": "dim1.req01"
+                                        },
+                                        {
+                                          "kind": "ref",
+                                          "reqId": "dim1.req15"
+                                        },
+                                        {
+                                          "kind": "color-css"
+                                        }
+                                      ]
+                                    }
+                                  }
+                                }
+                              },
+                              {
+                                "kind": "objeto",
+                                "fields": {
+                                  "tipo": {
+                                    "type": {
+                                      "kind": "enum",
+                                      "values": [
+                                        "longitud"
+                                      ]
+                                    }
+                                  },
+                                  "longitud": {
+                                    "type": {
+                                      "kind": "longitud-css",
+                                      "conSigno": true
+                                    }
+                                  }
+                                }
+                              },
+                              {
+                                "kind": "objeto",
+                                "fields": {
+                                  "tipo": {
+                                    "type": {
+                                      "kind": "enum",
+                                      "values": [
+                                        "numero"
+                                      ]
+                                    }
+                                  },
+                                  "numero": {
+                                    "type": {
+                                      "kind": "numero"
+                                    }
+                                  }
+                                }
+                              },
+                              {
+                                "kind": "objeto",
+                                "fields": {
+                                  "tipo": {
+                                    "type": {
+                                      "kind": "enum",
+                                      "values": [
+                                        "proporcion"
+                                      ]
+                                    }
+                                  },
+                                  "ancho": {
+                                    "type": {
+                                      "kind": "numero",
+                                      "min": 0.01
+                                    }
+                                  },
+                                  "alto": {
+                                    "type": {
+                                      "kind": "numero",
+                                      "min": 0.01
+                                    }
+                                  }
+                                }
+                              },
+                              {
+                                "kind": "objeto",
+                                "fields": {
+                                  "tipo": {
+                                    "type": {
+                                      "kind": "enum",
+                                      "values": [
+                                        "palabra"
+                                      ]
+                                    }
+                                  },
+                                  "palabra": {
+                                    "type": {
+                                      "kind": "texto"
+                                    }
+                                  }
+                                }
+                              },
+                              {
+                                "kind": "objeto",
+                                "fields": {
+                                  "tipo": {
+                                    "type": {
+                                      "kind": "enum",
+                                      "values": [
+                                        "referencia"
+                                      ]
+                                    }
+                                  },
+                                  "referencia": {
+                                    "type": {
+                                      "kind": "ref"
+                                    }
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        "quiebre": {
+                          "type": {
+                            "kind": "enum",
+                            "values": [
+                              "tablet",
+                              "mobile"
+                            ]
+                          },
+                          "optional": true
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "optional": true
+        },
+        "sinDiferencias": {
+          "type": {
+            "kind": "texto"
+          },
+          "optional": true
+        }
+      }
+    },
+    "dim9.req09": {
+      "estado": "nuevo",
+      "manifestVersion": "1.1",
+      "revision": 2,
+      "dependsOn": [
+        "dim9.req01"
+      ],
+      "payloadSchema": {
+        "correspondencias": {
+          "type": {
+            "kind": "lista",
+            "of": {
+              "kind": "objeto",
+              "fields": {
+                "arquetipo": {
+                  "type": {
+                    "kind": "enum",
+                    "values": [
+                      "accion",
+                      "contenedor",
+                      "navegacion",
+                      "feedback",
+                      "entrada",
+                      "secuencia-editorial",
+                      "lista",
+                      "tabla",
+                      "metricas",
+                      "representacion-de-datos"
+                    ]
+                  }
+                },
+                "familiaDeBloque": {
+                  "type": {
+                    "kind": "texto"
+                  }
+                }
+              }
+            }
+          },
+          "optional": true
+        },
+        "sinCorrespondencias": {
+          "type": {
+            "kind": "texto"
+          },
+          "optional": true
+        }
+      }
+    }
+  }
+}

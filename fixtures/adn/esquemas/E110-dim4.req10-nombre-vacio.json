@@ -1,0 +1,26 @@
+{
+  "id": "E110-dim4.req10-nombre-vacio",
+  "capa": 4,
+  "requisito": "dim4.req10",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "soloForma",
+  "descripcion": "Nombre vacío.",
+  "value": {
+    "grosores": [
+      {
+        "nombre": "",
+        "valor": "1px"
+      }
+    ]
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "no-cumple"
+  }
+}

@@ -22,7 +22,7 @@
  */
 define('ABSPATH', __DIR__ . '/');
 $plugin = realpath(__DIR__ . '/../contope-publisher/includes');
-foreach (['js', 'design-md', 'parser', 'requisitos', 'validator'] as $parte) {
+foreach (['js', 'design-md', 'parser', 'projection', 'requisitos', 'validator'] as $parte) {
     require_once $plugin . '/class-cod-adn-' . $parte . '.php';
 }
 
@@ -356,5 +356,209 @@ if ($real !== null) {
     $comprobar('control: el contrato original, sin tocar, pasa', COD_ADN_Validator::validar($base)['ok']);
 }
 
+// ---------------------------------------------------------------------------
+echo "\n== 7. capa 4 (esquemas/): la forma del value contra el payloadSchema del Core ==\n";
+$manifiesto = json_decode((string) file_get_contents($corpus . '/payload-schemas.json'), true);
+$casos_esq = $leer($corpus . '/esquemas');
+$comprobar('el corpus esquemas/ tiene casos (' . count($casos_esq) . ')', count($casos_esq) >= 100);
+$por_intencion = ['ok' => 0, 'soloForma' => 0, 'mal' => 0];
+foreach ($casos_esq as $c) {
+    $por_intencion[$c['caso']->intencion] = ($por_intencion[$c['caso']->intencion] ?? 0) + 1;
+}
+$comprobar('los conteos coinciden con meta.json (esquemas ' . ($meta['conteo']['esquemas'] ?? '?') . ': ok ' . ($meta['conteo']['esquemasOk'] ?? '?') . ', soloForma ' . ($meta['conteo']['esquemasSoloForma'] ?? '?') . ', mal ' . ($meta['conteo']['esquemasMal'] ?? '?') . ')',
+    ($meta['conteo']['esquemas'] ?? -1) === count($casos_esq) && ($meta['conteo']['esquemasOk'] ?? -1) === $por_intencion['ok'] && ($meta['conteo']['esquemasSoloForma'] ?? -1) === $por_intencion['soloForma'] && ($meta['conteo']['esquemasMal'] ?? -1) === $por_intencion['mal'], json_encode($por_intencion));
+
+/** JSON canónico del esquema: claves ordenadas salvo el ORDEN de los campos (`fields` y los slots), que fija el orden de los motivos. */
+$canon_esquema = static function ($v, bool $conservar_orden = false) use (&$canon_esquema) {
+    if (!is_array($v)) {
+        return $v;
+    }
+    $es_lista = $v === [] || array_keys($v) === range(0, count($v) - 1);
+    $out = [];
+    foreach ($v as $k => $item) {
+        $out[$k] = $canon_esquema($item, $k === 'fields');
+    }
+    if (!$es_lista && !$conservar_orden) {
+        ksort($out);
+    }
+    return $out;
+};
+/**
+ * El esquema del plugin contra el del manifiesto: mismos requisitos, mismos slots en el mismo orden, mismos tipos.
+ *
+ * @param array<string, array<string, mixed>> $manifiesto_reqs
+ * @return array<int, string>
+ */
+$comparar_esquemas = static function (array $manifiesto_reqs) use ($canon_esquema): array {
+    $disc = [];
+    $propio = COD_ADN_Requisitos::esquema_como_core();
+    foreach (array_diff(array_keys($manifiesto_reqs), array_keys($propio)) as $falta) {
+        $disc[] = "$falta: el manifiesto lo trae y el plugin no";
+    }
+    foreach (array_diff(array_keys($propio), array_keys($manifiesto_reqs)) as $sobra) {
+        $disc[] = "$sobra: el plugin lo trae y el manifiesto no";
+    }
+    foreach ($manifiesto_reqs as $req => $m) {
+        if (!isset($propio[$req])) {
+            continue;
+        }
+        $a = json_encode($canon_esquema($m['payloadSchema'], true));
+        $b = json_encode($canon_esquema($propio[$req], true));
+        if ($a !== $b) {
+            $disc[] = "$req: el payloadSchema del plugin difiere del del manifiesto";
+        }
+    }
+    return $disc;
+};
+$disc_esq = $comparar_esquemas($manifiesto['requisitos']);
+foreach ($disc_esq as $d) {
+    echo '           ' . $d . "\n";
+}
+$comprobar('ESQUEMAS: los ' . count($manifiesto['requisitos']) . ' payloadSchema del manifiesto (nuevos, ampliados y portados) son idénticos a COD_ADN_Requisitos::esquemas()', $disc_esq === [] && count($manifiesto['requisitos']) >= 23, count($disc_esq) . ' discrepancia(s)');
+
+/**
+ * Corre los casos de la capa 4: veredicto de la forma y ruta de cada motivo (y, de yapa, su texto).
+ *
+ * @param array<int, array{nombre: string, caso: stdClass}> $casos
+ * @return array{forma: array<int, string>, textos: array<int, string>}
+ */
+$correr_esquemas = static function (array $casos): array {
+    $forma = [];
+    $textos = [];
+    foreach ($casos as $c) {
+        $caso = $c['caso'];
+        $motivos = COD_ADN_Requisitos::validar_forma((string) $caso->requisito, $caso->value);
+        $veredicto = $motivos === [] ? 'valida' : 'invalida';
+        $rutas = array_column($motivos, 'ruta');
+        $espera_rutas = $caso->esperado->rutas;
+        if ($veredicto !== $caso->esperado->forma) {
+            $forma[] = $caso->id . ': el Core dice forma ' . $caso->esperado->forma . ' y PHP dice ' . $veredicto . ' (' . implode(' | ', array_column($motivos, 'mensaje')) . ')';
+            continue;
+        }
+        if ($rutas !== $espera_rutas) {
+            $forma[] = $caso->id . ': mismos veredictos pero rutas distintas. Core: [' . implode(', ', $espera_rutas) . '] PHP: [' . implode(', ', $rutas) . ']';
+            continue;
+        }
+        if (array_column($motivos, 'mensaje') !== $caso->esperado->motivos) {
+            $textos[] = $caso->id . ': el texto del motivo difiere. Core: ' . json_encode($caso->esperado->motivos, JSON_UNESCAPED_UNICODE) . ' PHP: ' . json_encode(array_column($motivos, 'mensaje'), JSON_UNESCAPED_UNICODE);
+        }
+    }
+    return ['forma' => $forma, 'textos' => $textos];
+};
+$r_esq = $correr_esquemas($casos_esq);
+foreach (array_merge($r_esq['forma'], $r_esq['textos']) as $d) {
+    echo '           ' . $d . "\n";
+}
+$comprobar('PARIDAD 100 %: en los ' . count($casos_esq) . ' casos PHP da el mismo veredicto de forma y la misma ruta de cada motivo que el Core', $r_esq['forma'] === [], count($r_esq['forma']) . ' discrepancia(s)');
+$comprobar('y el mismo texto de cada motivo (el Core lo mide; para el plugin es informativo, pero hoy coincide)', $r_esq['textos'] === [], count($r_esq['textos']) . ' texto(s) distinto(s)');
+$cubiertos = [];
+foreach ($casos_esq as $c) {
+    $cubiertos[(string) $c['caso']->requisito] = true;
+}
+$sin_casos = [];
+foreach ($manifiesto['requisitos'] as $req => $m) {
+    // Los "portados" ya estaban en el plugin antes del 02-nov: sus formas las miden las capas 1–3; los nuevos y ampliados, la capa 4.
+    if ($m['estado'] !== 'portado' && !isset($cubiertos[$req])) {
+        $sin_casos[] = $req;
+    }
+}
+$comprobar('piso: cada requisito nuevo o ampliado del manifiesto tiene casos en la capa 4 (' . count($cubiertos) . ' requisitos con casos)', $sin_casos === [] && count($cubiertos) >= 14, implode(', ', $sin_casos));
+$con_signo = array_filter($casos_esq, static function (array $c): bool {
+    return in_array($c['caso']->requisito, ['dim4.req09', 'dim9.req08'], true) && strpos(json_encode($c['caso']->value), '"-') !== false;
+});
+$comprobar('piso: hay casos con longitud con signo (' . count($con_signo) . ')', count($con_signo) >= 2);
+
+// CONTROLES: se rompe la paridad a propósito y el instrumento tiene que verla.
+$control_esq = static function (string $nombre, callable $alterar) use ($casos_esq, $correr_esquemas, $comprobar): void {
+    $copia = unserialize(serialize($casos_esq));
+    $alterar($copia);
+    $r = $correr_esquemas($copia);
+    $comprobar("control: $nombre → el instrumento reporta una discrepancia", $r['forma'] !== [], 'el instrumento NO vio la alteración');
+};
+$control_esq('se voltea el veredicto de forma de un caso válido', static function (array &$casos): void {
+    foreach ($casos as &$c) {
+        if ($c['caso']->esperado->forma === 'valida') {
+            $c['caso']->esperado->forma = 'invalida';
+            return;
+        }
+    }
+});
+$control_esq('se voltea el veredicto de un caso inválido', static function (array &$casos): void {
+    foreach ($casos as &$c) {
+        if ($c['caso']->esperado->forma === 'invalida') {
+            $c['caso']->esperado->forma = 'valida';
+            return;
+        }
+    }
+});
+$control_esq('se cambia la ruta de un motivo', static function (array &$casos): void {
+    foreach ($casos as &$c) {
+        if ($c['caso']->esperado->rutas !== []) {
+            $c['caso']->esperado->rutas[0] .= 'x';
+            return;
+        }
+    }
+});
+$control_esq('se altera el valor de un caso válido para que deje de cumplir (un `+` delante de la longitud con signo)', static function (array &$casos): void {
+    foreach ($casos as &$c) {
+        if ($c['caso']->requisito === 'dim4.req09' && $c['caso']->esperado->forma === 'valida' && isset($c['caso']->value->sombras[0])) {
+            $c['caso']->value->sombras[0]->x = '+4px';
+            return;
+        }
+    }
+});
+$alterado = json_decode((string) file_get_contents($corpus . '/payload-schemas.json'), true);
+$alterado['requisitos']['dim4.req09']['payloadSchema']['sombras']['type']['of']['fields']['x']['type'] = ['kind' => 'longitud-css'];
+$comprobar('control: si el manifiesto dejara de marcar `x` de la sombra con signo, la comparación de esquemas lo reporta', $comparar_esquemas($alterado['requisitos']) !== []);
+$alterado = json_decode((string) file_get_contents($corpus . '/payload-schemas.json'), true);
+unset($alterado['requisitos']['dim7.req09']['payloadSchema']['temaFormulario']['type']['fields']['medidas']['type']['fields']['botonRadio']);
+$comprobar('control: si el manifiesto perdiera una de las 68 variables del formulario, la comparación de esquemas lo reporta', $comparar_esquemas($alterado['requisitos']) !== []);
+$alterado = json_decode((string) file_get_contents($corpus . '/payload-schemas.json'), true);
+$alterado['requisitos']['dim3.req01']['payloadSchema']['escala']['type']['of']['fields'] = array_reverse($alterado['requisitos']['dim3.req01']['payloadSchema']['escala']['type']['of']['fields'], true);
+$comprobar('control: el ORDEN de los campos cuenta (fija el orden de los motivos): invertirlo se reporta', $comparar_esquemas($alterado['requisitos']) !== []);
+
+// El formulario: 68 variables, todas distintas.
+$vars_form = array_merge(COD_ADN_Requisitos::FORM_COLORES, ['familia'], COD_ADN_Requisitos::FORM_TAMANOS, COD_ADN_Requisitos::FORM_PESOS, COD_ADN_Requisitos::FORM_INTERLINEADOS, COD_ADN_Requisitos::FORM_MEDIDAS, COD_ADN_Requisitos::FORM_ALINEACIONES, ['casillaApariencia'], COD_ADN_Requisitos::FORM_SOMBRAS);
+$comprobar('dim7.req09 declara 68 variables, ninguna repetida', count($vars_form) === 68 && count(array_unique($vars_form)) === 68, (string) count($vars_form));
+
+// ---------------------------------------------------------------------------
+echo "\n== 8. los contratos del Core con definiciones Q1, Q3 y Q4 (core/215–218) ==\n";
+$por_nombre = [];
+foreach ($casos_core as $c) {
+    $por_nombre[$c['nombre']] = $c['caso'];
+}
+$v215 = COD_ADN_Validator::validar($por_nombre['215-contrato-ok-definiciones-q1-q3-q4-bien-formadas.json']->entrada);
+$codigos215 = array_values(array_unique(array_column($v215['errores'], 'codigo')));
+$comprobar('215: todas las formas de las 13 definiciones cumplen su esquema (lo único que el plugin objeta son las referencias a dim1.req01, dim2.req01…, que el contrato no trae)', !in_array('ADN_PAYLOAD_SHAPE', $codigos215, true) && !in_array('ADN_NAME_INVALID', $codigos215, true) && !in_array('ADN_NAME_DUPLICATE', $codigos215, true) && $codigos215 !== [], json_encode($codigos215));
+$comprobar('215: las 13 definiciones están en el resultado (11 con forma proyectada y las 2 de dim9, de forma conocida)', count($v215['definiciones']) === 13, (string) count($v215['definiciones']));
+$v216 = COD_ADN_Validator::validar($por_nombre['216-contrato-ok-definicion-q3-con-forma-incorrecta.json']->entrada);
+$comprobar('216: el Core acepta el sobre y el plugin RECHAZA la sombra con el color escrito (ADN_PAYLOAD_SHAPE, ruta sombras[0].color)', !$v216['ok'] && ($v216['errores'][0]['codigo'] ?? '') === 'ADN_PAYLOAD_SHAPE' && ($v216['errores'][0]['ruta'] ?? '') === 'sombras[0].color', json_encode($v216['errores']));
+$v217 = COD_ADN_Validator::validar($por_nombre['217-contrato-ok-definicion-q1-rol-libre-sin-los-nueve.json']->entrada);
+$codigos217 = array_values(array_unique(array_column($v217['errores'], 'codigo')));
+$comprobar('217: un rol libre sin los nueve del Core cumple la forma (el predicado de los nueve es informativo en el plugin); lo único que se objeta es la referencia a dim2.req01, que el contrato no trae', $codigos217 === ['ADN_REF_UNRESOLVED'], json_encode($codigos217));
+$v218 = COD_ADN_Validator::validar($por_nombre['218-portable-ok-con-definiciones-q1-q3-q4.json']->entrada);
+$comprobar('218: el paquete portable lleva las mismas definiciones y da los mismos veredictos que el contrato 215', $v218['formato'] === 'portable' && array_values(array_unique(array_column($v218['errores'], 'codigo'))) === $codigos215);
+
+// Las reglas que el Core deja al destino: nombre único y con slug propio, con código propio.
+$con_roles = static function (array $nombres) use ($por_nombre): array {
+    $c = unserialize(serialize($por_nombre['217-contrato-ok-definicion-q1-rol-libre-sin-los-nueve.json']->entrada));
+    $base = $c->definitions[0]->value->roleStyles[0];
+    $base->family = 'Georgia'; // texto en vez de la referencia a dim2.req01: el contrato de prueba no trae esa definición
+    $c->definitions[0]->value->roleStyles = [];
+    foreach ($nombres as $n) {
+        $r = clone $base;
+        $r->role = $n;
+        $c->definitions[0]->value->roleStyles[] = $r;
+    }
+    return COD_ADN_Validator::validar($c);
+};
+$r = $con_roles(['10', '20', '10']);
+$comprobar('un rol repetido se rechaza con ADN_NAME_DUPLICATE en la ruta del segundo (el Core no mide la unicidad: la exige el destino)', !$r['ok'] && ($r['errores'][0]['codigo'] ?? '') === 'ADN_NAME_DUPLICATE' && ($r['errores'][0]['ruta'] ?? '') === 'roleStyles[2].role', json_encode($r['errores']));
+$r = $con_roles(['10', '!!!']);
+$comprobar('un rol que no da slug ("!!!") se rechaza con ADN_NAME_INVALID', !$r['ok'] && ($r['errores'][0]['codigo'] ?? '') === 'ADN_NAME_INVALID', json_encode($r['errores']));
+$r = $con_roles(['Título 1', 'Titulo 1']);
+$comprobar('dos roles con nombres distintos que dan el mismo slug NO se rechazan (R3 los desambigua en la proyección)', $r['ok'], json_encode($r['errores']));
+$r = $con_roles(['display', 'título', 'cuerpo', '10']);
+$comprobar('roles de los nueve y numéricos conviven (Q1)', $r['ok'], json_encode($r['errores']));
 echo "\n" . ($fallas === 0 ? "TODO VERDE ($ejecutadas comprobaciones)" : "FALLARON $fallas de $ejecutadas comprobaciones") . "\n";
 exit($fallas === 0 ? 0 : 1);

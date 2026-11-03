@@ -240,6 +240,7 @@ final class COD_ADN_Validator
             $id = (string) $d->id;
             $req = COD_ADN_Requisitos::requisito_de($id);
             $proyectado = COD_ADN_Requisitos::es_proyectado($req);
+            $con_forma = COD_ADN_Requisitos::tiene_esquema($req); // proyectado, o forma conocida sin proyectar (dim9.req08/09)
             $ficha = ['estadoEfectivo' => $d->state, 'guardada' => true, 'emitida' => false, 'ignorada' => null];
 
             if ($d->state === 'confirmed') {
@@ -264,7 +265,7 @@ final class COD_ADN_Validator
             $motivo = null; // por qué no se emite (proposed) o por qué se rechaza (confirmed)
             $detalle = [];
 
-            if (!$proyectado) {
+            if (!$con_forma) {
                 $motivo = 'R4-no-proyectada';
             } elseif (self::sin_resolver($d)) {
                 if ($d->state === 'confirmed') {
@@ -278,18 +279,28 @@ final class COD_ADN_Validator
                 }
             } else {
                 $motivos = COD_ADN_Requisitos::validar_forma((string) $req, $d->value);
+                $codigo_forma = 'ADN_PAYLOAD_SHAPE';
+                if ($motivos === []) {
+                    // Lo que el Core deja al destino (nombre único y con slug propio): código propio.
+                    $motivos = COD_ADN_Requisitos::validar_destino((string) $req, $d->value);
+                    $codigo_forma = (string) ($motivos[0]['codigo'] ?? $codigo_forma);
+                }
                 if ($motivos !== []) {
                     if ($d->state === 'confirmed') {
                         $errores[] = self::error(
-                            'ADN_PAYLOAD_SHAPE',
-                            'La definición "' . $id . '" no cumple la forma de ' . $req . ': ' . $motivos[0]['mensaje'],
+                            $codigo_forma,
+                            'La definición "' . $id . '" no cumple ' . ($codigo_forma === 'ADN_PAYLOAD_SHAPE' ? 'la forma de ' : 'las reglas del destino para ') . $req . ': ' . $motivos[0]['mensaje'],
                             ['definicion' => $id, 'ruta' => $motivos[0]['ruta'], 'motivos' => $motivos]
                         );
                     } else {
-                        $motivo = 'ADN_PAYLOAD_SHAPE';
+                        $motivo = $codigo_forma;
                         $detalle = ['ruta' => $motivos[0]['ruta']];
                     }
                 }
+            }
+
+            if ($motivo === null && !$proyectado) {
+                $motivo = 'R4-no-proyectada'; // la forma es conocida (dim9.req08/09), pero la web aún no emite sus propiedades.
             }
 
             // R6 (también para lo que la web no proyecta: una referencia rota es una referencia rota).

@@ -1,0 +1,27 @@
+{
+  "id": "E172-dim9.req09-lista-y-ausencia",
+  "capa": 4,
+  "requisito": "dim9.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "soloForma",
+  "descripcion": "Lista y ausencia a la vez.",
+  "value": {
+    "correspondencias": [
+      {
+        "arquetipo": "accion",
+        "familiaDeBloque": "core/button"
+      }
+    ],
+    "sinCorrespondencias": "no"
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "no-cumple"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "id": "E123-dim7.req09-color-ref-a-roles",
+  "capa": 4,
+  "requisito": "dim7.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "mal",
+  "descripcion": "Un color por referencia a dim1.req02 (sólo se admite paleta o transparencia).",
+  "value": {
+    "temaFormulario": {
+      "colores": {
+        "texto": {
+          "refReqId": "dim1.req02",
+          "refPath": [
+            "roleColors",
+            0,
+            "color"
+          ]
+        }
+      }
+    }
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "temaFormulario.colores.texto"
+    ],
+    "motivos": [
+      "slot 'temaFormulario.colores.texto': no cumple ningún miembro de la unión"
+    ],
+    "predicado": "cumple"
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "id": "E003-dim1.req15-opacidad-en-los-limites",
+  "capa": 4,
+  "requisito": "dim1.req15",
+  "manifiesto": {
+    "manifestVersion": "1.3",
+    "revision": 4
+  },
+  "intencion": "ok",
+  "descripcion": "Opacidad 0 y 100 (límites incluidos).",
+  "value": {
+    "transparencias": [
+      {
+        "nombre": "nada",
+        "base": {
+          "refReqId": "dim1.req01",
+          "refPath": [
+            "neutros",
+            0
+          ]
+        },
+        "opacidad": 0
+      },
+      {
+        "nombre": "todo",
+        "base": {
+          "refReqId": "dim1.req01",
+          "refPath": [
+            "neutros",
+            0
+          ]
+        },
+        "opacidad": 100
+      }
+    ]
+  },
+  "contexto": {
+    "dim1.req01": {
+      "institucionales": [
+        {
+          "name": "Naranja Basis",
+          "value": "#F26621"
+        }
+      ],
+      "neutros": [
+        {
+          "name": "Tinta",
+          "value": "#0E0C19"
+        },
+        {
+          "name": "Gris",
+          "value": "#898989"
+        }
+      ]
+    }
+  },
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "cumple"
+  }
+}

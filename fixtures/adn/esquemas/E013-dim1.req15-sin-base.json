@@ -1,0 +1,49 @@
+{
+  "id": "E013-dim1.req15-sin-base",
+  "capa": 4,
+  "requisito": "dim1.req15",
+  "manifiesto": {
+    "manifestVersion": "1.3",
+    "revision": 4
+  },
+  "intencion": "mal",
+  "descripcion": "Falta `base`.",
+  "value": {
+    "transparencias": [
+      {
+        "nombre": "x",
+        "opacidad": 20
+      }
+    ]
+  },
+  "contexto": {
+    "dim1.req01": {
+      "institucionales": [
+        {
+          "name": "Naranja Basis",
+          "value": "#F26621"
+        }
+      ],
+      "neutros": [
+        {
+          "name": "Tinta",
+          "value": "#0E0C19"
+        },
+        {
+          "name": "Gris",
+          "value": "#898989"
+        }
+      ]
+    }
+  },
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "transparencias[0].base"
+    ],
+    "motivos": [
+      "slot 'transparencias[0]': campo obligatorio 'base' ausente"
+    ],
+    "predicado": "no-cumple"
+  }
+}

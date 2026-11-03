@@ -1,0 +1,21 @@
+{
+  "id": "E112-dim4.req11-sin-desenfoques",
+  "capa": 4,
+  "requisito": "dim4.req11",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "ok",
+  "descripcion": "Ausencia declarada.",
+  "value": {
+    "sinDesenfoques": "no usa desenfoques"
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "cumple"
+  }
+}

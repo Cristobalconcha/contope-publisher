@@ -1,0 +1,40 @@
+{
+  "id": "E104-dim4.req09-una-sombra-apilada",
+  "capa": 4,
+  "requisito": "dim4.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "mal",
+  "descripcion": "Dos sombras en un solo valor (no se admite apilar: una sombra por entrada).",
+  "value": {
+    "sombras": [
+      {
+        "nombre": "10",
+        "x": "0px 2px",
+        "y": "4px",
+        "desenfoque": "10px",
+        "expansion": "0px",
+        "color": {
+          "refReqId": "dim1.req15",
+          "refPath": [
+            "transparencias",
+            0
+          ]
+        }
+      }
+    ]
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "sombras[0].x"
+    ],
+    "motivos": [
+      "slot 'sombras[0].x': no es una longitud-css válida (con signo opcional)"
+    ],
+    "predicado": "cumple"
+  }
+}

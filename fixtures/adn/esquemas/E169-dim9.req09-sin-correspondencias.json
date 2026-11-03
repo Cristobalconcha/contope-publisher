@@ -1,0 +1,21 @@
+{
+  "id": "E169-dim9.req09-sin-correspondencias",
+  "capa": 4,
+  "requisito": "dim9.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "ok",
+  "descripcion": "Ausencia declarada (cada destino decide).",
+  "value": {
+    "sinCorrespondencias": "cada destino decide"
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "cumple"
+  }
+}

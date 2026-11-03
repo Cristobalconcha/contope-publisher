@@ -1,0 +1,29 @@
+{
+  "id": "E127-dim7.req09-peso-como-texto",
+  "capa": 4,
+  "requisito": "dim7.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "mal",
+  "descripcion": "Peso «600» (texto; el tema lo guarda como texto pero el ADN lo lleva como número).",
+  "value": {
+    "temaFormulario": {
+      "tipografia": {
+        "etiquetaPeso": "600"
+      }
+    }
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "temaFormulario.tipografia.etiquetaPeso"
+    ],
+    "motivos": [
+      "slot 'temaFormulario.tipografia.etiquetaPeso': se esperaba numero"
+    ],
+    "predicado": "cumple"
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "id": "E074-dim3.req11-minimo-no-es-longitud",
+  "capa": 4,
+  "requisito": "dim3.req11",
+  "manifiesto": {
+    "manifestVersion": "1.2",
+    "revision": 3
+  },
+  "intencion": "mal",
+  "descripcion": "El mínimo es una expresión (`max(10%, 20px)`), no una longitud simple.",
+  "value": {
+    "margenLateral": {
+      "nombre": "gutter",
+      "minimo": "max(10%, 20px)",
+      "contenedor": {
+        "refReqId": "dim3.req05",
+        "refPath": [
+          "contenedores",
+          0
+        ]
+      }
+    }
+  },
+  "contexto": {
+    "dim3.req05": {
+      "contenedores": [
+        {
+          "nombre": "contenido",
+          "maxWidth": "1080px",
+          "padding": {
+            "refReqId": "dim3.req02",
+            "refPath": [
+              "roleSpacing",
+              0
+            ]
+          },
+          "relacionSoporte": "centrado"
+        },
+        {
+          "nombre": "amplio",
+          "maxWidth": "1440px",
+          "padding": {
+            "refReqId": "dim3.req02",
+            "refPath": [
+              "roleSpacing",
+              1
+            ]
+          },
+          "relacionSoporte": "centrado"
+        }
+      ]
+    }
+  },
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "margenLateral.minimo"
+    ],
+    "motivos": [
+      "slot 'margenLateral.minimo': no es una longitud-css válida"
+    ],
+    "predicado": "no-cumple"
+  }
+}

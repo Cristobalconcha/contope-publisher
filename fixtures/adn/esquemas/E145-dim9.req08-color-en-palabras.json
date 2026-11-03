@@ -1,0 +1,62 @@
+{
+  "id": "E145-dim9.req08-color-en-palabras",
+  "capa": 4,
+  "requisito": "dim9.req08",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "mal",
+  "descripcion": "Un color que no es color (`rojo`).",
+  "value": {
+    "diferencias": [
+      {
+        "arquetipo": "accion",
+        "variante": "contorno",
+        "cambios": [
+          {
+            "propiedad": "border-width",
+            "valor": {
+              "tipo": "color",
+              "color": "rojo"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "contexto": {
+    "dim9.req03": {
+      "variantes": [
+        {
+          "arquetipo": "accion",
+          "nombre": "contorno",
+          "heredaDe": {
+            "refReqId": "dim9.req01",
+            "refPath": []
+          },
+          "diferencia": "quita el relleno y deja el borde"
+        },
+        {
+          "arquetipo": "contenedor",
+          "nombre": "tarjeta-con-contorno",
+          "heredaDe": {
+            "refReqId": "dim9.req01",
+            "refPath": []
+          },
+          "diferencia": "agrega contorno grueso"
+        }
+      ]
+    }
+  },
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "diferencias[0].cambios[0].valor"
+    ],
+    "motivos": [
+      "slot 'diferencias[0].cambios[0].valor': no cumple ningún miembro de la unión"
+    ],
+    "predicado": "cumple"
+  }
+}

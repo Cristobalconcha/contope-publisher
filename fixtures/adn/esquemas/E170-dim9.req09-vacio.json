@@ -1,0 +1,19 @@
+{
+  "id": "E170-dim9.req09-vacio",
+  "capa": 4,
+  "requisito": "dim9.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "soloForma",
+  "descripcion": "Objeto vacío.",
+  "value": {},
+  "contexto": {},
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "no-cumple"
+  }
+}

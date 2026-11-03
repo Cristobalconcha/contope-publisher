@@ -1,0 +1,29 @@
+{
+  "id": "E129-dim7.req09-familia-escrita",
+  "capa": 4,
+  "requisito": "dim7.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "mal",
+  "descripcion": "La familia es un nombre escrito, no una referencia a dim2.req01.",
+  "value": {
+    "temaFormulario": {
+      "tipografia": {
+        "familia": "Open Sans"
+      }
+    }
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "temaFormulario.tipografia.familia"
+    ],
+    "motivos": [
+      "slot 'temaFormulario.tipografia.familia': se esperaba ref (objeto { refReqId, refPath })"
+    ],
+    "predicado": "cumple"
+  }
+}

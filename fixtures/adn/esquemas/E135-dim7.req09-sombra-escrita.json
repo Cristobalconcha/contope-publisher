@@ -1,0 +1,29 @@
+{
+  "id": "E135-dim7.req09-sombra-escrita",
+  "capa": 4,
+  "requisito": "dim7.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "mal",
+  "descripcion": "La sombra es un valor CSS escrito, no una referencia a dim4.req09.",
+  "value": {
+    "temaFormulario": {
+      "sombras": {
+        "sombra": "0 1px 4px #000"
+      }
+    }
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "temaFormulario.sombras.sombra"
+    ],
+    "motivos": [
+      "slot 'temaFormulario.sombras.sombra': no cumple ningún miembro de la unión"
+    ],
+    "predicado": "cumple"
+  }
+}

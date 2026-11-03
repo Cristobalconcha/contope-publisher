@@ -1,0 +1,30 @@
+{
+  "id": "E176-dim9.req09-familia-numerica",
+  "capa": 4,
+  "requisito": "dim9.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "mal",
+  "descripcion": "`familiaDeBloque` numérica.",
+  "value": {
+    "correspondencias": [
+      {
+        "arquetipo": "accion",
+        "familiaDeBloque": 7
+      }
+    ]
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "correspondencias[0].familiaDeBloque"
+    ],
+    "motivos": [
+      "slot 'correspondencias[0].familiaDeBloque': se esperaba texto"
+    ],
+    "predicado": "cumple"
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "id": "E138-dim9.req08-color-escrito-y-longitud-negativa",
+  "capa": 4,
+  "requisito": "dim9.req08",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "ok",
+  "descripcion": "El color puede ir escrito (como en dim4.req03) y una longitud puede ser negativa.",
+  "value": {
+    "diferencias": [
+      {
+        "arquetipo": "accion",
+        "variante": "contorno",
+        "cambios": [
+          {
+            "propiedad": "border-color",
+            "valor": {
+              "tipo": "color",
+              "color": "#F26621"
+            }
+          },
+          {
+            "propiedad": "margin-top",
+            "valor": {
+              "tipo": "longitud",
+              "longitud": "-4px"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "contexto": {
+    "dim9.req03": {
+      "variantes": [
+        {
+          "arquetipo": "accion",
+          "nombre": "contorno",
+          "heredaDe": {
+            "refReqId": "dim9.req01",
+            "refPath": []
+          },
+          "diferencia": "quita el relleno y deja el borde"
+        },
+        {
+          "arquetipo": "contenedor",
+          "nombre": "tarjeta-con-contorno",
+          "heredaDe": {
+            "refReqId": "dim9.req01",
+            "refPath": []
+          },
+          "diferencia": "agrega contorno grueso"
+        }
+      ]
+    }
+  },
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "cumple"
+  }
+}

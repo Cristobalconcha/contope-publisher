@@ -1,0 +1,39 @@
+{
+  "id": "E103-dim4.req09-nombre-ausente",
+  "capa": 4,
+  "requisito": "dim4.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "mal",
+  "descripcion": "Sin `nombre`.",
+  "value": {
+    "sombras": [
+      {
+        "x": "0px",
+        "y": "4px",
+        "desenfoque": "10px",
+        "expansion": "0px",
+        "color": {
+          "refReqId": "dim1.req15",
+          "refPath": [
+            "transparencias",
+            0
+          ]
+        }
+      }
+    ]
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "sombras[0].nombre"
+    ],
+    "motivos": [
+      "slot 'sombras[0]': campo obligatorio 'nombre' ausente"
+    ],
+    "predicado": "no-cumple"
+  }
+}

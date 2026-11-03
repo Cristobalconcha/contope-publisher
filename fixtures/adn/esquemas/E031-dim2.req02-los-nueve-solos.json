@@ -1,0 +1,200 @@
+{
+  "id": "E031-dim2.req02-los-nueve-solos",
+  "capa": 4,
+  "requisito": "dim2.req02",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "ok",
+  "descripcion": "COMPATIBILIDAD: los nueve roles Core y nada más (lo que era válido ayer sigue siéndolo).",
+  "value": {
+    "roleStyles": [
+      {
+        "role": "display",
+        "family": {
+          "refReqId": "dim2.req01",
+          "refPath": [
+            "familias",
+            0
+          ]
+        },
+        "fontSize": "16px",
+        "fontWeight": 400,
+        "lineHeight": 1.5,
+        "source": "medido en el sitio",
+        "derivation": {
+          "of": "direct",
+          "rule": "medido"
+        }
+      },
+      {
+        "role": "título",
+        "family": {
+          "refReqId": "dim2.req01",
+          "refPath": [
+            "familias",
+            0
+          ]
+        },
+        "fontSize": "16px",
+        "fontWeight": 400,
+        "lineHeight": 1.5,
+        "source": "medido en el sitio",
+        "derivation": {
+          "of": "direct",
+          "rule": "medido"
+        }
+      },
+      {
+        "role": "subtítulo",
+        "family": {
+          "refReqId": "dim2.req01",
+          "refPath": [
+            "familias",
+            0
+          ]
+        },
+        "fontSize": "16px",
+        "fontWeight": 400,
+        "lineHeight": 1.5,
+        "source": "medido en el sitio",
+        "derivation": {
+          "of": "direct",
+          "rule": "medido"
+        }
+      },
+      {
+        "role": "cuerpo",
+        "family": {
+          "refReqId": "dim2.req01",
+          "refPath": [
+            "familias",
+            0
+          ]
+        },
+        "fontSize": "16px",
+        "fontWeight": 400,
+        "lineHeight": 1.5,
+        "source": "medido en el sitio",
+        "derivation": {
+          "of": "direct",
+          "rule": "medido"
+        }
+      },
+      {
+        "role": "cita",
+        "family": {
+          "refReqId": "dim2.req01",
+          "refPath": [
+            "familias",
+            0
+          ]
+        },
+        "fontSize": "16px",
+        "fontWeight": 400,
+        "lineHeight": 1.5,
+        "source": "medido en el sitio",
+        "derivation": {
+          "of": "direct",
+          "rule": "medido"
+        }
+      },
+      {
+        "role": "nota",
+        "family": {
+          "refReqId": "dim2.req01",
+          "refPath": [
+            "familias",
+            0
+          ]
+        },
+        "fontSize": "16px",
+        "fontWeight": 400,
+        "lineHeight": 1.5,
+        "source": "medido en el sitio",
+        "derivation": {
+          "of": "direct",
+          "rule": "medido"
+        }
+      },
+      {
+        "role": "leyenda",
+        "family": {
+          "refReqId": "dim2.req01",
+          "refPath": [
+            "familias",
+            0
+          ]
+        },
+        "fontSize": "16px",
+        "fontWeight": 400,
+        "lineHeight": 1.5,
+        "source": "medido en el sitio",
+        "derivation": {
+          "of": "direct",
+          "rule": "medido"
+        }
+      },
+      {
+        "role": "dato",
+        "family": {
+          "refReqId": "dim2.req01",
+          "refPath": [
+            "familias",
+            0
+          ]
+        },
+        "fontSize": "16px",
+        "fontWeight": 400,
+        "lineHeight": 1.5,
+        "source": "medido en el sitio",
+        "derivation": {
+          "of": "direct",
+          "rule": "medido"
+        }
+      },
+      {
+        "role": "control",
+        "family": {
+          "refReqId": "dim2.req01",
+          "refPath": [
+            "familias",
+            0
+          ]
+        },
+        "fontSize": "16px",
+        "fontWeight": 400,
+        "lineHeight": 1.5,
+        "source": "medido en el sitio",
+        "derivation": {
+          "of": "direct",
+          "rule": "medido"
+        }
+      }
+    ]
+  },
+  "contexto": {
+    "dim2.req01": {
+      "familias": [
+        {
+          "name": "Open Sans",
+          "stack": [
+            "Open Sans",
+            "sans-serif"
+          ],
+          "idiomas": [
+            "es"
+          ],
+          "licencia": "OFL"
+        }
+      ]
+    }
+  },
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "cumple"
+  }
+}

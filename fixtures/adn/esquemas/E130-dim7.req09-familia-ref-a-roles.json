@@ -1,0 +1,35 @@
+{
+  "id": "E130-dim7.req09-familia-ref-a-roles",
+  "capa": 4,
+  "requisito": "dim7.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "mal",
+  "descripcion": "La familia apunta a dim2.req02 (roles).",
+  "value": {
+    "temaFormulario": {
+      "tipografia": {
+        "familia": {
+          "refReqId": "dim2.req02",
+          "refPath": [
+            "roleStyles",
+            0
+          ]
+        }
+      }
+    }
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "temaFormulario.tipografia.familia"
+    ],
+    "motivos": [
+      "slot 'temaFormulario.tipografia.familia': ref apunta a 'dim2.req02', se esperaba 'dim2.req01'"
+    ],
+    "predicado": "cumple"
+  }
+}

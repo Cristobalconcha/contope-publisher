@@ -523,22 +523,41 @@ no cambia lo servido (WordPress no tiene un filtro previo al borrado y los valor
 | Ancho de caja (`dim3.req05`, ahora proyectado) | contenedor `contenido` → `settings.layout.contentSize`, `--wp--style--global--content-size`, `--cod-layout-max-width` (rol Core `measure`) y `layout_max_width`; contenedor `amplio` → `wideSize`; cualquier otro → `--wp--custom--layout--contenedor--<slug>` |
 | Movimiento Core (`dim8.req04`, ahora proyectado) | el movimiento con `caso` `enter`/`aparecer` → `--cod-motion-enter`; `response`/`responder` → `--cod-motion-response`; valor `<duración>ms <curva>` (la duración sale de `duracionMs` o de la referencia `tiempo` a `dim8.req03`). Todos los casos → `--wp--custom--motion--caso-<slug>` |
 | `styles` | `background` → `styles.color.background`; `text` → `styles.color.text`; `accent` → enlaces y fondo del botón; `font_body`/`font_heading` → `styles.typography.fontFamily` / `elements.heading`; todos como `var(--wp--preset--…)`, de modo que cambiar un color del ADN mueve todo lo que lo usa |
+**Q1 implementado (02-nov-2026, ya en el Core).** `dim2.req02.roleStyles[].role` es texto libre (el Core conserva obligatorios los nueve de
+`CORE_ROLES_9`; el plugin sólo exige la FORMA, así que un ADN con unos pocos roles pasa el validador del plugin aunque su predicado no se
+cumpla). Lo que el Core deja al destino lo exige el plugin con códigos propios: un nombre que no da un slug propio es `ADN_NAME_INVALID`
+y dos roles con el mismo nombre, `ADN_NAME_DUPLICATE` (dos nombres distintos que den el mismo slug no se rechazan: R3 los desambigua con `-2`).
+La constante `ROLES_TIPOGRAFICOS_ABIERTOS` desapareció: ya no hay espejo adelantado al Core.
 
-**Q1(a) implementado.** `dim2.req02.roleStyles[].role` admite nombres libres además de los nueve del Core
-(`COD_ADN_Requisitos::ROLES_TIPOGRAFICOS_ABIERTOS`). Es un cambio del espejo web **adelantado al Core**: un ADN con roles
-extra lo valida esta web pero **no** `parsePortableDesignModel` de Desktop hasta que el Core lo abra (pedido ya registrado
-en Q1). `true` por omisión; poniéndolo en `false` vuelve la lista cerrada de nueve.
+**Lo que el ADN lleva desde Q3 y Q4 (02-nov-2026).** El Core agregó doce requisitos (contrato en `docs/PEDIDOS-AL-CORE.md` del Core, sección
+«Resuelto el 02-nov-2026»; corpus en `fixtures/adn/`, capa 4 en `fixtures/adn/esquemas`, 176 casos) y el plugin los porta con paridad exacta de
+la forma (`COD_ADN_Requisitos::esquemas()` es idéntico al `payloadSchema` del manifiesto y `scripts/probar-adn-validador.php` corre los 176 casos).
+Se PROYECTAN al `theme.json` con las mismas claves que usa el de Basis:
 
-**Lo que el ADN todavía no puede llevar (pedido Q4 al Core, ver 9.1).** Un sitio destino NO recibe por el paquete, aunque
-el local sí lo tenga: las transparencias de la paleta (`color-mix()`, que el Core no tiene como color-css), los degradados,
-las sombras (Q3), el paso de espaciado `gutter` (`max()/calc()`), `custom.border`, los pesos y los interlineados
-(`custom.typography.fontWeight|lineHeight`), las medidas de texto (`custom.layout.measure`), los desenfoques
-(`custom.blur`), `custom.form` (contrato de diseño del formulario) y los **valores por punto de quiebre** de la escala
-(`styles.css`: lo de tablet y celular). Está escrito en código (`COD_ADN_Theme::fuera_del_adn()`, se ve en `cod_adn_get`) y la
-prueba P2.7 exige que **todo lo del `custom` de referencia que no llegue esté en esa lista**: una pérdida no declarada
-hace fallar la prueba. Mientras Q4 siga abierta, esas piezas siguen viviendo en el `theme.json` del tema o en Configuración
-y **un sitio destino sin ellas no es idéntico al local** (en Basis: bordes, pesos, medidas de texto, formulario, sombras,
-`gutter` y la escala responsiva).
+| Requisito | Sale como |
+|---|---|
+| `dim1.req15` transparencias | entradas de `settings.color.palette` con `color-mix(in srgb, var(--wp--preset--color--<base>) N%, transparent)` |
+| `dim1.req16` degradados | `settings.color.gradients` (`linear-gradient(<ángulo>deg, <parada> <pos>%, …)` o `radial-gradient(…)`) |
+| `dim2.req09` pesos e interlineados | `settings.custom.typography.fontWeight.<slug>` y `.lineHeight.<slug>` |
+| `dim3.req10` quiebres + `porQuiebre` de `dim2.req02` y `dim3.req01` | el bloque `/*cod-escalas-con-quiebres*/` de `styles.css` (variables del tamaño y del espaciado dentro de la media query), empalmado donde ya estaba |
+| `dim3.req11` margen lateral | el paso de espaciado `gutter`: `max(<mínimo>, calc((100% - <ancho del contenedor>) / 2))` |
+| `dim3.req12` medidas de texto | `settings.custom.layout.measure.<slug>` |
+| `dim4.req09` sombras | `settings.shadow.presets` (`<x> <y> <desenfoque> <expansión> <color>`; con el color RESUELTO) y `defaultPresets:false` |
+| `dim4.req10` / `dim4.req11` | `settings.custom.border.<slug>` / `settings.custom.blur.<slug>` |
+| `dim7.req09` tema del formulario | `settings.custom.form.<variable>` (las 68; sólo `familia` se llama `tipografia`) |
+
+Una escala con su ausencia declarada (`sin<Cosa>`) no emite nada; lista y ausencia a la vez tampoco (`ADN_AUSENCIA_Y_LISTA`). Los pasos de tamaño y de
+espaciado llevan el nombre de Configuración («`30 (16px / 15px / 14px)`»). El peso, el interlineado y el espaciado de letra de UN rol de `dim2.req02`
+se guardan pero ya no se emiten por rol (`custom.typography.<rol>`): la web los toma de las escalas con nombre. `dim9.req08` y `dim9.req09` se validan
+(forma) y se guardan; el destino aún no emite sus propiedades.
+
+**Lo que sigue fuera del ADN** (`COD_ADN_Theme::fuera_del_adn()`, se ve en `cod_adn_get`): el CSS de los estilos de bloque por quiebre
+(`/*cod-estilos-responsivos*/`, de `dim9.req08` + `dim9.req09`, cuyo selector es del destino y no está construido); el nombre de mostrar de un color o de
+una familia que no da su slug; el peso/interlineado por rol; y los estilos globales que no son color ni familia (`styles.blocks`, `elements.button.border`,
+`spacing.blockGap`…). La prueba de portabilidad (`scripts/probar-adn-proyeccion.php`) compara TODO `settings` de `wp_get_global_settings()` del destino atrasado
+con el ADN contra el del local de Basis, salvo los **extras** que el ADN necesita y el archivo del tema no declara: tres colores de la paleta
+(`ink-20`, `ink-12`, `dark-8`: el color de una sombra o del formulario tiene que ser una referencia a la paleta o a una transparencia), una sombra
+(`formulario`) y `custom.spacing` y `custom.motion` (los roles de espacio y el movimiento, que el local guarda en Configuración).
 
 **Familias de variables** (nombres deterministas: *slug* de `name`, con `_` y acentos normalizados):
 

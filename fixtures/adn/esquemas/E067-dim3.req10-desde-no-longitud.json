@@ -1,0 +1,31 @@
+{
+  "id": "E067-dim3.req10-desde-no-longitud",
+  "capa": 4,
+  "requisito": "dim3.req10",
+  "manifiesto": {
+    "manifestVersion": "1.2",
+    "revision": 3
+  },
+  "intencion": "mal",
+  "descripcion": "`desde` no es longitud.",
+  "value": {
+    "quiebres": [
+      {
+        "nombre": "tablet",
+        "desde": "x",
+        "hasta": "1023px"
+      }
+    ]
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "quiebres[0].desde"
+    ],
+    "motivos": [
+      "slot 'quiebres[0].desde': no es una longitud-css válida"
+    ],
+    "predicado": "cumple"
+  }
+}

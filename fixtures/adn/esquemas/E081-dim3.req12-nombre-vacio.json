@@ -1,0 +1,26 @@
+{
+  "id": "E081-dim3.req12-nombre-vacio",
+  "capa": 4,
+  "requisito": "dim3.req12",
+  "manifiesto": {
+    "manifestVersion": "1.2",
+    "revision": 3
+  },
+  "intencion": "soloForma",
+  "descripcion": "Nombre vacío.",
+  "value": {
+    "medidas": [
+      {
+        "nombre": "",
+        "valor": "700px"
+      }
+    ]
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "no-cumple"
+  }
+}

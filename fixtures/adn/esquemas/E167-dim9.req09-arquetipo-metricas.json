@@ -1,0 +1,26 @@
+{
+  "id": "E167-dim9.req09-arquetipo-metricas",
+  "capa": 4,
+  "requisito": "dim9.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "ok",
+  "descripcion": "El arquetipo «metricas» puede recibir su familia de bloque.",
+  "value": {
+    "correspondencias": [
+      {
+        "arquetipo": "metricas",
+        "familiaDeBloque": "core/group"
+      }
+    ]
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "cumple"
+  }
+}

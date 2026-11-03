@@ -1,0 +1,37 @@
+{
+  "id": "E058-dim3.req01-quiebre-desktop",
+  "capa": 4,
+  "requisito": "dim3.req01",
+  "manifiesto": {
+    "manifestVersion": "1.2",
+    "revision": 3
+  },
+  "intencion": "mal",
+  "descripcion": "`quiebre: desktop`.",
+  "value": {
+    "unidad": "4px",
+    "escala": [
+      {
+        "step": 1,
+        "value": "4px",
+        "porQuiebre": [
+          {
+            "quiebre": "desktop",
+            "value": "8px"
+          }
+        ]
+      }
+    ]
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "escala[0].porQuiebre[0].quiebre"
+    ],
+    "motivos": [
+      "slot 'escala[0].porQuiebre[0].quiebre': se esperaba uno de enum(tablet|mobile)"
+    ],
+    "predicado": "cumple"
+  }
+}

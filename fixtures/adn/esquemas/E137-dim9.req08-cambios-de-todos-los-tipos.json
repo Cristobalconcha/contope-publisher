@@ -1,0 +1,122 @@
+{
+  "id": "E137-dim9.req08-cambios-de-todos-los-tipos",
+  "capa": 4,
+  "requisito": "dim9.req08",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "ok",
+  "descripcion": "Una variante con un cambio de cada tipo de valor: palabra, longitud, color por referencia, proporción, número, referencia a otra definición, y uno acotado a celular.",
+  "value": {
+    "diferencias": [
+      {
+        "arquetipo": "accion",
+        "variante": "contorno",
+        "cambios": [
+          {
+            "propiedad": "background-color",
+            "valor": {
+              "tipo": "palabra",
+              "palabra": "transparent"
+            }
+          },
+          {
+            "propiedad": "border-width",
+            "valor": {
+              "tipo": "longitud",
+              "longitud": "2px"
+            }
+          },
+          {
+            "propiedad": "border-color",
+            "valor": {
+              "tipo": "color",
+              "color": {
+                "refReqId": "dim1.req01",
+                "refPath": [
+                  "neutros",
+                  0
+                ]
+              }
+            }
+          },
+          {
+            "propiedad": "aspect-ratio",
+            "valor": {
+              "tipo": "proporcion",
+              "ancho": 87,
+              "alto": 34
+            }
+          },
+          {
+            "propiedad": "opacity",
+            "valor": {
+              "tipo": "numero",
+              "numero": 0.9
+            }
+          },
+          {
+            "propiedad": "box-shadow",
+            "valor": {
+              "tipo": "referencia",
+              "referencia": {
+                "refReqId": "dim4.req09",
+                "refPath": [
+                  "sombras",
+                  0
+                ]
+              }
+            }
+          },
+          {
+            "propiedad": "min-height",
+            "valor": {
+              "tipo": "longitud",
+              "longitud": "255px"
+            },
+            "quiebre": "tablet"
+          },
+          {
+            "propiedad": "min-height",
+            "valor": {
+              "tipo": "longitud",
+              "longitud": "264px"
+            },
+            "quiebre": "mobile"
+          }
+        ]
+      }
+    ]
+  },
+  "contexto": {
+    "dim9.req03": {
+      "variantes": [
+        {
+          "arquetipo": "accion",
+          "nombre": "contorno",
+          "heredaDe": {
+            "refReqId": "dim9.req01",
+            "refPath": []
+          },
+          "diferencia": "quita el relleno y deja el borde"
+        },
+        {
+          "arquetipo": "contenedor",
+          "nombre": "tarjeta-con-contorno",
+          "heredaDe": {
+            "refReqId": "dim9.req01",
+            "refPath": []
+          },
+          "diferencia": "agrega contorno grueso"
+        }
+      ]
+    }
+  },
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "cumple"
+  }
+}

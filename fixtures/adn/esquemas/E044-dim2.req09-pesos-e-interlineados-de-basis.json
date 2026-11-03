@@ -1,0 +1,84 @@
+{
+  "id": "E044-dim2.req09-pesos-e-interlineados-de-basis",
+  "capa": 4,
+  "requisito": "dim2.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "ok",
+  "descripcion": "Las dos escalas de Basis (seis pesos y nueve interlineados).",
+  "value": {
+    "pesos": [
+      {
+        "nombre": "light",
+        "valor": 300
+      },
+      {
+        "nombre": "regular",
+        "valor": 400
+      },
+      {
+        "nombre": "medium",
+        "valor": 500
+      },
+      {
+        "nombre": "bold",
+        "valor": 700
+      },
+      {
+        "nombre": "extrabold",
+        "valor": 800
+      },
+      {
+        "nombre": "black",
+        "valor": 900
+      }
+    ],
+    "interlineados": [
+      {
+        "nombre": "none",
+        "valor": 1
+      },
+      {
+        "nombre": "tight",
+        "valor": 1.2
+      },
+      {
+        "nombre": "snug",
+        "valor": 1.4
+      },
+      {
+        "nombre": "cozy",
+        "valor": 1.5
+      },
+      {
+        "nombre": "comfy",
+        "valor": 1.6
+      },
+      {
+        "nombre": "normal",
+        "valor": 1.7
+      },
+      {
+        "nombre": "relaxed",
+        "valor": 1.75
+      },
+      {
+        "nombre": "airy",
+        "valor": 1.8
+      },
+      {
+        "nombre": "loose",
+        "valor": 2
+      }
+    ]
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "cumple"
+  }
+}

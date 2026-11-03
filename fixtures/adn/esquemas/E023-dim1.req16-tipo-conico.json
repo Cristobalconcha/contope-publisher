@@ -1,0 +1,81 @@
+{
+  "id": "E023-dim1.req16-tipo-conico",
+  "capa": 4,
+  "requisito": "dim1.req16",
+  "manifiesto": {
+    "manifestVersion": "1.3",
+    "revision": 4
+  },
+  "intencion": "mal",
+  "descripcion": "`tipo: conic` no está en el vocabulario (linear|radial).",
+  "value": {
+    "degradados": [
+      {
+        "nombre": "x",
+        "tipo": "conic",
+        "angulo": 90,
+        "paradas": [
+          {
+            "color": {
+              "refReqId": "dim1.req01",
+              "refPath": [
+                "neutros",
+                0
+              ]
+            },
+            "posicion": 0
+          },
+          {
+            "color": "transparent",
+            "posicion": 100
+          }
+        ]
+      }
+    ]
+  },
+  "contexto": {
+    "dim1.req01": {
+      "institucionales": [
+        {
+          "name": "Naranja Basis",
+          "value": "#F26621"
+        }
+      ],
+      "neutros": [
+        {
+          "name": "Tinta",
+          "value": "#0E0C19"
+        },
+        {
+          "name": "Gris",
+          "value": "#898989"
+        }
+      ]
+    },
+    "dim1.req15": {
+      "transparencias": [
+        {
+          "nombre": "ink al 15%",
+          "base": {
+            "refReqId": "dim1.req01",
+            "refPath": [
+              "neutros",
+              0
+            ]
+          },
+          "opacidad": 15
+        }
+      ]
+    }
+  },
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "degradados[0].tipo"
+    ],
+    "motivos": [
+      "slot 'degradados[0].tipo': se esperaba uno de enum(linear|radial)"
+    ],
+    "predicado": "cumple"
+  }
+}

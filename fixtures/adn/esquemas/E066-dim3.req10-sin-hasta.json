@@ -1,0 +1,29 @@
+{
+  "id": "E066-dim3.req10-sin-hasta",
+  "capa": 4,
+  "requisito": "dim3.req10",
+  "manifiesto": {
+    "manifestVersion": "1.2",
+    "revision": 3
+  },
+  "intencion": "mal",
+  "descripcion": "Falta `hasta`.",
+  "value": {
+    "quiebres": [
+      {
+        "nombre": "mobile"
+      }
+    ]
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "quiebres[0].hasta"
+    ],
+    "motivos": [
+      "slot 'quiebres[0]': campo obligatorio 'hasta' ausente"
+    ],
+    "predicado": "no-cumple"
+  }
+}

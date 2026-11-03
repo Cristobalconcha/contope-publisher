@@ -1,0 +1,42 @@
+{
+  "id": "E144-dim9.req08-vacio",
+  "capa": 4,
+  "requisito": "dim9.req08",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "soloForma",
+  "descripcion": "Objeto vacío.",
+  "value": {},
+  "contexto": {
+    "dim9.req03": {
+      "variantes": [
+        {
+          "arquetipo": "accion",
+          "nombre": "contorno",
+          "heredaDe": {
+            "refReqId": "dim9.req01",
+            "refPath": []
+          },
+          "diferencia": "quita el relleno y deja el borde"
+        },
+        {
+          "arquetipo": "contenedor",
+          "nombre": "tarjeta-con-contorno",
+          "heredaDe": {
+            "refReqId": "dim9.req01",
+            "refPath": []
+          },
+          "diferencia": "agrega contorno grueso"
+        }
+      ]
+    }
+  },
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "no-cumple"
+  }
+}

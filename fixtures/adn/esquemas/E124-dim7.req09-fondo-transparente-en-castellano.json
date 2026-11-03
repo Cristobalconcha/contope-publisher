@@ -1,0 +1,29 @@
+{
+  "id": "E124-dim7.req09-fondo-transparente-en-castellano",
+  "capa": 4,
+  "requisito": "dim7.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "mal",
+  "descripcion": "`transparente` (la palabra es `transparent`).",
+  "value": {
+    "temaFormulario": {
+      "colores": {
+        "fondo": "transparente"
+      }
+    }
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "temaFormulario.colores.fondo"
+    ],
+    "motivos": [
+      "slot 'temaFormulario.colores.fondo': no cumple ningún miembro de la unión"
+    ],
+    "predicado": "cumple"
+  }
+}

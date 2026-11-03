@@ -1,0 +1,63 @@
+{
+  "id": "E156-dim9.req08-quiebre-desktop",
+  "capa": 4,
+  "requisito": "dim9.req08",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "mal",
+  "descripcion": "`quiebre: desktop`.",
+  "value": {
+    "diferencias": [
+      {
+        "arquetipo": "accion",
+        "variante": "contorno",
+        "cambios": [
+          {
+            "propiedad": "border-width",
+            "valor": {
+              "tipo": "palabra",
+              "palabra": "none"
+            },
+            "quiebre": "desktop"
+          }
+        ]
+      }
+    ]
+  },
+  "contexto": {
+    "dim9.req03": {
+      "variantes": [
+        {
+          "arquetipo": "accion",
+          "nombre": "contorno",
+          "heredaDe": {
+            "refReqId": "dim9.req01",
+            "refPath": []
+          },
+          "diferencia": "quita el relleno y deja el borde"
+        },
+        {
+          "arquetipo": "contenedor",
+          "nombre": "tarjeta-con-contorno",
+          "heredaDe": {
+            "refReqId": "dim9.req01",
+            "refPath": []
+          },
+          "diferencia": "agrega contorno grueso"
+        }
+      ]
+    }
+  },
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "diferencias[0].cambios[0].quiebre"
+    ],
+    "motivos": [
+      "slot 'diferencias[0].cambios[0].quiebre': se esperaba uno de enum(tablet|mobile)"
+    ],
+    "predicado": "cumple"
+  }
+}

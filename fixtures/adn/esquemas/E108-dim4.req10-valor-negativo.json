@@ -1,0 +1,30 @@
+{
+  "id": "E108-dim4.req10-valor-negativo",
+  "capa": 4,
+  "requisito": "dim4.req10",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "mal",
+  "descripcion": "Grosor negativo.",
+  "value": {
+    "grosores": [
+      {
+        "nombre": "x",
+        "valor": "-1px"
+      }
+    ]
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "grosores[0].valor"
+    ],
+    "motivos": [
+      "slot 'grosores[0].valor': no es una longitud-css válida"
+    ],
+    "predicado": "no-cumple"
+  }
+}

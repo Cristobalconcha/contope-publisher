@@ -1,0 +1,56 @@
+{
+  "id": "E011-dim1.req15-base-de-otro-requisito",
+  "capa": 4,
+  "requisito": "dim1.req15",
+  "manifiesto": {
+    "manifestVersion": "1.3",
+    "revision": 4
+  },
+  "intencion": "mal",
+  "descripcion": "La base apunta a dim1.req02 (roles), no a dim1.req01.",
+  "value": {
+    "transparencias": [
+      {
+        "nombre": "x",
+        "base": {
+          "refReqId": "dim1.req02",
+          "refPath": [
+            "roleColors",
+            0
+          ]
+        },
+        "opacidad": 20
+      }
+    ]
+  },
+  "contexto": {
+    "dim1.req01": {
+      "institucionales": [
+        {
+          "name": "Naranja Basis",
+          "value": "#F26621"
+        }
+      ],
+      "neutros": [
+        {
+          "name": "Tinta",
+          "value": "#0E0C19"
+        },
+        {
+          "name": "Gris",
+          "value": "#898989"
+        }
+      ]
+    }
+  },
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "transparencias[0].base"
+    ],
+    "motivos": [
+      "slot 'transparencias[0].base': ref apunta a 'dim1.req02', se esperaba 'dim1.req01'"
+    ],
+    "predicado": "no-cumple"
+  }
+}

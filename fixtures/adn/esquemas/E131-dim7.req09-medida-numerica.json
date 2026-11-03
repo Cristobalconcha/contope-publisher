@@ -1,0 +1,29 @@
+{
+  "id": "E131-dim7.req09-medida-numerica",
+  "capa": 4,
+  "requisito": "dim7.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "mal",
+  "descripcion": "Una medida numérica (sin unidad).",
+  "value": {
+    "temaFormulario": {
+      "medidas": {
+        "radio": 4
+      }
+    }
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "temaFormulario.medidas.radio"
+    ],
+    "motivos": [
+      "slot 'temaFormulario.medidas.radio': no es una longitud-css válida"
+    ],
+    "predicado": "cumple"
+  }
+}

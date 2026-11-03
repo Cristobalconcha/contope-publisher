@@ -1,0 +1,30 @@
+{
+  "id": "E083-dim3.req12-valor-negativo",
+  "capa": 4,
+  "requisito": "dim3.req12",
+  "manifiesto": {
+    "manifestVersion": "1.2",
+    "revision": 3
+  },
+  "intencion": "mal",
+  "descripcion": "Medida negativa (el signo no se admite acá).",
+  "value": {
+    "medidas": [
+      {
+        "nombre": "s",
+        "valor": "-700px"
+      }
+    ]
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "medidas[0].valor"
+    ],
+    "motivos": [
+      "slot 'medidas[0].valor': no es una longitud-css válida"
+    ],
+    "predicado": "no-cumple"
+  }
+}

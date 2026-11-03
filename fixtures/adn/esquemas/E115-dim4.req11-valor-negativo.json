@@ -1,0 +1,30 @@
+{
+  "id": "E115-dim4.req11-valor-negativo",
+  "capa": 4,
+  "requisito": "dim4.req11",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "mal",
+  "descripcion": "Desenfoque negativo.",
+  "value": {
+    "desenfoques": [
+      {
+        "nombre": "s",
+        "valor": "-6px"
+      }
+    ]
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "desenfoques[0].valor"
+    ],
+    "motivos": [
+      "slot 'desenfoques[0].valor': no es una longitud-css válida"
+    ],
+    "predicado": "no-cumple"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "id": "E071-dim3.req11-nombre-vacio",
+  "capa": 4,
+  "requisito": "dim3.req11",
+  "manifiesto": {
+    "manifestVersion": "1.2",
+    "revision": 3
+  },
+  "intencion": "soloForma",
+  "descripcion": "Nombre vacío: la forma lo deja pasar; el predicado no.",
+  "value": {
+    "margenLateral": {
+      "nombre": "",
+      "minimo": "10%",
+      "contenedor": {
+        "refReqId": "dim3.req05",
+        "refPath": [
+          "contenedores",
+          0
+        ]
+      }
+    }
+  },
+  "contexto": {
+    "dim3.req05": {
+      "contenedores": [
+        {
+          "nombre": "contenido",
+          "maxWidth": "1080px",
+          "padding": {
+            "refReqId": "dim3.req02",
+            "refPath": [
+              "roleSpacing",
+              0
+            ]
+          },
+          "relacionSoporte": "centrado"
+        },
+        {
+          "nombre": "amplio",
+          "maxWidth": "1440px",
+          "padding": {
+            "refReqId": "dim3.req02",
+            "refPath": [
+              "roleSpacing",
+              1
+            ]
+          },
+          "relacionSoporte": "centrado"
+        }
+      ]
+    }
+  },
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "no-cumple"
+  }
+}

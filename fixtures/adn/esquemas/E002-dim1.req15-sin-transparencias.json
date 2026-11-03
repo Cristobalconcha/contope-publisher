@@ -1,0 +1,21 @@
+{
+  "id": "E002-dim1.req15-sin-transparencias",
+  "capa": 4,
+  "requisito": "dim1.req15",
+  "manifiesto": {
+    "manifestVersion": "1.3",
+    "revision": 4
+  },
+  "intencion": "ok",
+  "descripcion": "Ausencia declarada.",
+  "value": {
+    "sinTransparencias": "la marca no usa transparencias"
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "cumple"
+  }
+}

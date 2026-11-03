@@ -1,0 +1,56 @@
+{
+  "id": "E009-dim1.req15-opacidad-como-texto",
+  "capa": 4,
+  "requisito": "dim1.req15",
+  "manifiesto": {
+    "manifestVersion": "1.3",
+    "revision": 4
+  },
+  "intencion": "mal",
+  "descripcion": "Opacidad «15» (texto).",
+  "value": {
+    "transparencias": [
+      {
+        "nombre": "x",
+        "base": {
+          "refReqId": "dim1.req01",
+          "refPath": [
+            "neutros",
+            0
+          ]
+        },
+        "opacidad": "15"
+      }
+    ]
+  },
+  "contexto": {
+    "dim1.req01": {
+      "institucionales": [
+        {
+          "name": "Naranja Basis",
+          "value": "#F26621"
+        }
+      ],
+      "neutros": [
+        {
+          "name": "Tinta",
+          "value": "#0E0C19"
+        },
+        {
+          "name": "Gris",
+          "value": "#898989"
+        }
+      ]
+    }
+  },
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "transparencias[0].opacidad"
+    ],
+    "motivos": [
+      "slot 'transparencias[0].opacidad': se esperaba numero"
+    ],
+    "predicado": "cumple"
+  }
+}

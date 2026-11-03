@@ -1,0 +1,30 @@
+{
+  "id": "E052-dim2.req09-peso-como-texto",
+  "capa": 4,
+  "requisito": "dim2.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "mal",
+  "descripcion": "Peso «400» (texto).",
+  "value": {
+    "pesos": [
+      {
+        "nombre": "x",
+        "valor": "400"
+      }
+    ]
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "pesos[0].valor"
+    ],
+    "motivos": [
+      "slot 'pesos[0].valor': se esperaba numero"
+    ],
+    "predicado": "cumple"
+  }
+}

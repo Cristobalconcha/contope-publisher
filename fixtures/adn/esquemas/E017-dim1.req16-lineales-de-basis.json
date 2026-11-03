@@ -1,0 +1,104 @@
+{
+  "id": "E017-dim1.req16-lineales-de-basis",
+  "capa": 4,
+  "requisito": "dim1.req16",
+  "manifiesto": {
+    "manifestVersion": "1.3",
+    "revision": 4
+  },
+  "intencion": "ok",
+  "descripcion": "Los dos degradados de Basis: «ink a accent (65°)» y «texto-cuerpo a transparente (180°)».",
+  "value": {
+    "degradados": [
+      {
+        "nombre": "ink a accent (65°)",
+        "tipo": "linear",
+        "angulo": 65,
+        "paradas": [
+          {
+            "color": {
+              "refReqId": "dim1.req01",
+              "refPath": [
+                "neutros",
+                0
+              ]
+            },
+            "posicion": 0
+          },
+          {
+            "color": {
+              "refReqId": "dim1.req01",
+              "refPath": [
+                "institucionales",
+                0
+              ]
+            },
+            "posicion": 100
+          }
+        ]
+      },
+      {
+        "nombre": "texto-cuerpo a transparente",
+        "tipo": "linear",
+        "angulo": 180,
+        "paradas": [
+          {
+            "color": {
+              "refReqId": "dim1.req01",
+              "refPath": [
+                "neutros",
+                1
+              ]
+            },
+            "posicion": 0
+          },
+          {
+            "color": "transparent",
+            "posicion": 100
+          }
+        ]
+      }
+    ]
+  },
+  "contexto": {
+    "dim1.req01": {
+      "institucionales": [
+        {
+          "name": "Naranja Basis",
+          "value": "#F26621"
+        }
+      ],
+      "neutros": [
+        {
+          "name": "Tinta",
+          "value": "#0E0C19"
+        },
+        {
+          "name": "Gris",
+          "value": "#898989"
+        }
+      ]
+    },
+    "dim1.req15": {
+      "transparencias": [
+        {
+          "nombre": "ink al 15%",
+          "base": {
+            "refReqId": "dim1.req01",
+            "refPath": [
+              "neutros",
+              0
+            ]
+          },
+          "opacidad": 15
+        }
+      ]
+    }
+  },
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "cumple"
+  }
+}

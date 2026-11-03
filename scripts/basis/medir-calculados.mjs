@@ -5,9 +5,12 @@
 // theme.json) NO cambió lo que ve la gente: se mide ANTES, se mide DESPUÉS, y se compara elemento por elemento.
 //
 //   node scripts/basis/medir-calculados.mjs guardar <archivo.json> [--sitio http://localhost:8894] [--anchos 1440,393]
-//   node scripts/basis/medir-calculados.mjs comparar <antes.json> <despues.json>        (código 1 si algo difiere)
+//   node scripts/basis/medir-calculados.mjs comparar <antes.json> <despues.json> [--sin-ajenos]   (código 1 si algo difiere)
 //   node scripts/basis/medir-calculados.mjs estable <a.json> <b.json>                   (dos tomas SIN cambios: mide el ruido)
 //
+// Con --sin-ajenos (para comparar dos SITIOS distintos, p. ej. Basis y el destino que importó su paquete) no se miran los elementos marcados
+// __ajeno al medir: el aviso de cookies (otro plugin), el mapa (su clave de Mapbox es del sitio, no del paquete), el formulario (otro plugin) y los bloques que
+// listan entradas o comentarios; y el alto de quien los contiene. Todo lo demás se compara igual.
 // Sólo lee el sitio local. Una toma se identifica por página+ancho; cada elemento, por su camino de hijos
 // (tag:n > tag:n …), de modo que un elemento que aparece o desaparece también cuenta como diferencia.
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -45,7 +48,13 @@ async function tomar() {
           const props = ${JSON.stringify(PROPS)};
           const camino = (e) => { const p = []; for (; e && e !== document.documentElement; e = e.parentElement) { const i = e.parentElement ? [...e.parentElement.children].indexOf(e) : 0; p.unshift(e.tagName.toLowerCase() + ':' + i); } return p.join('>'); };
           const out = {};
-          const medir = (e, clave) => { const cs = getComputedStyle(e); const f = {}; for (const p of props) f[p] = cs.getPropertyValue(p); out[clave] = f; };
+          // Lo que NO es del diseño ni viaja en el paquete: el aviso de cookies (otro plugin), el mapa (su clave de Mapbox es del sitio, no del paquete: el
+          // destino sin clave dibuja otra cosa), el formulario (lo dibuja el plugin Orugantt Forms) y los bloques que listan entradas o comentarios del
+          // sitio. Se marca (__ajeno) para poder dejarlo fuera al comparar dos SITIOS distintos (--sin-ajenos); y a quien lo CONTIENE o es hermano de
+          // quien lo contiene (las columnas de una fila se estiran al alto de la mayor) se le marca __contiene, porque su alto depende de él.
+          const AJENOS = '[class*="cookieadmin"], [id*="cookieadmin"], [data-cod-mapa-lat], .wp-block-contope-formulario, .wp-block-latest-comments, .wp-block-latest-posts, .wp-block-archives, .wp-block-categories, .wp-block-tag-cloud, .wp-block-calendar';
+          const ajeno = (e) => e.closest(AJENOS) !== null;
+          const medir = (e, clave) => { const cs = getComputedStyle(e); const f = {}; for (const p of props) f[p] = cs.getPropertyValue(p); if (ajeno(e)) f.__ajeno = '1'; else if (e.querySelector(AJENOS) || (e.parentElement && [...e.parentElement.children].some((h) => h !== e && (h.matches(AJENOS) || h.querySelector(AJENOS))))) f.__contiene = '1'; out[clave] = f; };
           medir(document.documentElement, 'html');
           for (const e of document.body.querySelectorAll('*')) {
             if (['SCRIPT', 'STYLE', 'LINK', 'META', 'NOSCRIPT', 'TEMPLATE'].includes(e.tagName)) continue;
@@ -68,22 +77,27 @@ async function tomar() {
 // primera familia que daba --cod-font-*. Se cuenta aparte y no es un fallo; cualquier otro cambio sí lo es.
 const esPilaAmpliada = (p, antes, despues) => p === 'font-family' && despues.startsWith(antes + ', ') && antes.split(',').length === 1;
 
-function comparar(a, b) {
+function comparar(a, b, sinAjenos = false) {
   const difs = [];
   let elementos = 0;
   let pilas = 0;
+  let ajenos = 0;
   for (const toma of new Set([...Object.keys(a), ...Object.keys(b)])) {
     if (!a[toma] || !b[toma]) { difs.push(`${toma}: toma ausente en uno de los archivos`); continue; }
     for (const el of new Set([...Object.keys(a[toma]), ...Object.keys(b[toma])])) {
+      // --sin-ajenos: lo marcado __ajeno en cualquiera de los dos lados (cookies, mapa) no se compara.
+      if (sinAjenos && (a[toma][el]?.__ajeno === '1' || b[toma][el]?.__ajeno === '1')) { ajenos += 1; continue; }
       elementos += 1;
       if (!a[toma][el] || !b[toma][el]) { difs.push(`${toma} ${el}: ${a[toma][el] ? 'desaparece' : 'aparece'}`); continue; }
       for (const p of PROPS) {
+        // lo que contiene algo ajeno tiene otro alto en el otro sitio: su alto no dice nada del diseño
+        if (sinAjenos && p === 'height' && (a[toma][el].__contiene === '1' || b[toma][el].__contiene === '1')) continue;
         if (a[toma][el][p] !== b[toma][el][p] && esPilaAmpliada(p, a[toma][el][p], b[toma][el][p])) { pilas += 1; continue; }
         if (a[toma][el][p] !== b[toma][el][p]) difs.push(`${toma} ${el} ${p}: «${a[toma][el][p]}» -> «${b[toma][el][p]}»`);
       }
     }
   }
-  return { difs, elementos, pilas };
+  return { difs, elementos, pilas, ajenos };
 }
 
 if (orden === 'guardar') {
@@ -96,8 +110,9 @@ if (orden === 'guardar') {
 } else if (orden === 'comparar' || orden === 'estable') {
   const a = JSON.parse(readFileSync(args[1], 'utf8'));
   const b = JSON.parse(readFileSync(args[2], 'utf8'));
-  const { difs, elementos, pilas } = comparar(a, b);
-  console.log(`${elementos} elementos comparados × ${PROPS.length} propiedades · ${difs.length} diferencias${pilas ? ` · ${pilas} font-family con la pila ampliada (misma primera familia, ya contadas aparte)` : ''}`);
+  const sinAjenos = args.includes('--sin-ajenos');
+  const { difs, elementos, pilas, ajenos } = comparar(a, b, sinAjenos);
+  console.log(`${elementos} elementos comparados × ${PROPS.length} propiedades · ${difs.length} diferencias${sinAjenos ? ` · ${ajenos} elementos ajenos al diseño (cookies, mapa, formulario, listas de entradas) fuera de la comparación` : ''}${pilas ? ` · ${pilas} font-family con la pila ampliada (misma primera familia, ya contadas aparte)` : ''}`);
   for (const d of difs.slice(0, 40)) console.log('  ' + d);
   if (elementos < 500) { console.error('Se compararon muy pocos elementos: la medición no vale.'); process.exit(2); }
   process.exit(difs.length === 0 ? 0 : 1);

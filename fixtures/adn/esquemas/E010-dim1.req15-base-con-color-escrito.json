@@ -1,0 +1,50 @@
+{
+  "id": "E010-dim1.req15-base-con-color-escrito",
+  "capa": 4,
+  "requisito": "dim1.req15",
+  "manifiesto": {
+    "manifestVersion": "1.3",
+    "revision": 4
+  },
+  "intencion": "mal",
+  "descripcion": "La base es un color escrito, no una referencia (se referencia, no se duplica).",
+  "value": {
+    "transparencias": [
+      {
+        "nombre": "x",
+        "base": "#0E0C19",
+        "opacidad": 20
+      }
+    ]
+  },
+  "contexto": {
+    "dim1.req01": {
+      "institucionales": [
+        {
+          "name": "Naranja Basis",
+          "value": "#F26621"
+        }
+      ],
+      "neutros": [
+        {
+          "name": "Tinta",
+          "value": "#0E0C19"
+        },
+        {
+          "name": "Gris",
+          "value": "#898989"
+        }
+      ]
+    }
+  },
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "transparencias[0].base"
+    ],
+    "motivos": [
+      "slot 'transparencias[0].base': se esperaba ref (objeto { refReqId, refPath })"
+    ],
+    "predicado": "no-cumple"
+  }
+}

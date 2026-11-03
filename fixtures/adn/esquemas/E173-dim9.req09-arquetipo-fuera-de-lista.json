@@ -1,0 +1,30 @@
+{
+  "id": "E173-dim9.req09-arquetipo-fuera-de-lista",
+  "capa": 4,
+  "requisito": "dim9.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "mal",
+  "descripcion": "Arquetipo que no es uno de los diez (`carrusel`).",
+  "value": {
+    "correspondencias": [
+      {
+        "arquetipo": "carrusel",
+        "familiaDeBloque": "core/gallery"
+      }
+    ]
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "correspondencias[0].arquetipo"
+    ],
+    "motivos": [
+      "slot 'correspondencias[0].arquetipo': se esperaba uno de enum(accion|contenedor|navegacion|feedback|entrada|secuencia-editorial|lista|tabla|metricas|representacion-de-datos)"
+    ],
+    "predicado": "cumple"
+  }
+}

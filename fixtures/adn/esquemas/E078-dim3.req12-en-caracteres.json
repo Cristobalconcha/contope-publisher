@@ -1,0 +1,26 @@
+{
+  "id": "E078-dim3.req12-en-caracteres",
+  "capa": 4,
+  "requisito": "dim3.req12",
+  "manifiesto": {
+    "manifestVersion": "1.2",
+    "revision": 3
+  },
+  "intencion": "ok",
+  "descripcion": "Una medida en `ch`.",
+  "value": {
+    "medidas": [
+      {
+        "nombre": "lectura",
+        "valor": "68ch"
+      }
+    ]
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "cumple"
+  }
+}

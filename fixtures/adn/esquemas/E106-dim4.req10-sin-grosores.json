@@ -1,0 +1,21 @@
+{
+  "id": "E106-dim4.req10-sin-grosores",
+  "capa": 4,
+  "requisito": "dim4.req10",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "ok",
+  "descripcion": "Ausencia declarada.",
+  "value": {
+    "sinGrosores": "los bordes llevan el grosor sin nombrarlo"
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "cumple"
+  }
+}

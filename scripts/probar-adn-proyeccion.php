@@ -22,9 +22,12 @@
  * de Basis en 5e118c5 y el atrasado de producción de b7b0478. No se compara contra lo regenerado.
  */
 define('WP_USE_THEMES', false);
-$wp_load = getenv('COD_PRUEBA_WP') ?: __DIR__ . '/../../wp-local-f1b-destino/wordpress/wp-load.php';
+// El destino limpio: 8895 por omisión; `OCD_DESTINO_PUERTO=8896` usa otro independiente (scripts/paquete/crear-destino-limpio.mjs).
+$puerto_destino = (int) (getenv('OCD_DESTINO_PUERTO') ?: 8895);
+$wp_load = getenv('COD_PRUEBA_WP') ?: __DIR__ . '/../../wp-local-f1b-destino' . ($puerto_destino === 8895 ? '' : '-' . $puerto_destino) . '/wordpress/wp-load.php';
 require $wp_load;
 require __DIR__ . '/adn/lib/adn-desde-theme-json.php';
+require __DIR__ . '/adn/lib/comparar-ajustes.php';
 
 $fallas = 0;
 $ejecutadas = 0;
@@ -52,7 +55,7 @@ $SHA = [
 
 // ---------------------------------------------------------------------------
 echo "\n== 0. precondiciones ==\n";
-$comprobar('el sitio de prueba es el destino limpio (puerto 8895)', strpos((string) home_url(), ':8895') !== false, (string) home_url());
+$comprobar('el sitio de prueba es el destino limpio (puerto ' . $puerto_destino . ')', strpos((string) home_url(), ':' . $puerto_destino) !== false, (string) home_url());
 $repo_dir = realpath($raiz . '/contope-publisher');
 $inst_dir = rtrim((string) COD_PUBLISHER_DIR, '/\\');
 $desiguales = [];
@@ -264,52 +267,77 @@ if ($paquete_ruta !== '') {
 $comprobar('el ADN derivado de Basis se importa (nuevo, r1)', !is_wp_error($r1) && $r1['resultado'] === 'aplicado' && $r1['revision'] === 1, $codigo($r1) . (is_wp_error($r1) ? ' ' . $r1->get_error_message() : ''));
 $S1 = $ajustes();
 $P1 = $presets($S1);
-$alfa = ['fondo-pagina-88', 'ink-15']; // color-mix(): no caben en el color-css del Core
+// Desde el 02-nov-2026 el ADN lleva TODO lo que declara el theme.json de Basis (pedidos Q1, Q3 y Q4 al Core): la comparación ya no es por
+// familias de presets sino de TODO el árbol `settings` que sirve WordPress (wp_get_global_settings()), con las excepciones que dice
+// scripts/adn/lib/comparar-ajustes.php, una por una. Los extras son lo que el ADN agrega y el archivo del tema no declara.
+$EXTRAS = ['paleta' => ['ink-20', 'ink-12', 'dark-8'], 'sombras' => ['formulario'], 'custom' => ['spacing', 'motion']];
+$dif_total = comparar_ajustes($REF, $S1, $EXTRAS);
+foreach (array_slice($dif_total, 0, 12) as $d) {
+    echo '           ' . $d . "\n";
+}
+$comprobar('SETTINGS COMPLETOS: wp_get_global_settings() del destino atrasado + ADN == el del local de Basis, en todo el árbol (' . count($dif_total) . ' diferencia(s); sólo los extras declarados)', $dif_total === [], (string) count($dif_total));
+// CONTROLES de la comparación completa: tiene que ver cada tipo de diferencia, o no estaría midiendo nada.
+$roto = static function (callable $alterar) use ($S1, $REF, $EXTRAS): array {
+    $copia = $S1;
+    $alterar($copia);
+    return comparar_ajustes($REF, $copia, $EXTRAS);
+};
+$comprobar('CONTROL: sin el ADN (el theme.json atrasado a solas, sección 2) la comparación completa da más de 15 diferencias', count(comparar_ajustes($REF, $S0, $EXTRAS)) > 15, (string) count(comparar_ajustes($REF, $S0, $EXTRAS)));
+$comprobar('CONTROL: una variable de custom.form con otro valor (botonRadio 3px -> 9px) se ve', $roto(static function (array &$s): void {
+    $s['custom']['form']['botonRadio'] = '9px';
+}) !== []);
+$comprobar('CONTROL: una sombra con otra medida (la tercera, 72px -> 70px) se ve', $roto(static function (array &$s): void {
+    $s['shadow']['presets']['theme'][2]['shadow'] = str_replace('72px', '70px', $s['shadow']['presets']['theme'][2]['shadow']);
+}) !== []);
+$comprobar('CONTROL: un degradado con otro ángulo se ve', $roto(static function (array &$s): void {
+    $s['color']['gradients']['theme'][0]['gradient'] = str_replace('65deg', '66deg', $s['color']['gradients']['theme'][0]['gradient']);
+}) !== []);
+$comprobar('CONTROL: un paso de espaciado con otro nombre (el valor por quiebre) se ve', $roto(static function (array &$s): void {
+    $s['spacing']['spacingSizes']['theme'][5]['name'] = '60 (20px)';
+}) !== []);
+$comprobar('CONTROL: un peso o una medida de texto con otro valor se ve', $roto(static function (array &$s): void {
+    $s['custom']['typography']['fontWeight']['bold'] = '600';
+}) !== [] && $roto(static function (array &$s): void {
+    $s['custom']['layout']['measure']['m'] = '800px';
+}) !== []);
+$comprobar('CONTROL: un color de más que NO está declarado como extra se ve como «sobra»', (function () use ($roto) {
+    $d = $roto(static function (array &$s): void {
+        $s['color']['palette']['theme'][] = ['slug' => 'intruso', 'name' => 'Intruso', 'color' => '#123456'];
+    });
+    return $d !== [] && strpos(implode(' ', $d), 'intruso') !== false;
+})());
+$comprobar('CONTROL: un extra declarado que NO llega al destino se ve', comparar_ajustes($REF, $S1, ['paleta' => ['ink-20', 'ink-12', 'dark-8', 'no-existe']] + $EXTRAS) !== []);
 $cmp = $comparar_mapas($P_REF['paleta'], $P1['paleta']);
-$comprobar('PALETA: los 12 colores de la referencia llegan con su hex (piso 12)', $cmp['iguales'] >= 12 && $cmp['distintos'] === [] && array_diff($cmp['faltan'], $alfa) === [], json_encode($cmp));
-$comprobar('PALETA: lo único que falta son las 2 transparencias color-mix (fuera del ADN, declaradas)', array_values(array_diff($cmp['faltan'], $alfa)) === [] && count($cmp['faltan']) === 2 && $cmp['sobran'] === []);
+$comprobar('PALETA: los 12 colores y las 2 transparencias de la referencia llegan (piso 14), y sobran sólo los 3 colores que piden las sombras y el formulario', $cmp['iguales'] === 14 && $cmp['distintos'] === [] && $cmp['faltan'] === [] && $cmp['sobran'] === $EXTRAS['paleta'], json_encode($cmp));
 $cmp = $comparar_mapas($P_REF['familias'], $P1['familias']);
 $comprobar('FAMILIAS: las 4 familias llegan con su pila completa (piso 4)', $cmp['iguales'] === 4 && $cmp['faltan'] === [] && $cmp['distintos'] === [] && $cmp['sobran'] === [], json_encode($cmp));
 $cmp = $comparar_mapas($P_REF['tamanos'], $P1['tamanos']);
-$comprobar('TAMAÑOS: los 20 tamaños de letra 10–200 llegan con su valor (piso 20)', $cmp['iguales'] === 20 && $cmp['faltan'] === [] && $cmp['distintos'] === [], json_encode($cmp));
-$comprobar('TAMAÑOS: lo único que sobra son los roles display y cuerpo del Core (los pide dim2.req07)', $cmp['sobran'] === ['display', 'cuerpo'], json_encode($cmp['sobran']));
+$comprobar('TAMAÑOS: los 20 tamaños de letra 10–200 llegan con su valor, y no sobra ninguno (piso 20)', $cmp['iguales'] === 20 && $cmp['faltan'] === [] && $cmp['distintos'] === [] && $cmp['sobran'] === [], json_encode($cmp));
 $cmp = $comparar_mapas($P_REF['espaciados'], $P1['espaciados']);
-$comprobar('ESPACIADOS: los 31 pasos numéricos 10–310 llegan con su valor (piso 31)', $cmp['iguales'] === 31 && $cmp['distintos'] === [] && $cmp['faltan'] === ['gutter'], json_encode($cmp));
-$comprobar('ESPACIADOS: lo único que falta es «gutter» (max()/calc(): fuera del ADN, declarado)', $cmp['faltan'] === ['gutter'] && $cmp['sobran'] === []);
+$comprobar('ESPACIADOS: los 31 pasos numéricos 10–310 y el gutter llegan con su valor (piso 32)', $cmp['iguales'] === 32 && $cmp['distintos'] === [] && $cmp['faltan'] === [] && $cmp['sobran'] === [], json_encode($cmp));
+$comprobar('GUTTER: max(10%, calc((100% - var(--wp--style--global--content-size)) / 2)), como en el tema', ($P1['espaciados']['gutter'] ?? '') === 'max(10%, calc((100% - var(--wp--style--global--content-size)) / 2))');
 $comprobar('LAYOUT: contentSize y wideSize son los de la referencia', ($S1['layout']['contentSize'] ?? '') === '1080px' && ($S1['layout']['wideSize'] ?? '') === '1440px');
 $comprobar('CUSTOM.RADIUS: los 6 radios (xs s m l circle pill) son idénticos, con pill=9999px y circle=50%', ($S1['custom']['radius'] ?? null) === $REF['custom']['radius'] && count($REF['custom']['radius']) === 6, json_encode($S1['custom']['radius'] ?? null));
-// El resto del custom de la referencia: lo que no llega TIENE que estar declarado como "fuera del ADN".
-$perdido = [];
-foreach ($hojas($REF['custom']) as $ruta) {
-    if ($obtener($S1['custom'] ?? [], $ruta) !== $obtener($REF['custom'], $ruta)) {
-        $perdido[] = 'custom.' . $ruta;
-    }
+foreach (['border' => 2, 'blur' => 1, 'layout' => 1, 'typography' => 2] as $clave => $minimo) {
+    $comprobar('CUSTOM.' . strtoupper($clave) . ': idéntico al de la referencia (piso: ' . $minimo . ' grupo(s) o valor(es))', ($S1['custom'][$clave] ?? null) === $REF['custom'][$clave] && count($REF['custom'][$clave]) >= $minimo, json_encode($S1['custom'][$clave] ?? null));
 }
-// Cada entrada de fuera_del_adn() que empieza por settings.custom. es un prefijo de custom (con «a|b» = dos alternativas).
-$prefijos_declarados = [];
-foreach ($GAP as $g) {
-    if (strpos($g, 'settings.custom.') !== 0) {
-        continue;
-    }
-    $ruta_g = substr($g, strlen('settings.'));
-    $partes = explode('.', $ruta_g);
-    $ultimo = array_pop($partes);
-    foreach (explode('|', $ultimo) as $alt) {
-        $prefijos_declarados[] = implode('.', array_merge($partes, [$alt])) . '.';
-    }
-}
-$cubre = static function (string $ruta) use ($prefijos_declarados): bool {
-    foreach ($prefijos_declarados as $pre) {
-        if (strpos($ruta . '.', $pre) === 0) {
-            return true;
+$comprobar('CUSTOM.FORM: las 68 variables, cada una con su valor (las dos sombras, por lo que dibujan)', count($REF['custom']['form']) === 68 && count($S1['custom']['form'] ?? []) === 68 && array_diff_key($REF['custom']['form'], $S1['custom']['form']) === []);
+$comprobar('DEGRADADOS Y SOMBRAS: 2 degradados idénticos y 3 sombras del tema + 1 del formulario', ($S1['color']['gradients']['theme'] ?? null) === ($REF['color']['gradients']['theme'] ?? 'x') && count($S1['shadow']['presets']['theme'] ?? []) === 4 && count($REF['shadow']['presets']['theme'] ?? []) === 3);
+// Lo que sigue fuera del ADN está declarado, con razón; y lo que ahora viaja ya no figura.
+$comprobar('fuera_del_adn() declara lo que sigue fuera, cada cosa con su razón, y ya no lista nada de lo que Q3 y Q4 hicieron viajar', (function () use ($GAP) {
+    $viaja = ['shadow.presets', 'color.gradients', 'spacingSizes[gutter]', 'custom.border', 'fontWeight', 'measure', 'custom.blur', 'custom.form', 'palette[transparencias]'];
+    foreach (COD_ADN_Theme::fuera_del_adn() as $ruta => $razon) {
+        if (!is_string($razon) || strlen($razon) < 40) {
+            return false;
+        }
+        foreach ($viaja as $v) {
+            if (strpos($ruta, $v) !== false) {
+                return false;
+            }
         }
     }
-    return false;
-};
-$sin_declarar = array_values(array_filter($perdido, static function (string $r) use ($cubre): bool {
-    return !$cubre($r);
-}));
-$comprobar('CUSTOM: lo del custom de la referencia que no llega (' . count($perdido) . ' valores) está TODO declarado en fuera_del_adn()', $perdido !== [] && $sin_declarar === [], json_encode(array_slice($sin_declarar, 0, 8)));
+    return count($GAP) >= 3;
+})(), json_encode(array_keys(COD_ADN_Theme::fuera_del_adn())));
 $comprobar('sin los tamaños de fábrica de WordPress (defaultFontSizes y defaultSpacingSizes apagados, como la referencia)', ($S1['typography']['defaultFontSizes'] ?? null) === false && ($S1['spacing']['defaultSpacingSizes'] ?? null) === false && ($REF['typography']['defaultFontSizes'] ?? null) === false);
 $comprobar('los tamaños proyectados no son fluidos (fluid:false), como en la referencia', (function () use ($S1) {
     foreach ($S1['typography']['fontSizes']['theme'] ?? [] as $t) {
@@ -361,8 +389,13 @@ if (!is_wp_error($exp)) {
     $comprobar('LOS MISMOS ajustes con el archivo exportado (sincronizado) que con el filtro sobre el archivo atrasado', wp_json_encode($S_archivo) === wp_json_encode($S_filtro), 'difieren: ' . implode(', ', array_slice(array_keys(array_diff_assoc(array_map('wp_json_encode', $S_archivo), array_map('wp_json_encode', $S_filtro))), 0, 6)));
     $comprobar('LOS MISMOS estilos globales con el archivo exportado que con el filtro', wp_json_encode(wp_get_global_styles()) === wp_json_encode($styles_filtro));
     $sobre_local = COD_ADN_Theme::exportar_theme_json($F_LOCAL);
-    $comprobar('el archivo exportado conserva lo que el ADN no toca: sobre la base completa de Basis quedan las sombras, los degradados y el custom.form', !is_wp_error($sobre_local) && $sobre_local['datos']['settings']['shadow'] === $ref_tema['settings']['shadow'] && $sobre_local['datos']['settings']['color']['gradients'] === $ref_tema['settings']['color']['gradients'] && $sobre_local['datos']['settings']['custom']['form'] === $ref_tema['settings']['custom']['form'] && $sobre_local['datos']['settings']['custom']['border'] === $ref_tema['settings']['custom']['border'], $codigo($sobre_local));
-    $comprobar('y sobre la base completa los presets del ADN reemplazan a los del archivo (no se duplican): 22 tamaños (20 + display + cuerpo) y 12 colores (las 2 transparencias salen de Configuración, no del ADN)', !is_wp_error($sobre_local) && count($sobre_local['datos']['settings']['typography']['fontSizes']) === 22 && count($sobre_local['datos']['settings']['color']['palette']) === 12);
+    $comprobar('el archivo exportado sobre la base completa de Basis lleva lo que antes no viajaba: las 4 sombras, los 2 degradados, el custom.form de 68 variables y los 3 colores extra', !is_wp_error($sobre_local) && count($sobre_local['datos']['settings']['shadow']['presets']) === 4 && count($sobre_local['datos']['settings']['color']['gradients']) === 2 && count($sobre_local['datos']['settings']['custom']['form']) === 68 && count($sobre_local['datos']['settings']['color']['palette']) === 17, $codigo($sobre_local));
+    $comprobar('y los presets del ADN reemplazan a los del archivo (no se duplican): 20 tamaños (sin display ni cuerpo), 32 espaciados con el gutter y 17 colores', !is_wp_error($sobre_local) && count($sobre_local['datos']['settings']['typography']['fontSizes']) === 20 && count($sobre_local['datos']['settings']['spacing']['spacingSizes']) === 32 && count($sobre_local['datos']['settings']['color']['palette']) === 17);
+    $comprobar('el archivo exportado sobre la base de Basis conserva el CSS de los estilos de bloque y el bloque de los quiebres queda donde estaba, una sola vez', !is_wp_error($sobre_local) && substr_count((string) $sobre_local['datos']['styles']['css'], '/*cod-escalas-con-quiebres*/') === 1 && substr_count((string) $sobre_local['datos']['styles']['css'], '/*cod-estilos-responsivos*/') === 1 && $sobre_local['datos']['styles']['css'] === $ref_tema['styles']['css'], is_wp_error($sobre_local) ? $codigo($sobre_local) : strlen((string) $sobre_local['datos']['styles']['css']) . ' contra ' . strlen((string) $ref_tema['styles']['css']));
+    $comprobar('el archivo exportado sobre la base ATRASADA agrega el bloque de los quiebres (el destino queda con los valores de tablet y celular)', (function () use ($F_ATRASADO) {
+        $e = COD_ADN_Theme::exportar_theme_json($F_ATRASADO);
+        return !is_wp_error($e) && substr_count((string) ($e['datos']['styles']['css'] ?? ''), '--wp--preset--font-size--30:15px') === 1 && substr_count((string) ($e['datos']['styles']['css'] ?? ''), '--wp--preset--spacing--300:35.37px') === 1;
+    })());
     // CONTROL: un archivo con el sello de OTRA revisión se considera adelantado y el filtro superpone.
     $falso = $exp['datos'];
     $falso['settings']['custom']['adn']['digest'] = str_repeat('0', 64);
@@ -522,15 +555,17 @@ $p = $contrato_de(static function ($c) {
         }
     }
 });
-$comprobar('CONTROL: un rol cuyo nombre no da slug se rechaza con ADN_PAYLOAD_SHAPE', isset($p['error']) && strpos($p['error'], 'ADN_PAYLOAD_SHAPE') !== false, $p['error'] ?? 'no falló');
+$comprobar('CONTROL: un rol cuyo nombre no da slug se rechaza con ADN_NAME_INVALID (el Core mide la forma; el slug propio lo exige el destino)', isset($p['error']) && strpos($p['error'], 'ADN_NAME_INVALID') !== false, $p['error'] ?? 'no falló');
 $p = $contrato_de(static function ($c) {
     foreach ($c->definitions as $d) {
         if ($d->id === 'dim2.req02.def1') {
-            $d->value->roleStyles[] = (object) ['role' => 'Display', 'family' => 'X', 'fontSize' => '10px', 'fontWeight' => 400, 'lineHeight' => 1.2, 'source' => 'p', 'derivation' => (object) ['of' => 'direct']];
+            foreach (['Título grande', 'Titulo grande'] as $nombre) {
+                $d->value->roleStyles[] = (object) ['role' => $nombre, 'family' => 'X', 'fontSize' => '10px', 'fontWeight' => 400, 'lineHeight' => 1.2, 'source' => 'p', 'derivation' => (object) ['of' => 'direct']];
+            }
         }
     }
 });
-$comprobar('dos roles que dan el mismo slug (display / Display) no se pisan: el segundo queda display-2 y se avisa (R3)', isset($p['registro']['--wp--preset--font-size--display-2']) && in_array('ADN_SLUG_COLLISION', array_column($p['avisos'] ?? [], 'codigo'), true), json_encode(array_column($p['avisos'] ?? [], 'codigo')) . ($p['error'] ?? ''));
+$comprobar('dos roles con nombres distintos que dan el mismo slug (Título grande / Titulo grande) no se pisan: el segundo queda titulo-grande-2 y se avisa (R3)', isset($p['registro']['--wp--preset--font-size--titulo-grande'], $p['registro']['--wp--preset--font-size--titulo-grande-2']) && in_array('ADN_SLUG_COLLISION', array_column($p['avisos'] ?? [], 'codigo'), true), json_encode(array_column($p['avisos'] ?? [], 'codigo')) . ($p['error'] ?? ''));
 
 echo "\n";
 echo $fallas === 0 ? "TODO VERDE ($ejecutadas comprobaciones)\n" : "FALLARON $fallas de $ejecutadas\n";

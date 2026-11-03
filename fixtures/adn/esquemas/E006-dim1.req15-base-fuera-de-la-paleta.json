@@ -1,0 +1,52 @@
+{
+  "id": "E006-dim1.req15-base-fuera-de-la-paleta",
+  "capa": 4,
+  "requisito": "dim1.req15",
+  "manifiesto": {
+    "manifestVersion": "1.3",
+    "revision": 4
+  },
+  "intencion": "soloForma",
+  "descripcion": "La referencia tiene la forma correcta pero el camino no llega a ningún color de la paleta (`institucionales[9]`).",
+  "value": {
+    "transparencias": [
+      {
+        "nombre": "x",
+        "base": {
+          "refReqId": "dim1.req01",
+          "refPath": [
+            "institucionales",
+            9
+          ]
+        },
+        "opacidad": 20
+      }
+    ]
+  },
+  "contexto": {
+    "dim1.req01": {
+      "institucionales": [
+        {
+          "name": "Naranja Basis",
+          "value": "#F26621"
+        }
+      ],
+      "neutros": [
+        {
+          "name": "Tinta",
+          "value": "#0E0C19"
+        },
+        {
+          "name": "Gris",
+          "value": "#898989"
+        }
+      ]
+    }
+  },
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "no-cumple"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "id": "E119-dim7.req09-sin-tema",
+  "capa": 4,
+  "requisito": "dim7.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "ok",
+  "descripcion": "Ausencia declarada.",
+  "value": {
+    "sinTemaFormulario": "valores por defecto del runtime"
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "cumple"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "id": "E061-dim3.req10-tablet-y-mobile-de-basis",
+  "capa": 4,
+  "requisito": "dim3.req10",
+  "manifiesto": {
+    "manifestVersion": "1.2",
+    "revision": 3
+  },
+  "intencion": "ok",
+  "descripcion": "Tableta 768–1023 px y celular hasta 767 px (Basis).",
+  "value": {
+    "quiebres": [
+      {
+        "nombre": "tablet",
+        "desde": "768px",
+        "hasta": "1023px"
+      },
+      {
+        "nombre": "mobile",
+        "hasta": "767px"
+      }
+    ]
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "cumple"
+  }
+}

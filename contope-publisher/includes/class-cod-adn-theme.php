@@ -23,12 +23,17 @@ if (!defined('ABSPATH')) {
  *
  *   3. `limpiar_cache()` descarta lo que WordPress guardó del theme.json cuando cambia el puntero.
  *
- * QUÉ SUPERPONE: sólo lo que la proyección declara. Las listas (paleta, familias, tamaños, espaciados)
- * REEMPLAZAN a las del archivo: el ADN es la autoridad de esas escalas, y un `theme.json` viejo no
- * puede volver a tapar un hueco. Los mapas (`custom`, `styles`, `layout`) se mezclan por clave.
- * Lo que el ADN no puede expresar todavía (sombras, degradados, pesos, interlineados, bordes, medidas,
- * transparencias, quiebres responsivos, `custom.form`) sigue viniendo del archivo o de Configuración;
- * la lista está en `fuera_del_adn()` y en la ESPEC (pedidos Q4 al Core).
+ * QUÉ SUPERPONE: sólo lo que la proyección declara. Las listas (paleta con sus transparencias, degradados,
+ * familias, tamaños, espaciados con su gutter, sombras) REEMPLAZAN a las del archivo: el ADN es la autoridad
+ * de esas escalas, y un `theme.json` viejo no puede volver a tapar un hueco. Los mapas (`custom`, `styles`,
+ * `layout`) se mezclan por clave. Desde el 02-nov-2026 (pedidos Q1, Q3 y Q4 al Core) el ADN lleva también
+ * transparencias, degradados, sombras, pesos e interlineados con nombre, medidas de texto, grosores de borde,
+ * desenfoques, el margen lateral (gutter), el tema del formulario (`custom.form`) y los valores por punto de
+ * quiebre. Lo que sigue fuera, y por qué, está en `fuera_del_adn()`.
+ *
+ * EL CSS DE LOS QUIEBRES (`styles.css`) es una cadena, no un mapa: la proyección trae sólo SU bloque (entre las
+ * marcas de COD_ADN_Projection::MARCA_CSS_ESCALA) y aquí se inserta en el CSS que el archivo ya trae, sin pisar
+ * lo demás (el CSS de los estilos de bloque, p. ej.).
  */
 final class COD_ADN_Theme
 {
@@ -63,7 +68,28 @@ final class COD_ADN_Theme
         if (is_string($sello) && hash_equals($sello, (string) $puntero['digest'])) {
             return $datos;
         }
+        if (isset($fragmento['styles']['css']) && is_string($fragmento['styles']['css'])) {
+            $fragmento['styles']['css'] = self::con_bloque_de_quiebres(is_array($actual) ? (string) ($actual['styles']['css'] ?? '') : '', $fragmento['styles']['css']);
+        }
         return $datos->update_with($fragmento);
+    }
+
+    /**
+     * Pone el bloque de CSS de los quiebres del ADN dentro del CSS que ya hay: si ya había uno (entre las mismas marcas)
+     * lo cambia donde estaba y, si no, agrega el nuevo al final; lo demás queda como estaba.
+     */
+    public static function con_bloque_de_quiebres(string $existente, string $bloque): string
+    {
+        $m = preg_quote(COD_ADN_Projection::MARCA_CSS_ESCALA, '#');
+        $patron = '#/\*' . $m . '\*/.*?/\*/' . $m . '\*/#s';
+        if ($bloque !== '' && preg_match($patron, $existente) === 1) {
+            // Ya hay un bloque: se cambia donde está (no se mueve el resto del CSS).
+            return trim((string) preg_replace_callback($patron, static function () use ($bloque): string {
+                return $bloque;
+            }, $existente, 1));
+        }
+        $sin = trim((string) preg_replace($patron, '', $existente));
+        return trim($sin . ($sin !== '' && $bloque !== '' ? "\n" : '') . $bloque);
     }
 
     /** Lo que WordPress recuerda del theme.json durante esta petición: se descarta para que el puntero nuevo se vea. */
@@ -77,25 +103,23 @@ final class COD_ADN_Theme
     }
 
     /**
-     * Lo que el esquema del ADN (el espejo del Core) todavía no puede llevar y que, por eso, un sitio
-     * destino NO recibe por el paquete. Se muestra en `cod_adn_get` y lo mide la prueba P2.7: si algún día
-     * el Core lo cubre, la prueba lo dice y se actualiza esta lista.
+     * Lo que el ADN NO lleva y, por eso, un sitio destino no recibe por el paquete. Se muestra en `cod_adn_get` y lo mide
+     * la prueba de portabilidad (scripts/probar-adn-proyeccion.php): si algo de esta lista pasa a viajar, la prueba lo dice
+     * y se saca de aquí; si algo del theme.json de Basis no llega y no está aquí, la prueba falla.
+     *
+     * Hasta el 02-nov-2026 estaban aquí las transparencias, los degradados, las sombras, el gutter, los grosores de borde,
+     * los pesos y los interlineados, las medidas de texto, los desenfoques, `custom.form` y los quiebres: el Core los
+     * agregó (pedidos Q3 y Q4) y ahora viajan.
      *
      * @return array<string, string> ruta del theme.json -> por qué no viaja
      */
     public static function fuera_del_adn(): array
     {
         return [
-            'settings.color.palette[transparencias]' => 'color-mix() no es un color-css del Core (scale_alpha de Configuración)',
-            'settings.color.gradients' => 'el Core no tiene degradados tipados',
-            'settings.shadow.presets' => 'Q3: el Core no tiene escala de sombras',
-            'settings.spacing.spacingSizes[gutter]' => 'el paso "gutter" no es numérico ni una longitud simple',
-            'settings.custom.border' => 'dim4.req03 describe estilos de borde, no una escala de grosores',
-            'settings.custom.typography.fontWeight|lineHeight' => 'el Core no tiene escalas de peso ni de interlineado',
-            'settings.custom.layout.measure' => 'el Core no tiene medidas de texto',
-            'settings.custom.blur' => 'el Core no tiene desenfoques',
-            'settings.custom.form' => 'es el contrato de diseño del formulario, no una dimensión del Core',
-            'styles.css (quiebres tablet/celular)' => 'el Core no tiene valores por punto de quiebre',
+            'styles.css (/*cod-estilos-responsivos*/)' => 'la proporción y el alto mínimo de un estilo de bloque por punto de quiebre salen de dim9.req08 + dim9.req09, que el plugin valida y guarda pero aún no emite: qué selector lleva cada propiedad (`img` dentro de `.wp-block-image`, el propio grupo…) es del destino y no está construido. Esas reglas siguen viniendo del tema (styles/blocks/*.json) y de su theme.json',
+            'settings.color.palette[].name|settings.typography.fontFamilies[].name' => 'el slug de una variable sale del NOMBRE del color o de la familia (slug(nombre)): un nombre de mostrar que no da su slug («Naranja Basis» -> accent) no puede viajar; es cosmético (el editor), no cambia ningún valor calculado',
+            'settings.custom.typography.<rol> (peso, interlineado y espaciado de letra de un rol)' => 'dim2.req02 los exige por rol, pero la web los toma de las escalas con nombre (dim2.req09); emitirlos habría agregado claves a settings.custom que ningún tema declara',
+            'styles.* (blocks, elements.button.border|typography, spacing.blockGap…)' => 'el ADN sólo gobierna los colores y las familias de los elementos (styles.color, elements.link|button|heading); el resto de los estilos globales sigue siendo del archivo del tema',
         ];
     }
 
@@ -141,7 +165,11 @@ final class COD_ADN_Theme
         if (!is_array($base)) {
             return new WP_Error('ADN_THEME_BASE', 'No se pudo leer la base del theme.json: ' . $archivo_base);
         }
-        $datos = self::mezclar($base, is_array($proyeccion['themeJson'] ?? null) ? $proyeccion['themeJson'] : []);
+        $fragmento = is_array($proyeccion['themeJson'] ?? null) ? $proyeccion['themeJson'] : [];
+        if (isset($fragmento['styles']['css']) && is_string($fragmento['styles']['css'])) {
+            $fragmento['styles']['css'] = self::con_bloque_de_quiebres((string) ($base['styles']['css'] ?? ''), $fragmento['styles']['css']);
+        }
+        $datos = self::mezclar($base, $fragmento);
         $json = (string) wp_json_encode($datos, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRESERVE_ZERO_FRACTION) . "\n";
         return [
             'json' => $json,

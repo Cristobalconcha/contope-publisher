@@ -1,0 +1,29 @@
+{
+  "id": "E134-dim7.req09-apariencia-checkbox",
+  "capa": 4,
+  "requisito": "dim7.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "mal",
+  "descripcion": "Apariencia fuera de none|auto.",
+  "value": {
+    "temaFormulario": {
+      "medidas": {
+        "casillaApariencia": "checkbox"
+      }
+    }
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "temaFormulario.medidas.casillaApariencia"
+    ],
+    "motivos": [
+      "slot 'temaFormulario.medidas.casillaApariencia': se esperaba uno de enum(none|auto)"
+    ],
+    "predicado": "cumple"
+  }
+}

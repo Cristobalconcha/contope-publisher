@@ -1,0 +1,19 @@
+{
+  "id": "E080-dim3.req12-vacio",
+  "capa": 4,
+  "requisito": "dim3.req12",
+  "manifiesto": {
+    "manifestVersion": "1.2",
+    "revision": 3
+  },
+  "intencion": "soloForma",
+  "descripcion": "Objeto vacío.",
+  "value": {},
+  "contexto": {},
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "no-cumple"
+  }
+}

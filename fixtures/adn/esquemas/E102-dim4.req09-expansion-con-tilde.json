@@ -1,0 +1,40 @@
+{
+  "id": "E102-dim4.req09-expansion-con-tilde",
+  "capa": 4,
+  "requisito": "dim4.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "mal",
+  "descripcion": "El campo se llama `expansion`, sin tilde: con tilde cuenta como ausente.",
+  "value": {
+    "sombras": [
+      {
+        "nombre": "10",
+        "x": "0px",
+        "y": "4px",
+        "desenfoque": "10px",
+        "color": {
+          "refReqId": "dim1.req15",
+          "refPath": [
+            "transparencias",
+            0
+          ]
+        },
+        "expansión": "0px"
+      }
+    ]
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "sombras[0].expansion"
+    ],
+    "motivos": [
+      "slot 'sombras[0]': campo obligatorio 'expansion' ausente"
+    ],
+    "predicado": "no-cumple"
+  }
+}

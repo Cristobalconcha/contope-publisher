@@ -1,0 +1,26 @@
+{
+  "id": "E163-dim9.req09-arquetipo-entrada",
+  "capa": 4,
+  "requisito": "dim9.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "ok",
+  "descripcion": "El arquetipo «entrada» puede recibir su familia de bloque.",
+  "value": {
+    "correspondencias": [
+      {
+        "arquetipo": "entrada",
+        "familiaDeBloque": "core/group"
+      }
+    ]
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "cumple"
+  }
+}

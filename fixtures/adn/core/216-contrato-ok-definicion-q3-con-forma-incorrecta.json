@@ -1,0 +1,122 @@
+{
+  "id": "216-contrato-ok-definicion-q3-con-forma-incorrecta",
+  "capa": 1,
+  "funcion": "parseDesignContract",
+  "origen": "nuevo",
+  "descripcion": "El sobre NO mira el `value`: una sombra con el color escrito (inválida para dim4.req09) es un contrato válido. Quien juzga la forma es el destino (R2, `ADN_PAYLOAD_SHAPE`).",
+  "incomodo": true,
+  "entrada": {
+    "schemaVersion": 1,
+    "design": {
+      "id": "d1",
+      "revision": 1,
+      "createdAt": "2026-08-02T00:00:00.000Z",
+      "updatedAt": "2026-08-02T00:00:00.000Z"
+    },
+    "sources": [
+      {
+        "id": "brief",
+        "technicalKind": "text",
+        "purpose": "observation",
+        "label": "Project brief",
+        "locator": "Project brief",
+        "path": ".codesign/sources/brief.txt",
+        "importedAt": "2026-08-02T00:00:00.000Z"
+      }
+    ],
+    "definitions": [
+      {
+        "id": "dim4.req09.def1",
+        "category": "otra",
+        "name": "dim4.req09.def1",
+        "value": {
+          "sombras": [
+            {
+              "nombre": "10",
+              "x": "0px",
+              "y": "4px",
+              "desenfoque": "10px",
+              "expansion": "0px",
+              "color": "#0E0C19"
+            }
+          ]
+        },
+        "state": "confirmed",
+        "authority": "human-confirmed",
+        "evidenceSourceIds": [
+          "brief"
+        ],
+        "provenance": [
+          {
+            "sourceId": "brief"
+          }
+        ],
+        "constraintDefinitionIds": [],
+        "reviewedAt": "2026-08-02T00:00:00.000Z"
+      }
+    ],
+    "developmentTasks": [],
+    "projections": {
+      "designMd": null
+    }
+  },
+  "esperado": {
+    "valido": true,
+    "salida": {
+      "schemaVersion": 1,
+      "design": {
+        "id": "d1",
+        "revision": 1,
+        "createdAt": "2026-08-02T00:00:00.000Z",
+        "updatedAt": "2026-08-02T00:00:00.000Z"
+      },
+      "sources": [
+        {
+          "id": "brief",
+          "technicalKind": "text",
+          "purpose": "observation",
+          "label": "Project brief",
+          "locator": "Project brief",
+          "path": ".codesign/sources/brief.txt",
+          "importedAt": "2026-08-02T00:00:00.000Z"
+        }
+      ],
+      "definitions": [
+        {
+          "id": "dim4.req09.def1",
+          "category": "otra",
+          "name": "dim4.req09.def1",
+          "value": {
+            "sombras": [
+              {
+                "nombre": "10",
+                "x": "0px",
+                "y": "4px",
+                "desenfoque": "10px",
+                "expansion": "0px",
+                "color": "#0E0C19"
+              }
+            ]
+          },
+          "state": "confirmed",
+          "authority": "human-confirmed",
+          "evidenceSourceIds": [
+            "brief"
+          ],
+          "provenance": [
+            {
+              "sourceId": "brief"
+            }
+          ],
+          "constraintDefinitionIds": [],
+          "reviewedAt": "2026-08-02T00:00:00.000Z"
+        }
+      ],
+      "developmentTasks": [],
+      "projections": {
+        "designMd": null
+      }
+    }
+  },
+  "cubre": []
+}

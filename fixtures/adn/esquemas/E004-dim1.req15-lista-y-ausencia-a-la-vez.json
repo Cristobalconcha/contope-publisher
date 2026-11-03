@@ -1,0 +1,53 @@
+{
+  "id": "E004-dim1.req15-lista-y-ausencia-a-la-vez",
+  "capa": 4,
+  "requisito": "dim1.req15",
+  "manifiesto": {
+    "manifestVersion": "1.3",
+    "revision": 4
+  },
+  "intencion": "soloForma",
+  "descripcion": "Forma válida (los dos slots son opcionales); el predicado exige que sea una cosa o la otra.",
+  "value": {
+    "transparencias": [
+      {
+        "nombre": "ink al 15%",
+        "base": {
+          "refReqId": "dim1.req01",
+          "refPath": [
+            "neutros",
+            0
+          ]
+        },
+        "opacidad": 15
+      }
+    ],
+    "sinTransparencias": "no usa"
+  },
+  "contexto": {
+    "dim1.req01": {
+      "institucionales": [
+        {
+          "name": "Naranja Basis",
+          "value": "#F26621"
+        }
+      ],
+      "neutros": [
+        {
+          "name": "Tinta",
+          "value": "#0E0C19"
+        },
+        {
+          "name": "Gris",
+          "value": "#898989"
+        }
+      ]
+    }
+  },
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "no-cumple"
+  }
+}

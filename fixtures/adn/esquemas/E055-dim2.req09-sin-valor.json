@@ -1,0 +1,29 @@
+{
+  "id": "E055-dim2.req09-sin-valor",
+  "capa": 4,
+  "requisito": "dim2.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "mal",
+  "descripcion": "Falta `valor`.",
+  "value": {
+    "interlineados": [
+      {
+        "nombre": "x"
+      }
+    ]
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "interlineados[0].valor"
+    ],
+    "motivos": [
+      "slot 'interlineados[0]': campo obligatorio 'valor' ausente"
+    ],
+    "predicado": "cumple"
+  }
+}

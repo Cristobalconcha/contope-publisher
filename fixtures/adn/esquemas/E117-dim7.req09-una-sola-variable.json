@@ -1,0 +1,25 @@
+{
+  "id": "E117-dim7.req09-una-sola-variable",
+  "capa": 4,
+  "requisito": "dim7.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "ok",
+  "descripcion": "Las variables son opcionales: basta una.",
+  "value": {
+    "temaFormulario": {
+      "medidas": {
+        "radio": "4px"
+      }
+    }
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "cumple"
+  }
+}

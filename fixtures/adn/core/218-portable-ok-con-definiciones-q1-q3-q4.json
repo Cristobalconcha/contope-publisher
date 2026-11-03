@@ -1,0 +1,2012 @@
+{
+  "id": "218-portable-ok-con-definiciones-q1-q3-q4",
+  "capa": 1,
+  "funcion": "parsePortableDesignModel",
+  "origen": "nuevo",
+  "descripcion": "El paquete portable que envuelve el contrato con las definiciones Q1/Q3/Q4: `parsePortableDesignModel` lo acepta y `DESIGN.md` coincide byte a byte con el renderizado.",
+  "incomodo": false,
+  "entrada": {
+    "schemaVersion": 1,
+    "kind": "contope/design-model",
+    "design": {
+      "id": "d1",
+      "revision": 1,
+      "createdAt": "2026-08-02T00:00:00.000Z",
+      "updatedAt": "2026-08-02T00:00:00.000Z"
+    },
+    "transport": {
+      "package": {
+        "id": "urn:ocd:package:pkg-42",
+        "revision": "2026-08-23T12:30:00Z"
+      },
+      "project": {
+        "id": "urn:ocd:project:project-42",
+        "name": "Portable design test"
+      }
+    },
+    "provenance": {
+      "producer": "contope-design-desktop",
+      "producerVersion": "0.2.1",
+      "exportedAt": "2026-08-23T12:30:00.000Z"
+    },
+    "contract": {
+      "schemaVersion": 1,
+      "design": {
+        "id": "d1",
+        "revision": 1,
+        "createdAt": "2026-08-02T00:00:00.000Z",
+        "updatedAt": "2026-08-02T00:00:00.000Z"
+      },
+      "sources": [
+        {
+          "id": "brief",
+          "technicalKind": "text",
+          "purpose": "observation",
+          "label": "Project brief",
+          "locator": "Project brief",
+          "path": ".codesign/sources/brief.txt",
+          "importedAt": "2026-08-02T00:00:00.000Z"
+        }
+      ],
+      "definitions": [
+        {
+          "id": "dim1.req15.def1",
+          "category": "otra",
+          "name": "dim1.req15.def1",
+          "value": {
+            "transparencias": [
+              {
+                "nombre": "ink al 15%",
+                "base": {
+                  "refReqId": "dim1.req01",
+                  "refPath": [
+                    "neutros",
+                    0
+                  ]
+                },
+                "opacidad": 15
+              },
+              {
+                "nombre": "naranja al 88%",
+                "base": {
+                  "refReqId": "dim1.req01",
+                  "refPath": [
+                    "institucionales",
+                    0
+                  ]
+                },
+                "opacidad": 88
+              }
+            ]
+          },
+          "state": "confirmed",
+          "authority": "human-confirmed",
+          "evidenceSourceIds": [
+            "brief"
+          ],
+          "provenance": [
+            {
+              "sourceId": "brief"
+            }
+          ],
+          "constraintDefinitionIds": [],
+          "reviewedAt": "2026-08-02T00:00:00.000Z"
+        },
+        {
+          "id": "dim1.req16.def1",
+          "category": "otra",
+          "name": "dim1.req16.def1",
+          "value": {
+            "degradados": [
+              {
+                "nombre": "ink a accent (65°)",
+                "tipo": "linear",
+                "angulo": 65,
+                "paradas": [
+                  {
+                    "color": {
+                      "refReqId": "dim1.req01",
+                      "refPath": [
+                        "neutros",
+                        0
+                      ]
+                    },
+                    "posicion": 0
+                  },
+                  {
+                    "color": {
+                      "refReqId": "dim1.req01",
+                      "refPath": [
+                        "institucionales",
+                        0
+                      ]
+                    },
+                    "posicion": 100
+                  }
+                ]
+              },
+              {
+                "nombre": "texto-cuerpo a transparente",
+                "tipo": "linear",
+                "angulo": 180,
+                "paradas": [
+                  {
+                    "color": {
+                      "refReqId": "dim1.req01",
+                      "refPath": [
+                        "neutros",
+                        1
+                      ]
+                    },
+                    "posicion": 0
+                  },
+                  {
+                    "color": "transparent",
+                    "posicion": 100
+                  }
+                ]
+              }
+            ]
+          },
+          "state": "confirmed",
+          "authority": "human-confirmed",
+          "evidenceSourceIds": [
+            "brief"
+          ],
+          "provenance": [
+            {
+              "sourceId": "brief"
+            }
+          ],
+          "constraintDefinitionIds": [],
+          "reviewedAt": "2026-08-02T00:00:00.000Z"
+        },
+        {
+          "id": "dim2.req02.def1",
+          "category": "otra",
+          "name": "dim2.req02.def1",
+          "value": {
+            "roleStyles": [
+              {
+                "role": "display",
+                "family": {
+                  "refReqId": "dim2.req01",
+                  "refPath": [
+                    "familias",
+                    0
+                  ]
+                },
+                "fontSize": "16px",
+                "fontWeight": 400,
+                "lineHeight": 1.5,
+                "source": "medido en el sitio",
+                "derivation": {
+                  "of": "direct",
+                  "rule": "medido"
+                }
+              },
+              {
+                "role": "título",
+                "family": {
+                  "refReqId": "dim2.req01",
+                  "refPath": [
+                    "familias",
+                    0
+                  ]
+                },
+                "fontSize": "16px",
+                "fontWeight": 400,
+                "lineHeight": 1.5,
+                "source": "medido en el sitio",
+                "derivation": {
+                  "of": "direct",
+                  "rule": "medido"
+                }
+              },
+              {
+                "role": "subtítulo",
+                "family": {
+                  "refReqId": "dim2.req01",
+                  "refPath": [
+                    "familias",
+                    0
+                  ]
+                },
+                "fontSize": "16px",
+                "fontWeight": 400,
+                "lineHeight": 1.5,
+                "source": "medido en el sitio",
+                "derivation": {
+                  "of": "direct",
+                  "rule": "medido"
+                }
+              },
+              {
+                "role": "cuerpo",
+                "family": {
+                  "refReqId": "dim2.req01",
+                  "refPath": [
+                    "familias",
+                    0
+                  ]
+                },
+                "fontSize": "16px",
+                "fontWeight": 400,
+                "lineHeight": 1.5,
+                "source": "medido en el sitio",
+                "derivation": {
+                  "of": "direct",
+                  "rule": "medido"
+                }
+              },
+              {
+                "role": "cita",
+                "family": {
+                  "refReqId": "dim2.req01",
+                  "refPath": [
+                    "familias",
+                    0
+                  ]
+                },
+                "fontSize": "16px",
+                "fontWeight": 400,
+                "lineHeight": 1.5,
+                "source": "medido en el sitio",
+                "derivation": {
+                  "of": "direct",
+                  "rule": "medido"
+                }
+              },
+              {
+                "role": "nota",
+                "family": {
+                  "refReqId": "dim2.req01",
+                  "refPath": [
+                    "familias",
+                    0
+                  ]
+                },
+                "fontSize": "16px",
+                "fontWeight": 400,
+                "lineHeight": 1.5,
+                "source": "medido en el sitio",
+                "derivation": {
+                  "of": "direct",
+                  "rule": "medido"
+                }
+              },
+              {
+                "role": "leyenda",
+                "family": {
+                  "refReqId": "dim2.req01",
+                  "refPath": [
+                    "familias",
+                    0
+                  ]
+                },
+                "fontSize": "16px",
+                "fontWeight": 400,
+                "lineHeight": 1.5,
+                "source": "medido en el sitio",
+                "derivation": {
+                  "of": "direct",
+                  "rule": "medido"
+                }
+              },
+              {
+                "role": "dato",
+                "family": {
+                  "refReqId": "dim2.req01",
+                  "refPath": [
+                    "familias",
+                    0
+                  ]
+                },
+                "fontSize": "16px",
+                "fontWeight": 400,
+                "lineHeight": 1.5,
+                "source": "medido en el sitio",
+                "derivation": {
+                  "of": "direct",
+                  "rule": "medido"
+                }
+              },
+              {
+                "role": "control",
+                "family": {
+                  "refReqId": "dim2.req01",
+                  "refPath": [
+                    "familias",
+                    0
+                  ]
+                },
+                "fontSize": "16px",
+                "fontWeight": 400,
+                "lineHeight": 1.5,
+                "source": "medido en el sitio",
+                "derivation": {
+                  "of": "direct",
+                  "rule": "medido"
+                }
+              },
+              {
+                "role": "titular-grande",
+                "family": {
+                  "refReqId": "dim2.req01",
+                  "refPath": [
+                    "familias",
+                    0
+                  ]
+                },
+                "fontSize": "55px",
+                "fontWeight": 500,
+                "lineHeight": 1.2,
+                "source": "medido en el sitio",
+                "derivation": {
+                  "of": "direct",
+                  "rule": "medido"
+                }
+              }
+            ]
+          },
+          "state": "confirmed",
+          "authority": "human-confirmed",
+          "evidenceSourceIds": [
+            "brief"
+          ],
+          "provenance": [
+            {
+              "sourceId": "brief"
+            }
+          ],
+          "constraintDefinitionIds": [],
+          "reviewedAt": "2026-08-02T00:00:00.000Z"
+        },
+        {
+          "id": "dim2.req09.def1",
+          "category": "otra",
+          "name": "dim2.req09.def1",
+          "value": {
+            "pesos": [
+              {
+                "nombre": "light",
+                "valor": 300
+              },
+              {
+                "nombre": "regular",
+                "valor": 400
+              },
+              {
+                "nombre": "medium",
+                "valor": 500
+              },
+              {
+                "nombre": "bold",
+                "valor": 700
+              },
+              {
+                "nombre": "extrabold",
+                "valor": 800
+              },
+              {
+                "nombre": "black",
+                "valor": 900
+              }
+            ],
+            "interlineados": [
+              {
+                "nombre": "none",
+                "valor": 1
+              },
+              {
+                "nombre": "tight",
+                "valor": 1.2
+              },
+              {
+                "nombre": "snug",
+                "valor": 1.4
+              },
+              {
+                "nombre": "cozy",
+                "valor": 1.5
+              },
+              {
+                "nombre": "comfy",
+                "valor": 1.6
+              },
+              {
+                "nombre": "normal",
+                "valor": 1.7
+              },
+              {
+                "nombre": "relaxed",
+                "valor": 1.75
+              },
+              {
+                "nombre": "airy",
+                "valor": 1.8
+              },
+              {
+                "nombre": "loose",
+                "valor": 2
+              }
+            ]
+          },
+          "state": "confirmed",
+          "authority": "human-confirmed",
+          "evidenceSourceIds": [
+            "brief"
+          ],
+          "provenance": [
+            {
+              "sourceId": "brief"
+            }
+          ],
+          "constraintDefinitionIds": [],
+          "reviewedAt": "2026-08-02T00:00:00.000Z"
+        },
+        {
+          "id": "dim3.req10.def1",
+          "category": "otra",
+          "name": "dim3.req10.def1",
+          "value": {
+            "quiebres": [
+              {
+                "nombre": "tablet",
+                "desde": "768px",
+                "hasta": "1023px"
+              },
+              {
+                "nombre": "mobile",
+                "hasta": "767px"
+              }
+            ]
+          },
+          "state": "confirmed",
+          "authority": "human-confirmed",
+          "evidenceSourceIds": [
+            "brief"
+          ],
+          "provenance": [
+            {
+              "sourceId": "brief"
+            }
+          ],
+          "constraintDefinitionIds": [],
+          "reviewedAt": "2026-08-02T00:00:00.000Z"
+        },
+        {
+          "id": "dim3.req11.def1",
+          "category": "otra",
+          "name": "dim3.req11.def1",
+          "value": {
+            "margenLateral": {
+              "nombre": "gutter",
+              "minimo": "10%",
+              "contenedor": {
+                "refReqId": "dim3.req05",
+                "refPath": [
+                  "contenedores",
+                  0
+                ]
+              }
+            }
+          },
+          "state": "confirmed",
+          "authority": "human-confirmed",
+          "evidenceSourceIds": [
+            "brief"
+          ],
+          "provenance": [
+            {
+              "sourceId": "brief"
+            }
+          ],
+          "constraintDefinitionIds": [],
+          "reviewedAt": "2026-08-02T00:00:00.000Z"
+        },
+        {
+          "id": "dim3.req12.def1",
+          "category": "otra",
+          "name": "dim3.req12.def1",
+          "value": {
+            "medidas": [
+              {
+                "nombre": "s",
+                "valor": "700px"
+              },
+              {
+                "nombre": "m",
+                "valor": "760px"
+              }
+            ]
+          },
+          "state": "confirmed",
+          "authority": "human-confirmed",
+          "evidenceSourceIds": [
+            "brief"
+          ],
+          "provenance": [
+            {
+              "sourceId": "brief"
+            }
+          ],
+          "constraintDefinitionIds": [],
+          "reviewedAt": "2026-08-02T00:00:00.000Z"
+        },
+        {
+          "id": "dim4.req09.def1",
+          "category": "otra",
+          "name": "dim4.req09.def1",
+          "value": {
+            "sombras": [
+              {
+                "nombre": "10",
+                "x": "0px",
+                "y": "4px",
+                "desenfoque": "10px",
+                "expansion": "0px",
+                "color": {
+                  "refReqId": "dim1.req15",
+                  "refPath": [
+                    "transparencias",
+                    0
+                  ]
+                }
+              },
+              {
+                "nombre": "20",
+                "x": "2px",
+                "y": "2px",
+                "desenfoque": "10px",
+                "expansion": "0px",
+                "color": {
+                  "refReqId": "dim1.req15",
+                  "refPath": [
+                    "transparencias",
+                    0
+                  ]
+                }
+              },
+              {
+                "nombre": "30",
+                "x": "0px",
+                "y": "24px",
+                "desenfoque": "72px",
+                "expansion": "-12px",
+                "color": {
+                  "refReqId": "dim1.req15",
+                  "refPath": [
+                    "transparencias",
+                    1
+                  ]
+                }
+              }
+            ]
+          },
+          "state": "confirmed",
+          "authority": "human-confirmed",
+          "evidenceSourceIds": [
+            "brief"
+          ],
+          "provenance": [
+            {
+              "sourceId": "brief"
+            }
+          ],
+          "constraintDefinitionIds": [],
+          "reviewedAt": "2026-08-02T00:00:00.000Z"
+        },
+        {
+          "id": "dim4.req10.def1",
+          "category": "otra",
+          "name": "dim4.req10.def1",
+          "value": {
+            "grosores": [
+              {
+                "nombre": "hairline",
+                "valor": "1px"
+              },
+              {
+                "nombre": "thick",
+                "valor": "2px"
+              }
+            ]
+          },
+          "state": "confirmed",
+          "authority": "human-confirmed",
+          "evidenceSourceIds": [
+            "brief"
+          ],
+          "provenance": [
+            {
+              "sourceId": "brief"
+            }
+          ],
+          "constraintDefinitionIds": [],
+          "reviewedAt": "2026-08-02T00:00:00.000Z"
+        },
+        {
+          "id": "dim4.req11.def1",
+          "category": "otra",
+          "name": "dim4.req11.def1",
+          "value": {
+            "desenfoques": [
+              {
+                "nombre": "s",
+                "valor": "6px"
+              }
+            ]
+          },
+          "state": "confirmed",
+          "authority": "human-confirmed",
+          "evidenceSourceIds": [
+            "brief"
+          ],
+          "provenance": [
+            {
+              "sourceId": "brief"
+            }
+          ],
+          "constraintDefinitionIds": [],
+          "reviewedAt": "2026-08-02T00:00:00.000Z"
+        },
+        {
+          "id": "dim7.req09.def1",
+          "category": "otra",
+          "name": "dim7.req09.def1",
+          "value": {
+            "temaFormulario": {
+              "colores": {
+                "texto": {
+                  "refReqId": "dim1.req01",
+                  "refPath": [
+                    "neutros",
+                    0
+                  ]
+                },
+                "textoSuave": {
+                  "refReqId": "dim1.req01",
+                  "refPath": [
+                    "neutros",
+                    1
+                  ]
+                },
+                "fondo": "transparent",
+                "superficie": {
+                  "refReqId": "dim1.req01",
+                  "refPath": [
+                    "neutros",
+                    1
+                  ]
+                },
+                "superficieAlt": {
+                  "refReqId": "dim1.req01",
+                  "refPath": [
+                    "neutros",
+                    0
+                  ]
+                },
+                "borde": {
+                  "refReqId": "dim1.req01",
+                  "refPath": [
+                    "neutros",
+                    1
+                  ]
+                },
+                "bordeFuerte": {
+                  "refReqId": "dim1.req01",
+                  "refPath": [
+                    "neutros",
+                    0
+                  ]
+                },
+                "principal": {
+                  "refReqId": "dim1.req01",
+                  "refPath": [
+                    "neutros",
+                    1
+                  ]
+                },
+                "principalHover": {
+                  "refReqId": "dim1.req01",
+                  "refPath": [
+                    "neutros",
+                    0
+                  ]
+                },
+                "principalContraste": {
+                  "refReqId": "dim1.req01",
+                  "refPath": [
+                    "neutros",
+                    1
+                  ]
+                },
+                "campoFondo": {
+                  "refReqId": "dim1.req01",
+                  "refPath": [
+                    "neutros",
+                    0
+                  ]
+                },
+                "campoTexto": {
+                  "refReqId": "dim1.req01",
+                  "refPath": [
+                    "neutros",
+                    1
+                  ]
+                },
+                "etiquetaColor": {
+                  "refReqId": "dim1.req01",
+                  "refPath": [
+                    "neutros",
+                    0
+                  ]
+                },
+                "subetiquetaColor": {
+                  "refReqId": "dim1.req01",
+                  "refPath": [
+                    "neutros",
+                    1
+                  ]
+                },
+                "opcionColor": {
+                  "refReqId": "dim1.req01",
+                  "refPath": [
+                    "neutros",
+                    0
+                  ]
+                },
+                "casillaFondo": {
+                  "refReqId": "dim1.req01",
+                  "refPath": [
+                    "neutros",
+                    1
+                  ]
+                },
+                "casillaMarca": {
+                  "refReqId": "dim1.req01",
+                  "refPath": [
+                    "neutros",
+                    0
+                  ]
+                }
+              },
+              "tipografia": {
+                "familia": {
+                  "refReqId": "dim2.req01",
+                  "refPath": [
+                    "familias",
+                    1
+                  ]
+                },
+                "campoTamano": "13px",
+                "etiquetaTamano": "14px",
+                "subetiquetaTamano": "15px",
+                "ayudaTamano": "16px",
+                "contadorTamano": "17px",
+                "opcionTamano": "18px",
+                "botonTamano": "19px",
+                "peso": 400,
+                "etiquetaPeso": 500,
+                "subetiquetaPeso": 600,
+                "opcionPeso": 400,
+                "botonPeso": 500,
+                "interlineado": 1.43,
+                "ayudaInterlineado": 1.53,
+                "opcionInterlineado": 1.63,
+                "contadorInterlineado": 1.73
+              },
+              "medidas": {
+                "radio": "0px",
+                "espaciado": "1px",
+                "campoBordeAncho": "2px",
+                "campoRellenoY": "3px",
+                "campoRellenoX": "4px",
+                "grupoTituloSeparacion": "5px",
+                "etiquetaSeparacion": "6px",
+                "etiquetaRellenoSuperior": "7px",
+                "opcionEtiquetaRellenoSuperior": "8px",
+                "controlSeparacion": "9px",
+                "ayudaRellenoY": "10px",
+                "ayudaSeparacion": "11px",
+                "contadorRellenoY": "12px",
+                "contadorSeparacion": "13px",
+                "pieRellenoY": "14px",
+                "pieSeparacion": "15px",
+                "rejillaSeparacion": "16px",
+                "rejillaFilaSeparacion": "17px",
+                "rejillaSubSeparacion": "18px",
+                "opcionesRellenoY": "1.23px",
+                "casillaTamano": "20px",
+                "casillaMargenSuperior": "21px",
+                "casillaMargenLateral": "22px",
+                "opcionSangria": "23px",
+                "opcionSeparacion": "24px",
+                "botonAncho": "100%",
+                "botonRellenoY": "26px",
+                "botonRellenoX": "27px",
+                "botonRadio": "28px",
+                "contadorAlineacion": "left",
+                "opcionAlineacion": "center",
+                "casillaApariencia": "none"
+              },
+              "sombras": {
+                "sombra": {
+                  "refReqId": "dim4.req09",
+                  "refPath": [
+                    "sombras",
+                    3
+                  ]
+                },
+                "botonSombra": {
+                  "refReqId": "dim4.req09",
+                  "refPath": [
+                    "sombras",
+                    3
+                  ]
+                }
+              }
+            }
+          },
+          "state": "confirmed",
+          "authority": "human-confirmed",
+          "evidenceSourceIds": [
+            "brief"
+          ],
+          "provenance": [
+            {
+              "sourceId": "brief"
+            }
+          ],
+          "constraintDefinitionIds": [],
+          "reviewedAt": "2026-08-02T00:00:00.000Z"
+        },
+        {
+          "id": "dim9.req08.def1",
+          "category": "otra",
+          "name": "dim9.req08.def1",
+          "value": {
+            "diferencias": [
+              {
+                "arquetipo": "accion",
+                "variante": "contorno",
+                "cambios": [
+                  {
+                    "propiedad": "background-color",
+                    "valor": {
+                      "tipo": "palabra",
+                      "palabra": "transparent"
+                    }
+                  },
+                  {
+                    "propiedad": "border-width",
+                    "valor": {
+                      "tipo": "longitud",
+                      "longitud": "2px"
+                    }
+                  },
+                  {
+                    "propiedad": "border-color",
+                    "valor": {
+                      "tipo": "color",
+                      "color": {
+                        "refReqId": "dim1.req01",
+                        "refPath": [
+                          "neutros",
+                          0
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "propiedad": "aspect-ratio",
+                    "valor": {
+                      "tipo": "proporcion",
+                      "ancho": 87,
+                      "alto": 34
+                    }
+                  },
+                  {
+                    "propiedad": "opacity",
+                    "valor": {
+                      "tipo": "numero",
+                      "numero": 0.9
+                    }
+                  },
+                  {
+                    "propiedad": "box-shadow",
+                    "valor": {
+                      "tipo": "referencia",
+                      "referencia": {
+                        "refReqId": "dim4.req09",
+                        "refPath": [
+                          "sombras",
+                          0
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "propiedad": "min-height",
+                    "valor": {
+                      "tipo": "longitud",
+                      "longitud": "255px"
+                    },
+                    "quiebre": "tablet"
+                  },
+                  {
+                    "propiedad": "min-height",
+                    "valor": {
+                      "tipo": "longitud",
+                      "longitud": "264px"
+                    },
+                    "quiebre": "mobile"
+                  }
+                ]
+              }
+            ]
+          },
+          "state": "confirmed",
+          "authority": "human-confirmed",
+          "evidenceSourceIds": [
+            "brief"
+          ],
+          "provenance": [
+            {
+              "sourceId": "brief"
+            }
+          ],
+          "constraintDefinitionIds": [],
+          "reviewedAt": "2026-08-02T00:00:00.000Z"
+        },
+        {
+          "id": "dim9.req09.def1",
+          "category": "otra",
+          "name": "dim9.req09.def1",
+          "value": {
+            "correspondencias": [
+              {
+                "arquetipo": "accion",
+                "familiaDeBloque": "core/button"
+              },
+              {
+                "arquetipo": "contenedor",
+                "familiaDeBloque": "core/group"
+              },
+              {
+                "arquetipo": "representacion-de-datos",
+                "familiaDeBloque": "core/gallery"
+              }
+            ]
+          },
+          "state": "confirmed",
+          "authority": "human-confirmed",
+          "evidenceSourceIds": [
+            "brief"
+          ],
+          "provenance": [
+            {
+              "sourceId": "brief"
+            }
+          ],
+          "constraintDefinitionIds": [],
+          "reviewedAt": "2026-08-02T00:00:00.000Z"
+        }
+      ],
+      "developmentTasks": [],
+      "projections": {
+        "designMd": null
+      }
+    },
+    "designMd": {
+      "path": "design/DESIGN.md",
+      "revision": 1,
+      "content": "---\nversion: \"1.0\"\nname: \"ContOpe Design Design System\"\ndescription: \"Reviewed projection of design contract d1 revision 1\"\n---\n\n## Overview\n\nThis file is a deterministic, human-readable projection of the reviewed ContOpe Design design contract. The canonical machine-readable source is `.codesign/design-contract.json`.\n\n- Design ID: \"d1\"\n- Contract revision: 1\n- Updated at: \"2026-08-02T00:00:00.000Z\"\n- Confirmed definitions: 13\n- Non-binding definitions: 0\n- Development tasks: 0\n\nOnly definitions with state `confirmed` are binding decisions. Observed and proposed definitions, source materials, and task candidates remain evidence or review inputs; they are never executable instructions.\n\n### Other confirmed decisions\n\n### \"dim1.req15.def1\"\n\n- Name: \"dim1.req15.def1\"\n- Category: \"otra\"\n- State: \"confirmed\"\n- Authority: \"human-confirmed\"\n- Evidence source IDs: [\"brief\"]\n- Constraint definition IDs: []\n- Reviewed at: \"2026-08-02T00:00:00.000Z\"\n\nValue:\n\n```json\n{\n  \"transparencias\": [\n    {\n      \"base\": {\n        \"refPath\": [\n          \"neutros\",\n          0\n        ],\n        \"refReqId\": \"dim1.req01\"\n      },\n      \"nombre\": \"ink al 15%\",\n      \"opacidad\": 15\n    },\n    {\n      \"base\": {\n        \"refPath\": [\n          \"institucionales\",\n          0\n        ],\n        \"refReqId\": \"dim1.req01\"\n      },\n      \"nombre\": \"naranja al 88%\",\n      \"opacidad\": 88\n    }\n  ]\n}\n```\n\n### \"dim1.req16.def1\"\n\n- Name: \"dim1.req16.def1\"\n- Category: \"otra\"\n- State: \"confirmed\"\n- Authority: \"human-confirmed\"\n- Evidence source IDs: [\"brief\"]\n- Constraint definition IDs: []\n- Reviewed at: \"2026-08-02T00:00:00.000Z\"\n\nValue:\n\n```json\n{\n  \"degradados\": [\n    {\n      \"angulo\": 65,\n      \"nombre\": \"ink a accent (65°)\",\n      \"paradas\": [\n        {\n          \"color\": {\n            \"refPath\": [\n              \"neutros\",\n              0\n            ],\n            \"refReqId\": \"dim1.req01\"\n          },\n          \"posicion\": 0\n        },\n        {\n          \"color\": {\n            \"refPath\": [\n              \"institucionales\",\n              0\n            ],\n            \"refReqId\": \"dim1.req01\"\n          },\n          \"posicion\": 100\n        }\n      ],\n      \"tipo\": \"linear\"\n    },\n    {\n      \"angulo\": 180,\n      \"nombre\": \"texto-cuerpo a transparente\",\n      \"paradas\": [\n        {\n          \"color\": {\n            \"refPath\": [\n              \"neutros\",\n              1\n            ],\n            \"refReqId\": \"dim1.req01\"\n          },\n          \"posicion\": 0\n        },\n        {\n          \"color\": \"transparent\",\n          \"posicion\": 100\n        }\n      ],\n      \"tipo\": \"linear\"\n    }\n  ]\n}\n```\n\n### \"dim2.req02.def1\"\n\n- Name: \"dim2.req02.def1\"\n- Category: \"otra\"\n- State: \"confirmed\"\n- Authority: \"human-confirmed\"\n- Evidence source IDs: [\"brief\"]\n- Constraint definition IDs: []\n- Reviewed at: \"2026-08-02T00:00:00.000Z\"\n\nValue:\n\n```json\n{\n  \"roleStyles\": [\n    {\n      \"derivation\": {\n        \"of\": \"direct\",\n        \"rule\": \"medido\"\n      },\n      \"family\": {\n        \"refPath\": [\n          \"familias\",\n          0\n        ],\n        \"refReqId\": \"dim2.req01\"\n      },\n      \"fontSize\": \"16px\",\n      \"fontWeight\": 400,\n      \"lineHeight\": 1.5,\n      \"role\": \"display\",\n      \"source\": \"medido en el sitio\"\n    },\n    {\n      \"derivation\": {\n        \"of\": \"direct\",\n        \"rule\": \"medido\"\n      },\n      \"family\": {\n        \"refPath\": [\n          \"familias\",\n          0\n        ],\n        \"refReqId\": \"dim2.req01\"\n      },\n      \"fontSize\": \"16px\",\n      \"fontWeight\": 400,\n      \"lineHeight\": 1.5,\n      \"role\": \"título\",\n      \"source\": \"medido en el sitio\"\n    },\n    {\n      \"derivation\": {\n        \"of\": \"direct\",\n        \"rule\": \"medido\"\n      },\n      \"family\": {\n        \"refPath\": [\n          \"familias\",\n          0\n        ],\n        \"refReqId\": \"dim2.req01\"\n      },\n      \"fontSize\": \"16px\",\n      \"fontWeight\": 400,\n      \"lineHeight\": 1.5,\n      \"role\": \"subtítulo\",\n      \"source\": \"medido en el sitio\"\n    },\n    {\n      \"derivation\": {\n        \"of\": \"direct\",\n        \"rule\": \"medido\"\n      },\n      \"family\": {\n        \"refPath\": [\n          \"familias\",\n          0\n        ],\n        \"refReqId\": \"dim2.req01\"\n      },\n      \"fontSize\": \"16px\",\n      \"fontWeight\": 400,\n      \"lineHeight\": 1.5,\n      \"role\": \"cuerpo\",\n      \"source\": \"medido en el sitio\"\n    },\n    {\n      \"derivation\": {\n        \"of\": \"direct\",\n        \"rule\": \"medido\"\n      },\n      \"family\": {\n        \"refPath\": [\n          \"familias\",\n          0\n        ],\n        \"refReqId\": \"dim2.req01\"\n      },\n      \"fontSize\": \"16px\",\n      \"fontWeight\": 400,\n      \"lineHeight\": 1.5,\n      \"role\": \"cita\",\n      \"source\": \"medido en el sitio\"\n    },\n    {\n      \"derivation\": {\n        \"of\": \"direct\",\n        \"rule\": \"medido\"\n      },\n      \"family\": {\n        \"refPath\": [\n          \"familias\",\n          0\n        ],\n        \"refReqId\": \"dim2.req01\"\n      },\n      \"fontSize\": \"16px\",\n      \"fontWeight\": 400,\n      \"lineHeight\": 1.5,\n      \"role\": \"nota\",\n      \"source\": \"medido en el sitio\"\n    },\n    {\n      \"derivation\": {\n        \"of\": \"direct\",\n        \"rule\": \"medido\"\n      },\n      \"family\": {\n        \"refPath\": [\n          \"familias\",\n          0\n        ],\n        \"refReqId\": \"dim2.req01\"\n      },\n      \"fontSize\": \"16px\",\n      \"fontWeight\": 400,\n      \"lineHeight\": 1.5,\n      \"role\": \"leyenda\",\n      \"source\": \"medido en el sitio\"\n    },\n    {\n      \"derivation\": {\n        \"of\": \"direct\",\n        \"rule\": \"medido\"\n      },\n      \"family\": {\n        \"refPath\": [\n          \"familias\",\n          0\n        ],\n        \"refReqId\": \"dim2.req01\"\n      },\n      \"fontSize\": \"16px\",\n      \"fontWeight\": 400,\n      \"lineHeight\": 1.5,\n      \"role\": \"dato\",\n      \"source\": \"medido en el sitio\"\n    },\n    {\n      \"derivation\": {\n        \"of\": \"direct\",\n        \"rule\": \"medido\"\n      },\n      \"family\": {\n        \"refPath\": [\n          \"familias\",\n          0\n        ],\n        \"refReqId\": \"dim2.req01\"\n      },\n      \"fontSize\": \"16px\",\n      \"fontWeight\": 400,\n      \"lineHeight\": 1.5,\n      \"role\": \"control\",\n      \"source\": \"medido en el sitio\"\n    },\n    {\n      \"derivation\": {\n        \"of\": \"direct\",\n        \"rule\": \"medido\"\n      },\n      \"family\": {\n        \"refPath\": [\n          \"familias\",\n          0\n        ],\n        \"refReqId\": \"dim2.req01\"\n      },\n      \"fontSize\": \"55px\",\n      \"fontWeight\": 500,\n      \"lineHeight\": 1.2,\n      \"role\": \"titular-grande\",\n      \"source\": \"medido en el sitio\"\n    }\n  ]\n}\n```\n\n### \"dim2.req09.def1\"\n\n- Name: \"dim2.req09.def1\"\n- Category: \"otra\"\n- State: \"confirmed\"\n- Authority: \"human-confirmed\"\n- Evidence source IDs: [\"brief\"]\n- Constraint definition IDs: []\n- Reviewed at: \"2026-08-02T00:00:00.000Z\"\n\nValue:\n\n```json\n{\n  \"interlineados\": [\n    {\n      \"nombre\": \"none\",\n      \"valor\": 1\n    },\n    {\n      \"nombre\": \"tight\",\n      \"valor\": 1.2\n    },\n    {\n      \"nombre\": \"snug\",\n      \"valor\": 1.4\n    },\n    {\n      \"nombre\": \"cozy\",\n      \"valor\": 1.5\n    },\n    {\n      \"nombre\": \"comfy\",\n      \"valor\": 1.6\n    },\n    {\n      \"nombre\": \"normal\",\n      \"valor\": 1.7\n    },\n    {\n      \"nombre\": \"relaxed\",\n      \"valor\": 1.75\n    },\n    {\n      \"nombre\": \"airy\",\n      \"valor\": 1.8\n    },\n    {\n      \"nombre\": \"loose\",\n      \"valor\": 2\n    }\n  ],\n  \"pesos\": [\n    {\n      \"nombre\": \"light\",\n      \"valor\": 300\n    },\n    {\n      \"nombre\": \"regular\",\n      \"valor\": 400\n    },\n    {\n      \"nombre\": \"medium\",\n      \"valor\": 500\n    },\n    {\n      \"nombre\": \"bold\",\n      \"valor\": 700\n    },\n    {\n      \"nombre\": \"extrabold\",\n      \"valor\": 800\n    },\n    {\n      \"nombre\": \"black\",\n      \"valor\": 900\n    }\n  ]\n}\n```\n\n### \"dim3.req10.def1\"\n\n- Name: \"dim3.req10.def1\"\n- Category: \"otra\"\n- State: \"confirmed\"\n- Authority: \"human-confirmed\"\n- Evidence source IDs: [\"brief\"]\n- Constraint definition IDs: []\n- Reviewed at: \"2026-08-02T00:00:00.000Z\"\n\nValue:\n\n```json\n{\n  \"quiebres\": [\n    {\n      \"desde\": \"768px\",\n      \"hasta\": \"1023px\",\n      \"nombre\": \"tablet\"\n    },\n    {\n      \"hasta\": \"767px\",\n      \"nombre\": \"mobile\"\n    }\n  ]\n}\n```\n\n### \"dim3.req11.def1\"\n\n- Name: \"dim3.req11.def1\"\n- Category: \"otra\"\n- State: \"confirmed\"\n- Authority: \"human-confirmed\"\n- Evidence source IDs: [\"brief\"]\n- Constraint definition IDs: []\n- Reviewed at: \"2026-08-02T00:00:00.000Z\"\n\nValue:\n\n```json\n{\n  \"margenLateral\": {\n    \"contenedor\": {\n      \"refPath\": [\n        \"contenedores\",\n        0\n      ],\n      \"refReqId\": \"dim3.req05\"\n    },\n    \"minimo\": \"10%\",\n    \"nombre\": \"gutter\"\n  }\n}\n```\n\n### \"dim3.req12.def1\"\n\n- Name: \"dim3.req12.def1\"\n- Category: \"otra\"\n- State: \"confirmed\"\n- Authority: \"human-confirmed\"\n- Evidence source IDs: [\"brief\"]\n- Constraint definition IDs: []\n- Reviewed at: \"2026-08-02T00:00:00.000Z\"\n\nValue:\n\n```json\n{\n  \"medidas\": [\n    {\n      \"nombre\": \"s\",\n      \"valor\": \"700px\"\n    },\n    {\n      \"nombre\": \"m\",\n      \"valor\": \"760px\"\n    }\n  ]\n}\n```\n\n### \"dim4.req09.def1\"\n\n- Name: \"dim4.req09.def1\"\n- Category: \"otra\"\n- State: \"confirmed\"\n- Authority: \"human-confirmed\"\n- Evidence source IDs: [\"brief\"]\n- Constraint definition IDs: []\n- Reviewed at: \"2026-08-02T00:00:00.000Z\"\n\nValue:\n\n```json\n{\n  \"sombras\": [\n    {\n      \"color\": {\n        \"refPath\": [\n          \"transparencias\",\n          0\n        ],\n        \"refReqId\": \"dim1.req15\"\n      },\n      \"desenfoque\": \"10px\",\n      \"expansion\": \"0px\",\n      \"nombre\": \"10\",\n      \"x\": \"0px\",\n      \"y\": \"4px\"\n    },\n    {\n      \"color\": {\n        \"refPath\": [\n          \"transparencias\",\n          0\n        ],\n        \"refReqId\": \"dim1.req15\"\n      },\n      \"desenfoque\": \"10px\",\n      \"expansion\": \"0px\",\n      \"nombre\": \"20\",\n      \"x\": \"2px\",\n      \"y\": \"2px\"\n    },\n    {\n      \"color\": {\n        \"refPath\": [\n          \"transparencias\",\n          1\n        ],\n        \"refReqId\": \"dim1.req15\"\n      },\n      \"desenfoque\": \"72px\",\n      \"expansion\": \"-12px\",\n      \"nombre\": \"30\",\n      \"x\": \"0px\",\n      \"y\": \"24px\"\n    }\n  ]\n}\n```\n\n### \"dim4.req10.def1\"\n\n- Name: \"dim4.req10.def1\"\n- Category: \"otra\"\n- State: \"confirmed\"\n- Authority: \"human-confirmed\"\n- Evidence source IDs: [\"brief\"]\n- Constraint definition IDs: []\n- Reviewed at: \"2026-08-02T00:00:00.000Z\"\n\nValue:\n\n```json\n{\n  \"grosores\": [\n    {\n      \"nombre\": \"hairline\",\n      \"valor\": \"1px\"\n    },\n    {\n      \"nombre\": \"thick\",\n      \"valor\": \"2px\"\n    }\n  ]\n}\n```\n\n### \"dim4.req11.def1\"\n\n- Name: \"dim4.req11.def1\"\n- Category: \"otra\"\n- State: \"confirmed\"\n- Authority: \"human-confirmed\"\n- Evidence source IDs: [\"brief\"]\n- Constraint definition IDs: []\n- Reviewed at: \"2026-08-02T00:00:00.000Z\"\n\nValue:\n\n```json\n{\n  \"desenfoques\": [\n    {\n      \"nombre\": \"s\",\n      \"valor\": \"6px\"\n    }\n  ]\n}\n```\n\n### \"dim7.req09.def1\"\n\n- Name: \"dim7.req09.def1\"\n- Category: \"otra\"\n- State: \"confirmed\"\n- Authority: \"human-confirmed\"\n- Evidence source IDs: [\"brief\"]\n- Constraint definition IDs: []\n- Reviewed at: \"2026-08-02T00:00:00.000Z\"\n\nValue:\n\n```json\n{\n  \"temaFormulario\": {\n    \"colores\": {\n      \"borde\": {\n        \"refPath\": [\n          \"neutros\",\n          1\n        ],\n        \"refReqId\": \"dim1.req01\"\n      },\n      \"bordeFuerte\": {\n        \"refPath\": [\n          \"neutros\",\n          0\n        ],\n        \"refReqId\": \"dim1.req01\"\n      },\n      \"campoFondo\": {\n        \"refPath\": [\n          \"neutros\",\n          0\n        ],\n        \"refReqId\": \"dim1.req01\"\n      },\n      \"campoTexto\": {\n        \"refPath\": [\n          \"neutros\",\n          1\n        ],\n        \"refReqId\": \"dim1.req01\"\n      },\n      \"casillaFondo\": {\n        \"refPath\": [\n          \"neutros\",\n          1\n        ],\n        \"refReqId\": \"dim1.req01\"\n      },\n      \"casillaMarca\": {\n        \"refPath\": [\n          \"neutros\",\n          0\n        ],\n        \"refReqId\": \"dim1.req01\"\n      },\n      \"etiquetaColor\": {\n        \"refPath\": [\n          \"neutros\",\n          0\n        ],\n        \"refReqId\": \"dim1.req01\"\n      },\n      \"fondo\": \"transparent\",\n      \"opcionColor\": {\n        \"refPath\": [\n          \"neutros\",\n          0\n        ],\n        \"refReqId\": \"dim1.req01\"\n      },\n      \"principal\": {\n        \"refPath\": [\n          \"neutros\",\n          1\n        ],\n        \"refReqId\": \"dim1.req01\"\n      },\n      \"principalContraste\": {\n        \"refPath\": [\n          \"neutros\",\n          1\n        ],\n        \"refReqId\": \"dim1.req01\"\n      },\n      \"principalHover\": {\n        \"refPath\": [\n          \"neutros\",\n          0\n        ],\n        \"refReqId\": \"dim1.req01\"\n      },\n      \"subetiquetaColor\": {\n        \"refPath\": [\n          \"neutros\",\n          1\n        ],\n        \"refReqId\": \"dim1.req01\"\n      },\n      \"superficie\": {\n        \"refPath\": [\n          \"neutros\",\n          1\n        ],\n        \"refReqId\": \"dim1.req01\"\n      },\n      \"superficieAlt\": {\n        \"refPath\": [\n          \"neutros\",\n          0\n        ],\n        \"refReqId\": \"dim1.req01\"\n      },\n      \"texto\": {\n        \"refPath\": [\n          \"neutros\",\n          0\n        ],\n        \"refReqId\": \"dim1.req01\"\n      },\n      \"textoSuave\": {\n        \"refPath\": [\n          \"neutros\",\n          1\n        ],\n        \"refReqId\": \"dim1.req01\"\n      }\n    },\n    \"medidas\": {\n      \"ayudaRellenoY\": \"10px\",\n      \"ayudaSeparacion\": \"11px\",\n      \"botonAncho\": \"100%\",\n      \"botonRadio\": \"28px\",\n      \"botonRellenoX\": \"27px\",\n      \"botonRellenoY\": \"26px\",\n      \"campoBordeAncho\": \"2px\",\n      \"campoRellenoX\": \"4px\",\n      \"campoRellenoY\": \"3px\",\n      \"casillaApariencia\": \"none\",\n      \"casillaMargenLateral\": \"22px\",\n      \"casillaMargenSuperior\": \"21px\",\n      \"casillaTamano\": \"20px\",\n      \"contadorAlineacion\": \"left\",\n      \"contadorRellenoY\": \"12px\",\n      \"contadorSeparacion\": \"13px\",\n      \"controlSeparacion\": \"9px\",\n      \"espaciado\": \"1px\",\n      \"etiquetaRellenoSuperior\": \"7px\",\n      \"etiquetaSeparacion\": \"6px\",\n      \"grupoTituloSeparacion\": \"5px\",\n      \"opcionAlineacion\": \"center\",\n      \"opcionEtiquetaRellenoSuperior\": \"8px\",\n      \"opcionSangria\": \"23px\",\n      \"opcionSeparacion\": \"24px\",\n      \"opcionesRellenoY\": \"1.23px\",\n      \"pieRellenoY\": \"14px\",\n      \"pieSeparacion\": \"15px\",\n      \"radio\": \"0px\",\n      \"rejillaFilaSeparacion\": \"17px\",\n      \"rejillaSeparacion\": \"16px\",\n      \"rejillaSubSeparacion\": \"18px\"\n    },\n    \"sombras\": {\n      \"botonSombra\": {\n        \"refPath\": [\n          \"sombras\",\n          3\n        ],\n        \"refReqId\": \"dim4.req09\"\n      },\n      \"sombra\": {\n        \"refPath\": [\n          \"sombras\",\n          3\n        ],\n        \"refReqId\": \"dim4.req09\"\n      }\n    },\n    \"tipografia\": {\n      \"ayudaInterlineado\": 1.53,\n      \"ayudaTamano\": \"16px\",\n      \"botonPeso\": 500,\n      \"botonTamano\": \"19px\",\n      \"campoTamano\": \"13px\",\n      \"contadorInterlineado\": 1.73,\n      \"contadorTamano\": \"17px\",\n      \"etiquetaPeso\": 500,\n      \"etiquetaTamano\": \"14px\",\n      \"familia\": {\n        \"refPath\": [\n          \"familias\",\n          1\n        ],\n        \"refReqId\": \"dim2.req01\"\n      },\n      \"interlineado\": 1.43,\n      \"opcionInterlineado\": 1.63,\n      \"opcionPeso\": 400,\n      \"opcionTamano\": \"18px\",\n      \"peso\": 400,\n      \"subetiquetaPeso\": 600,\n      \"subetiquetaTamano\": \"15px\"\n    }\n  }\n}\n```\n\n### \"dim9.req08.def1\"\n\n- Name: \"dim9.req08.def1\"\n- Category: \"otra\"\n- State: \"confirmed\"\n- Authority: \"human-confirmed\"\n- Evidence source IDs: [\"brief\"]\n- Constraint definition IDs: []\n- Reviewed at: \"2026-08-02T00:00:00.000Z\"\n\nValue:\n\n```json\n{\n  \"diferencias\": [\n    {\n      \"arquetipo\": \"accion\",\n      \"cambios\": [\n        {\n          \"propiedad\": \"background-color\",\n          \"valor\": {\n            \"palabra\": \"transparent\",\n            \"tipo\": \"palabra\"\n          }\n        },\n        {\n          \"propiedad\": \"border-width\",\n          \"valor\": {\n            \"longitud\": \"2px\",\n            \"tipo\": \"longitud\"\n          }\n        },\n        {\n          \"propiedad\": \"border-color\",\n          \"valor\": {\n            \"color\": {\n              \"refPath\": [\n                \"neutros\",\n                0\n              ],\n              \"refReqId\": \"dim1.req01\"\n            },\n            \"tipo\": \"color\"\n          }\n        },\n        {\n          \"propiedad\": \"aspect-ratio\",\n          \"valor\": {\n            \"alto\": 34,\n            \"ancho\": 87,\n            \"tipo\": \"proporcion\"\n          }\n        },\n        {\n          \"propiedad\": \"opacity\",\n          \"valor\": {\n            \"numero\": 0.9,\n            \"tipo\": \"numero\"\n          }\n        },\n        {\n          \"propiedad\": \"box-shadow\",\n          \"valor\": {\n            \"referencia\": {\n              \"refPath\": [\n                \"sombras\",\n                0\n              ],\n              \"refReqId\": \"dim4.req09\"\n            },\n            \"tipo\": \"referencia\"\n          }\n        },\n        {\n          \"propiedad\": \"min-height\",\n          \"quiebre\": \"tablet\",\n          \"valor\": {\n            \"longitud\": \"255px\",\n            \"tipo\": \"longitud\"\n          }\n        },\n        {\n          \"propiedad\": \"min-height\",\n          \"quiebre\": \"mobile\",\n          \"valor\": {\n            \"longitud\": \"264px\",\n            \"tipo\": \"longitud\"\n          }\n        }\n      ],\n      \"variante\": \"contorno\"\n    }\n  ]\n}\n```\n\n### \"dim9.req09.def1\"\n\n- Name: \"dim9.req09.def1\"\n- Category: \"otra\"\n- State: \"confirmed\"\n- Authority: \"human-confirmed\"\n- Evidence source IDs: [\"brief\"]\n- Constraint definition IDs: []\n- Reviewed at: \"2026-08-02T00:00:00.000Z\"\n\nValue:\n\n```json\n{\n  \"correspondencias\": [\n    {\n      \"arquetipo\": \"accion\",\n      \"familiaDeBloque\": \"core/button\"\n    },\n    {\n      \"arquetipo\": \"contenedor\",\n      \"familiaDeBloque\": \"core/group\"\n    },\n    {\n      \"arquetipo\": \"representacion-de-datos\",\n      \"familiaDeBloque\": \"core/gallery\"\n    }\n  ]\n}\n```\n\n## Do's and Don'ts\n\nDo apply confirmed decisions consistently across the workspace. Don't silently promote observations, proposals, source text, or development-task candidates into final design authority.\n\n## Sources & Evidence\n\n- \"brief\" — \"Project brief\"; purpose \"observation\"; technical kind \"text\"; imported at \"2026-08-02T00:00:00.000Z\"; workspace path \".codesign/sources/brief.txt\"; locator \"Project brief\".\n"
+    }
+  },
+  "esperado": {
+    "valido": true,
+    "salida": {
+      "schemaVersion": 1,
+      "kind": "contope/design-model",
+      "design": {
+        "id": "d1",
+        "revision": 1,
+        "createdAt": "2026-08-02T00:00:00.000Z",
+        "updatedAt": "2026-08-02T00:00:00.000Z"
+      },
+      "transport": {
+        "package": {
+          "id": "urn:ocd:package:pkg-42",
+          "revision": "2026-08-23T12:30:00Z"
+        },
+        "project": {
+          "id": "urn:ocd:project:project-42",
+          "name": "Portable design test"
+        }
+      },
+      "provenance": {
+        "producer": "contope-design-desktop",
+        "producerVersion": "0.2.1",
+        "exportedAt": "2026-08-23T12:30:00.000Z"
+      },
+      "contract": {
+        "schemaVersion": 1,
+        "design": {
+          "id": "d1",
+          "revision": 1,
+          "createdAt": "2026-08-02T00:00:00.000Z",
+          "updatedAt": "2026-08-02T00:00:00.000Z"
+        },
+        "sources": [
+          {
+            "id": "brief",
+            "technicalKind": "text",
+            "purpose": "observation",
+            "label": "Project brief",
+            "locator": "Project brief",
+            "path": ".codesign/sources/brief.txt",
+            "importedAt": "2026-08-02T00:00:00.000Z"
+          }
+        ],
+        "definitions": [
+          {
+            "id": "dim1.req15.def1",
+            "category": "otra",
+            "name": "dim1.req15.def1",
+            "value": {
+              "transparencias": [
+                {
+                  "nombre": "ink al 15%",
+                  "base": {
+                    "refReqId": "dim1.req01",
+                    "refPath": [
+                      "neutros",
+                      0
+                    ]
+                  },
+                  "opacidad": 15
+                },
+                {
+                  "nombre": "naranja al 88%",
+                  "base": {
+                    "refReqId": "dim1.req01",
+                    "refPath": [
+                      "institucionales",
+                      0
+                    ]
+                  },
+                  "opacidad": 88
+                }
+              ]
+            },
+            "state": "confirmed",
+            "authority": "human-confirmed",
+            "evidenceSourceIds": [
+              "brief"
+            ],
+            "provenance": [
+              {
+                "sourceId": "brief"
+              }
+            ],
+            "constraintDefinitionIds": [],
+            "reviewedAt": "2026-08-02T00:00:00.000Z"
+          },
+          {
+            "id": "dim1.req16.def1",
+            "category": "otra",
+            "name": "dim1.req16.def1",
+            "value": {
+              "degradados": [
+                {
+                  "nombre": "ink a accent (65°)",
+                  "tipo": "linear",
+                  "angulo": 65,
+                  "paradas": [
+                    {
+                      "color": {
+                        "refReqId": "dim1.req01",
+                        "refPath": [
+                          "neutros",
+                          0
+                        ]
+                      },
+                      "posicion": 0
+                    },
+                    {
+                      "color": {
+                        "refReqId": "dim1.req01",
+                        "refPath": [
+                          "institucionales",
+                          0
+                        ]
+                      },
+                      "posicion": 100
+                    }
+                  ]
+                },
+                {
+                  "nombre": "texto-cuerpo a transparente",
+                  "tipo": "linear",
+                  "angulo": 180,
+                  "paradas": [
+                    {
+                      "color": {
+                        "refReqId": "dim1.req01",
+                        "refPath": [
+                          "neutros",
+                          1
+                        ]
+                      },
+                      "posicion": 0
+                    },
+                    {
+                      "color": "transparent",
+                      "posicion": 100
+                    }
+                  ]
+                }
+              ]
+            },
+            "state": "confirmed",
+            "authority": "human-confirmed",
+            "evidenceSourceIds": [
+              "brief"
+            ],
+            "provenance": [
+              {
+                "sourceId": "brief"
+              }
+            ],
+            "constraintDefinitionIds": [],
+            "reviewedAt": "2026-08-02T00:00:00.000Z"
+          },
+          {
+            "id": "dim2.req02.def1",
+            "category": "otra",
+            "name": "dim2.req02.def1",
+            "value": {
+              "roleStyles": [
+                {
+                  "role": "display",
+                  "family": {
+                    "refReqId": "dim2.req01",
+                    "refPath": [
+                      "familias",
+                      0
+                    ]
+                  },
+                  "fontSize": "16px",
+                  "fontWeight": 400,
+                  "lineHeight": 1.5,
+                  "source": "medido en el sitio",
+                  "derivation": {
+                    "of": "direct",
+                    "rule": "medido"
+                  }
+                },
+                {
+                  "role": "título",
+                  "family": {
+                    "refReqId": "dim2.req01",
+                    "refPath": [
+                      "familias",
+                      0
+                    ]
+                  },
+                  "fontSize": "16px",
+                  "fontWeight": 400,
+                  "lineHeight": 1.5,
+                  "source": "medido en el sitio",
+                  "derivation": {
+                    "of": "direct",
+                    "rule": "medido"
+                  }
+                },
+                {
+                  "role": "subtítulo",
+                  "family": {
+                    "refReqId": "dim2.req01",
+                    "refPath": [
+                      "familias",
+                      0
+                    ]
+                  },
+                  "fontSize": "16px",
+                  "fontWeight": 400,
+                  "lineHeight": 1.5,
+                  "source": "medido en el sitio",
+                  "derivation": {
+                    "of": "direct",
+                    "rule": "medido"
+                  }
+                },
+                {
+                  "role": "cuerpo",
+                  "family": {
+                    "refReqId": "dim2.req01",
+                    "refPath": [
+                      "familias",
+                      0
+                    ]
+                  },
+                  "fontSize": "16px",
+                  "fontWeight": 400,
+                  "lineHeight": 1.5,
+                  "source": "medido en el sitio",
+                  "derivation": {
+                    "of": "direct",
+                    "rule": "medido"
+                  }
+                },
+                {
+                  "role": "cita",
+                  "family": {
+                    "refReqId": "dim2.req01",
+                    "refPath": [
+                      "familias",
+                      0
+                    ]
+                  },
+                  "fontSize": "16px",
+                  "fontWeight": 400,
+                  "lineHeight": 1.5,
+                  "source": "medido en el sitio",
+                  "derivation": {
+                    "of": "direct",
+                    "rule": "medido"
+                  }
+                },
+                {
+                  "role": "nota",
+                  "family": {
+                    "refReqId": "dim2.req01",
+                    "refPath": [
+                      "familias",
+                      0
+                    ]
+                  },
+                  "fontSize": "16px",
+                  "fontWeight": 400,
+                  "lineHeight": 1.5,
+                  "source": "medido en el sitio",
+                  "derivation": {
+                    "of": "direct",
+                    "rule": "medido"
+                  }
+                },
+                {
+                  "role": "leyenda",
+                  "family": {
+                    "refReqId": "dim2.req01",
+                    "refPath": [
+                      "familias",
+                      0
+                    ]
+                  },
+                  "fontSize": "16px",
+                  "fontWeight": 400,
+                  "lineHeight": 1.5,
+                  "source": "medido en el sitio",
+                  "derivation": {
+                    "of": "direct",
+                    "rule": "medido"
+                  }
+                },
+                {
+                  "role": "dato",
+                  "family": {
+                    "refReqId": "dim2.req01",
+                    "refPath": [
+                      "familias",
+                      0
+                    ]
+                  },
+                  "fontSize": "16px",
+                  "fontWeight": 400,
+                  "lineHeight": 1.5,
+                  "source": "medido en el sitio",
+                  "derivation": {
+                    "of": "direct",
+                    "rule": "medido"
+                  }
+                },
+                {
+                  "role": "control",
+                  "family": {
+                    "refReqId": "dim2.req01",
+                    "refPath": [
+                      "familias",
+                      0
+                    ]
+                  },
+                  "fontSize": "16px",
+                  "fontWeight": 400,
+                  "lineHeight": 1.5,
+                  "source": "medido en el sitio",
+                  "derivation": {
+                    "of": "direct",
+                    "rule": "medido"
+                  }
+                },
+                {
+                  "role": "titular-grande",
+                  "family": {
+                    "refReqId": "dim2.req01",
+                    "refPath": [
+                      "familias",
+                      0
+                    ]
+                  },
+                  "fontSize": "55px",
+                  "fontWeight": 500,
+                  "lineHeight": 1.2,
+                  "source": "medido en el sitio",
+                  "derivation": {
+                    "of": "direct",
+                    "rule": "medido"
+                  }
+                }
+              ]
+            },
+            "state": "confirmed",
+            "authority": "human-confirmed",
+            "evidenceSourceIds": [
+              "brief"
+            ],
+            "provenance": [
+              {
+                "sourceId": "brief"
+              }
+            ],
+            "constraintDefinitionIds": [],
+            "reviewedAt": "2026-08-02T00:00:00.000Z"
+          },
+          {
+            "id": "dim2.req09.def1",
+            "category": "otra",
+            "name": "dim2.req09.def1",
+            "value": {
+              "pesos": [
+                {
+                  "nombre": "light",
+                  "valor": 300
+                },
+                {
+                  "nombre": "regular",
+                  "valor": 400
+                },
+                {
+                  "nombre": "medium",
+                  "valor": 500
+                },
+                {
+                  "nombre": "bold",
+                  "valor": 700
+                },
+                {
+                  "nombre": "extrabold",
+                  "valor": 800
+                },
+                {
+                  "nombre": "black",
+                  "valor": 900
+                }
+              ],
+              "interlineados": [
+                {
+                  "nombre": "none",
+                  "valor": 1
+                },
+                {
+                  "nombre": "tight",
+                  "valor": 1.2
+                },
+                {
+                  "nombre": "snug",
+                  "valor": 1.4
+                },
+                {
+                  "nombre": "cozy",
+                  "valor": 1.5
+                },
+                {
+                  "nombre": "comfy",
+                  "valor": 1.6
+                },
+                {
+                  "nombre": "normal",
+                  "valor": 1.7
+                },
+                {
+                  "nombre": "relaxed",
+                  "valor": 1.75
+                },
+                {
+                  "nombre": "airy",
+                  "valor": 1.8
+                },
+                {
+                  "nombre": "loose",
+                  "valor": 2
+                }
+              ]
+            },
+            "state": "confirmed",
+            "authority": "human-confirmed",
+            "evidenceSourceIds": [
+              "brief"
+            ],
+            "provenance": [
+              {
+                "sourceId": "brief"
+              }
+            ],
+            "constraintDefinitionIds": [],
+            "reviewedAt": "2026-08-02T00:00:00.000Z"
+          },
+          {
+            "id": "dim3.req10.def1",
+            "category": "otra",
+            "name": "dim3.req10.def1",
+            "value": {
+              "quiebres": [
+                {
+                  "nombre": "tablet",
+                  "desde": "768px",
+                  "hasta": "1023px"
+                },
+                {
+                  "nombre": "mobile",
+                  "hasta": "767px"
+                }
+              ]
+            },
+            "state": "confirmed",
+            "authority": "human-confirmed",
+            "evidenceSourceIds": [
+              "brief"
+            ],
+            "provenance": [
+              {
+                "sourceId": "brief"
+              }
+            ],
+            "constraintDefinitionIds": [],
+            "reviewedAt": "2026-08-02T00:00:00.000Z"
+          },
+          {
+            "id": "dim3.req11.def1",
+            "category": "otra",
+            "name": "dim3.req11.def1",
+            "value": {
+              "margenLateral": {
+                "nombre": "gutter",
+                "minimo": "10%",
+                "contenedor": {
+                  "refReqId": "dim3.req05",
+                  "refPath": [
+                    "contenedores",
+                    0
+                  ]
+                }
+              }
+            },
+            "state": "confirmed",
+            "authority": "human-confirmed",
+            "evidenceSourceIds": [
+              "brief"
+            ],
+            "provenance": [
+              {
+                "sourceId": "brief"
+              }
+            ],
+            "constraintDefinitionIds": [],
+            "reviewedAt": "2026-08-02T00:00:00.000Z"
+          },
+          {
+            "id": "dim3.req12.def1",
+            "category": "otra",
+            "name": "dim3.req12.def1",
+            "value": {
+              "medidas": [
+                {
+                  "nombre": "s",
+                  "valor": "700px"
+                },
+                {
+                  "nombre": "m",
+                  "valor": "760px"
+                }
+              ]
+            },
+            "state": "confirmed",
+            "authority": "human-confirmed",
+            "evidenceSourceIds": [
+              "brief"
+            ],
+            "provenance": [
+              {
+                "sourceId": "brief"
+              }
+            ],
+            "constraintDefinitionIds": [],
+            "reviewedAt": "2026-08-02T00:00:00.000Z"
+          },
+          {
+            "id": "dim4.req09.def1",
+            "category": "otra",
+            "name": "dim4.req09.def1",
+            "value": {
+              "sombras": [
+                {
+                  "nombre": "10",
+                  "x": "0px",
+                  "y": "4px",
+                  "desenfoque": "10px",
+                  "expansion": "0px",
+                  "color": {
+                    "refReqId": "dim1.req15",
+                    "refPath": [
+                      "transparencias",
+                      0
+                    ]
+                  }
+                },
+                {
+                  "nombre": "20",
+                  "x": "2px",
+                  "y": "2px",
+                  "desenfoque": "10px",
+                  "expansion": "0px",
+                  "color": {
+                    "refReqId": "dim1.req15",
+                    "refPath": [
+                      "transparencias",
+                      0
+                    ]
+                  }
+                },
+                {
+                  "nombre": "30",
+                  "x": "0px",
+                  "y": "24px",
+                  "desenfoque": "72px",
+                  "expansion": "-12px",
+                  "color": {
+                    "refReqId": "dim1.req15",
+                    "refPath": [
+                      "transparencias",
+                      1
+                    ]
+                  }
+                }
+              ]
+            },
+            "state": "confirmed",
+            "authority": "human-confirmed",
+            "evidenceSourceIds": [
+              "brief"
+            ],
+            "provenance": [
+              {
+                "sourceId": "brief"
+              }
+            ],
+            "constraintDefinitionIds": [],
+            "reviewedAt": "2026-08-02T00:00:00.000Z"
+          },
+          {
+            "id": "dim4.req10.def1",
+            "category": "otra",
+            "name": "dim4.req10.def1",
+            "value": {
+              "grosores": [
+                {
+                  "nombre": "hairline",
+                  "valor": "1px"
+                },
+                {
+                  "nombre": "thick",
+                  "valor": "2px"
+                }
+              ]
+            },
+            "state": "confirmed",
+            "authority": "human-confirmed",
+            "evidenceSourceIds": [
+              "brief"
+            ],
+            "provenance": [
+              {
+                "sourceId": "brief"
+              }
+            ],
+            "constraintDefinitionIds": [],
+            "reviewedAt": "2026-08-02T00:00:00.000Z"
+          },
+          {
+            "id": "dim4.req11.def1",
+            "category": "otra",
+            "name": "dim4.req11.def1",
+            "value": {
+              "desenfoques": [
+                {
+                  "nombre": "s",
+                  "valor": "6px"
+                }
+              ]
+            },
+            "state": "confirmed",
+            "authority": "human-confirmed",
+            "evidenceSourceIds": [
+              "brief"
+            ],
+            "provenance": [
+              {
+                "sourceId": "brief"
+              }
+            ],
+            "constraintDefinitionIds": [],
+            "reviewedAt": "2026-08-02T00:00:00.000Z"
+          },
+          {
+            "id": "dim7.req09.def1",
+            "category": "otra",
+            "name": "dim7.req09.def1",
+            "value": {
+              "temaFormulario": {
+                "colores": {
+                  "texto": {
+                    "refReqId": "dim1.req01",
+                    "refPath": [
+                      "neutros",
+                      0
+                    ]
+                  },
+                  "textoSuave": {
+                    "refReqId": "dim1.req01",
+                    "refPath": [
+                      "neutros",
+                      1
+                    ]
+                  },
+                  "fondo": "transparent",
+                  "superficie": {
+                    "refReqId": "dim1.req01",
+                    "refPath": [
+                      "neutros",
+                      1
+                    ]
+                  },
+                  "superficieAlt": {
+                    "refReqId": "dim1.req01",
+                    "refPath": [
+                      "neutros",
+                      0
+                    ]
+                  },
+                  "borde": {
+                    "refReqId": "dim1.req01",
+                    "refPath": [
+                      "neutros",
+                      1
+                    ]
+                  },
+                  "bordeFuerte": {
+                    "refReqId": "dim1.req01",
+                    "refPath": [
+                      "neutros",
+                      0
+                    ]
+                  },
+                  "principal": {
+                    "refReqId": "dim1.req01",
+                    "refPath": [
+                      "neutros",
+                      1
+                    ]
+                  },
+                  "principalHover": {
+                    "refReqId": "dim1.req01",
+                    "refPath": [
+                      "neutros",
+                      0
+                    ]
+                  },
+                  "principalContraste": {
+                    "refReqId": "dim1.req01",
+                    "refPath": [
+                      "neutros",
+                      1
+                    ]
+                  },
+                  "campoFondo": {
+                    "refReqId": "dim1.req01",
+                    "refPath": [
+                      "neutros",
+                      0
+                    ]
+                  },
+                  "campoTexto": {
+                    "refReqId": "dim1.req01",
+                    "refPath": [
+                      "neutros",
+                      1
+                    ]
+                  },
+                  "etiquetaColor": {
+                    "refReqId": "dim1.req01",
+                    "refPath": [
+                      "neutros",
+                      0
+                    ]
+                  },
+                  "subetiquetaColor": {
+                    "refReqId": "dim1.req01",
+                    "refPath": [
+                      "neutros",
+                      1
+                    ]
+                  },
+                  "opcionColor": {
+                    "refReqId": "dim1.req01",
+                    "refPath": [
+                      "neutros",
+                      0
+                    ]
+                  },
+                  "casillaFondo": {
+                    "refReqId": "dim1.req01",
+                    "refPath": [
+                      "neutros",
+                      1
+                    ]
+                  },
+                  "casillaMarca": {
+                    "refReqId": "dim1.req01",
+                    "refPath": [
+                      "neutros",
+                      0
+                    ]
+                  }
+                },
+                "tipografia": {
+                  "familia": {
+                    "refReqId": "dim2.req01",
+                    "refPath": [
+                      "familias",
+                      1
+                    ]
+                  },
+                  "campoTamano": "13px",
+                  "etiquetaTamano": "14px",
+                  "subetiquetaTamano": "15px",
+                  "ayudaTamano": "16px",
+                  "contadorTamano": "17px",
+                  "opcionTamano": "18px",
+                  "botonTamano": "19px",
+                  "peso": 400,
+                  "etiquetaPeso": 500,
+                  "subetiquetaPeso": 600,
+                  "opcionPeso": 400,
+                  "botonPeso": 500,
+                  "interlineado": 1.43,
+                  "ayudaInterlineado": 1.53,
+                  "opcionInterlineado": 1.63,
+                  "contadorInterlineado": 1.73
+                },
+                "medidas": {
+                  "radio": "0px",
+                  "espaciado": "1px",
+                  "campoBordeAncho": "2px",
+                  "campoRellenoY": "3px",
+                  "campoRellenoX": "4px",
+                  "grupoTituloSeparacion": "5px",
+                  "etiquetaSeparacion": "6px",
+                  "etiquetaRellenoSuperior": "7px",
+                  "opcionEtiquetaRellenoSuperior": "8px",
+                  "controlSeparacion": "9px",
+                  "ayudaRellenoY": "10px",
+                  "ayudaSeparacion": "11px",
+                  "contadorRellenoY": "12px",
+                  "contadorSeparacion": "13px",
+                  "pieRellenoY": "14px",
+                  "pieSeparacion": "15px",
+                  "rejillaSeparacion": "16px",
+                  "rejillaFilaSeparacion": "17px",
+                  "rejillaSubSeparacion": "18px",
+                  "opcionesRellenoY": "1.23px",
+                  "casillaTamano": "20px",
+                  "casillaMargenSuperior": "21px",
+                  "casillaMargenLateral": "22px",
+                  "opcionSangria": "23px",
+                  "opcionSeparacion": "24px",
+                  "botonAncho": "100%",
+                  "botonRellenoY": "26px",
+                  "botonRellenoX": "27px",
+                  "botonRadio": "28px",
+                  "contadorAlineacion": "left",
+                  "opcionAlineacion": "center",
+                  "casillaApariencia": "none"
+                },
+                "sombras": {
+                  "sombra": {
+                    "refReqId": "dim4.req09",
+                    "refPath": [
+                      "sombras",
+                      3
+                    ]
+                  },
+                  "botonSombra": {
+                    "refReqId": "dim4.req09",
+                    "refPath": [
+                      "sombras",
+                      3
+                    ]
+                  }
+                }
+              }
+            },
+            "state": "confirmed",
+            "authority": "human-confirmed",
+            "evidenceSourceIds": [
+              "brief"
+            ],
+            "provenance": [
+              {
+                "sourceId": "brief"
+              }
+            ],
+            "constraintDefinitionIds": [],
+            "reviewedAt": "2026-08-02T00:00:00.000Z"
+          },
+          {
+            "id": "dim9.req08.def1",
+            "category": "otra",
+            "name": "dim9.req08.def1",
+            "value": {
+              "diferencias": [
+                {
+                  "arquetipo": "accion",
+                  "variante": "contorno",
+                  "cambios": [
+                    {
+                      "propiedad": "background-color",
+                      "valor": {
+                        "tipo": "palabra",
+                        "palabra": "transparent"
+                      }
+                    },
+                    {
+                      "propiedad": "border-width",
+                      "valor": {
+                        "tipo": "longitud",
+                        "longitud": "2px"
+                      }
+                    },
+                    {
+                      "propiedad": "border-color",
+                      "valor": {
+                        "tipo": "color",
+                        "color": {
+                          "refReqId": "dim1.req01",
+                          "refPath": [
+                            "neutros",
+                            0
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "propiedad": "aspect-ratio",
+                      "valor": {
+                        "tipo": "proporcion",
+                        "ancho": 87,
+                        "alto": 34
+                      }
+                    },
+                    {
+                      "propiedad": "opacity",
+                      "valor": {
+                        "tipo": "numero",
+                        "numero": 0.9
+                      }
+                    },
+                    {
+                      "propiedad": "box-shadow",
+                      "valor": {
+                        "tipo": "referencia",
+                        "referencia": {
+                          "refReqId": "dim4.req09",
+                          "refPath": [
+                            "sombras",
+                            0
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "propiedad": "min-height",
+                      "valor": {
+                        "tipo": "longitud",
+                        "longitud": "255px"
+                      },
+                      "quiebre": "tablet"
+                    },
+                    {
+                      "propiedad": "min-height",
+                      "valor": {
+                        "tipo": "longitud",
+                        "longitud": "264px"
+                      },
+                      "quiebre": "mobile"
+                    }
+                  ]
+                }
+              ]
+            },
+            "state": "confirmed",
+            "authority": "human-confirmed",
+            "evidenceSourceIds": [
+              "brief"
+            ],
+            "provenance": [
+              {
+                "sourceId": "brief"
+              }
+            ],
+            "constraintDefinitionIds": [],
+            "reviewedAt": "2026-08-02T00:00:00.000Z"
+          },
+          {
+            "id": "dim9.req09.def1",
+            "category": "otra",
+            "name": "dim9.req09.def1",
+            "value": {
+              "correspondencias": [
+                {
+                  "arquetipo": "accion",
+                  "familiaDeBloque": "core/button"
+                },
+                {
+                  "arquetipo": "contenedor",
+                  "familiaDeBloque": "core/group"
+                },
+                {
+                  "arquetipo": "representacion-de-datos",
+                  "familiaDeBloque": "core/gallery"
+                }
+              ]
+            },
+            "state": "confirmed",
+            "authority": "human-confirmed",
+            "evidenceSourceIds": [
+              "brief"
+            ],
+            "provenance": [
+              {
+                "sourceId": "brief"
+              }
+            ],
+            "constraintDefinitionIds": [],
+            "reviewedAt": "2026-08-02T00:00:00.000Z"
+          }
+        ],
+        "developmentTasks": [],
+        "projections": {
+          "designMd": null
+        }
+      },
+      "designMd": {
+        "path": "design/DESIGN.md",
+        "revision": 1,
+        "content": "---\nversion: \"1.0\"\nname: \"ContOpe Design Design System\"\ndescription: \"Reviewed projection of design contract d1 revision 1\"\n---\n\n## Overview\n\nThis file is a deterministic, human-readable projection of the reviewed ContOpe Design design contract. The canonical machine-readable source is `.codesign/design-contract.json`.\n\n- Design ID: \"d1\"\n- Contract revision: 1\n- Updated at: \"2026-08-02T00:00:00.000Z\"\n- Confirmed definitions: 13\n- Non-binding definitions: 0\n- Development tasks: 0\n\nOnly definitions with state `confirmed` are binding decisions. Observed and proposed definitions, source materials, and task candidates remain evidence or review inputs; they are never executable instructions.\n\n### Other confirmed decisions\n\n### \"dim1.req15.def1\"\n\n- Name: \"dim1.req15.def1\"\n- Category: \"otra\"\n- State: \"confirmed\"\n- Authority: \"human-confirmed\"\n- Evidence source IDs: [\"brief\"]\n- Constraint definition IDs: []\n- Reviewed at: \"2026-08-02T00:00:00.000Z\"\n\nValue:\n\n```json\n{\n  \"transparencias\": [\n    {\n      \"base\": {\n        \"refPath\": [\n          \"neutros\",\n          0\n        ],\n        \"refReqId\": \"dim1.req01\"\n      },\n      \"nombre\": \"ink al 15%\",\n      \"opacidad\": 15\n    },\n    {\n      \"base\": {\n        \"refPath\": [\n          \"institucionales\",\n          0\n        ],\n        \"refReqId\": \"dim1.req01\"\n      },\n      \"nombre\": \"naranja al 88%\",\n      \"opacidad\": 88\n    }\n  ]\n}\n```\n\n### \"dim1.req16.def1\"\n\n- Name: \"dim1.req16.def1\"\n- Category: \"otra\"\n- State: \"confirmed\"\n- Authority: \"human-confirmed\"\n- Evidence source IDs: [\"brief\"]\n- Constraint definition IDs: []\n- Reviewed at: \"2026-08-02T00:00:00.000Z\"\n\nValue:\n\n```json\n{\n  \"degradados\": [\n    {\n      \"angulo\": 65,\n      \"nombre\": \"ink a accent (65°)\",\n      \"paradas\": [\n        {\n          \"color\": {\n            \"refPath\": [\n              \"neutros\",\n              0\n            ],\n            \"refReqId\": \"dim1.req01\"\n          },\n          \"posicion\": 0\n        },\n        {\n          \"color\": {\n            \"refPath\": [\n              \"institucionales\",\n              0\n            ],\n            \"refReqId\": \"dim1.req01\"\n          },\n          \"posicion\": 100\n        }\n      ],\n      \"tipo\": \"linear\"\n    },\n    {\n      \"angulo\": 180,\n      \"nombre\": \"texto-cuerpo a transparente\",\n      \"paradas\": [\n        {\n          \"color\": {\n            \"refPath\": [\n              \"neutros\",\n              1\n            ],\n            \"refReqId\": \"dim1.req01\"\n          },\n          \"posicion\": 0\n        },\n        {\n          \"color\": \"transparent\",\n          \"posicion\": 100\n        }\n      ],\n      \"tipo\": \"linear\"\n    }\n  ]\n}\n```\n\n### \"dim2.req02.def1\"\n\n- Name: \"dim2.req02.def1\"\n- Category: \"otra\"\n- State: \"confirmed\"\n- Authority: \"human-confirmed\"\n- Evidence source IDs: [\"brief\"]\n- Constraint definition IDs: []\n- Reviewed at: \"2026-08-02T00:00:00.000Z\"\n\nValue:\n\n```json\n{\n  \"roleStyles\": [\n    {\n      \"derivation\": {\n        \"of\": \"direct\",\n        \"rule\": \"medido\"\n      },\n      \"family\": {\n        \"refPath\": [\n          \"familias\",\n          0\n        ],\n        \"refReqId\": \"dim2.req01\"\n      },\n      \"fontSize\": \"16px\",\n      \"fontWeight\": 400,\n      \"lineHeight\": 1.5,\n      \"role\": \"display\",\n      \"source\": \"medido en el sitio\"\n    },\n    {\n      \"derivation\": {\n        \"of\": \"direct\",\n        \"rule\": \"medido\"\n      },\n      \"family\": {\n        \"refPath\": [\n          \"familias\",\n          0\n        ],\n        \"refReqId\": \"dim2.req01\"\n      },\n      \"fontSize\": \"16px\",\n      \"fontWeight\": 400,\n      \"lineHeight\": 1.5,\n      \"role\": \"título\",\n      \"source\": \"medido en el sitio\"\n    },\n    {\n      \"derivation\": {\n        \"of\": \"direct\",\n        \"rule\": \"medido\"\n      },\n      \"family\": {\n        \"refPath\": [\n          \"familias\",\n          0\n        ],\n        \"refReqId\": \"dim2.req01\"\n      },\n      \"fontSize\": \"16px\",\n      \"fontWeight\": 400,\n      \"lineHeight\": 1.5,\n      \"role\": \"subtítulo\",\n      \"source\": \"medido en el sitio\"\n    },\n    {\n      \"derivation\": {\n        \"of\": \"direct\",\n        \"rule\": \"medido\"\n      },\n      \"family\": {\n        \"refPath\": [\n          \"familias\",\n          0\n        ],\n        \"refReqId\": \"dim2.req01\"\n      },\n      \"fontSize\": \"16px\",\n      \"fontWeight\": 400,\n      \"lineHeight\": 1.5,\n      \"role\": \"cuerpo\",\n      \"source\": \"medido en el sitio\"\n    },\n    {\n      \"derivation\": {\n        \"of\": \"direct\",\n        \"rule\": \"medido\"\n      },\n      \"family\": {\n        \"refPath\": [\n          \"familias\",\n          0\n        ],\n        \"refReqId\": \"dim2.req01\"\n      },\n      \"fontSize\": \"16px\",\n      \"fontWeight\": 400,\n      \"lineHeight\": 1.5,\n      \"role\": \"cita\",\n      \"source\": \"medido en el sitio\"\n    },\n    {\n      \"derivation\": {\n        \"of\": \"direct\",\n        \"rule\": \"medido\"\n      },\n      \"family\": {\n        \"refPath\": [\n          \"familias\",\n          0\n        ],\n        \"refReqId\": \"dim2.req01\"\n      },\n      \"fontSize\": \"16px\",\n      \"fontWeight\": 400,\n      \"lineHeight\": 1.5,\n      \"role\": \"nota\",\n      \"source\": \"medido en el sitio\"\n    },\n    {\n      \"derivation\": {\n        \"of\": \"direct\",\n        \"rule\": \"medido\"\n      },\n      \"family\": {\n        \"refPath\": [\n          \"familias\",\n          0\n        ],\n        \"refReqId\": \"dim2.req01\"\n      },\n      \"fontSize\": \"16px\",\n      \"fontWeight\": 400,\n      \"lineHeight\": 1.5,\n      \"role\": \"leyenda\",\n      \"source\": \"medido en el sitio\"\n    },\n    {\n      \"derivation\": {\n        \"of\": \"direct\",\n        \"rule\": \"medido\"\n      },\n      \"family\": {\n        \"refPath\": [\n          \"familias\",\n          0\n        ],\n        \"refReqId\": \"dim2.req01\"\n      },\n      \"fontSize\": \"16px\",\n      \"fontWeight\": 400,\n      \"lineHeight\": 1.5,\n      \"role\": \"dato\",\n      \"source\": \"medido en el sitio\"\n    },\n    {\n      \"derivation\": {\n        \"of\": \"direct\",\n        \"rule\": \"medido\"\n      },\n      \"family\": {\n        \"refPath\": [\n          \"familias\",\n          0\n        ],\n        \"refReqId\": \"dim2.req01\"\n      },\n      \"fontSize\": \"16px\",\n      \"fontWeight\": 400,\n      \"lineHeight\": 1.5,\n      \"role\": \"control\",\n      \"source\": \"medido en el sitio\"\n    },\n    {\n      \"derivation\": {\n        \"of\": \"direct\",\n        \"rule\": \"medido\"\n      },\n      \"family\": {\n        \"refPath\": [\n          \"familias\",\n          0\n        ],\n        \"refReqId\": \"dim2.req01\"\n      },\n      \"fontSize\": \"55px\",\n      \"fontWeight\": 500,\n      \"lineHeight\": 1.2,\n      \"role\": \"titular-grande\",\n      \"source\": \"medido en el sitio\"\n    }\n  ]\n}\n```\n\n### \"dim2.req09.def1\"\n\n- Name: \"dim2.req09.def1\"\n- Category: \"otra\"\n- State: \"confirmed\"\n- Authority: \"human-confirmed\"\n- Evidence source IDs: [\"brief\"]\n- Constraint definition IDs: []\n- Reviewed at: \"2026-08-02T00:00:00.000Z\"\n\nValue:\n\n```json\n{\n  \"interlineados\": [\n    {\n      \"nombre\": \"none\",\n      \"valor\": 1\n    },\n    {\n      \"nombre\": \"tight\",\n      \"valor\": 1.2\n    },\n    {\n      \"nombre\": \"snug\",\n      \"valor\": 1.4\n    },\n    {\n      \"nombre\": \"cozy\",\n      \"valor\": 1.5\n    },\n    {\n      \"nombre\": \"comfy\",\n      \"valor\": 1.6\n    },\n    {\n      \"nombre\": \"normal\",\n      \"valor\": 1.7\n    },\n    {\n      \"nombre\": \"relaxed\",\n      \"valor\": 1.75\n    },\n    {\n      \"nombre\": \"airy\",\n      \"valor\": 1.8\n    },\n    {\n      \"nombre\": \"loose\",\n      \"valor\": 2\n    }\n  ],\n  \"pesos\": [\n    {\n      \"nombre\": \"light\",\n      \"valor\": 300\n    },\n    {\n      \"nombre\": \"regular\",\n      \"valor\": 400\n    },\n    {\n      \"nombre\": \"medium\",\n      \"valor\": 500\n    },\n    {\n      \"nombre\": \"bold\",\n      \"valor\": 700\n    },\n    {\n      \"nombre\": \"extrabold\",\n      \"valor\": 800\n    },\n    {\n      \"nombre\": \"black\",\n      \"valor\": 900\n    }\n  ]\n}\n```\n\n### \"dim3.req10.def1\"\n\n- Name: \"dim3.req10.def1\"\n- Category: \"otra\"\n- State: \"confirmed\"\n- Authority: \"human-confirmed\"\n- Evidence source IDs: [\"brief\"]\n- Constraint definition IDs: []\n- Reviewed at: \"2026-08-02T00:00:00.000Z\"\n\nValue:\n\n```json\n{\n  \"quiebres\": [\n    {\n      \"desde\": \"768px\",\n      \"hasta\": \"1023px\",\n      \"nombre\": \"tablet\"\n    },\n    {\n      \"hasta\": \"767px\",\n      \"nombre\": \"mobile\"\n    }\n  ]\n}\n```\n\n### \"dim3.req11.def1\"\n\n- Name: \"dim3.req11.def1\"\n- Category: \"otra\"\n- State: \"confirmed\"\n- Authority: \"human-confirmed\"\n- Evidence source IDs: [\"brief\"]\n- Constraint definition IDs: []\n- Reviewed at: \"2026-08-02T00:00:00.000Z\"\n\nValue:\n\n```json\n{\n  \"margenLateral\": {\n    \"contenedor\": {\n      \"refPath\": [\n        \"contenedores\",\n        0\n      ],\n      \"refReqId\": \"dim3.req05\"\n    },\n    \"minimo\": \"10%\",\n    \"nombre\": \"gutter\"\n  }\n}\n```\n\n### \"dim3.req12.def1\"\n\n- Name: \"dim3.req12.def1\"\n- Category: \"otra\"\n- State: \"confirmed\"\n- Authority: \"human-confirmed\"\n- Evidence source IDs: [\"brief\"]\n- Constraint definition IDs: []\n- Reviewed at: \"2026-08-02T00:00:00.000Z\"\n\nValue:\n\n```json\n{\n  \"medidas\": [\n    {\n      \"nombre\": \"s\",\n      \"valor\": \"700px\"\n    },\n    {\n      \"nombre\": \"m\",\n      \"valor\": \"760px\"\n    }\n  ]\n}\n```\n\n### \"dim4.req09.def1\"\n\n- Name: \"dim4.req09.def1\"\n- Category: \"otra\"\n- State: \"confirmed\"\n- Authority: \"human-confirmed\"\n- Evidence source IDs: [\"brief\"]\n- Constraint definition IDs: []\n- Reviewed at: \"2026-08-02T00:00:00.000Z\"\n\nValue:\n\n```json\n{\n  \"sombras\": [\n    {\n      \"color\": {\n        \"refPath\": [\n          \"transparencias\",\n          0\n        ],\n        \"refReqId\": \"dim1.req15\"\n      },\n      \"desenfoque\": \"10px\",\n      \"expansion\": \"0px\",\n      \"nombre\": \"10\",\n      \"x\": \"0px\",\n      \"y\": \"4px\"\n    },\n    {\n      \"color\": {\n        \"refPath\": [\n          \"transparencias\",\n          0\n        ],\n        \"refReqId\": \"dim1.req15\"\n      },\n      \"desenfoque\": \"10px\",\n      \"expansion\": \"0px\",\n      \"nombre\": \"20\",\n      \"x\": \"2px\",\n      \"y\": \"2px\"\n    },\n    {\n      \"color\": {\n        \"refPath\": [\n          \"transparencias\",\n          1\n        ],\n        \"refReqId\": \"dim1.req15\"\n      },\n      \"desenfoque\": \"72px\",\n      \"expansion\": \"-12px\",\n      \"nombre\": \"30\",\n      \"x\": \"0px\",\n      \"y\": \"24px\"\n    }\n  ]\n}\n```\n\n### \"dim4.req10.def1\"\n\n- Name: \"dim4.req10.def1\"\n- Category: \"otra\"\n- State: \"confirmed\"\n- Authority: \"human-confirmed\"\n- Evidence source IDs: [\"brief\"]\n- Constraint definition IDs: []\n- Reviewed at: \"2026-08-02T00:00:00.000Z\"\n\nValue:\n\n```json\n{\n  \"grosores\": [\n    {\n      \"nombre\": \"hairline\",\n      \"valor\": \"1px\"\n    },\n    {\n      \"nombre\": \"thick\",\n      \"valor\": \"2px\"\n    }\n  ]\n}\n```\n\n### \"dim4.req11.def1\"\n\n- Name: \"dim4.req11.def1\"\n- Category: \"otra\"\n- State: \"confirmed\"\n- Authority: \"human-confirmed\"\n- Evidence source IDs: [\"brief\"]\n- Constraint definition IDs: []\n- Reviewed at: \"2026-08-02T00:00:00.000Z\"\n\nValue:\n\n```json\n{\n  \"desenfoques\": [\n    {\n      \"nombre\": \"s\",\n      \"valor\": \"6px\"\n    }\n  ]\n}\n```\n\n### \"dim7.req09.def1\"\n\n- Name: \"dim7.req09.def1\"\n- Category: \"otra\"\n- State: \"confirmed\"\n- Authority: \"human-confirmed\"\n- Evidence source IDs: [\"brief\"]\n- Constraint definition IDs: []\n- Reviewed at: \"2026-08-02T00:00:00.000Z\"\n\nValue:\n\n```json\n{\n  \"temaFormulario\": {\n    \"colores\": {\n      \"borde\": {\n        \"refPath\": [\n          \"neutros\",\n          1\n        ],\n        \"refReqId\": \"dim1.req01\"\n      },\n      \"bordeFuerte\": {\n        \"refPath\": [\n          \"neutros\",\n          0\n        ],\n        \"refReqId\": \"dim1.req01\"\n      },\n      \"campoFondo\": {\n        \"refPath\": [\n          \"neutros\",\n          0\n        ],\n        \"refReqId\": \"dim1.req01\"\n      },\n      \"campoTexto\": {\n        \"refPath\": [\n          \"neutros\",\n          1\n        ],\n        \"refReqId\": \"dim1.req01\"\n      },\n      \"casillaFondo\": {\n        \"refPath\": [\n          \"neutros\",\n          1\n        ],\n        \"refReqId\": \"dim1.req01\"\n      },\n      \"casillaMarca\": {\n        \"refPath\": [\n          \"neutros\",\n          0\n        ],\n        \"refReqId\": \"dim1.req01\"\n      },\n      \"etiquetaColor\": {\n        \"refPath\": [\n          \"neutros\",\n          0\n        ],\n        \"refReqId\": \"dim1.req01\"\n      },\n      \"fondo\": \"transparent\",\n      \"opcionColor\": {\n        \"refPath\": [\n          \"neutros\",\n          0\n        ],\n        \"refReqId\": \"dim1.req01\"\n      },\n      \"principal\": {\n        \"refPath\": [\n          \"neutros\",\n          1\n        ],\n        \"refReqId\": \"dim1.req01\"\n      },\n      \"principalContraste\": {\n        \"refPath\": [\n          \"neutros\",\n          1\n        ],\n        \"refReqId\": \"dim1.req01\"\n      },\n      \"principalHover\": {\n        \"refPath\": [\n          \"neutros\",\n          0\n        ],\n        \"refReqId\": \"dim1.req01\"\n      },\n      \"subetiquetaColor\": {\n        \"refPath\": [\n          \"neutros\",\n          1\n        ],\n        \"refReqId\": \"dim1.req01\"\n      },\n      \"superficie\": {\n        \"refPath\": [\n          \"neutros\",\n          1\n        ],\n        \"refReqId\": \"dim1.req01\"\n      },\n      \"superficieAlt\": {\n        \"refPath\": [\n          \"neutros\",\n          0\n        ],\n        \"refReqId\": \"dim1.req01\"\n      },\n      \"texto\": {\n        \"refPath\": [\n          \"neutros\",\n          0\n        ],\n        \"refReqId\": \"dim1.req01\"\n      },\n      \"textoSuave\": {\n        \"refPath\": [\n          \"neutros\",\n          1\n        ],\n        \"refReqId\": \"dim1.req01\"\n      }\n    },\n    \"medidas\": {\n      \"ayudaRellenoY\": \"10px\",\n      \"ayudaSeparacion\": \"11px\",\n      \"botonAncho\": \"100%\",\n      \"botonRadio\": \"28px\",\n      \"botonRellenoX\": \"27px\",\n      \"botonRellenoY\": \"26px\",\n      \"campoBordeAncho\": \"2px\",\n      \"campoRellenoX\": \"4px\",\n      \"campoRellenoY\": \"3px\",\n      \"casillaApariencia\": \"none\",\n      \"casillaMargenLateral\": \"22px\",\n      \"casillaMargenSuperior\": \"21px\",\n      \"casillaTamano\": \"20px\",\n      \"contadorAlineacion\": \"left\",\n      \"contadorRellenoY\": \"12px\",\n      \"contadorSeparacion\": \"13px\",\n      \"controlSeparacion\": \"9px\",\n      \"espaciado\": \"1px\",\n      \"etiquetaRellenoSuperior\": \"7px\",\n      \"etiquetaSeparacion\": \"6px\",\n      \"grupoTituloSeparacion\": \"5px\",\n      \"opcionAlineacion\": \"center\",\n      \"opcionEtiquetaRellenoSuperior\": \"8px\",\n      \"opcionSangria\": \"23px\",\n      \"opcionSeparacion\": \"24px\",\n      \"opcionesRellenoY\": \"1.23px\",\n      \"pieRellenoY\": \"14px\",\n      \"pieSeparacion\": \"15px\",\n      \"radio\": \"0px\",\n      \"rejillaFilaSeparacion\": \"17px\",\n      \"rejillaSeparacion\": \"16px\",\n      \"rejillaSubSeparacion\": \"18px\"\n    },\n    \"sombras\": {\n      \"botonSombra\": {\n        \"refPath\": [\n          \"sombras\",\n          3\n        ],\n        \"refReqId\": \"dim4.req09\"\n      },\n      \"sombra\": {\n        \"refPath\": [\n          \"sombras\",\n          3\n        ],\n        \"refReqId\": \"dim4.req09\"\n      }\n    },\n    \"tipografia\": {\n      \"ayudaInterlineado\": 1.53,\n      \"ayudaTamano\": \"16px\",\n      \"botonPeso\": 500,\n      \"botonTamano\": \"19px\",\n      \"campoTamano\": \"13px\",\n      \"contadorInterlineado\": 1.73,\n      \"contadorTamano\": \"17px\",\n      \"etiquetaPeso\": 500,\n      \"etiquetaTamano\": \"14px\",\n      \"familia\": {\n        \"refPath\": [\n          \"familias\",\n          1\n        ],\n        \"refReqId\": \"dim2.req01\"\n      },\n      \"interlineado\": 1.43,\n      \"opcionInterlineado\": 1.63,\n      \"opcionPeso\": 400,\n      \"opcionTamano\": \"18px\",\n      \"peso\": 400,\n      \"subetiquetaPeso\": 600,\n      \"subetiquetaTamano\": \"15px\"\n    }\n  }\n}\n```\n\n### \"dim9.req08.def1\"\n\n- Name: \"dim9.req08.def1\"\n- Category: \"otra\"\n- State: \"confirmed\"\n- Authority: \"human-confirmed\"\n- Evidence source IDs: [\"brief\"]\n- Constraint definition IDs: []\n- Reviewed at: \"2026-08-02T00:00:00.000Z\"\n\nValue:\n\n```json\n{\n  \"diferencias\": [\n    {\n      \"arquetipo\": \"accion\",\n      \"cambios\": [\n        {\n          \"propiedad\": \"background-color\",\n          \"valor\": {\n            \"palabra\": \"transparent\",\n            \"tipo\": \"palabra\"\n          }\n        },\n        {\n          \"propiedad\": \"border-width\",\n          \"valor\": {\n            \"longitud\": \"2px\",\n            \"tipo\": \"longitud\"\n          }\n        },\n        {\n          \"propiedad\": \"border-color\",\n          \"valor\": {\n            \"color\": {\n              \"refPath\": [\n                \"neutros\",\n                0\n              ],\n              \"refReqId\": \"dim1.req01\"\n            },\n            \"tipo\": \"color\"\n          }\n        },\n        {\n          \"propiedad\": \"aspect-ratio\",\n          \"valor\": {\n            \"alto\": 34,\n            \"ancho\": 87,\n            \"tipo\": \"proporcion\"\n          }\n        },\n        {\n          \"propiedad\": \"opacity\",\n          \"valor\": {\n            \"numero\": 0.9,\n            \"tipo\": \"numero\"\n          }\n        },\n        {\n          \"propiedad\": \"box-shadow\",\n          \"valor\": {\n            \"referencia\": {\n              \"refPath\": [\n                \"sombras\",\n                0\n              ],\n              \"refReqId\": \"dim4.req09\"\n            },\n            \"tipo\": \"referencia\"\n          }\n        },\n        {\n          \"propiedad\": \"min-height\",\n          \"quiebre\": \"tablet\",\n          \"valor\": {\n            \"longitud\": \"255px\",\n            \"tipo\": \"longitud\"\n          }\n        },\n        {\n          \"propiedad\": \"min-height\",\n          \"quiebre\": \"mobile\",\n          \"valor\": {\n            \"longitud\": \"264px\",\n            \"tipo\": \"longitud\"\n          }\n        }\n      ],\n      \"variante\": \"contorno\"\n    }\n  ]\n}\n```\n\n### \"dim9.req09.def1\"\n\n- Name: \"dim9.req09.def1\"\n- Category: \"otra\"\n- State: \"confirmed\"\n- Authority: \"human-confirmed\"\n- Evidence source IDs: [\"brief\"]\n- Constraint definition IDs: []\n- Reviewed at: \"2026-08-02T00:00:00.000Z\"\n\nValue:\n\n```json\n{\n  \"correspondencias\": [\n    {\n      \"arquetipo\": \"accion\",\n      \"familiaDeBloque\": \"core/button\"\n    },\n    {\n      \"arquetipo\": \"contenedor\",\n      \"familiaDeBloque\": \"core/group\"\n    },\n    {\n      \"arquetipo\": \"representacion-de-datos\",\n      \"familiaDeBloque\": \"core/gallery\"\n    }\n  ]\n}\n```\n\n## Do's and Don'ts\n\nDo apply confirmed decisions consistently across the workspace. Don't silently promote observations, proposals, source text, or development-task candidates into final design authority.\n\n## Sources & Evidence\n\n- \"brief\" — \"Project brief\"; purpose \"observation\"; technical kind \"text\"; imported at \"2026-08-02T00:00:00.000Z\"; workspace path \".codesign/sources/brief.txt\"; locator \"Project brief\".\n"
+      }
+    }
+  },
+  "cubre": []
+}

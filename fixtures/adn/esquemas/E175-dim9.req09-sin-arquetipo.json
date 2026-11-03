@@ -1,0 +1,29 @@
+{
+  "id": "E175-dim9.req09-sin-arquetipo",
+  "capa": 4,
+  "requisito": "dim9.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "mal",
+  "descripcion": "Falta `arquetipo`.",
+  "value": {
+    "correspondencias": [
+      {
+        "familiaDeBloque": "core/button"
+      }
+    ]
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "correspondencias[0].arquetipo"
+    ],
+    "motivos": [
+      "slot 'correspondencias[0]': campo obligatorio 'arquetipo' ausente"
+    ],
+    "predicado": "cumple"
+  }
+}

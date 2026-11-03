@@ -1,0 +1,63 @@
+{
+  "id": "E001-dim1.req15-por-referencia",
+  "capa": 4,
+  "requisito": "dim1.req15",
+  "manifiesto": {
+    "manifestVersion": "1.3",
+    "revision": 4
+  },
+  "intencion": "ok",
+  "descripcion": "Dos transparencias de la paleta, cada una por referencia a la ENTRADA completa de dim1.req01 (como las de Basis: «ink al 15 %», «fondo-pagina al 88 %»).",
+  "value": {
+    "transparencias": [
+      {
+        "nombre": "ink al 15%",
+        "base": {
+          "refReqId": "dim1.req01",
+          "refPath": [
+            "neutros",
+            0
+          ]
+        },
+        "opacidad": 15
+      },
+      {
+        "nombre": "naranja al 88%",
+        "base": {
+          "refReqId": "dim1.req01",
+          "refPath": [
+            "institucionales",
+            0
+          ]
+        },
+        "opacidad": 88
+      }
+    ]
+  },
+  "contexto": {
+    "dim1.req01": {
+      "institucionales": [
+        {
+          "name": "Naranja Basis",
+          "value": "#F26621"
+        }
+      ],
+      "neutros": [
+        {
+          "name": "Tinta",
+          "value": "#0E0C19"
+        },
+        {
+          "name": "Gris",
+          "value": "#898989"
+        }
+      ]
+    }
+  },
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "cumple"
+  }
+}

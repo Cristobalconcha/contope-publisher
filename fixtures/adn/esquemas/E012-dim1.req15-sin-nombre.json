@@ -1,0 +1,55 @@
+{
+  "id": "E012-dim1.req15-sin-nombre",
+  "capa": 4,
+  "requisito": "dim1.req15",
+  "manifiesto": {
+    "manifestVersion": "1.3",
+    "revision": 4
+  },
+  "intencion": "mal",
+  "descripcion": "Falta `nombre`.",
+  "value": {
+    "transparencias": [
+      {
+        "base": {
+          "refReqId": "dim1.req01",
+          "refPath": [
+            "neutros",
+            0
+          ]
+        },
+        "opacidad": 20
+      }
+    ]
+  },
+  "contexto": {
+    "dim1.req01": {
+      "institucionales": [
+        {
+          "name": "Naranja Basis",
+          "value": "#F26621"
+        }
+      ],
+      "neutros": [
+        {
+          "name": "Tinta",
+          "value": "#0E0C19"
+        },
+        {
+          "name": "Gris",
+          "value": "#898989"
+        }
+      ]
+    }
+  },
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "transparencias[0].nombre"
+    ],
+    "motivos": [
+      "slot 'transparencias[0]': campo obligatorio 'nombre' ausente"
+    ],
+    "predicado": "no-cumple"
+  }
+}

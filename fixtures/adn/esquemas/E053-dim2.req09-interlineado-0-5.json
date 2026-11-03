@@ -1,0 +1,30 @@
+{
+  "id": "E053-dim2.req09-interlineado-0-5",
+  "capa": 4,
+  "requisito": "dim2.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "mal",
+  "descripcion": "Interlineado 0,5 (mínimo 0,8).",
+  "value": {
+    "interlineados": [
+      {
+        "nombre": "x",
+        "valor": 0.5
+      }
+    ]
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "interlineados[0].valor"
+    ],
+    "motivos": [
+      "slot 'interlineados[0].valor': numero 0.5 por debajo del mínimo 0.8"
+    ],
+    "predicado": "cumple"
+  }
+}

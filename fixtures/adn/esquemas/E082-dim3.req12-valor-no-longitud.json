@@ -1,0 +1,30 @@
+{
+  "id": "E082-dim3.req12-valor-no-longitud",
+  "capa": 4,
+  "requisito": "dim3.req12",
+  "manifiesto": {
+    "manifestVersion": "1.2",
+    "revision": 3
+  },
+  "intencion": "mal",
+  "descripcion": "La medida no es longitud.",
+  "value": {
+    "medidas": [
+      {
+        "nombre": "s",
+        "valor": "70 caracteres"
+      }
+    ]
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "medidas[0].valor"
+    ],
+    "motivos": [
+      "slot 'medidas[0].valor': no es una longitud-css válida"
+    ],
+    "predicado": "no-cumple"
+  }
+}

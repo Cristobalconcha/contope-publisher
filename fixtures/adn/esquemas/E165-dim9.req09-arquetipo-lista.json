@@ -1,0 +1,26 @@
+{
+  "id": "E165-dim9.req09-arquetipo-lista",
+  "capa": 4,
+  "requisito": "dim9.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "ok",
+  "descripcion": "El arquetipo «lista» puede recibir su familia de bloque.",
+  "value": {
+    "correspondencias": [
+      {
+        "arquetipo": "lista",
+        "familiaDeBloque": "core/group"
+      }
+    ]
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "cumple"
+  }
+}

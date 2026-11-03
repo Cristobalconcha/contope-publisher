@@ -1,0 +1,30 @@
+{
+  "id": "E050-dim2.req09-peso-1000",
+  "capa": 4,
+  "requisito": "dim2.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "mal",
+  "descripcion": "Peso 1000 (máximo 900).",
+  "value": {
+    "pesos": [
+      {
+        "nombre": "x",
+        "valor": 1000
+      }
+    ]
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "pesos[0].valor"
+    ],
+    "motivos": [
+      "slot 'pesos[0].valor': numero 1000 por encima del máximo 900"
+    ],
+    "predicado": "cumple"
+  }
+}

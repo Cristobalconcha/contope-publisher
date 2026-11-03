@@ -1,0 +1,30 @@
+{
+  "id": "E054-dim2.req09-interlineado-3-5",
+  "capa": 4,
+  "requisito": "dim2.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "mal",
+  "descripcion": "Interlineado 3,5 (máximo 3).",
+  "value": {
+    "interlineados": [
+      {
+        "nombre": "x",
+        "valor": 3.5
+      }
+    ]
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "interlineados[0].valor"
+    ],
+    "motivos": [
+      "slot 'interlineados[0].valor': numero 3.5 por encima del máximo 3"
+    ],
+    "predicado": "cumple"
+  }
+}

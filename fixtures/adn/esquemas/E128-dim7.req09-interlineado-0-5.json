@@ -1,0 +1,29 @@
+{
+  "id": "E128-dim7.req09-interlineado-0-5",
+  "capa": 4,
+  "requisito": "dim7.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "mal",
+  "descripcion": "Interlineado 0,5.",
+  "value": {
+    "temaFormulario": {
+      "tipografia": {
+        "interlineado": 0.5
+      }
+    }
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "temaFormulario.tipografia.interlineado"
+    ],
+    "motivos": [
+      "slot 'temaFormulario.tipografia.interlineado': numero 0.5 por debajo del mínimo 0.8"
+    ],
+    "predicado": "cumple"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "id": "E051-dim2.req09-peso-50",
+  "capa": 4,
+  "requisito": "dim2.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "mal",
+  "descripcion": "Peso 50 (mínimo 100).",
+  "value": {
+    "pesos": [
+      {
+        "nombre": "x",
+        "valor": 50
+      }
+    ]
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "pesos[0].valor"
+    ],
+    "motivos": [
+      "slot 'pesos[0].valor': numero 50 por debajo del mínimo 100"
+    ],
+    "predicado": "cumple"
+  }
+}

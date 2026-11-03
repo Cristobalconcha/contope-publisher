@@ -1,0 +1,21 @@
+{
+  "id": "E088-dim4.req09-sin-sombras",
+  "capa": 4,
+  "requisito": "dim4.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "ok",
+  "descripcion": "Ausencia declarada (un set plano).",
+  "value": {
+    "sinSombras": "el set es plano"
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "cumple"
+  }
+}

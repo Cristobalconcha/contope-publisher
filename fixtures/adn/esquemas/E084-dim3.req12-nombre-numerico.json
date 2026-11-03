@@ -1,0 +1,30 @@
+{
+  "id": "E084-dim3.req12-nombre-numerico",
+  "capa": 4,
+  "requisito": "dim3.req12",
+  "manifiesto": {
+    "manifestVersion": "1.2",
+    "revision": 3
+  },
+  "intencion": "mal",
+  "descripcion": "`nombre` numérico.",
+  "value": {
+    "medidas": [
+      {
+        "nombre": 700,
+        "valor": "700px"
+      }
+    ]
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "medidas[0].nombre"
+    ],
+    "motivos": [
+      "slot 'medidas[0].nombre': se esperaba texto"
+    ],
+    "predicado": "cumple"
+  }
+}

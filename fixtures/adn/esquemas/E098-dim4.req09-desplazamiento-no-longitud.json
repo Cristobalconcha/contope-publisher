@@ -1,0 +1,40 @@
+{
+  "id": "E098-dim4.req09-desplazamiento-no-longitud",
+  "capa": 4,
+  "requisito": "dim4.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "mal",
+  "descripcion": "`y: abajo`.",
+  "value": {
+    "sombras": [
+      {
+        "nombre": "10",
+        "x": "0px",
+        "y": "abajo",
+        "desenfoque": "10px",
+        "expansion": "0px",
+        "color": {
+          "refReqId": "dim1.req15",
+          "refPath": [
+            "transparencias",
+            0
+          ]
+        }
+      }
+    ]
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "sombras[0].y"
+    ],
+    "motivos": [
+      "slot 'sombras[0].y': no es una longitud-css válida (con signo opcional)"
+    ],
+    "predicado": "cumple"
+  }
+}

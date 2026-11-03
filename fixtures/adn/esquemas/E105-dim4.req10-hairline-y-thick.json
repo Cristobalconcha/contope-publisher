@@ -1,0 +1,30 @@
+{
+  "id": "E105-dim4.req10-hairline-y-thick",
+  "capa": 4,
+  "requisito": "dim4.req10",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "ok",
+  "descripcion": "`custom.border` de Basis.",
+  "value": {
+    "grosores": [
+      {
+        "nombre": "hairline",
+        "valor": "1px"
+      },
+      {
+        "nombre": "thick",
+        "valor": "2px"
+      }
+    ]
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "cumple"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "id": "E168-dim9.req09-arquetipo-representacion-de-datos",
+  "capa": 4,
+  "requisito": "dim9.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "ok",
+  "descripcion": "El arquetipo «representacion-de-datos» puede recibir su familia de bloque.",
+  "value": {
+    "correspondencias": [
+      {
+        "arquetipo": "representacion-de-datos",
+        "familiaDeBloque": "core/group"
+      }
+    ]
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "cumple"
+  }
+}

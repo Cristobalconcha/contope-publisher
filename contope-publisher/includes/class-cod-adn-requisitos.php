@@ -16,11 +16,25 @@ if (!defined('ABSPATH')) {
  *   dim3.req01 escala de espacio · dim3.req02 roles de espacio · dim4.req02 formas ·
  *   dim8.req03 escala de duraciones
  *
- * (`dim9.req03` queda fuera mientras dure Q3). Los demás requisitos se GUARDAN y se
- * listan en `ignored[]` (R4); nunca se descartan ni se emiten.
+ * A eso se suman los doce que el Core agregó el 02-nov-2026 (pedidos Q1, Q3 y Q4; contrato en
+ * docs/PEDIDOS-AL-CORE.md del Core, sección «Resuelto el 02-nov-2026»):
  *
- * Las listas cerradas (roles) están en un solo lugar a propósito: si el Core las abre
- * (Q1) se cambia acá y se agrega un caso al corpus.
+ *   dim1.req15 transparencias · dim1.req16 degradados · dim2.req09 pesos e interlineados ·
+ *   dim3.req10 quiebres · dim3.req11 margen lateral (gutter) · dim3.req12 medidas de texto ·
+ *   dim4.req09 sombras · dim4.req10 grosores de borde · dim4.req11 desenfoques ·
+ *   dim7.req09 tema del formulario (68 variables) · dim9.req08 variantes · dim9.req09 arquetipo → familia de bloque
+ *
+ * y los campos opcionales nuevos de dim2.req02 y dim3.req01 (`porQuiebre`). Los nueve primeros y el tema
+ * del formulario se PROYECTAN al theme.json; dim9.req08 y dim9.req09 se validan (forma) y se guardan, pero
+ * el destino aún no emite sus propiedades (PROYECTADOS no los lista; ver COD_ADN_Theme::fuera_del_adn()).
+ * Los demás requisitos se GUARDAN y se listan en `ignored[]` (R4); nunca se descartan ni se emiten.
+ *
+ * Las listas cerradas (roles) están en un solo lugar a propósito: si el Core las cambia se cambia acá y
+ * se agrega un caso al corpus. La PARIDAD con el manifiesto se mide: scripts/probar-adn-validador.php compara
+ * `esquema_como_core()` con fixtures/adn/payload-schemas.json y corre los 176 casos de la capa 4 (fixtures/adn/esquemas).
+ *
+ * La FORMA (validar_forma) es la del Core y nada más. Lo que el Core deja al destino (nombre único y slug
+ * propio de roles y escalas) está en `validar_destino()`, con códigos propios.
  *
  * Lo que NO hace este archivo: leer el manifiesto del Core en tiempo de ejecución (el
  * hosting no tiene el repositorio del Core). Si el manifiesto cambia, esta tabla se
@@ -37,16 +51,38 @@ final class COD_ADN_Requisitos
     public const MAX_MOTIVOS = 20;
 
     /** Requisitos que la web proyecta. */
-    public const PROYECTADOS = ['dim1.req01', 'dim1.req02', 'dim2.req01', 'dim2.req02', 'dim2.req07', 'dim3.req01', 'dim3.req02', 'dim3.req05', 'dim4.req02', 'dim8.req03', 'dim8.req04'];
+    public const PROYECTADOS = [
+        'dim1.req01', 'dim1.req02', 'dim1.req15', 'dim1.req16',
+        'dim2.req01', 'dim2.req02', 'dim2.req07', 'dim2.req09',
+        'dim3.req01', 'dim3.req02', 'dim3.req05', 'dim3.req10', 'dim3.req11', 'dim3.req12',
+        'dim4.req02', 'dim4.req09', 'dim4.req10', 'dim4.req11',
+        'dim7.req09',
+        'dim8.req03', 'dim8.req04',
+    ];
 
     /**
-     * Q1(a), DECIDIDO por el dueño el 02-nov-2026: `dim2.req02` admite roles tipográficos ADEMÁS de los nueve del Core,
-     * con nombre libre (el Core de Desktop lo abre en una versión menor; hasta entonces un ADN con roles extra lo
-     * valida esta web pero no `parsePortableDesignModel` de Desktop). Un rol extra se vuelve el tamaño de letra
-     * `--wp--preset--font-size--<slug del rol>`. El nombre debe dar un slug propio ([a-z0-9-], sin acentos).
-     * Poner en false vuelve a la lista cerrada de nueve.
+     * Requisitos cuya forma el plugin conoce y valida aunque no los proyecte todavía (se guardan y se listan
+     * en `ignored[]` como R4-no-proyectada; una `confirmed` con forma incorrecta sí se rechaza).
      */
-    public const ROLES_TIPOGRAFICOS_ABIERTOS = true;
+    public const SOLO_FORMA = ['dim9.req08', 'dim9.req09'];
+
+    /**
+     * El grupo de cada variable de `dim7.req09.temaFormulario` (los nombres son los de `settings.custom.form`;
+     * `FORM_TOKENS` en manifest-v0-dim7.ts del Core las exporta). Una variable pertenece a UN grupo: el grupo es
+     * un nivel del `value`, la variable es su clave. Sólo `tipografia.familia` se renombra (la variable del tema
+     * se llama `tipografia`).
+     */
+    public const FORM_COLORES = ['texto', 'textoSuave', 'fondo', 'superficie', 'superficieAlt', 'borde', 'bordeFuerte', 'principal', 'principalHover', 'principalContraste', 'campoFondo', 'campoTexto', 'etiquetaColor', 'subetiquetaColor', 'opcionColor', 'casillaFondo', 'casillaMarca'];
+    public const FORM_TAMANOS = ['campoTamano', 'etiquetaTamano', 'subetiquetaTamano', 'ayudaTamano', 'contadorTamano', 'opcionTamano', 'botonTamano'];
+    public const FORM_PESOS = ['peso', 'etiquetaPeso', 'subetiquetaPeso', 'opcionPeso', 'botonPeso'];
+    public const FORM_INTERLINEADOS = ['interlineado', 'ayudaInterlineado', 'opcionInterlineado', 'contadorInterlineado'];
+    public const FORM_MEDIDAS = ['radio', 'espaciado', 'campoBordeAncho', 'campoRellenoY', 'campoRellenoX', 'grupoTituloSeparacion', 'etiquetaSeparacion', 'etiquetaRellenoSuperior', 'opcionEtiquetaRellenoSuperior', 'controlSeparacion', 'ayudaRellenoY', 'ayudaSeparacion', 'contadorRellenoY', 'contadorSeparacion', 'pieRellenoY', 'pieSeparacion', 'rejillaSeparacion', 'rejillaFilaSeparacion', 'rejillaSubSeparacion', 'opcionesRellenoY', 'casillaTamano', 'casillaMargenSuperior', 'casillaMargenLateral', 'opcionSangria', 'opcionSeparacion', 'botonAncho', 'botonRellenoY', 'botonRellenoX', 'botonRadio'];
+    public const FORM_ALINEACIONES = ['contadorAlineacion', 'opcionAlineacion'];
+    public const FORM_SOMBRAS = ['sombra', 'botonSombra'];
+    public const ALINEACIONES = ['left', 'center', 'right'];
+    public const APARIENCIAS = ['none', 'auto'];
+    public const QUIEBRES = ['tablet', 'mobile'];
+    public const ARQUETIPOS = ['accion', 'contenedor', 'navegacion', 'feedback', 'entrada', 'secuencia-editorial', 'lista', 'tabla', 'metricas', 'representacion-de-datos'];
 
     /** @var array<string, array<string, mixed>>|null */
     private static ?array $esquemas = null;
@@ -110,6 +146,22 @@ final class COD_ADN_Requisitos
         return ['k' => 'union', 'of' => $miembros];
     }
 
+    /**
+     * Un campo opcional por cada variable de un grupo del tema del formulario.
+     *
+     * @param array<int, string> $nombres
+     * @param array<string, mixed> $tipo
+     * @return array<string, array<string, mixed>>
+     */
+    private static function variables_de_formulario(array $nombres, array $tipo): array
+    {
+        $out = [];
+        foreach ($nombres as $n) {
+            $out[$n] = self::campo($tipo, true);
+        }
+        return $out;
+    }
+
     /** @return array<string, array<string, mixed>> requisito → slot → campo */
     public static function esquemas(): array
     {
@@ -118,7 +170,9 @@ final class COD_ADN_Requisitos
         }
         $color = self::t('color');
         $largo = self::t('longitud');
+        $largo_signo = self::t('longitud', ['signo' => true]);
         $texto = self::t('texto');
+        $transparente = self::conjunto(['transparent']);
         $derivacion = static function (string $de): array {
             return self::objeto(['of' => self::campo(self::conjunto([$de, 'direct'])), 'rule' => self::campo(self::t('texto'), true)]);
         };
@@ -145,12 +199,16 @@ final class COD_ADN_Requisitos
             ],
             'dim2.req02' => [
                 'roleStyles' => self::campo(self::lista(self::objeto([
-                    'role' => self::campo(self::ROLES_TIPOGRAFICOS_ABIERTOS ? self::t('rol') : self::conjunto(self::ROLES_TIPOGRAFICOS)),
+                    'role' => self::campo($texto),
                     'family' => self::campo(self::union([self::ref('dim2.req01'), $texto])),
                     'fontSize' => self::campo($largo),
                     'fontWeight' => self::campo(self::numero(100, 900)),
                     'lineHeight' => self::campo(self::numero(0.8, 3)),
                     'letterSpacing' => self::campo($largo, true),
+                    'porQuiebre' => self::campo(self::lista(self::objeto([
+                        'quiebre' => self::campo(self::conjunto(self::QUIEBRES)),
+                        'fontSize' => self::campo($largo),
+                    ])), true),
                     'source' => self::campo($texto),
                     'derivation' => self::campo($derivacion('dim2.req01')),
                 ]))),
@@ -164,7 +222,14 @@ final class COD_ADN_Requisitos
             ],
             'dim3.req01' => [
                 'unidad' => self::campo($largo),
-                'escala' => self::campo(self::lista(self::objeto(['step' => self::campo(self::numero(1)), 'value' => self::campo($largo)]))),
+                'escala' => self::campo(self::lista(self::objeto([
+                    'step' => self::campo(self::numero(1)),
+                    'value' => self::campo($largo),
+                    'porQuiebre' => self::campo(self::lista(self::objeto([
+                        'quiebre' => self::campo(self::conjunto(self::QUIEBRES)),
+                        'value' => self::campo($largo),
+                    ])), true),
+                ]))),
             ],
             'dim3.req02' => [
                 'roleSpacing' => self::campo(self::lista(self::objeto([
@@ -201,6 +266,141 @@ final class COD_ADN_Requisitos
                     'duracionMs' => self::campo(self::numero(0, 5000), true),
                 ]))),
                 'sinAmplitud' => self::campo($texto, true),
+            ],
+            'dim1.req15' => [
+                'transparencias' => self::campo(self::lista(self::objeto([
+                    'nombre' => self::campo($texto),
+                    'base' => self::campo(self::ref('dim1.req01')),
+                    'opacidad' => self::campo(self::numero(0, 100)),
+                ])), true),
+                'sinTransparencias' => self::campo($texto, true),
+            ],
+            'dim1.req16' => [
+                'degradados' => self::campo(self::lista(self::objeto([
+                    'nombre' => self::campo($texto),
+                    'tipo' => self::campo(self::conjunto(['linear', 'radial'])),
+                    'angulo' => self::campo(self::numero(0, 360), true),
+                    'paradas' => self::campo(self::lista(self::objeto([
+                        'color' => self::campo(self::union([self::ref('dim1.req01'), self::ref('dim1.req15'), $transparente])),
+                        'posicion' => self::campo(self::numero(0, 100)),
+                    ]))),
+                ])), true),
+                'sinDegradados' => self::campo($texto, true),
+            ],
+            'dim2.req09' => [
+                'pesos' => self::campo(self::lista(self::objeto([
+                    'nombre' => self::campo($texto),
+                    'valor' => self::campo(self::numero(100, 900)),
+                ])), true),
+                'interlineados' => self::campo(self::lista(self::objeto([
+                    'nombre' => self::campo($texto),
+                    'valor' => self::campo(self::numero(0.8, 3)),
+                ])), true),
+                'sinEscalas' => self::campo($texto, true),
+            ],
+            'dim3.req10' => [
+                'quiebres' => self::campo(self::lista(self::objeto([
+                    'nombre' => self::campo(self::conjunto(['tablet', 'mobile'])),
+                    'desde' => self::campo($largo, true),
+                    'hasta' => self::campo($largo),
+                ])), true),
+                'sinQuiebres' => self::campo($texto, true),
+            ],
+            'dim3.req11' => [
+                'margenLateral' => self::campo(self::objeto([
+                    'nombre' => self::campo($texto),
+                    'minimo' => self::campo($largo),
+                    'contenedor' => self::campo(self::ref('dim3.req05')),
+                ]), true),
+                'sinMargenLateral' => self::campo($texto, true),
+            ],
+            'dim3.req12' => [
+                'medidas' => self::campo(self::lista(self::objeto([
+                    'nombre' => self::campo($texto),
+                    'valor' => self::campo($largo),
+                ])), true),
+                'sinMedidas' => self::campo($texto, true),
+            ],
+            'dim4.req09' => [
+                'sombras' => self::campo(self::lista(self::objeto([
+                    'nombre' => self::campo($texto),
+                    'x' => self::campo($largo_signo),
+                    'y' => self::campo($largo_signo),
+                    'desenfoque' => self::campo($largo),
+                    'expansion' => self::campo($largo_signo),
+                    'color' => self::campo(self::union([self::ref('dim1.req15'), self::ref('dim1.req01')])),
+                ])), true),
+                'sinSombras' => self::campo($texto, true),
+            ],
+            'dim4.req10' => [
+                'grosores' => self::campo(self::lista(self::objeto([
+                    'nombre' => self::campo($texto),
+                    'valor' => self::campo($largo),
+                ])), true),
+                'sinGrosores' => self::campo($texto, true),
+            ],
+            'dim4.req11' => [
+                'desenfoques' => self::campo(self::lista(self::objeto([
+                    'nombre' => self::campo($texto),
+                    'valor' => self::campo($largo),
+                ])), true),
+                'sinDesenfoques' => self::campo($texto, true),
+            ],
+            'dim7.req09' => [
+                'temaFormulario' => self::campo(self::objeto([
+                    'colores' => self::campo(self::objeto(self::variables_de_formulario(self::FORM_COLORES, self::union([self::ref('dim1.req01'), self::ref('dim1.req15'), $color, $transparente]))), true),
+                    'tipografia' => self::campo(self::objeto(
+                        ['familia' => self::campo(self::ref('dim2.req01'), true)]
+                        + self::variables_de_formulario(self::FORM_TAMANOS, $largo)
+                        + self::variables_de_formulario(self::FORM_PESOS, self::numero(100, 900))
+                        + self::variables_de_formulario(self::FORM_INTERLINEADOS, self::numero(0.8, 3))
+                    ), true),
+                    'medidas' => self::campo(self::objeto(
+                        self::variables_de_formulario(self::FORM_MEDIDAS, $largo)
+                        + self::variables_de_formulario(self::FORM_ALINEACIONES, self::conjunto(self::ALINEACIONES))
+                        + ['casillaApariencia' => self::campo(self::conjunto(self::APARIENCIAS), true)]
+                    ), true),
+                    'sombras' => self::campo(self::objeto(self::variables_de_formulario(self::FORM_SOMBRAS, self::union([self::ref('dim4.req09'), self::conjunto(['none'])]))), true),
+                ]), true),
+                'sinTemaFormulario' => self::campo($texto, true),
+            ],
+            'dim9.req08' => [
+                'diferencias' => self::campo(self::lista(self::objeto([
+                    'arquetipo' => self::campo(self::conjunto(['accion', 'contenedor', 'navegacion', 'feedback', 'entrada', 'secuencia-editorial', 'lista', 'tabla', 'metricas', 'representacion-de-datos'])),
+                    'variante' => self::campo($texto),
+                    'cambios' => self::campo(self::lista(self::objeto([
+                        'propiedad' => self::campo($texto),
+                        'valor' => self::campo(self::union([self::objeto([
+                            'tipo' => self::campo(self::conjunto(['color'])),
+                            'color' => self::campo(self::union([self::ref('dim1.req01'), self::ref('dim1.req15'), $color])),
+                        ]), self::objeto([
+                            'tipo' => self::campo(self::conjunto(['longitud'])),
+                            'longitud' => self::campo($largo_signo),
+                        ]), self::objeto([
+                            'tipo' => self::campo(self::conjunto(['numero'])),
+                            'numero' => self::campo(self::numero(null, null)),
+                        ]), self::objeto([
+                            'tipo' => self::campo(self::conjunto(['proporcion'])),
+                            'ancho' => self::campo(self::numero(0.01, null)),
+                            'alto' => self::campo(self::numero(0.01, null)),
+                        ]), self::objeto([
+                            'tipo' => self::campo(self::conjunto(['palabra'])),
+                            'palabra' => self::campo($texto),
+                        ]), self::objeto([
+                            'tipo' => self::campo(self::conjunto(['referencia'])),
+                            'referencia' => self::campo(self::ref()),
+                        ])])),
+                        'quiebre' => self::campo(self::conjunto(['tablet', 'mobile']), true),
+                    ]))),
+                ])), true),
+                'sinDiferencias' => self::campo($texto, true),
+            ],
+            'dim9.req09' => [
+                'correspondencias' => self::campo(self::lista(self::objeto([
+                    'arquetipo' => self::campo(self::conjunto(['accion', 'contenedor', 'navegacion', 'feedback', 'entrada', 'secuencia-editorial', 'lista', 'tabla', 'metricas', 'representacion-de-datos'])),
+                    'familiaDeBloque' => self::campo($texto),
+                ])), true),
+                'sinCorrespondencias' => self::campo($texto, true),
             ],
             'dim8.req03' => [
                 'escala' => self::campo(self::lista(self::objeto(['nombre' => self::campo($texto), 'duracion' => self::campo(self::numero(0, 5000))]))),
@@ -332,6 +532,23 @@ final class COD_ADN_Requisitos
         return preg_match('/^(?:0(?:\.0+)?|(?:\d+(?:\.\d+)?)(?:px|rem|em|%|vh|vw|ch|ex|pt|pc|cm|mm|in|q))$/iD', $s) === 1;
     }
 
+    /**
+     * `isSignedLengthCss` del Core: la misma longitud precedida de un `-` pegado al número (`-12px`, `-0`). Sin `+`
+     * y sin espacio entre el signo y el número. Sólo la usan los campos con `conSigno: true`.
+     */
+    public static function es_longitud_con_signo($valor): bool
+    {
+        if (!is_string($valor)) {
+            return false;
+        }
+        $s = COD_ADN_Js::trim($valor);
+        if (strncmp($s, '-', 1) !== 0) {
+            return self::es_longitud_css($s);
+        }
+        $resto = substr($s, 1);
+        return $resto === COD_ADN_Js::trim($resto) && self::es_longitud_css($resto);
+    }
+
     // ------------------------------------------------------------------
     // payload.ts
     // ------------------------------------------------------------------
@@ -373,19 +590,17 @@ final class COD_ADN_Requisitos
                 }
                 return;
             case 'longitud':
-                if (!self::es_longitud_css($valor)) {
+                if (!empty($tipo['signo'])) {
+                    if (!self::es_longitud_con_signo($valor)) {
+                        $agregar("slot '$ruta': no es una longitud-css válida (con signo opcional)");
+                    }
+                } elseif (!self::es_longitud_css($valor)) {
                     $agregar("slot '$ruta': no es una longitud-css válida");
                 }
                 return;
             case 'texto':
                 if (!is_string($valor)) {
                     $agregar("slot '$ruta': se esperaba texto");
-                }
-                return;
-            case 'rol':
-                // Q1(a): un rol abierto es un texto cuyo slug no queda vacío ni cambia de nombre al normalizarse.
-                if (!is_string($valor) || self::slug_de_rol($valor) === '') {
-                    $agregar("slot '$ruta': se esperaba el nombre de un rol (letras, números o guion)");
                 }
                 return;
             case 'enum':
@@ -399,10 +614,10 @@ final class COD_ADN_Requisitos
                     return;
                 }
                 if ($tipo['min'] !== null && $valor < $tipo['min']) {
-                    $agregar("slot '$ruta': numero " . COD_ADN_Js::numero_a_texto($valor) . ' por debajo del mínimo');
+                    $agregar("slot '$ruta': numero " . COD_ADN_Js::numero_a_texto($valor) . ' por debajo del mínimo ' . COD_ADN_Js::numero_a_texto($tipo['min']));
                 }
                 if ($tipo['max'] !== null && $valor > $tipo['max']) {
-                    $agregar("slot '$ruta': numero " . COD_ADN_Js::numero_a_texto($valor) . ' por encima del máximo');
+                    $agregar("slot '$ruta': numero " . COD_ADN_Js::numero_a_texto($valor) . ' por encima del máximo ' . COD_ADN_Js::numero_a_texto($tipo['max']));
                 }
                 return;
             case 'ref':
@@ -481,6 +696,157 @@ final class COD_ADN_Requisitos
         return $motivos;
     }
 
+    // ------------------------------------------------------------------
+    // El esquema, en el formato del manifiesto del Core (para medir la paridad)
+    // ------------------------------------------------------------------
+
+    /**
+     * El tipo de nuestro esquema escrito como lo publica el manifiesto del Core (`payloadSchema` de
+     * fixtures/adn/payload-schemas.json): `{kind: 'lista', of: …}`, `{kind: 'objeto', fields: {campo: {type, optional?}}}`…
+     *
+     * @param array<string, mixed> $tipo
+     * @return array<string, mixed>
+     */
+    private static function tipo_como_core(array $tipo): array
+    {
+        switch ($tipo['k']) {
+            case 'texto':
+                return ['kind' => 'texto'];
+            case 'color':
+                return ['kind' => 'color-css'];
+            case 'longitud':
+                return empty($tipo['signo']) ? ['kind' => 'longitud-css'] : ['kind' => 'longitud-css', 'conSigno' => true];
+            case 'enum':
+                return ['kind' => 'enum', 'values' => $tipo['v']];
+            case 'numero':
+                $n = ['kind' => 'numero'];
+                if ($tipo['min'] !== null) {
+                    $n['min'] = $tipo['min'];
+                }
+                if ($tipo['max'] !== null) {
+                    $n['max'] = $tipo['max'];
+                }
+                return $n;
+            case 'ref':
+                return $tipo['req'] === null ? ['kind' => 'ref'] : ['kind' => 'ref', 'reqId' => $tipo['req']];
+            case 'lista':
+                return ['kind' => 'lista', 'of' => self::tipo_como_core($tipo['of'])];
+            case 'union':
+                return ['kind' => 'union', 'of' => array_map([self::class, 'tipo_como_core'], $tipo['of'])];
+            default: // objeto
+                $campos = [];
+                foreach ($tipo['f'] as $nombre => $campo) {
+                    $campos[(string) $nombre] = self::campo_como_core($campo);
+                }
+                return ['kind' => 'objeto', 'fields' => $campos];
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $campo
+     * @return array<string, mixed>
+     */
+    private static function campo_como_core(array $campo): array
+    {
+        return $campo['opt'] ? ['type' => self::tipo_como_core($campo['t']), 'optional' => true] : ['type' => self::tipo_como_core($campo['t'])];
+    }
+
+    /**
+     * El `payloadSchema` de cada requisito que el plugin conoce, en el formato del manifiesto del Core.
+     * scripts/probar-adn-validador.php lo compara con fixtures/adn/payload-schemas.json: si el Core cambia un esquema y
+     * esta tabla no, la prueba falla.
+     *
+     * @return array<string, array<string, array<string, mixed>>> requisito → slot → {type, optional?}
+     */
+    public static function esquema_como_core(): array
+    {
+        $out = [];
+        foreach (self::esquemas() as $req => $slots) {
+            foreach ($slots as $slot => $campo) {
+                $out[(string) $req][(string) $slot] = self::campo_como_core($campo);
+            }
+        }
+        return $out;
+    }
+
+    /** ¿El plugin conoce la forma de este requisito (lo proyecta o lo valida sin proyectarlo)? */
+    public static function tiene_esquema(?string $requisito): bool
+    {
+        return $requisito !== null && isset(self::esquemas()[$requisito]);
+    }
+
+    // ------------------------------------------------------------------
+    // Lo que el Core deja al DESTINO
+    // ------------------------------------------------------------------
+
+    /**
+     * ¿El nombre de una escala da un slug propio? (no vacío, no sólo símbolos, no más de 80 caracteres).
+     * A diferencia de un rol tipográfico (slug_de_rol, que además limita los caracteres), una escala puede
+     * llamarse «ink a accent (65°)»: sólo importa que el slug no quede vacío.
+     */
+    public static function nombre_con_slug(string $nombre): bool
+    {
+        $limpio = COD_ADN_Js::trim($nombre);
+        if ($limpio === '' || mb_strlen($limpio, 'UTF-8') > 80) {
+            return false;
+        }
+        return COD_ADN_Projection::slug($limpio) !== 'x' || mb_strtolower($limpio, 'UTF-8') === 'x';
+    }
+
+    /**
+     * Las reglas que el manifiesto del Core NO mide y deja explícitamente al destino (sus `mappingNotes`):
+     * nombre único y con slug propio en roles y escalas. La forma ya cumple el esquema.
+     *
+     * Códigos propios: ADN_NAME_INVALID (el nombre no da un slug) y ADN_NAME_DUPLICATE (dos entradas de la misma lista
+     * con el mismo nombre; dos nombres distintos que den el mismo slug NO se rechazan: R3 los desambigua con -2).
+     *
+     * @param mixed $valor
+     * @return array<int, array{codigo: string, ruta: string, mensaje: string}>
+     */
+    public static function validar_destino(string $requisito, $valor): array
+    {
+        if (!$valor instanceof stdClass) {
+            return [];
+        }
+        // slot de lista → campo del nombre, y si el nombre es de un rol tipográfico (regla más estricta).
+        $listas = [
+            'dim1.req15' => [['transparencias', 'nombre', false]],
+            'dim1.req16' => [['degradados', 'nombre', false]],
+            'dim2.req02' => [['roleStyles', 'role', true]],
+            'dim2.req09' => [['pesos', 'nombre', false], ['interlineados', 'nombre', false]],
+            'dim3.req10' => [['quiebres', 'nombre', false]],
+            'dim3.req12' => [['medidas', 'nombre', false]],
+            'dim4.req09' => [['sombras', 'nombre', false]],
+            'dim4.req10' => [['grosores', 'nombre', false]],
+            'dim4.req11' => [['desenfoques', 'nombre', false]],
+        ];
+        $motivos = [];
+        foreach ($listas[$requisito] ?? [] as [$slot, $campo, $es_rol]) {
+            if (!property_exists($valor, $slot) || !is_array($valor->{$slot})) {
+                continue;
+            }
+            $vistos = [];
+            foreach ($valor->{$slot} as $i => $item) {
+                if (!$item instanceof stdClass || !property_exists($item, $campo) || !is_string($item->{$campo})) {
+                    continue;
+                }
+                $nombre = COD_ADN_Js::trim($item->{$campo});
+                $ruta = $slot . '[' . $i . '].' . $campo;
+                $da_slug = $es_rol ? self::slug_de_rol($nombre) !== '' : self::nombre_con_slug($nombre);
+                if (!$da_slug) {
+                    $motivos[] = ['codigo' => 'ADN_NAME_INVALID', 'ruta' => $ruta, 'mensaje' => "slot '$ruta': el nombre " . json_encode($item->{$campo}, JSON_UNESCAPED_UNICODE) . ' no da un slug propio (no puede quedar vacío ni ser sólo símbolos)'];
+                    continue;
+                }
+                if (isset($vistos[$nombre])) {
+                    $motivos[] = ['codigo' => 'ADN_NAME_DUPLICATE', 'ruta' => $ruta, 'mensaje' => "slot '$ruta': el nombre " . json_encode($nombre, JSON_UNESCAPED_UNICODE) . ' ya está en ' . $slot . '[' . $vistos[$nombre] . ']'];
+                    continue;
+                }
+                $vistos[$nombre] = $i;
+            }
+        }
+        return $motivos;
+    }
+
     /**
      * El tipo que un `ref` en la ruta dada debe alcanzar, o null si el esquema no lo dice.
      * Si el slot es una unión, el valor alcanzado debe cumplir alguno de los miembros que NO
@@ -522,10 +888,19 @@ final class COD_ADN_Requisitos
     /**
      * ¿El valor alcanzado por un ref cumple alguno de los miembros esperados?
      *
+     * Una referencia puede llegar a un VALOR del tipo esperado (`dim1.req01 → institucionales[0].value`, un color) o a la ENTRADA
+     * completa del requisito destino (`institucionales[0]`, un objeto `{name, value}`): así apuntan todas las referencias de los requisitos
+     * que el Core agregó el 02-nov-2026 (transparencias, degradados, sombras, formulario…) y el destino lee de la entrada lo que necesita
+     * (`name` para el slug, `value` para el color). Una entrada se acepta; lo que sigue rechazándose es llegar a un texto, número o
+     * lista que no es del tipo esperado (el NOMBRE «Verde oliva» donde va un color).
+     *
      * @param array<int, array<string, mixed>> $miembros
      */
     public static function cumple_alguno($valor, array $miembros): bool
     {
+        if ($valor instanceof stdClass) {
+            return true;
+        }
         foreach ($miembros as $m) {
             $propios = [];
             self::validar_tipo($valor, $m, '', $propios);

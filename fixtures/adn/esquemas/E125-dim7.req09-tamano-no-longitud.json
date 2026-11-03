@@ -1,0 +1,29 @@
+{
+  "id": "E125-dim7.req09-tamano-no-longitud",
+  "capa": 4,
+  "requisito": "dim7.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "mal",
+  "descripcion": "Un tamaño de letra que no es longitud.",
+  "value": {
+    "temaFormulario": {
+      "tipografia": {
+        "campoTamano": "normal"
+      }
+    }
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "temaFormulario.tipografia.campoTamano"
+    ],
+    "motivos": [
+      "slot 'temaFormulario.tipografia.campoTamano': no es una longitud-css válida"
+    ],
+    "predicado": "cumple"
+  }
+}

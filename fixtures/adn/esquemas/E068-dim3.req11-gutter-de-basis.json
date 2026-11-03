@@ -1,0 +1,60 @@
+{
+  "id": "E068-dim3.req11-gutter-de-basis",
+  "capa": 4,
+  "requisito": "dim3.req11",
+  "manifiesto": {
+    "manifestVersion": "1.2",
+    "revision": 3
+  },
+  "intencion": "ok",
+  "descripcion": "El «gutter» de Basis: `max(10%, calc((100% - 1080px) / 2))` declarado por sus dos datos.",
+  "value": {
+    "margenLateral": {
+      "nombre": "gutter",
+      "minimo": "10%",
+      "contenedor": {
+        "refReqId": "dim3.req05",
+        "refPath": [
+          "contenedores",
+          0
+        ]
+      }
+    }
+  },
+  "contexto": {
+    "dim3.req05": {
+      "contenedores": [
+        {
+          "nombre": "contenido",
+          "maxWidth": "1080px",
+          "padding": {
+            "refReqId": "dim3.req02",
+            "refPath": [
+              "roleSpacing",
+              0
+            ]
+          },
+          "relacionSoporte": "centrado"
+        },
+        {
+          "nombre": "amplio",
+          "maxWidth": "1440px",
+          "padding": {
+            "refReqId": "dim3.req02",
+            "refPath": [
+              "roleSpacing",
+              1
+            ]
+          },
+          "relacionSoporte": "centrado"
+        }
+      ]
+    }
+  },
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "cumple"
+  }
+}

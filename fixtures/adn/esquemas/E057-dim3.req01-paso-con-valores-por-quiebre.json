@@ -1,0 +1,47 @@
+{
+  "id": "E057-dim3.req01-paso-con-valores-por-quiebre",
+  "capa": 4,
+  "requisito": "dim3.req01",
+  "manifiesto": {
+    "manifestVersion": "1.2",
+    "revision": 3
+  },
+  "intencion": "ok",
+  "descripcion": "Q4: el paso «60» de Basis vale 20px, 19px en tableta y 20px en celular.",
+  "value": {
+    "unidad": "4px",
+    "escala": [
+      {
+        "step": 60,
+        "value": "20px",
+        "porQuiebre": [
+          {
+            "quiebre": "tablet",
+            "value": "19px"
+          },
+          {
+            "quiebre": "mobile",
+            "value": "20px"
+          }
+        ]
+      },
+      {
+        "step": 90,
+        "value": "24px",
+        "porQuiebre": [
+          {
+            "quiebre": "tablet",
+            "value": "0px"
+          }
+        ]
+      }
+    ]
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "cumple"
+  }
+}

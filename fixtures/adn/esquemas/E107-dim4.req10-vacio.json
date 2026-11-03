@@ -1,0 +1,19 @@
+{
+  "id": "E107-dim4.req10-vacio",
+  "capa": 4,
+  "requisito": "dim4.req10",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "soloForma",
+  "descripcion": "Objeto vacío.",
+  "value": {},
+  "contexto": {},
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "no-cumple"
+  }
+}

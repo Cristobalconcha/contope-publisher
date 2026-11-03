@@ -1,0 +1,56 @@
+{
+  "id": "E007-dim1.req15-opacidad-101",
+  "capa": 4,
+  "requisito": "dim1.req15",
+  "manifiesto": {
+    "manifestVersion": "1.3",
+    "revision": 4
+  },
+  "intencion": "mal",
+  "descripcion": "Opacidad 101.",
+  "value": {
+    "transparencias": [
+      {
+        "nombre": "x",
+        "base": {
+          "refReqId": "dim1.req01",
+          "refPath": [
+            "neutros",
+            0
+          ]
+        },
+        "opacidad": 101
+      }
+    ]
+  },
+  "contexto": {
+    "dim1.req01": {
+      "institucionales": [
+        {
+          "name": "Naranja Basis",
+          "value": "#F26621"
+        }
+      ],
+      "neutros": [
+        {
+          "name": "Tinta",
+          "value": "#0E0C19"
+        },
+        {
+          "name": "Gris",
+          "value": "#898989"
+        }
+      ]
+    }
+  },
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "transparencias[0].opacidad"
+    ],
+    "motivos": [
+      "slot 'transparencias[0].opacidad': numero 101 por encima del máximo 100"
+    ],
+    "predicado": "cumple"
+  }
+}

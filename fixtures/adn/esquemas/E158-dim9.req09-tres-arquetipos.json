@@ -1,0 +1,34 @@
+{
+  "id": "E158-dim9.req09-tres-arquetipos",
+  "capa": 4,
+  "requisito": "dim9.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "ok",
+  "descripcion": "Tres de los diez arquetipos con su familia de bloque (no se exige cubrir los diez).",
+  "value": {
+    "correspondencias": [
+      {
+        "arquetipo": "accion",
+        "familiaDeBloque": "core/button"
+      },
+      {
+        "arquetipo": "contenedor",
+        "familiaDeBloque": "core/group"
+      },
+      {
+        "arquetipo": "representacion-de-datos",
+        "familiaDeBloque": "core/gallery"
+      }
+    ]
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "cumple"
+  }
+}

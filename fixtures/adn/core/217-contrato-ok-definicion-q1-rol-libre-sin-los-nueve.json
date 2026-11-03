@@ -1,0 +1,142 @@
+{
+  "id": "217-contrato-ok-definicion-q1-rol-libre-sin-los-nueve",
+  "capa": 1,
+  "funcion": "parseDesignContract",
+  "origen": "nuevo",
+  "descripcion": "Tampoco mira la cobertura: un `dim2.req02` con un solo rol libre es un contrato válido. Que falten los nueve roles Core lo dice el predicado del requisito, no el sobre.",
+  "incomodo": true,
+  "entrada": {
+    "schemaVersion": 1,
+    "design": {
+      "id": "d1",
+      "revision": 1,
+      "createdAt": "2026-08-02T00:00:00.000Z",
+      "updatedAt": "2026-08-02T00:00:00.000Z"
+    },
+    "sources": [
+      {
+        "id": "brief",
+        "technicalKind": "text",
+        "purpose": "observation",
+        "label": "Project brief",
+        "locator": "Project brief",
+        "path": ".codesign/sources/brief.txt",
+        "importedAt": "2026-08-02T00:00:00.000Z"
+      }
+    ],
+    "definitions": [
+      {
+        "id": "dim2.req02.def1",
+        "category": "otra",
+        "name": "dim2.req02.def1",
+        "value": {
+          "roleStyles": [
+            {
+              "role": "titular-grande",
+              "family": {
+                "refReqId": "dim2.req01",
+                "refPath": [
+                  "familias",
+                  0
+                ]
+              },
+              "fontSize": "16px",
+              "fontWeight": 400,
+              "lineHeight": 1.5,
+              "source": "medido en el sitio",
+              "derivation": {
+                "of": "direct",
+                "rule": "medido"
+              }
+            }
+          ]
+        },
+        "state": "confirmed",
+        "authority": "human-confirmed",
+        "evidenceSourceIds": [
+          "brief"
+        ],
+        "provenance": [
+          {
+            "sourceId": "brief"
+          }
+        ],
+        "constraintDefinitionIds": [],
+        "reviewedAt": "2026-08-02T00:00:00.000Z"
+      }
+    ],
+    "developmentTasks": [],
+    "projections": {
+      "designMd": null
+    }
+  },
+  "esperado": {
+    "valido": true,
+    "salida": {
+      "schemaVersion": 1,
+      "design": {
+        "id": "d1",
+        "revision": 1,
+        "createdAt": "2026-08-02T00:00:00.000Z",
+        "updatedAt": "2026-08-02T00:00:00.000Z"
+      },
+      "sources": [
+        {
+          "id": "brief",
+          "technicalKind": "text",
+          "purpose": "observation",
+          "label": "Project brief",
+          "locator": "Project brief",
+          "path": ".codesign/sources/brief.txt",
+          "importedAt": "2026-08-02T00:00:00.000Z"
+        }
+      ],
+      "definitions": [
+        {
+          "id": "dim2.req02.def1",
+          "category": "otra",
+          "name": "dim2.req02.def1",
+          "value": {
+            "roleStyles": [
+              {
+                "role": "titular-grande",
+                "family": {
+                  "refReqId": "dim2.req01",
+                  "refPath": [
+                    "familias",
+                    0
+                  ]
+                },
+                "fontSize": "16px",
+                "fontWeight": 400,
+                "lineHeight": 1.5,
+                "source": "medido en el sitio",
+                "derivation": {
+                  "of": "direct",
+                  "rule": "medido"
+                }
+              }
+            ]
+          },
+          "state": "confirmed",
+          "authority": "human-confirmed",
+          "evidenceSourceIds": [
+            "brief"
+          ],
+          "provenance": [
+            {
+              "sourceId": "brief"
+            }
+          ],
+          "constraintDefinitionIds": [],
+          "reviewedAt": "2026-08-02T00:00:00.000Z"
+        }
+      ],
+      "developmentTasks": [],
+      "projections": {
+        "designMd": null
+      }
+    }
+  },
+  "cubre": []
+}

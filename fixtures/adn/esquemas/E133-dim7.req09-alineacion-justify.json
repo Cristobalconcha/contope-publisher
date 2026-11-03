@@ -1,0 +1,29 @@
+{
+  "id": "E133-dim7.req09-alineacion-justify",
+  "capa": 4,
+  "requisito": "dim7.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "mal",
+  "descripcion": "Alineación fuera de left|center|right.",
+  "value": {
+    "temaFormulario": {
+      "medidas": {
+        "contadorAlineacion": "justify"
+      }
+    }
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "temaFormulario.medidas.contadorAlineacion"
+    ],
+    "motivos": [
+      "slot 'temaFormulario.medidas.contadorAlineacion': se esperaba uno de enum(left|center|right)"
+    ],
+    "predicado": "cumple"
+  }
+}

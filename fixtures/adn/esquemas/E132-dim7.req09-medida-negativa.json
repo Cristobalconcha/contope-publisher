@@ -1,0 +1,29 @@
+{
+  "id": "E132-dim7.req09-medida-negativa",
+  "capa": 4,
+  "requisito": "dim7.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "mal",
+  "descripcion": "Una medida negativa.",
+  "value": {
+    "temaFormulario": {
+      "medidas": {
+        "botonAncho": "-100%"
+      }
+    }
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      "temaFormulario.medidas.botonAncho"
+    ],
+    "motivos": [
+      "slot 'temaFormulario.medidas.botonAncho': no es una longitud-css válida"
+    ],
+    "predicado": "cumple"
+  }
+}

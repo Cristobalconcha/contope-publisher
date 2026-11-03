@@ -1,0 +1,25 @@
+{
+  "id": "E118-dim7.req09-sombra-ninguna",
+  "capa": 4,
+  "requisito": "dim7.req09",
+  "manifiesto": {
+    "manifestVersion": "1.1",
+    "revision": 2
+  },
+  "intencion": "ok",
+  "descripcion": "La sombra puede ser la palabra `none`.",
+  "value": {
+    "temaFormulario": {
+      "sombras": {
+        "botonSombra": "none"
+      }
+    }
+  },
+  "contexto": {},
+  "esperado": {
+    "forma": "valida",
+    "rutas": [],
+    "motivos": [],
+    "predicado": "cumple"
+  }
+}

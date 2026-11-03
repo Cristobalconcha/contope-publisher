@@ -1,0 +1,42 @@
+{
+  "id": "E016-dim1.req15-payload-no-es-objeto",
+  "capa": 4,
+  "requisito": "dim1.req15",
+  "manifiesto": {
+    "manifestVersion": "1.3",
+    "revision": 4
+  },
+  "intencion": "mal",
+  "descripcion": "El payload es una lista, no un objeto.",
+  "value": [],
+  "contexto": {
+    "dim1.req01": {
+      "institucionales": [
+        {
+          "name": "Naranja Basis",
+          "value": "#F26621"
+        }
+      ],
+      "neutros": [
+        {
+          "name": "Tinta",
+          "value": "#0E0C19"
+        },
+        {
+          "name": "Gris",
+          "value": "#898989"
+        }
+      ]
+    }
+  },
+  "esperado": {
+    "forma": "invalida",
+    "rutas": [
+      ""
+    ],
+    "motivos": [
+      "el payload debe ser un objeto (la definición efectiva del requisito)"
+    ],
+    "predicado": "no-cumple"
+  }
+}

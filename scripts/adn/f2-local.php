@@ -4,7 +4,7 @@
  * Los orquesta scripts/adn/probar-portabilidad-presets.mjs; no es una prueba por sí mismo.
  *
  *   php f2-local.php importar-r1              importa el ADN derivado del theme.json de Basis (r1)
- *   php f2-local.php exportar-paquete <zip>   exporta el sitio (sin medios) a un .ocdsite
+ *   php f2-local.php exportar-paquete <zip> [--con-medios]   exporta el sitio a un .ocdsite (sin medios, salvo --con-medios)
  *   php f2-local.php importar-r2 <hex>        importa la revisión 2 con otro accent (para medir el cambio en el navegador)
  *   php f2-local.php quitar                   quita todo lo que se importó y deja el modo de la compuerta como estaba
  *
@@ -54,7 +54,8 @@ if ($accion === 'importar-r1') {
         $falla('falta la ruta de salida o no hay ADN activo');
     }
     $repositorio = new COD_Canvas_Document_Repository();
-    $zip = (new COD_Site_Package_Exporter($repositorio))->export(false);
+    // Con --con-medios el paquete lleva las fotos y los videos: lo que el navegador necesita para ver el sitio importado igual que el local.
+    $zip = (new COD_Site_Package_Exporter($repositorio))->export(in_array('--con-medios', $argv, true));
     if (is_wp_error($zip)) {
         $falla($zip->get_error_code() . ': ' . $zip->get_error_message());
     }
