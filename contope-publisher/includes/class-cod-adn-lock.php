@@ -13,8 +13,9 @@ if (!defined('ABSPATH')) {
  * cambia lo que TODOS los documentos pueden referenciar, así que no puede convivir con una
  * escritura de documento en curso, ni al revés.
  *
- * SEMÁNTICA LECTOR/ESCRITOR, sobre el mismo mutex de `add_option` que ya usa el repositorio
- * (atómico: la segunda inserción de la misma opción falla):
+ * SEMÁNTICA LECTOR/ESCRITOR, sobre COD_Mutex (un `INSERT IGNORE` que decide quién gana; el
+ * bloqueo exclusivo y el de cada documento lo usan. OJO: `add_option()` NO sirve de mutex, comprueba y
+ * escribe en dos pasos y la segunda inserción PISA la primera; ver class-cod-mutex.php):
  *
  *   - el IMPORT toma el bloqueo EXCLUSIVO (`cod_adn_lock_x`);
  *   - CADA ESCRITURA DE DOCUMENTO toma uno COMPARTIDO (`cod_adn_lock_s_<token>`, uno por
@@ -131,7 +132,7 @@ final class COD_ADN_Lock
         }
     }
 
-    /** @return array{option: string, token: string}|WP_Error */
+    /** @return array{option: string, token: string, value: string}|WP_Error */
     public static function exclusivo()
     {
         $token = wp_generate_uuid4();
@@ -139,36 +140,26 @@ final class COD_ADN_Lock
         if (!is_string($valor)) {
             return self::ocupado('No fue posible preparar el bloqueo de diseño.', 'bloqueo');
         }
-        if (!add_option(self::OPCION_EXCLUSIVO, $valor, '', false)) {
-            if (self::exclusivo_vivo() !== null) {
-                return self::ocupado('Otro import del ADN está en curso.', 'import');
-            }
-            // Venció: se limpia y se reintenta una sola vez.
-            delete_option(self::OPCION_EXCLUSIVO);
-            if (!add_option(self::OPCION_EXCLUSIVO, $valor, '', false)) {
-                return self::ocupado('Otro import del ADN está en curso.', 'import');
-            }
+        // ATÓMICO (COD_Mutex): una sola sentencia decide quién gana; un bloqueo vencido se quita
+        // sólo si sigue siendo el mismo que se vio (add_option() comprobaba y escribía en dos pasos).
+        if (!COD_Mutex::tomar_o_recuperar_vencido(self::OPCION_EXCLUSIVO, $valor)) {
+            return self::ocupado('Otro import del ADN está en curso.', 'import');
         }
         // Bandera levantada; ahora, las de las escrituras de documento.
         if (self::compartidos_vivos() > 0) {
-            delete_option(self::OPCION_EXCLUSIVO);
+            COD_Mutex::soltar(self::OPCION_EXCLUSIVO, $valor);
             return self::ocupado('Hay una escritura de documento en curso. Reintenta el import en unos segundos.', 'escritura');
         }
-        return ['option' => self::OPCION_EXCLUSIVO, 'token' => $token];
+        return ['option' => self::OPCION_EXCLUSIVO, 'token' => $token, 'value' => $valor];
     }
 
-    /** @param array{option: string, token: string}|WP_Error|null $bloqueo */
+    /** @param array{option: string, token: string, value: string}|WP_Error|null $bloqueo */
     public static function soltar_exclusivo($bloqueo): void
     {
-        global $wpdb;
-        if (!is_array($bloqueo) || !isset($bloqueo['token'])) {
+        if (!is_array($bloqueo) || !isset($bloqueo['value'])) {
             return;
         }
-        $crudo = $wpdb->get_var($wpdb->prepare("SELECT option_value FROM {$wpdb->options} WHERE option_name = %s", self::OPCION_EXCLUSIVO));
-        $dato = is_string($crudo) ? json_decode($crudo, true) : null;
-        // Sólo se suelta lo propio: si venció y otro lo tomó, no se le quita.
-        if (is_array($dato) && ($dato['token'] ?? '') === $bloqueo['token']) {
-            delete_option(self::OPCION_EXCLUSIVO);
-        }
+        // Sólo se suelta lo propio (DELETE condicional al valor): si venció y otro lo tomó, no se le quita.
+        COD_Mutex::soltar(self::OPCION_EXCLUSIVO, $bloqueo['value']);
     }
 }

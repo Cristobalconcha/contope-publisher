@@ -45,6 +45,7 @@ require_once COD_PUBLISHER_DIR . 'includes/class-cod-adn-design-md.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-adn-parser.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-adn-requisitos.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-adn-validator.php';
+require_once COD_PUBLISHER_DIR . 'includes/class-cod-mutex.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-adn-lock.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-adn-projection.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-adn-integridad.php';

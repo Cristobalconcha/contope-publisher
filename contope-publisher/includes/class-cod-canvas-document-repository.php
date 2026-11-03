@@ -741,17 +741,12 @@ final class COD_Canvas_Document_Repository
             return new WP_Error('cod_canvas_lock_failed', 'No fue posible preparar el bloqueo de escritura Canvas.');
         }
 
-        if (!add_option($option, $value, '', false)) {
-            $existing = json_decode((string) get_option($option, ''), true);
-            $expired = is_array($existing) && isset($existing['expiresAt']) && (int) $existing['expiresAt'] < time();
-            if ($expired) {
-                delete_option($option);
-            }
-            if (!$expired || !add_option($option, $value, '', false)) {
-                $error = new WP_Error('cod_canvas_document_busy', 'El documento Canvas está siendo modificado por otra operación.');
-                $error->add_data(['retryAfterSeconds' => self::MUTATION_LOCK_TTL_SECONDS]);
-                return $error;
-            }
+        // ATÓMICO (COD_Mutex): add_option() comprobaba y escribía en dos pasos, y dos procesos
+        // podían pasar a la vez (los dos creían tener el bloqueo y una escritura se perdía).
+        if (!COD_Mutex::tomar_o_recuperar_vencido($option, $value)) {
+            $error = new WP_Error('cod_canvas_document_busy', 'El documento Canvas está siendo modificado por otra operación.');
+            $error->add_data(['retryAfterSeconds' => self::MUTATION_LOCK_TTL_SECONDS]);
+            return $error;
         }
 
         return ['option' => $option, 'value' => $value];
@@ -760,9 +755,8 @@ final class COD_Canvas_Document_Repository
     /** @param array{option: string, value: string} $lock */
     private function release_document_lock(array $lock): void
     {
-        if ((string) get_option($lock['option'], '') === $lock['value']) {
-            delete_option($lock['option']);
-        }
+        // Sólo si la fila sigue siendo la propia (si venció y otro la tomó, no se le quita).
+        COD_Mutex::soltar($lock['option'], $lock['value']);
     }
 
     /**
