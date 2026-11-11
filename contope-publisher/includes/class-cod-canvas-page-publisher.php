@@ -1832,6 +1832,11 @@ CSS;
                 . self::pestanas_css($header_html . $body_html . $footer_html)
                 . self::marquesina_css($header_html . $body_html . $footer_html)
                 . self::aviso_css($header_html . $body_html . $footer_html)
+                // Los dos que faltaban en este camino. Sin ellos, una página servida por acá
+                // pierde el acordeón (todas las respuestas abiertas, la pregunta como botón del
+                // sistema) y el mensaje de WhatsApp. Los dos caminos tienen que emitir lo mismo.
+                . self::wa_mensaje_css($header_html . $body_html . $footer_html)
+                . self::acordeon_css($header_html . $body_html . $footer_html)
                 . self::mapa_css($header_html . $body_html . $footer_html)
                 . COD_Divisor::css($header_html . $body_html . $footer_html)
                 . COD_Icono::css($header_html . $body_html . $footer_html)
