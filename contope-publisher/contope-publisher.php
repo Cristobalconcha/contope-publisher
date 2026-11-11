@@ -2,7 +2,7 @@
 /**
  * Plugin Name: ContOpe Publisher
  * Description: Importa proyectos ContOpe Design como páginas Gutenberg nativas y editables.
- * Version: 0.3.85
+ * Version: 0.3.86
  * Requires at least: 6.5
  * Requires PHP: 8.0
  * Author: Cristóbal Concha
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('COD_PUBLISHER_VERSION', '0.3.85');
+define('COD_PUBLISHER_VERSION', '0.3.86');
 define('COD_PUBLISHER_FILE', __FILE__);
 define('COD_PUBLISHER_DIR', plugin_dir_path(__FILE__));
 
@@ -47,6 +47,7 @@ require_once COD_PUBLISHER_DIR . 'includes/class-cod-adn-requisitos.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-adn-validator.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-mutex.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-adn-lock.php';
+require_once COD_PUBLISHER_DIR . 'includes/class-cod-adn-block-styles.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-adn-projection.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-adn-integridad.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-adn-store.php';
@@ -73,6 +74,7 @@ require_once COD_PUBLISHER_DIR . 'includes/class-cod-iconos-de-bloque.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-imagen-progresiva.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-diseno-hoja.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-mapa.php';
+require_once COD_PUBLISHER_DIR . 'includes/class-cod-plano-parcelas.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-canvas-mcp-recipe-compiler.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-canvas-mcp-service.php';
 require_once COD_PUBLISHER_DIR . 'includes/class-cod-mcp-server.php';

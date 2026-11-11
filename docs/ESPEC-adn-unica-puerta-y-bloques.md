@@ -9,6 +9,16 @@ contra la copia local del Core en `c3a96f3` (19-sep, nueve commits atrás); los 
 ambas. Los `archivo:línea` agregados en esta versión se verificaron leyendo esas dos versiones (los heredados de la
 primera versión no se volvieron a medir salvo que el texto lo diga); si cualquiera de las dos cambia, hay que releerlos. El detalle de cada hallazgo de la auditoría está en `docs/CORRECCIONES-auditoria-aymara-2026-11-01.md`.
 
+**Actualización del 02-nov-2026 (la historia de abajo se conserva; lo resuelto se marca con «RESUELTO el 02-nov-2026»).** Las tres preguntas
+que bloqueaban fases se contestaron ese día y el trabajo ya está hecho: **Q1** (roles tipográficos abiertos), **Q3** (sombras, diferencia por variante
+y arquetipo → familia de bloque) y **Q4** (lo que el ADN necesita para que un sitio sea idéntico al local) se resolvieron ampliando el Core
+(commit `c6a9a68`: doce requisitos nuevos, `docs/PEDIDOS-AL-CORE.md` del Core, sección «Resuelto el 02-nov-2026»). El plugin porta sus formas con
+paridad exacta y proyecta todo al `theme.json` (commit `09c5231` en la rama `basis-transcriptor`); los estilos de bloque (`dim9.req08` y
+`dim9.req09`: el relleno de `core/group`, la proporción de las fotos y el alto de los recuadros por punto de quiebre) los emite la clase
+`COD_ADN_Block_Styles` (mismo día, trabajo posterior a `09c5231`; ver 3.6.1). **Dónde está cada fase:** F1, F1b y F2 construidas; F4b y F8 **ya no están
+bloqueadas por Q3**, pero siguen **sin construir**; F6 sigue reestimada como trabajo del Core. Lo que quedó fuera del ADN, con su razón, está en
+`COD_ADN_Theme::fuera_del_adn()`.
+
 Lo que mandó el dueño (Cristóbal), textual, y de lo que cuelga todo este documento:
 
 > «nuestro MCP no admita una incorporación de parámetros de diseño que no sea a través de lo que ContOpe Core es
@@ -35,7 +45,7 @@ uno; las correcciones están **dentro** del texto, no en un anexo. [D] = decidid
 | H3 | `projectData` y atributos SVG quedaban fuera del barrido | **4.1** (qué se inspecciona), 4.3, 4.4, F4 (P4.4b) |
 | H4 | El inventario de referencias miraba un registro que se borra | **3.6** (integridad sobre lo servido; la hoja no pierde documentos parchados), F1 (P1.7), F3 (P3.3) |
 | H5 | La atomicidad no estaba resuelta | **3.3** (proyecciones por revisión, puntero único, bloqueo global), 3.6, F1 (P1.5, P1.6), F2 (P2.4) |
-| H6 | El Core no tiene sombras ni variantes con datos | 2.1, 4.1, 6.2, 6.5, **9.1 (Q3)**, F4b y F8 **bloqueadas por Q3** |
+| H6 | El Core no tiene sombras ni variantes con datos | 2.1, 4.1, 6.2, 6.5, **9.1 (Q3)**, F4b y F8 **bloqueadas por Q3** [RESUELTO el 02-nov-2026: Q3 se contestó (a) y el Core ya tiene `dim4.req09`, `dim9.req08` y `dim9.req09` (`c6a9a68`); F4b y F8 ya no están bloqueadas, siguen sin construir] |
 | H7 | Validar la forma no valida las dependencias | **3.2** (regla R6), 3.5 (estado efectivo), 4.4, F1 (P1.8) |
 | H8 | El regreso a Desktop pierde información | 2.2, 5.2, **5.4**, F5 (P5.7), **F6 reestimada como trabajo del Core** (P6.1-P6.3) |
 | H9 | Exportar/importar devuelve la página al lienzo | 2.3, 3.4, **F1b** (lector nuevo; P1b.1-P1b.3) |
@@ -45,7 +55,7 @@ uno; las correcciones están **dentro** del texto, no en un anexo. [D] = decidid
 | H13 | La paridad 100 % PHP/TS es imposible como estaba escrita | **3.2** (tres capas), Anexo A, F0 (P0.1), F1 (P1.1, P1.4) |
 | H14 | Una pendiente `value: {}` haría caer el import | **3.2** (R2), F1 (P1.9) |
 
-Cambios de plan: **F4b y F8 quedan bloqueadas por Q3; F6 se reestima como trabajo del Core; se agrega F0b**
+Cambios de plan (01-nov; [RESUELTO el 02-nov-2026: F4b y F8 dejaron de estar bloqueadas por Q3, ver 9.1]): **F4b y F8 quedan bloqueadas por Q3; F6 se reestima como trabajo del Core; se agrega F0b**
 (instrumentos de prueba). Antes de cualquier fase de construcción se cierran los cinco contratos (qué ve el público y
 cómo se activa; datos tipados y dependencias; inspección completa de las entradas; ida y vuelta sin pérdidas;
 migración, reversa y pruebas que fallen de verdad). Esta versión vuelve a auditoría de Aymara (disponible hasta el
@@ -91,7 +101,7 @@ migración, reversa y pruebas que fallen de verdad). Esta versión vuelve a audi
    declaradas en el ADN. **Ningún valor de diseño dentro de un bloque.** El mapa nodo→bloque está en 6.2; sólo
    faltan tres bloques propios (`contope/formulario`, `contope/mapa`, `contope/whatsapp`). Las variaciones que
    necesitan datos (sombras, diferencia por variante) están **bloqueadas por Q3**: hoy el Core no las puede expresar
-   (2.1).
+   (2.1). [RESUELTO el 02-nov-2026: el Core las expresa desde `c6a9a68` (`dim4.req09`, `dim9.req08`, `dim9.req09`) y el plugin las proyecta; ya no están bloqueadas.]
 10. **Lo que apareció midiendo y cambia el plan:** colores y familias de Basis ya están gobernados (0 literales),
     pero **la escala no**: 262 espaciados, 26 valores tipográficos, 23 radios y 11 grosores literales en reglas
     `properties`, más 49 tamaños de letra en reglas `typography`. Y el plugin lleva **valores de diseño dentro de
@@ -100,7 +110,8 @@ migración, reversa y pruebas que fallen de verdad). Esta versión vuelve a audi
 11. **Las tensiones que sólo el dueño resuelve** (9.1): **Q1**, `dim2.req02` del Core enumera **9 roles tipográficos**
     y Basis mide **14 tamaños de letra** en **20 combinaciones** familia-peso-tamaño (o se abre la lista en el Core, o
     Basis se normaliza y cambia de tamaño en algunos títulos); y **Q3**, el Core no tiene escala de sombras ni
-    diferencia de variantes con datos (o se abren esos requisitos, o Basis deja ese hueco declarado).
+    diferencia de variantes con datos (o se abren esos requisitos, o Basis deja ese hueco declarado). [RESUELTO el 02-nov-2026: Q1 (a), Q3 (a) y Q4 (a);
+    el Core se amplió (`c6a9a68`) y el plugin lo porta y lo proyecta (`09c5231`).]
 12. **Orden de subida a producción:** plugin (sin efecto visible) → tema con `theme.json` generado (misma paleta)
     → ADN → páginas al final. Cada paso reversible; en ningún momento el sitio depende de algo que aún no subió.
 13. **El rechazo de propuestas va en la escritura, no en «publicar»** (H1): en `enforce`, preview/apply/patch/write
@@ -141,7 +152,7 @@ Lo que sigue sale de leer código y correr guiones (anexo C). Donde dice "no enc
 | `parsePortableDesignModel` exige **claves exactas** y que `designMd.content` sea **idéntico byte a byte** a `renderDesignContractDesignMd(contract)`. `provenance.producer` sólo puede ser `'contope-design-desktop'`; `transport` exige URNs `urn:ocd:package:*` / `urn:ocd:project:*`. | `design-contract-portable.ts:204-254` (la igualdad, `:233-237`; su prueba, `design-contract-portable.test.ts:132-137`), `:128-144`, `:105-126` | Portar la igualdad de `DESIGN.md` obliga a portar el renderizador entero (`design-contract-design-md.ts`, 257 líneas con orden y JSON estables). **Se decide portarlo** (3.2, capa 1): si no, el plugin aceptaría envoltorios que el Core rechaza. Y un extractor **no puede** emitir el envoltorio sin falsear el productor. |
 | Nadie llama a `createPortableDesignPackageContribution` fuera de su propio módulo. | `grep` en `ContOpeDesign-Core` (sólo definición y pruebas) | **Hoy ningún emisor produce `design/model.json`.** Desktop exporta `design-contract.json` + `DESIGN.md` (`packages/desktop/src/dominio/capsula.ts: proyectarCapsula`). |
 | Los payloads de cada requisito están tipados: `dim1.req01` → `{institucionales:[{name,value}], neutros:[…]}`; `dim1.req02` → `roleColors`; `dim2.req01` → `familias:[{name,stack,idiomas,licencia}]`; `dim2.req02` → `roleStyles` con `role ∈ CORE_ROLES_9`; `dim2.req07` → correspondencia con el **almacén plano** de WordPress; `dim3.req01` → `{unidad, escala:[{step,value}]}`; `dim3.req02` → `roleSpacing`; `dim4.req02` → `formas[].radioValor`; `dim8.req03` → `escala:[{nombre,duracion}]`. | `requirement-manifest/manifest-v0-dim{1,2,3,4,8,9}.ts` | El ADN **ya tiene dónde poner** paleta, familias, escala de espacio, radios y duraciones. Faltan por leer antes de fijar el mapeo: `dim4.req03`, `dim8.req02/04` y los requisitos de contenedores/retícula de `dim3`. |
-| **El Core NO puede expresar sombras con valores ni variantes con datos** (medido en `6115353`). `dim4.req04` (profundidad) sólo trae `{rol, nivel, stacking, oclusion}` y su propio `mappingNotes` lo llama «BRECHA DECLARADA»; `dim4.req05` es política de efectos, no una escala. En `dim9.req03`, `diferencia` es **texto** y `arquetipo` es una lista abstracta, no una familia de bloque. | `manifest-v0-dim4.ts:384-423` y `:436-474`; `manifest-v0-dim9.ts:345` | **Q3 (9.1).** F4b (presets de sombra) y F8 (variaciones de bloque) quedan **bloqueadas** hasta que el Core tenga (a) una escala de sombras tipada `{nombre, x, y, desenfoque, expansión, color→ref}` y (b) una diferencia por variante tipada `propiedad → valor|ref`, más la correspondencia arquetipo → familia de bloque. Mientras tanto, una sombra o variante pedida da `ADN_NAME_UNRESOLVED`: **nunca** se interpreta prosa ni se inventa un valor en el adaptador. |
+| **El Core NO puede expresar sombras con valores ni variantes con datos** (medido en `6115353`). `dim4.req04` (profundidad) sólo trae `{rol, nivel, stacking, oclusion}` y su propio `mappingNotes` lo llama «BRECHA DECLARADA»; `dim4.req05` es política de efectos, no una escala. En `dim9.req03`, `diferencia` es **texto** y `arquetipo` es una lista abstracta, no una familia de bloque. | `manifest-v0-dim4.ts:384-423` y `:436-474`; `manifest-v0-dim9.ts:345` | **Q3 (9.1).** F4b (presets de sombra) y F8 (variaciones de bloque) quedan **bloqueadas** hasta que el Core tenga (a) una escala de sombras tipada `{nombre, x, y, desenfoque, expansión, color→ref}` y (b) una diferencia por variante tipada `propiedad → valor|ref`, más la correspondencia arquetipo → familia de bloque. Mientras tanto, una sombra o variante pedida da `ADN_NAME_UNRESOLVED`: **nunca** se interpreta prosa ni se inventa un valor en el adaptador. [RESUELTO el 02-nov-2026: el Core agregó `dim4.req09` (escala de sombras), `dim9.req08` (diferencia por variante con datos) y `dim9.req09` (arquetipo → familia de bloque), `c6a9a68`; el plugin los porta (`09c5231`) y los proyecta (theme.json y estilos de bloque). Lo escrito en esta fila es lo medido en `6115353`, antes de esa ampliación.] |
 | Las referencias entre definiciones (`{refReqId, refPath}`) se validan sólo en su **forma** (`payload.ts:71-80`) y por existencia de **una entrada** con ese requisito (`design-set/adapter.ts:81-94`); `resolveRefValue` recorre la ruta sin mirar el estado (`adapter.ts:136-177`). `refReqId` nombra un **requisito**, no una definición: con `.def1` y `.def2` es ambiguo. | `requirement-manifest/payload.ts:71-80`; `design-set/adapter.ts:81-94`, `:136-177` | Hace falta una regla del destino (**R6**, 3.2) que resuelva dependencias, estado y ambigüedad. |
 
 ### 2.2 ¿Puede Desktop importar un `design/model.json` ajeno? **No.**
@@ -288,7 +299,7 @@ Componentes:
      pasa a leerla.]
    - **R2.** Para cada requisito que la web consume, el `value` debe tener la **forma de su payloadSchema** (hoy:
      `dim1.req01/02`, `dim2.req01/02/07`, `dim3.req01/02`, `dim4.req02`, `dim8.req03`; `dim9.req03` queda fuera
-     mientras dure Q3). **`value` ausente o `{}` = «declarada y sin resolver»** (H14): igual que una definición
+     mientras dure Q3 [RESUELTO el 02-nov-2026: ya no hay «mientras dure Q3»; el plugin valida la forma de `dim9.req08` y `dim9.req09` y los proyecta; `dim9.req03`, cuya forma el plugin no porta, sigue fuera]). **`value` ausente o `{}` = «declarada y sin resolver»** (H14): igual que una definición
      apuntada por una `developmentTask` abierta, se **guarda**, **no se emite** y va a `ignored[]`. Desktop genera las
      pendientes con `value: {}` y `design-contract.ts:485` siempre escribe `value`: el caso «ausente» nunca ocurre,
      llega `{}`, que no cumple los campos obligatorios, y con import atómico haría caer el contrato entero. R2
@@ -545,16 +556,28 @@ Se PROYECTAN al `theme.json` con las mismas claves que usa el de Basis:
 | `dim4.req09` sombras | `settings.shadow.presets` (`<x> <y> <desenfoque> <expansión> <color>`; con el color RESUELTO) y `defaultPresets:false` |
 | `dim4.req10` / `dim4.req11` | `settings.custom.border.<slug>` / `settings.custom.blur.<slug>` |
 | `dim7.req09` tema del formulario | `settings.custom.form.<variable>` (las 68; sólo `familia` se llama `tipografia`) |
+| `dim9.req09` arquetipo → familia de bloque + `dim9.req08` diferencia por variante | **estilos de bloque** (`COD_ADN_Block_Styles`): la variante `base` de una familia es `styles.blocks.<bloque>` (el relleno lateral de `core/group`, el radio de `core/image`) y todo cambio con `quiebre` (o de una variante con nombre) es una regla `.wp-block-<bloque>.is-style-<variante> <elemento>{<propiedad>:<valor>}` en el bloque marcado `/*cod-estilos-responsivos*/` de `styles.css`, dentro del `@media` del quiebre |
 
 Una escala con su ausencia declarada (`sin<Cosa>`) no emite nada; lista y ausencia a la vez tampoco (`ADN_AUSENCIA_Y_LISTA`). Los pasos de tamaño y de
 espaciado llevan el nombre de Configuración («`30 (16px / 15px / 14px)`»). El peso, el interlineado y el espaciado de letra de UN rol de `dim2.req02`
-se guardan pero ya no se emiten por rol (`custom.typography.<rol>`): la web los toma de las escalas con nombre. `dim9.req08` y `dim9.req09` se validan
-(forma) y se guardan; el destino aún no emite sus propiedades.
+se guardan pero ya no se emiten por rol (`custom.typography.<rol>`): la web los toma de las escalas con nombre.
 
-**Lo que sigue fuera del ADN** (`COD_ADN_Theme::fuera_del_adn()`, se ve en `cod_adn_get`): el CSS de los estilos de bloque por quiebre
-(`/*cod-estilos-responsivos*/`, de `dim9.req08` + `dim9.req09`, cuyo selector es del destino y no está construido); el nombre de mostrar de un color o de
-una familia que no da su slug; el peso/interlineado por rol; y los estilos globales que no son color ni familia (`styles.blocks`, `elements.button.border`,
-`spacing.blockGap`…). La prueba de portabilidad (`scripts/probar-adn-proyeccion.php`) compara TODO `settings` de `wp_get_global_settings()` del destino atrasado
+**Estilos de bloque (`dim9.req08` y `dim9.req09`, 02-nov-2026).** El Core guarda datos y deja al destino qué propiedades sabe emitir y sobre qué elemento cae
+cada una; esa decisión es `COD_ADN_Block_Styles::catalogo()`, cerrada y por familia de bloque (hoy `core/image`: `aspect-ratio`, `border-radius`, `object-fit`,
+todas sobre la `img`; `core/group`: `min-height` y `padding-*`, sobre el propio bloque). Reglas: (1) la `familiaDeBloque` de un arquetipo sale de `dim9.req09`
+(un arquetipo, una familia; el nombre tiene que ser de un bloque: `ADN_BLOQUE_INVALIDO`, y repetirlo es `ADN_NAME_DUPLICATE`); (2) la `variante` llamada `base` es el
+estilo del propio bloque, sin variación; cualquier otra es una variación y su clase es `is-style-<slug de la variante>` (la convención `base` es de este plugin, el Core
+no la define); (3) una `propiedad` que no es un nombre de CSS es `ADN_PROPIEDAD_INVALIDA` y se rechaza; una que el catálogo no conoce para esa familia, una familia
+sin destino, un arquetipo sin familia, un tipo de valor que no cabe en la propiedad o una referencia que no llega a una variable emitida **se omiten y se avisan**
+(`ADN_PROPIEDAD_NO_EMITIDA`, `ADN_FAMILIA_SIN_DESTINO`, `ADN_VARIANTE_SIN_FAMILIA`, `ADN_VALOR_NO_EMITIDO`): nunca se inventa un valor; (4) todo lo que llega al CSS
+pasa por una lista cerrada de caracteres (sin `;`, llaves, comillas ni comentarios). El valor **base** (escritorio) de una variante con nombre vive en
+`contope-basis/styles/blocks/<variante>.json`, un archivo del tema que el ADN no reemplaza (se declara en `fuera_del_adn()`).
+
+**Lo que sigue fuera del ADN** (`COD_ADN_Theme::fuera_del_adn()`, se ve en `cod_adn_get`; hasta el 02-nov-2026 incluía además el CSS
+`/*cod-estilos-responsivos*/` y `styles.blocks`, que ahora salen de `dim9.req08` + `dim9.req09`): los archivos `styles/blocks/*.json` del tema (el valor
+base de cada estilo de bloque con nombre: contorno, desenfoque, ícono de un pliegue, proporción y alto de escritorio); el nombre de mostrar de un color o de
+una familia que no da su slug; el peso/interlineado por rol; y los estilos globales que el Core no expresa (`spacing.blockGap`, `typography.lineHeight`,
+`elements.heading`, `elements.button.border|typography`; hoy el `theme.json` atrasado los trae con los mismos valores que el local). La prueba de portabilidad (`scripts/probar-adn-proyeccion.php`) compara TODO `settings` de `wp_get_global_settings()` del destino atrasado
 con el ADN contra el del local de Basis, salvo los **extras** que el ADN necesita y el archivo del tema no declara: tres colores de la paleta
 (`ink-20`, `ink-12`, `dark-8`: el color de una sombra o del formulario tiene que ser una referencia a la paleta o a una transparencia), una sombra
 (`formulario`) y `custom.spacing` y `custom.motion` (los roles de espacio y el movimiento, que el local guarda en Configuración).
@@ -572,9 +595,9 @@ con el ADN contra el del local de Basis, salvo los **extras** que el ADN necesit
 | espacio por rol | `--wp--custom--spacing--{intra,inter,entre-secciones}` | `settings.custom`, `styles.spacing.blockGap` | `dim3.req02` |
 | ancho de caja | `--wp--style--global--content-size` / `wide-size` | `settings.layout` | requisito de contenedores de `dim3` (por identificar en fase 2) |
 | radio | `--wp--custom--radius--<rol>` | `settings.custom.radius` | `dim4.req02` (`radioValor`) |
-| sombra | `--wp--preset--shadow--<slug>` | `settings.shadow.presets` | **sin origen hoy — bloqueada por Q3.** El Core no tiene escala de sombras tipada: `dim4.req04` es profundidad (rol/nivel/stacking/oclusión) y `dim4.req05` es política de efectos (2.1) |
+| sombra | `--wp--preset--shadow--<slug>` | `settings.shadow.presets` | **sin origen el 01-nov — bloqueada por Q3.** El Core no tenía escala de sombras tipada: `dim4.req04` es profundidad (rol/nivel/stacking/oclusión) y `dim4.req05` es política de efectos (2.1). [RESUELTO el 02-nov-2026: origen `dim4.req09`, proyectado a `settings.shadow.presets`] |
 | movimiento | `--wp--custom--motion--<nombre>`; `--cod-motion-enter/response` como alias | `settings.custom.motion` | `dim8.req03` + roles de `dim8.req02` (por leer) |
-| variante de bloque | clase `is-style-<slug>` | `styles.blocks.<bloque>.variations` | `dim9.req03` — **bloqueada por Q3** mientras `diferencia` sea texto (2.1) |
+| variante de bloque | clase `is-style-<slug>` | `styles.blocks.<bloque>.variations` | `dim9.req03` — **bloqueada por Q3** mientras `diferencia` sea texto (2.1). [RESUELTO el 02-nov-2026: `dim9.req08` + `dim9.req09`. El plugin emite el estilo base como `styles.blocks.<bloque>` y los cambios por quiebre como reglas `.is-style-<slug>` en `styles.css`; las `variations` de `theme.json` no se emiten (cada variación con nombre sigue siendo un archivo `styles/blocks/*.json` del tema)] |
 
 **Dos hallazgos de nombres, que se resuelven con una tabla fija y no con otro vocabulario:**
 (1) el plugin llama `surface` al **fondo de la página** (`--cod-color-surface = color_bg`), el Core llama
@@ -631,7 +654,7 @@ la leen la compuerta y `cod_get_capabilities`: quien construya ve qué campos es
 | `espaciado` | `padding-*`, `margin-*`, `gap`, `row-gap`, `column-gap`, `scroll-margin-*`, `inset*` de separación | `spacing.*`, `layout.gap/minColumnWidth`, `gallery.gap`, `icono.tamano/separacion`, medidas de `form.theme` | `var(--wp--preset--spacing--…)`, `var(--wp--custom--spacing--…)`, `0`, `auto`; negativos como `calc(-1 * var(--…))` | `dim3.req01/02` |
 | `radio` | `border-*-radius` | `shape.radius`, `form.theme` (radios) | `var(--wp--custom--radius--…)`, `0`; `pill`/`circle` resuelven por el ADN | `dim4.req02` |
 | `borde-grosor` | `border-*-width`, `outline-width` | `shape.borderWidth`, `surface.borderWidth` | `var(--wp--custom--border--…)`, `0` | `dim4.req03` (por leer) |
-| `sombra` | `box-shadow`, `text-shadow`, `filter: drop-shadow()` | `surface.shadow` (`sm/md/lg`) | `var(--wp--preset--shadow--…)`, `none` | **ninguno hoy — bloqueada por Q3** (2.1). Hasta entonces: `ADN_NAME_UNRESOLVED` / `ADN_NO_DEFINITION`; no se inventa un valor |
+| `sombra` | `box-shadow`, `text-shadow`, `filter: drop-shadow()` | `surface.shadow` (`sm/md/lg`) | `var(--wp--preset--shadow--…)`, `none` | **ninguno el 01-nov — bloqueada por Q3** (2.1). Hasta entonces: `ADN_NAME_UNRESOLVED` / `ADN_NO_DEFINITION`; no se inventa un valor. [RESUELTO el 02-nov-2026: `dim4.req09`; sin la definición en el ADN de un sitio sigue valiendo `ADN_NAME_UNRESOLVED`] |
 | `movimiento` | `transition-*`, `animation-*` (duración, curva, retraso) | `motion.{duration,delay,easing}` | `var(--wp--custom--motion--…)`, `0s` | `dim8.req02/03` |
 | `ancho-de-caja` | `max-width` con unidad **absoluta** | `layout.maxWidth` | `var(--wp--style--global--content-size/wide-size)`, `none`, `100%`, `fit-content` | contenedores de `dim3` (por identificar) |
 | `declaracion-de-variable` | cualquier propiedad personalizada `--*` (en regla, `@media`, selector o `style=""`) | declaraciones de `properties`, `cod_patch_css`, `cod_write_canvas_document`, `style` de `cod_grapes_edit_node` y de WhatsApp | **sólo** variables locales no reservadas; las reservadas se rechazan (`ADN_VAR_RESERVED`) | el registro de la proyección |
@@ -711,7 +734,7 @@ que no es de ensayo (`ADN_PROPOSED_ON_PUBLIC`, 3.5).
 |---|---|
 | `cod_preview_canvas_composition` y `cod_apply_canvas_composition` | en `COD_Canvas_MCP_Recipe_Compiler::compile()`, **después de `normalize_design()`** y antes de renderizar. Preview y apply pasan por el mismo `compile()`, así que no se pueden desalinear. |
 | `cod_patch_css`, `cod_patch_html`, `cod_write_canvas_document`, `cod_grapes_edit_node` (`mutation.style`, `mutation.attributes["style"]`), `cod_activate_section_whatsapp(style)` | antes de `repository->save()`: `delta(documentoActual, documentoNuevo)` sobre **CSS + `style=""` + atributos de presentación SVG + `styles` de `projectData`**; **cada literal de una clase gobernada que no estaba antes** es violación. Un `replace` que cambia un `var()` del registro por `#F26621` se rechaza. `cod_write_canvas_document` además exige que el CSS derivado de `projectData` coincida con el CSS enviado. |
-| Valores nombrados del motor (`shadow: md`, `button.size`, `tone`) | se resuelven **por el ADN sin valor de respaldo** (F4b): si el ADN no declara la sombra `md`, el nombre falla con `ADN_NAME_UNRESOLVED` en vez de pintar `rgba(0,0,0,.16)`. **Bloqueado por Q3 en lo que toca a sombras.** |
+| Valores nombrados del motor (`shadow: md`, `button.size`, `tone`) | se resuelven **por el ADN sin valor de respaldo** (F4b): si el ADN no declara la sombra `md`, el nombre falla con `ADN_NAME_UNRESOLVED` en vez de pintar `rgba(0,0,0,.16)`. **Bloqueado por Q3 en lo que toca a sombras.** [RESUELTO el 02-nov-2026: ya no lo está (`dim4.req09`); F4b sigue sin construir.] |
 | Contenido en bloques (6.4) | `COD_Block_Content::compile()`: los `attrs` de cada bloque pasan por el mismo `COD_ADN_Gate` (`style.color.*`, `style.typography.*`, `style.spacing.*`, `style.border.*`, `style.shadow`). |
 
 **Por qué todo va en la escritura y no en un paso posterior.** Lo que se aplica ya es lo que se sirve (2.3): no hay una
@@ -736,7 +759,8 @@ Ejemplo (sin con qué reemplazar):
 
 > `ADN_NO_DEFINITION` — `box-shadow: 0 8px 24px rgba(0,0,0,.16)`. El ADN `basis-web` r3 no declara escala de
 > sombras, así que no hay variable que referenciar. (Hoy el Core no puede expresarla: es la pregunta Q3. Mientras
-> tanto la sombra queda como hueco declarado; no se inventa un valor.)
+> tanto la sombra queda como hueco declarado; no se inventa un valor.) [RESUELTO el 02-nov-2026: el Core la expresa desde `c6a9a68`; el ejemplo vale para un ADN que no
+> declare la escala de sombras.]
 
 Ejemplo (variable reservada):
 
@@ -929,11 +953,12 @@ roles, radios y variantes; la parte web es una proyección más.
 5. **Si una declaración no tiene atributo nativo ni variación**, el compilador falla con `ADN_NO_VARIATION` y dice
    qué variante falta. No se cae a CSS en línea.
 
-   **Hoy el punto 4(b) está bloqueado (Q3).** Una variación de estilo con datos (relleno, radio, sombra, familia de un
+   **Hoy el punto 4(b) está bloqueado (Q3).** [RESUELTO el 02-nov-2026: Q3 se contestó y el Core ya expresa la diferencia por variante (`dim9.req08`); lo que sigue es la
+   parte del compilador (F8), sin construir. Texto del 01-nov:] Una variación de estilo con datos (relleno, radio, sombra, familia de un
    botón) necesita que el ADN diga `propiedad → valor|ref` por variante. En `dim9.req03` la `diferencia` es **texto**
    y `arquetipo` es una lista abstracta (`manifest-v0-dim9.ts:345`; 2.1), así que el Core no puede expresarla. Mientras
    Q3 siga abierta una variación pedida da `ADN_NAME_UNRESOLVED` (o `ADN_NO_VARIATION`): nunca se interpreta prosa ni
-   se inventa el valor en el adaptador.
+   se inventa el valor en el adaptador (sigue valiendo para una variación que el ADN de un sitio no declare).
 
 ### 6.2 Mapa nodo / módulo → bloque (las 5 páginas y las 2 regiones de Basis)
 
@@ -968,9 +993,9 @@ Conteos de nodos tomados de `scripts/basis/salida/*.componer.json`.
 Ya existen y **no se usan** en Basis: `contope/lienzo`, `contope/cuadrantes` + `contope/cuadrante`. Existe y **se
 deprecia** (no se borra): `ocd/heading` — su propio archivo lo llama POC y duplica `core/heading`.
 
-**Qué filas dependen de Q3.** Toda fila de la tabla cuyo «Dónde vive la forma» diga *variación* (`core/group`
+**Qué filas dependen de Q3** ([RESUELTO el 02-nov-2026: Q3 se contestó y el Core tiene `dim9.req08`/`dim9.req09`; estas filas ya no esperan al Core, esperan a F8, sin construir). Toda fila de la tabla cuyo «Dónde vive la forma» diga *variación* (`core/group`
 `is-style-seccion-*`, `core/cover`, `core/button`, `core/image` `is-style-foto-linea`, `core/separator`,
-`core/accordion`, el `divisor`) necesita variantes **con datos** en el ADN y queda **bloqueada por Q3**. Lo que no
+`core/accordion`, el `divisor`) necesita variantes **con datos** en el ADN y quedaba **bloqueada por Q3** (01-nov). Lo que no
 depende de Q3 y puede avanzar: los presets por *slug* (`backgroundColor`, `textColor`, `fontSize`, `style.spacing.*`),
 los estilos globales de `theme.json` (`styles.elements`, `styles.blocks`) y la geometría nativa.
 
@@ -1035,7 +1060,7 @@ El transcriptor ya produce reglas con `var()` (tras `b7b0478`). Para bloques, ca
 | `color`/`background-color` = `var(--wp--preset--color--X)` | `textColor` / `backgroundColor` = `X` |
 | `font-size` = `var(--wp--preset--font-size--X)` | `fontSize` = `X` |
 | `padding-*`/`margin-*`/`gap` = `var(--wp--preset--spacing--N)` | `style.spacing.*` = `var:preset|spacing|N` |
-| `border-radius`, `box-shadow`, `outline-*`, `backdrop-filter`, `text-transform`… sin atributo nativo | **variación** declarada en el ADN (`dim9.req03`, `heredaDe`, `diferencia`); el bloque lleva `is-style-<x>`. **Bloqueado por Q3** mientras `diferencia` sea texto: hoy esa fila da `ADN_NO_VARIATION`; no se inventa la variación |
+| `border-radius`, `box-shadow`, `outline-*`, `backdrop-filter`, `text-transform`… sin atributo nativo | **variación** declarada en el ADN (`dim9.req03`, `heredaDe`, `diferencia`); el bloque lleva `is-style-<x>`. **Bloqueado por Q3** mientras `diferencia` sea texto: hoy esa fila da `ADN_NO_VARIATION`; no se inventa la variación. [RESUELTO el 02-nov-2026: `dim9.req08` lo expresa; la fila espera a F8] |
 | geometría (anchos, columnas, `min-height`, `position`) | atributos nativos (`width` de `core/column`, `minHeight` de `core/cover`, `layout`) |
 
 ### 6.6 Relación con el plan de fases de agosto
@@ -1130,11 +1155,11 @@ comprobado), y las que dependen de la compuerta verifican en la propia evidencia
 | F2 — Proyección única | | F1 |
 | F3 — Auditoría y modo `observe` | | F1, F2, F0b |
 | F4 — Compuerta `ratchet` / `enforce` | | F3 |
-| **F4b — Valores del motor** | **BLOQUEADA por Q3** (sombras) | F4, Q3 |
+| **F4b — Valores del motor** | ~~BLOQUEADA por Q3~~ **desbloqueada el 02-nov-2026** (sombras: `dim4.req09`); sin construir | F4 |
 | F5 — Extractor | | F1 |
 | **F6 — Ida y vuelta con Desktop** | **reestimada: trabajo del Core** | F5 |
 | F7 — Transcriptor sobre el ADN | | F4, F5 |
-| **F8 — Contenido en bloques** | **BLOQUEADA por Q3** (variaciones de bloque) | F4, F7, Q3 |
+| **F8 — Contenido en bloques** | ~~BLOQUEADA por Q3~~ **desbloqueada el 02-nov-2026** (variaciones: `dim9.req08`/`dim9.req09`); sin construir | F4, F7 |
 | F9 — Basis en bloques (local) | | F8, F0b |
 | F10 — Producción | | F9 |
 | F11 — Cromo, discriminador y otros sitios | | F10 |
@@ -1318,7 +1343,10 @@ completos y rechazan sobrescribir una página en bloques con el shortcode (H9). 
 - **P4.11** Los mismos casos se corren en `observe`, `ratchet` y `enforce`; en `ratchet` la deuda heredada pasa y la
   nueva no, para las clases nuevas también (variable reservada preexistente = heredada).
 
-### F4b — Valores del motor — **BLOQUEADA por Q3**
+### F4b — Valores del motor — ~~BLOQUEADA por Q3~~ **desbloqueada el 02-nov-2026, sin construir**
+
+*RESUELTO el 02-nov-2026: el Core tiene la escala de sombras (`dim4.req09`, `c6a9a68`); el plugin ya la proyecta a `settings.shadow.presets`. Falta F4b propiamente dicha:
+que el motor resuelva `shadow sm/md/lg` por el ADN. El texto de abajo es el del 01-nov.*
 
 Resolver `shadow sm/md/lg`, `button.size`, `tone`, zebra, caja de formulario y defaults de WhatsApp **por el ADN, sin
 respaldo**; inventario del cromo del motor. **Bloqueada** porque el Core no tiene escala de sombras con valores (2.1,
@@ -1378,7 +1406,11 @@ reemite; fusión que aplica sólo lo que la persona cambió. Se estima como fase
 - **P7.2** `comparar-vivo.mjs` (ya arreglado, P0.4): 0 diferencias de familia y color; diferencias de tamaño y
   espaciado **sólo** las del informe de ajuste (lista cerrada, sin otras).
 
-### F8 — Contenido en bloques — **BLOQUEADA por Q3**
+### F8 — Contenido en bloques — ~~BLOQUEADA por Q3~~ **desbloqueada el 02-nov-2026, sin construir**
+
+*RESUELTO el 02-nov-2026: el Core expresa la diferencia por variante y la familia de bloque (`dim9.req08`, `dim9.req09`, `c6a9a68`); el plugin ya emite los estilos de bloque base
+y por quiebre (`COD_ADN_Block_Styles`). Falta el compilador de contenido en bloques (`COD_Block_Content`) y el registro de las variaciones con nombre desde el ADN.
+El texto de abajo es el del 01-nov.*
 
 `COD_Block_Content`, tres herramientas, bloques `contope/formulario|mapa|whatsapp`, registro de variaciones desde el
 ADN. **Bloqueada** en lo que usa variaciones de estilo con datos (2.1, 6.2, Q3); lo que no depende de Q3 (presets por
@@ -1394,7 +1426,7 @@ slug, estilos globales de `theme.json`, geometría nativa) puede construirse ant
   medición con las hojas de `b7b0478` debe mostrar `body` sin valor (esto es lo que se corrige).
 - **P8.3** Con un tema de bloques estándar activo: misma secuencia de textos/imágenes/listas/tablas.
 - **P8.4** `core/paragraph` con `style.color.text:"#FF0000"` → `ADN_LITERAL_COLOR`; con `textColor:"accent"` → aceptado.
-- **P8.5** *(bloqueada por Q3)* Una variación declarada en el ADN aparece en el selector de estilos del editor y se
+- **P8.5** *(estaba bloqueada por Q3; [RESUELTO el 02-nov-2026: ya no lo está)* Una variación declarada en el ADN aparece en el selector de estilos del editor y se
   guarda como `is-style-<x>`.
 
 ### F9 — Basis en bloques (local)
@@ -1443,7 +1475,7 @@ Opciones: **(a)** abrir `dim2.req02` en el Core a roles adicionales con nombre l
 cubiertos (hay precedente: en `dim4.req01` «la lista queda ABIERTA por D12: lo cerrado es el SET (lo que el diseñador declaró es todo lo que hay), no el vocabulario que el manifiesto acepta»); es un
 cambio de manifiesto en versión menor; **(b)** normalizar Basis a 9 roles: varios títulos cambian de tamaño
 (p. ej. 55 → 50, 42 → 40, 30 → 28), con el desvío escrito en el informe de ajuste.
-**DECIDIDO por Cristóbal el 02-nov-2026: (a), ampliar el Core.**
+**DECIDIDO por Cristóbal el 02-nov-2026: (a), ampliar el Core.** [RESUELTO el 02-nov-2026: `dim2.req02` admite roles con nombre libre (Core `c6a9a68`); el plugin lo porta y la lista de nueve roles dejó de ser un espejo propio (`09c5231`).]
 **Recomendación: (a)**, porque la migración se pidió "visualmente idéntica al original" y la armonización (b) es
 una decisión de diseño que se hace después, en Desktop, con muestras a la vista, no por un umbral del extractor.
 
@@ -1453,7 +1485,8 @@ chat, con huella). **Recomendación:** hacer las dos: F6 en paralelo, y la B só
 guardados como evidencia. Dado el tamaño de F6, la B probablemente sea la vía real para Basis.
 
 **DECIDIDO por Cristóbal el 02-nov-2026 sobre Q3: (a), agregar al Core la escala de sombras y la diferencia por
-variante con datos. F4b y F8 dejan de estar bloqueadas por la decisión; ahora dependen de ese trabajo en el Core.**
+variante con datos. F4b y F8 dejan de estar bloqueadas por la decisión; ahora dependen de ese trabajo en el Core.** [RESUELTO el 02-nov-2026: ese trabajo se hizo en el Core (`c6a9a68`:
+`dim4.req09`, `dim9.req08`, `dim9.req09`) y el plugin lo porta (`09c5231`) y lo proyecta; F4b y F8 ya no esperan al Core, siguen sin construir.]
 
 **Q3 (nueva, H6). Sombras y variantes con datos en el Core.** Hoy el Core **no puede expresar** (a) una escala de
 sombras con valores (`dim4.req04` es profundidad; `dim4.req05`, política de efectos) ni (b) una diferencia por variante
@@ -1463,7 +1496,7 @@ que es tuya. Opciones: **(a)** abrir en el Core dos requisitos: una escala de so
 la correspondencia arquetipo → familia de bloque; **(b)** dejar fuera de Basis las sombras y variantes con datos,
 como **hueco declarado** en el informe de ajuste, y avanzar sin ellas. Mientras no se decida: **F4b y F8 quedan
 bloqueadas**, y una sombra o variante pedida da `ADN_NAME_UNRESOLVED`. **Recomendación:** no frenar F0-F7, que no
-dependen de Q3, y decidir antes de F8.
+dependen de Q3, y decidir antes de F8. *(Texto del 01-nov, antes de la decisión.)*
 
 **Q4 (nueva, F2). Qué más tiene que poder llevar el ADN para que un sitio sea idéntico al local sin subir archivos.** El
 Core no puede expresar: transparencias de la paleta (`color-mix()`), degradados, el paso de espaciado `gutter`
@@ -1473,7 +1506,8 @@ Core (requisitos nuevos para esas escalas, con valores por quiebre) — es lo qu
 paquete lo lleva todo» sea cierta; **(b)** aceptar que esas piezas viajan sólo con el tema (subiendo el `theme.json`
 generado), lo que **contradice** la regla de subir sólo con Portabilidad. **Recomendación: (a), empezando por los
 valores por quiebre y el formulario**, que son lo que más se nota en celular; hasta entonces el informe de cada subida
-debe listar lo de `fuera_del_adn()`.
+debe listar lo de `fuera_del_adn()`. **DECIDIDO (a) y [RESUELTO el 02-nov-2026:** el Core agregó los doce requisitos (`c6a9a68`), el plugin los porta y proyecta (`09c5231`) y los
+estilos de bloque por quiebre salen de `dim9.req08`/`dim9.req09`; lo único que sigue dependiendo de subir el tema está en `fuera_del_adn()` con su razón.]
 
 **Pendiente heredado (sin número): los 7 colores fuera del set.** Siete colores de Basis no tienen equivalente en la
 paleta (2.5). Siguen abiertos; el extractor los lleva a `obs.colores-de-uso-puntual` y no se emiten.
@@ -1508,10 +1542,10 @@ paleta (2.5). Siguen abiertos; el extractor los lleva a `obs.colores-de-uso-punt
 | Los *slugs* derivados de nombres cambian al renombrar | El diff separa "renombradas" y el import se rechaza si rompe referencias. |
 | Una escala de espacio de ~2 docenas de escalones no es un "sistema" | Es el costo explícito de la fidelidad; la armonización posterior la reduce con muestras. |
 | Un `value` con forma no prevista por el plugin | R2 lo rechaza con la ruta; R4 guarda sin emitir lo que la web no consume. |
-| Hay requisitos que no leí aún (`dim4.req03`, `dim8.req02/04`, contenedores de `dim3`) | La fase 2 empieza leyéndolos; el mapeo de borde, movimiento y ancho queda como borrador hasta entonces. (`dim4.req04` y `req05` ya se leyeron: no tienen valores de sombra, Q3.) |
+| Hay requisitos que no leí aún (`dim4.req03`, `dim8.req02/04`, contenedores de `dim3`) | La fase 2 empieza leyéndolos; el mapeo de borde, movimiento y ancho queda como borrador hasta entonces. (`dim4.req04` y `req05` ya se leyeron: no tienen valores de sombra, Q3; [RESUELTO el 02-nov-2026: la escala de sombras es `dim4.req09`.]) |
 | Cromo del motor con valores propios (`lightbox`, placeholder) | Inventario en F4b; fuera de la compuerta con la razón escrita. |
 | La edición humana en el wp-admin reintroduce literales | `cod_adn_audit` la mide; una notificación de admin lista las nuevas. |
-| El Core no tiene sombras ni variantes con datos (H6) | Q3; F4b y F8 bloqueadas; `ADN_NAME_UNRESOLVED` y hueco declarado, nunca un valor inventado. |
+| El Core no tiene sombras ni variantes con datos (H6) | Q3; F4b y F8 bloqueadas; `ADN_NAME_UNRESOLVED` y hueco declarado, nunca un valor inventado. [RESUELTO el 02-nov-2026: Q3 contestada (a), el Core ya expresa ambas cosas; F4b y F8 siguen sin construir.] |
 | El contrato v1 no distingue restricción de hecho (R1) | R1 aplica la excepción a `confirmed`+`deterministic-extraction` con `reviewedAt` que no alimenta variables; si el Core agrega la marca, la regla la lee. |
 | La convención `<designId>-ensayo` es de esta espec, no del Core | Se somete a la próxima auditoría; reversible (basta otro criterio para «documento de ensayo» sin tocar la regla de fondo). |
 | El `contope-canvas` padre usa `var(--cod-border-color, rgba(0,0,0,.12))` con fallback literal (`style.css:22,40,45`) | Con el plugin apagado cae al literal sin romperse, pero es un valor de diseño fuera del ADN: se anota para el inventario de F2/F11; el padre es del motor. |

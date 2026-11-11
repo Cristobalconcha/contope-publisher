@@ -1920,6 +1920,11 @@ CSS;
         // produce con los datos de ESTE momento (las entradas, los comentarios recientes). Ver COD_Canvas_Bloque_Renderer.
         $markup = (new COD_Canvas_Bloque_Renderer())->render($markup);
 
+        // El número de parcelas disponibles se escribe acá, con lo que ya está en el HTML (los estados de cada parcela),
+        // para que quien no ejecuta JavaScript lo lea. Va al final porque es lo último que puede cambiar el marcado.
+        // Sin plano en la página no hace nada. Ver COD_Plano_Parcelas.
+        $markup = COD_Plano_Parcelas::resolver_en_html($markup);
+
         return $markup;
     }
 

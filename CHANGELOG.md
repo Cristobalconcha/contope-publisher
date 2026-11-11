@@ -9,7 +9,7 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 Cambios del plugin que sólo existen en el banco de pruebas local de Basis; no tienen número de versión hasta que se publiquen. Lo que no los usa sale **idéntico a 0.3.85** (el CSS de las definiciones de estilo es byte a byte el de siempre: comprobado contra `scripts/css-del-tema.referencia.json`).
 
-- **El ADN lleva todo lo que el `theme.json` de Basis usa (pedidos Q1, Q3 y Q4 al Core, resueltos el 02-nov-2026).** El Core agregó doce requisitos: transparencias, degradados, pesos e interlineados con nombre, quiebres, margen lateral (`gutter`), medidas de texto, sombras, grosores de borde, desenfoques, el tema del formulario (68 variables), las diferencias por variante y la correspondencia arquetipo → familia de bloque; abrió los roles tipográficos a nombres libres y agregó los valores por punto de quiebre. El validador del plugin los porta con **paridad exacta** (los 23 esquemas son idénticos al manifiesto y los 176 casos de la capa 4 dan el mismo veredicto y la misma ruta de cada motivo; hay controles que rompen la paridad). La proyección los lleva al `theme.json` con las mismas claves que usa el de Basis: un sitio destino con el `theme.json` atrasado queda con `settings` y `custom` **idénticos** a los del local (salvo cuatro entradas extra que el ADN necesita para referir el color de las sombras y del formulario, declaradas y medidas) y, en el navegador, los valores calculados de las cinco páginas son los de Basis. Nombres de roles y de escalas: único y con slug propio (`ADN_NAME_INVALID`, `ADN_NAME_DUPLICATE`). Cambia lo que se emite: ya no sale `settings.custom.typography.<rol>` (peso e interlineado por rol, que nadie imprimía) y los tamaños y espaciados llevan el nombre de Configuración («`30 (16px / 15px / 14px)`»). Sin ADN, nada cambia.
+- **El ADN lleva todo lo que el `theme.json` de Basis usa (pedidos Q1, Q3 y Q4 al Core, resueltos el 02-nov-2026).** El Core agregó doce requisitos: transparencias, degradados, pesos e interlineados con nombre, quiebres, margen lateral (`gutter`), medidas de texto, sombras, grosores de borde, desenfoques, el tema del formulario (68 variables), las diferencias por variante y la correspondencia arquetipo → familia de bloque; abrió los roles tipográficos a nombres libres y agregó los valores por punto de quiebre. El validador del plugin los porta con **paridad exacta** (los 23 esquemas son idénticos al manifiesto y los 176 casos de la capa 4 dan el mismo veredicto y la misma ruta de cada motivo; hay controles que rompen la paridad). La proyección los lleva al `theme.json` con las mismas claves que usa el de Basis: un sitio destino con el `theme.json` atrasado queda con `settings` y `custom` **idénticos** a los del local (salvo cuatro entradas extra que el ADN necesita para referir el color de las sombras y del formulario, declaradas y medidas) y, en el navegador, los valores calculados de las cinco páginas son los de Basis. Nombres de roles y de escalas: único y con slug propio (`ADN_NAME_INVALID`, `ADN_NAME_DUPLICATE`). Cambia lo que se emite: ya no sale `settings.custom.typography.<rol>` (peso e interlineado por rol, que nadie imprimía) y los tamaños y espaciados llevan el nombre de Configuración («`30 (16px / 15px / 14px)`»). **Estilos de bloque (`dim9.req09` + `dim9.req08`):** también se proyectan (clase nueva `COD_ADN_Block_Styles`): la variante `base` de una familia de bloque es `styles.blocks.<bloque>` (el relleno lateral de `core/group`, el radio de `core/image`) y lo que cambia por punto de quiebre (la proporción de una foto, el alto mínimo de un recuadro) es una regla `.wp-block-<bloque>.is-style-<variante>` en el bloque `cod-estilos-responsivos` de `styles.css`. Un sitio con el `theme.json` atrasado de producción **a solas** y este ADN se ve como el local (0 diferencias en las cinco páginas, escritorio y celular); lo único visible que sigue dependiendo del tema son los archivos `styles/blocks/*.json` (el valor base de cada estilo con nombre), declarado en `fuera_del_adn()`. Una propiedad, familia o valor que el plugin no sabe emitir se omite y se avisa (`ADN_PROPIEDAD_NO_EMITIDA`, `ADN_FAMILIA_SIN_DESTINO`, `ADN_VARIANTE_SIN_FAMILIA`, `ADN_VALOR_NO_EMITIDO`); un nombre de bloque o de propiedad que no es un nombre se rechaza (`ADN_BLOQUE_INVALIDO`, `ADN_PROPIEDAD_INVALIDA`). Sin ADN, nada cambia.
 - **Portabilidad: el sitio armado en el local sube a producción exportando e importando, sin SQL ni Administrador de archivos.** El paquete (`.ocdsite`, formato v1 de `docs/package-format-v1.md`) ahora lleva TODO lo que hace que el sitio llegue igual: las páginas en bloques con su `post_content` exacto (cada una como archivo propio con su sha256), las páginas del lienzo, el encabezado y el pie globales (antes sólo viajaban si estaban en la plantilla global), los estilos compartidos, el ADN de diseño activo (como `design/model.json`, por la misma puerta de «Diseño (ADN)») y los medios completos —también PDF, video y los de nombre con `@`, tilde o espacios—, cada uno con su sha256. Al importar se revisa todo ANTES de escribir nada: manifiesto, hashes, bloques que hacen falta, la compuerta del diseño, el ADN y las páginas; si algo no pasa, el sitio queda como estaba. Una página en bloques nunca se convierte en el shortcode `[contope_canvas …]` y una página en bloques editada en el destino no se pisa: el paquete se rechaza con un error que nombra la página (hay una casilla, desactivada por omisión, para reemplazarlas a propósito). Los paquetes anteriores se siguen importando. El plugin deja de aceptar entradas de ZIP con rutas fuera de su carpeta, enlaces simbólicos o bombas de compresión. Pantalla: ContOpe Design → Portabilidad; WP-CLI: `wp ocd export-site` / `wp ocd import-site [--reemplazar-editadas]`. **Límites declarados:** el `theme.json` del tema viaja como referencia pero NO se aplica en el destino; los ajustes de WordPress que no son contenido (menús, logo, permalinks, título del sitio) no viajan; el juego de íconos del sitio (`uploads/contope-iconos`) y las hojas generadas (`contope-disenos`) sólo viajan si una página los cita como archivo; una región con un destino por número de página (no por tipo) lleva un aviso porque ese número es de cada instalación.
 - **La compuerta del diseño: una IA que usa el MCP no puede saltarse el sistema.** Todo valor de diseño que entra por el MCP —color, familia, tamaño de letra, peso, interlineado, espaciado, radio, sombra, grosor de borde, movimiento, ancho de caja— tiene que ser `var(--nombre)` de un nombre del registro de diseño del sitio (`COD_ADN_Registry`: hoy lo que el sitio ya emite —`--wp--preset--*`, `--wp--custom--*`, `--wp--style--global--*`, las `--cod-*` de Configuración y del núcleo—; mañana la proyección del ADN, cambiando sólo esa función) o una palabra neutra (`inherit`, `currentColor`, `transparent`, `0`, `none`, `auto`). Un literal se rechaza con un código estable (`ADN_LITERAL_COLOR|FONT|SIZE|FINE|SPACING|RADIUS|BORDER|SHADOW|MOTION|MEASURE`), la ruta exacta, el valor y con qué reemplazarlo. También se rechaza: declarar o redefinir una variable reservada (`ADN_VAR_RESERVED`: los nombres del registro y los prefijos `--wp--preset--`, `--wp--custom--`, `--wp--style--`, `--cod-`), una `--x` local con un color literal, un `var(--x, #literal)` con respaldo literal, un `var()` a un nombre que no está en el registro ni se declara en la misma regla (`ADN_VAR_UNKNOWN`), un literal escondido sólo en `projectData` (`ADN_PROJECT_DATA_MISMATCH`), `style=""` y atributos de presentación SVG (`fill`, `stroke`, `stop-color`; `font-*` en `text`/`tspan`), y lo que no se puede leer (escapes CSS, `ADN_SCAN_FAILED`; hoja externa por `<link>`, `ADN_EXTERNAL_STYLE`). Cubre todos los caminos que escriben diseño: `cod_preview/apply_canvas_composition` (un único `compile_gated`), `cod_patch_css`, `cod_patch_html`, `cod_write_canvas_document`, `cod_grapes_edit_node`, `cod_sync_project_data`, `cod_activate_section_whatsapp` y `cod_patch_geo_places` (un único `guarded_save`). Modo por sitio en la opción `cod_adn_gate_mode` (o la constante `COD_ADN_GATE_MODE`): `off` por omisión —Santa Luisa y Econut siguen igual—, `observe` (informa sin rechazar), `ratchet` (rechaza lo que agrega deuda) y `enforce`. **El modo no se cambia por el MCP**: sólo desde ContOpe Design → Compuerta del diseño (cookie + nonce) o la constante. El editor visual humano queda fuera; lo que una escritura por MCP deja en `projectData` se revisa igual. Con la compuerta encendida, las medidas aceptan `var(--nombre)` del registro (y `calc(-1 * var(--nombre))` donde se admite negativo), y `fontWeight`/`lineHeight` un nombre del registro. Además, las escrituras crudas recomparan la revisión **dentro** del bloqueo del documento (`save_if_revision`; hallazgo H5). Pruebas: `scripts/probar-compuerta-adn.php` y, contra el MCP real del local, `scripts/basis/probar-compuerta-real.mjs`.
 
@@ -42,6 +42,50 @@ Cambios del plugin que sólo existen en el banco de pruebas local de Basis; no t
 
 ---
 
+## 0.3.86 — 11 de noviembre de 2026
+
+### Agregado
+
+- **El plano de parcelas dice cuántas quedan disponibles sin necesidad de
+  JavaScript.** La portada de Santa Luisa muestra «Solo quedan 10 parcelas
+  disponibles», pero ese número lo calculaba el navegador: el HTML que entregaba
+  el servidor decía «Solo quedan ___ parcelas». El dato no faltaba —cada parcela
+  ya lleva su estado escrito—, faltaba el resultado de la cuenta.
+
+  Importa porque los asistentes que leen páginas normalmente **no ejecutan
+  JavaScript**, y Google lo hace en una segunda pasada que no siempre llega. El
+  dato más comercial de la página era invisible para ellos. ChatGPT ya manda
+  visitas a este sitio, así que no es hipotético.
+
+  Ahora el servidor hace la cuenta justo antes de entregar la página y rellena el
+  hueco. **No se congela ningún número**: se deriva en cada entrega del mismo
+  estado por parcela que ya está en el HTML, así que no puede quedar desfasado si
+  alguien marca una parcela como vendida. El runtime sigue recalculando en el
+  navegador exactamente igual que antes; lo único que cambia es que dejó de ser el
+  único que sabe la cuenta.
+
+  Clase nueva `COD_Plano_Parcelas`, enganchada donde el plugin ya resuelve redes,
+  mapa, divisores e íconos. Usa `WP_HTML_Tag_Processor`, que lee y modifica
+  etiquetas sin reescribir el documento. Si el HTML no calza con lo esperado no
+  escribe nada y deja la página intacta; una página sin plano no paga ningún
+  costo. El panel «Lote Nº ___» **no** se tocó: ahí el guion está vacío a
+  propósito, porque en reposo no hay ningún lote seleccionado.
+
+  Medido en el espejo: el HTML servido, pedido sin navegador, trae «10», y en ese
+  mismo HTML hay 10 parcelas disponibles y 12 vendidas. Una página sin plano queda
+  idéntica byte a byte.
+
+### Cerrado
+
+- **El trabajo del ADN del 2 de noviembre queda registrado.** Las fases F1, F1b y
+  F2 estaban construidas y probadas desde ese día, pero sin confirmar en el
+  repositorio. Se cierran acá tal como quedaron. **F4b y F8 siguen sin construir**
+  — se desbloquearon tras la auditoría del 1 de noviembre y no se han abordado.
+  Las pruebas propias del ADN pasan: 55 comprobaciones del validador y 64 de la
+  proyección al `theme.json`. La tercera batería necesita un sitio con el tema
+  `contope-basis` activo y no se corrió acá.
+
+---
 ## 0.3.85 — 30 de octubre de 2026
 
 Dos ampliaciones que apareció al cerrar las últimas diferencias de Basis contra su original. Lo que no las pide sale **idéntico a 0.3.84**.

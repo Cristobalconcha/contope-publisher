@@ -14,6 +14,12 @@
  * (dim7.req09, las 68 variables de `custom.form`) y los valores por punto de quiebre de los tamaños de letra y los espaciados
  * (`porQuiebre`, que salen del bloque de CSS marcado `cod-escalas-con-quiebres` de `styles.css`).
  *
+ * Desde el mismo día lleva también los ESTILOS DE BLOQUE del theme.json (dim9.req09 arquetipo -> familia de bloque y dim9.req08 diferencia por
+ * variante): `styles.blocks` (el relleno lateral de `core/group`, el radio de `core/image`) como la variante `base` de su arquetipo, y el CSS marcado
+ * `cod-estilos-responsivos` (la proporción de las fotos y el alto mínimo de los recuadros por punto de quiebre) como los cambios con `quiebre` de
+ * cada variante. Si el theme.json trae algo de eso que el catálogo de COD_ADN_Block_Styles no sabe emitir, la derivación FALLA (nada se pierde en
+ * silencio). El valor base (escritorio) de cada variante con nombre vive en `contope-basis/styles/blocks/<variante>.json`, un archivo del tema, y no se deriva.
+ *
  * Reglas de la derivación (cada una es una decisión, no un descuido):
  *  - El slug de una variable sale del NOMBRE del color o de la familia; para que el slug sea el del
  *    theme.json, un nombre que no da su slug (p. ej. «Naranja Basis» -> accent) se reemplaza por el slug
@@ -32,7 +38,8 @@
  *  - Los radios del custom.radius se declaran como formas cuyo nombre viene de una referencia genérica a
  *    una definición dim4.req01 (la lista de roles de forma).
  *
- * @param array{revision?: int, designId?: string} $o
+ * @param array{revision?: int, designId?: string, sinEstilosDeBloque?: bool} $o `sinEstilosDeBloque`: el mismo ADN sin dim9.req08 ni dim9.req09 (el control
+ *        de la prueba de portabilidad: sin ellos el destino tiene que verse distinto)
  */
 function adn_desde_theme_json(string $ruta_theme_json, array $o = []): string
 {
@@ -359,6 +366,87 @@ function adn_desde_theme_json(string $ruta_theme_json, array $o = []): string
         $tema_form = array_filter($grupos);
     }
 
+    // --- estilos de bloque: la variante base (styles.blocks) y las variantes con nombre por punto de quiebre (el CSS marcado)
+    $catalogo = COD_ADN_Block_Styles::catalogo();
+    $arquetipo_de = ['core/group' => 'contenedor', 'core/image' => 'secuencia-editorial']; // convención del fixture; el Core no cataloga familias
+    $familias_usadas = [];
+    $diferencias = [];
+    $indice_dif = []; // "arquetipo|variante" -> índice en $diferencias
+    $agregar_cambio = static function (string $familia, string $variante, array $cambio) use (&$familias_usadas, &$diferencias, &$indice_dif, $arquetipo_de): void {
+        if (!isset($arquetipo_de[$familia])) {
+            throw new RuntimeException('Sin arquetipo para la familia de bloque ' . $familia);
+        }
+        $familias_usadas[$arquetipo_de[$familia]] = $familia;
+        $clave = $arquetipo_de[$familia] . '|' . $variante;
+        if (!isset($indice_dif[$clave])) {
+            $indice_dif[$clave] = count($diferencias);
+            $diferencias[] = ['arquetipo' => $arquetipo_de[$familia], 'variante' => $variante, 'cambios' => []];
+        }
+        $diferencias[$indice_dif[$clave]]['cambios'][] = $cambio;
+    };
+    foreach ($tema['styles']['blocks'] ?? [] as $familia => $estilos_de_bloque) {
+        $hojas = [];
+        $recorrer = static function ($nodo, array $ruta) use (&$recorrer, &$hojas): void {
+            if (is_array($nodo)) {
+                foreach ($nodo as $k => $v) {
+                    $recorrer($v, array_merge($ruta, [(string) $k]));
+                }
+            } else {
+                $hojas[] = [$ruta, $nodo];
+            }
+        };
+        $recorrer($estilos_de_bloque, []);
+        foreach ($hojas as [$ruta, $valor]) {
+            $propiedad = null;
+            foreach ($catalogo[$familia] ?? [] as $nombre_prop => $spec) {
+                if ($spec['ruta'] === $ruta) {
+                    $propiedad = $nombre_prop;
+                }
+            }
+            if ($propiedad === null || !COD_ADN_Requisitos::es_longitud_css((string) $valor)) {
+                throw new RuntimeException('styles.blocks.' . $familia . '.' . implode('.', $ruta) . ' = ' . json_encode($valor) . ': el catálogo de estilos de bloque no sabe emitirlo');
+            }
+            $agregar_cambio((string) $familia, COD_ADN_Block_Styles::VARIANTE_BASE, ['propiedad' => $propiedad, 'valor' => ['tipo' => 'longitud', 'longitud' => (string) $valor]]);
+        }
+    }
+    if (preg_match('#/\*cod-estilos-responsivos\*/(.*?)/\*/cod-estilos-responsivos\*/#s', $css, $resp) === 1) {
+        $resto = $resp[1];
+        preg_match_all('/@media ([^{]+)\{((?:[^{}]+\{[^{}]*\})+)\}/', $resp[1], $medias_b, PREG_SET_ORDER);
+        foreach ($medias_b as $md) {
+            $resto = str_replace($md[0], '', $resto);
+            $quiebre = strpos($md[1], 'min-width') !== false ? 'tablet' : 'mobile';
+            preg_match_all('/([^{}]+)\{([^{}]*)\}/', $md[2], $reglas, PREG_SET_ORDER);
+            foreach ($reglas as $regla) {
+                if (preg_match('/^\.wp-block-([a-z0-9-]+)\.is-style-([a-z0-9-]+)(?: ([a-z]+))?$/D', $regla[1], $sel) !== 1) {
+                    throw new RuntimeException('Selector que no sé leer en cod-estilos-responsivos: ' . $regla[1]);
+                }
+                $familia = 'core/' . $sel[1];
+                foreach (array_filter(explode(';', $regla[2])) as $decl) {
+                    [$propiedad, $valor] = explode(':', $decl, 2);
+                    $spec = $catalogo[$familia][$propiedad] ?? null;
+                    if ($spec === null || $spec['destino'] !== ($sel[3] ?? '')) {
+                        throw new RuntimeException('cod-estilos-responsivos: ' . $familia . ' ' . $regla[1] . '{' . $decl . '} no está en el catálogo de estilos de bloque');
+                    }
+                    if ($propiedad === 'aspect-ratio' && preg_match('#^(\d+(?:\.\d+)?)/(\d+(?:\.\d+)?)$#D', $valor, $pr) === 1) {
+                        $tipo = ['tipo' => 'proporcion', 'ancho' => $pr[1] + 0, 'alto' => $pr[2] + 0];
+                    } elseif (COD_ADN_Requisitos::es_longitud_css($valor)) {
+                        $tipo = ['tipo' => 'longitud', 'longitud' => $valor];
+                    } else {
+                        throw new RuntimeException('cod-estilos-responsivos: valor que no sé leer: ' . $decl);
+                    }
+                    $agregar_cambio($familia, $sel[2], ['propiedad' => $propiedad, 'quiebre' => $quiebre, 'valor' => $tipo]);
+                }
+            }
+        }
+        if (trim($resto) !== '') {
+            throw new RuntimeException('cod-estilos-responsivos trae algo que no sé leer: ' . substr($resto, 0, 120));
+        }
+    }
+    $correspondencias = [];
+    foreach ($familias_usadas as $arquetipo => $familia) {
+        $correspondencias[] = ['arquetipo' => $arquetipo, 'familiaDeBloque' => $familia];
+    }
+
     $d = static function (string $id, string $categoria, string $nombre, array $valor) use ($humano): array {
         return ['id' => $id, 'category' => $categoria, 'name' => $nombre, 'value' => $valor] + $humano();
     };
@@ -388,6 +476,10 @@ function adn_desde_theme_json(string $ruta_theme_json, array $o = []): string
     ];
     if ($tema_form !== null) {
         $defs[] = $d('dim7.req09.def1', 'interaction', 'Tema del formulario', ['temaFormulario' => $tema_form]);
+    }
+    if (!($o['sinEstilosDeBloque'] ?? false)) {
+        $defs[] = $d('dim9.req09.def1', 'component', 'Familias de bloque', $correspondencias === [] ? ['sinCorrespondencias' => 'el tema no declara estilos de bloque'] : ['correspondencias' => $correspondencias]);
+        $defs[] = $d('dim9.req08.def1', 'component', 'Diferencias por variante', $diferencias === [] ? ['sinDiferencias' => 'el tema no declara estilos de bloque'] : ['diferencias' => $diferencias]);
     }
     $defs[] = $d('dim8.req03.def1', 'motion', 'Duraciones', ['escala' => [['nombre' => 'enter', 'duracion' => 420], ['nombre' => 'response', 'duracion' => 160]], 'ritmo' => ['descripcion' => 'fixture', 'sinPausas' => 'sin pausas']]);
     $defs[] = $d('dim8.req04.def1', 'motion', 'Movimientos', ['movimientos' => [

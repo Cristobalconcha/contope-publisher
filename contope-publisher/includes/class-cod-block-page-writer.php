@@ -28,6 +28,13 @@ final class COD_Block_Page_Writer
     public const META_DOCUMENT = '_cod_canvas_document_id';
     public const MAX_BYTES = 2097152;
     private const BLOQUE_LIENZO = 'contope/lienzo';
+    /**
+     * Prefijo de la opción del candado de escritura por página (sigue siendo `cod_bp_lock_<pageId>`).
+     * Su valor es `<time()>:<uuid>`: un lector antiguo, que hacía `(int) get_option(...)`, lo lee como la hora de
+     * la toma; y un candado antiguo (un entero pelado) lo reconoce y vence COD_Mutex con CANDADO_TTL_SEGUNDOS.
+     */
+    private const OPCION_CANDADO = 'cod_bp_lock_';
+    private const CANDADO_TTL_SEGUNDOS = 30;
 
     /** @return array<string, mixed>|WP_Error */
     public function read(int $page_id)
@@ -83,10 +90,12 @@ final class COD_Block_Page_Writer
             if (!($existente instanceof WP_Post) || $existente->post_type !== 'page') {
                 return new WP_Error('cod_mcp_page_not_found', 'No existe una página con ese pageId.');
             }
-            $actual = (int) get_post_meta($page_id, self::META_REVISION, true);
             $esperada = (int) ($args['expectedRevision'] ?? -1);
-            if ($esperada !== $actual) {
-                return new WP_Error('cod_mcp_revision_conflict', 'La página está en la revisión ' . $actual . ' y se esperaba la ' . $esperada . '. Lee la página con cod_read_block_page y vuelve a intentar.', ['expectedRevision' => $esperada, 'currentRevision' => $actual]);
+            // Primera comparación, barata, SIN candado (rechaza pronto lo que ya está viejo). La que vale es la
+            // segunda, dentro del candado: entre esta y la toma otro proceso pudo escribir la página.
+            $conflicto = $this->conflicto_de_revision($page_id, $esperada, false);
+            if ($conflicto !== null) {
+                return $conflicto;
             }
             if ((string) get_post_meta($page_id, self::META_DOCUMENT, true) !== '' && !has_block(self::BLOQUE_LIENZO, $content)) {
                 return new WP_Error('cod_mcp_block_needs_lienzo', 'Esta página tiene el encabezado y el pie del sitio por el bloque contope/lienzo; sin ese bloque como envoltorio la página saldría sin ellos. Envuelve el contenido en contope/lienzo.');
@@ -105,15 +114,25 @@ final class COD_Block_Page_Writer
             $informe = is_array($resuelto) ? $resuelto : $informe;
         }
 
-        $clave_candado = 'cod_bp_lock_' . $page_id;
+        // Candado ATÓMICO por página (COD_Mutex: un solo INSERT IGNORE decide quién gana). Antes era
+        // get_option() + update_option(): dos pasos con una ventana en medio, así que dos procesos podían
+        // pasar a la vez y escribir la misma página.
+        $valor_candado = null;
         if ($page_id > 0) {
-            $tomado = get_option($clave_candado, 0);
-            if ($tomado && (time() - (int) $tomado) < 30) {
+            $valor_candado = time() . ':' . wp_generate_uuid4();
+            if (!COD_Mutex::tomar_o_recuperar_vencido(self::OPCION_CANDADO . $page_id, $valor_candado, self::CANDADO_TTL_SEGUNDOS)) {
                 return new WP_Error('cod_mcp_page_busy', 'Otra escritura de esta página está en curso; reintenta en unos segundos.');
             }
-            update_option($clave_candado, time(), false);
         }
         try {
+            if ($page_id > 0) {
+                // Dentro del candado la revisión ya no puede cambiar: si otro escribió entre la primera
+                // comparación y la toma, esta escritura se rechaza en vez de pisarlo (actualización perdida).
+                $conflicto = $this->conflicto_de_revision($page_id, (int) ($args['expectedRevision'] ?? -1), true);
+                if ($conflicto !== null) {
+                    return $conflicto;
+                }
+            }
             $post_arr = ['post_content' => wp_slash($content)];
             if (isset($args['title']) && trim((string) $args['title']) !== '') {
                 $post_arr['post_title'] = sanitize_text_field((string) $args['title']);
@@ -139,8 +158,9 @@ final class COD_Block_Page_Writer
             $nueva = (int) get_post_meta($id, self::META_REVISION, true) + 1;
             update_post_meta($id, self::META_REVISION, $nueva);
         } finally {
-            if ($page_id > 0) {
-                delete_option($clave_candado);
+            if ($valor_candado !== null) {
+                // Sólo se suelta lo propio: si el candado venció y otro lo tomó, no se le quita.
+                COD_Mutex::soltar(self::OPCION_CANDADO . $page_id, $valor_candado);
             }
         }
 
@@ -157,6 +177,22 @@ final class COD_Block_Page_Writer
             $salida['adnGate'] = $informe;
         }
         return $salida;
+    }
+
+    /**
+     * @param bool $fresca true = leer la revisión directo de la base (dentro del candado, sin la caché de metadatos
+     *                     de este proceso, que no ve lo que otro acaba de escribir)
+     */
+    private function conflicto_de_revision(int $page_id, int $esperada, bool $fresca): ?WP_Error
+    {
+        if ($fresca) {
+            wp_cache_delete($page_id, 'post_meta');
+        }
+        $actual = (int) get_post_meta($page_id, self::META_REVISION, true);
+        if ($esperada === $actual) {
+            return null;
+        }
+        return new WP_Error('cod_mcp_revision_conflict', 'La página está en la revisión ' . $actual . ' y se esperaba la ' . $esperada . '. Lee la página con cod_read_block_page y vuelve a intentar.', ['expectedRevision' => $esperada, 'currentRevision' => $actual]);
     }
 
     /**

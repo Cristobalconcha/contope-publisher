@@ -200,6 +200,44 @@ $obtener = static function (array $a, string $ruta) {
     }
     return $a;
 };
+/** Las reglas de un CSS como lista ordenada de "@media|selector|declaración": dos CSS que dibujan lo mismo dan la misma lista. */
+$reglas_css = static function (string $css): array {
+    $out = [];
+    $css = (string) preg_replace('#/\*/?[a-z-]+\*/#', '', $css);
+    $css = (string) preg_replace_callback('/@media ([^{]+)\{((?:[^{}]+\{[^{}]*\})+)\}/', static function (array $m) use (&$out): string {
+        preg_match_all('/([^{}]+)\{([^{}]*)\}/', $m[2], $rs, PREG_SET_ORDER);
+        foreach ($rs as $r) {
+            foreach (array_filter(explode(';', $r[2])) as $decl) {
+                $out[] = trim($m[1]) . '|' . trim($r[1]) . '|' . $decl;
+            }
+        }
+        return '';
+    }, $css);
+    preg_match_all('/([^{}]+)\{([^{}]*)\}/', $css, $rs, PREG_SET_ORDER);
+    foreach ($rs as $r) {
+        foreach (array_filter(explode(';', $r[2])) as $decl) {
+            $out[] = '|' . trim($r[1]) . '|' . $decl;
+        }
+    }
+    sort($out);
+    return $out;
+};
+/**
+ * Las hojas de wp_get_global_styles() (todo lo que WordPress sirve en "styles") que difieren entre dos árboles, sin el CSS suelto (se compara
+ * aparte, por reglas). @param array<string, mixed> $a @param array<string, mixed> $b @return array<int, string>
+ */
+$dif_estilos = static function (array $a, array $b) use (&$hojas, $obtener): array {
+    unset($a['css'], $b['css']);
+    $dif = [];
+    foreach (array_unique(array_merge($hojas($a), $hojas($b))) as $ruta) {
+        $va = $obtener($a, $ruta);
+        $vb = $obtener($b, $ruta);
+        if (wp_json_encode($va) !== wp_json_encode($vb)) {
+            $dif[] = $ruta . ': «' . wp_json_encode($va) . '» vs «' . wp_json_encode($vb) . '»';
+        }
+    }
+    return $dif;
+};
 $importar = static function (string $json, ?int $esperada = null) {
     $opciones = ['emitirPropuestas' => false] + ($esperada !== null ? ['expectedCurrentRevision' => $esperada] : []);
     $previa = COD_ADN_Store::previsualizar($json, $opciones);
@@ -218,6 +256,7 @@ $GAP = array_keys(COD_ADN_Theme::fuera_del_adn());
 echo "\n== 1. la referencia: lo que sirve el local de Basis (theme.json congelado de 5e118c5) ==\n";
 $poner_tema((string) file_get_contents($F_LOCAL));
 $REF = $ajustes();
+$REF_ESTILOS = wp_get_global_styles();
 $P_REF = $presets($REF);
 $comprobar('la referencia tiene paleta, 4 familias, 20 tamaños y 31+ espaciados (piso: no se compara en vacío)',
     count($P_REF['paleta']) >= 12 && count($P_REF['familias']) === 4 && count($P_REF['tamanos']) === 20 && count($P_REF['espaciados']) >= 31,
@@ -228,6 +267,7 @@ $comprobar('la referencia trae el custom (radius, border, typography, layout, bl
 echo "\n== 2. CONTROL: el destino atrasado (theme.json de producción de b7b0478) sin ADN muestra el problema ==\n";
 $poner_tema((string) file_get_contents($F_ATRASADO));
 $S0 = $ajustes();
+$E0 = wp_get_global_styles();
 $P0 = $presets($S0);
 $comprobar('atrasado y sin ADN: 4 tamaños (los de fábrica del tema viejo), no los 20', count($P0['tamanos']) === 4 && count($P_REF['tamanos']) === 20, json_encode(array_map('count', $P0)));
 $comprobar('atrasado y sin ADN: sin escala de espaciado ni custom', count($P0['espaciados']) === 0 && !isset($S0['custom']['radius']) && !isset($S0['custom']['border']));
@@ -354,6 +394,37 @@ $comprobar('el registro de diseño del destino ya conoce --wp--preset--font-size
 $comprobar('CONTROL del control: lo mismo ANTES de importar daba menos (la prueba sabe ver el cambio)', count($P1['tamanos']) > count($P0['tamanos']) && count($P1['espaciados']) > count($P0['espaciados']) && isset($S1['custom']['radius']) && !isset($S0['custom']['radius']));
 $estilos = wp_get_global_styles();
 $comprobar('ESTILOS: el botón y los enlaces siguen el rol accent (var del preset), el fondo y el texto la página', ($estilos['elements']['button']['color']['background'] ?? '') === 'var(--wp--preset--color--accent)' && ($estilos['elements']['link']['color']['text'] ?? '') === 'var(--wp--preset--color--accent)' && ($estilos['color']['background'] ?? '') === 'var(--wp--preset--color--fondo-pagina)' && ($estilos['color']['text'] ?? '') === 'var(--wp--preset--color--texto-cuerpo)', json_encode([$estilos['elements']['button']['color'] ?? null, $estilos['color'] ?? null]));
+// Los ESTILOS COMPLETOS (todo "styles" de wp_get_global_styles(): bloques, elementos, tipografía, espaciado y el CSS), no sólo los que el ADN gobierna por color y
+// familia: lo que el theme.json local declara y el atrasado no tiene tiene que llegar por el ADN. Las únicas diferencias admitidas son los cuatro colores que el ADN
+// escribe como variable de la paleta en vez del hexadecimal del archivo (el mismo color).
+$E1 = (function () use ($ajustes) {
+    $ajustes();
+    return wp_get_global_styles();
+})();
+$COLOR_COMO_VARIABLE = ['color.background', 'color.text', 'elements.link.color.text', 'elements.button.color.background'];
+$dif_e = $dif_estilos($REF_ESTILOS, $E1);
+$dif_e_inesperadas = array_values(array_filter($dif_e, static function (string $d) use ($COLOR_COMO_VARIABLE): bool {
+    foreach ($COLOR_COMO_VARIABLE as $ruta) {
+        if (strpos($d, $ruta . ':') === 0) {
+            return false;
+        }
+    }
+    return true;
+}));
+foreach (array_slice($dif_e_inesperadas, 0, 8) as $d) {
+    echo '           ' . $d . "\n";
+}
+$comprobar('ESTILOS COMPLETOS: wp_get_global_styles() del destino atrasado + ADN == el del local de Basis en todo el árbol (' . count($hojas($REF_ESTILOS)) . ' hojas), salvo los 4 colores escritos como variable de la paleta', $dif_e_inesperadas === [] && count($dif_e) <= 4 && count($hojas($REF_ESTILOS)) >= 40, count($dif_e_inesperadas) . ' distinta(s): ' . implode(' | ', array_slice($dif_e_inesperadas, 0, 3)));
+$comprobar('ESTILOS COMPLETOS: styles.blocks.core/group (relleno lateral 0) y core/image (radio 16px) llegan; el atrasado a solas tenía el relleno clamp(…)', ($E1['blocks']['core/group']['spacing']['padding']['left'] ?? null) === '0' && ($E1['blocks']['core/group']['spacing']['padding']['right'] ?? null) === '0' && ($E1['blocks']['core/image']['border']['radius'] ?? null) === '16px' && strpos((string) ($E0['blocks']['core/group']['spacing']['padding']['left'] ?? ''), 'clamp') === 0);
+$comprobar('ESTILOS COMPLETOS: el CSS por punto de quiebre de los estilos de bloque (7 reglas) llega: mismas reglas que el local; el atrasado a solas no traía ninguna', (function () use ($reglas_css, $REF_ESTILOS, $E1, $E0) {
+    $de_bloque = static fn (array $l): array => array_values(array_filter($l, static fn (string $x): bool => strpos(explode('|', $x)[1], '.wp-block-') === 0 && strpos($x, 'is-style-') !== false));
+    $ref = $de_bloque($reglas_css((string) ($REF_ESTILOS['css'] ?? '')));
+    return count($ref) === 7 && $de_bloque($reglas_css((string) ($E1['css'] ?? ''))) === $ref && $reglas_css((string) ($E1['css'] ?? '')) === $reglas_css((string) ($REF_ESTILOS['css'] ?? '')) && $de_bloque($reglas_css((string) ($E0['css'] ?? ''))) === [];
+})());
+$comprobar('CONTROL: sin el ADN (el atrasado a solas) los estilos completos difieren del local en el relleno de core/group y en el CSS de los quiebres', (function () use ($dif_estilos, $REF_ESTILOS, $E0, $reglas_css) {
+    $d = implode(' ', $dif_estilos($REF_ESTILOS, $E0));
+    return strpos($d, 'blocks.core/group.spacing.padding.left') !== false && $reglas_css((string) ($E0['css'] ?? '')) !== $reglas_css((string) ($REF_ESTILOS['css'] ?? ''));
+})());
 $comprobar('ESTILOS: la familia del cuerpo y de los títulos son las de la referencia', ($estilos['typography']['fontFamily'] ?? '') === 'var(--wp--preset--font-family--body)' && ($estilos['elements']['heading']['typography']['fontFamily'] ?? '') === 'var(--wp--preset--font-family--display)');
 $comprobar('el archivo del tema sigue atrasado y cod_adn_get lo dice (themeJson: ausente)', COD_ADN_Store::resumen()['proyeccion']['themeJson'] === 'ausente');
 $ref_hoja_dest = (string) file_get_contents($archivo_tema);
@@ -391,7 +462,7 @@ if (!is_wp_error($exp)) {
     $sobre_local = COD_ADN_Theme::exportar_theme_json($F_LOCAL);
     $comprobar('el archivo exportado sobre la base completa de Basis lleva lo que antes no viajaba: las 4 sombras, los 2 degradados, el custom.form de 68 variables y los 3 colores extra', !is_wp_error($sobre_local) && count($sobre_local['datos']['settings']['shadow']['presets']) === 4 && count($sobre_local['datos']['settings']['color']['gradients']) === 2 && count($sobre_local['datos']['settings']['custom']['form']) === 68 && count($sobre_local['datos']['settings']['color']['palette']) === 17, $codigo($sobre_local));
     $comprobar('y los presets del ADN reemplazan a los del archivo (no se duplican): 20 tamaños (sin display ni cuerpo), 32 espaciados con el gutter y 17 colores', !is_wp_error($sobre_local) && count($sobre_local['datos']['settings']['typography']['fontSizes']) === 20 && count($sobre_local['datos']['settings']['spacing']['spacingSizes']) === 32 && count($sobre_local['datos']['settings']['color']['palette']) === 17);
-    $comprobar('el archivo exportado sobre la base de Basis conserva el CSS de los estilos de bloque y el bloque de los quiebres queda donde estaba, una sola vez', !is_wp_error($sobre_local) && substr_count((string) $sobre_local['datos']['styles']['css'], '/*cod-escalas-con-quiebres*/') === 1 && substr_count((string) $sobre_local['datos']['styles']['css'], '/*cod-estilos-responsivos*/') === 1 && $sobre_local['datos']['styles']['css'] === $ref_tema['styles']['css'], is_wp_error($sobre_local) ? $codigo($sobre_local) : strlen((string) $sobre_local['datos']['styles']['css']) . ' contra ' . strlen((string) $ref_tema['styles']['css']));
+    $comprobar('el archivo exportado sobre la base de Basis deja el CSS de los estilos de bloque y el de los quiebres (mismas reglas) y los styles.blocks iguales a los de Basis, cada bloque marcado una sola vez', !is_wp_error($sobre_local) && substr_count((string) $sobre_local['datos']['styles']['css'], '/*cod-escalas-con-quiebres*/') === 1 && substr_count((string) $sobre_local['datos']['styles']['css'], '/*cod-estilos-responsivos*/') === 1 && $reglas_css((string) $sobre_local['datos']['styles']['css']) === $reglas_css((string) $ref_tema['styles']['css']) && ($sobre_local['datos']['styles']['blocks'] ?? null) === $ref_tema['styles']['blocks'], is_wp_error($sobre_local) ? $codigo($sobre_local) : strlen((string) $sobre_local['datos']['styles']['css']) . ' contra ' . strlen((string) $ref_tema['styles']['css']));
     $comprobar('el archivo exportado sobre la base ATRASADA agrega el bloque de los quiebres (el destino queda con los valores de tablet y celular)', (function () use ($F_ATRASADO) {
         $e = COD_ADN_Theme::exportar_theme_json($F_ATRASADO);
         return !is_wp_error($e) && substr_count((string) ($e['datos']['styles']['css'] ?? ''), '--wp--preset--font-size--30:15px') === 1 && substr_count((string) ($e['datos']['styles']['css'] ?? ''), '--wp--preset--spacing--300:35.37px') === 1;

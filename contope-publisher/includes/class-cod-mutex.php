@@ -65,7 +65,7 @@ final class COD_Mutex
      * reintenta UNA vez. Quitarlo es condicional al valor visto: de dos procesos que ven el mismo
      * bloqueo vencido, sólo uno lo borra; el otro no borra nada y pierde ante la clave única.
      */
-    public static function tomar_o_recuperar_vencido(string $opcion, string $valor): bool
+    public static function tomar_o_recuperar_vencido(string $opcion, string $valor, ?int $ttl_marca_de_tiempo = null): bool
     {
         if (self::tomar($opcion, $valor)) {
             return true;
@@ -75,12 +75,34 @@ final class COD_Mutex
             // Se soltó entre una sentencia y otra: un último intento.
             return self::tomar($opcion, $valor);
         }
-        $dato = json_decode($visto, true);
-        if (!is_array($dato) || !isset($dato['expiresAt']) || (int) $dato['expiresAt'] >= time()) {
+        if (!self::vencido($visto, $ttl_marca_de_tiempo)) {
             return false;
         }
         self::soltar($opcion, $visto);
         return self::tomar($opcion, $valor);
+    }
+
+    /**
+     * ¿Venció el valor crudo $visto?
+     *
+     * Dos formatos:
+     *   - JSON con `expiresAt` (el de los bloqueos del documento y del ADN): vence cuando `expiresAt` < ahora.
+     *   - MARCA DE TIEMPO (el formato antiguo del candado de página en bloques: un entero `time()` pelado, o
+     *     `time():token` en el formato nuevo, que un lector antiguo lee igual con `(int)`): sólo se entiende si
+     *     quien llama dice cuánto dura ($ttl_marca_de_tiempo, en segundos); vence cuando ahora - marca >= ttl.
+     *
+     * Cualquier otra cosa NO vence jamás (no se adivina): quien llama decide qué hacer con ella.
+     */
+    private static function vencido(string $visto, ?int $ttl_marca_de_tiempo): bool
+    {
+        $dato = json_decode($visto, true);
+        if (is_array($dato)) {
+            return isset($dato['expiresAt']) && (int) $dato['expiresAt'] < time();
+        }
+        if ($ttl_marca_de_tiempo !== null && preg_match('/^(\d{9,12})(?::.*)?$/s', $visto, $m) === 1) {
+            return (time() - (int) $m[1]) >= $ttl_marca_de_tiempo;
+        }
+        return false;
     }
 
     /**

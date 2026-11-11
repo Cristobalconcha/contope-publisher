@@ -240,7 +240,7 @@ final class COD_ADN_Validator
             $id = (string) $d->id;
             $req = COD_ADN_Requisitos::requisito_de($id);
             $proyectado = COD_ADN_Requisitos::es_proyectado($req);
-            $con_forma = COD_ADN_Requisitos::tiene_esquema($req); // proyectado, o forma conocida sin proyectar (dim9.req08/09)
+            $con_forma = COD_ADN_Requisitos::tiene_esquema($req); // proyectado, o forma conocida sin proyectar (COD_ADN_Requisitos::SOLO_FORMA, hoy vacía)
             $ficha = ['estadoEfectivo' => $d->state, 'guardada' => true, 'emitida' => false, 'ignorada' => null];
 
             if ($d->state === 'confirmed') {
@@ -300,7 +300,7 @@ final class COD_ADN_Validator
             }
 
             if ($motivo === null && !$proyectado) {
-                $motivo = 'R4-no-proyectada'; // la forma es conocida (dim9.req08/09), pero la web aún no emite sus propiedades.
+                $motivo = 'R4-no-proyectada'; // la forma es conocida (SOLO_FORMA), pero la web no la proyecta.
             }
 
             // R6 (también para lo que la web no proyecta: una referencia rota es una referencia rota).

@@ -113,6 +113,17 @@ if (orden === 'guardar') {
   const sinAjenos = args.includes('--sin-ajenos');
   const { difs, elementos, pilas, ajenos } = comparar(a, b, sinAjenos);
   console.log(`${elementos} elementos comparados × ${PROPS.length} propiedades · ${difs.length} diferencias${sinAjenos ? ` · ${ajenos} elementos ajenos al diseño (cookies, mapa, formulario, listas de entradas) fuera de la comparación` : ''}${pilas ? ` · ${pilas} font-family con la pila ampliada (misma primera familia, ya contadas aparte)` : ''}`);
+  if (difs.length > 0) {
+    // Dónde están: por propiedad y por ancho de pantalla (la toma es «página@ancho»), para que una prueba pueda exigir QUÉ cambió y en cuál pantalla.
+    const porProp = {};
+    const porAncho = {};
+    for (const d of difs) {
+      const m = /^(\S+)@(\d+) .* ([a-z-]+): «/.exec(d);
+      if (m) { porProp[m[3]] = (porProp[m[3]] ?? 0) + 1; porAncho[m[2]] = (porAncho[m[2]] ?? 0) + 1; }
+    }
+    console.log('  por propiedad: ' + Object.entries(porProp).sort((x, y) => y[1] - x[1]).map(([k, v]) => k + ' ' + v).join(', '));
+    console.log('  por ancho: ' + Object.entries(porAncho).map(([k, v]) => k + ' ' + v).join(', '));
+  }
   for (const d of difs.slice(0, 40)) console.log('  ' + d);
   if (elementos < 500) { console.error('Se compararon muy pocos elementos: la medición no vale.'); process.exit(2); }
   process.exit(difs.length === 0 ? 0 : 1);

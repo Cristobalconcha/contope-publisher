@@ -7,14 +7,15 @@
 //      ampliada (misma primera familia). Y P2.3: una revisión 2 con otro accent cambia, en el navegador, --cod-color-accent,
 //      --wp--preset--color--accent y el fondo del botón; el CONTROL (dos tomas sin importar nada) no cambia.
 //   3. Se quita el ADN del local (queda como estaba: sin ADN, modo de la compuerta original).
-//   4. Destino LIMPIO (8895; con OCD_DESTINO_PUERTO=8896, el otro) con un theme.json ATRASADO: se importa el paquete y
+//   4. Destino LIMPIO (8895; con OCD_DESTINO_PUERTO=8896, el otro) con el theme.json ATRASADO DE PRODUCCIÓN A SOLAS (byte a byte, sin agregarle nada): se importa el paquete y
 //      probar-adn-proyeccion.php comprueba que TODO `settings` de wp_get_global_settings() —no sólo los presets: paleta con sus
 //      transparencias, degradados, sombras, tamaños y espaciados con el gutter, y el `custom` completo (radius, border, typography,
 //      layout, blur, form de 68 variables)— es IGUAL al del local de Basis (salvo los pocos extras que declara
 //      scripts/adn/lib/comparar-ajustes.php), más P2.1 a P2.4 y los mapeos; con sus CONTROLES (un valor cambiado, un extra no declarado).
 //   5. Ese mismo destino, importado con el paquete CON medios, en el navegador: el valor calculado de todos los elementos de las 5 páginas
 //      (escritorio y celular) es el de Basis local, sin lo que no es del diseño (cookies, mapa, formulario, listas de entradas). Es la meta
-//      real: que el sitio importado SE VEA igual. CONTROL: el mismo destino sin el ADN se ve muy distinto.
+//      real: que el sitio importado SE VEA igual. CONTROLES: el mismo destino con el ADN pero SIN los estilos de bloque (dim9.req08 y dim9.req09: el relleno de
+//      core/group, la proporción de las fotos y el alto de los recuadros por punto de quiebre) se ve distinto, y sin el ADN se ve muy distinto.
 //
 //   node scripts/adn/probar-portabilidad-presets.mjs --base <medicion-antes.json> [--sin-navegador]
 //   OCD_DESTINO_PUERTO=8896 node scripts/adn/probar-portabilidad-presets.mjs --base <medicion-antes.json>
@@ -22,7 +23,8 @@
 // La medición "antes" se toma con:  node scripts/basis/medir-calculados.mjs guardar <archivo>   ANTES de tocar las hojas del tema.
 // Sólo escribe en los dos sitios de prueba (Basis local y el destino limpio) y los deja como estaban.
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, existsSync } from 'node:fs';
+import { mkdtempSync, existsSync, readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -160,14 +162,28 @@ if (!SIN_NAVEGADOR) {
   } else {
     try {
       const imp = destino('importar', [zip]);
-      paso(imp.ok && imp.datos.adn?.designId === 'basis-web', 'el destino (theme.json atrasado + lo que el ADN no lleva, declarado) importa el paquete con medios y queda con el ADN de Basis', imp.crudo);
+      paso(imp.ok && imp.datos.adn?.designId === 'basis-web', 'el destino (con el theme.json atrasado de producción A SOLAS) importa el paquete con medios y queda con el ADN de Basis', imp.crudo);
+      const temaDestino = path.join(path.dirname(WP_LOAD), 'wp-content', 'themes', 'contope-basis', 'theme.json');
+      const temaAtrasado = path.join(raiz, 'fixtures', 'adn', 'f2', 'basis-theme.destino-atrasado-b7b0478.json');
+      const sha = (p) => createHash('sha256').update(readFileSync(p)).digest('hex');
+      paso(existsSync(temaDestino) && sha(temaDestino) === sha(temaAtrasado), 'el theme.json del destino es el atrasado de producción, byte a byte: no se le agregó ningún bloque ni CSS (lo que se vea igual llegó por el ADN o el paquete)', existsSync(temaDestino) ? sha(temaDestino) : 'no existe ' + temaDestino);
       const conAdn = path.join(tmp, 'destino-con-adn.json');
       let m = medirSitio(URL_DESTINO, conAdn);
       paso(m.status === 0, 'medición de las 5 páginas del destino (escritorio y celular)', m.stdout + m.stderr);
       let c = compararSitios(basisConAdn, conAdn);
       console.log('        ' + c.stdout.trim().split('\n').slice(0, 1).join(''));
       paso(c.status === 0, 'DESTINO == BASIS: color, texto, tamaños, pesos, interlineados, radios, bordes, espaciado y medidas de todos los elementos de las 5 páginas son los de Basis local (sin cookies, mapa, formulario ni listas de entradas)', c.stdout.split('\n').slice(0, 8).join(' | '));
-      // CONTROL: el mismo destino SIN el ADN (el theme.json atrasado a solas) tiene que verse distinto, o la comparación no estaría midiendo nada.
+      // CONTROL 1: el mismo destino con el ADN SIN los estilos de bloque (dim9.req08 y dim9.req09) tiene que verse distinto, o esos dos requisitos no estarían
+      // haciendo nada: el relleno de core/group (los dos anchos de pantalla) y la proporción de las fotos y el alto de los recuadros del celular.
+      const sb = destino('sin-estilos-de-bloque');
+      paso(sb.ok && sb.datos.conBloques === false && sb.datos.conCssResponsivo === false, 'CONTROL: se reemplaza el ADN por su revisión siguiente SIN dim9.req08 ni dim9.req09 (lo demás del ADN queda)', sb.crudo);
+      const sinBloques = path.join(tmp, 'destino-sin-estilos-de-bloque.json');
+      m = medirSitio(URL_DESTINO, sinBloques);
+      paso(m.status === 0, 'CONTROL: medición del destino sin los estilos de bloque', m.stdout + m.stderr);
+      c = compararSitios(basisConAdn, sinBloques);
+      console.log('        ' + c.stdout.trim().split('\n').slice(0, 3).join(' · '));
+      paso(c.status === 1 && /por propiedad: .*padding-left/.test(c.stdout) && /por propiedad: .*\bheight\b/.test(c.stdout) && /por ancho: .*1440/.test(c.stdout) && /por ancho: .*393/.test(c.stdout), 'CONTROL: sin los estilos de bloque el destino SE VE distinto: el relleno lateral de core/group (escritorio y celular) y las alturas del celular (fotos y recuadros)', c.stdout.split('\n').slice(0, 4).join(' | '));
+      // CONTROL 2: el mismo destino SIN el ADN (el theme.json atrasado a solas) tiene que verse distinto, o la comparación no estaría midiendo nada.
       const q = destino('quitar-adn');
       paso(q.ok && q.datos.activo === false, 'CONTROL: se quita el ADN del destino (el contenido y el theme.json quedan)', q.crudo);
       const sinAdn = path.join(tmp, 'destino-sin-adn.json');

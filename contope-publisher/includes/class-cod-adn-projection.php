@@ -15,8 +15,8 @@ if (!defined('ABSPATH')) {
  * proyección derivada). Sin ADN activo nadie lo lee y el sitio queda como estaba.
  *
  * MAPEOS FIJADOS EN F2 (ESPEC 3.6):
- *   - Rol de color Core -> variable del plugin: background -> --cod-color-surface, text ->
- *     --cod-color-ink, accent -> --cod-color-accent, surface (la superficie de tarjeta del Core) ->
+ *   - Rol de color Core -> variable del plugin: background -> --cod-color-surface; text ->
+ *     --cod-color-ink; accent -> --cod-color-accent; surface (la superficie de tarjeta del Core) ->
  *     --cod-color-primary (así lo llama el plugin: color_primary), y cualquier otro rol (border,
  *     action, info, success, warning, error, active, inactive, focus) -> --cod-color-<rol>.
  *   - Forma: la variable es --wp--custom--radius--<nombre>; el nombre sale de resolver el `rol` (una
@@ -43,8 +43,9 @@ if (!defined('ABSPATH')) {
  *       porQuiebre (dim2.req02, dim3.req01) + dim3.req10 -> styles.css, entre las marcas de COD_Theme_Definitions::MARCA_CSS_ESCALA
  *     Una escala con su ausencia declarada (`sin<Cosa>`) no emite nada. Los nombres de los pasos de tamaño y de espaciado
  *     son los de Configuración: «<paso> (<escritorio> / <tablet> / <celular>)».
- *   - dim9.req08 (diferencias por variante) y dim9.req09 (arquetipo -> familia de bloque) se validan y se guardan; el destino
- *     aún no emite sus propiedades (COD_ADN_Theme::fuera_del_adn()).
+ *   - dim9.req09 (arquetipo -> familia de bloque) y dim9.req08 (diferencias por variante) salen como estilos de bloque
+ *     (COD_ADN_Block_Styles): la variante `base` de una familia es `styles.blocks.<bloque>` del theme.json y todo cambio por punto
+ *     de quiebre (o de una variante con nombre) es una regla de CSS entre las marcas `cod-estilos-responsivos` de `styles.css`.
  *   - Ancho de caja (dim3.req05): el contenedor `contenido` es settings.layout.contentSize y el rol
  *     Core `measure` (--cod-layout-max-width); el contenedor `amplio` es wideSize.
  *   - Movimiento Core (dim8.req04): el movimiento cuyo `caso` se llama `enter`/`aparecer` es
@@ -206,8 +207,10 @@ final class COD_ADN_Projection
         $plano = [];
         $quiebres_de = ['tablet' => [], 'mobile' => []]; // variable -> valor, por pantalla (porQuiebre)
         $usa_quiebres = false;
-        $agregar = static function (string $variable, string $clase, string $valor, string $req, string $ruta) use (&$registro, &$ganadoras): void {
+        $por_ref = []; // "<requisito>|<ruta>" -> la primera variable que salió de ahí (para resolver una referencia a una variable)
+        $agregar = static function (string $variable, string $clase, string $valor, string $req, string $ruta) use (&$registro, &$ganadoras, &$por_ref): void {
             $g = $ganadoras[$req];
+            $por_ref[$req . '|' . $ruta] = $por_ref[$req . '|' . $ruta] ?? $variable;
             $registro[$variable] = [
                 'definicion' => (string) $g['def']->id,
                 'requisito' => $req,
@@ -665,19 +668,64 @@ final class COD_ADN_Projection
             }
         }
 
-        // --- valores por punto de quiebre (porQuiebre) y los anchos de dim3.req10 ---
-        if ($usa_quiebres) {
-            $media = ['tablet' => self::QUIEBRE_TABLET, 'mobile' => self::QUIEBRE_MOVIL];
-            $anchos = $valor_de('dim3.req10');
-            $declarados = [];
-            foreach ($lista_de($anchos, 'quiebres', 'sinQuiebres', 'dim3.req10') as $q) {
-                $hasta = (string) $q->hasta;
-                $desde = property_exists($q, 'desde') ? (string) $q->desde : '';
-                $media[(string) $q->nombre] = ($desde !== '' ? '(min-width: ' . $desde . ') and ' : '') . '(max-width: ' . $hasta . ')';
-                $declarados[(string) $q->nombre] = true;
+        // --- los anchos de los puntos de quiebre (dim3.req10): los de la web, salvo los que el ADN declare ---
+        $anchos_cache = null;
+        $anchos_de = static function () use (&$anchos_cache, $valor_de, $lista_de): array {
+            if ($anchos_cache === null) {
+                $media = ['tablet' => self::QUIEBRE_TABLET, 'mobile' => self::QUIEBRE_MOVIL];
+                $declarados = [];
+                foreach ($lista_de($valor_de('dim3.req10'), 'quiebres', 'sinQuiebres', 'dim3.req10') as $q) {
+                    $hasta = (string) $q->hasta;
+                    $desde = property_exists($q, 'desde') ? (string) $q->desde : '';
+                    $media[(string) $q->nombre] = ($desde !== '' ? '(min-width: ' . $desde . ') and ' : '') . '(max-width: ' . $hasta . ')';
+                    $declarados[(string) $q->nombre] = true;
+                }
+                $anchos_cache = ['media' => $media, 'declarados' => $declarados];
             }
+            return $anchos_cache;
+        };
+
+        // --- estilos de bloque (dim9.req09 y dim9.req08) ---
+        // Una referencia del Core a una variable que el ADN emitió: la ruta del ref ("escala", 3, "value") es la que quedó anotada al emitirla
+        // ("escala[3].value"); si apunta a la entrada entera ("grosores", 0) vale la única variable que salió de adentro.
+        $referencia_a_variable = static function (stdClass $ref) use (&$por_ref): ?string {
+            $ruta = '';
+            foreach ($ref->refPath as $i => $seg) {
+                $ruta .= is_int($seg) || is_float($seg) ? '[' . (int) $seg . ']' : ($i === 0 ? '' : '.') . $seg;
+            }
+            $clave = (string) $ref->refReqId . '|' . $ruta;
+            if (isset($por_ref[$clave])) {
+                return 'var(' . $por_ref[$clave] . ')';
+            }
+            $dentro = [];
+            foreach ($por_ref as $k => $variable) {
+                if (strpos($k, $clave . '.') === 0) {
+                    $dentro[$variable] = true;
+                }
+            }
+            return count($dentro) === 1 ? 'var(' . (string) array_key_first($dentro) . ')' : null;
+        };
+        $estilos_de_bloque = COD_ADN_Block_Styles::proyectar(
+            $lista_de($valor_de('dim9.req09'), 'correspondencias', 'sinCorrespondencias', 'dim9.req09'),
+            $lista_de($valor_de('dim9.req08'), 'diferencias', 'sinDiferencias', 'dim9.req08'),
+            static function () use ($anchos_de): array {
+                return $anchos_de()['media'];
+            },
+            $referencia_a_variable
+        );
+        foreach ($estilos_de_bloque['avisos'] as $aviso) {
+            $avisos[] = $aviso;
+        }
+        if ($estilos_de_bloque['bloques'] !== []) {
+            $tema['styles']['blocks'] = $estilos_de_bloque['bloques'];
+        }
+
+        // --- valores por punto de quiebre (porQuiebre) y los anchos de dim3.req10 ---
+        if ($usa_quiebres || $estilos_de_bloque['css'] !== '') {
+            $anchos = $anchos_de();
+            $media = $anchos['media'];
             foreach (['tablet', 'mobile'] as $q) {
-                if ($quiebres_de[$q] !== [] && !isset($declarados[$q])) {
+                if (($quiebres_de[$q] !== [] || $estilos_de_bloque['quiebres'][$q]) && !isset($anchos['declarados'][$q])) {
                     $avisos[] = ['codigo' => 'ADN_QUIEBRES_HEREDADOS', 'mensaje' => 'Hay valores para "' . $q . '" y dim3.req10 no declara su ancho: se usa el de la web (' . $media[$q] . ').', 'quiebre' => $q];
                 }
             }
@@ -692,7 +740,14 @@ final class COD_ADN_Projection
                 }
                 $css .= '@media ' . $media[$q] . '{:root{' . $declaraciones . '}}';
             }
-            $tema['styles']['css'] = '/*' . self::MARCA_CSS_ESCALA . '*/' . $css . '/*/' . self::MARCA_CSS_ESCALA . '*/';
+            // Dos bloques marcados, cada uno con su dueño: los valores por quiebre de las escalas y los estilos de bloque.
+            $bloques_css = $css === '' ? [] : ['/*' . self::MARCA_CSS_ESCALA . '*/' . $css . '/*/' . self::MARCA_CSS_ESCALA . '*/'];
+            if ($estilos_de_bloque['css'] !== '') {
+                $bloques_css[] = $estilos_de_bloque['css'];
+            }
+            if ($bloques_css !== []) {
+                $tema['styles']['css'] = implode("\n", $bloques_css);
+            }
         }
 
         $tema['settings']['custom']['adn'] = [

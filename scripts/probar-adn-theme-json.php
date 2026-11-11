@@ -34,7 +34,7 @@ if (!class_exists('WP_Error')) {
     }
 }
 $plugin = realpath(__DIR__ . '/../contope-publisher/includes');
-foreach (['js', 'design-md', 'parser', 'projection', 'requisitos', 'validator', 'theme'] as $parte) {
+foreach (['js', 'design-md', 'parser', 'block-styles', 'projection', 'requisitos', 'validator', 'theme'] as $parte) {
     require_once $plugin . '/class-cod-adn-' . $parte . '.php';
 }
 require __DIR__ . '/adn/lib/adn-desde-theme-json.php';
@@ -81,9 +81,9 @@ if (!$r['ok']) {
     exit(1);
 }
 $def = $r['validacion']['definiciones'];
-$nuevos = ['dim1.req15', 'dim1.req16', 'dim2.req09', 'dim3.req10', 'dim3.req11', 'dim3.req12', 'dim4.req09', 'dim4.req10', 'dim4.req11', 'dim7.req09'];
+$nuevos = ['dim1.req15', 'dim1.req16', 'dim2.req09', 'dim3.req10', 'dim3.req11', 'dim3.req12', 'dim4.req09', 'dim4.req10', 'dim4.req11', 'dim7.req09', 'dim9.req08', 'dim9.req09'];
 $no_emitidos = array_filter($nuevos, static fn (string $q): bool => empty($def[$q . '.def1']['emitida']));
-$comprobar('las 10 definiciones nuevas quedan EMITIDAS (ninguna ignorada)', $no_emitidos === [], implode(', ', $no_emitidos));
+$comprobar('las 12 definiciones nuevas (con dim9.req08 y dim9.req09, los estilos de bloque) quedan EMITIDAS (ninguna ignorada)', $no_emitidos === [], implode(', ', $no_emitidos));
 $comprobar('la proyección no avisa de nada (sin colisiones de slug, degradados incompletos, referencias sin color…)', $r['proyeccion']['avisos'] === [], json_encode($r['proyeccion']['avisos'], JSON_UNESCAPED_UNICODE));
 $proy = $r['proyeccion'];
 $ajustes = $sobre_atrasado($proy);
@@ -112,18 +112,155 @@ $comprobar('los nombres de los pasos son los de Configuración: «30 (16px / 15p
 })());
 $comprobar('settings.shadow.defaultPresets y settings.color.defaultGradients quedan apagados (el ADN es la autoridad)', ($ajustes['shadow']['defaultPresets'] ?? null) === false && ($ajustes['color']['defaultGradients'] ?? null) === false);
 
-echo "\n== 3. styles.css: los valores por punto de quiebre ==\n";
+echo "\n== 3. styles.css: los valores por punto de quiebre y los estilos de bloque ==\n";
 $css_ref = (string) $ref['styles']['css'];
 preg_match('#/\*cod-escalas-con-quiebres\*/.*?/\*/cod-escalas-con-quiebres\*/#s', $css_ref, $m_ref);
-$bloque = (string) ($proy['themeJson']['styles']['css'] ?? '');
-$comprobar('el bloque de CSS del ADN es BYTE A BYTE el del theme.json de Basis (mismas variables, mismo orden, mismos anchos de pantalla)', $bloque !== '' && ($m_ref[0] ?? null) === $bloque, substr($bloque, 0, 160));
+$css_adn = (string) ($proy['themeJson']['styles']['css'] ?? '');
+preg_match('#/\*cod-escalas-con-quiebres\*/.*?/\*/cod-escalas-con-quiebres\*/#s', $css_adn, $m_adn);
+$bloque = $m_adn[0] ?? '';
+/** Las reglas de un CSS como lista ordenada de "@media|selector|declaración": dos CSS que dibujan lo mismo dan la misma lista (el orden de las reglas sueltas entre selectores distintos no cuenta). */
+$reglas = static function (string $css): array {
+    $out = [];
+    $css = (string) preg_replace('#/\*/?[a-z-]+\*/#', '', $css);
+    $css = (string) preg_replace_callback('/@media ([^{]+)\{((?:[^{}]+\{[^{}]*\})+)\}/', static function (array $m) use (&$out): string {
+        preg_match_all('/([^{}]+)\{([^{}]*)\}/', $m[2], $rs, PREG_SET_ORDER);
+        foreach ($rs as $r) {
+            foreach (array_filter(explode(';', $r[2])) as $decl) {
+                $out[] = trim($m[1]) . '|' . trim($r[1]) . '|' . $decl;
+            }
+        }
+        return '';
+    }, $css);
+    preg_match_all('/([^{}]+)\{([^{}]*)\}/', $css, $rs, PREG_SET_ORDER);
+    foreach ($rs as $r) {
+        foreach (array_filter(explode(';', $r[2])) as $decl) {
+            $out[] = '|' . trim($r[1]) . '|' . $decl;
+        }
+    }
+    sort($out);
+    return $out;
+};
+$solo_bloques = static fn (array $lista): array => array_values(array_filter($lista, static fn (string $x): bool => strpos(explode('|', $x)[1], '.wp-block-') === 0));
+$comprobar('el bloque de CSS de las escalas del ADN es BYTE A BYTE el del theme.json de Basis (mismas variables, mismo orden, mismos anchos de pantalla)', $bloque !== '' && ($m_ref[0] ?? null) === $bloque, substr($bloque, 0, 160));
 $comprobar('piso: el bloque declara las variables de 7 tamaños y 13 espaciados en tablet y de 9 y 15 en celular',
     substr_count(explode('@media (max-width', $bloque)[0], '--wp--preset--font-size--') === 7 && substr_count(explode('@media (max-width', $bloque)[0], '--wp--preset--spacing--') === 13
     && substr_count(explode('@media (max-width', $bloque)[1] ?? '', '--wp--preset--font-size--') === 9 && substr_count(explode('@media (max-width', $bloque)[1] ?? '', '--wp--preset--spacing--') === 15);
-$con = COD_ADN_Theme::con_bloque_de_quiebres((string) $ref['styles']['css'], $bloque);
-$comprobar('empalmar el bloque sobre el CSS de Basis lo deja IGUAL (no duplica ni pisa el CSS de los estilos de bloque)', $con === trim($css_ref) || preg_replace('/\s+/', '', $con) === preg_replace('/\s+/', '', $css_ref), strlen($con) . ' contra ' . strlen($css_ref));
-$comprobar('y sobre un CSS ajeno agrega el bloque al final y conserva lo que había', COD_ADN_Theme::con_bloque_de_quiebres('a{b:c}', $bloque) === "a{b:c}\n" . $bloque && COD_ADN_Theme::con_bloque_de_quiebres('', $bloque) === $bloque);
-$comprobar('rehacer el empalme es idempotente', COD_ADN_Theme::con_bloque_de_quiebres(COD_ADN_Theme::con_bloque_de_quiebres('a{b:c}', $bloque), $bloque) === "a{b:c}\n" . $bloque);
+$comprobar('el CSS del ADN trae los dos bloques marcados, cada uno una vez', substr_count($css_adn, '/*cod-escalas-con-quiebres*/') === 1 && substr_count($css_adn, '/*cod-estilos-responsivos*/') === 1 && substr_count($css_adn, '/*/cod-estilos-responsivos*/') === 1);
+$con = COD_ADN_Theme::con_bloques_del_adn($css_ref, $css_adn);
+$comprobar('empalmar los bloques del ADN sobre el CSS de Basis lo deja IGUAL (mismas reglas, ninguna duplicada ni pisada)', $reglas($con) === $reglas($css_ref) && substr_count($con, '/*cod-estilos-responsivos*/') === 1 && substr_count($con, '/*cod-escalas-con-quiebres*/') === 1, strlen($con) . ' contra ' . strlen($css_ref));
+$comprobar('y sobre un CSS ajeno agrega los bloques al final y conserva lo que había', COD_ADN_Theme::con_bloque_de_quiebres('a{b:c}', $bloque) === "a{b:c}\n" . $bloque && COD_ADN_Theme::con_bloque_de_quiebres('', $bloque) === $bloque && strpos(COD_ADN_Theme::con_bloques_del_adn('a{b:c}', $css_adn), "a{b:c}\n") === 0);
+$comprobar('rehacer el empalme es idempotente', COD_ADN_Theme::con_bloque_de_quiebres(COD_ADN_Theme::con_bloque_de_quiebres('a{b:c}', $bloque), $bloque) === "a{b:c}\n" . $bloque && COD_ADN_Theme::con_bloques_del_adn(COD_ADN_Theme::con_bloques_del_adn('a{b:c}', $css_adn), $css_adn) === COD_ADN_Theme::con_bloques_del_adn('a{b:c}', $css_adn));
+$comprobar('un CSS del ADN sin el bloque de estilos de bloque NO borra el que el archivo ya traía (el ADN sólo pisa lo que dice)', $reglas(COD_ADN_Theme::con_bloques_del_adn($css_ref, $bloque)) === $reglas($css_ref));
+
+echo "\n== 3b. estilos de bloque (dim9.req09 + dim9.req08): styles.blocks y el CSS por punto de quiebre ==\n";
+$comprobar('styles.blocks del ADN == styles.blocks de Basis (core/group sin relleno lateral, core/image con radio de 16px)', json_encode($proy['themeJson']['styles']['blocks'] ?? null) === json_encode(['core/image' => ['border' => ['radius' => '16px']], 'core/group' => ['spacing' => ['padding' => ['left' => '0', 'right' => '0']]]]) && ($proy['themeJson']['styles']['blocks']['core/group'] ?? null) === $ref['styles']['blocks']['core/group'] && ($proy['themeJson']['styles']['blocks']['core/image'] ?? null) === $ref['styles']['blocks']['core/image'], json_encode($proy['themeJson']['styles']['blocks'] ?? null));
+$comprobar('sobre el theme.json ATRASADO (relleno lateral clamp) el ADN deja styles.blocks idéntico al de Basis', COD_ADN_Theme::mezclar($atrasado, $proy['themeJson'])['styles']['blocks'] === $ref['styles']['blocks'] && $atrasado['styles']['blocks']['core/group'] !== $ref['styles']['blocks']['core/group']);
+$resp_ref = $solo_bloques($reglas($css_ref));
+$resp_adn = $solo_bloques($reglas($css_adn));
+$comprobar('las reglas por quiebre de los estilos de bloque son las de Basis: 7 reglas (3 fotos y 1 recuadro en tablet y celular), mismo selector, misma propiedad, mismo valor', count($resp_ref) === 7 && $resp_adn === $resp_ref, json_encode(array_diff($resp_ref, $resp_adn)) . ' | ' . json_encode(array_diff($resp_adn, $resp_ref)));
+$comprobar('los @media son los de la web (tablet 768 a 1023 y celular hasta 767), los mismos de las escalas', strpos($css_adn, '@media (min-width: 768px) and (max-width: 1023px){.wp-block-image') !== false && strpos($css_adn, '@media (max-width: 767px){.wp-block-image') !== false);
+$estilos = static function (callable $alterar, bool $debe_validar = true) use ($F_LOCAL, $proyectar): array {
+    $c = json_decode(adn_desde_theme_json($F_LOCAL, ['revision' => 1]), false);
+    $alterar($c);
+    return $proyectar((string) json_encode($c, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRESERVE_ZERO_FRACTION));
+};
+$cambios_de = static function (stdClass $c, string $arquetipo, string $variante): array {
+    foreach ($c->definitions as $d) {
+        if ($d->id === 'dim9.req08.def1') {
+            foreach ($d->value->diferencias as $dif) {
+                if ($dif->arquetipo === $arquetipo && $dif->variante === $variante) {
+                    return [$dif, $d];
+                }
+            }
+        }
+    }
+    throw new RuntimeException($arquetipo . '/' . $variante);
+};
+$aviso_de = static fn (array $r): array => array_column($r['proyeccion']['avisos'] ?? [], 'codigo');
+$sin_dim9 = $proyectar(adn_desde_theme_json($F_LOCAL, ['revision' => 1, 'sinEstilosDeBloque' => true]));
+$comprobar('CONTROL: el mismo ADN sin dim9.req08 ni dim9.req09 no emite styles.blocks ni el CSS de estilos de bloque (y entonces el destino se ve distinto)', $sin_dim9['ok'] && !isset($sin_dim9['proyeccion']['themeJson']['styles']['blocks']) && strpos((string) $sin_dim9['proyeccion']['themeJson']['styles']['css'], 'cod-estilos-responsivos') === false && COD_ADN_Theme::mezclar($atrasado, $sin_dim9['proyeccion']['themeJson'])['styles']['blocks'] !== $ref['styles']['blocks']);
+$r = $estilos(static function (stdClass $c) use ($cambios_de): void {
+    [$dif] = $cambios_de($c, 'contenedor', 'altura-321-255-264');
+    $dif->cambios[0]->valor->longitud = '256px';
+});
+$comprobar('CONTROL: el alto mínimo de tablet con otro valor (255px -> 256px) se ve en el CSS', $r['ok'] && $solo_bloques($reglas((string) $r['proyeccion']['themeJson']['styles']['css'])) !== $resp_ref && strpos((string) $r['proyeccion']['themeJson']['styles']['css'], 'min-height:256px') !== false);
+$r = $estilos(static function (stdClass $c) use ($cambios_de): void {
+    [$dif] = $cambios_de($c, 'secuencia-editorial', 'base');
+    $dif->cambios[0]->valor->longitud = '17px';
+});
+$comprobar('CONTROL: el radio base de la foto con otro valor (16px -> 17px) se ve en styles.blocks', $r['ok'] && ($r['proyeccion']['themeJson']['styles']['blocks']['core/image']['border']['radius'] ?? '') === '17px');
+$r = $estilos(static function (stdClass $c): void {
+    foreach ($c->definitions as $d) {
+        if ($d->id === 'dim9.req09.def1') {
+            $d->value->correspondencias = array_values(array_filter($d->value->correspondencias, static fn ($x): bool => $x->arquetipo !== 'contenedor'));
+        }
+    }
+});
+$comprobar('un arquetipo sin familia de bloque (dim9.req09 sin «contenedor»): sus variantes no se proyectan y se avisa ADN_VARIANTE_SIN_FAMILIA', $r['ok'] && in_array('ADN_VARIANTE_SIN_FAMILIA', $aviso_de($r), true) && !isset($r['proyeccion']['themeJson']['styles']['blocks']['core/group']) && strpos((string) $r['proyeccion']['themeJson']['styles']['css'], 'wp-block-group') === false);
+$r = $estilos(static function (stdClass $c): void {
+    foreach ($c->definitions as $d) {
+        if ($d->id === 'dim9.req09.def1') {
+            $d->value->correspondencias[0]->familiaDeBloque = 'core/button';
+        }
+    }
+});
+$comprobar('una familia de bloque que el plugin no sabe emitir (core/button): se omite y se avisa ADN_FAMILIA_SIN_DESTINO', $r['ok'] && in_array('ADN_FAMILIA_SIN_DESTINO', $aviso_de($r), true));
+$r = $estilos(static function (stdClass $c) use ($cambios_de): void {
+    [$dif] = $cambios_de($c, 'contenedor', 'altura-321-255-264');
+    $dif->cambios[] = (object) ['propiedad' => 'box-shadow', 'valor' => (object) ['tipo' => 'palabra', 'palabra' => 'none']];
+});
+$comprobar('una propiedad que el bloque no sabe emitir (box-shadow en core/group): se omite y se avisa ADN_PROPIEDAD_NO_EMITIDA, el resto sigue', $r['ok'] && in_array('ADN_PROPIEDAD_NO_EMITIDA', $aviso_de($r), true) && strpos((string) $r['proyeccion']['themeJson']['styles']['css'], 'box-shadow') === false && strpos((string) $r['proyeccion']['themeJson']['styles']['css'], 'min-height:264px') !== false);
+$r = $estilos(static function (stdClass $c) use ($cambios_de): void {
+    [$dif] = $cambios_de($c, 'contenedor', 'altura-321-255-264');
+    $dif->cambios[] = (object) ['propiedad' => 'min-height', 'valor' => (object) ['tipo' => 'palabra', 'palabra' => 'auto']];
+});
+$comprobar('un tipo de valor que no cabe en la propiedad (una palabra en min-height): se omite y se avisa ADN_VALOR_NO_EMITIDO', $r['ok'] && in_array('ADN_VALOR_NO_EMITIDO', $aviso_de($r), true) && strpos((string) $r['proyeccion']['themeJson']['styles']['css'], 'min-height:auto') === false);
+$r = $estilos(static function (stdClass $c) use ($cambios_de): void {
+    [$dif] = $cambios_de($c, 'secuencia-editorial', 'proporcion-4x3-87x34-89x68-contorno-thick-fondo-pagina-20');
+    $dif->cambios[] = (object) ['propiedad' => 'object-fit', 'valor' => (object) ['tipo' => 'palabra', 'palabra' => 'red;}body{display:none']];
+});
+$comprobar('INYECCIÓN: una «palabra» con ; y llaves no llega al CSS (se omite y se avisa ADN_VALOR_NO_EMITIDO)', $r['ok'] && in_array('ADN_VALOR_NO_EMITIDO', $aviso_de($r), true) && strpos((string) $r['proyeccion']['themeJson']['styles']['css'], 'body{') === false && strpos((string) $r['proyeccion']['themeJson']['styles']['css'], 'display:none') === false);
+$r = $estilos(static function (stdClass $c) use ($cambios_de): void {
+    [$dif] = $cambios_de($c, 'secuencia-editorial', 'proporcion-4x3-87x34-89x68-contorno-thick-fondo-pagina-20');
+    $dif->cambios[] = (object) ['propiedad' => 'object-fit', 'valor' => (object) ['tipo' => 'palabra', 'palabra' => 'cover']];
+});
+$comprobar('una propiedad más del catálogo se emite (object-fit: cover en la foto, sin quiebre: regla suelta antes de los @media)', $r['ok'] && $r['proyeccion']['avisos'] === [] && strpos((string) $r['proyeccion']['themeJson']['styles']['css'], 'cod-estilos-responsivos*/.wp-block-image.is-style-proporcion-4x3-87x34-89x68-contorno-thick-fondo-pagina-20 img{object-fit:cover}@media') !== false, json_encode($r['proyeccion']['avisos'] ?? null));
+$r = $estilos(static function (stdClass $c) use ($cambios_de): void {
+    [$dif] = $cambios_de($c, 'contenedor', 'base');
+    $paso = 0;
+    foreach ($c->definitions as $d) {
+        if ($d->id === 'dim3.req01.def1') {
+            foreach ($d->value->escala as $i => $e) {
+                if ($e->step === 50) {
+                    $paso = $i;
+                }
+            }
+        }
+    }
+    $dif->cambios[0]->valor = (object) ['tipo' => 'referencia', 'referencia' => (object) ['refReqId' => 'dim3.req01', 'refPath' => ['escala', $paso, 'value']]];
+});
+$comprobar('un valor por REFERENCIA llega como la variable que el ADN emitió (padding-left -> var(--wp--preset--spacing--50)), no como un literal', $r['ok'] && ($r['proyeccion']['themeJson']['styles']['blocks']['core/group']['spacing']['padding']['left'] ?? '') === 'var(--wp--preset--spacing--50)', json_encode($r['proyeccion']['themeJson']['styles']['blocks']['core/group'] ?? $r['errores']));
+$r = $estilos(static function (stdClass $c): void {
+    foreach ($c->definitions as $d) {
+        if ($d->id === 'dim9.req09.def1') {
+            $d->value->correspondencias[0]->familiaDeBloque = 'core group';
+        }
+    }
+});
+$comprobar('el nombre de una familia de bloque que no es un nombre («core group») se RECHAZA en una definición confirmada: ADN_BLOQUE_INVALIDO en su ruta', !$r['ok'] && ($r['errores'][0]['codigo'] ?? '') === 'ADN_BLOQUE_INVALIDO' && ($r['errores'][0]['ruta'] ?? '') === 'correspondencias[0].familiaDeBloque', json_encode($r['errores']));
+$r = $estilos(static function (stdClass $c) use ($cambios_de): void {
+    [$dif] = $cambios_de($c, 'contenedor', 'altura-321-255-264');
+    $dif->cambios[0]->propiedad = 'min-height:0;x';
+});
+$comprobar('la propiedad que no es un nombre de CSS («min-height:0;x») se RECHAZA: ADN_PROPIEDAD_INVALIDA en su ruta', !$r['ok'] && ($r['errores'][0]['codigo'] ?? '') === 'ADN_PROPIEDAD_INVALIDA' && ($r['errores'][0]['ruta'] ?? '') === 'diferencias[4].cambios[0].propiedad', json_encode($r['errores']));
+$r = $estilos(static function (stdClass $c): void {
+    foreach ($c->definitions as $d) {
+        if ($d->id === 'dim9.req09.def1') {
+            $d->value->correspondencias[] = (object) ['arquetipo' => 'contenedor', 'familiaDeBloque' => 'core/cover'];
+        }
+    }
+});
+$comprobar('dos familias para el mismo arquetipo se RECHAZAN: ADN_NAME_DUPLICATE', !$r['ok'] && ($r['errores'][0]['codigo'] ?? '') === 'ADN_NAME_DUPLICATE', json_encode($r['errores']));
 
 echo "\n== 4. CONTROLES: quitar cada pieza del ADN hace fallar la comparación ==\n";
 $sin = static function (callable $quitar) use ($json, $proyectar, $ref, $EXTRAS, $sobre_atrasado): array {

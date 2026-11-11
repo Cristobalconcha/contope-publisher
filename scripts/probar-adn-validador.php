@@ -22,7 +22,7 @@
  */
 define('ABSPATH', __DIR__ . '/');
 $plugin = realpath(__DIR__ . '/../contope-publisher/includes');
-foreach (['js', 'design-md', 'parser', 'projection', 'requisitos', 'validator'] as $parte) {
+foreach (['js', 'design-md', 'parser', 'block-styles', 'projection', 'requisitos', 'validator'] as $parte) {
     require_once $plugin . '/class-cod-adn-' . $parte . '.php';
 }
 
@@ -530,7 +530,7 @@ foreach ($casos_core as $c) {
 $v215 = COD_ADN_Validator::validar($por_nombre['215-contrato-ok-definiciones-q1-q3-q4-bien-formadas.json']->entrada);
 $codigos215 = array_values(array_unique(array_column($v215['errores'], 'codigo')));
 $comprobar('215: todas las formas de las 13 definiciones cumplen su esquema (lo único que el plugin objeta son las referencias a dim1.req01, dim2.req01…, que el contrato no trae)', !in_array('ADN_PAYLOAD_SHAPE', $codigos215, true) && !in_array('ADN_NAME_INVALID', $codigos215, true) && !in_array('ADN_NAME_DUPLICATE', $codigos215, true) && $codigos215 !== [], json_encode($codigos215));
-$comprobar('215: las 13 definiciones están en el resultado (11 con forma proyectada y las 2 de dim9, de forma conocida)', count($v215['definiciones']) === 13, (string) count($v215['definiciones']));
+$comprobar('215: las 13 definiciones están en el resultado (todas con forma conocida y proyectadas, las 2 de dim9 incluidas)', count($v215['definiciones']) === 13, (string) count($v215['definiciones']));
 $v216 = COD_ADN_Validator::validar($por_nombre['216-contrato-ok-definicion-q3-con-forma-incorrecta.json']->entrada);
 $comprobar('216: el Core acepta el sobre y el plugin RECHAZA la sombra con el color escrito (ADN_PAYLOAD_SHAPE, ruta sombras[0].color)', !$v216['ok'] && ($v216['errores'][0]['codigo'] ?? '') === 'ADN_PAYLOAD_SHAPE' && ($v216['errores'][0]['ruta'] ?? '') === 'sombras[0].color', json_encode($v216['errores']));
 $v217 = COD_ADN_Validator::validar($por_nombre['217-contrato-ok-definicion-q1-rol-libre-sin-los-nueve.json']->entrada);

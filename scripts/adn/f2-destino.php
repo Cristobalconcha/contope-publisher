@@ -4,11 +4,12 @@
  * ver OCD_DESTINO_PUERTO) y que el navegador necesita ver ENTRE medio: el sitio importado, con el theme.json ATRASADO de producción.
  * Los orquesta scripts/adn/probar-portabilidad-presets.mjs; no es una prueba por sí mismo.
  *
- *   php f2-destino.php <wp-load.php> importar <paquete.ocdsite> [--tema=declarado|atrasado]
- *                                                                 deja el theme.json atrasado, vacía el destino e importa el paquete.
- *                                                                 `declarado` (por omisión): el atrasado MÁS lo único que el ADN no lleva y
- *                                                                 COD_ADN_Theme::fuera_del_adn() declara (el relleno del grupo y el CSS de los estilos de
- *                                                                 bloque por quiebre); `atrasado`: tal cual está en producción
+ *   php f2-destino.php <wp-load.php> importar <paquete.ocdsite>   deja el theme.json ATRASADO de producción TAL CUAL (sin agregarle nada: ni los estilos de
+ *                                                                 bloque ni el CSS por quiebre), vacía el destino e importa el paquete: lo que el sitio
+ *                                                                 necesita para verse como el local tiene que llegar por el ADN o por el paquete
+ *   php f2-destino.php <wp-load.php> sin-estilos-de-bloque        CONTROL: reemplaza el ADN activo por su revisión siguiente SIN dim9.req08 ni dim9.req09
+ *                                                                 (los estilos de bloque); el contenido y el resto del ADN quedan. Sin ellos el destino tiene
+ *                                                                 que verse distinto del local
  *   php f2-destino.php <wp-load.php> quitar-adn                   quita sólo el ADN (el contenido queda): el CONTROL de lo que se ve
  *   php f2-destino.php <wp-load.php> limpiar                      vacía el destino y devuelve el theme.json del repositorio
  *
@@ -52,18 +53,12 @@ if ($accion === 'importar') {
     if ($v['codigo'] !== 0) {
         $falla('no pude vaciar el destino: ' . $v['salida']);
     }
-    // El theme.json ATRASADO de producción (b7b0478): el destino recibe el diseño sólo por el ADN.
-    $tema = json_decode((string) file_get_contents($repo . '/fixtures/adn/f2/basis-theme.destino-atrasado-b7b0478.json'), true);
-    if (!in_array('--tema=atrasado', $argv, true)) {
-        // ...más lo único que el ADN no lleva (COD_ADN_Theme::fuera_del_adn()), tal como lo trae el theme.json de Basis.
-        $local = json_decode((string) file_get_contents($repo . '/fixtures/adn/f2/basis-theme.local-5e118c5.json'), true);
-        $tema['styles']['blocks']['core/group'] = $local['styles']['blocks']['core/group'];
-        if (preg_match('#/\*cod-estilos-responsivos\*/.*?/\*/cod-estilos-responsivos\*/#s', (string) $local['styles']['css'], $bloque) !== 1) {
-            $falla('el theme.json de Basis no trae el bloque cod-estilos-responsivos');
-        }
-        $tema['styles']['css'] = $bloque[0];
+    // El theme.json ATRASADO de producción (b7b0478), byte a byte: el destino recibe el diseño sólo por el ADN. Nada se le agrega.
+    $atrasado = (string) file_get_contents($repo . '/fixtures/adn/f2/basis-theme.destino-atrasado-b7b0478.json');
+    if (hash('sha256', $atrasado) !== '96cecdee572babea142d253ac1dad2d85a7f04ede222440aac053c27264c40ba') {
+        $falla('la referencia congelada del theme.json atrasado no es la de siempre (sha256)');
     }
-    file_put_contents($archivo_tema, json_encode($tema, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRESERVE_ZERO_FRACTION) . "\n");
+    file_put_contents($archivo_tema, $atrasado);
     $repositorio = new COD_Canvas_Document_Repository();
     $importador = new COD_Site_Package_Importer($repositorio, new COD_Canvas_Document_Sanitizer(), new COD_Media_Attachment_Sync());
     $r = $importador->import($zip);
@@ -72,6 +67,26 @@ if ($accion === 'importar') {
     }
     $puntero = COD_ADN_Store::puntero();
     $salida(['ok' => true, 'adn' => $puntero === null ? null : ['designId' => $puntero['designId'], 'revision' => $puntero['revision']], 'themeJson' => COD_ADN_Store::resumen()['proyeccion']['themeJson']]);
+} elseif ($accion === 'sin-estilos-de-bloque') {
+    require_once $repo . '/scripts/adn/lib/adn-desde-theme-json.php';
+    $puntero = COD_ADN_Store::puntero();
+    if ($puntero === null) {
+        $falla('el destino no tiene un ADN activo');
+    }
+    $revision = (int) $puntero['revision'];
+    $json = adn_desde_theme_json($repo . '/fixtures/adn/f2/basis-theme.local-5e118c5.json', ['revision' => $revision + 1, 'designId' => (string) $puntero['designId'], 'sinEstilosDeBloque' => true]);
+    $opciones = ['emitirPropuestas' => false, 'expectedCurrentRevision' => $revision];
+    $previa = COD_ADN_Store::previsualizar($json, $opciones);
+    if (!$previa['ok']) {
+        $falla('el ADN sin estilos de bloque no valida: ' . (string) ($previa['errores'][0]['codigo'] ?? '?'));
+    }
+    $r = COD_ADN_Store::aplicar($json, $opciones + ['previewId' => $previa['previewId'], 'fuente' => 'upload']);
+    if (is_wp_error($r)) {
+        $falla($r->get_error_code() . ': ' . $r->get_error_message());
+    }
+    wp_cache_flush();
+    $proy = COD_ADN_Store::proyeccion((int) COD_ADN_Store::puntero()['revision']);
+    $salida(['ok' => true, 'revision' => $r['revision'], 'conBloques' => isset($proy['themeJson']['styles']['blocks']), 'conCssResponsivo' => strpos((string) ($proy['themeJson']['styles']['css'] ?? ''), 'cod-estilos-responsivos') !== false]);
 } elseif ($accion === 'quitar-adn') {
     global $wpdb;
     foreach (get_posts(['post_type' => COD_ADN_Store::POST_TYPE, 'post_status' => 'any', 'numberposts' => -1, 'fields' => 'ids']) as $id) {

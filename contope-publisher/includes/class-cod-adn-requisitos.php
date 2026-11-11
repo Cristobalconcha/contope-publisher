@@ -25,8 +25,8 @@ if (!defined('ABSPATH')) {
  *   dim7.req09 tema del formulario (68 variables) · dim9.req08 variantes · dim9.req09 arquetipo → familia de bloque
  *
  * y los campos opcionales nuevos de dim2.req02 y dim3.req01 (`porQuiebre`). Los nueve primeros y el tema
- * del formulario se PROYECTAN al theme.json; dim9.req08 y dim9.req09 se validan (forma) y se guardan, pero
- * el destino aún no emite sus propiedades (PROYECTADOS no los lista; ver COD_ADN_Theme::fuera_del_adn()).
+ * del formulario se PROYECTAN al theme.json; dim9.req08 y dim9.req09 también (estilos de bloque: styles.blocks y el CSS por
+ * punto de quiebre, ver COD_ADN_Block_Styles).
  * Los demás requisitos se GUARDAN y se listan en `ignored[]` (R4); nunca se descartan ni se emiten.
  *
  * Las listas cerradas (roles) están en un solo lugar a propósito: si el Core las cambia se cambia acá y
@@ -58,13 +58,15 @@ final class COD_ADN_Requisitos
         'dim4.req02', 'dim4.req09', 'dim4.req10', 'dim4.req11',
         'dim7.req09',
         'dim8.req03', 'dim8.req04',
+        'dim9.req08', 'dim9.req09',
     ];
 
     /**
-     * Requisitos cuya forma el plugin conoce y valida aunque no los proyecte todavía (se guardan y se listan
-     * en `ignored[]` como R4-no-proyectada; una `confirmed` con forma incorrecta sí se rechaza).
+     * Requisitos cuya forma el plugin conoce y valida aunque no los proyecte (se guardan y se listan en `ignored[]` como
+     * R4-no-proyectada; una `confirmed` con forma incorrecta sí se rechaza). Desde el 02-nov-2026 (estilos de bloque, ver
+     * COD_ADN_Block_Styles) dim9.req08 y dim9.req09 se proyectan y la lista quedó vacía.
      */
-    public const SOLO_FORMA = ['dim9.req08', 'dim9.req09'];
+    public const SOLO_FORMA = [];
 
     /**
      * El grupo de cada variable de `dim7.req09.temaFormulario` (los nombres son los de `settings.custom.form`;
@@ -842,6 +844,46 @@ final class COD_ADN_Requisitos
                     continue;
                 }
                 $vistos[$nombre] = $i;
+            }
+        }
+        // Estilos de bloque (dim9.req08 y dim9.req09): el Core deja al destino validar el NOMBRE de la familia de bloque y de la propiedad
+        // (la forma sólo pide texto); lo que llega al CSS tiene que ser un nombre, nunca una declaración. Qué familias y propiedades sabe
+        // emitir el plugin no es un error de forma: la proyección omite y avisa (COD_ADN_Block_Styles).
+        if ($requisito === 'dim9.req09' && property_exists($valor, 'correspondencias') && is_array($valor->correspondencias)) {
+            $vistos = [];
+            foreach ($valor->correspondencias as $i => $c) {
+                if (!$c instanceof stdClass) {
+                    continue;
+                }
+                if (is_string($c->familiaDeBloque ?? null) && preg_match('#^[a-z][a-z0-9-]*/[a-z][a-z0-9-]*$#D', COD_ADN_Js::trim($c->familiaDeBloque)) !== 1) {
+                    $ruta = 'correspondencias[' . $i . '].familiaDeBloque';
+                    $motivos[] = ['codigo' => 'ADN_BLOQUE_INVALIDO', 'ruta' => $ruta, 'mensaje' => "slot '$ruta': " . json_encode($c->familiaDeBloque, JSON_UNESCAPED_UNICODE) . ' no es el nombre de un bloque (<espacio>/<nombre>, p. ej. core/group)'];
+                }
+                if (is_string($c->arquetipo ?? null)) {
+                    if (isset($vistos[$c->arquetipo])) {
+                        $ruta = 'correspondencias[' . $i . '].arquetipo';
+                        $motivos[] = ['codigo' => 'ADN_NAME_DUPLICATE', 'ruta' => $ruta, 'mensaje' => "slot '$ruta': el arquetipo " . json_encode($c->arquetipo, JSON_UNESCAPED_UNICODE) . ' ya tiene su familia de bloque en correspondencias[' . $vistos[$c->arquetipo] . ']'];
+                    } else {
+                        $vistos[$c->arquetipo] = $i;
+                    }
+                }
+            }
+        }
+        if ($requisito === 'dim9.req08' && property_exists($valor, 'diferencias') && is_array($valor->diferencias)) {
+            foreach ($valor->diferencias as $i => $d) {
+                if (!$d instanceof stdClass) {
+                    continue;
+                }
+                if (is_string($d->variante ?? null) && !self::nombre_con_slug($d->variante)) {
+                    $ruta = 'diferencias[' . $i . '].variante';
+                    $motivos[] = ['codigo' => 'ADN_NAME_INVALID', 'ruta' => $ruta, 'mensaje' => "slot '$ruta': el nombre " . json_encode($d->variante, JSON_UNESCAPED_UNICODE) . ' no da un slug propio (no puede quedar vacío ni ser sólo símbolos)'];
+                }
+                foreach (is_array($d->cambios ?? null) ? $d->cambios : [] as $j => $c) {
+                    if ($c instanceof stdClass && is_string($c->propiedad ?? null) && preg_match('/^[a-z]+(?:-[a-z]+)*$/D', COD_ADN_Js::trim($c->propiedad)) !== 1) {
+                        $ruta = 'diferencias[' . $i . '].cambios[' . $j . '].propiedad';
+                        $motivos[] = ['codigo' => 'ADN_PROPIEDAD_INVALIDA', 'ruta' => $ruta, 'mensaje' => "slot '$ruta': " . json_encode($c->propiedad, JSON_UNESCAPED_UNICODE) . ' no es el nombre de una propiedad de CSS (minúsculas y guiones, p. ej. min-height)'];
+                    }
+                }
             }
         }
         return $motivos;
