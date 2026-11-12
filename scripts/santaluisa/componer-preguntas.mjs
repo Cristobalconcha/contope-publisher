@@ -22,6 +22,14 @@ const PAGE_ID = 61;
 const DOCUMENT_ID = 'ocd-canvas-page-12';
 const SUBIDAS = '/wp-content/uploads';
 
+// La ventana de mensaje de WhatsApp es la misma de Contacto y está escrita
+// allá. Se lee de su receta generada para no tener dos definiciones.
+import { readFileSync as leerArchivo } from 'node:fs';
+const CONTACTO = JSON.parse(leerArchivo(new URL('./contacto.json', import.meta.url), 'utf8'));
+const VENTANA_WA = CONTACTO.composition.nodes.find((n) => n.id === 'wa-ventana');
+const REGLAS_WA = CONTACTO.design.rules.filter((r) => /^sl-wa/.test(r.id));
+if (!VENTANA_WA || REGLAS_WA.length === 0) throw new Error('contacto.json no trae la ventana de WhatsApp: generar Contacto primero');
+
 /**
  * Las nueve preguntas, sacadas del HTML de la página y no escritas de nuevo:
  * copiarlas a mano es la forma más fácil de cambiarle el texto a un cliente sin
@@ -82,19 +90,41 @@ const propias = [
   regla('sl-faq-encabezado', 'properties', { declarations: { 'padding-block-end': '28px' } }),
   regla('sl-faq-bajada-medida', 'typography', { role: 'bajada', fontSize: '15px', lineHeight: 1.5, measure: '560px' }),
 
+  // La onda que cierra la sección contra el pie: el mismo recurso de Términos,
+  // en el color del pie y del revés. Valores leídos de la página publicada.
+  regla('sl-faq-onda-abajo', 'divisor', {
+    forma: SUBIDAS + '/2026/10/divisor-onda.svg',
+    donde: 'abajo',
+    alto: '96px',
+    voltear: true,
+    color: '#2A2C22',
+    capas: [
+      { opacidad: 1 },
+      { opacidad: 0.55, desplazamiento: '40px' },
+      { opacidad: 0.3, desplazamiento: '-40px' },
+    ],
+    reserva: true,
+    espacio: '0px',
+  }, { porque: 'El pie entra con una onda en vez de un corte recto, como en Términos.' }),
+
   // El acordeón.
   regla('sl-faq-acordeon', 'interaction', { behavior: 'acordeon', showIcon: true }, {
     porque: 'Nueve preguntas que se abren de a una, como hacía el original con <details name>.',
   }),
-  regla('sl-faq-lista', 'properties', { declarations: { 'padding-inline-end': '130px' } }),
+  regla('sl-faq-lista', 'properties', { declarations: { 'padding-inline-end': '130px', 'row-gap': '0' } }),
   regla('sl-faq-lista-angosta', 'properties', { declarations: { 'padding-inline-end': '0' } }, { bp: 'tablet' }),
   regla('sl-faq-lista-movil', 'properties', { declarations: { 'padding-inline-end': '0' } }, { bp: 'mobile' }),
-  // Cada pliegue: aire arriba y abajo y la línea dorada que los separa.
+  // Cada pliegue: sin relleno propio. El aire lo pone la caja de la pregunta
+  // (11px arriba y abajo), que es además el área donde se pincha. Tenerlo en
+  // los dos duplicaba el aire: 58px para una línea de 22. Medido el 11-nov.
   regla('sl-faq-pliegue', 'properties', { declarations: {
-    'padding-block-start': '18px', 'padding-block-end': '18px',
+    'padding-block-start': '0', 'padding-block-end': '0',
     'border-bottom-width': '1px', 'border-bottom-style': 'solid',
     'border-bottom-color': 'var(--dorado-600)',
   } }),
+  // El signo va en el dorado de la línea, no en el oliva del texto: es lo que
+  // pidió Cristóbal el 11-nov. Es una máscara, así que su color es el fondo.
+  regla('sl-faq-icono', 'properties', { declarations: { 'background-color': 'var(--dorado-600)' } }),
   regla('sl-faq-pregunta', 'typography', { role: 'pregunta', fontSize: '14.5px', fontWeight: 700, lineHeight: 1.5 }),
   regla('sl-faq-respuesta', 'typography', { role: 'respuesta', fontSize: '13.5px', lineHeight: 1.5 }),
   regla('sl-faq-respuesta-aire', 'properties', { declarations: { 'margin-block-start': '12px' } }),
@@ -106,7 +136,7 @@ const propias = [
   // resúmenes daban 22. El relleno va en el párrafo y no en el botón para que
   // la zona que responde al dedo sea la misma que se ve.
   regla('sl-faq-pregunta-caja', 'properties', { declarations: {
-    'padding-block-start': '11px', 'padding-block-end': '11px',
+    'padding-block-start': '18px', 'padding-block-end': '15px',
     'margin-block-start': '0', 'margin-block-end': '0',
   } }),
 
@@ -144,7 +174,7 @@ const composicion = {
   nodes: [
     {
       id: 'seccion-faq', kind: 'section', marker: 'preguntas',
-      ruleIds: ['sl-faq-fondo'],
+      ruleIds: ['sl-faq-fondo', 'sl-faq-onda-abajo'],
       children: [
         G('faq-marco', ['sl-faq-marco'], [
           // La persona va ANTES de la tarjeta en el documento y se posiciona
@@ -181,6 +211,7 @@ const composicion = {
               partes: {
                 item: ['sl-faq-pliegue'],
                 resumen: ['sl-faq-pregunta', 'sl-texto-oliva'],
+                icono: ['sl-faq-icono'],
               },
               children: PREGUNTAS.map((qa, i) => G(`faq-${i + 1}`, [], [
                 P(`faq-${i + 1}-pregunta`, qa.p, ['sl-faq-pregunta', 'sl-texto-oliva', 'sl-faq-pregunta-caja']),
@@ -218,13 +249,17 @@ const composicion = {
         ]),
       ],
     },
+    VENTANA_WA,
   ],
 };
+
+const disenoCompleto = diseno(propias, Number(process.env.REV_DISENO || 0));
+for (const r of REGLAS_WA) if (!disenoCompleto.rules.some((x) => x.id === r.id)) disenoCompleto.rules.push(r);
 
 process.stdout.write(JSON.stringify({
   pageId: PAGE_ID,
   documentId: DOCUMENT_ID,
   expectedRevision: Number(process.env.REV_PREGUNTAS || 0),
-  design: diseno(propias, Number(process.env.REV_DISENO || 0)),
+  design: disenoCompleto,
   composition: composicion,
 }, null, 2));
