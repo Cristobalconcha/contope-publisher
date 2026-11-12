@@ -160,3 +160,32 @@ $cod_cookies_de_partida = static function ($guardado) {
 // los errores, el que se arregla solo mientras alguien mira.
 add_filter('option_cookieadmin_consent_settings', $cod_cookies_de_partida);
 add_filter('default_option_cookieadmin_consent_settings', $cod_cookies_de_partida);
+
+// ---------------------------------------------------------------------------
+// Direcciones del sitio anterior que quedaron en 404 al rehacerlo (ago-2026).
+//
+// Los dos articulos del blog traian la mayor parte de las busquedas organicas
+// del sitio viejo y hoy no existen. Mientras no se recupere su texto, cada uno
+// lleva a la pagina que hoy responde esa misma duda: las preguntas frecuentes
+// explican el rol propio y las etapas de compra. Si el articulo vuelve a
+// publicarse en su direccion original, WordPress lo encuentra antes de llegar
+// aqui (esto solo corre cuando la respuesta iba a ser 404) y la redireccion
+// deja de aplicarse sola: no hay que acordarse de borrarla.
+// ---------------------------------------------------------------------------
+add_action('template_redirect', static function (): void {
+    if (! is_404()) {
+        return;
+    }
+
+    $reemplazos = [
+        'que-es-el-rol-de-una-propiedad-entendiendo-su-importancia' => '/preguntas-frecuentes/',
+        'guia-completa-para-comprar-una-parcela-agricola-en-chile' => '/preguntas-frecuentes/',
+    ];
+
+    $ruta = trim((string) wp_parse_url((string) ($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_PATH), '/');
+
+    if (isset($reemplazos[$ruta])) {
+        wp_safe_redirect(home_url($reemplazos[$ruta]), 301);
+        exit;
+    }
+});
