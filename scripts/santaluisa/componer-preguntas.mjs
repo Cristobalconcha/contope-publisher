@@ -83,7 +83,7 @@ const propias = [
   regla('sl-faq-bajada-medida', 'typography', { role: 'bajada', fontSize: '15px', lineHeight: 1.5, measure: '560px' }),
 
   // El acordeón.
-  regla('sl-faq-acordeon', 'interaction', { behavior: 'acordeon' }, {
+  regla('sl-faq-acordeon', 'interaction', { behavior: 'acordeon', showIcon: true }, {
     porque: 'Nueve preguntas que se abren de a una, como hacía el original con <details name>.',
   }),
   regla('sl-faq-lista', 'properties', { declarations: { 'padding-inline-end': '130px' } }),
@@ -163,7 +163,7 @@ const composicion = {
               {
                 id: 'faq-titulo', kind: 'heading', ruleIds: ['sl-titulo-aire'],
                 content: {
-                  level: 2,
+                  level: 1,
                   segments: [
                     { text: 'Resolvamos', ruleIds: ['sl-titulo-script', 'sl-titulo-script-caja', 'sl-rotulo-color'] },
                     { text: 'tus dudas', ruleIds: ['sl-titulo-caps', 'sl-titulo-caps-encaje', 'sl-texto-oliva'] },
