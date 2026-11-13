@@ -70,14 +70,45 @@ function Ensure-RemoteDirectory([hashtable]$config, [string]$path) {
     }
 }
 
+# Un archivo NUNCA se escribe sobre su nombre definitivo.
+#
+# El 13 de noviembre de 2026 la conexion se corto a mitad de
+# `class-cod-adn-gate.php`: en el servidor quedaron 65.420 de sus 93.050 bytes,
+# PHP no pudo leerlo y santaluisadepalpi.cl respondio error 500 hasta que se
+# resubio ese archivo. Subir sobre el nombre real significa que un corte deja
+# el sitio caido.
+#
+# Ahora cada archivo sube con un nombre provisional, se comprueba su tamano y
+# recien entonces se renombra al definitivo, que es una sola operacion: o esta
+# el archivo viejo completo o esta el nuevo completo. Un corte deja un
+# `.subiendo` suelto, que no rompe nada, y se reintenta.
 function Upload-File([hashtable]$config, [string]$localPath, [string]$remotePath) {
     $bytes = [System.IO.File]::ReadAllBytes($localPath)
-    $request = New-FtpRequest (Remote-Uri $config $remotePath) ([System.Net.WebRequestMethods+Ftp]::UploadFile) $config
-    $request.ContentLength = $bytes.Length
-    $stream = $request.GetRequestStream()
-    try { $stream.Write($bytes, 0, $bytes.Length) } finally { $stream.Dispose() }
-    $response = $request.GetResponse()
-    try { return $bytes.Length } finally { $response.Dispose() }
+    $provisional = $remotePath + '.subiendo'
+    $ultimoError = $null
+    foreach ($intento in 1..3) {
+        try {
+            $request = New-FtpRequest (Remote-Uri $config $provisional) ([System.Net.WebRequestMethods+Ftp]::UploadFile) $config
+            $request.ContentLength = $bytes.Length
+            $stream = $request.GetRequestStream()
+            try { $stream.Write($bytes, 0, $bytes.Length) } finally { $stream.Dispose() }
+            $response = $request.GetResponse()
+            $response.Dispose()
+
+            $subido = Remote-FileSize $config $provisional
+            if ($subido -ne $bytes.Length) { throw "quedo incompleto: $subido de $($bytes.Length) bytes" }
+
+            $rename = New-FtpRequest (Remote-Uri $config $provisional) ([System.Net.WebRequestMethods+Ftp]::Rename) $config
+            $rename.RenameTo = '/' + $remotePath.Trim().TrimStart('/')
+            $response = $rename.GetResponse()
+            $response.Dispose()
+            return $bytes.Length
+        } catch {
+            $ultimoError = $_
+            Start-Sleep -Seconds (2 * $intento)
+        }
+    }
+    throw "No se pudo subir $remotePath despues de 3 intentos: $ultimoError"
 }
 
 function Remote-FileSize([hashtable]$config, [string]$remotePath) {
