@@ -1,0 +1,6 @@
+{
+  "mode": "append",
+  "styles": [
+    { "selector": "h1.precio-gancho", "style": { "font-size": "inherit", "font-weight": "inherit", "line-height": "inherit" } }
+  ]
+}

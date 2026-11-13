@@ -13,7 +13,7 @@
  *          "selector":".hero-family","mutation":{"attributes":{"data-foo":"1"}}}' \
  *     | node cod-headless-node-edit.mjs
  *
- * mutation admite: remove (elimina el nodo), move (lo reubica bajo otro padre), attributes (merge),
+ * mutation admite: tag (cambia la etiqueta: h1..h6, p, div, span), remove (elimina el nodo), move (lo reubica bajo otro padre), attributes (merge),
  * content (texto, solo nodos de texto),
  * addClass/removeClass (arrays de string), style (merge de reglas CSS).
  * Todo pasa por la API real de componentes de Grapes (component.addAttributes/
@@ -221,6 +221,14 @@ window.fetch=async(_url,options)=>{const body=new URLSearchParams(options.body);
           target.set('src',mutation.attributes.src);
         }
       }
+    }
+    // tag: cambia la ETIQUETA del nodo (h2→h1, h1→p) sin tocar clases, atributos
+    // ni hijos. Existe para lo que no se ve: qué elemento es el título principal
+    // de la página para un buscador. Sólo etiquetas de texto y contenedor.
+    if(typeof mutation.tag==='string'){
+      const t=mutation.tag.toLowerCase();
+      if(!['h1','h2','h3','h4','h5','h6','p','div','span'].includes(t)) throw new Error('tag no permitido: '+mutation.tag);
+      target.set('tagName',t);
     }
     if(typeof mutation.content==='string') target.components(mutation.content);
     if(Array.isArray(mutation.addClass)) mutation.addClass.forEach(c=>target.addClass(c));

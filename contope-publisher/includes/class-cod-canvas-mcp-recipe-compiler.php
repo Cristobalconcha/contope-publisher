@@ -3903,7 +3903,12 @@ final class COD_Canvas_MCP_Recipe_Compiler
             }
             $rotation = $content['rotation'];
         }
-        if (isset($content['assetUrlVertical'])
+        // Vacío es «no hay otro encuadre», no un activo inválido. Esta misma
+        // función lo devuelve como '' cuando falta, y cod_read_canvas_composition
+        // lo entrega así: rechazarlo al volver hacía imposible leer una página
+        // con imagen, cambiarle un nodo y resubmitirla (11-nov-2026, Preguntas
+        // frecuentes: pasar el título a H1 fallaba por la foto, que nadie tocó).
+        if (isset($content['assetUrlVertical']) && $content['assetUrlVertical'] !== ''
             && (!is_string($content['assetUrlVertical']) || !$this->is_safe_asset_url($content['assetUrlVertical']))) {
             return new WP_Error('cod_mcp_image_invalid', 'assetUrlVertical debe ser un activo Canvas resuelto.');
         }
@@ -4623,16 +4628,21 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 $level = $node['content']['level'];
                 $dentro = nl2br(esc_html($node['content']['text']), false);
                 if (!empty($node['content']['segments'])) {
-                    $spans = '';
+                    $spans = [];
                     foreach ($node['content']['segments'] as $tramo) {
                         $clases = [];
                         foreach ($tramo['ruleIds'] as $rule_id) {
                             $clases[] = $this->rule_class($rule_id);
                         }
-                        $spans .= '<span' . ($clases === [] ? '' : ' class="' . esc_attr(implode(' ', $clases)) . '"') . '>'
+                        $spans[] = '<span' . ($clases === [] ? '' : ' class="' . esc_attr(implode(' ', $clases)) . '"') . '>'
                             . esc_html($tramo['text']) . '</span>';
                     }
-                    $dentro = $spans;
+                    // Un espacio ENTRE tramos. En pantalla cada tramo suele ser un
+                    // bloque y el salto lo da el CSS, pero quien lee el HTML sin
+                    // dibujarlo (buscadores, IA, lectores) recibía «Agendatu visita»:
+                    // dos palabras pegadas. El texto plano del título ya se unía con
+                    // espacio; el HTML no.
+                    $dentro = implode(' ', $spans);
                 }
                 return '<h' . $level . ' ' . $attrs . '>' . $dentro . '</h' . $level . '>';
             case 'paragraph':

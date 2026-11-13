@@ -5,6 +5,24 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.88 — 13 de noviembre de 2026
+
+- **Las imágenes incrustadas ya no dependen de otro plugin para sobrevivir al guardado.** Una imagen escrita dentro de la propia página (`src="data:image/…"`, como la imagen de espera del visor de fotos) perdía el comienzo de su dirección al guardar, salvo que CookieAdmin estuviera activo: era CookieAdmin, y no ContOpe, quien le decía a WordPress que ese tipo de dirección es válida. El 13-nov-2026 CookieAdmin estaba desactivado en Santa Luisa y el primer guardado de la portada dejó al visor sin su imagen de espera; se repuso el mismo día. Ahora el permiso lo da ContOpe, sólo para imágenes y sólo en `src` y `poster`; un enlace o un `data:text/html` siguen sin pasar. Prueba nueva: `probar-imagen-incrustada.php`.
+
+---
+
+## 0.3.87 — 13 de noviembre de 2026
+
+Tres correcciones que no cambian nada de lo que se ve; salieron del trabajo de SEO de Santa Luisa.
+
+- **Los títulos de dos caras ya no salen con las palabras pegadas en el HTML (11-nov-2026).** Un título con `segments` se escribía como tramos seguidos sin nada entre ellos; en pantalla el salto lo da el CSS, pero un buscador o una IA que lee el HTML sin dibujarlo recibía «Agendatu visita». Ahora va un espacio entre tramos. Las páginas ya publicadas lo toman al volver a aplicar su composición.
+
+- **Leer una página con imagen, cambiarle un nodo y volver a entregarla ya no falla (11-nov-2026).** `cod_read_canvas_composition` devuelve `assetUrlVertical: ""` cuando la imagen no tiene un segundo encuadre, y el compilador rechazaba ese vacío al recibirlo de vuelta («assetUrlVertical debe ser un activo Canvas resuelto»). Apareció al pasar a H1 el título de Preguntas frecuentes de Santa Luisa: la foto, que nadie tocaba, impedía el cambio. Ahora vacío significa «no hay otro encuadre».
+
+- **El editor de nodos puede cambiar la etiqueta de un elemento** (`--set-tag` en `cod-grapes-runner`: h1…h6, p, div, span) sin tocar sus clases, atributos ni hijos. Sirve para decidir cuál es el título principal de la página para un buscador sin mover el diseño: en la portada de Santa Luisa el H1 pasó de «Suma la tuya» al recuadro del precio, y ambos se pintan igual que antes.
+
+---
+
 ## Sin publicar — lo que el sitio de Basis pidió para quedar gobernado por el set
 
 Cambios del plugin que sólo existen en el banco de pruebas local de Basis; no tienen número de versión hasta que se publiquen. Lo que no los usa sale **idéntico a 0.3.85** (el CSS de las definiciones de estilo es byte a byte el de siempre: comprobado contra `scripts/css-del-tema.referencia.json`).

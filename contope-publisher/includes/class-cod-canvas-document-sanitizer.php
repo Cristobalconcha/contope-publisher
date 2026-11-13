@@ -184,8 +184,39 @@ final class COD_Canvas_Document_Sanitizer
             return array_values(array_unique(array_merge($properties, self::EXTRA_STYLE_PROPERTIES)));
         };
         add_filter('safe_style_css', $filter);
-        $clean = wp_kses($html, $allowed);
+        /*
+         * Las imágenes incrustadas (`src="data:image/…"`) se conservan POR
+         * DECISIÓN DE ESTE PLUGIN, no por casualidad.
+         *
+         * WordPress no admite el esquema `data:` y `wp_kses` le quita el
+         * prefijo: `src="data:image/svg+xml;base64,…"` queda en
+         * `src="image/svg+xml;base64,…"`, una dirección que no existe. Durante
+         * meses eso no pasó en Santa Luisa porque CookieAdmin agrega `data` a
+         * los esquemas permitidos de todo el sitio; el 13-nov-2026 CookieAdmin
+         * estaba desactivado en producción y el primer guardado dejó sin
+         * imagen de espera al visor de fotos de la portada.
+         *
+         * Se permite `data` en la pasada de kses y enseguida se vuelve a
+         * quitar de todo lo que no sea una IMAGEN en `src` o `poster`: un
+         * `href="data:…"` o un `data:text/html` siguen sin pasar.
+         */
+        $protocolos = array_values(array_unique(array_merge(wp_allowed_protocols(), ['data'])));
+        $clean = wp_kses($html, $allowed, $protocolos);
         remove_filter('safe_style_css', $filter);
+
+        $clean = (string) preg_replace_callback(
+            '/(\s)([a-z][a-z0-9:-]*)(\s*=\s*)(["\'])\s*data:([^"\']*)\4/i',
+            static function (array $m): string {
+                $atributo = strtolower($m[2]);
+                $es_imagen = preg_match('#^image/(png|jpe?g|gif|webp|avif|svg\+xml)[;,]#i', $m[5]) === 1;
+                if ($es_imagen && in_array($atributo, ['src', 'poster'], true)) {
+                    return $m[0];
+                }
+                // Lo mismo que habría hecho kses sin el permiso: fuera el esquema.
+                return $m[1] . $m[2] . $m[3] . $m[4] . $m[5] . $m[4];
+            },
+            $clean
+        );
 
         return $clean;
     }

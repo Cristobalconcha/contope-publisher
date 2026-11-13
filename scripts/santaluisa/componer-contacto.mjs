@@ -203,7 +203,7 @@ const composicion = {
               kind: 'heading',
               ruleIds: ['sl-titulo-aire'],
               content: {
-                level: 2,
+                level: 1,
                 segments: [
                   { text: 'Agenda', ruleIds: ['sl-titulo-script', 'sl-titulo-script-caja', 'sl-rotulo-color'] },
                   { text: 'tu visita', ruleIds: ['sl-titulo-caps', 'sl-titulo-caps-encaje', 'sl-titulo-claro'] },
