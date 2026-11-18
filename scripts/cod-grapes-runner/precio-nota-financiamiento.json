@@ -1,0 +1,18 @@
+{
+  "mode": "append",
+  "styles": [
+    { "selector": ".precio-nota", "style": {
+      "grid-column": "1 / -1", "justify-self": "center", "max-width": "620px", "text-align": "center",
+      "font-size": "13px", "line-height": "1.5", "color": "var(--tierra-500)",
+      "border-top-width": "1px", "border-right-width": "1px", "border-bottom-width": "1px", "border-left-width": "1px",
+      "border-top-style": "solid", "border-right-style": "solid", "border-bottom-style": "solid", "border-left-style": "solid",
+      "border-top-color": "var(--dorado-600)", "border-right-color": "var(--dorado-600)", "border-bottom-color": "var(--dorado-600)", "border-left-color": "var(--dorado-600)",
+      "border-top-left-radius": "12px", "border-top-right-radius": "12px", "border-bottom-right-radius": "12px", "border-bottom-left-radius": "12px",
+      "padding-top": "12px", "padding-right": "20px", "padding-bottom": "12px", "padding-left": "20px",
+      "margin-top": "14px", "margin-bottom": "0px"
+    } }
+  ],
+  "structure": [
+    { "tag": "p", "classes": ["precio-nota"], "text": "El financiamiento puede gestionarse con el banco de su preferencia, sujeto a evaluación y a las condiciones de cada institución.", "parent": ".proyecto__grid", "at": 3 }
+  ]
+}

@@ -16,6 +16,8 @@
 .cod-mcp-gallery__item img{width:100%;height:100%;object-fit:cover;}
 .cod-mcp-gallery__item video,.cod-mcp-gallery__item figure{width:100%;height:100%;margin:0;}
 .cod-mcp-gallery__item video{object-fit:cover;display:block;}
+.cod-figura--tarjeta{display:flex;flex-direction:column;overflow:visible;}
+.cod-mcp-gallery__item.cod-figura--tarjeta img{height:auto;flex:0 0 auto;}
 .cod-video--pendiente{display:flex;align-items:center;justify-content:center;width:100%;aspect-ratio:16/9;background-color:rgba(0,0,0,0.06);opacity:.75;font-size:.8em;letter-spacing:.06em;text-transform:uppercase;}
 .cod-rot-180{transform:rotate(180deg);}
 .cod-marco-girado{position:relative;overflow:hidden;container-type:size;}

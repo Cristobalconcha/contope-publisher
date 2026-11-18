@@ -98,6 +98,12 @@ if (typeof args['set-content-file'] === 'string') {
   mutation.content = readFileSync(args['set-content-file'], 'utf8');
 }
 if (typeof args['set-tag'] === 'string') mutation.tag = args['set-tag'];
+// --move '{"before":"<selector>"}' (o after / into [+ at]): reubica el nodo con la
+// operación move del puente, la misma de scripts/mover-nodo.mjs, pero acá se
+// puede elegir la instalación con --config.
+if (typeof args.move === 'string') {
+  try { mutation.move = JSON.parse(args.move); } catch (e) { fail(`--move no es JSON válido: ${e.message}`); }
+}
 if (args.index !== undefined) mutation.index = Number.parseInt(args.index, 10) || 0;
 if (typeof args.closest === 'string' && args.closest !== '') mutation.closest = args.closest;
 if (typeof args['add-class'] === 'string') mutation.addClass = args['add-class'].split(',').map((s) => s.trim()).filter(Boolean);
@@ -119,7 +125,7 @@ if (typeof args.style === 'string') {
 // "closest" solo redirige la mutación a un ancestro: no es una acción en sí,
 // así que no cuenta para decidir si hay algo que hacer.
 if (!isBuild && Object.keys(mutation).filter((k) => k !== 'closest' && k !== 'index').length === 0) {
-  fail('No indicaste ninguna mutación. Usá --remove, --set-content, --set-tag, --add-class, --remove-class, --attributes o --style; o --build <archivo.json>.');
+  fail('No indicaste ninguna mutación. Usá --remove, --move, --set-content, --set-tag, --add-class, --remove-class, --attributes o --style; o --build <archivo.json>.');
 }
 
 // Receta de construcción: { mode?, styles?: [...], structure?: [...] }

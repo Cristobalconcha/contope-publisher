@@ -5,6 +5,15 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.89 — 18 de noviembre de 2026
+
+- **Galería de tarjetas: cada foto puede llevar título y texto.** Una imagen —suelta o dentro de una galería— admite ahora `description`, una o dos frases que explican la foto debajo de su título (`caption`). Sale como dos piezas dentro de la leyenda, cada una alcanzable por una regla: las partes `leyenda-titulo` y `leyenda-texto`. La galería suma además la parte `foto` (la imagen de cada pieza, sin su leyenda), que es donde van el redondeo y la proporción cuando hay texto debajo. Lo pidió Cristóbal para la urbanización de Santa Luisa: «que cada foto viniera con un pequeño texto debajo y con un titulito; de esa manera se explicaría el contenido y además sería indexable». Una imagen sin `description` sale exactamente igual que antes.
+- **La leyenda bajo la foto de un carrusel no se veía, y ahora la de las tarjetas sí.** La hoja base le daba a la foto el 100 % del alto de su pieza, así que la leyenda quedaba empujada fuera y recortada: estaba en el HTML y nadie la veía (pasaba con los rótulos de la urbanización de Santa Luisa). Para las tarjetas la foto ya no ocupa todo el alto y la pieza no recorta. Las galerías sin `description` no cambian.
+- **El editor de nodos puede mover un elemento eligiendo la instalación** (`--move` en `cod-grapes-runner`, con `before`, `after` o `into`). Es la misma operación de `mover-nodo.mjs`, ahora con `--config` para trabajar primero en el espejo.
+- Prueba nueva: `probar-tarjeta-de-galeria.php`.
+
+---
+
 ## 0.3.88 — 13 de noviembre de 2026
 
 - **Las imágenes incrustadas ya no dependen de otro plugin para sobrevivir al guardado.** Una imagen escrita dentro de la propia página (`src="data:image/…"`, como la imagen de espera del visor de fotos) perdía el comienzo de su dirección al guardar, salvo que CookieAdmin estuviera activo: era CookieAdmin, y no ContOpe, quien le decía a WordPress que ese tipo de dirección es válida. El 13-nov-2026 CookieAdmin estaba desactivado en Santa Luisa y el primer guardado de la portada dejó al visor sin su imagen de espera; se repuso el mismo día. Ahora el permiso lo da ContOpe, sólo para imágenes y sólo en `src` y `poster`; un enlace o un `data:text/html` siguen sin pasar. Prueba nueva: `probar-imagen-incrustada.php`.

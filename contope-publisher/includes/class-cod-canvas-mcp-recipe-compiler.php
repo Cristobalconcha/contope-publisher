@@ -345,6 +345,16 @@ final class COD_Canvas_MCP_Recipe_Compiler
                     'elegido' => null,
                     'descripcion' => 'el pie de la imagen, cuando tiene caption',
                 ],
+                'leyenda-titulo' => [
+                    'selector' => '.cod-leyenda__titulo',
+                    'elegido' => null,
+                    'descripcion' => 'el título de la leyenda, cuando el ítem trae además description (ver image). Sin description la leyenda es un solo texto y esta parte no existe',
+                ],
+                'leyenda-texto' => [
+                    'selector' => '.cod-leyenda__texto',
+                    'elegido' => null,
+                    'descripcion' => 'el texto que explica la foto, debajo del título de la leyenda (el description del ítem)',
+                ],
             ],
         ],
         /*
@@ -401,6 +411,21 @@ final class COD_Canvas_MCP_Recipe_Compiler
                     'selector' => 'figcaption',
                     'elegido' => null,
                     'descripcion' => 'el pie de cada ítem, cuando la regla gallery pide caption below u overlay',
+                ],
+                'leyenda-titulo' => [
+                    'selector' => '.cod-leyenda__titulo',
+                    'elegido' => null,
+                    'descripcion' => 'el título de la leyenda, cuando el ítem trae además description (ver image). Sin description la leyenda es un solo texto y esta parte no existe',
+                ],
+                'leyenda-texto' => [
+                    'selector' => '.cod-leyenda__texto',
+                    'elegido' => null,
+                    'descripcion' => 'el texto que explica la foto, debajo del título de la leyenda (el description del ítem)',
+                ],
+                'foto' => [
+                    'selector' => '.cod-mcp-gallery__item img',
+                    'elegido' => null,
+                    'descripcion' => 'la foto de cada pieza, sin su leyenda. En una galería de tarjetas (ítems con description) acá van el redondeo y la proporción: si fueran en la pieza, el recorte se llevaría también el texto',
                 ],
                 'flecha' => [
                     'selector' => '.cod-mcp-gallery__controls button',
@@ -937,6 +962,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
                 'assetUrlVertical' => 'opcional. El OTRO ENCUADRE, para pantalla alta (no la misma foto más chica: otro recorte). Sale como <picture> y el navegador elige por la forma de la pantalla, no por su ancho.',
                 'alt' => 'texto requerido',
                 'caption' => 'opcional',
+                'description' => 'opcional, texto plano <=600. Una o dos frases que explican la foto, debajo del caption. Con description la leyenda sale en dos piezas —título (caption) y texto— que se estilan por las partes leyenda-titulo y leyenda-texto: es lo que convierte una galería de fotos en una galería de TARJETAS, y el texto queda en el HTML, legible para un buscador.',
                 'rotation' => 'opcional, 0|90|180|270 (por defecto 0). Cuarto de vuelta de la imagen, en sentido horario. Es propiedad de la IMAGEN, no del marco: dentro de una galería cada ítem lleva el suyo, y el giro se respeta también al ampliar en el lightbox. Sirve para material de teléfono al que WordPress le borró la orientación EXIF sin girar los píxeles.',
             ]],
             'video' => ['content' => [
@@ -3884,12 +3910,13 @@ final class COD_Canvas_MCP_Recipe_Compiler
          * lo que usa el sitio), porque lo que decide cuál encuadre sirve es la
          * forma de la pantalla, no cuántos píxeles mide.
          */
-        $allowed = ['assetUrl', 'assetUrlVertical', 'alt', 'caption', 'rotation'];
+        $allowed = ['assetUrl', 'assetUrlVertical', 'alt', 'caption', 'description', 'rotation'];
         if (!$this->has_only_keys($content, $allowed) || !isset($content['assetUrl'], $content['alt'])
             || !is_string($content['assetUrl']) || !$this->is_safe_asset_url($content['assetUrl'])
             || !$this->is_plain_text($content['alt'], 1000)
-            || (isset($content['caption']) && !$this->is_plain_text($content['caption'], 2000))) {
-            return new WP_Error('cod_mcp_image_invalid', 'image requiere assetUrl resuelto y alt; caption es opcional.');
+            || (isset($content['caption']) && !$this->is_plain_text($content['caption'], 2000))
+            || (isset($content['description']) && !$this->is_plain_text($content['description'], 600))) {
+            return new WP_Error('cod_mcp_image_invalid', 'image requiere assetUrl resuelto y alt; caption y description (texto plano, hasta 600) son opcionales.');
         }
         // rotation es propiedad de la IMAGEN, no del marco: dentro de una galería
         // puede haber un item girado y el resto derecho, y el giro tiene que
@@ -3917,6 +3944,7 @@ final class COD_Canvas_MCP_Recipe_Compiler
             'assetUrlVertical' => isset($content['assetUrlVertical']) ? $content['assetUrlVertical'] : '',
             'alt' => $content['alt'],
             'caption' => isset($content['caption']) ? $content['caption'] : '',
+            'description' => isset($content['description']) ? $content['description'] : '',
             'rotation' => $rotation,
         ];
     }
@@ -5127,6 +5155,16 @@ final class COD_Canvas_MCP_Recipe_Compiler
     private function render_image(array $content, string $attrs): string
     {
         $caption = $content['caption'] !== '' ? '<figcaption>' . esc_html($content['caption']) . '</figcaption>' : '';
+        // Con description la leyenda es una TARJETA: título y texto, cada uno
+        // con su clase para que una regla lo alcance (partes leyenda-titulo y
+        // leyenda-texto). Sin description sale como siempre, un solo texto: lo
+        // ya publicado no cambia ni un carácter.
+        $descripcion = isset($content['description']) ? (string) $content['description'] : '';
+        if ($descripcion !== '') {
+            $caption = '<figcaption>'
+                . ($content['caption'] !== '' ? '<span class="cod-leyenda__titulo">' . esc_html($content['caption']) . '</span> ' : '')
+                . '<span class="cod-leyenda__texto">' . esc_html($descripcion) . '</span></figcaption>';
+        }
         // El giro se estampa en la propia <img>: como clase (para que la página
         // se vea bien sin JavaScript) y como data-* (para que el lightbox pueda
         // reponerlo al ampliar, ya que ahí solo se copian src y alt).
@@ -5144,7 +5182,10 @@ final class COD_Canvas_MCP_Recipe_Compiler
             $img = '<picture><source media="(max-aspect-ratio: 4 / 5)" srcset="'
                 . esc_url($content['assetUrlVertical']) . '">' . $img . '</picture>';
         }
-        return '<figure ' . $this->add_class_to_attrs($attrs, $marco) . '>' . $img . $caption . '</figure>';
+        // La tarjeta se marca en la figura: la hoja base la trata distinto (ver
+        // base_styles: la foto no se estira sobre la leyenda ni la recorta).
+        $tarjeta = $descripcion !== '' ? ' cod-figura--tarjeta' : '';
+        return '<figure ' . $this->add_class_to_attrs($attrs, $marco . $tarjeta) . '>' . $img . $caption . '</figure>';
     }
 
     /**
@@ -5878,6 +5919,12 @@ final class COD_Canvas_MCP_Recipe_Compiler
             . ".cod-mcp-gallery__item img{width:100%;height:100%;object-fit:cover;}\n"
             . ".cod-mcp-gallery__item video,.cod-mcp-gallery__item figure{width:100%;height:100%;margin:0;}\n"
             . ".cod-mcp-gallery__item video{object-fit:cover;display:block;}\n"
+            // La TARJETA (foto + título + texto, ítems con description): la foto no
+            // puede medir el 100% del alto de la pieza, porque entonces empuja la
+            // leyenda fuera y el overflow la recorta. Era lo que pasaba con toda
+            // leyenda «below» dentro de un carrusel: existía en el HTML y no se veía.
+            . ".cod-figura--tarjeta{display:flex;flex-direction:column;overflow:visible;}\n"
+            . ".cod-mcp-gallery__item.cod-figura--tarjeta img{height:auto;flex:0 0 auto;}\n"
             . ".cod-video--pendiente{display:flex;align-items:center;justify-content:center;width:100%;aspect-ratio:16/9;background-color:rgba(0,0,0,0.06);opacity:.75;font-size:.8em;letter-spacing:.06em;text-transform:uppercase;}\n"
             // Giro de la imagen. 180 no cambia la forma de la caja, así que basta
             // el transform. 90 y 270 sí la cambian: la imagen girada necesita
