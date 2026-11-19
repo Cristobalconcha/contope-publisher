@@ -6907,6 +6907,16 @@ final class COD_Canvas_MCP_Recipe_Compiler
             $css = $selector . '{display:block;}'
                 . $selector . ' .cod-carousel__track{display:flex;overflow-x:auto;gap:' . $gap . ';scroll-snap-type:x mandatory;}'
                 . $selector . ' .cod-carousel__track .cod-mcp-gallery__item{flex:0 0 calc((100% - ' . (($columns - 1) * 1) . '*' . $gap . ')/' . $columns . ');scroll-snap-align:start;}';
+            // Con flechas (o flechas y puntos) la barra de desplazamiento del
+            // navegador sobra: se ve una barra gris bajo las fotos, encima de
+            // los controles propios. El carril sigue desplazándose con el dedo,
+            // el trackpad y el teclado. Sin controles la barra se queda: es la
+            // única señal de que hay más fotos. (Cristóbal, 18-nov-2026: «hay
+            // que sacar el scrollbar de las tarjetas».)
+            if (($value['controls'] ?? 'none') !== 'none') {
+                $css .= $selector . ' .cod-carousel__track{scrollbar-width:none;}'
+                    . $selector . ' .cod-carousel__track::-webkit-scrollbar{display:none;}';
+            }
         } else {
             $css = $selector . '{display:grid;grid-template-columns:repeat(' . $columns . ',minmax(0,1fr));gap:' . $gap . ';}';
             if ($value['mode'] === 'metro') {

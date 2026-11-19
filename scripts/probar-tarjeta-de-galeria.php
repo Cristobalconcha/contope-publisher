@@ -92,6 +92,31 @@ $r = $compilar($composicion([['assetUrl' => $foto, 'alt' => 'x', 'caption' => 'T
 $salida = is_wp_error($r) ? '' : (string) $r['storage']['markup'];
 $comprobar('un description con marcado no se interpreta: sale escapado o se rechaza', is_wp_error($r) || (strpos($salida, '<b>') === false && strpos($salida, '&lt;b&gt;') !== false));
 
+echo "\n== la barra del navegador en el carrusel ==\n";
+// 18-nov-2026: bajo las tarjetas se veía la barra gris del navegador, encima
+// de las flechas. Con controles se oculta; sin controles se queda.
+$carrusel = static function (string $controles) use ($compilador, $diseno, $composicion, $foto, $regla) {
+    $d = $diseno;
+    $d['rules'][0]['value'] = ['mode' => 'carousel', 'columns' => 4, 'mobileColumns' => 1, 'gap' => '12px', 'caption' => 'below', 'controls' => $controles];
+    $comp = $composicion([
+        ['assetUrl' => $foto, 'alt' => 'a', 'caption' => 'A'],
+        ['assetUrl' => $foto, 'alt' => 'b', 'caption' => 'B'],
+    ]);
+    if ($controles !== 'none') {
+        // Los controles exigen su regla de comportamiento en el mismo nodo.
+        $d['rules'][] = $regla('g-carrusel', 'interaction', ['behavior' => 'carousel-basic', 'mode' => 'track', 'visible' => 4, 'visibleMobile' => 1]);
+        $comp['nodes'][0]['children'][0]['ruleIds'][] = 'g-carrusel';
+    }
+    $r = $compilador->compile($comp, $d);
+    return is_wp_error($r) ? $r : (string) $r['storage']['styles'];
+};
+$css = $carrusel('arrows');
+$comprobar('con flechas, la barra se oculta', is_string($css)
+    && strpos($css, '.cod-carousel__track{scrollbar-width:none;}') !== false
+    && strpos($css, '.cod-carousel__track::-webkit-scrollbar{display:none;}') !== false, is_wp_error($css) ? $css->get_error_message() : '');
+$css = $carrusel('none');
+$comprobar('sin controles, la barra se queda', is_string($css) && strpos($css, 'scrollbar-width') === false, is_wp_error($css) ? $css->get_error_message() : '');
+
 echo "\n== la hoja base ==\n";
 $base = file_get_contents(__DIR__ . '/../contope-publisher/assets/css/cod-canvas-base.css');
 $comprobar('la tarjeta no recorta su leyenda', strpos($base, '.cod-figura--tarjeta{display:flex;flex-direction:column;overflow:visible;}') !== false);

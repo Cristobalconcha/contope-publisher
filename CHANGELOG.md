@@ -5,6 +5,12 @@ de quien lo escribe. Lo más nuevo, arriba.
 
 ---
 
+## 0.3.90 — 18 de noviembre de 2026
+
+- **Un carrusel con flechas ya no muestra la barra de desplazamiento del navegador.** Bajo las fotos aparecía una barra gris, encima de las flechas propias del carrusel. Con controles (`arrows` o `arrows-and-dots`) la barra se oculta; el carril sigue moviéndose con el dedo, el trackpad y el teclado. Un carrusel sin controles la conserva, porque es su única señal de que hay más fotos. Lo pidió Cristóbal al ver las tarjetas de urbanización de Santa Luisa. Una página ya publicada lo toma al volver a compilarse.
+
+---
+
 ## 0.3.89 — 18 de noviembre de 2026
 
 - **Galería de tarjetas: cada foto puede llevar título y texto.** Una imagen —suelta o dentro de una galería— admite ahora `description`, una o dos frases que explican la foto debajo de su título (`caption`). Sale como dos piezas dentro de la leyenda, cada una alcanzable por una regla: las partes `leyenda-titulo` y `leyenda-texto`. La galería suma además la parte `foto` (la imagen de cada pieza, sin su leyenda), que es donde van el redondeo y la proporción cuando hay texto debajo. Lo pidió Cristóbal para la urbanización de Santa Luisa: «que cada foto viniera con un pequeño texto debajo y con un titulito; de esa manera se explicaría el contenido y además sería indexable». Una imagen sin `description` sale exactamente igual que antes.
